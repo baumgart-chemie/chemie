@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chemisches Rechnen</title>
+<style>
+:root{
+  --bg:#14171a; --panel:#1b1f23; --panel-alt:#20252a; --raise:#262c32;
+  --line:#31383e; --line-soft:#262c31;
+  --text:#e7e4dd; --text-dim:#9aa2a9; --text-faint:#5f6870;
+  --amber:#ffb454; --amber-dim:#8a6535;
+  --teal:#4fd1c5; --teal-dim:#2c5b56;
+  --good:#7fd68a;
+  --danger:#e4785b; --danger-dim:#6b3a2d;
+  --screen:#0e1113; --grid:#233029;
+  --radius:3px;
+  color-scheme: dark;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{margin:0; background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; -webkit-font-smoothing:antialiased; padding-left:env(safe-area-inset-left); padding-right:env(safe-area-inset-right);}
+.mono{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-variant-numeric:tabular-nums;}
+h1,h2,h3{font-weight:600; margin:0;}
+sub{font-size:.75em;}
+
+header{padding:22px 28px 18px; border-bottom:1px solid var(--line); display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;}
+header h1{font-size:20px; letter-spacing:.2px;}
+header .tag{color:var(--text-dim); font-size:13.5px;}
+header .status{margin-left:auto; font-size:12.5px; padding:4px 10px; border:1px solid var(--line); border-radius:20px; color:var(--text-dim); display:flex; align-items:center; gap:7px;}
+header .status .dot{width:7px;height:7px;border-radius:50%;background:var(--text-faint);}
+header .status.running .dot{background:var(--amber); box-shadow:0 0 6px var(--amber);}
+header .status.running{color:var(--amber); border-color:var(--amber-dim);}
+header .status.done .dot{background:var(--teal); box-shadow:0 0 6px var(--teal);}
+header .status.done{color:var(--teal); border-color:var(--teal-dim);}
+header .status.shown .dot{background:var(--danger);}
+header .status.shown{color:var(--danger); border-color:var(--danger-dim);}
+.back-btn{
+  display:inline-flex; align-items:center; gap:6px; align-self:center; color:var(--text-dim); font-size:13px; text-decoration:none;
+  border:1px solid var(--line); border-radius:var(--radius); background:var(--panel-alt); padding:5px 11px 5px 9px; white-space:nowrap;
+}
+.back-btn:hover{color:var(--text); border-color:var(--text-faint);}
+.back-btn:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.back-btn .ar{color:var(--teal); font-size:14px; line-height:1;}
+.guide-link{color:var(--teal); font-size:13.5px; text-decoration:none; border-bottom:1px solid var(--teal-dim); padding-bottom:1px;}
+.guide-link:hover{border-bottom-color:var(--teal);}
+@media (max-width:600px){ header{padding:18px 16px 14px;} }
+
+.modal-backdrop{display:none; position:fixed; inset:0; background:rgba(8,10,12,.7); z-index:100; align-items:center; justify-content:center; padding:24px 16px;}
+.modal-backdrop.open{display:flex;}
+.modal-box{background:var(--panel); border:1px solid var(--line); border-radius:5px; width:100%; max-width:660px; max-height:82vh; overflow-y:auto; padding:22px 26px 26px;}
+.modal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;}
+.modal-head h2{font-size:17px;}
+.modal-close{background:none; border:none; color:var(--text-dim); font-size:22px; line-height:1; cursor:pointer; padding:2px 6px;}
+.modal-close:hover{color:var(--text);}
+.modal-body h3{font-size:13.5px; color:var(--amber); margin:18px 0 6px; font-weight:600;}
+.modal-body h3:first-child{margin-top:0;}
+.modal-body p, .modal-body li{font-size:13.5px; line-height:1.6; color:var(--text-dim); margin:0 0 6px;}
+.modal-body ol, .modal-body ul{padding-left:20px; margin:0 0 6px;}
+.modal-body strong, .modal-body li strong{color:var(--text); font-weight:600;}
+.formula-box{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:13px; color:var(--text); background:var(--screen); border:1px solid var(--line-soft); border-radius:4px; padding:10px 12px; margin:6px 0 8px; overflow-x:auto; white-space:nowrap; line-height:1.7;}
+.vh-ver{display:flex; align-items:baseline; gap:10px; margin:18px 0 6px;}
+.vh-ver:first-child{margin-top:0;}
+.vh-ver .v{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:13px; color:var(--amber); border:1px solid var(--amber-dim); border-radius:var(--radius); padding:1px 7px;}
+.vh-ver .d{font-size:12px; color:var(--text-faint);}
+
+.wrap{display:grid; grid-template-columns: 350px 1fr; gap:0; align-items:start;}
+@media (max-width:920px){ .wrap{grid-template-columns:1fr;} }
+.sidebar{border-right:1px solid var(--line); padding:20px 20px 60px; max-height:calc(100vh - 70px); overflow-y:auto;}
+@media (max-width:920px){ .sidebar{border-right:none; border-bottom:1px solid var(--line); max-height:none; padding-bottom:24px;} }
+.main{padding:20px 24px 60px; min-width:0;}
+@media (max-width:600px){ .sidebar{padding:18px 16px 24px;} .main{padding:18px 16px 50px;} }
+
+section.block{margin-bottom:26px;}
+.block h2{font-size:12.5px; color:var(--text-dim); font-weight:600; padding-bottom:8px; border-bottom:1px solid var(--line-soft); margin-bottom:14px; letter-spacing:.2px;}
+.sub-label{font-size:13px; color:var(--text-dim); margin:0 0 6px;}
+
+.mode-toggle{display:flex; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; margin-bottom:12px;}
+.mode-toggle button{flex:1; background:var(--panel-alt); color:var(--text-dim); border:none; padding:8px 4px; font-size:12.5px; cursor:pointer; font-family:inherit; min-width:0;}
+.mode-toggle button + button{border-left:1px solid var(--line);}
+.mode-toggle button.active{background:var(--teal-dim); color:var(--text);}
+.mode-toggle button:focus-visible{outline:2px solid var(--teal); outline-offset:-2px;}
+.mode-toggle.big button{padding:10px 4px; font-size:12px; font-weight:500; line-height:1.3;}
+.mode-toggle.small{margin:0;}
+.mode-toggle.small button{padding:6px 10px; font-size:12px; flex:none;}
+
+.check-row{display:flex; align-items:flex-start; gap:9px; font-size:13px; color:var(--text-dim); margin-bottom:10px; cursor:pointer; line-height:1.4;}
+.check-row input{accent-color:var(--teal); width:15px; height:15px; margin:1px 0 0; flex:none;}
+
+.btn{border-radius:var(--radius); border:1px solid var(--line); background:var(--panel-alt); color:var(--text); font-size:13px; padding:8px 14px; cursor:pointer; font-family:inherit; font-weight:500;}
+.btn:hover{border-color:var(--text-faint);}
+.btn.primary{background:var(--teal); border-color:var(--teal); color:#0d1614;}
+.btn.primary:hover{filter:brightness(1.08);}
+.btn.ghost{background:transparent;}
+.btn.check-btn{padding:7px 14px; font-size:13px; border-color:var(--teal-dim); color:var(--teal);}
+.btn.check-btn:hover:not(:disabled){border-color:var(--teal); background:var(--teal-dim); color:var(--text);}
+.btn:disabled{opacity:.4; cursor:not-allowed;}
+.btn:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+
+/* PSE */
+.pse{display:grid; grid-template-columns:14px repeat(8,minmax(0,1fr)); gap:2px;}
+.pse.tm{grid-template-columns:14px repeat(6,minmax(0,1fr)); margin-top:8px;}
+.pse .hd{font-size:9.5px; color:var(--text-faint); text-align:center; padding:2px 0; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.pse .rh{font-size:9.5px; color:var(--text-faint); display:flex; align-items:center; justify-content:center; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.pse .cell{position:relative; background:var(--panel-alt); border:1px solid var(--line-soft); border-radius:2px; height:44px; padding:0; cursor:pointer; color:var(--text); font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; display:flex; flex-direction:column; align-items:center; justify-content:center; min-width:0;}
+.pse .cell:hover{border-color:var(--text-faint);}
+.pse .cell:focus-visible{outline:2px solid var(--teal); outline-offset:1px;}
+.pse .cell .z{position:absolute; left:3px; top:1px; font-size:8.5px; color:var(--text-dim);}
+.pse .cell .sy{font-size:14px; font-weight:600; line-height:1; margin-top:4px;}
+.pse .cell .ms{font-size:8.5px; color:var(--amber); line-height:1; margin-top:4px; white-space:nowrap;}
+.pse .cell.nm{background:#1a2a29;}
+.pse .cell.nm .sy{color:#bfe9e3;}
+.pse .cell.hm{background:#29251d;}
+.pse .cell.hm .sy{color:#f1d6ae;}
+.pse .cell.eg{background:#22222b;}
+.pse .cell.eg .sy{color:var(--text-dim);}
+.pse .cell.sel{border-color:var(--teal); box-shadow:0 0 0 1px var(--teal-dim);}
+.pse .legend{grid-column:3 / span 6; font-size:10.5px; color:var(--text-faint); line-height:1.35; display:flex; align-items:center; justify-content:center; text-align:center; padding:0 4px;}
+.tm-lbl{font-size:10.5px; color:var(--text-faint); margin-top:10px;}
+.pse-info{margin-top:8px; font-size:12.5px; color:var(--text-dim); min-height:36px; line-height:1.45; background:var(--screen); border:1px solid var(--line-soft); border-radius:4px; padding:7px 10px;}
+.pse-info b{color:var(--text); font-weight:600;}
+.pse-info .a{color:var(--amber); font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+
+.lib-wrap{border:1px solid var(--line-soft); border-radius:4px; overflow:hidden;}
+.lib-table{width:100%; border-collapse:collapse; font-size:12.5px;}
+.lib-table td{padding:5px 8px; border-bottom:1px solid var(--line-soft); color:var(--text-dim); line-height:1.4;}
+.lib-table td.k{color:var(--amber); font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; width:1%; white-space:nowrap;}
+.lib-table tr.grp td{color:var(--text-faint); font-size:10.5px; letter-spacing:.4px; text-transform:uppercase; padding-top:10px; background:var(--bg);}
+.lib-table tr:last-child td{border-bottom:none;}
+details.rules{margin-bottom:26px;}
+details.rules summary{list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:12.5px; color:var(--text-dim); font-weight:600; padding:8px 10px; border:1px solid var(--line); border-radius:var(--radius); background:var(--panel-alt); letter-spacing:.2px;}
+details.rules summary::-webkit-details-marker{display:none;}
+details.rules summary:hover{border-color:var(--text-faint); color:var(--text);}
+details.rules summary:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+details.rules .rules-state{font-weight:500; color:var(--teal); font-size:12px;}
+details.rules .rules-state::after{content:"anzeigen +";}
+details.rules[open] .rules-state::after{content:"ausblenden −";}
+details.rules[open] summary{margin-bottom:12px;}
+.note{font-size:12px; color:var(--text-faint); line-height:1.5; margin-top:10px; max-width:62ch;}
+
+/* Aufgabe */
+.screen-card{border:1px solid var(--line); background:var(--screen); border-radius:4px; padding:14px 14px 6px;}
+.screen-top{display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap;}
+.help-wrap{margin-left:auto; display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text-faint);}
+@media (max-width:700px){ .help-wrap{margin-left:0; width:100%;} }
+.task-meta{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px;}
+.task-num{font-size:11.5px; color:var(--text-faint);}
+.chip{font-size:11px; padding:2px 8px; border-radius:20px; border:1px solid var(--line); color:var(--text-dim);}
+.chip.l1{color:var(--good); border-color:#35573a;}
+.chip.l2{color:var(--amber); border-color:var(--amber-dim);}
+.chip.l3{color:var(--danger); border-color:var(--danger-dim);}
+.task-ctx{font-size:12.5px; color:var(--text-faint);}
+.task-text{font-size:16px; line-height:1.6; color:var(--text); margin:4px 0 6px; max-width:80ch;}
+.task-text b{color:var(--amber); font-weight:600; white-space:nowrap;}
+.eqbox{display:inline-block; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:16px; color:var(--text); background:var(--panel); border:1px solid var(--line-soft); border-left:3px solid var(--amber-dim); border-radius:4px; padding:7px 14px; margin:6px 0 4px;}
+
+.work-grid{display:grid; grid-template-columns:minmax(0,1fr) 270px; gap:14px; align-items:start; margin:14px 0 4px;}
+@media (max-width:1050px){ .work-grid{grid-template-columns:1fr;} }
+.steps-col{display:flex; flex-direction:column; gap:10px;}
+.stepbox{border:1px solid var(--line-soft); border-radius:4px; padding:10px 12px 12px; background:var(--panel); transition:opacity .15s;}
+.stepbox.active{border-color:var(--teal-dim);}
+.stepbox.locked{opacity:.42;}
+.stepbox .sh{display:flex; align-items:baseline; justify-content:space-between; gap:8px; font-size:12.5px; color:var(--text-dim); font-weight:600; letter-spacing:.2px;}
+.stepbox .sh .n{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; color:var(--amber); border:1px solid var(--amber-dim); border-radius:var(--radius); padding:0 6px; margin-right:8px; font-size:11px;}
+.stepbox .sh .lbl{color:var(--text-dim);}
+.stepbox .sh .st{font-weight:500; font-size:11.5px; color:var(--text-faint); white-space:nowrap;}
+.stepbox.passed .sh .st{color:var(--good);}
+.stepbox.passed .sh .n{color:var(--good); border-color:#35573a;}
+.stepbox .hlp{font-size:12.5px; color:var(--text-dim); line-height:1.5; margin:7px 0 0;}
+.stepbox .fml{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:13px; color:var(--amber); background:var(--screen); border:1px solid var(--line-soft); border-radius:3px; padding:5px 9px; margin:7px 0 0; display:inline-block; line-height:1.55;}
+.in-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:10px;}
+.in-row .eqs{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; color:var(--text); font-size:14.5px; font-weight:600;}
+.in-row .u{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; color:var(--text-dim); font-size:14px; white-space:nowrap; min-width:42px;}
+.in-row .pow{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; color:var(--text-dim); font-size:14px;}
+.in-row .spacer{flex:1;}
+input.num-in{width:150px; background:var(--panel-alt); border:1px solid var(--line); color:var(--text); padding:7px 10px; border-radius:var(--radius); font-size:16px; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; text-align:right;}
+input.num-in.exp{width:62px;}
+input.num-in:focus{outline:2px solid var(--teal-dim); outline-offset:1px;}
+input.num-in.ok{border-color:var(--teal); box-shadow:0 0 0 1px var(--teal-dim); color:var(--teal);}
+input.num-in.bad{border-color:var(--danger); box-shadow:0 0 0 1px var(--danger-dim);}
+input.num-in:disabled{opacity:.6;}
+.choice{display:flex; gap:8px; flex-wrap:wrap;}
+.choice button{background:var(--panel-alt); color:var(--text-dim); border:1px solid var(--line); border-radius:var(--radius); padding:8px 14px; font-size:13.5px; cursor:pointer; font-family:inherit;}
+.choice button.sel{border-color:var(--teal); color:var(--text); background:var(--teal-dim);}
+.choice button.bad{border-color:var(--danger);}
+.choice button:disabled{cursor:default;}
+
+.qpanel{border:1px solid var(--line-soft); border-radius:4px; background:var(--panel); padding:10px 12px 12px; position:sticky; top:12px;}
+.qpanel .qh{font-size:10.5px; color:var(--text-faint); letter-spacing:.4px; text-transform:uppercase; margin:12px 0 6px;}
+.qpanel .qh:first-child{margin-top:0;}
+.qrow{display:flex; justify-content:space-between; gap:10px; font-size:13px; padding:3px 0; border-bottom:1px dashed var(--line-soft); line-height:1.4;}
+.qrow:last-child{border-bottom:none;}
+.qrow .qs{color:var(--text-dim); font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.qrow .qv{color:var(--text); font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; text-align:right;}
+.qrow .qv.t{color:var(--teal);}
+.qrow .qv.w{color:var(--amber);}
+.qpanel .qnote{font-size:12px; color:var(--text-faint); line-height:1.45;}
+
+.feedback{display:flex; flex-direction:column; gap:6px; margin:14px 0 4px;}
+.fb{font-size:13px; line-height:1.55; padding:8px 11px; border-radius:4px; border:1px solid var(--line-soft); background:var(--panel);}
+.fb.good{color:var(--good); border-color:#35573a;}
+.fb.bad{color:var(--danger); border-color:var(--danger-dim);}
+.fb.hint{color:var(--amber); border-color:var(--amber-dim);}
+.fb.info{color:var(--text-dim);}
+.fb.notype{font-size:15px; padding:16px 18px; line-height:1.6;}
+.fb .m{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; color:var(--text);}
+
+.readout-bar{display:flex; gap:26px; padding:12px 4px 12px; flex-wrap:wrap; border-top:1px solid var(--line-soft); margin-top:12px;}
+.readout{display:flex; flex-direction:column; gap:2px;}
+.readout .k{font-size:10.5px; color:var(--text-faint);}
+.readout .v{font-size:15px; color:var(--amber);}
+
+.tabs{display:flex; gap:2px; margin:26px 0 0; border-bottom:1px solid var(--line); overflow-x:auto;}
+.tabs button{background:none; border:none; color:var(--text-dim); font-size:13px; padding:9px 4px; margin-right:22px; cursor:pointer; font-family:inherit; border-bottom:2px solid transparent; font-weight:500; white-space:nowrap;}
+.tabs button.active{color:var(--text); border-bottom-color:var(--amber);}
+.tabpanel{display:none; padding-top:18px;}
+.tabpanel.active{display:block;}
+.empty-hint{color:var(--text-faint); font-size:13px; padding:22px 4px;}
+
+.steps{display:flex; flex-direction:column; border:1px solid var(--line-soft); border-radius:4px; background:var(--screen);}
+.step{display:grid; grid-template-columns:28px 190px 1fr; gap:10px; padding:10px 14px; border-bottom:1px solid var(--line-soft); font-size:13.5px; line-height:1.6; align-items:baseline;}
+.step:last-child{border-bottom:none;}
+.step .n{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; color:var(--text-faint); font-size:12px;}
+.step .h{color:var(--text-dim);}
+.step .b{color:var(--text);}
+.step .b .t{color:var(--teal); font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.step .b .m{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.step .b .sm{color:var(--text-dim); font-size:12.5px; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.step.final .b{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:17px; color:var(--teal);}
+@media (max-width:600px){ .step{grid-template-columns:22px 1fr;} .step .b{grid-column:2;} }
+
+.table-wrap{overflow-x:auto; border:1px solid var(--line-soft); border-radius:4px;}
+table.hist{width:100%; border-collapse:collapse; font-size:12.8px;}
+table.hist thead th{text-align:left; font-weight:500; color:var(--text-faint); font-size:11px; padding:6px 8px; border-bottom:1px solid var(--line); white-space:nowrap;}
+table.hist td{padding:7px 8px; border-bottom:1px solid var(--line-soft); white-space:nowrap;}
+.s-first{color:var(--good);} .s-ok{color:var(--teal);} .s-help{color:var(--amber);} .s-shown{color:var(--danger);} .s-open{color:var(--text-faint); font-style:italic;}
+
+footer{padding:16px 28px 30px; color:var(--text-faint); font-size:11.5px; border-top:1px solid var(--line-soft); margin-top:10px;}
+footer p{margin:0;}
+footer a{color:var(--text-dim); text-decoration:none; border-bottom:1px solid var(--line);}
+footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
+footer .footer-credit{margin-top:8px; color:var(--text-dim);}
+@media (max-width:600px){ footer{padding:16px 16px 30px;} }
+::-webkit-scrollbar{width:9px; height:9px;}
+::-webkit-scrollbar-thumb{background:var(--line); border-radius:5px;}
+@media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+
+/* Linke Spalte: steht beim Scrollen still und scrollt als Ganzes (ein einziger Scrollbereich) */
+@media (min-width:921px){
+  .sidebar{
+    position:sticky; top:0; align-self:start;
+    height:calc(100vh - var(--hdr, 70px)); height:calc(100dvh - var(--hdr, 70px)); max-height:none;
+    overflow-y:auto; overscroll-behavior:contain; background:var(--bg);
+  }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="../index.html" class="back-btn" title="Zur Übersicht aller Simulationen"><span class="ar" aria-hidden="true">←</span>Zurück</a>
+  <h1>Chemisches Rechnen</h1>
+  <span class="tag">Stoffmenge, Masse, Volumen und Konzentration</span>
+  <a href="#" class="guide-link" id="btnGuide">Anleitung</a>
+  <span class="status running" id="statusBadge"><span class="dot"></span><span id="statusText">Aufgabe offen</span></span>
+</header>
+
+<div class="modal-backdrop" id="guideBackdrop">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+    <div class="modal-head">
+      <h2 id="guideTitle">Anleitung</h2>
+      <button class="modal-close" id="closeGuide" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body">
+      <h3>Worum es geht</h3>
+      <p>Du übst die wichtigsten Rechnungen der Chemie: <strong>molare Masse</strong>, <strong>Stoffmenge</strong>, <strong>Masse</strong>, <strong>Gasvolumen</strong> und <strong>Stoffmengenkonzentration</strong>. Jede Aufgabe ist in <strong>Teilschritte</strong> zerlegt. Jeder Teilschritt hat einen eigenen <strong>Prüfen-Knopf</strong> und muss richtig sein, bevor der nächste freigeschaltet wird. Die Aufgabe ist gelöst, wenn alle Schritte geprüft und richtig sind.</p>
+
+      <h3>Die drei Übungsarten</h3>
+      <ol>
+        <li><strong>Grundrechnungen</strong>: kurze Rechnungen mit einer Größengleichung, z. B. n = m / M, mit dem Volumen von Flüssigkeiten über die Dichte (m = ρ · V) und mit Konzentration, Stoffmenge und Volumen von Lösungen (c = n / V, n = c · V, V = n / c). Links wählst du aus, welche Größen vorkommen sollen.</li>
+        <li><strong>Einfache Textaufgaben</strong>: kleine Sachaufgaben mit zwei bis fünf Rechenschritten, z. B. Masse → Stoffmenge → Gasvolumen, Stoffmenge, Konzentration oder Volumen einer Lösung mit n = c · V oder eine Reaktion im Verhältnis 1 : 1.</li>
+        <li><strong>Komplexe Textaufgaben</strong>: Aufgaben mit Reaktionsgleichung und Stoffmengenverhältnis, Verdünnen und Mischen von Lösungen, Ausbeute, Reinheit sowie begrenzendem Stoff und Überschuss.</li>
+      </ol>
+
+      <p>Ist kein Aufgabentyp angehakt, startet keine Aufgabe. Hake dann links mindestens einen Typ an.</p>
+
+      <h3>Hilfen im Lösungsweg</h3>
+      <p>Oben in der Aufgabe stellst du ein, wie viel Hilfe du bekommst. Beim Start sind die Hilfen ausgeschaltet.</p>
+      <ul>
+        <li><strong>Aus</strong>: Du siehst nur, welche Größe im Schritt berechnet wird. Gegeben und Gesucht musst du selbst aus dem Text herausschreiben.</li>
+        <li><strong>Hinweise</strong>: Zu jedem Schritt steht, was zu tun ist. Rechts werden Gegeben und Gesucht aufgelistet.</li>
+        <li><strong>+ Formeln</strong>: Zusätzlich steht bei jedem Schritt die passende Größengleichung.</li>
+      </ul>
+      <p>Der Knopf <strong>Tipp</strong> hilft beim aktuellen Schritt in Stufen weiter (Hinweis, Formel, Ansatz mit Zahlen). Mit Tipp gelöste Aufgaben zählen nicht als „im 1. Versuch“. <strong>Lösung zeigen</strong> beendet die Aufgabe ohne Wertung.</p>
+
+      <h3>Eingabe und Prüfung</h3>
+      <ul>
+        <li>Kommazahlen mit Komma oder Punkt eingeben, ohne Tausenderpunkte. <strong>Enter</strong> prüft den aktuellen Schritt.</li>
+        <li>Rechne mit mindestens <strong>drei gültigen Ziffern</strong>. Kleine Rundungsabweichungen (bis etwa 1,5 %) werden akzeptiert.</li>
+        <li>Teilchenanzahlen gibst du als Zahl und Zehnerpotenz ein: 3,01 · 10<sup>23</sup> → 3,01 und 23.</li>
+        <li>Die Prüfung rechnet mit <strong>deinen eigenen</strong> Zwischenergebnissen weiter. Ein leicht anders gerundeter Wert führt also nicht zu Folgefehlern.</li>
+        <li>Typische Fehler werden erkannt, z. B. vertauschte Brüche, vergessene Umrechnung von mL in L, fehlende Koeffizienten aus der Reaktionsgleichung oder das falsche molare Volumen.</li>
+      </ul>
+
+      <h3>Rechenwerte</h3>
+      <p>Die Atommassen stehen im PSE links. Bei „Rechnen mit Atommassen“ stellst du ein, ob mit einer Nachkommastelle oder mit gerundeten Werten gerechnet wird. Beide Varianten werden bei der Prüfung akzeptiert.</p>
+      <div class="formula-box">V<sub>m</sub> = 22,4 L/mol (0 °C, 1013 hPa) &nbsp;·&nbsp; V<sub>m</sub> = 24,0 L/mol (20 °C, 1013 hPa)<br>N<sub>A</sub> = 6,022 · 10<sup>23</sup> mol<sup>−1</sup></div>
+      <p>Welches molare Volumen gilt, steht immer in der Aufgabe. Die wichtigsten Formeln findest du links unter „Formelsammlung“. Der Tab <strong>Lösungsweg</strong> zeigt nach dem Lösen alle Schritte, der <strong>Verlauf</strong> listet die Aufgaben dieser Sitzung.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="changelogBackdrop">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="changelogTitle">
+    <div class="modal-head">
+      <h2 id="changelogTitle">Versionshinweise</h2>
+      <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.0</span><span class="d">01.11.2026</span></div>
+      <ul>
+        <li><strong>Erste Version</strong> mit drei Übungsarten: Grundrechnungen, einfache Textaufgaben und komplexe Textaufgaben.</li>
+        <li><strong>Grundrechnungen</strong> zu molarer Masse, Stoffmenge, Masse, Gasvolumen, Volumen von Flüssigkeiten (Dichte), Konzentration, Stoffmenge und Volumen von Lösungen (c = n / V, n = c · V, V = n / c) sowie optional zur Teilchenanzahl.</li>
+        <li><strong>Einfache Textaufgaben</strong> zu Gasen, Lösungen (u. a. n = c · V), Teilchenanzahl und Reaktionen im Verhältnis 1 : 1.</li>
+        <li><strong>Komplexe Textaufgaben</strong> zu Reaktionen mit Massen und Gasen, Verdünnen und Mischen von Lösungen, Ausbeute, Reinheit sowie begrenzendem Stoff und Überschuss.</li>
+        <li>Jeder Teilschritt hat einen eigenen Prüfen-Knopf; der nächste Schritt wird erst nach richtiger Prüfung freigeschaltet. Die Prüfung berücksichtigt Folgefehler und erkennt typische Fehler.</li>
+        <li>Hilfen im Lösungsweg zuschaltbar (Aus, Hinweise, + Formeln; beim Start aus), Tipps in drei Stufen, Lösungsweg und Verlauf.</li>
+        <li>Aufgabentypen frei wählbar; ohne gewählten Typ erscheint ein Hinweis statt einer Aufgabe.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="sidebar">
+    <section class="block">
+      <h2>Übungsart</h2>
+      <div class="mode-toggle big" id="modeToggle">
+        <button data-mode="1" class="active">Grund&shy;rechnungen</button>
+        <button data-mode="2">Einfache Textaufgaben</button>
+        <button data-mode="3">Komplexe Textaufgaben</button>
+      </div>
+      <p class="note" id="modeNote" style="margin-top:0"></p>
+    </section>
+
+    <section class="block">
+      <h2 id="catTitle">Größen</h2>
+      <div id="catBox"></div>
+      <p class="note" id="catNote" style="margin-top:2px"></p>
+    </section>
+
+    <section class="block">
+      <h2>Rechnen mit Atommassen</h2>
+      <div class="mode-toggle" id="precToggle">
+        <button data-p="p" class="active">eine Nachkommastelle</button>
+        <button data-p="r">gerundet</button>
+      </div>
+      <p class="note" style="margin-top:-2px">Gilt für das PSE, die Tipps und den Lösungsweg. Gerundet: ganze Zahlen, ,5 wird aufgerundet (Chlor 36, Kupfer 64). Bei der Prüfung werden beide Varianten akzeptiert.</p>
+    </section>
+
+    <section class="block">
+      <h2>Periodensystem (Hauptgruppen)</h2>
+      <div class="pse" id="pse"></div>
+      <div class="tm-lbl">Nebengruppen (Auswahl)</div>
+      <div class="pse tm" id="pseTM"></div>
+      <div class="pse-info" id="pseInfo">Klicke auf ein Element, um Namen, Ordnungszahl und Atommasse zu sehen. Die Atommasse steht in <span class="a">orange</span> unter dem Symbol.</div>
+    </section>
+
+    <details class="block rules" id="rulesBox">
+      <summary><span>Formelsammlung</span><span class="rules-state" aria-hidden="true"></span></summary>
+      <div class="lib-wrap">
+        <table class="lib-table">
+          <tbody>
+            <tr class="grp"><td colspan="2">Grundgleichungen</td></tr>
+            <tr><td class="k">n = m / M</td><td>Stoffmenge aus Masse und molarer Masse</td></tr>
+            <tr><td class="k">m = n · M</td><td>Masse aus Stoffmenge</td></tr>
+            <tr><td class="k">M</td><td>Summe aus Anzahl · Atommasse, Einheit g/mol</td></tr>
+            <tr><td class="k">n = V / V<sub>m</sub></td><td>Stoffmenge eines Gases aus dem Volumen</td></tr>
+            <tr><td class="k">c = n / V</td><td>Stoffmengenkonzentration (V der Lösung in L)</td></tr>
+            <tr><td class="k">n = c · V</td><td>Stoffmenge aus Konzentration und Volumen</td></tr>
+            <tr><td class="k">V = n / c</td><td>Volumen einer Lösung aus Stoffmenge und Konzentration</td></tr>
+            <tr><td class="k">N = n · N<sub>A</sub></td><td>Teilchenanzahl</td></tr>
+            <tr><td class="k">m = ρ · V</td><td>Masse einer Flüssigkeit aus Dichte und Volumen</td></tr>
+            <tr><td class="k">V = m / ρ</td><td>Volumen einer Flüssigkeit aus Masse und Dichte</td></tr>
+            <tr class="grp"><td colspan="2">Reaktionen &amp; Lösungen</td></tr>
+            <tr><td class="k">n(B) = n(A) · ν(B)/ν(A)</td><td>Stoffmengenverhältnis aus den Koeffizienten der Reaktionsgleichung</td></tr>
+            <tr><td class="k">n / ν</td><td>Der Stoff mit dem kleineren Wert n/ν ist begrenzend</td></tr>
+            <tr><td class="k">c₁ · V₁ = c₂ · V₂</td><td>Verdünnen: Die Stoffmenge bleibt gleich</td></tr>
+            <tr><td class="k">n<sub>ges</sub> / V<sub>ges</sub></td><td>Mischen: Stoffmengen und Volumina addieren, dann teilen</td></tr>
+            <tr><td class="k">η = m<sub>tats.</sub> / m<sub>theor.</sub></td><td>Ausbeute, · 100 % für Prozent</td></tr>
+            <tr><td class="k">w = m(Stoff) / m(Probe)</td><td>Massenanteil, · 100 % für Prozent</td></tr>
+            <tr class="grp"><td colspan="2">Einheiten &amp; Konstanten</td></tr>
+            <tr><td class="k">1 L = 1000 mL</td><td>1 kg = 1000 g · 1 m³ = 1000 L</td></tr>
+            <tr><td class="k">V<sub>m</sub></td><td>22,4 L/mol (0 °C, 1013 hPa) · 24,0 L/mol (20 °C, 1013 hPa)</td></tr>
+            <tr><td class="k">N<sub>A</sub></td><td>6,022 · 10<sup>23</sup> mol<sup>−1</sup></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+  </div>
+
+  <div class="main">
+    <div class="screen-card">
+      <div class="screen-top">
+        <button class="btn primary" id="btnNew">Neue Aufgabe</button>
+        <button class="btn ghost" id="btnHint">Tipp</button>
+        <button class="btn ghost" id="btnSolve">Lösung zeigen</button>
+        <div class="help-wrap">
+          <span>Hilfen im Lösungsweg</span>
+          <div class="mode-toggle small" id="helpToggle">
+            <button data-h="0" class="active">Aus</button>
+            <button data-h="1">Hinweise</button>
+            <button data-h="2">+ Formeln</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="task-meta">
+        <span class="task-num mono" id="taskNum">Aufgabe 1</span>
+        <span class="chip" id="taskLevel">Grundrechnung</span>
+        <span class="task-ctx" id="taskCtx"></span>
+      </div>
+      <div class="task-text" id="taskText"></div>
+      <div id="taskEq"></div>
+
+      <div class="work-grid">
+        <div class="steps-col" id="stepsCol"></div>
+        <div class="qpanel" id="qPanel"></div>
+      </div>
+
+      <div class="feedback" id="feedback"></div>
+
+      <div class="readout-bar">
+        <div class="readout"><span class="k">gelöst</span><span class="v mono" id="roSolved">0</span></div>
+        <div class="readout"><span class="k">davon im 1. Versuch</span><span class="v mono" id="roFirst">0</span></div>
+        <div class="readout"><span class="k">Serie</span><span class="v mono" id="roStreak">0</span></div>
+        <div class="readout"><span class="k">Lösung angesehen</span><span class="v mono" id="roShown">0</span></div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tabbtn active" data-tab="way">Lösungsweg</button>
+      <button class="tabbtn" data-tab="hist">Verlauf</button>
+    </div>
+    <div class="tabpanel active" id="tab-way">
+      <div id="wayBox"><div class="empty-hint">Der Lösungsweg erscheint, sobald die Aufgabe gelöst oder die Lösung angezeigt wurde.</div></div>
+    </div>
+    <div class="tabpanel" id="tab-hist">
+      <div class="table-wrap">
+        <table class="hist">
+          <thead><tr><th>#</th><th>Übungsart</th><th>Aufgabe</th><th>Ergebnis</th><th>Status</th></tr></thead>
+          <tbody id="histBody"><tr><td colspan="5" class="empty-hint">Noch keine Aufgaben bearbeitet.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p class="footer-note">Rechenwerte: Atommassen nach IUPAC (eine Nachkommastelle bzw. gerundet), V<sub>m</sub> = 22,4 L/mol bei 0 °C und 1013 hPa bzw. 24,0 L/mol bei 20 °C und 1013 hPa, N<sub>A</sub> = 6,022 · 10<sup>23</sup> mol<sup>−1</sup>. Gase werden als ideal betrachtet.</p>
+  <p class="footer-credit">Bastian Baumgart · Chemisches Rechnen V1.0 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+
+  // ---------- Elementdaten ----------
+  // [Symbol, Ordnungszahl, Name, Klasse, Atommasse (1 Nachkommastelle)]
+  const ROWS = [
+    [["H",1,"Wasserstoff","n",1.0], null,null,null,null,null,null, ["He",2,"Helium","e",4.0]],
+    [["Li",3,"Lithium","m",6.9],["Be",4,"Beryllium","m",9.0],["B",5,"Bor","h",10.8],["C",6,"Kohlenstoff","n",12.0],["N",7,"Stickstoff","n",14.0],["O",8,"Sauerstoff","n",16.0],["F",9,"Fluor","n",19.0],["Ne",10,"Neon","e",20.2]],
+    [["Na",11,"Natrium","m",23.0],["Mg",12,"Magnesium","m",24.3],["Al",13,"Aluminium","m",27.0],["Si",14,"Silicium","h",28.1],["P",15,"Phosphor","n",31.0],["S",16,"Schwefel","n",32.1],["Cl",17,"Chlor","n",35.5],["Ar",18,"Argon","e",39.9]],
+    [["K",19,"Kalium","m",39.1],["Ca",20,"Calcium","m",40.1],["Ga",31,"Gallium","m",69.7],["Ge",32,"Germanium","h",72.6],["As",33,"Arsen","h",74.9],["Se",34,"Selen","n",79.0],["Br",35,"Brom","n",79.9],["Kr",36,"Krypton","e",83.8]],
+    [["Rb",37,"Rubidium","m",85.5],["Sr",38,"Strontium","m",87.6],["In",49,"Indium","m",114.8],["Sn",50,"Zinn","m",118.7],["Sb",51,"Antimon","h",121.8],["Te",52,"Tellur","h",127.6],["I",53,"Iod","n",126.9],["Xe",54,"Xenon","e",131.3]],
+    [["Cs",55,"Caesium","m",132.9],["Ba",56,"Barium","m",137.3],["Tl",81,"Thallium","m",204.4],["Pb",82,"Blei","m",207.2],["Bi",83,"Bismut","m",209.0],["Po",84,"Polonium","m",209,true],["At",85,"Astat","h",210,true],["Rn",86,"Radon","e",222,true]]
+  ];
+  const TM = [["Cr",24,"Chrom","m",52.0],["Mn",25,"Mangan","m",54.9],["Fe",26,"Eisen","m",55.8],["Cu",29,"Kupfer","m",63.5],["Zn",30,"Zink","m",65.4],["Ag",47,"Silber","m",107.9]];
+  const EL = {};
+  ROWS.forEach((row,pi)=>row.forEach((d,gi)=>{ if(d) EL[d[0]] = {s:d[0], z:d[1], n:d[2], c:d[3], mp:d[4], rad:!!d[5], g:gi+1, p:pi+1}; }));
+  TM.forEach(d=>{ EL[d[0]] = {s:d[0], z:d[1], n:d[2], c:d[3], mp:d[4], g:null, p:d[1]===47?5:4, tm:true}; });
+  Object.values(EL).forEach(e=>{ e.mr = Math.round(e.mp); });
+  const CLS = {m:"Metall", h:"Halbmetall", n:"Nichtmetall", e:"Edelgas"};
+  const ROMAN = ["","I","II","III","IV","V","VI","VII","VIII"];
+
+  // ---------- Einstellungen & Zustand ----------
+  let mode = "1";
+  let help = 0;          // 0 = aus, 1 = Hinweise, 2 = Hinweise + Formeln
+  let prec = "p";        // p = eine Nachkommastelle, r = gerundet
+  let task = null, taskCount = 0;
+  const stats = {solved:0, first:0, streak:0, shown:0};
+  const hist = [];
+
+  // ---------- Zahlen ----------
+  const SUPM = {"0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹","-":"⁻"};
+  const SUPR = {}; Object.keys(SUPM).forEach(k=>{ SUPR[SUPM[k]] = k; });
+  const sup = n => String(n).split("").map(c=>SUPM[c]||c).join("");
+  const dec = (x,d) => x.toFixed(d).replace(".",",");
+  const g = x => String(+(+x).toPrecision(6)).replace(".",",");      // gegebene Werte
+  function sciParts(x, sig){
+    let e = Math.floor(Math.log10(Math.abs(x)));
+    let m = +(x/Math.pow(10,e)).toFixed(sig-1);
+    if(Math.abs(m)>=10){ m = +(m/10).toFixed(sig-1); e++; }
+    return [m,e];
+  }
+  function fN(x, sig=3){
+    if(x===null || x===undefined || !isFinite(x)) return "?";
+    if(x===0) return "0";
+    const ax = Math.abs(x);
+    if(ax>=1e6 || ax<1e-3){ const [m,e] = sciParts(x,sig); return `${dec(m,sig-1)} · 10${sup(e)}`; }
+    let d;
+    if(ax>=1) d = Math.max(0, sig - (Math.floor(Math.log10(ax))+1));
+    else d = -Math.floor(Math.log10(ax)) + sig - 1;
+    return dec(x,d);
+  }
+  function fV(x, unit, P){
+    if(x===null || x===undefined || !isFinite(x)) return "?";
+    if(unit==="g/mol") return (P==="r" && Math.abs(x-Math.round(x))<1e-6) ? String(Math.round(x)) : dec(x,1);
+    if(unit==="%") return dec(x,1);
+    return fN(x,3);
+  }
+  const am = (s,P) => P==="p" ? dec(EL[s].mp,1) : String(EL[s].mr);
+  function parseNum(str){
+    let s = String(str==null ? "" : str).trim();
+    if(!s) return null;
+    s = s.replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁻]/g, c=>SUPR[c]).replace(/\s+/g,"").replace(/[−–]/g,"-");
+    s = s.replace(/(g\/mol|mol\/l|mol|ml|kg|m³|l|g|%)$/i,"");
+    if(s.includes(",") && s.includes(".")) s = s.replace(/\./g,"");
+    s = s.replace(/,/g,".");
+    const m = s.match(/^([+-]?(?:\d+\.?\d*|\.\d+))(?:(?:[·*x×⋅]10\^?|e)([+-]?\d+))?$/i);
+    if(!m) return NaN;
+    let v = parseFloat(m[1]);
+    if(m[2]!==undefined) v *= Math.pow(10, parseInt(m[2],10));
+    return v;
+  }
+  function near(a, b, tol){
+    if(a===null || a===undefined || isNaN(a) || !isFinite(b)) return false;
+    const t = Math.max(tol.abs||0, (tol.rel||0)*Math.abs(b));
+    return Math.abs(a-b) <= t + 1e-12;
+  }
+
+  // ---------- Formeln ----------
+  function parseFormula(str){
+    const res = {order:[], cnt:{}};
+    let i = 0;
+    const readNum = () => { let s = ""; while(i<str.length && /\d/.test(str[i])) s += str[i++]; return s ? +s : 1; };
+    function seq(){
+      const out = [];
+      while(i<str.length && str[i]!==")"){
+        if(str[i]==="("){ i++; const inner = seq(); i++; const k = readNum(); inner.forEach(a=>out.push({el:a.el, n:a.n*k})); }
+        else { const mm = str.slice(i).match(/^[A-Z][a-z]?/); i += mm[0].length; out.push({el:mm[0], n:readNum()}); }
+      }
+      return out;
+    }
+    seq().forEach(a=>{ if(!(a.el in res.cnt)){ res.order.push(a.el); res.cnt[a.el]=0; } res.cnt[a.el] += a.n; });
+    return res;
+  }
+  function fHTML(str){
+    let h = "", sub = false, prev = "";
+    for(const ch of str){
+      if(/\d/.test(ch)) sub = sub || /[A-Za-z)]/.test(prev); else sub = false;
+      h += sub ? `<sub>${ch}</sub>` : ch;
+      prev = ch;
+    }
+    return h.replace(/<\/sub><sub>/g, "");
+  }
+
+  // ---------- Stoffe ----------
+  const SUBST = [
+    ["H2O","Wasser"],["CO2","Kohlenstoffdioxid"],["O2","Sauerstoff"],["N2","Stickstoff"],["H2","Wasserstoff"],["CH4","Methan"],["NH3","Ammoniak"],
+    ["HCl","Chlorwasserstoff","Salzsäure"],["Cl2","Chlor"],["He","Helium"],["SO2","Schwefeldioxid"],["C3H8","Propan"],["C4H10","Butan"],
+    ["CO","Kohlenstoffmonooxid"],["Ar","Argon"],["NaCl","Natriumchlorid"],["KCl","Kaliumchlorid"],["NaOH","Natriumhydroxid","Natronlauge"],
+    ["KOH","Kaliumhydroxid","Kalilauge"],["CaCO3","Calciumcarbonat"],["CuSO4","Kupfer(II)-sulfat"],["KNO3","Kaliumnitrat"],["C6H12O6","Glucose"],
+    ["C12H22O11","Saccharose"],["Mg","Magnesium"],["Fe","Eisen"],["Cu","Kupfer"],["Zn","Zink"],["Al","Aluminium"],["S","Schwefel"],["C","Kohlenstoff"],
+    ["Na","Natrium"],["MgO","Magnesiumoxid"],["CaO","Calciumoxid"],["Na2CO3","Natriumcarbonat"],["KMnO4","Kaliumpermanganat"],["AgNO3","Silbernitrat"],
+    ["C2H5OH","Ethanol"],["Fe2O3","Eisen(III)-oxid"],["H2SO4","Schwefelsäure","Schwefelsäure"],["Ca(OH)2","Calciumhydroxid"],["Al2(SO4)3","Aluminiumsulfat"],
+    ["NH4Cl","Ammoniumchlorid"],["KI","Kaliumiodid"],["CaCl2","Calciumchlorid"],["FeS","Eisen(II)-sulfid"],["ZnS","Zinksulfid"],["CuO","Kupfer(II)-oxid"],
+    ["Al2O3","Aluminiumoxid"],["MgCl2","Magnesiumchlorid"],["ZnCl2","Zinkchlorid"],["AlCl3","Aluminiumchlorid"],["H2O2","Wasserstoffperoxid"],
+    ["KClO3","Kaliumchlorat"],["C8H18","Octan"],["C16H34","Hexadecan"],["NaHCO3","Natriumhydrogencarbonat"],["AgCl","Silberchlorid"],["NaNO3","Natriumnitrat"],
+    ["Na2SO4","Natriumsulfat"],["MgSO4","Magnesiumsulfat"],["CH3COOH","Essigsäure","Essigsäure"],["CH3COONa","Natriumacetat"],
+    ["CH3COOC2H5","Essigsäureethylester"],["BaCl2","Bariumchlorid"],["BaSO4","Bariumsulfat"],["MgS","Magnesiumsulfid"],
+    ["CH3OH","Methanol"],["C3H6O","Aceton"],["C6H14","Hexan"],["C3H8O3","Glycerin"],["Br2","Brom"]
+  ];
+  const SP = {};
+  SUBST.forEach(([f,name,sol])=>{ SP[f] = {f, name, sol: sol || (name+"-Lösung"), h:fHTML(f), p:parseFormula(f)}; });
+  const S = f => { if(!SP[f]) throw new Error("Stoff fehlt: "+f); return SP[f]; };
+  function Mof(s, P){ return Math.round(s.p.order.reduce((a,e)=>a + s.p.cnt[e]*(P==="p"?EL[e].mp:EL[e].mr), 0)*1000)/1000; }
+  function particleWord(s){
+    const els = s.p.order;
+    if(els.length===1 && (s.p.cnt[els[0]]===1)) return "Atome";
+    if(els.some(e=>EL[e].c==="m") || s.f.includes("NH4")) return "Formeleinheiten";
+    return "Moleküle";
+  }
+
+  // ---------- Reaktionen ----------
+  function R(str){
+    const side = t => t.split(" + ").map(x=>{ x = x.trim(); const m = x.match(/^(\d+)\s+(.+)$/); return m ? [+m[1], m[2]] : [1, x]; });
+    const [l, r] = str.split("->");
+    return {l:side(l), r:side(r)};
+  }
+  const nu = (rx, f) => rx.l.concat(rx.r).find(x=>x[1]===f)[0];
+  const eqHTML = rx => { const s = side => side.map(([n,f])=>(n>1 ? n+" " : "")+fHTML(f)).join(" + "); return s(rx.l)+" &nbsp;→&nbsp; "+s(rx.r); };
+
+  // ---------- Konstanten ----------
+  const VMS = [
+    {v:22.4, vs:"22,4", cond:"Normbedingungen (0 °C, 1013 hPa)"},
+    {v:24.0, vs:"24,0", cond:"20 °C und 1013 hPa"}
+  ];
+  const pickVm = () => pick(VMS);
+  const NA = 6.022e23, NA_TXT = "6,022 · 10²³ mol⁻¹";
+  const VMG = vm => ["V<sub>m</sub>", `${vm.vs} L/mol`];
+  const vmTxt = vm => `${vm.cond}, V<sub>m</sub> = ${vm.vs} L/mol`;
+
+  // ---------- Bausteine für Rechenschritte ----------
+  const val = (V, r) => typeof r==="number" ? r : V[r];
+  const hv = (V, r, u, P) => (typeof r==="number" ? g(r) : fV(V[r], u, P)) + (u ? " "+u : "");
+  const base = o => Object.assign({kind:"num", tol:{rel:0.015}, errs:[]}, o);
+
+  function mSumSym(s){ return s.p.order.map(e=>(s.p.cnt[e]>1 ? s.p.cnt[e]+" · " : "")+`M(${e})`).join(" + "); }
+  function mSumNum(s, P){
+    const t = s.p.order.map(e=>(s.p.cnt[e]>1 ? s.p.cnt[e]+" · " : "")+am(e,P));
+    return t.length>1 || s.p.cnt[s.p.order[0]]>1 ? `(${t.join(" + ")}) g/mol` : `${t[0]} g/mol`;
+  }
+  function stM(key, s){
+    const single = s.p.order.length===1 && s.p.cnt[s.p.order[0]]===1;
+    return base({key, sym:`M(${s.h})`, unit:"g/mol", label:`Molare Masse von ${s.name}`, isM:true, tol:{rel:0.004, abs:0.06},
+      hint: single ? "Die molare Masse eines Elements hat denselben Zahlenwert wie seine Atommasse im PSE." : "Atommassen im PSE ablesen, jeweils mit der Anzahl der Atome multiplizieren und alles addieren.",
+      formula: single ? `M(${s.h}) = Atommasse in g/mol` : `M(${s.h}) = ${mSumSym(s)}`,
+      calc:(V,P)=>Mof(s,P), ans:(V,P)=> single ? `Atommasse von ${s.f} aus dem PSE &nbsp;→&nbsp; M(${s.h})` : `M(${s.h}) = ${mSumNum(s,P)}`,
+      errs:[
+        ()=>[s.p.order.reduce((a,e)=>a+s.p.cnt[e]*EL[e].z,0), "Das ist die Summe der Ordnungszahlen. Die Atommasse steht im PSE unter dem Symbol."],
+        (V,P)=>[single ? NaN : s.p.order.reduce((a,e)=>a+(P==="p"?EL[e].mp:EL[e].mr),0), "Jede Atommasse muss noch mit der Anzahl der Atome (Index) multipliziert werden."]
+      ]});
+  }
+  function stNm(key, s, mRef, MRef, o={}){
+    const sy = o.sym || `n(${s.h})`;
+    return base({key, sym:sy, unit:"mol", label:o.label || `Stoffmenge an ${s.name}`,
+      hint:"Die Stoffmenge berechnest du aus der Masse und der molaren Masse.",
+      formula:`n = m / M &nbsp;⇒&nbsp; ${sy} = m(${s.h}) / M(${s.h})`,
+      calc:V=>val(V,mRef)/val(V,MRef), ans:(V,P)=>`${sy} = ${hv(V,mRef,"g",P)} / ${hv(V,MRef,"g/mol",P)}`,
+      errs:[V=>[val(V,mRef)*val(V,MRef), "Du hast Masse und molare Masse multipliziert. Richtig ist n = m / M."],
+            V=>[val(V,MRef)/val(V,mRef), "Der Bruch ist umgedreht. Die Masse gehört in den Zähler: n = m / M."]]});
+  }
+  function stmn(key, s, nRef, MRef, o={}){
+    const sy = o.sym || `m(${s.h})`;
+    return base({key, sym:sy, unit:"g", label:o.label || `Masse an ${s.name}`,
+      hint:o.hint || "Die Masse ergibt sich aus Stoffmenge und molarer Masse.",
+      formula:`m = n · M &nbsp;⇒&nbsp; ${sy} = n(${s.h}) · M(${s.h})`,
+      calc:V=>val(V,nRef)*val(V,MRef), ans:(V,P)=>`${sy} = ${hv(V,nRef,"mol",P)} · ${hv(V,MRef,"g/mol",P)}`,
+      errs:[V=>[val(V,nRef)/val(V,MRef), "Du hast durch die molare Masse geteilt. Richtig ist m = n · M."],
+            V=>[val(V,MRef)/val(V,nRef), "Du hast M durch n geteilt. Richtig ist m = n · M."]]});
+  }
+  function stNV(key, s, VRef, vm, o={}){
+    const sy = o.sym || `n(${s.h})`, other = vm.v===22.4 ? 24.0 : 22.4;
+    return base({key, sym:sy, unit:"mol", label:o.label || `Stoffmenge an ${s.name}`,
+      hint:`Für Gase gilt: Die Stoffmenge ergibt sich aus dem Volumen und dem molaren Volumen (hier V<sub>m</sub> = ${vm.vs} L/mol).`,
+      formula:`n = V / V<sub>m</sub> &nbsp;⇒&nbsp; ${sy} = V(${s.h}) / V<sub>m</sub>`,
+      calc:V=>val(V,VRef)/vm.v, ans:(V,P)=>`${sy} = ${hv(V,VRef,"L",P)} / ${vm.vs} L/mol`,
+      errs:[V=>[val(V,VRef)*vm.v, "Du hast Volumen und molares Volumen multipliziert. Richtig ist n = V / V<sub>m</sub>."],
+            V=>[val(V,VRef)/other, `Falsches molares Volumen. Bei den Bedingungen der Aufgabe gilt V<sub>m</sub> = ${vm.vs} L/mol.`],
+            V=>[vm.v/val(V,VRef), "Der Bruch ist umgedreht. Richtig ist n = V / V<sub>m</sub>."]]});
+  }
+  function stVn(key, s, nRef, vm, o={}){
+    const sy = o.sym || `V(${s.h})`, other = vm.v===22.4 ? 24.0 : 22.4;
+    return base({key, sym:sy, unit:"L", label:o.label || `Volumen an ${s.name}`,
+      hint:`Das Volumen eines Gases ergibt sich aus Stoffmenge und molarem Volumen (hier V<sub>m</sub> = ${vm.vs} L/mol).`,
+      formula:`V = n · V<sub>m</sub> &nbsp;⇒&nbsp; ${sy} = n(${s.h}) · V<sub>m</sub>`,
+      calc:V=>val(V,nRef)*vm.v, ans:(V,P)=>`${sy} = ${hv(V,nRef,"mol",P)} · ${vm.vs} L/mol`,
+      errs:[V=>[val(V,nRef)/vm.v, "Du hast durch das molare Volumen geteilt. Richtig ist V = n · V<sub>m</sub>."],
+            V=>[vm.v/val(V,nRef), "Du hast V<sub>m</sub> durch n geteilt. Richtig ist V = n · V<sub>m</sub>."],
+            V=>[val(V,nRef)*other, `Falsches molares Volumen. Bei den Bedingungen der Aufgabe gilt V<sub>m</sub> = ${vm.vs} L/mol.`]]});
+  }
+  const CONV = {"mL>L":"1 L = 1000 mL, also durch 1000 teilen.", "L>mL":"1 L = 1000 mL, also mit 1000 multiplizieren.",
+                "g>kg":"1 kg = 1000 g, also durch 1000 teilen.", "m³>L":"1 m³ = 1000 L, also mit 1000 multiplizieren."};
+  function stConv(key, sy, ref, factor, fu, tu, label){
+    return base({key, sym:sy, unit:tu, label:label || `Umrechnung in ${tu}`, tol:{rel:0.005},
+      hint:`Rechne von ${fu} in ${tu} um: ${CONV[fu+">"+tu]}`,
+      formula: factor>1 ? `Wert in ${tu} = Wert in ${fu} · ${g(factor)}` : `Wert in ${tu} = Wert in ${fu} : ${g(1/factor)}`,
+      calc:V=>val(V,ref)*factor, ans:(V,P)=>`${sy} = ${hv(V,ref,fu,P)} ${factor>1 ? "· "+g(factor) : ": "+g(1/factor)}`});
+  }
+  function stCnV(key, s, nRef, VRef, o={}){
+    const sy = o.sym || `c(${s.h})`;
+    return base({key, sym:sy, unit:"mol/L", label:o.label || "Stoffmengenkonzentration",
+      hint:"Die Konzentration ist die Stoffmenge des gelösten Stoffes pro Liter Lösung.",
+      formula:`c = n / V &nbsp;⇒&nbsp; ${sy} = n(${s.h}) / V(Lösung)`,
+      calc:V=>val(V,nRef)/val(V,VRef), ans:(V,P)=>`${sy} = ${hv(V,nRef,"mol",P)} / ${hv(V,VRef,"L",P)}`,
+      errs:[V=>[val(V,nRef)*val(V,VRef), "Du hast Stoffmenge und Volumen multipliziert. Richtig ist c = n / V."],
+            V=>[val(V,VRef)/val(V,nRef), "Der Bruch ist umgedreht. Richtig ist c = n / V."]]});
+  }
+  function stNcV(key, s, cRef, VRef, o={}){
+    const sy = o.sym || `n(${s.h})`;
+    return base({key, sym:sy, unit:"mol", label:o.label || `Stoffmenge an ${s.name}`,
+      hint:"Die Stoffmenge des gelösten Stoffes ergibt sich aus Konzentration und Volumen der Lösung (in L).",
+      formula:`n = c · V &nbsp;⇒&nbsp; ${sy} = c(${s.h}) · V(Lösung)`,
+      calc:V=>val(V,cRef)*val(V,VRef), ans:(V,P)=>`${sy} = ${hv(V,cRef,"mol/L",P)} · ${hv(V,VRef,"L",P)}`,
+      errs:[V=>[val(V,cRef)/val(V,VRef), "Du hast die Konzentration durch das Volumen geteilt. Richtig ist n = c · V."],
+            V=>[val(V,VRef)/val(V,cRef), "Du hast das Volumen durch die Konzentration geteilt. Richtig ist n = c · V."]]});
+  }
+  function stVnc(key, s, nRef, cRef, o={}){
+    const sy = o.sym || "V(Lösung)";
+    return base({key, sym:sy, unit:"L", label:o.label || "Volumen der Lösung in L",
+      hint:"Das Volumen der Lösung ergibt sich aus der benötigten Stoffmenge und der Konzentration.",
+      formula:`V = n / c &nbsp;⇒&nbsp; ${sy} = n(${s.h}) / c(${s.h})`,
+      calc:V=>val(V,nRef)/val(V,cRef), ans:(V,P)=>`${sy} = ${hv(V,nRef,"mol",P)} / ${hv(V,cRef,"mol/L",P)}`,
+      errs:[V=>[val(V,nRef)*val(V,cRef), "Du hast Stoffmenge und Konzentration multipliziert. Richtig ist V = n / c."],
+            V=>[val(V,cRef)/val(V,nRef), "Der Bruch ist umgedreht. Richtig ist V = n / c."]]});
+  }
+  function stRatio(key, rx, A, B, nRef){
+    const a = nu(rx,A.f), b = nu(rx,B.f);
+    const errs = a===b ? [] : [
+      V=>[val(V,nRef), `Die Koeffizienten der Reaktionsgleichung fehlen noch: ${b} ${B.h} pro ${a} ${A.h}.`],
+      V=>[val(V,nRef)*a/b, "Das Verhältnis ist vertauscht. Es gilt n(B) = n(A) · ν(B) / ν(A)."]];
+    return base({key, sym:`n(${B.h})`, unit:"mol", label:`Stoffmenge an ${B.name}`,
+      hint:"Das Stoffmengenverhältnis folgt aus den Koeffizienten der Reaktionsgleichung.",
+      formula: a===b ? `n(${B.h}) : n(${A.h}) = ${b} : ${a} &nbsp;⇒&nbsp; n(${B.h}) = n(${A.h})` : `n(${B.h}) : n(${A.h}) = ${b} : ${a} &nbsp;⇒&nbsp; n(${B.h}) = n(${A.h}) · ${b}/${a}`,
+      calc:V=>val(V,nRef)*b/a, ans:(V,P)=> a===b ? `n(${B.h}) = n(${A.h}) = ${hv(V,nRef,"mol",P)}` : `n(${B.h}) = ${hv(V,nRef,"mol",P)} · ${b}/${a}`, errs});
+  }
+  function stNpart(key, s, nRef, word){
+    return base({key, kind:"sci", sym:`N(${s.h})`, unit:word, label:`Anzahl der ${word}`,
+      hint:"Ein Mol enthält 6,022 · 10²³ Teilchen (Avogadro-Konstante).",
+      formula:`N = n · N<sub>A</sub> &nbsp;⇒&nbsp; N(${s.h}) = n(${s.h}) · ${NA_TXT}`,
+      calc:V=>val(V,nRef)*NA, ans:(V,P)=>`N(${s.h}) = ${hv(V,nRef,"mol",P)} · ${NA_TXT}`,
+      errs:[V=>[val(V,nRef)/NA, "Du hast durch N<sub>A</sub> geteilt. Richtig ist N = n · N<sub>A</sub>."]]});
+  }
+  function stNfromN(key, s, Nval){
+    return base({key, sym:`n(${s.h})`, unit:"mol", label:`Stoffmenge an ${s.name}`,
+      hint:"Ein Mol enthält 6,022 · 10²³ Teilchen. Teile die Teilchenanzahl durch die Avogadro-Konstante.",
+      formula:`n = N / N<sub>A</sub>`,
+      calc:()=>Nval/NA, ans:()=>`n(${s.h}) = ${fN(Nval,3)} / ${NA_TXT}`,
+      errs:[()=>[NA/Nval, "Der Bruch ist umgedreht. Richtig ist n = N / N<sub>A</sub>."]]});
+  }
+  function stMassVrho(key, s, VRef, rho, what){
+    return base({key, sym:`m(${s.h})`, unit:"g", label:`Masse an ${what}`,
+      hint:`Die Masse ergibt sich aus der Dichte (ρ = ${g(rho)} g/mL) und dem Volumen in mL.`,
+      formula:`m = ρ · V &nbsp;⇒&nbsp; m(${s.h}) = ρ · V(${s.h})`,
+      calc:V=>rho*val(V,VRef), ans:(V,P)=>`m(${s.h}) = ${g(rho)} g/mL · ${hv(V,VRef,"mL",P)}`,
+      errs:[V=>[val(V,VRef)/rho, "Du hast das Volumen durch die Dichte geteilt. Richtig ist m = ρ · V."],
+            V=>[rho/val(V,VRef), "Richtig ist m = ρ · V."]]});
+  }
+  function stVmrho(key, s, mRef, rho){
+    return base({key, sym:`V(${s.h})`, unit:"mL", label:`Volumen an ${s.name}`,
+      hint:`Das Volumen einer Flüssigkeit ergibt sich aus der Masse und der Dichte (ρ = ${g(rho)} g/mL).`,
+      formula:`V = m / ρ &nbsp;⇒&nbsp; V(${s.h}) = m(${s.h}) / ρ`,
+      calc:V=>val(V,mRef)/rho, ans:(V,P)=>`V(${s.h}) = ${hv(V,mRef,"g",P)} / ${g(rho)} g/mL`,
+      errs:[V=>[val(V,mRef)*rho, "Du hast Masse und Dichte multipliziert. Richtig ist V = m / ρ."],
+            V=>[rho/val(V,mRef), "Der Bruch ist umgedreht. Die Masse gehört in den Zähler: V = m / ρ."]]});
+  }
+  function stPct(key, sy, label, partRef, totRef, hint, formula, partSym, totSym){
+    return base({key, sym:sy, unit:"%", label, tol:{rel:0.015, abs:0.3}, hint, formula,
+      calc:V=>val(V,partRef)/val(V,totRef)*100,
+      ans:(V,P)=>`${sy} = ${hv(V,partRef,"g",P)} / ${hv(V,totRef,"g",P)} · 100 %`,
+      errs:[V=>[val(V,totRef)/val(V,partRef)*100, `Der Bruch ist umgedreht: ${partSym} gehört in den Zähler, ${totSym} in den Nenner.`],
+            V=>[val(V,partRef)/val(V,totRef), "Das ist der Anteil als Dezimalzahl. Für Prozent noch mit 100 multiplizieren."]]});
+  }
+
+  // ---------- Aufgaben: Grundrechnungen ----------
+  const L_SOLID = ["NaCl","KCl","NaOH","CaCO3","CuSO4","KNO3","C6H12O6","C12H22O11","Mg","Fe","Cu","Zn","Al","S","MgO","CaO","Na2CO3","KMnO4","AgNO3","H2O","C2H5OH","Fe2O3","H2SO4","Ca(OH)2","Al2(SO4)3","NH4Cl"];
+  const L_GAS = ["O2","N2","H2","CO2","CH4","NH3","HCl","Cl2","He","SO2","C3H8","C4H10","CO","Ar"];
+  const L_SOLU = ["NaCl","NaOH","KOH","HCl","H2SO4","KMnO4","CuSO4","C6H12O6","KCl","AgNO3","Na2CO3","KI","CaCl2"];
+  const M_LIST = [0.5,1,2,2.5,4,5,7.5,10,12.5,15,20,25,40,50,100];
+  const N_LIST = [0.02,0.025,0.05,0.1,0.15,0.2,0.25,0.4,0.5,0.75,1.5,2,2.5];
+  const pickV = () => Math.random()<0.65 ? {ml:pick([50,100,200,250,500])} : {l:pick([0.5,1,1.5,2])};
+  const vTxt = v => v.ml ? `${v.ml} mL` : `${g(v.l)} L`;
+
+  function g1_M(){
+    const s = S(pick(L_SOLID.concat(L_GAS)));
+    return {title:`M(${s.h})`, text:`Berechne die molare Masse von <b>${s.name}</b> (${s.h}).`,
+      given:[["Formel", s.h]], wanted:[`M(${s.h})`], steps:[stM("M",s)]};
+  }
+  function g1_n(){
+    const s = S(pick(L_SOLID)), m = pick(M_LIST);
+    return {title:`n aus m · ${s.h}`, text:`Berechne die Stoffmenge, die in <b>m = ${g(m)} g</b> ${s.name} (${s.h}) enthalten ist.`,
+      given:[[`m(${s.h})`, `${g(m)} g`]], wanted:[`n(${s.h})`], steps:[stM("M",s), stNm("n",s,m,"M")]};
+  }
+  function g1_m(){
+    const s = S(pick(L_SOLID)), n = pick(N_LIST);
+    return {title:`m aus n · ${s.h}`, text:`Welche Masse haben <b>n = ${g(n)} mol</b> ${s.name} (${s.h})?`,
+      given:[[`n(${s.h})`, `${g(n)} mol`]], wanted:[`m(${s.h})`], steps:[stM("M",s), stmn("m",s,n,"M")]};
+  }
+  function g1_Vn(){
+    const s = S(pick(L_GAS)), n = pick([0.05,0.1,0.2,0.25,0.5,0.75,1.5,2,3]), vm = pickVm();
+    return {title:`V aus n · ${s.h}`, text:`Welches Volumen nehmen <b>n = ${g(n)} mol</b> ${s.name} (${s.h}) bei ${vm.cond} ein? Dort gilt V<sub>m</sub> = ${vm.vs} L/mol.`,
+      given:[[`n(${s.h})`, `${g(n)} mol`], VMG(vm)], wanted:[`V(${s.h})`], steps:[stVn("V",s,n,vm)]};
+  }
+  function g1_nV(){
+    const s = S(pick(L_GAS)), V = pick([0.5,1,1.2,2,2.4,4.8,5,6,10,11.2,20,50]), vm = pickVm();
+    return {title:`n aus V · ${s.h}`, text:`Welche Stoffmenge an ${s.name} (${s.h}) ist in <b>V = ${g(V)} L</b> des Gases bei ${vm.cond} enthalten? Dort gilt V<sub>m</sub> = ${vm.vs} L/mol.`,
+      given:[[`V(${s.h})`, `${g(V)} L`], VMG(vm)], wanted:[`n(${s.h})`], steps:[stNV("n",s,V,vm)]};
+  }
+  function g1_c(){
+    const s = S(pick(L_SOLU)), n = pick([0.01,0.02,0.05,0.1,0.25,0.5]), v = pickV();
+    const steps = v.ml ? [stConv("VL","V(Lösung)",v.ml,0.001,"mL","L","Volumen der Lösung in L"), stCnV("c",s,n,"VL")] : [stCnV("c",s,n,v.l)];
+    return {title:`c aus n und V · ${s.h}`, text:`In <b>V = ${vTxt(v)}</b> ${s.sol} sind <b>n = ${g(n)} mol</b> ${s.name} gelöst. Berechne die Stoffmengenkonzentration.`,
+      given:[["V(Lösung)", vTxt(v)], [`n(${s.h})`, `${g(n)} mol`]], wanted:[`c(${s.h})`], steps};
+  }
+  function g1_nc(){
+    const s = S(pick(L_SOLU)), c = pick([0.05,0.1,0.2,0.5,1,2]), v = pickV();
+    const steps = v.ml ? [stConv("VL","V(Lösung)",v.ml,0.001,"mL","L","Volumen der Lösung in L"), stNcV("n",s,c,"VL")] : [stNcV("n",s,c,v.l)];
+    return {title:`n aus c und V · ${s.h}`, text:`Welche Stoffmenge an ${s.name} ist in <b>V = ${vTxt(v)}</b> ${s.sol} mit <b>c(${s.h}) = ${g(c)} mol/L</b> enthalten?`,
+      given:[["V(Lösung)", vTxt(v)], [`c(${s.h})`, `${g(c)} mol/L`]], wanted:[`n(${s.h})`], steps};
+  }
+  function g1_Vc(){
+    const s = S(pick(L_SOLU));
+    if(Math.random()<0.5){
+      const n = pick([0.005,0.01,0.02,0.025,0.05,0.1]), c = pick([0.1,0.2,0.25,0.5,1]);
+      return {title:`V aus n und c · ${s.h}`, text:`Welches Volumen einer ${s.sol} mit <b>c(${s.h}) = ${g(c)} mol/L</b> enthält <b>n = ${g(n)} mol</b> ${s.name}? Gib das Volumen in mL an.`,
+        given:[[`n(${s.h})`, `${g(n)} mol`], [`c(${s.h})`, `${g(c)} mol/L`]], wanted:["V(Lösung) in mL"],
+        steps:[stVnc("VL",s,n,c), stConv("Vml","V(Lösung)","VL",1000,"L","mL","Volumen der Lösung in mL")]};
+    }
+    const n = pick([0.1,0.2,0.25,0.5,1,1.5,2]), c = pick([0.1,0.2,0.25,0.5,1,2]);
+    return {title:`V aus n und c · ${s.h}`, text:`Welches Volumen einer ${s.sol} mit <b>c(${s.h}) = ${g(c)} mol/L</b> enthält <b>n = ${g(n)} mol</b> ${s.name}? Gib das Volumen in L an.`,
+      given:[[`n(${s.h})`, `${g(n)} mol`], [`c(${s.h})`, `${g(c)} mol/L`]], wanted:["V(Lösung)"],
+      steps:[stVnc("VL",s,n,c)]};
+  }
+  function g1_N(){
+    const s = S(pick(L_SOLID.concat(L_GAS))), n = pick([0.01,0.05,0.1,0.25,0.5,1.5,2,3]), w = particleWord(s);
+    return {title:`N aus n · ${s.h}`, text:`Wie viele ${w} sind in <b>n = ${g(n)} mol</b> ${s.name} (${s.h}) enthalten?`,
+      given:[[`n(${s.h})`, `${g(n)} mol`], ["N<sub>A</sub>", NA_TXT]], wanted:[`N(${s.h})`], steps:[stNpart("N",s,n,w)]};
+  }
+  function g1_nN(){
+    const s = S(pick(L_SOLID.concat(L_GAS))), mant = pick([1.2,1.5,2.0,3.0,4.5,6.022,9.0,1.8]), e = pick([21,22,23,24]), w = particleWord(s);
+    const N = mant*Math.pow(10,e), Nt = `${g(mant)} · 10${sup(e)}`;
+    return {title:`n aus N · ${s.h}`, text:`Welche Stoffmenge an ${s.name} (${s.h}) entspricht <b>N = ${Nt}</b> ${w}?`,
+      given:[[`N(${s.h})`, Nt], ["N<sub>A</sub>", NA_TXT]], wanted:[`n(${s.h})`], steps:[stNfromN("n",s,N)]};
+  }
+
+  // Flüssigkeiten: [Formel, Dichte in g/mL bei 20 °C]
+  const LIQ = [["H2O",1.00],["C2H5OH",0.79],["CH3OH",0.79],["C3H6O",0.79],["C6H14",0.66],["C8H18",0.70],["C3H8O3",1.26],["CH3COOH",1.05],["H2SO4",1.83],["Br2",3.12]];
+  const pickLV = () => Math.random()<0.75 ? {ml:pick([5,10,20,25,50,100,250])} : {l:pick([0.5,1,1.5,2])};
+  const rhoTxt = rho => `${dec(rho,2)} g/mL`;
+  function liqVol(v, s){
+    return v.ml ? {ref:v.ml, steps:[]} : {ref:"Vml", steps:[stConv("Vml",`V(${s.h})`,v.l,1000,"L","mL","Volumen der Flüssigkeit in mL")]};
+  }
+  const liqName = s => s.f==="H2SO4" ? "konzentrierter Schwefelsäure" : s.name;
+  function g1_Lm(){
+    const [f,rho] = pick(LIQ), s = S(f), v = pickLV(), lv = liqVol(v,s);
+    return {title:`m aus V (Flüssigkeit) · ${s.h}`, text:`Welche Masse haben <b>V = ${vTxt(v)}</b> ${liqName(s)} (${s.h})? Die Dichte beträgt <b>ρ = ${rhoTxt(rho)}</b>.`,
+      given:[[`V(${s.h})`, vTxt(v)], ["ρ", rhoTxt(rho)]], wanted:[`m(${s.h})`],
+      steps:[...lv.steps, stMassVrho("m",s,lv.ref,rho,s.name)]};
+  }
+  function g1_LV(){
+    const [f,rho] = pick(LIQ), s = S(f), m = pick([5,10,20,25,50,100,200]);
+    return {title:`V aus m (Flüssigkeit) · ${s.h}`, text:`Welches Volumen in mL nehmen <b>m = ${g(m)} g</b> ${liqName(s)} (${s.h}) ein? Die Dichte beträgt <b>ρ = ${rhoTxt(rho)}</b>.`,
+      given:[[`m(${s.h})`, `${g(m)} g`], ["ρ", rhoTxt(rho)]], wanted:[`V(${s.h})`],
+      steps:[stVmrho("V",s,m,rho)]};
+  }
+  function g1_Ln(){
+    const [f,rho] = pick(LIQ), s = S(f), v = pickLV(), lv = liqVol(v,s);
+    return {title:`n aus V (Flüssigkeit) · ${s.h}`, text:`Welche Stoffmenge an ${s.name} ist in <b>V = ${vTxt(v)}</b> ${liqName(s)} (${s.h}) enthalten? Die Dichte beträgt <b>ρ = ${rhoTxt(rho)}</b>.`,
+      given:[[`V(${s.h})`, vTxt(v)], ["ρ", rhoTxt(rho)]], wanted:[`n(${s.h})`],
+      steps:[...lv.steps, stMassVrho("m",s,lv.ref,rho,s.name), stM("M",s), stNm("n",s,"m","M")]};
+  }
+  function g1_LVn(){
+    const [f,rho] = pick(LIQ), s = S(f), n = pick([0.1,0.2,0.25,0.5,1,2]);
+    return {title:`V aus n (Flüssigkeit) · ${s.h}`, text:`Welches Volumen in mL haben <b>n = ${g(n)} mol</b> ${liqName(s)} (${s.h})? Die Dichte beträgt <b>ρ = ${rhoTxt(rho)}</b>.`,
+      given:[[`n(${s.h})`, `${g(n)} mol`], ["ρ", rhoTxt(rho)]], wanted:[`V(${s.h})`],
+      steps:[stM("M",s), stmn("m",s,n,"M"), stVmrho("V",s,"m",rho)]};
+  }
+
+  // ---------- Aufgaben: einfache Textaufgaben ----------
+  const G2MV = [
+    {f:"O2", m:[0.08,0.12,0.16,0.24], t:m=>`Bei der Zersetzung von Wasserstoffperoxid fängt eine Schülergruppe <b>${m}</b> Sauerstoff in einem Kolbenprober auf.`},
+    {f:"CO2", m:[300,400,425], t:m=>`Ein Zylinder für einen Wassersprudler enthält <b>${m}</b> Kohlenstoffdioxid.`},
+    {f:"C4H10", m:[100,190,250], t:m=>`Eine Gaskartusche für einen Campingkocher enthält <b>${m}</b> Butan.`},
+    {f:"H2", m:[0.1,0.2,0.5,1], t:m=>`Bei der Elektrolyse von Wasser entstehen <b>${m}</b> Wasserstoff.`},
+    {f:"CH4", m:[16,80,160,400], t:m=>`Eine kleine Biogasanlage erzeugt in einer Stunde <b>${m}</b> Methan.`},
+    {f:"NH3", m:[1.7,3.4,8.5], t:m=>`Bei einem Versuch werden <b>${m}</b> Ammoniak freigesetzt.`},
+    {f:"Cl2", m:[0.71,1.42,3.55], t:m=>`Bei der Elektrolyse einer Natriumchlorid-Lösung entstehen <b>${m}</b> Chlor.`}
+  ];
+  function g2_mV(){
+    const d = pick(G2MV), s = S(d.f), m = pick(d.m), vm = pickVm();
+    return {title:`Gas: m → V · ${s.h}`, text:`${d.t(g(m)+" g")} Welches Volumen nimmt das Gas bei ${vm.cond} ein? (V<sub>m</sub> = ${vm.vs} L/mol)`,
+      given:[[`m(${s.h})`, `${g(m)} g`], VMG(vm)], wanted:[`V(${s.h})`],
+      steps:[stM("M",s), stNm("n",s,m,"M"), stVn("V",s,"n",vm)]};
+  }
+  const G2VM = [
+    {f:"He", V:[3,5,6,8,10], u:"L", t:V=>`Ein Partyballon wird mit <b>${V}</b> Helium gefüllt.`},
+    {f:"CO2", V:[60,80,96,100], u:"mL", t:V=>`Ein Kolbenprober enthält <b>${V}</b> Kohlenstoffdioxid.`},
+    {f:"CH4", V:[50,100,120,240], u:"L", t:V=>`Beim Kochen eines Nudelgerichts verbraucht ein Gasherd <b>${V}</b> Erdgas (vereinfacht reines Methan).`},
+    {f:"H2", V:[12,24,36,48], u:"L", t:V=>`Ein Modellauto mit Brennstoffzelle verbraucht während einer Fahrt <b>${V}</b> Wasserstoff.`},
+    {f:"O2", V:[120,240,500], u:"mL", t:V=>`Beim Erhitzen von Kaliumpermanganat werden <b>${V}</b> Sauerstoff aufgefangen.`}
+  ];
+  function g2_Vm(){
+    const d = pick(G2VM), s = S(d.f), V = pick(d.V), vm = pickVm();
+    const steps = d.u==="mL" ? [stConv("VL",`V(${s.h})`,V,0.001,"mL","L","Gasvolumen in L"), stNV("n",s,"VL",vm)] : [stNV("n",s,V,vm)];
+    steps.push(stM("M",s), stmn("m",s,"n","M"));
+    return {title:`Gas: V → m · ${s.h}`, text:`${d.t(g(V)+" "+d.u)} Berechne die Masse des Gases bei ${vm.cond}. (V<sub>m</sub> = ${vm.vs} L/mol)`,
+      given:[[`V(${s.h})`, `${g(V)} ${d.u}`], VMG(vm)], wanted:[`m(${s.h})`], steps};
+  }
+  const SOLMAKE = [["NaCl",[0.1,0.2,0.5,1]],["NaOH",[0.1,0.2,0.5,1]],["KOH",[0.1,0.5,1]],["CuSO4",[0.1,0.2,0.5]],["KMnO4",[0.01,0.02,0.05]],
+    ["C6H12O6",[0.1,0.25,0.5]],["KCl",[0.1,0.5,1]],["AgNO3",[0.01,0.05,0.1]],["Na2CO3",[0.1,0.2,0.5]],["KI",[0.1,0.5]],["CaCl2",[0.1,0.2,0.5]]];
+  function g2_solMake(){
+    const d = pick(SOLMAKE), s = S(d[0]), c = pick(d[1]), V = pick([100,200,250,500,1000]);
+    const text = Math.random()<0.6
+      ? `Für einen Versuch sollst du <b>${V} mL</b> ${s.sol} mit der Konzentration <b>c(${s.h}) = ${g(c)} mol/L</b> herstellen. Wie viel Gramm ${s.name} musst du abwiegen?`
+      : `Im Chemikalienschrank steht eine Flasche mit <b>${V} mL</b> ${s.sol}, <b>c(${s.h}) = ${g(c)} mol/L</b>. Welche Masse an ${s.name} ist darin gelöst?`;
+    return {title:`Lösung: c, V → m · ${s.h}`, text,
+      given:[["V(Lösung)", `${V} mL`], [`c(${s.h})`, `${g(c)} mol/L`]], wanted:[`m(${s.h})`],
+      steps:[stConv("VL","V(Lösung)",V,0.001,"mL","L","Volumen der Lösung in L"), stNcV("n",s,c,"VL"), stM("M",s), stmn("m",s,"n","M")]};
+  }
+  function g2_solConc(){
+    const d = pick(SOLMAKE), s = S(d[0]), c = pick(d[1]), V = pick([100,200,250,500]);
+    const m = +(c*V/1000*Mof(s,"p")).toPrecision(3);
+    return {title:`Lösung: m, V → c · ${s.h}`, text:`<b>${g(m)} g</b> ${s.name} werden in Wasser gelöst. Die Lösung wird in einem Messkolben mit Wasser auf <b>${V} mL</b> aufgefüllt. Berechne die Stoffmengenkonzentration der Lösung.`,
+      given:[[`m(${s.h})`, `${g(m)} g`], ["V(Lösung)", `${V} mL`]], wanted:[`c(${s.h})`],
+      steps:[stM("M",s), stNm("n",s,m,"M"), stConv("VL","V(Lösung)",V,0.001,"mL","L","Volumen der Lösung in L"), stCnV("c",s,"n","VL")]};
+  }
+  const NCV = [
+    {f:"HCl", c:[0.1,0.5,1,2], V:[25,50,100,250,500], t:(V,c)=>`Im Chemikalienschrank steht eine Flasche mit <b>${V}</b> Salzsäure, <b>c(HCl) = ${c}</b>.`},
+    {f:"NaOH", c:[0.1,0.2,0.5,1], V:[10,20,25,50], t:(V,c)=>`Für eine Titration werden mit einer Pipette <b>${V}</b> Natronlauge mit <b>c(NaOH) = ${c}</b> abgemessen.`},
+    {f:"NaCl", c:[0.154], V:[250,500,1000], t:(V,c)=>`Physiologische Kochsalzlösung für Infusionen enthält Natriumchlorid mit <b>c(NaCl) = ${c}</b>. Ein Infusionsbeutel enthält <b>${V}</b> Lösung.`},
+    {f:"C6H12O6", c:[0.28], V:[250,500], t:(V,c)=>`Eine Glucose-Infusionslösung hat die Konzentration <b>c(${fHTML("C6H12O6")}) = ${c}</b>. Ein Beutel enthält <b>${V}</b> Lösung.`},
+    {f:"CuSO4", c:[0.1,0.5,1], V:[50,100,250], t:(V,c)=>`Für einen Elektrolyseversuch werden <b>${V}</b> Kupfer(II)-sulfat-Lösung mit <b>c(${fHTML("CuSO4")}) = ${c}</b> in ein Becherglas gefüllt.`},
+    {f:"KMnO4", c:[0.01,0.02], V:[100,250,500], t:(V,c)=>`Eine Maßlösung enthält Kaliumpermanganat mit <b>c(${fHTML("KMnO4")}) = ${c}</b>. Im Vorratsgefäß befinden sich <b>${V}</b> Lösung.`},
+    {f:"AgNO3", c:[0.05,0.1], V:[20,50,100], t:(V,c)=>`Für den Nachweis von Chlorid-Ionen werden <b>${V}</b> Silbernitrat-Lösung mit <b>c(${fHTML("AgNO3")}) = ${c}</b> vorbereitet.`}
+  ];
+  const vStep = (V) => stConv("VL","V(Lösung)",V,0.001,"mL","L","Volumen der Lösung in L");
+  function g2_ncv_n(){
+    const d = pick(NCV), s = S(d.f), c = pick(d.c), V = pick(d.V);
+    return {title:`n = c · V: n gesucht · ${s.h}`, text:`${d.t(V+" mL", g(c)+" mol/L")} Welche Stoffmenge an ${s.name} ist darin enthalten?`,
+      given:[["V(Lösung)", `${V} mL`], [`c(${s.h})`, `${g(c)} mol/L`]], wanted:[`n(${s.h})`],
+      steps:[vStep(V), stNcV("n",s,c,"VL")]};
+  }
+  function g2_ncv_c(){
+    const d = pick(NCV), s = S(d.f), c = pick(d.c), V = pick(d.V), n = +(c*V/1000).toPrecision(4);
+    return {title:`n = c · V: c gesucht · ${s.h}`, text:`Bei einer Analyse wird festgestellt, dass <b>${V} mL</b> einer ${s.sol} <b>${g(n)} mol</b> ${s.name} enthalten. Berechne die Stoffmengenkonzentration der Lösung.`,
+      given:[["V(Lösung)", `${V} mL`], [`n(${s.h})`, `${g(n)} mol`]], wanted:[`c(${s.h})`],
+      steps:[vStep(V), stCnV("c",s,n,"VL")]};
+  }
+  function g2_ncv_V(){
+    const d = pick(NCV), s = S(d.f), c = pick(d.c), Vt = pick([5,10,20,25,40,50,100,200,250]), n = +(c*Vt/1000).toPrecision(4);
+    return {title:`n = c · V: V gesucht · ${s.h}`, text:`Für einen Versuch benötigst du genau <b>${g(n)} mol</b> ${s.name}. Im Regal steht ${s.sol} mit <b>c(${s.h}) = ${g(c)} mol/L</b>. Wie viel Milliliter der Lösung musst du abmessen?`,
+      given:[[`n(${s.h})`, `${g(n)} mol`], [`c(${s.h})`, `${g(c)} mol/L`]], wanted:["V(Lösung) in mL"],
+      steps:[stVnc("VL",s,n,c), stConv("Vml","V(Lösung)","VL",1000,"L","mL","Volumen der Lösung in mL")]};
+  }
+  const G2PART = [
+    {f:"C12H22O11", m:[2.5,3,3.5], w:"Saccharose-Moleküle", t:m=>`Ein Zuckerwürfel besteht aus <b>${m}</b> Saccharose (Haushaltszucker).`},
+    {f:"H2O", m:[18,200,250], w:"Wassermoleküle", t:m=>`Ein Glas enthält <b>${m}</b> Wasser.`},
+    {f:"Fe", m:[2,3.5,5], w:"Eisenatome", t:m=>`Ein Eisennagel hat eine Masse von <b>${m}</b>.`},
+    {f:"Cu", m:[2.3,3.06,3.9], w:"Kupferatome", t:m=>`Eine Münze aus reinem Kupfer hat eine Masse von <b>${m}</b>.`},
+    {f:"C", m:[0.2,0.5,1], w:"Kohlenstoffatome", t:m=>`Ein Diamant besteht aus <b>${m}</b> reinem Kohlenstoff.`},
+    {f:"Al", m:[0.5,1.35,2.7], w:"Aluminiumatome", t:m=>`Ein Stück Alufolie hat eine Masse von <b>${m}</b>.`}
+  ];
+  function g2_part(){
+    const d = pick(G2PART), s = S(d.f), m = pick(d.m);
+    return {title:`Teilchen: m → N · ${s.h}`, text:`${d.t(g(m)+" g")} Wie viele ${d.w} sind darin enthalten? (N<sub>A</sub> = ${NA_TXT})`,
+      given:[[`m(${s.h})`, `${g(m)} g`], ["N<sub>A</sub>", NA_TXT]], wanted:[`N(${s.h})`],
+      steps:[stM("M",s), stNm("n",s,m,"M"), stNpart("N",s,"n",d.w)]};
+  }
+  const RX11 = [
+    {eq:"Fe + S -> FeS", A:"Fe", B:"S", m:[2.8,5.6,10,11.2], t:m=>`Eisen und Schwefel reagieren beim Erhitzen zu Eisen(II)-sulfid. Wie viel Gramm Schwefel werden benötigt, um <b>${m}</b> Eisen vollständig umzusetzen?`},
+    {eq:"Fe + S -> FeS", A:"Fe", B:"FeS", m:[2.8,5.6,10,11.2], t:m=>`Eisen und Schwefel reagieren beim Erhitzen zu Eisen(II)-sulfid. Wie viel Gramm Eisen(II)-sulfid entstehen aus <b>${m}</b> Eisen?`},
+    {eq:"Zn + S -> ZnS", A:"Zn", B:"ZnS", m:[3.27,6.5,10], t:m=>`Zink und Schwefel reagieren heftig zu Zinksulfid. Wie viel Gramm Zinksulfid entstehen aus <b>${m}</b> Zink?`},
+    {eq:"C + O2 -> CO2", A:"C", B:"CO2", m:[12,24,50,100], t:m=>`Grillkohle besteht vereinfacht aus reinem Kohlenstoff. Wie viel Gramm Kohlenstoffdioxid entstehen bei der vollständigen Verbrennung von <b>${m}</b> Grillkohle?`},
+    {eq:"CaCO3 -> CaO + CO2", A:"CaCO3", B:"CaO", m:[10,25,50,100], t:m=>`Beim Kalkbrennen wird Calciumcarbonat zu Branntkalk (Calciumoxid) und Kohlenstoffdioxid zersetzt. Wie viel Gramm Branntkalk entstehen aus <b>${m}</b> Calciumcarbonat?`},
+    {eq:"CuO + H2 -> Cu + H2O", A:"CuO", B:"Cu", m:[2,4,5,8], t:m=>`Schwarzes Kupfer(II)-oxid wird im Wasserstoffstrom zu Kupfer reduziert. Wie viel Gramm Kupfer erhält man aus <b>${m}</b> Kupfer(II)-oxid?`},
+    {eq:"NaOH + HCl -> NaCl + H2O", A:"NaOH", B:"NaCl", m:[2,4,5,10], t:m=>`Natronlauge mit <b>${m}</b> gelöstem Natriumhydroxid wird mit Salzsäure genau neutralisiert. Wie viel Gramm Natriumchlorid bleiben nach dem Eindampfen zurück?`},
+    {eq:"S + O2 -> SO2", A:"S", B:"SO2", m:[1,3.2,6.4], t:m=>`Schwefel verbrennt mit blauer Flamme zu Schwefeldioxid. Wie viel Gramm Schwefeldioxid entstehen aus <b>${m}</b> Schwefel?`},
+    {eq:"2 Mg + O2 -> 2 MgO", A:"Mg", B:"MgO", m:[0.24,1.2,2.4,4.8], t:m=>`Magnesiumband verbrennt mit greller Flamme zu Magnesiumoxid. Wie viel Gramm Magnesiumoxid entstehen aus <b>${m}</b> Magnesium?`},
+    {eq:"2 Cu + O2 -> 2 CuO", A:"Cu", B:"CuO", m:[1.27,2.54,5], t:m=>`Kupferblech überzieht sich beim Erhitzen an der Luft mit schwarzem Kupfer(II)-oxid. Wie viel Gramm Kupfer(II)-oxid entstehen aus <b>${m}</b> Kupfer?`}
+  ];
+  function rxMassSteps(rx, A, B, mA, mSym){
+    return [stM("MA",A), stNm("nA",A,mA,"MA"), stRatio("nB",rx,A,B,"nA"), stM("MB",B), stmn("mB",B,"nB","MB", mSym ? {sym:mSym, label:`theoretische Masse an ${B.name}`, hint:"Die theoretische Masse ist die Masse, die bei vollständigem Umsatz entstehen würde: m = n · M."} : {})];
+  }
+  function g2_rx(){
+    const d = pick(RX11), rx = R(d.eq), A = S(d.A), B = S(d.B), m = pick(d.m);
+    return {title:`Reaktion 1 : 1 · ${A.h} → ${B.h}`, text:d.t(g(m)+" g"), eq:eqHTML(rx),
+      given:[[`m(${A.h})`, `${g(m)} g`]], wanted:[`m(${B.h})`], steps:rxMassSteps(rx,A,B,m)};
+  }
+
+  // ---------- Aufgaben: komplexe Textaufgaben ----------
+  const RXM = [
+    {eq:"4 Al + 3 O2 -> 2 Al2O3", A:"Al", B:"Al2O3", m:[2.7,5.4,10,13.5], t:m=>`Aluminiumpulver verbrennt an der Luft zu Aluminiumoxid. Wie viel Gramm Aluminiumoxid entstehen aus <b>${m}</b> Aluminium?`},
+    {eq:"Fe2O3 + 3 CO -> 2 Fe + 3 CO2", A:"Fe2O3", B:"Fe", m:[16,50,80,160], t:m=>`Im Hochofen wird Eisen(III)-oxid mit Kohlenstoffmonooxid zu Eisen reduziert. Wie viel Gramm Eisen lassen sich aus <b>${m}</b> Eisen(III)-oxid gewinnen?`},
+    {eq:"Fe2O3 + 2 Al -> Al2O3 + 2 Fe", A:"Al", B:"Fe", m:[10,27,54], t:m=>`Beim Thermitverfahren werden Eisenbahnschienen verschweißt. Wie viel Gramm flüssiges Eisen entstehen, wenn <b>${m}</b> Aluminium vollständig reagieren?`},
+    {eq:"C6H12O6 -> 2 C2H5OH + 2 CO2", A:"C6H12O6", B:"C2H5OH", m:[90,180,250,500], t:m=>`Hefe vergärt Glucose zu Ethanol und Kohlenstoffdioxid. Wie viel Gramm Ethanol entstehen höchstens aus <b>${m}</b> Glucose?`},
+    {eq:"6 CO2 + 6 H2O -> C6H12O6 + 6 O2", A:"C6H12O6", B:"CO2", m:[18,45,90,100], t:m=>`Pflanzen bauen bei der Fotosynthese Glucose auf. Wie viel Gramm Kohlenstoffdioxid nimmt eine Pflanze auf, um <b>${m}</b> Glucose zu bilden?`},
+    {eq:"CH4 + 2 O2 -> CO2 + 2 H2O", A:"CH4", B:"H2O", m:[8,16,40,100], t:m=>`Methan verbrennt vollständig zu Kohlenstoffdioxid und Wasser. Wie viel Gramm Wasser entstehen bei der Verbrennung von <b>${m}</b> Methan?`},
+    {eq:"2 Na + Cl2 -> 2 NaCl", A:"Cl2", B:"NaCl", m:[3.55,7.1,10,14.2], t:m=>`Natrium reagiert heftig mit Chlor zu Natriumchlorid. Wie viel Gramm Natriumchlorid können aus <b>${m}</b> Chlor gebildet werden?`},
+    {eq:"2 H2 + O2 -> 2 H2O", A:"O2", B:"H2", m:[8,16,32], t:m=>`Im Knallgas reagieren Wasserstoff und Sauerstoff zu Wasser. Wie viel Gramm Wasserstoff reagieren vollständig mit <b>${m}</b> Sauerstoff?`},
+    {eq:"2 C8H18 + 25 O2 -> 16 CO2 + 18 H2O", A:"C8H18", B:"O2", m:[100,114,228,500], t:m=>`Benzin wird vereinfacht als reines Octan betrachtet. Wie viel Gramm Sauerstoff werden für die vollständige Verbrennung von <b>${m}</b> Octan benötigt?`},
+    {eq:"4 Fe + 3 O2 -> 2 Fe2O3", A:"Fe", B:"Fe2O3", m:[5.6,10,28,56], t:m=>`Eisen rostet vereinfacht zu Eisen(III)-oxid. Wie viel Gramm Rost (${fHTML("Fe2O3")}) können aus <b>${m}</b> Eisen entstehen?`},
+    {eq:"N2 + 3 H2 -> 2 NH3", A:"H2", B:"NH3", m:[3,6,10,30], t:m=>`Beim Haber-Bosch-Verfahren entsteht Ammoniak aus Stickstoff und Wasserstoff. Wie viel Gramm Ammoniak entstehen aus <b>${m}</b> Wasserstoff?`},
+    {eq:"N2 + 3 H2 -> 2 NH3", A:"N2", B:"NH3", m:[14,28,100], t:m=>`Beim Haber-Bosch-Verfahren entsteht Ammoniak aus Stickstoff und Wasserstoff. Wie viel Gramm Ammoniak entstehen aus <b>${m}</b> Stickstoff?`}
+  ];
+  function g3_rxm(){
+    const d = pick(RXM), rx = R(d.eq), A = S(d.A), B = S(d.B), m = pick(d.m);
+    return {title:`Reaktion m → m · ${A.h} → ${B.h}`, text:d.t(g(m)+" g"), eq:eqHTML(rx),
+      given:[[`m(${A.h})`, `${g(m)} g`]], wanted:[`m(${B.h})`], steps:rxMassSteps(rx,A,B,m)};
+  }
+  const RXMV = [
+    {eq:"Zn + 2 HCl -> ZnCl2 + H2", A:"Zn", B:"H2", m:[0.65,1.3,3.27,6.5], t:m=>`<b>${m}</b> Zink reagieren mit Salzsäure im Überschuss. Welches Volumen Wasserstoff entsteht`},
+    {eq:"Mg + 2 HCl -> MgCl2 + H2", A:"Mg", B:"H2", m:[0.12,0.24,0.5,1.2], t:m=>`Ein Stück Magnesiumband (<b>${m}</b>) löst sich vollständig in Salzsäure. Welches Volumen Wasserstoff entsteht`},
+    {eq:"2 Na + 2 H2O -> 2 NaOH + H2", A:"Na", B:"H2", m:[0.23,0.46,0.5,1], t:m=>`Ein Stück Natrium (<b>${m}</b>) reagiert vollständig mit Wasser. Welches Volumen Wasserstoff wird frei`},
+    {eq:"2 Al + 6 HCl -> 2 AlCl3 + 3 H2", A:"Al", B:"H2", m:[0.27,0.54,1,2.7], t:m=>`<b>${m}</b> Aluminiumgrieß reagieren mit Salzsäure im Überschuss. Welches Volumen Wasserstoff entsteht`},
+    {eq:"CaCO3 + 2 HCl -> CaCl2 + H2O + CO2", A:"CaCO3", B:"CO2", m:[1,2,5,10], t:m=>`<b>${m}</b> Marmor (Calciumcarbonat) werden mit Salzsäure im Überschuss übergossen. Welches Volumen Kohlenstoffdioxid entsteht`},
+    {eq:"2 H2O2 -> 2 H2O + O2", A:"H2O2", B:"O2", m:[1.7,3.4,5,10], t:m=>`<b>${m}</b> Wasserstoffperoxid zerfallen mit Braunstein als Katalysator vollständig. Welches Volumen Sauerstoff entsteht`},
+    {eq:"2 KClO3 -> 2 KCl + 3 O2", A:"KClO3", B:"O2", m:[1.23,2.45,5], t:m=>`<b>${m}</b> Kaliumchlorat werden erhitzt und zersetzen sich vollständig. Welches Volumen Sauerstoff entsteht`},
+    {eq:"C3H8 + 5 O2 -> 3 CO2 + 4 H2O", A:"C3H8", B:"CO2", m:[22,44,100,250], t:m=>`Ein Gasgrill verbrennt <b>${m}</b> Propan vollständig. Welches Volumen Kohlenstoffdioxid entsteht`},
+    {eq:"C3H8 + 5 O2 -> 3 CO2 + 4 H2O", A:"C3H8", B:"O2", m:[22,44,100], t:m=>`Ein Gasgrill verbrennt <b>${m}</b> Propan vollständig. Welches Volumen Sauerstoff wird dabei verbraucht`},
+    {eq:"2 NaHCO3 -> Na2CO3 + H2O + CO2", A:"NaHCO3", B:"CO2", m:[4.2,8.4,10], t:m=>`Backpulver enthält Natron (Natriumhydrogencarbonat), das sich beim Backen zersetzt. Welches Volumen Kohlenstoffdioxid entsteht aus <b>${m}</b> Natron`}
+  ];
+  function g3_rxmV(){
+    const d = pick(RXMV), rx = R(d.eq), A = S(d.A), B = S(d.B), m = pick(d.m), vm = pickVm();
+    return {title:`Reaktion m → V · ${A.h} → ${B.h}`, text:`${d.t(g(m)+" g")}? Es gilt: ${vm.cond}, V<sub>m</sub> = ${vm.vs} L/mol.`, eq:eqHTML(rx),
+      given:[[`m(${A.h})`, `${g(m)} g`], VMG(vm)], wanted:[`V(${B.h})`],
+      steps:[stM("MA",A), stNm("nA",A,m,"MA"), stRatio("nB",rx,A,B,"nA"), stVn("VB",B,"nB",vm)]};
+  }
+  const RXVM = [
+    {eq:"Zn + 2 HCl -> ZnCl2 + H2", A:"H2", B:"Zn", V:[0.5,1,2,2.4], t:V=>`Im Labor sollen <b>${V}</b> Wasserstoff aus Zink und Salzsäure hergestellt werden. Wie viel Gramm Zink werden benötigt`},
+    {eq:"2 H2O2 -> 2 H2O + O2", A:"O2", B:"H2O2", V:[0.5,1,1.2,2], t:V=>`Für einen Versuch werden <b>${V}</b> Sauerstoff benötigt, die durch Zersetzung von Wasserstoffperoxid gewonnen werden. Wie viel Gramm Wasserstoffperoxid müssen zerfallen`},
+    {eq:"CH4 + 2 O2 -> CO2 + 2 H2O", A:"CH4", B:"H2O", V:[10,24,50,100], t:V=>`Ein Gasherd verbrennt <b>${V}</b> Methan. Wie viel Gramm Wasser entstehen dabei`},
+    {eq:"CaCO3 + 2 HCl -> CaCl2 + H2O + CO2", A:"CO2", B:"CaCO3", V:[0.24,0.5,1,2], t:V=>`Beim Auflösen einer Kalkprobe in Salzsäure entstehen <b>${V}</b> Kohlenstoffdioxid. Wie viel Gramm Calciumcarbonat haben reagiert`},
+    {eq:"N2 + 3 H2 -> 2 NH3", A:"N2", B:"NH3", V:[10,22.4,50], t:V=>`<b>${V}</b> Stickstoff reagieren vollständig mit Wasserstoff zu Ammoniak. Wie viel Gramm Ammoniak entstehen`},
+    {eq:"2 H2 + O2 -> 2 H2O", A:"H2", B:"H2O", V:[1,2,5,10], t:V=>`In einer Brennstoffzelle reagieren <b>${V}</b> Wasserstoff mit Sauerstoff zu Wasser. Wie viel Gramm Wasser entstehen`}
+  ];
+  function g3_rxVm(){
+    const d = pick(RXVM), rx = R(d.eq), A = S(d.A), B = S(d.B), V = pick(d.V), vm = pickVm();
+    return {title:`Reaktion V → m · ${A.h} → ${B.h}`, text:`${d.t(g(V)+" L")} (${vmTxt(vm)})?`, eq:eqHTML(rx),
+      given:[[`V(${A.h})`, `${g(V)} L`], VMG(vm)], wanted:[`m(${B.h})`],
+      steps:[stNV("nA",A,V,vm), stRatio("nB",rx,A,B,"nA"), stM("MB",B), stmn("mB",B,"nB","MB")]};
+  }
+  const DIL = [["HCl",[1,2]],["NaOH",[1,2]],["H2SO4",[1,2]],["NaCl",[1,2]],["CuSO4",[0.5,1]]];
+  function g3_dil(){
+    const d = pick(DIL), s = S(d[0]), c1 = pick(d[1]);
+    const c2 = pick([0.05,0.1,0.2,0.25].filter(x=>x<=c1/2)), V2 = pick([100,250,500,1000]);
+    if(Math.random()<0.6){
+      return {title:`Verdünnen: V₁ gesucht · ${s.h}`,
+        text:`Aus einer Stammlösung (${s.sol}, <b>c₁ = ${g(c1)} mol/L</b>) sollen <b>${V2} mL</b> einer verdünnten Lösung mit <b>c₂ = ${g(c2)} mol/L</b> hergestellt werden. Welches Volumen der Stammlösung musst du abmessen?`,
+        given:[["c₁", `${g(c1)} mol/L`], ["c₂", `${g(c2)} mol/L`], ["V₂", `${V2} mL`]], wanted:["V₁ in mL"],
+        steps:[stConv("V2L","V₂",V2,0.001,"mL","L","Volumen der verdünnten Lösung in L"),
+               stNcV("n",s,c2,"V2L",{label:`Stoffmenge an ${s.name} in der verdünnten Lösung`}),
+               Object.assign(stVnc("V1L",s,"n",c1,{sym:"V₁", label:"Volumen der Stammlösung in L"}), {hint:"Beim Verdünnen bleibt die Stoffmenge gleich. Diese Stoffmenge muss aus der Stammlösung kommen.", formula:"V₁ = n / c₁ &nbsp;(gleichwertig: c₁ · V₁ = c₂ · V₂)"}),
+               stConv("V1ml","V₁","V1L",1000,"L","mL","Volumen der Stammlösung in mL")]};
+    }
+    const V1 = +(c2*V2/c1).toPrecision(3);
+    return {title:`Verdünnen: c₂ gesucht · ${s.h}`,
+      text:`<b>${g(V1)} mL</b> ${s.sol} mit <b>c₁ = ${g(c1)} mol/L</b> werden in einem Messkolben mit Wasser auf <b>${V2} mL</b> aufgefüllt. Berechne die Konzentration der verdünnten Lösung.`,
+      given:[["c₁", `${g(c1)} mol/L`], ["V₁", `${g(V1)} mL`], ["V₂", `${V2} mL`]], wanted:["c₂"],
+      steps:[stConv("V1L","V₁",V1,0.001,"mL","L","Volumen der Stammlösung in L"),
+             stNcV("n",s,c1,"V1L",{label:`Stoffmenge an ${s.name} in der Stammlösung`}),
+             stConv("V2L","V₂",V2,0.001,"mL","L","Volumen der verdünnten Lösung in L"),
+             Object.assign(stCnV("c2",s,"n","V2L",{sym:"c₂", label:"Konzentration der verdünnten Lösung"}), {hint:"Die Stoffmenge bleibt beim Verdünnen gleich, sie verteilt sich nur auf ein größeres Volumen."})]};
+  }
+  const RXY = [
+    {eq:"Fe2O3 + 3 CO -> 2 Fe + 3 CO2", A:"Fe2O3", B:"Fe", m:[50,80,100,160], ctx:"Im Hochofen wird Eisen(III)-oxid mit Kohlenstoffmonooxid zu Eisen reduziert."},
+    {eq:"C6H12O6 -> 2 C2H5OH + 2 CO2", A:"C6H12O6", B:"C2H5OH", m:[180,250,500], ctx:"Bei der alkoholischen Gärung wird Glucose zu Ethanol und Kohlenstoffdioxid abgebaut."},
+    {eq:"N2 + 3 H2 -> 2 NH3", A:"N2", B:"NH3", m:[28,56,100], ctx:"Beim Haber-Bosch-Verfahren reagiert Stickstoff mit Wasserstoff zu Ammoniak."},
+    {eq:"CaCO3 -> CaO + CO2", A:"CaCO3", B:"CaO", m:[50,100,250], ctx:"Beim Kalkbrennen wird Calciumcarbonat zu Branntkalk (Calciumoxid) zersetzt."},
+    {eq:"Fe2O3 + 2 Al -> Al2O3 + 2 Fe", A:"Fe2O3", B:"Fe", m:[16,32,80], ctx:"Beim Thermitverfahren wird Eisen(III)-oxid mit Aluminium zu Eisen reduziert."},
+    {eq:"2 Mg + O2 -> 2 MgO", A:"Mg", B:"MgO", m:[0.5,1.2,2.4], ctx:"Magnesium wird in einem Tiegel an der Luft verbrannt."},
+    {eq:"CH3COOH + C2H5OH -> CH3COOC2H5 + H2O", A:"CH3COOH", B:"CH3COOC2H5", m:[6,12,30], ctx:"Essigsäure wird mit Ethanol im Überschuss zu Essigsäureethylester verestert."}
+  ];
+  function g3_yield(){
+    const d = pick(RXY), rx = R(d.eq), A = S(d.A), B = S(d.B), m = pick(d.m);
+    const eta = 55 + Math.floor(Math.random()*40);
+    const mTheo = m/Mof(A,"p")*nu(rx,B.f)/nu(rx,A.f)*Mof(B,"p");
+    const mReal = +(mTheo*eta/100).toPrecision(3);
+    const mt = `m<sub>theor.</sub>(${B.h})`;
+    const steps = rxMassSteps(rx,A,B,m,mt);
+    steps.push(stPct("eta","η",`Ausbeute`, mReal, "mB", "Die Ausbeute vergleicht die tatsächlich erhaltene Masse mit der theoretisch möglichen Masse.",
+      `η = m<sub>tats.</sub> / m<sub>theor.</sub> · 100 %`, "die tatsächliche Masse", "die theoretische Masse"));
+    return {title:`Ausbeute · ${A.h} → ${B.h}`, eq:eqHTML(rx),
+      text:`${d.ctx} Aus <b>${g(m)} g</b> ${A.name} erhält man tatsächlich nur <b>${g(mReal)} g</b> ${B.name}. Berechne die Ausbeute in Prozent.`,
+      given:[[`m(${A.h})`, `${g(m)} g`], [`m<sub>tats.</sub>(${B.h})`, `${g(mReal)} g`]], wanted:["η in %"], steps};
+  }
+  function g3_pure(){
+    const typ = pick(["kalk","messing","erz"]);
+    const w = 0.6 + Math.random()*0.35;
+    if(typ==="kalk" || typ==="messing"){
+      const kalk = typ==="kalk";
+      const rx = kalk ? R("CaCO3 + 2 HCl -> CaCl2 + H2O + CO2") : R("Zn + 2 HCl -> ZnCl2 + H2");
+      const X = kalk ? S("CaCO3") : S("Zn"), G = kalk ? S("CO2") : S("H2");
+      const mp = kalk ? pick([5,10,12,20]) : pick([2,5,10]), vm = pickVm();
+      const wx = kalk ? w : 0.28 + Math.random()*0.15;
+      const V = +(wx*mp/Mof(X,"p")*nu(rx,G.f)/nu(rx,X.f)*vm.v).toPrecision(3);
+      const text = kalk
+        ? `Eine Kalksteinprobe (<b>m = ${g(mp)} g</b>) wird mit Salzsäure im Überschuss versetzt. Nur das Calciumcarbonat reagiert, dabei entstehen <b>${g(V)} L</b> Kohlenstoffdioxid (${vmTxt(vm)}). Berechne den Massenanteil an Calciumcarbonat in der Probe.`
+        : `Messing ist eine Legierung aus Kupfer und Zink. Eine Messingprobe (<b>m = ${g(mp)} g</b>) wird mit Salzsäure im Überschuss versetzt. Nur das Zink reagiert, dabei entstehen <b>${g(V)} L</b> Wasserstoff (${vmTxt(vm)}). Berechne den Massenanteil an Zink in der Probe.`;
+      return {title:kalk ? "Reinheit · Kalkstein" : "Massenanteil · Messing", eq:eqHTML(rx), text,
+        given:[["m(Probe)", `${g(mp)} g`], [`V(${G.h})`, `${g(V)} L`], VMG(vm)], wanted:[`w(${X.h}) in %`],
+        steps:[stNV("nA",G,V,vm), stRatio("nB",rx,G,X,"nA"), stM("MB",X), stmn("mB",X,"nB","MB"),
+               stPct("w",`w(${X.h})`,`Massenanteil an ${X.name}`,"mB",mp,"Der Massenanteil gibt an, wie viel Prozent der Probenmasse auf den reinen Stoff entfallen.",
+                 `w = m(${X.h}) / m(Probe) · 100 %`, `m(${X.h})`, "m(Probe)")]};
+    }
+    const rx = R("Fe2O3 + 3 CO -> 2 Fe + 3 CO2"), Fe = S("Fe"), Ox = S("Fe2O3");
+    const mp = pick([100,250,500]), wo = 0.5 + Math.random()*0.35;
+    const mFe = +(wo*mp/Mof(Ox,"p")*2*Mof(Fe,"p")).toPrecision(3);
+    return {title:"Massenanteil · Eisenerz", eq:eqHTML(rx),
+      text:`Ein Eisenerz enthält Eisen(III)-oxid und Gestein. Aus <b>${g(mp)} g</b> Erz gewinnt man im Hochofen <b>${g(mFe)} g</b> Eisen. Berechne den Massenanteil an Eisen(III)-oxid im Erz.`,
+      given:[["m(Erz)", `${g(mp)} g`], ["m(Fe)", `${g(mFe)} g`]], wanted:[`w(${Ox.h}) in %`],
+      steps:[stM("MA",Fe), stNm("nA",Fe,mFe,"MA"), stRatio("nB",rx,Fe,Ox,"nA"), stM("MB",Ox), stmn("mB",Ox,"nB","MB"),
+             stPct("w",`w(${Ox.h})`,"Massenanteil an Eisen(III)-oxid","mB",mp,"Der Massenanteil gibt an, wie viel Prozent der Erzmasse auf Eisen(III)-oxid entfallen.",
+               `w = m(${Ox.h}) / m(Erz) · 100 %`, `m(${Ox.h})`, "m(Erz)")]};
+  }
+  const LIM = [
+    {eq:"Fe + S -> FeS", A:"Fe", B:"S", P:"FeS", mA:[5,5.6,8,10], mB:[2,3.2,4,6], ctx:"Eisenpulver und Schwefelpulver werden gemischt und erhitzt."},
+    {eq:"Zn + S -> ZnS", A:"Zn", B:"S", P:"ZnS", mA:[3,6.5,10], mB:[1.6,2,4], ctx:"Zinkpulver und Schwefel werden gemischt und gezündet."},
+    {eq:"N2 + 3 H2 -> 2 NH3", A:"N2", B:"H2", P:"NH3", mA:[14,28,56], mB:[2,4,6,10], ctx:"In einem Reaktor werden Stickstoff und Wasserstoff zur Reaktion gebracht."},
+    {eq:"2 H2 + O2 -> 2 H2O", A:"H2", B:"O2", P:"H2O", mA:[1,2,4], mB:[8,16,40], ctx:"Ein Gemisch aus Wasserstoff und Sauerstoff wird gezündet."},
+    {eq:"2 Na + Cl2 -> 2 NaCl", A:"Na", B:"Cl2", P:"NaCl", mA:[2.3,4.6,5], mB:[3.55,5,7.1,10], ctx:"Natrium wird in einem Standzylinder mit Chlor zur Reaktion gebracht."},
+    {eq:"Mg + S -> MgS", A:"Mg", B:"S", P:"MgS", mA:[1.2,2.4,3], mB:[1.6,3.2,4], ctx:"Magnesiumpulver und Schwefel werden gemischt und erhitzt."}
+  ];
+  function g3_lim(){
+    const d = pick(LIM), rx = R(d.eq), A = S(d.A), B = S(d.B), P = S(d.P);
+    const a = nu(rx,A.f), b = nu(rx,B.f), p = nu(rx,P.f);
+    let mA, mB, k = 0;
+    do { mA = pick(d.mA); mB = pick(d.mB); k++;
+      const rA = mA/Mof(A,"p")/a, rB = mB/Mof(B,"p")/b;
+      if(Math.abs(rA-rB)/Math.min(rA,rB) > 0.15) break;
+    } while(k<50);
+    const lim = {key:"lim", kind:"choice", sym:"begrenzender Stoff", unit:"", label:"Begrenzender Stoff (wird vollständig verbraucht)", tol:{},
+      options:[{h:`${A.h} (${A.name})`}, {h:`${B.h} (${B.name})`}],
+      hint:`Teile jede Stoffmenge durch ihren Koeffizienten. Der Stoff mit dem kleineren Wert n/ν wird vollständig verbraucht, der andere liegt im Überschuss vor.`,
+      formula:`Vergleiche n(${A.h}) / ${a} mit n(${B.h}) / ${b}`,
+      calc:V=> V.nA/a <= V.nB/b ? 0 : 1,
+      ans:(V,P2)=>`n(${A.h}) / ${a} = ${fN(V.nA/a)} mol &nbsp;·&nbsp; n(${B.h}) / ${b} = ${fN(V.nB/b)} mol`,
+      wrong:"Das stimmt nicht. Teile beide Stoffmengen durch ihre Koeffizienten und vergleiche: Der kleinere Wert gehört zum begrenzenden Stoff.", errs:[]};
+    const nP = base({key:"nP", sym:`n(${P.h})`, unit:"mol", label:`Stoffmenge an ${P.name}`,
+      hint:"Die Produktmenge wird vom begrenzenden Stoff bestimmt. Rechne mit dessen Stoffmenge und dem Verhältnis aus der Reaktionsgleichung.",
+      formula:`n(${P.h}) = n(begrenzender Stoff) · ν(${P.h}) / ν(begrenzender Stoff)`,
+      calc:V=> V.lim===0 ? V.nA*p/a : V.nB*p/b,
+      ans:(V,P2)=> V.lim===0 ? `n(${P.h}) = ${fN(V.nA)} mol · ${p}/${a}` : `n(${P.h}) = ${fN(V.nB)} mol · ${p}/${b}`,
+      errs:[V=>[V.lim===0 ? V.nB*p/b : V.nA*p/a, "Du hast mit dem Stoff gerechnet, der im Überschuss vorliegt. Maßgeblich ist der begrenzende Stoff."],
+            V=>[V.lim===0 ? V.nA : V.nB, "Das Stoffmengenverhältnis aus der Reaktionsgleichung fehlt noch."]]});
+    return {title:`Überschuss · ${A.h} + ${B.h}`, eq:eqHTML(rx),
+      text:`${d.ctx} Eingesetzt werden <b>${g(mA)} g</b> ${A.name} und <b>${g(mB)} g</b> ${B.name}. Welcher Stoff wird vollständig verbraucht, und wie viel Gramm ${P.name} entstehen höchstens?`,
+      given:[[`m(${A.h})`, `${g(mA)} g`], [`m(${B.h})`, `${g(mB)} g`]], wanted:["begrenzender Stoff", `m(${P.h})`],
+      steps:[stM("MA",A), stNm("nA",A,mA,"MA"), stM("MB",B), stNm("nB",B,mB,"MB"), lim, nP, stM("MP",P), stmn("mP",P,"nP","MP")]};
+  }
+  const stSum = (key, sy, unit, refs, label, hint, formula) => base({key, sym:sy, unit, label, hint, formula,
+    calc:V=>refs.reduce((a,r)=>a+val(V,r),0), ans:(V,P)=>`${sy} = ${refs.map(r=>hv(V,r,unit,P)).join(" + ")}`});
+  const MIX = [["NaCl",[0.1,0.2,0.5,1]],["HCl",[0.1,0.5,1,2]],["NaOH",[0.1,0.2,0.5,1]],["C6H12O6",[0.1,0.25,0.5]],["CuSO4",[0.1,0.2,0.5]],["KCl",[0.1,0.5,1]]];
+  function g3_mix(){
+    const d = pick(MIX), s = S(d[0]);
+    if(s.f!=="HCl" && Math.random()<0.4){
+      const c = pick(d[1]), V = pick([100,200,250,500]), m = pick([1,2,2.5,5,10]);
+      return {title:`Lösung + Feststoff · ${s.h}`,
+        text:`In <b>${V} mL</b> ${s.sol} mit <b>c(${s.h}) = ${g(c)} mol/L</b> werden zusätzlich <b>${g(m)} g</b> ${s.name} gelöst. Das Volumen der Lösung ändert sich dabei vernachlässigbar wenig. Berechne die neue Konzentration.`,
+        given:[["V(Lösung)", `${V} mL`], [`c<sub>1</sub>(${s.h})`, `${g(c)} mol/L`], [`m(${s.h})`, `${g(m)} g`]], wanted:[`c<sub>neu</sub>(${s.h})`],
+        steps:[stConv("VL","V(Lösung)",V,0.001,"mL","L","Volumen der Lösung in L"),
+               stNcV("n1",s,c,"VL",{sym:`n<sub>1</sub>(${s.h})`, label:`Stoffmenge an ${s.name} in der Lösung`}),
+               stM("M",s), stNm("n2",s,m,"M",{sym:`n<sub>2</sub>(${s.h})`, label:`Stoffmenge an zugegebenem ${s.name}`}),
+               stSum("nges",`n<sub>ges</sub>(${s.h})`,"mol",["n1","n2"],"Gesamte Stoffmenge","Die Stoffmengen aus der Lösung und aus dem Feststoff addieren sich.",`n<sub>ges</sub> = n<sub>1</sub> + n<sub>2</sub>`),
+               Object.assign(stCnV("c",s,"nges","VL",{sym:`c<sub>neu</sub>(${s.h})`, label:"Neue Konzentration"}), {formula:`c<sub>neu</sub> = n<sub>ges</sub> / V(Lösung)`})]};
+    }
+    let c1 = pick(d[1]), c2 = pick(d[1]); let k = 0; while(c2===c1 && k++<20) c2 = pick(d[1]);
+    const V1 = pick([50,100,150,200,250]), V2 = pick([100,200,250,300,500]);
+    return {title:`Lösungen mischen · ${s.h}`,
+      text:`<b>${V1} mL</b> ${s.sol} mit <b>c₁ = ${g(c1)} mol/L</b> werden mit <b>${V2} mL</b> ${s.sol} mit <b>c₂ = ${g(c2)} mol/L</b> gemischt. Berechne die Konzentration der Mischung (die Volumina addieren sich).`,
+      given:[["V₁", `${V1} mL`], ["c₁", `${g(c1)} mol/L`], ["V₂", `${V2} mL`], ["c₂", `${g(c2)} mol/L`]], wanted:[`c<sub>Misch</sub>(${s.h})`],
+      steps:[stConv("V1L","V₁",V1,0.001,"mL","L","Volumen der 1. Lösung in L"),
+             stNcV("n1",s,c1,"V1L",{sym:`n<sub>1</sub>(${s.h})`, label:`Stoffmenge an ${s.name} in der 1. Lösung`}),
+             stConv("V2L","V₂",V2,0.001,"mL","L","Volumen der 2. Lösung in L"),
+             stNcV("n2",s,c2,"V2L",{sym:`n<sub>2</sub>(${s.h})`, label:`Stoffmenge an ${s.name} in der 2. Lösung`}),
+             stSum("nges",`n<sub>ges</sub>(${s.h})`,"mol",["n1","n2"],"Gesamte Stoffmenge","Beim Mischen addieren sich die Stoffmengen des gelösten Stoffes.",`n<sub>ges</sub> = n<sub>1</sub> + n<sub>2</sub>`),
+             stSum("Vges","V<sub>ges</sub>","L",["V1L","V2L"],"Gesamtvolumen der Mischung in L","Die Volumina der beiden Lösungen werden addiert.",`V<sub>ges</sub> = V<sub>1</sub> + V<sub>2</sub>`),
+             Object.assign(stCnV("c",s,"nges","Vges",{sym:`c<sub>Misch</sub>(${s.h})`, label:"Konzentration der Mischung"}), {formula:`c<sub>Misch</sub> = n<sub>ges</sub> / V<sub>ges</sub>`,
+               errs:[V=>[(V.n1/V.V1L+V.n2/V.V2L)/2, "Konzentrationen dürfen nicht einfach gemittelt werden. Teile die gesamte Stoffmenge durch das Gesamtvolumen."], V=>[V.nges*V.Vges, "Richtig ist c = n / V, also teilen."]]})]};
+  }
+
+  // ---------- Kategorien ----------
+  const MODES = {
+    "1":{name:"Grundrechnung", chip:"l1", title:"Größen",
+      note:"Kurze Rechnungen mit einer Größengleichung. Die Rechnung ist in Teilschritte zerlegt, jeder Schritt wird einzeln geprüft.",
+      cats:[{id:"M", name:"Molare Masse", on:true, gens:[g1_M]},
+            {id:"n", name:"Stoffmenge aus der Masse", on:true, gens:[g1_n]},
+            {id:"m", name:"Masse aus der Stoffmenge", on:true, gens:[g1_m]},
+            {id:"V", name:"Gasvolumen (molares Volumen)", on:true, gens:[g1_Vn, g1_nV]},
+            {id:"L", name:"Volumen von Flüssigkeiten (Dichte)", on:true, gens:[g1_Lm, g1_LV, g1_Ln, g1_LVn]},
+            {id:"c", name:"Konzentration aus Stoffmenge und Volumen", on:true, gens:[g1_c]},
+            {id:"nc", name:"Stoffmenge aus Konzentration und Volumen", on:true, gens:[g1_nc]},
+            {id:"Vc", name:"Volumen aus Stoffmenge und Konzentration", on:true, gens:[g1_Vc]},
+            {id:"N", name:"Teilchenanzahl (Avogadro-Konstante)", on:false, gens:[g1_N, g1_nN]}]},
+    "2":{name:"Einfache Textaufgabe", chip:"l2", title:"Aufgabentypen",
+      note:"Kleine Sachaufgaben mit zwei bis fünf Rechenschritten. Jeder Schritt wird geprüft, bevor der nächste freigeschaltet wird.",
+      cats:[{id:"gas", name:"Gase: Masse ↔ Volumen", on:true, gens:[g2_mV, g2_Vm]},
+            {id:"sol", name:"Lösungen herstellen, Konzentration", on:true, gens:[g2_solMake, g2_solConc]},
+            {id:"ncv", name:"Lösungen: n = c · V (Stoffmenge, Konzentration, Volumen)", on:true, gens:[g2_ncv_n, g2_ncv_c, g2_ncv_V]},
+            {id:"part", name:"Teilchenanzahl", on:true, gens:[g2_part]},
+            {id:"rx", name:"Reaktionen im Verhältnis 1 : 1", on:true, gens:[g2_rx]}]},
+    "3":{name:"Komplexe Textaufgabe", chip:"l3", title:"Aufgabentypen",
+      note:"Mehrschrittige Aufgaben mit Reaktionsgleichung und Stoffmengenverhältnis. Jeder Zwischenschritt wird geprüft.",
+      cats:[{id:"rxm", name:"Reaktionen: Masse → Masse", on:true, gens:[g3_rxm]},
+            {id:"rxg", name:"Reaktionen mit Gasen", on:true, gens:[g3_rxmV, g3_rxVm]},
+            {id:"dil", name:"Verdünnen", on:true, gens:[g3_dil]},
+            {id:"mix", name:"Lösungen mischen (n = c · V)", on:true, gens:[g3_mix]},
+            {id:"yield", name:"Ausbeute", on:true, gens:[g3_yield]},
+            {id:"pure", name:"Reinheit & Massenanteil", on:true, gens:[g3_pure]},
+            {id:"lim", name:"Begrenzender Stoff & Überschuss", on:true, gens:[g3_lim]}]}
+  };
+
+  function renderCats(){
+    const M = MODES[mode];
+    $("catTitle").textContent = M.title;
+    $("modeNote").textContent = M.note;
+    $("catBox").innerHTML = M.cats.map(c=>`<label class="check-row"><input type="checkbox" data-cat="${c.id}" ${c.on ? "checked" : ""}><span>${c.name}</span></label>`).join("");
+    $("catNote").textContent = "";
+  }
+
+  // ---------- PSE ----------
+  function cellHTML(e){
+    const k = {m:"", h:" hm", n:" nm", e:" eg"}[e.c];
+    const mv = e.rad ? `(${e.mp})` : am(e.s, prec);
+    return `<button class="cell${k}" data-s="${e.s}" title="${e.n}" aria-label="${e.n}, Atommasse ${mv} u"><span class="z">${e.z}</span><span class="sy">${e.s}</span><span class="ms">${mv}</span></button>`;
+  }
+  let selSym = null;
+  function buildPSE(){
+    let h = `<div></div>`;
+    for(let gr=1; gr<=8; gr++) h += `<div class="hd">${ROMAN[gr]}</div>`;
+    ROWS.forEach((row,pi)=>{
+      h += `<div class="rh">${pi+1}</div>`;
+      if(pi===0) h += cellHTML(EL.H) + `<div class="legend">oben links: Ordnungszahl<br>unten: Atommasse in u</div>` + cellHTML(EL.He);
+      else row.forEach(d=> h += cellHTML(EL[d[0]]));
+    });
+    $("pse").innerHTML = h;
+    let t = `<div></div>`;
+    TM.forEach(d=> t += cellHTML(EL[d[0]]));
+    $("pseTM").innerHTML = t;
+    if(selSym) showInfo(selSym);
+  }
+  function showInfo(s){
+    const e = EL[s]; selSym = s;
+    document.querySelectorAll(".pse .cell").forEach(c=>c.classList.toggle("sel", c.dataset.s===s));
+    const mv = e.rad ? `(${e.mp})` : am(e.s, prec);
+    const pos = e.tm ? "Nebengruppenmetall" : `${ROMAN[e.g]}. Hauptgruppe · ${e.p}. Periode · ${CLS[e.c]}`;
+    $("pseInfo").innerHTML = `<b>${e.n}</b> (${e.s}) · Ordnungszahl <span class="a">${e.z}</span> · Atommasse <span class="a">${mv} u</span> → M = <span class="a">${mv} g/mol</span><br>${pos}`;
+  }
+
+  // ---------- Aufgabe erzeugen ----------
+  let lastTitle = "";
+  function newTask(){
+    if(task && !task.done && task.touched) logHistory(task, "open");
+    const M = MODES[mode];
+    const gens = [];
+    M.cats.forEach(c=>{ if(c.on) c.gens.forEach(gn=>gens.push(gn)); });
+    if(!gens.length){ task = null; showNoType(); return; }
+    let T, k = 0;
+    do { T = pick(gens)(); k++; } while(T.title===lastTitle && k<10);
+    lastTitle = T.title;
+    T.mode = mode; T.modeName = M.name; T.chip = M.chip;
+    T.num = ++taskCount; T.uv = {}; T.raw = {}; T.bad = {}; T.passed = 0; T.wrong = 0; T.hints = 0; T.hintLvl = {};
+    T.done = false; T.shown = false; T.touched = false; T.logged = false;
+    task = T;
+    renderTask();
+    setStatus("running","Aufgabe offen");
+    say([]);
+    $("wayBox").innerHTML = `<div class="empty-hint">Der Lösungsweg erscheint, sobald die Aufgabe gelöst oder die Lösung angezeigt wurde.</div>`;
+    focusActive();
+  }
+  function noTypeMsg(){
+    return `Es ist kein Aufgabentyp ausgewählt. Wähle links unter „${MODES[mode].title}“ zuerst mindestens einen Aufgabentyp aus – danach startet automatisch eine neue Aufgabe.`;
+  }
+  function showNoType(){
+    const M = MODES[mode];
+    $("taskNum").textContent = "Keine Aufgabe";
+    $("taskLevel").textContent = M.name;
+    $("taskLevel").className = "chip "+M.chip;
+    $("taskCtx").textContent = "";
+    $("taskText").innerHTML = "";
+    $("taskEq").innerHTML = "";
+    $("stepsCol").innerHTML = `<div class="fb bad notype">${noTypeMsg()}</div>`;
+    $("qPanel").style.display = "none";
+    say([]);
+    setStatus("","Kein Aufgabentyp gewählt");
+    $("wayBox").innerHTML = `<div class="empty-hint">Der Lösungsweg erscheint, sobald die Aufgabe gelöst oder die Lösung angezeigt wurde.</div>`;
+  }
+  function setStatus(cls, txt){
+    $("statusBadge").className = "status "+cls;
+    $("statusText").textContent = txt;
+  }
+
+  // ---------- Darstellung ----------
+  function renderTask(){
+    $("taskNum").textContent = `Aufgabe ${task.num}`;
+    $("taskLevel").textContent = task.modeName;
+    $("taskLevel").className = "chip "+task.chip;
+    $("taskCtx").innerHTML = task.title;
+    $("taskText").innerHTML = task.text;
+    $("taskEq").innerHTML = task.eq ? `<div class="eqbox">${task.eq}</div>` : "";
+    $("qPanel").style.display = "";
+    renderSteps();
+    renderPanel();
+  }
+  function stepVal(st, v, P){
+    if(st.kind==="choice") return st.options[v].h;
+    return fV(v, st.unit, P);
+  }
+  function renderSteps(){
+    const T = task;
+    let h = "";
+    T.steps.forEach((st,i)=>{
+      const passed = i < T.passed, locked = !T.done && i > T.passed, active = !T.done && i===T.passed;
+      const cls = passed ? "passed" : locked ? "locked" : active ? "active" : "";
+      const stTxt = passed ? (T.shown && T.solvedFrom!==undefined && i>=T.solvedFrom ? "Lösung" : "✓ richtig") : locked ? "gesperrt" : "offen";
+      h += `<div class="stepbox ${cls}" data-i="${i}">`;
+      h += `<div class="sh"><span><span class="n">${i+1}</span>${help>=1 ? `<span class="lbl">${st.label}</span>` : `<span class="lbl">Schritt ${i+1}</span>`}</span><span class="st">${stTxt}</span></div>`;
+      if(help>=1 && !passed) h += `<p class="hlp">${st.hint}</p>`;
+      if(help>=2 && !passed) h += `<div class="fml">${st.formula}</div>`;
+      const dis = (passed || locked || T.done) ? "disabled" : "";
+      const okc = passed ? " ok" : (T.bad[i] ? " bad" : "");
+      if(st.kind==="choice"){
+        const selV = passed ? T.uv[st.key] : T.raw[st.key];
+        h += `<div class="in-row"><div class="choice" data-key="${st.key}">` + st.options.map((o,oi)=>`<button data-v="${oi}" class="${String(selV)===String(oi) ? "sel" : ""}${T.bad[i] && String(selV)===String(oi) ? " bad" : ""}" ${dis}>${o.h}</button>`).join("") + `</div>`;
+      } else if(st.kind==="sci"){
+        let mv = T.raw[st.key+"_m"] || "", ev = T.raw[st.key+"_e"] || "";
+        if(passed){ const [m,e] = sciParts(T.uv[st.key],3); mv = dec(m,2); ev = String(e); }
+        h += `<div class="in-row"><span class="eqs">${st.sym} =</span><input type="text" class="num-in" data-key="${st.key}_m" inputmode="decimal" autocomplete="off" placeholder="Zahl" value="${esc(mv)}" ${dis}><span class="pow">· 10^</span><input type="text" class="num-in exp${okc}" data-key="${st.key}_e" inputmode="decimal" autocomplete="off" placeholder="Exp." value="${esc(ev)}" ${dis}><span class="u">${st.unit}</span>`;
+        h = h.replace(`class="num-in" data-key="${st.key}_m"`, `class="num-in${okc}" data-key="${st.key}_m"`);
+      } else {
+        const v = passed ? stepVal(st, T.uv[st.key], prec) : (T.raw[st.key] || "");
+        h += `<div class="in-row"><span class="eqs">${st.sym} =</span><input type="text" class="num-in${okc}" data-key="${st.key}" inputmode="decimal" autocomplete="off" value="${esc(v)}" ${dis}><span class="u">${st.unit}</span>`;
+      }
+      if(!passed && !T.done) h += `<span class="spacer"></span><button class="btn check-btn" data-check="${i}" ${locked ? "disabled" : ""}>Prüfen</button>`;
+      h += `</div></div>`;
+    });
+    $("stepsCol").innerHTML = h;
+  }
+  const esc = s => String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
+  function renderPanel(){
+    const T = task;
+    let h = "";
+    if(help>=1){
+      h += `<div class="qh">Gegeben</div>` + T.given.map(([s,v])=>`<div class="qrow"><span class="qs">${s}</span><span class="qv w">${v}</span></div>`).join("");
+      h += `<div class="qh">Gesucht</div>` + T.wanted.map(s=>`<div class="qrow"><span class="qs">${s}</span><span class="qv">?</span></div>`).join("");
+    } else {
+      h += `<div class="qh">Gegeben / Gesucht</div><p class="qnote">Hilfen sind aus: Schreibe Gegeben und Gesucht selbst aus dem Aufgabentext heraus.</p>`;
+    }
+    h += `<div class="qh">Zwischenergebnisse</div>`;
+    const rows = T.steps.slice(0, T.passed).map(st=>`<div class="qrow"><span class="qs">${st.sym}</span><span class="qv t">${stepVal(st, T.uv[st.key], prec)}${st.kind==="choice" ? "" : " "+st.unit}</span></div>`);
+    h += rows.length ? rows.join("") : `<p class="qnote">Noch keine. Geprüfte Schritte erscheinen hier.</p>`;
+    $("qPanel").innerHTML = h;
+  }
+  function say(list){
+    $("feedback").innerHTML = list.map(([cls,txt])=>`<div class="fb ${cls}">${txt}</div>`).join("");
+  }
+  function focusActive(){
+    if(!task || task.done) return;
+    const box = document.querySelector(`.stepbox[data-i="${task.passed}"]`);
+    if(!box) return;
+    const inp = box.querySelector("input:not([disabled])");
+    if(inp && window.matchMedia("(pointer:fine)").matches) inp.focus({preventScroll:true});
+  }
+
+  // ---------- Prüfen ----------
+  function chainVals(T, P, upto, user){
+    const V = {};
+    for(let i=0; i<upto; i++){
+      const st = T.steps[i];
+      const ex = st.calc(V, P);
+      V[st.key] = (user && T.uv[st.key]!==undefined) ? T.uv[st.key] : ex;
+    }
+    return V;
+  }
+  function stepCtx(i){
+    const st = task.steps[i];
+    const Vup = chainVals(task,"p",i,true), Vur = chainVals(task,"r",i,true);
+    const Vxp = chainVals(task,"p",i,false), Vxr = chainVals(task,"r",i,false);
+    const Vu = prec==="p" ? Vup : Vur;
+    return {Vu, exp:st.calc(Vu,prec), cands:[st.calc(Vup,"p"), st.calc(Vur,"r"), st.calc(Vxp,"p"), st.calc(Vxr,"r")]};
+  }
+  function readInput(st){
+    if(st.kind==="choice"){
+      const r = task.raw[st.key];
+      return (r===undefined || r===null || r==="") ? null : +r;
+    }
+    if(st.kind==="sci"){
+      const m = parseNum(task.raw[st.key+"_m"]);
+      const eRaw = String(task.raw[st.key+"_e"]||"").trim();
+      if(m===null) return null;
+      if(isNaN(m)) return NaN;
+      if(eRaw==="") return m;
+      if(!/^[+-]?\d+$/.test(eRaw)) return NaN;
+      return m*Math.pow(10, parseInt(eRaw,10));
+    }
+    return parseNum(task.raw[st.key]);
+  }
+  function diagnose(st, v, ctx){
+    if(st.kind==="choice") return st.wrong;
+    for(const e of st.errs){
+      const [w, msg] = e(ctx.Vu, prec);
+      if(isFinite(w) && Math.abs(w-ctx.exp) > 1e-9*Math.abs(ctx.exp) && near(v, w, {rel:0.015, abs:st.tol.abs||0})) return msg;
+    }
+    const r = v/ctx.exp;
+    if(near(r,1000,{rel:0.02}) || near(r,0.001,{rel:0.02})) return "Der Wert ist um den Faktor 1000 falsch. Hast du die Einheiten umgerechnet (mL ↔ L, g ↔ kg, m³ ↔ L)?";
+    if([10,100,0.1,0.01].some(k=>near(r,k,{rel:0.02}))) return "Die Ziffern passen, aber die Größenordnung nicht. Prüfe Komma bzw. Zehnerpotenz.";
+    const lr = Math.log10(Math.abs(r));
+    if(st.kind==="sci" && Math.abs(lr)>0.5 && Math.abs(lr-Math.round(lr))<0.01) return "Die Zahl vor der Zehnerpotenz stimmt, der Exponent nicht.";
+    if(near(v, ctx.exp, {rel:0.06})) return "Knapp daneben. Vermutlich hast du zu stark gerundet – rechne mit mindestens drei gültigen Ziffern.";
+    if(v<0) return "Der Wert darf nicht negativ sein.";
+    return "Das stimmt noch nicht. Prüfe Formel, eingesetzte Werte und Einheit." + (help<2 ? " Mit „Tipp“ oder der Hilfestufe „+ Formeln“ bekommst du Unterstützung." : "");
+  }
+  function check(i){
+    if(!task || task.done || i!==task.passed) return;
+    const st = task.steps[i];
+    const v = readInput(st);
+    if(v===null){ say([["bad", st.kind==="choice" ? "Wähle zuerst eine Antwort aus." : "Trage zuerst einen Wert ein."]]); return; }
+    if(isNaN(v)){ say([["bad","Die Eingabe ist keine gültige Zahl. Verwende Komma oder Punkt als Dezimaltrennzeichen (ohne Tausenderpunkte)."]]); return; }
+    task.touched = true;
+    const ctx = stepCtx(i);
+    const ok = st.kind==="choice" ? v===ctx.exp : ctx.cands.some(c=>near(v,c,st.tol));
+    if(ok){
+      task.uv[st.key] = v; task.passed++; task.bad[i] = false;
+      if(task.passed===task.steps.length){ finish(); return; }
+      renderSteps(); renderPanel();
+      say([["good", `Schritt ${i+1} ist richtig: <span class="m">${st.sym} = ${stepVal(st,v,prec)}${st.kind==="choice" ? "" : " "+st.unit}</span>. Weiter mit Schritt ${i+2}.`]]);
+      focusActive();
+    } else {
+      task.wrong++; task.bad[i] = true;
+      renderSteps();
+      say([["bad", `<b>Schritt ${i+1}:</b> ${diagnose(st, v, ctx)}`]]);
+    }
+  }
+  function finish(){
+    task.done = true;
+    stats.solved++;
+    const first = task.wrong===0 && task.hints===0;
+    if(first){ stats.first++; stats.streak++; } else stats.streak = 0;
+    updateStats();
+    renderSteps(); renderPanel();
+    const last = task.steps[task.steps.length-1];
+    setStatus("done","Gelöst");
+    say([["good", `${first ? "Perfekt, im ersten Versuch gelöst!" : "Aufgabe gelöst!"} Ergebnis: <span class="m">${last.sym} = ${stepVal(last, task.uv[last.key], prec)} ${last.unit}</span>. Den vollständigen Lösungsweg findest du unten.`]]);
+    logHistory(task, first ? "first" : (task.hints>0 ? "help" : "ok"));
+    renderWay();
+  }
+  function solve(){
+    if(!task){ showNoType(); return; }
+    if(task.done) return;
+    const V = chainVals(task, prec, task.steps.length, true);
+    task.solvedFrom = task.passed;
+    task.steps.forEach((st,i)=>{ if(i>=task.passed) task.uv[st.key] = V[st.key]; });
+    task.passed = task.steps.length; task.done = true; task.shown = true;
+    stats.shown++; stats.streak = 0; updateStats();
+    renderSteps(); renderPanel();
+    setStatus("shown","Lösung angezeigt");
+    say([["info","Die Lösung wird angezeigt. Vergleiche die Schritte mit deinem Weg im Tab „Lösungsweg“."]]);
+    logHistory(task, "shown");
+    renderWay();
+  }
+  function hint(){
+    if(!task){ showNoType(); return; }
+    if(task.done) return;
+    const i = task.passed, st = task.steps[i];
+    const prev = task.hintLvl[i];
+    const lvl = Math.min(2, Math.max(help, prev===undefined ? help : prev+1));
+    task.hintLvl[i] = lvl; task.hints++; task.touched = true;
+    const Vu = chainVals(task, prec, i, true);
+    let txt;
+    if(lvl===0) txt = `<b>Tipp zu Schritt ${i+1}:</b> Gesucht ist ${st.label} (<span class="m">${st.sym}</span>). ${st.hint}`;
+    else if(lvl===1) txt = `<b>Formel zu Schritt ${i+1}:</b> <span class="m">${st.formula}</span>`;
+    else txt = `<b>Ansatz zu Schritt ${i+1}:</b> <span class="m">${st.ans(Vu, prec)}${st.kind==="choice" ? "" : " = ?"}</span>` + (prev===2 ? " – mehr Tipps gibt es für diesen Schritt nicht." : "");
+    say([["hint", txt]]);
+  }
+
+  // ---------- Lösungsweg ----------
+  function renderWay(){
+    const P = prec, V = {};
+    let h = `<div class="steps">`;
+    task.steps.forEach((st,i)=>{
+      const v = st.calc(V,P);
+      const ans = st.ans(V,P);
+      V[st.key] = v;
+      const res = st.kind==="choice" ? `<br>→ begrenzend: <span class="t">${st.options[v].h}</span>` : ` = <span class="t">${stepVal(st,v,P)} ${st.unit}</span>`;
+      h += `<div class="step"><span class="n">${i+1}</span><span class="h">${st.label}</span><span class="b"><span class="sm">${st.formula}</span><br><span class="m">${ans}${res}</span></span></div>`;
+    });
+    const fin = task.steps.filter((st,i)=>i===task.steps.length-1 || st.kind==="choice" || (task.wanted.length>1 && i===task.steps.length-2 && task.wanted[0]===st.sym));
+    h += `<div class="step final"><span class="n">=</span><span class="h">Ergebnis</span><span class="b">${fin.map(st=>`${st.sym}${st.kind==="choice" ? ": " : " = "}${stepVal(st,V[st.key],P)}${st.kind==="choice" ? "" : " "+st.unit}`).join("<br>")}</span></div></div>`;
+    h += `<p class="note">Zwischenergebnisse sind gerundet angegeben; gerechnet wurde mit den ungerundeten Werten${P==="p" ? " und Atommassen mit einer Nachkommastelle" : " und gerundeten Atommassen"}.</p>`;
+    $("wayBox").innerHTML = h;
+  }
+
+  // ---------- Verlauf & Statistik ----------
+  function logHistory(t, status){
+    if(t.logged) return; t.logged = true;
+    const V = chainVals(t, prec, t.steps.length, false);
+    const last = t.steps[t.steps.length-1];
+    hist.unshift({num:t.num, mode:t.modeName, title:t.title, res:`${last.sym} = ${stepVal(last, V[last.key], prec)} ${last.unit}`, status});
+    const lbl = {first:["im 1. Versuch","s-first"], ok:["gelöst","s-ok"], help:["mit Hilfen gelöst","s-help"], shown:["Lösung angesehen","s-shown"], open:["abgebrochen","s-open"]};
+    $("histBody").innerHTML = hist.map(r=>`<tr><td class="mono">${r.num}</td><td>${r.mode}</td><td>${r.title}</td><td class="mono">${r.res}</td><td class="${lbl[r.status][1]}">${lbl[r.status][0]}</td></tr>`).join("");
+  }
+  function updateStats(){
+    $("roSolved").textContent = stats.solved;
+    $("roFirst").textContent = stats.first;
+    $("roStreak").textContent = stats.streak;
+    $("roShown").textContent = stats.shown;
+  }
+
+  // ---------- Ereignisse ----------
+  $("modeToggle").addEventListener("click", ev=>{
+    const b = ev.target.closest("button"); if(!b) return;
+    $("modeToggle").querySelectorAll("button").forEach(x=>x.classList.toggle("active", x===b));
+    mode = b.dataset.mode; renderCats(); newTask();
+  });
+  $("catBox").addEventListener("change", ev=>{
+    const inp = ev.target.closest("input[data-cat]"); if(!inp) return;
+    const cats = MODES[mode].cats, c = cats.find(x=>x.id===inp.dataset.cat);
+    c.on = inp.checked;
+    newTask();
+  });
+  $("helpToggle").addEventListener("click", ev=>{
+    const b = ev.target.closest("button"); if(!b) return;
+    $("helpToggle").querySelectorAll("button").forEach(x=>x.classList.toggle("active", x===b));
+    help = +b.dataset.h; if(task){ renderSteps(); renderPanel(); }
+  });
+  $("precToggle").addEventListener("click", ev=>{
+    const b = ev.target.closest("button"); if(!b) return;
+    $("precToggle").querySelectorAll("button").forEach(x=>x.classList.toggle("active", x===b));
+    prec = b.dataset.p; buildPSE(); if(task){ renderSteps(); renderPanel(); if(task.done) renderWay(); }
+  });
+  const pseClick = ev=>{ const c = ev.target.closest(".cell"); if(c) showInfo(c.dataset.s); };
+  $("pse").addEventListener("click", pseClick);
+  $("pseTM").addEventListener("click", pseClick);
+
+  const col = $("stepsCol");
+  col.addEventListener("input", ev=>{
+    const el = ev.target; if(!el.classList.contains("num-in")) return;
+    task.raw[el.dataset.key] = el.value; task.touched = true;
+    if(task.bad[task.passed]){ task.bad[task.passed] = false; el.closest(".stepbox").querySelectorAll(".num-in").forEach(x=>x.classList.remove("bad")); }
+  });
+  col.addEventListener("keydown", ev=>{
+    if(ev.key!=="Enter" || !ev.target.classList.contains("num-in")) return;
+    ev.preventDefault();
+    check(+ev.target.closest(".stepbox").dataset.i);
+  });
+  col.addEventListener("click", ev=>{
+    const cb = ev.target.closest("[data-check]");
+    if(cb){ check(+cb.dataset.check); return; }
+    const ch = ev.target.closest(".choice button");
+    if(ch && !ch.disabled){
+      const key = ch.closest(".choice").dataset.key;
+      task.raw[key] = ch.dataset.v; task.touched = true; task.bad[task.passed] = false;
+      ch.parentNode.querySelectorAll("button").forEach(x=>{ x.classList.toggle("sel", x===ch); x.classList.remove("bad"); });
+    }
+  });
+
+  $("btnNew").addEventListener("click", newTask);
+  $("btnHint").addEventListener("click", hint);
+  $("btnSolve").addEventListener("click", solve);
+
+  document.querySelectorAll(".tabbtn").forEach(b=>b.addEventListener("click", ()=>{
+    document.querySelectorAll(".tabbtn").forEach(x=>x.classList.toggle("active", x===b));
+    document.querySelectorAll(".tabpanel").forEach(p=>p.classList.toggle("active", p.id==="tab-"+b.dataset.tab));
+  }));
+  $("btnGuide").addEventListener("click", ev=>{ ev.preventDefault(); $("guideBackdrop").classList.add("open"); });
+  $("closeGuide").addEventListener("click", ()=>$("guideBackdrop").classList.remove("open"));
+  $("guideBackdrop").addEventListener("click", ev=>{ if(ev.target===$("guideBackdrop")) $("guideBackdrop").classList.remove("open"); });
+  $("btnChangelog").addEventListener("click", ev=>{ ev.preventDefault(); $("changelogBackdrop").classList.add("open"); });
+  $("closeChangelog").addEventListener("click", ()=>$("changelogBackdrop").classList.remove("open"));
+  $("changelogBackdrop").addEventListener("click", ev=>{ if(ev.target===$("changelogBackdrop")) $("changelogBackdrop").classList.remove("open"); });
+  document.addEventListener("keydown", ev=>{ if(ev.key==="Escape"){ $("guideBackdrop").classList.remove("open"); $("changelogBackdrop").classList.remove("open"); } });
+
+  renderCats();
+  buildPSE();
+  newTask();
+  updateStats();
+})();
+</script>
+
+<script>
+/* Höhe der Kopfzeile für die feststehende linke Spalte */
+(function(){
+  const hdr = document.querySelector("header");
+  if(!hdr) return;
+  const set = () => document.documentElement.style.setProperty("--hdr", Math.max(0, Math.round(hdr.getBoundingClientRect().bottom)) + "px");
+  addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
+})();
+</script>
+</body>
+</html>

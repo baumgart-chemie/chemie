@@ -271,7 +271,7 @@ table.hist td{padding:7px 8px; border-bottom:1px solid var(--line-soft); vertica
 table.hist td sub{font-size:.72em;}
 table.hist tr.grp td{color:var(--text-faint); font-size:10.5px; letter-spacing:.4px; text-transform:uppercase; padding-top:12px; background:var(--panel);}
 table.hist td.k{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; color:var(--amber); white-space:nowrap;}
-.s-first{color:var(--good);} .s-ok{color:var(--teal);} .s-shown{color:var(--danger);} .s-open{color:var(--text-faint); font-style:italic;}
+.s-first{color:var(--good);} .s-ok{color:var(--teal);} .s-help{color:var(--amber);} .s-shown{color:var(--danger);} .s-open{color:var(--text-faint); font-style:italic;}
 
 footer{padding:16px 28px 30px; color:var(--text-faint); font-size:11.5px; border-top:1px solid var(--line-soft); margin-top:10px;}
 footer p{margin:0;}
@@ -364,6 +364,15 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
 .eqop.by{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:14px; color:var(--text-dim); white-space:nowrap; margin:0;}
 .explain h3{font-size:13.5px; color:var(--amber); margin:16px 0 4px; font-weight:600;}
 .explain h3:first-child{margin-top:0;}
+
+/* Linke Spalte: steht beim Scrollen still und scrollt als Ganzes (ein einziger Scrollbereich) */
+@media (min-width:921px){
+  .sidebar{
+    position:sticky; top:0; align-self:start;
+    height:calc(100vh - var(--hdr, 70px)); height:calc(100dvh - var(--hdr, 70px)); max-height:none;
+    overflow-y:auto; overscroll-behavior:contain; background:var(--bg);
+  }
+}
 </style>
 </head>
 <body>
@@ -1376,7 +1385,7 @@ function renderStats(){
 }
 function renderHistory(){
   if(!history.length){ $("histBody").innerHTML=`<tr><td colspan="5" class="empty-hint">Noch keine Aufgaben bearbeitet.</td></tr>`; return; }
-  const lab = {clean:["s-first","ohne Fehlversuch gelöst"], ok:["s-ok","gelöst"], shown:["s-shown","Lösung angesehen"], open:["s-open","nicht beendet"]};
+  const lab = {clean:["s-first","ohne Fehlversuch gelöst"], ok:["s-ok","gelöst"], help:["s-help","mit Hilfen gelöst"], shown:["s-shown","Lösung angesehen"], open:["s-open","nicht beendet"]};
   $("histBody").innerHTML = history.slice().reverse().map(h=>`<tr><td class="mono">${h.no}</td><td>${esc(h.title)}</td><td class="mono">${h.st==="shown"?"–":h.steps} / ${h.minD}</td><td class="mono">${h.errors}</td><td class="${lab[h.st][0]}">${lab[h.st][1]}</td></tr>`).join("");
 }
 
@@ -1539,7 +1548,7 @@ function solved(msg){
   stats.solved++; if(T.errors===0) stats.clean++; stats.streak++;
   const extra = T.steps.length===T.minD ? " Das ist der kürzeste Weg." : ` Der kürzeste Weg hat ${T.minD} ${T.minD===1?"Schritt":"Schritte"}.`;
   fb("good", `${msg}<br><strong>Zielstoff erreicht – in ${T.steps.length} ${T.steps.length===1?"Schritt":"Schritten"}${T.errors?` mit ${T.errors} ${T.errors===1?"Fehlversuch":"Fehlversuchen"}`:" ohne Fehlversuch"}.</strong>${extra} Alle Reaktionsgleichungen stehen unten im Tab „Erklärung“.`);
-  finish(T.errors===0 ? "clean" : "ok");
+  finish(T.hints>0 ? "help" : (T.errors===0 ? "clean" : "ok"));
 }
 function solve(){
   if(T.done || !T.goal) return;
@@ -1675,6 +1684,15 @@ if(typeof window!=="undefined") window.__syn = {get T(){return T;}, react, short
   document.getElementById("closeChangelog").addEventListener("click", ()=>bd.classList.remove("open"));
   bd.addEventListener("click", e=>{ if(e.target===bd) bd.classList.remove("open"); });
   document.addEventListener("keydown", e=>{ if(e.key==="Escape") bd.classList.remove("open"); });
+})();
+</script>
+<script>
+/* Höhe der Kopfzeile für die feststehende linke Spalte */
+(function(){
+  const hdr = document.querySelector("header");
+  if(!hdr) return;
+  const set = () => document.documentElement.style.setProperty("--hdr", Math.max(0, Math.round(hdr.getBoundingClientRect().bottom)) + "px");
+  addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
 })();
 </script>
 </body>

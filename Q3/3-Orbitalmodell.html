@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Orbitalmodell – Hybridisierung, σ- und π-Bindungen</title>
+<style>
+:root{
+  --bg:#14171a; --panel:#1b1f23; --panel-alt:#20252a; --raise:#262c32;
+  --line:#31383e; --line-soft:#262c31;
+  --text:#e7e4dd; --text-dim:#9aa2a9; --text-faint:#5f6870;
+  --amber:#ffb454; --amber-dim:#8a6535;
+  --teal:#4fd1c5; --teal-dim:#2c5b56;
+  --good:#7fd68a;
+  --danger:#e4785b; --danger-dim:#6b3a2d;
+  --oxy:#ff8a7a; --nitro:#8fb4ff; --hal:#9bd88f;
+  --bond:#b9c0c6;
+  --screen:#0e1113; --grid:#233029;
+  --radius:3px;
+  color-scheme: dark;
+}
+*{box-sizing:border-box;}
+[hidden]{display:none !important;}
+html,body{height:100%;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.mono{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-variant-numeric:tabular-nums;}
+h1,h2,h3{font-weight:600; margin:0;}
+
+/* header */
+header{
+  padding:22px 28px 18px; border-bottom:1px solid var(--line);
+  display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;
+}
+header h1{font-size:20px; letter-spacing:.2px;}
+header .tag{color:var(--text-dim); font-size:13.5px;}
+header .status{
+  margin-left:auto; font-size:12.5px; padding:4px 10px; border:1px solid var(--line);
+  border-radius:20px; color:var(--text-dim); display:flex; align-items:center; gap:7px;
+}
+header .status .dot{width:7px;height:7px;border-radius:50%;background:var(--text-faint);}
+header .status.running .dot{background:var(--amber); box-shadow:0 0 6px var(--amber);}
+header .status.running{color:var(--amber); border-color:var(--amber-dim);}
+header .status.done .dot{background:var(--teal); box-shadow:0 0 6px var(--teal);}
+header .status.done{color:var(--teal); border-color:var(--teal-dim);}
+header .status.shown .dot{background:var(--danger);}
+header .status.shown{color:var(--danger); border-color:var(--danger-dim);}
+.guide-link{
+  color:var(--teal); font-size:13.5px; text-decoration:none; border-bottom:1px solid var(--teal-dim);
+  padding-bottom:1px;
+}
+.guide-link:hover{border-bottom-color:var(--teal);}
+@media (max-width:600px){ header{padding:18px 16px 14px;} }
+
+.modal-backdrop{
+  display:none; position:fixed; inset:0; background:rgba(8,10,12,.7); z-index:100;
+  align-items:center; justify-content:center; padding:24px 16px;
+}
+.modal-backdrop.open{display:flex;}
+.modal-box{
+  background:var(--panel); border:1px solid var(--line); border-radius:5px;
+  width:100%; max-width:640px; max-height:82vh; overflow-y:auto; padding:22px 26px 26px;
+}
+.modal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;}
+.modal-head h2{font-size:17px;}
+.modal-close{background:none; border:none; color:var(--text-dim); font-size:22px; line-height:1; cursor:pointer; padding:2px 6px;}
+.modal-close:hover{color:var(--text);}
+.modal-body h3{font-size:13.5px; color:var(--amber); margin:18px 0 6px; font-weight:600;}
+.modal-body h3:first-child{margin-top:0;}
+.modal-body p{font-size:13.5px; line-height:1.6; color:var(--text-dim); margin:0 0 6px;}
+.modal-body strong{color:var(--text); font-weight:600;}
+.formula-box{
+  font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:13px; color:var(--text);
+  background:var(--screen); border:1px solid var(--line-soft); border-radius:4px; padding:10px 12px; margin:6px 0 8px;
+  overflow-x:auto; white-space:nowrap;
+}
+
+/* layout */
+.wrap{display:grid; grid-template-columns: 330px 1fr; gap:0; align-items:start;}
+@media (max-width:920px){ .wrap{grid-template-columns:1fr;} }
+.sidebar{
+  border-right:1px solid var(--line); padding:20px 20px 60px;
+  max-height:calc(100vh - 70px); overflow-y:auto;
+}
+@media (max-width:920px){ .sidebar{border-right:none; border-bottom:1px solid var(--line); max-height:none; padding-bottom:24px;} }
+.main{padding:20px 24px 60px; min-width:0;}
+@media (max-width:600px){ .sidebar{padding:18px 16px 24px;} .main{padding:18px 16px 50px;} }
+
+section.block{margin-bottom:26px;}
+.block h2{
+  font-size:12.5px; color:var(--text-dim); font-weight:600;
+  padding-bottom:8px; border-bottom:1px solid var(--line-soft); margin-bottom:14px; letter-spacing:.2px;
+}
+.sub-label{font-size:13px; color:var(--text-dim); margin:0 0 6px;}
+
+.type-list{display:flex; flex-direction:column; gap:8px; margin-bottom:6px;}
+.type-item{
+  display:flex; gap:10px; align-items:flex-start; padding:9px 11px; cursor:pointer;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel);
+}
+.type-item:hover{border-color:var(--text-faint);}
+.type-item input{accent-color:var(--teal); width:16px; height:16px; margin:2px 0 0; flex:none;}
+.type-item .tt{font-size:13px; color:var(--text); font-weight:500;}
+.type-item .td{font-size:12px; color:var(--text-faint); line-height:1.45; margin-top:2px;}
+.type-item.on{border-color:var(--teal-dim); background:var(--panel-alt);}
+
+.field-full{margin-bottom:14px;}
+.field-full label{display:block; font-size:13px; color:var(--text-dim); margin-bottom:6px;}
+select{
+  width:100%; background:var(--panel-alt); border:1px solid var(--line); color:var(--text);
+  padding:7px 9px; border-radius:var(--radius); font-size:13.5px; font-family:inherit;
+}
+select:focus{outline:2px solid var(--teal-dim); outline-offset:1px;}
+
+.btn{
+  border-radius:var(--radius); border:1px solid var(--line); background:var(--panel-alt);
+  color:var(--text); font-size:13px; padding:8px 14px; cursor:pointer; font-family:inherit; font-weight:500;
+}
+.btn:hover{border-color:var(--text-faint);}
+.btn.primary{background:var(--teal); border-color:var(--teal); color:#0d1614;}
+.btn.primary:hover{filter:brightness(1.08);}
+.btn.ghost{background:transparent;}
+.btn:disabled{opacity:.4; cursor:not-allowed;}
+.btn:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.note{font-size:12px; color:var(--text-faint); line-height:1.5; margin-top:10px; max-width:62ch;}
+
+.legend{display:flex; flex-direction:column; gap:6px; font-size:12.5px; color:var(--text-dim);}
+.legend span.sw{display:inline-block; min-width:44px; font-weight:600;}
+
+/* Aufgaben-Screen */
+.screen-card{border:1px solid var(--line); background:var(--screen); border-radius:4px; padding:14px 14px 6px;}
+.screen-top{display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap;}
+.task-meta{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px;}
+.task-num{font-size:11.5px; color:var(--text-faint);}
+.chip{font-size:11px; padding:2px 8px; border-radius:20px; border:1px solid var(--line); color:var(--text-dim);}
+.chip.tA{color:var(--teal); border-color:var(--teal-dim);}
+.chip.tB{color:var(--amber); border-color:var(--amber-dim);}
+.chip.tC{color:var(--good); border-color:#35573a;}
+.chip.tD{color:var(--oxy); border-color:var(--danger-dim);}
+.ctx{font-size:14px; color:var(--text); line-height:1.55; margin:4px 0 10px;}
+.ctx p{margin:0 0 8px;}
+.ctx .dim{color:var(--text-dim); font-size:13px;}
+.mol-row{
+  display:flex; align-items:center; gap:14px; flex-wrap:wrap; padding:12px 4px 14px;
+  overflow-x:auto;
+}
+.mol-box{display:flex; flex-direction:column; align-items:center; gap:6px;}
+.mol-box .cap{font-size:12.5px; color:var(--text-dim); text-align:center; max-width:280px;}
+.mol-row .plus{color:var(--text-faint); font-size:22px;}
+.eqline{
+  font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:18px; color:var(--text);
+  padding:12px 2px 16px; line-height:1.5; overflow-x:auto; white-space:nowrap;
+}
+.eqline sub, .opt sub, .q sub{font-size:.68em;}
+.rad{color:var(--amber); font-weight:700;}
+.arr{color:var(--teal); margin:0 .5em;}
+@media (max-width:600px){ .eqline{font-size:15px;} }
+
+svg.mol{display:block; max-width:100%; height:auto; overflow:visible;}
+svg.mol line, svg.mol path, svg.mol polygon{stroke:var(--bond); stroke-width:1.5; fill:none; stroke-linecap:round; stroke-linejoin:round;}
+svg.mol path.br{stroke:var(--text-dim); stroke-width:1.4;}
+svg.mol text{fill:var(--text); font-size:15px; font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;}
+svg.mol .ox{fill:var(--oxy);}
+svg.mol .ni{fill:var(--nitro);}
+svg.mol .hal{fill:var(--hal);}
+svg.mol text.nn{fill:var(--text-dim); font-size:13px; font-style:italic;}
+svg.mol text.ix{fill:var(--text-dim); font-size:11.5px;}
+svg.mol line.lp{stroke-width:1.7;}
+svg.mol line.lp.ox{stroke:var(--oxy);}
+svg.mol line.lp.ni{stroke:var(--nitro);}
+svg.mol line.lp.hal{stroke:var(--hal);}
+svg.mol circle.rd{fill:var(--amber); stroke:none;}
+svg.mol path.wv{stroke:var(--text-dim); stroke-width:1.4;}
+.eqs{display:flex; align-items:center; flex-wrap:wrap; gap:6px 12px; padding:8px 2px 12px;}
+.eqop{font-size:20px; color:var(--text-faint); line-height:1;}
+.eqop.arr{color:var(--teal); font-size:22px;}
+.eqop.co{color:var(--text); font-size:17px; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; margin-right:-6px;}
+.opt .eqs{padding:2px 0;}
+.eqnum{display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--line-soft);}
+.eqnum:last-child{border-bottom:none;}
+.eqnum > span{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; color:var(--amber); font-size:15px; flex:none;}
+.formula-box .eqs{padding:2px 0;}
+
+svg.net{display:block; width:100%; max-width:340px; height:auto;}
+svg.net polyline{fill:none; stroke:var(--text-dim); stroke-width:2; stroke-linejoin:round; stroke-linecap:round;}
+svg.net line{stroke:var(--amber); stroke-width:3; stroke-linecap:round;}
+svg.net circle{fill:var(--amber);}
+
+/* Teilaufgaben */
+.q-group{border-top:1px solid var(--line-soft); padding:12px 0 12px;}
+.q-group .q{font-size:13.5px; color:var(--text-dim); margin-bottom:9px;}
+.q-group .q b{color:var(--text); font-weight:600;}
+.q-group .q .qn{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--amber); margin-right:7px;}
+.q-group.inline{display:grid; grid-template-columns:1fr auto; gap:8px 16px; align-items:center;}
+.q-group.inline .q{margin:0;}
+.q-group.inline .q.eqq{overflow-x:auto; min-width:0;}
+.q-group.inline .q.eqq .eqs{padding:2px 0;}
+@media (max-width:700px){ .q-group.inline{grid-template-columns:1fr;} }
+.choices{display:flex; flex-wrap:wrap; gap:8px;}
+.cards{display:grid; gap:10px; grid-template-columns:repeat(auto-fill, minmax(220px,1fr));}
+.cards.wide{grid-template-columns:1fr;}
+.cards.net3{grid-template-columns:repeat(auto-fill, minmax(190px,1fr));}
+.opt{
+  background:var(--panel-alt); border:1px solid var(--line); color:var(--text);
+  border-radius:var(--radius); padding:8px 13px; min-height:38px; font-size:13.5px; font-family:inherit;
+  cursor:pointer; text-align:left; touch-action:manipulation;
+}
+.opt:hover{border-color:var(--text-faint);}
+.opt:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.opt.card{display:flex; align-items:center; justify-content:center; padding:12px 10px; min-height:96px; background:var(--panel); overflow-x:auto;}
+.opt.card.txt{justify-content:flex-start; min-height:52px; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:14px; white-space:nowrap;}
+.opt.sel{border-color:var(--teal); background:var(--teal-dim);}
+.opt.card.sel{background:#16302d;}
+.q-group.ok .opt.sel{border-color:var(--good); background:#1d3322; box-shadow:0 0 0 1px #35573a;}
+.q-group.bad .opt.sel{border-color:var(--danger); background:#33201b; box-shadow:0 0 0 1px var(--danger-dim);}
+.q-group.done .opt:not(.sel){opacity:.55;}
+.mark{font-size:12px; margin-left:8px; font-weight:600;}
+.q-group.ok .mark::after{content:"✓ richtig"; color:var(--good);}
+.q-group.bad .mark::after{content:"✗ falsch"; color:var(--danger);}
+.why{font-size:12.5px; color:var(--danger); margin-top:8px; line-height:1.5;}
+.why sub{font-size:.75em;}
+
+.check-row{display:flex; justify-content:flex-end; padding:12px 0 2px; border-top:1px solid var(--line-soft);}
+.feedback{display:flex; flex-direction:column; gap:6px; margin:12px 0 4px;}
+.feedback:empty{display:none;}
+.fb{font-size:13px; line-height:1.5; padding:8px 11px; border-radius:4px; border:1px solid var(--line-soft); background:var(--panel);}
+.fb.good{color:var(--good); border-color:#35573a;}
+.fb.bad{color:var(--danger); border-color:var(--danger-dim);}
+.fb.hint{color:var(--amber); border-color:var(--amber-dim);}
+.fb.info{color:var(--text-dim);}
+.fb sub{font-size:.75em;}
+
+.readout-bar{display:flex; gap:26px; padding:12px 4px 12px; flex-wrap:wrap; border-top:1px solid var(--line-soft); margin-top:12px;}
+.readout{display:flex; flex-direction:column; gap:2px;}
+.readout .k{font-size:10.5px; color:var(--text-faint);}
+.readout .v{font-size:15px; color:var(--amber);}
+
+/* tabs */
+.tabs{display:flex; gap:2px; margin:26px 0 0; border-bottom:1px solid var(--line); overflow-x:auto;}
+.tabs button{
+  background:none; border:none; color:var(--text-dim); font-size:13px; padding:9px 4px; margin-right:22px;
+  cursor:pointer; font-family:inherit; border-bottom:2px solid transparent; font-weight:500; white-space:nowrap;
+}
+.tabs button.active{color:var(--text); border-bottom-color:var(--amber);}
+.tabpanel{display:none; padding-top:18px;}
+.tabpanel.active{display:block;}
+.empty-hint{color:var(--text-faint); font-size:13px; padding:22px 4px;}
+
+.explain{font-size:13.5px; color:var(--text-dim); line-height:1.65; max-width:78ch;}
+.explain p{margin:0 0 10px;}
+.explain strong{color:var(--text); font-weight:600;}
+.explain .figure{background:var(--screen); border:1px solid var(--line-soft); border-radius:4px; padding:12px 14px; margin:6px 0 12px; overflow-x:auto;}
+.explain .figure .eqline{padding:4px 0; font-size:15px;}
+.explain ul{margin:0 0 10px; padding-left:18px;}
+.explain li{margin-bottom:4px;}
+
+.table-wrap{overflow-x:auto; border:1px solid var(--line-soft); border-radius:4px;}
+table.hist{width:100%; border-collapse:collapse; font-size:12.8px;}
+table.hist thead th{text-align:left; font-weight:500; color:var(--text-faint); font-size:11px; padding:6px 8px; border-bottom:1px solid var(--line); white-space:nowrap;}
+table.hist td{padding:7px 8px; border-bottom:1px solid var(--line-soft); vertical-align:top;}
+table.hist td sub{font-size:.72em;}
+table.hist tr.grp td{color:var(--text-faint); font-size:10.5px; letter-spacing:.4px; text-transform:uppercase; padding-top:12px; background:var(--panel);}
+table.hist td.k{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; color:var(--amber); white-space:nowrap;}
+.s-first{color:var(--good);} .s-ok{color:var(--teal);} .s-help{color:var(--amber);} .s-shown{color:var(--danger);} .s-open{color:var(--text-faint); font-style:italic;}
+
+footer{padding:16px 28px 30px; color:var(--text-faint); font-size:11.5px; border-top:1px solid var(--line-soft); margin-top:10px;}
+footer p{margin:0;}
+footer a{color:var(--text-dim); text-decoration:none; border-bottom:1px solid var(--line);}
+footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
+footer .footer-credit{margin-top:8px; color:var(--text-dim);}
+@media (max-width:600px){ footer{padding:16px 16px 30px;} }
+::-webkit-scrollbar{width:9px; height:9px;}
+::-webkit-scrollbar-thumb{background:var(--line); border-radius:5px;}
+@media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+</style>
+
+<style>
+/* Versionshinweise */
+.modal-body ul{padding-left:18px; margin:0 0 6px;}
+.modal-body li{font-size:13.5px; line-height:1.6; color:var(--text-dim); margin:0 0 6px;}
+.modal-body li strong{color:var(--text); font-weight:600;}
+.vh-ver{display:flex; align-items:baseline; gap:10px; margin:18px 0 6px;}
+.vh-ver:first-child{margin-top:0;}
+.vh-ver .v{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:13px; color:var(--amber); border:1px solid var(--amber-dim); border-radius:var(--radius); padding:1px 7px;}
+.vh-ver .d{font-size:12px; color:var(--text-faint);}
+</style>
+<style>
+/* Zurück-Knopf */
+.back-btn{
+  display:inline-flex; align-items:center; gap:6px; align-self:center; color:var(--text-dim); font-size:13px; text-decoration:none;
+  border:1px solid var(--line); border-radius:var(--radius); background:var(--panel-alt); padding:5px 11px 5px 9px; white-space:nowrap;
+}
+.back-btn:hover{color:var(--text); border-color:var(--text-faint);}
+.back-btn:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.back-btn .ar{color:var(--teal); font-size:14px; line-height:1;}
+
+/* Hervorhebung in Valenzstrichformeln */
+svg.mol circle.hla{fill:rgba(255,180,84,.14); stroke:var(--amber); stroke-width:1.4;}
+svg.mol line.hl{stroke:var(--amber); stroke-width:2.2;}
+
+/* Kästchenschreibweise */
+svg.box{display:block; max-width:100%; height:auto;}
+svg.box rect{fill:none; stroke:var(--bond); stroke-width:1.3;}
+svg.box rect.bad{stroke:var(--bond);}
+svg.box line.e, svg.box polyline.e{stroke:var(--text); stroke-width:1.6; fill:none; stroke-linecap:round; stroke-linejoin:round;}
+svg.box text.lb{fill:var(--text-dim); font-size:12.5px; font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;}
+svg.box line.ax, svg.box polyline.ax{stroke:var(--text-faint); stroke-width:1.2; fill:none;}
+svg.box text.axl{fill:var(--text-faint); font-size:12px; font-style:italic;}
+/* Kästchen zum Ausfüllen */
+.fillwrap{display:flex; flex-direction:column; align-items:flex-start; gap:6px;}
+.fill-wait{font-size:13px; color:var(--text-faint); padding:10px 12px; border:1px dashed var(--line); border-radius:4px;}
+.fill-ctl{display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-size:12.5px; color:var(--text-dim);}
+.fill-ctl .cnt.full{color:var(--teal);}
+.fill-ctl .cnt.over{color:var(--danger);}
+.fill-ctl .btn{padding:5px 10px; font-size:12.5px;}
+svg.box.fill rect.fx{fill:rgba(255,255,255,.001); cursor:pointer; touch-action:manipulation;}
+svg.box.fill g.bx:hover rect.fx{stroke:var(--teal);}
+.q-group.ok svg.box.fill rect.fx{stroke:var(--good);}
+.q-group.bad svg.box.fill rect.fx{stroke:var(--danger);}
+.q-group.done svg.box.fill rect.fx{cursor:default;}
+.fill-note{font-size:12px; color:var(--text-faint);}
+.step-row{display:flex; align-items:center; gap:10px; margin-top:10px;}
+.step-row .btn{padding:6px 12px; font-size:12.5px;}
+.q-group.done .step-row{display:none;}
+.why.info{color:var(--text-dim);}
+
+/* Orbitaldarstellungen (SVG wird um Faktor 1,8 vergrößert dargestellt) */
+svg.orb{display:block; max-width:100%; height:auto; overflow:visible;}
+svg.orb .hy{fill:rgba(79,209,197,.20); stroke:var(--teal); stroke-width:.7;}
+svg.orb .po{fill:rgba(255,180,84,.18); stroke:var(--amber); stroke-width:.7;}
+svg.orb .so{fill:rgba(143,180,255,.24); stroke:var(--nitro); stroke-width:.7;}
+svg.orb .pic{fill:rgba(255,180,84,.10); stroke:var(--amber); stroke-width:.7; stroke-dasharray:2.5 2;}
+svg.orb .ax{stroke:var(--text-faint); stroke-width:.6; stroke-dasharray:2 2.5;}
+svg.orb text.axl{fill:var(--text-faint); font-size:7px; font-style:italic;}
+svg.orb circle.nuc{fill:var(--text);}
+svg.orb circle.lpd{fill:var(--oxy);}
+svg.orb text.el{fill:var(--text); font-size:7.5px; font-weight:600; font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;}
+svg.orb text.el.ox{fill:var(--oxy);}
+svg.orb text.elh{fill:var(--nitro); font-size:6.5px; font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;}
+svg.orb .mk line{stroke:var(--amber); stroke-width:.7;}
+svg.orb .mk circle{fill:var(--screen); stroke:var(--amber); stroke-width:.8;}
+svg.orb .mk text{fill:var(--amber); font-size:7px; font-weight:700; font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;}
+.mkn{display:inline-flex; align-items:center; justify-content:center; width:19px; height:19px; border-radius:50%;
+  border:1.4px solid var(--amber); color:var(--amber); font-size:11.5px; font-weight:700; margin:0 2px; vertical-align:1px;}
+.opt.card .cardcap{display:none;}
+.chip.tE{color:var(--nitro); border-color:#34466b;}
+
+/* Rubrik Grundlagen */
+.basics-list{display:flex; flex-direction:column; gap:6px;}
+.basic-item{
+  display:flex; gap:10px; align-items:center; width:100%; text-align:left; padding:8px 11px; cursor:pointer;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel); color:var(--text);
+  font-size:13px; font-family:inherit; font-weight:500; touch-action:manipulation;
+}
+.basic-item:hover{border-color:var(--text-faint); background:var(--panel-alt);}
+.basic-item:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.basic-item .nr{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--amber); min-width:14px;}
+.basic-item .go{margin-left:auto; color:var(--text-faint); font-size:12px;}
+.modal-box.wide{max-width:900px; max-height:88vh;}
+.modal-head .bnum{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--text-faint); margin-right:10px;}
+.fig-row{display:flex; flex-wrap:wrap; gap:12px; align-items:stretch; margin:8px 0 14px;}
+.fig{background:var(--screen); border:1px solid var(--line-soft); border-radius:4px; padding:10px 12px 8px;
+  display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:6px; max-width:100%; overflow-x:auto;}
+.fig .cap{font-size:12px; color:var(--text-dim); text-align:center; line-height:1.45; max-width:300px;}
+.fig-arrow{color:var(--teal); font-size:22px; align-self:center; padding:0 2px;}
+.modal-body table.hist td, .modal-body table.hist th{font-size:12.8px;}
+.modal-body .table-wrap{margin:6px 0 10px;}
+.basics-nav{display:flex; align-items:center; gap:10px; border-top:1px solid var(--line-soft); padding-top:14px; margin-top:16px;}
+.basics-nav .sp{flex:1; text-align:center; font-size:12px; color:var(--text-faint);}
+.legend span.swb{display:inline-block; width:22px; height:12px; border-radius:6px; margin-right:22px; vertical-align:-1px;}
+
+/* Linke Spalte: steht beim Scrollen still und scrollt als Ganzes (ein einziger Scrollbereich) */
+@media (min-width:921px){
+  .sidebar{
+    position:sticky; top:0; align-self:start;
+    height:calc(100vh - var(--hdr, 70px)); height:calc(100dvh - var(--hdr, 70px)); max-height:none;
+    overflow-y:auto; overscroll-behavior:contain; background:var(--bg);
+  }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="../index.html" class="back-btn" title="Zur Übersicht aller Simulationen"><span class="ar" aria-hidden="true">←</span>Zurück</a>
+  <h1>Orbitalmodell</h1>
+  <span class="tag">Atomorbitale, Hybridisierung, σ- und π-Bindungen</span>
+  <a href="#" class="guide-link" id="btnGuide">Anleitung</a>
+  <span class="status running" id="statusBadge"><span class="dot"></span><span id="statusText">Aufgabe offen</span></span>
+</header>
+
+<div class="modal-backdrop" id="guideBackdrop">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+    <div class="modal-head">
+      <h2 id="guideTitle">Anleitung</h2>
+      <button class="modal-close" id="closeGuide" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body">
+      <h3>Worum es geht</h3>
+      <p>Im <strong>Orbitalmodell</strong> halten sich Elektronen in <strong>Orbitalen</strong> auf, also Räumen, in denen sie mit hoher Wahrscheinlichkeit anzutreffen sind. Jedes Orbital fasst höchstens <strong>zwei Elektronen</strong> mit entgegengesetztem Spin. s-Orbitale sind kugelförmig, p-Orbitale hantelförmig mit einer Knotenebene am Kern.</p>
+
+      <h3>Hybridisierung</h3>
+      <p>Im Grundzustand hat das C-Atom (1s² 2s² 2p²) nur zwei ungepaarte Elektronen, wäre also zweibindig. Im <strong>angeregten Zustand</strong> wird ein 2s-Elektron in das leere 2p-Orbital angehoben. Danach werden das 2s-Orbital und ein, zwei oder drei 2p-Orbitale zu energiegleichen <strong>Hybridorbitalen</strong> gemischt.</p>
+      <p><strong>sp³:</strong> 2s + drei 2p → vier sp³-Orbitale, tetraedrisch, 109,5°.<br>
+         <strong>sp²:</strong> 2s + zwei 2p → drei sp²-Orbitale, trigonal-planar, 120°, ein p-Orbital bleibt.<br>
+         <strong>sp:</strong> 2s + ein 2p → zwei sp-Orbitale, linear, 180°, zwei p-Orbitale bleiben.</p>
+      <p>Faustregel: Zähle die π-Bindungen eines Atoms. Keine → sp³, eine → sp², zwei → sp. Das gilt auch für N- und O-Atome; ihre freien Elektronenpaare liegen dann in Hybridorbitalen.</p>
+
+      <h3>σ- und π-Bindungen</h3>
+      <p><strong>σ-Bindung:</strong> frontale Überlappung zweier Orbitale, die Elektronendichte liegt auf der Kernverbindungsachse. Um eine reine σ-Bindung ist freie Drehung möglich.</p>
+      <p><strong>π-Bindung:</strong> seitliche Überlappung zweier paralleler p-Orbitale, die Elektronendichte liegt ober- und unterhalb der Kernverbindungsachse. π-Bindungen verhindern die Drehung.</p>
+      <p>Einfachbindung = 1 σ, Doppelbindung = 1 σ + 1 π, Dreifachbindung = 1 σ + 2 π.</p>
+
+      <h3>Darstellungen</h3>
+      <p>Strukturformeln sind <strong>Valenzstrichformeln</strong> mit freien Elektronenpaaren, das markierte Atom bzw. die markierte Bindung ist orange. In den Orbitalbildern sind Hybridorbitale <strong>türkis</strong>, p-Orbitale und π-Elektronenwolken <strong>orange</strong> und 1s-Orbitale der H-Atome <strong>blau</strong>. In der Kästchenschreibweise steht jedes Kästchen für ein Orbital, die Pfeile für Elektronen.</p>
+
+      <h3>Bedienung</h3>
+      <p>Unter <strong>Grundlagen</strong> in der linken Spalte öffnet jedes Thema eine Erklärung mit Grafiken; mit den Pfeiltasten oder den Knöpfen unten blätterst du zum nächsten Thema.</p>
+      <p>Links wählst du die <strong>Aufgabentypen</strong> aus, mehrere gleichzeitig sind möglich. Du kannst auch alle abwählen und dann neu auswählen; ohne markierten Typ startet keine neue Aufgabe.</p>
+      <p>Beim Typ <strong>Elektronen eintragen</strong> tippst du auf ein Kästchen, um Elektronen einzutragen (leer → ↑ → ↑↓ → leer). Die Kästchen für den hybridisierten Zustand erscheinen, sobald du die Hybridisierung gewählt hast. Mit „Schritt prüfen“ kontrollierst du den Grundzustand und die Hybridisierung schon vorab; ein Fehler dabei zählt nicht als Versuch, die Aufgabe gilt dann aber nicht mehr als „im 1. Versuch gelöst“.</p>
+      <p>„Neue Aufgabe“ wählt zufällig eine Aufgabe aus den markierten Typen. Über „Aufgabe gezielt wählen“ lässt sich jede Aufgabe direkt aufrufen, zum Beispiel für die Besprechung im Unterricht.</p>
+      <p>Jede Aufgabe besteht aus mehreren Teilaufgaben. Tippe jeweils eine Antwort an und drücke „Prüfen“. Richtige Antworten werden grün markiert, falsche rot, oft mit einem Hinweis auf den Denkfehler. Die Auswahl lässt sich danach ändern und erneut prüfen.</p>
+      <p>„Tipp“ gibt schrittweise Hinweise. „Lösung zeigen“ markiert alle richtigen Antworten, die Aufgabe zählt dann nicht als gelöst. Nach dem Lösen steht im Tab <strong>Erklärung</strong> eine Begründung. Der Tab <strong>Übersicht</strong> fasst die Hybridisierungsarten und Bindungstypen zusammen, der <strong>Verlauf</strong> zeigt alle Aufgaben dieser Sitzung.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="basicsBackdrop">
+  <div class="modal-box wide" role="dialog" aria-modal="true" aria-labelledby="basicsTitle">
+    <div class="modal-head">
+      <h2><span class="bnum mono" id="basicsNum"></span><span id="basicsTitle"></span></h2>
+      <button class="modal-close" id="closeBasics" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body" id="basicsBody"></div>
+    <div class="basics-nav">
+      <button class="btn ghost" id="basicsPrev">← Vorheriges Thema</button>
+      <span class="sp" id="basicsPos"></span>
+      <button class="btn" id="basicsNext">Nächstes Thema →</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="changelogBackdrop">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="changelogTitle">
+    <div class="modal-head">
+      <h2 id="changelogTitle">Versionshinweise</h2>
+      <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.0</span><span class="d">01.11.2026</span></div>
+      <ul>
+        <li>Erste Version mit fünf Aufgabentypen: <strong>Orbitale &amp; Elektronenkonfiguration</strong>, <strong>Elektronen eintragen</strong>, <strong>Hybridisierung im Molekül</strong>, <strong>σ- und π-Bindungen</strong> sowie <strong>Orbitalmodell-Darstellungen</strong>.</li>
+        <li><strong>Elektronen eintragen:</strong> Kästchenschreibweise eines markierten C-, N- oder O-Atoms selbst ausfüllen – Grundzustand, Hybridisierung, hybridisierter Zustand. Antippen schaltet leer → ↑ → ↑↓ → leer; Zwischenschritte lassen sich mit „Schritt prüfen“ einzeln kontrollieren.</li>
+        <li><strong>Rubrik „Grundlagen“</strong> mit neun Themen, Grafiken und Erklärtext: Atomorbitale, Elektronenkonfiguration, Anregung &amp; Hybridisierung, sp³, sp², sp, σ- und π-Bindungen, freie Elektronenpaare (N, O), Hybridisierung bestimmen.</li>
+        <li>Kästchenschreibweise für C, N und O, Valenzstrichformeln mit freien Elektronenpaaren und markiertem Atom bzw. markierter Bindung, Orbitalbilder von Methan, Ethan, Ethen, Ethin und Methanal.</li>
+        <li>Frei wählbare Aufgabentypen (auch alle abwählbar), gezielte Aufgabenwahl, Tipps, Rückmeldung zu typischen Fehlern, Erklärung, Übersicht und Verlauf. Bedienbar mit iPad und Stift.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <section class="block">
+      <h2>Grundlagen</h2>
+      <div class="basics-list" id="basicsList"></div>
+      <p class="note">Erklärungen mit Grafiken zum Nachlesen – auch zur Besprechung im Unterricht.</p>
+    </section>
+
+    <section class="block">
+      <h2>Aufgabentypen</h2>
+      <div class="type-list" id="typeList"></div>
+      <p class="note">Mehrfachauswahl möglich. „Neue Aufgabe“ wählt zufällig aus den markierten Typen; ohne markierten Typ startet keine Aufgabe.</p>
+    </section>
+
+    <section class="block">
+      <h2>Aufgabe gezielt wählen</h2>
+      <div class="field-full">
+        <div style="display:flex; gap:6px;">
+          <select id="taskSelect" style="flex:1; min-width:0;" aria-label="Aufgabe gezielt wählen"></select>
+          <button class="btn ghost" id="btnLoad" style="flex:none;">Laden</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>Farben</h2>
+      <div class="legend">
+        <div><span class="sw" style="color:var(--oxy)">O</span>Sauerstoff</div>
+        <div><span class="sw" style="color:var(--nitro)">N</span>Stickstoff</div>
+        <div><span class="sw" style="color:var(--amber)">◯</span>markiertes Atom bzw. markierte Bindung</div>
+        <div><span class="sw">|</span>freies Elektronenpaar</div>
+        <div><span class="swb" style="background:rgba(79,209,197,.25); border:1px solid var(--teal)"></span>Hybridorbital</div>
+        <div><span class="swb" style="background:rgba(255,180,84,.22); border:1px solid var(--amber)"></span>p-Orbital, π-Elektronenwolke</div>
+        <div><span class="swb" style="background:rgba(143,180,255,.28); border:1px solid var(--nitro)"></span>1s-Orbital (H-Atom)</div>
+      </div>
+      <p class="note">Strukturformeln sind Valenzstrichformeln mit freien Elektronenpaaren. Orbitalbilder sind schematisch und nicht maßstabsgetreu; die kleinen Rückseiten-Keulen der Hybridorbitale sind in den Molekülen weggelassen.</p>
+    </section>
+
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <div class="screen-card">
+      <div class="screen-top">
+        <button class="btn primary" id="btnNew">Neue Aufgabe</button>
+        <button class="btn ghost" id="btnHint">Tipp</button>
+        <button class="btn ghost" id="btnSolve">Lösung zeigen</button>
+      </div>
+
+      <div class="task-meta">
+        <span class="task-num mono" id="taskNum">Aufgabe 1</span>
+        <span class="chip" id="taskChip"></span>
+      </div>
+      <div class="ctx" id="ctx"></div>
+      <div id="groups"></div>
+
+      <div class="check-row">
+        <button class="btn" id="btnCheck">Prüfen</button>
+      </div>
+      <div class="feedback" id="feedback"></div>
+
+      <div class="readout-bar">
+        <div class="readout"><span class="k">gelöst</span><span class="v mono" id="roSolved">0</span></div>
+        <div class="readout"><span class="k">davon im 1. Versuch</span><span class="v mono" id="roFirst">0</span></div>
+        <div class="readout"><span class="k">Serie</span><span class="v mono" id="roStreak">0</span></div>
+        <div class="readout"><span class="k">Lösung angesehen</span><span class="v mono" id="roShown">0</span></div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tabbtn active" data-tab="exp">Erklärung</button>
+      <button class="tabbtn" data-tab="ovw">Übersicht</button>
+      <button class="tabbtn" data-tab="hist">Verlauf</button>
+    </div>
+
+    <div class="tabpanel active" id="tab-exp">
+      <div id="expBox"><div class="empty-hint">Die Erklärung erscheint, sobald die Aufgabe gelöst oder die Lösung angezeigt wurde.</div></div>
+    </div>
+
+    <div class="tabpanel" id="tab-ovw">
+      <div class="table-wrap">
+        <table class="hist">
+          <thead><tr><th>Hybridisierung</th><th>gemischte Atomorbitale</th><th>Hybridorbitale</th><th>Anordnung</th><th>Winkel</th><th>p-Orbitale übrig</th><th>Bindungen (C-Atom)</th><th>Beispiele</th></tr></thead>
+          <tbody id="ovwBody"></tbody>
+        </table>
+      </div>
+      <div class="table-wrap" style="margin-top:14px">
+        <table class="hist">
+          <thead><tr><th></th><th>σ-Bindung</th><th>π-Bindung</th></tr></thead>
+          <tbody id="ovwBody2"></tbody>
+        </table>
+      </div>
+      <p class="note">Faustregel für C-, N- und O-Atome: Anzahl der π-Bindungen am Atom 0 → sp³, 1 → sp², 2 → sp. Freie Elektronenpaare befinden sich in Hybridorbitalen. Die tatsächlichen Bindungswinkel in NH₃ (ca. 107°) und H₂O (ca. 104,5°) sind kleiner als 109,5°, weil freie Elektronenpaare mehr Raum beanspruchen.</p>
+    </div>
+
+    <div class="tabpanel" id="tab-hist">
+      <div class="table-wrap">
+        <table class="hist">
+          <thead><tr><th>#</th><th>Typ</th><th>Aufgabe</th><th>Status</th></tr></thead>
+          <tbody id="histBody"><tr><td colspan="4" class="empty-hint">Noch keine Aufgaben bearbeitet.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <p class="footer-note">Valenzstrichformeln mit freien Elektronenpaaren; Orbitaldarstellungen schematisch, nicht maßstabsgetreu. Hybridisierung nach dem Schulmodell.</p>
+  <p class="footer-credit">Bastian Baumgart · Orbitalmodell V1.0 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+</footer>
+
+<script>
+(function(){
+"use strict";
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const shuffle = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; };
+const f1 = v => Math.round(v*10)/10;
+const uniq = a => a.filter((x,i)=>a.indexOf(x)===i);
+
+/* ============================================================
+   VALENZSTRICHFORMELN mit freien Elektronenpaaren
+   Molekül: a = [[Element, x, y], …], b = [[i, j, Bindungsordnung], …]
+   Freie Elektronenpaare werden aus der Valenzelektronenzahl berechnet
+   und so gesetzt, dass sie möglichst weit von den Bindungen entfernt liegen.
+   opt.hlA = [Atomindizes], opt.hlB = [Bindungsindizes] werden orange markiert.
+   ============================================================ */
+const U = 32;
+const VE = {H:1, C:4, N:5, O:6};
+const ELCLS = {O:"ox", N:"ni"};
+
+const adist = (a,b)=>{ const d=Math.abs(a-b)%360; return Math.min(d,360-d); };
+function chooseAngles(fixed, n){
+  const C=[]; for(let a=0;a<360;a+=15) C.push(a);
+  let best=null, bs=-1, bt=-1;
+  const rec=(start, ch)=>{
+    if(ch.length===n){
+      const all=fixed.concat(ch); let mn=360;
+      for(let i=0;i<all.length;i++) for(let j=i+1;j<all.length;j++) mn=Math.min(mn, adist(all[i],all[j]));
+      const ax=ch.filter(a=>a%90===0).length;
+      if(mn>bs || (mn===bs && ax>bt)){ bs=mn; bt=ax; best=ch.slice(); }
+      return;
+    }
+    for(let k=start;k<C.length;k++){ ch.push(C[k]); rec(k+1,ch); ch.pop(); }
+  };
+  rec(0,[]);
+  return best;
+}
+
+function lewisSVG(mol, opt){
+  opt=opt||{};
+  const A = mol.a.map(([el,x,y])=>({el,x,y}));
+  const B = mol.b.map(([i,j,o])=>({i,j,o:o||1}));
+  const hlA = opt.hlA||[], hlB = opt.hlB||[];
+  const P = a=>[a.x*U, a.y*U];
+  const nb = A.map(()=>[]);
+  B.forEach(b=>{ nb[b.i].push(b); nb[b.j].push(b); });
+  const other = (b,i)=>A[b.i===i?b.j:b.i];
+  const pre=[], out=[], bb={x0:Infinity, x1:-Infinity, y0:Infinity, y1:-Infinity};
+  const ext=(x,y,rx,ry)=>{ bb.x0=Math.min(bb.x0,x-rx); bb.x1=Math.max(bb.x1,x+rx); bb.y0=Math.min(bb.y0,y-ry); bb.y1=Math.max(bb.y1,y+ry); };
+  const hw = ()=>5.5;
+  const er = (a,dx,dy)=>{ const rx=hw(a)+3.5, ry=9.5; return 1/Math.sqrt((dx/rx)**2+(dy/ry)**2); };
+  const L = (x1,y1,x2,y2,c)=>{ out.push(`<line${c?` class="${c}"`:""} x1="${f1(x1)}" y1="${f1(y1)}" x2="${f1(x2)}" y2="${f1(y2)}"/>`); ext(x1,y1,0,0); ext(x2,y2,0,0); };
+
+  B.forEach((b,k)=>{
+    const a1=A[b.i], a2=A[b.j]; let [x1,y1]=P(a1), [x2,y2]=P(a2);
+    const len=Math.hypot(x2-x1,y2-y1), dx=(x2-x1)/len, dy=(y2-y1)/len;
+    const s1=er(a1,dx,dy), s2=er(a2,dx,dy);
+    x1+=dx*s1; y1+=dy*s1; x2-=dx*s2; y2-=dy*s2;
+    const nx=-dy, ny=dx, cls = hlB.includes(k) ? "hl" : "";
+    (b.o===2?[-2.8,2.8] : b.o===3?[-3.8,0,3.8] : [0]).forEach(o=>L(x1+nx*o, y1+ny*o, x2+nx*o, y2+ny*o, cls));
+  });
+  A.forEach((a,i)=>{
+    const [x,y]=P(a);
+    if(hlA.includes(i)){ pre.push(`<circle class="hla" cx="${f1(x)}" cy="${f1(y)}" r="11"/>`); ext(x,y,12,12); }
+    out.push(`<text x="${f1(x)}" y="${f1(y)}" text-anchor="middle" dominant-baseline="central"${ELCLS[a.el]?` class="${ELCLS[a.el]}"`:""}>${esc(a.el)}</text>`);
+    ext(x,y,hw(a),9);
+    const ve=VE[a.el]; if(ve==null) return;
+    const bsum=nb[i].reduce((s,b)=>s+b.o,0);
+    const n=Math.max(0, Math.floor((ve-bsum)/2));
+    if(!n || a.el==="H") return;
+    const fixed=nb[i].map(b=>{ const o=other(b,i); return (Math.round(Math.atan2(o.y-a.y,o.x-a.x)*180/Math.PI)+360)%360; });
+    const ang=chooseAngles(fixed,n);
+    const hlx=hlA.includes(i)?5:0, rx=hw(a)+5+hlx, ry=11.5+hlx, cls="lp"+(ELCLS[a.el]?" "+ELCLS[a.el]:"");
+    ang.forEach(t=>{
+      const c=Math.cos(t*Math.PI/180), s=Math.sin(t*Math.PI/180), px=x+rx*c, py=y+ry*s, h=4.6;
+      L(px-s*h, py+c*h, px+s*h, py-c*h, cls); ext(px,py,3,3);
+    });
+  });
+  const Z=1.3, P0=7, W=f1(bb.x1-bb.x0+2*P0), H=f1(bb.y1-bb.y0+2*P0);
+  return `<svg class="mol" viewBox="${f1(bb.x0-P0)} ${f1(bb.y0-P0)} ${W} ${H}" width="${f1(W*Z)}" height="${f1(H*Z)}" role="img" aria-label="Strukturformel">${pre.join("")}${out.join("")}</svg>`;
+}
+
+/* ============================================================
+   KÄSTCHENSCHREIBWEISE (Energieniveauschema)
+   rows: [[Bezeichnung, [Besetzung je Orbital 0/1/2]], …]
+   ============================================================ */
+const LEVY = {"2p":34, "sp³":56, "sp²":64, "sp":76, "2s":112, "1s":170};
+function boxSVG(rows){
+  const BX=24, X0=50, out=[];
+  const hasHyb = rows.some(r=>/^sp/.test(r[0]));
+  const nHyb = hasHyb ? rows.find(r=>/^sp/.test(r[0]))[1].length : 0;
+  let xmax=0;
+  const up = (cx,yt)=>{ out.push(`<line class="e" x1="${cx}" y1="${yt+20}" x2="${cx}" y2="${yt+4}"/><polyline class="e" points="${cx-3},${yt+8} ${cx},${yt+4} ${cx+3},${yt+8}"/>`); };
+  const dn = (cx,yt)=>{ out.push(`<line class="e" x1="${cx}" y1="${yt+4}" x2="${cx}" y2="${yt+20}"/><polyline class="e" points="${cx-3},${yt+16} ${cx},${yt+20} ${cx+3},${yt+16}"/>`); };
+  rows.forEach(([lab, occ])=>{
+    const y = LEVY[lab];
+    let x0 = X0;
+    if(lab==="2p") x0 = hasHyb ? X0 + nHyb*BX + 16 : X0 + BX + 16;
+    out.push(`<text class="lb" x="${x0-6}" y="${y+BX/2}" text-anchor="end" dominant-baseline="central">${lab}</text>`);
+    occ.forEach((n,k)=>{
+      const x = x0 + k*BX;
+      out.push(`<rect x="${x}" y="${y}" width="${BX}" height="${BX}"/>`);
+      if(n===1) up(x+BX/2-0.5, y);
+      if(n===2){ up(x+BX/2-4.5, y); dn(x+BX/2+4.5, y); }
+      xmax = Math.max(xmax, x+BX);
+    });
+  });
+  out.unshift(`<line class="ax" x1="10" y1="196" x2="10" y2="22"/><polyline class="ax" points="6,28 10,22 14,28"/><text class="axl" x="17" y="26">E</text>`);
+  const W = Math.max(xmax+10, 150), H = 202;
+  return `<svg class="box" viewBox="0 12 ${W} ${H-12}" width="${W}" height="${H-12}" role="img" aria-label="Kästchenschreibweise">${out.join("")}</svg>`;
+}
+
+/* Interaktive Kästchenschreibweise: occ = Besetzung je Zeile, Klick schaltet 0 → 1 → 2 → 0 */
+const FILLY = {"2p":40, "sp³":72, "sp²":80, "sp":92, "2s":118, "1s":168};
+function fillSVG(rows, occ){
+  const BX=34, X0=58, out=[];
+  const hasHyb = rows.some(r=>/^sp/.test(r[0]));
+  const nHyb = hasHyb ? rows.find(r=>/^sp/.test(r[0]))[1].length : 0;
+  let xmax=0;
+  const up = (cx,yt)=>{ out.push(`<line class="e" x1="${cx}" y1="${yt+28}" x2="${cx}" y2="${yt+6}"/><polyline class="e" points="${cx-4},${yt+11} ${cx},${yt+6} ${cx+4},${yt+11}"/>`); };
+  const dn = (cx,yt)=>{ out.push(`<line class="e" x1="${cx}" y1="${yt+6}" x2="${cx}" y2="${yt+28}"/><polyline class="e" points="${cx-4},${yt+23} ${cx},${yt+28} ${cx+4},${yt+23}"/>`); };
+  rows.forEach(([lab, cells], r)=>{
+    const y = FILLY[lab];
+    let x0 = X0;
+    if(lab==="2p") x0 = hasHyb ? X0 + nHyb*BX + 18 : X0 + BX + 18;
+    out.push(`<text class="lb" x="${x0-7}" y="${y+BX/2}" text-anchor="end" dominant-baseline="central">${lab}</text>`);
+    cells.forEach((_,k)=>{
+      const x = x0 + k*BX, n = occ[r][k];
+      out.push(`<g class="bx" data-box="${r},${k}"><rect class="fx" x="${x}" y="${y}" width="${BX}" height="${BX}"/>`);
+      if(n===1) up(x+BX/2-0.5, y);
+      if(n===2){ up(x+BX/2-6, y); dn(x+BX/2+6, y); }
+      out.push(`</g>`);
+      xmax = Math.max(xmax, x+BX);
+    });
+  });
+  const yb = FILLY["1s"]+BX+8;
+  out.unshift(`<line class="ax" x1="12" y1="${yb}" x2="12" y2="34"/><polyline class="ax" points="8,40 12,34 16,40"/><text class="axl" x="19" y="38">E</text>`);
+  const W = Math.max(xmax+12, 180), H = yb+6;
+  return `<svg class="box fill" viewBox="0 24 ${W} ${H-24}" width="${W}" height="${H-24}" role="img" aria-label="Kästchenschreibweise zum Ausfüllen">${out.join("")}</svg>`;
+}
+
+/* ============================================================
+   ORBITALBILDER (schematische 3D-Projektion)
+   Koordinaten in Å, x nach rechts, y nach oben, z zum Betrachter
+   ============================================================ */
+const OV = {yaw:-12, pitch:35, s:58};
+const vadd=(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]], vsub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]];
+const vmul=(a,k)=>[a[0]*k,a[1]*k,a[2]*k], vlen=a=>Math.hypot(a[0],a[1],a[2]);
+const vnorm=a=>vmul(a,1/vlen(a)), vmid=(a,b)=>vmul(vadd(a,b),0.5);
+const rad=d=>d*Math.PI/180;
+function proj(p){
+  const a=rad(OV.yaw), b=rad(OV.pitch);
+  const x1 = p[0]*Math.cos(a) + p[2]*Math.sin(a);
+  const z1 = -p[0]*Math.sin(a) + p[2]*Math.cos(a);
+  const y2 = p[1]*Math.cos(b) - z1*Math.sin(b);
+  const z2 = p[1]*Math.sin(b) + z1*Math.cos(b);
+  return [x1*OV.s, -y2*OV.s, z2];
+}
+
+function Scene(){ this.items=[]; this.top=[]; this.bb={x0:Infinity,x1:-Infinity,y0:Infinity,y1:-Infinity}; }
+Scene.prototype.ext=function(x,y,r){ r=r||0; const b=this.bb; b.x0=Math.min(b.x0,x-r); b.x1=Math.max(b.x1,x+r); b.y0=Math.min(b.y0,y-r); b.y1=Math.max(b.y1,y+r); };
+/* Keule (Tropfenform) vom Kern P in Richtung d, Länge L (px), Breite W (px) */
+Scene.prototype.lobe=function(P, d, L, W, cls, dots){
+  d = vnorm(d);
+  const p0=proj(P), p1=proj(vadd(P, vmul(d, L/OV.s)));
+  let ux=p1[0]-p0[0], uy=p1[1]-p0[1]; const ls=Math.hypot(ux,uy);
+  if(ls<1e-6){ ux=0; uy=-1; } else { ux/=ls; uy/=ls; }
+  const l=Math.max(ls, 0.95*W), vx=-uy, vy=ux;
+  const Q=(a,b)=>`${f1(p0[0]+ux*a+vx*b)} ${f1(p0[1]+uy*a+vy*b)}`;
+  const w=W;
+  const dpath=`M${Q(0,0)} C${Q(.15*l,-.55*w)} ${Q(.35*l,-w)} ${Q(.65*l,-w)} C${Q(.9*l,-w)} ${Q(l,-.55*w)} ${Q(l,0)} C${Q(l,.55*w)} ${Q(.9*l,w)} ${Q(.65*l,w)} C${Q(.35*l,w)} ${Q(.15*l,.55*w)} ${Q(0,0)} Z`;
+  let svg=`<path class="${cls}" d="${dpath}"/>`;
+  if(dots){
+    const cx=p0[0]+ux*l*.62, cy=p0[1]+uy*l*.62;
+    svg+=`<circle class="lpd" cx="${f1(cx+vx*3.5)}" cy="${f1(cy+vy*3.5)}" r="1.6"/><circle class="lpd" cx="${f1(cx-vx*3.5)}" cy="${f1(cy-vy*3.5)}" r="1.6"/>`;
+  }
+  this.items.push({z:(p0[2]+p1[2])/2, svg});
+  this.ext(p0[0],p0[1],0); this.ext(p0[0]+ux*l, p0[1]+uy*l, w*0.6); this.ext(p0[0]+ux*l*.65+vx*w, p0[1]+uy*l*.65+vy*w, 0); this.ext(p0[0]+ux*l*.65-vx*w, p0[1]+uy*l*.65-vy*w, 0);
+};
+Scene.prototype.sphere=function(P, r, cls, label){
+  const p=proj(P);
+  let svg=`<circle class="${cls}" cx="${f1(p[0])}" cy="${f1(p[1])}" r="${r}"/>`;
+  if(label) svg+=`<text class="elh" x="${f1(p[0])}" y="${f1(p[1])}" text-anchor="middle" dominant-baseline="central">${label}</text>`;
+  this.items.push({z:p[2], svg}); this.ext(p[0],p[1],r);
+};
+/* π-Elektronenwolke zwischen A und B, versetzt um h (Å) in Richtung n */
+Scene.prototype.cloud=function(A, B, n, h, W){
+  const c3=vadd(vmid(A,B), vmul(vnorm(n), h)), c=proj(c3), pa=proj(A), pb=proj(B);
+  const dx=pb[0]-pa[0], dy=pb[1]-pa[1], ls=Math.hypot(dx,dy);
+  const ang=Math.atan2(dy,dx)*180/Math.PI, rx=ls/2+W*0.9, ry=W*0.75;
+  this.items.push({z:c[2]+0.01, svg:`<ellipse class="pic" cx="${f1(c[0])}" cy="${f1(c[1])}" rx="${f1(rx)}" ry="${f1(ry)}" transform="rotate(${f1(ang)} ${f1(c[0])} ${f1(c[1])})"/>`});
+  const t=rad(ang), hx=Math.hypot(rx*Math.cos(t), ry*Math.sin(t)), hy=Math.hypot(rx*Math.sin(t), ry*Math.cos(t));
+  this.ext(c[0]-hx,c[1]-hy,0); this.ext(c[0]+hx,c[1]+hy,0);
+};
+Scene.prototype.nucleus=function(P, el){
+  const p=proj(P);
+  this.top.push(`<circle class="nuc" cx="${f1(p[0])}" cy="${f1(p[1])}" r="1.6"/>`);
+  if(el) this.top.push(`<text class="el${el==="O"?" ox":""}" x="${f1(p[0]+3)}" y="${f1(p[1]+8)}">${el}</text>`);
+};
+Scene.prototype.axes=function(len){
+  [[[1,0,0],"x"],[[0,1,0],"y"],[[0,0,1],"z"]].forEach(([d,l])=>{
+    const a=proj(vmul(d,-len)), b=proj(vmul(d,len));
+    this.items.push({z:-99, svg:`<line class="ax" x1="${f1(a[0])}" y1="${f1(a[1])}" x2="${f1(b[0])}" y2="${f1(b[1])}"/>`});
+    this.top.push(`<text class="axl" x="${f1(b[0]+(l==="y"?6:4))}" y="${f1(b[1]+(l==="y"?4:-4))}">${l}</text>`);
+    this.ext(a[0],a[1],4); this.ext(b[0],b[1],12);
+  });
+};
+Scene.prototype.mark=function(P, num, off){
+  const p=proj(P), x=p[0]+off[0], y=p[1]+off[1];
+  const d=Math.hypot(off[0],off[1]), ex=x-off[0]/d*6, ey=y-off[1]/d*6;
+  this.top.push(`<g class="mk"><line x1="${f1(p[0])}" y1="${f1(p[1])}" x2="${f1(ex)}" y2="${f1(ey)}"/><circle cx="${f1(x)}" cy="${f1(y)}" r="6"/><text x="${f1(x)}" y="${f1(y)+0.3}" text-anchor="middle" dominant-baseline="central">${num}</text></g>`);
+  this.ext(x,y,8);
+};
+Scene.prototype.svg=function(zoom){
+  this.items.sort((a,b)=>a.z-b.z);
+  const Z=zoom||1.8, P0=6, b=this.bb, W=f1(b.x1-b.x0+2*P0), H=f1(b.y1-b.y0+2*P0);
+  return `<svg class="orb" viewBox="${f1(b.x0-P0)} ${f1(b.y0-P0)} ${W} ${H}" width="${f1(W*Z)}" height="${f1(H*Z)}" role="img" aria-label="Orbitaldarstellung">${this.items.map(i=>i.svg).join("")}${this.top.join("")}</svg>`;
+};
+
+const TETRA = [[0,1,0]].concat([50,170,290].map(f=>[0.943*Math.cos(rad(f)), -0.333, 0.943*Math.sin(rad(f))]));
+
+/* Einzelne Orbitale bzw. Orbitalsätze am Atom */
+function orbSetSVG(kind, zoom){
+  const S=new Scene(), O=[0,0,0];
+  S.axes(1.45);
+  if(kind==="s"){ S.sphere(O, 38, "so"); }
+  if(kind==="p"){ S.lobe(O,[0,1,0],66,24,"po"); S.lobe(O,[0,-1,0],66,24,"po"); }
+  if(kind==="p3"){ [[1,0,0],[0,1,0],[0,0,1]].forEach(d=>{ S.lobe(O,d,62,20,"po"); S.lobe(O,vmul(d,-1),62,20,"po"); }); }
+  if(kind==="hyb1"){ S.lobe(O,[1,0,0],74,28,"hy"); S.lobe(O,[-1,0,0],22,13,"hy"); }
+  if(kind==="sp3"){ TETRA.forEach(d=>S.lobe(O,d,66,21,"hy")); }
+  if(kind==="sp2"){ [0,120,240].forEach(f=>S.lobe(O,[Math.cos(rad(f)),0,Math.sin(rad(f))],66,21,"hy")); S.lobe(O,[0,1,0],56,18,"po"); S.lobe(O,[0,-1,0],56,18,"po"); }
+  if(kind==="sp"){ S.lobe(O,[1,0,0],68,21,"hy"); S.lobe(O,[-1,0,0],68,21,"hy"); [[0,1,0],[0,0,1]].forEach(d=>{ S.lobe(O,d,54,17,"po"); S.lobe(O,vmul(d,-1),54,17,"po"); }); }
+  S.nucleus(O, "");
+  return S.svg(zoom);
+}
+
+/* Schemabilder zur Überlappung: ss, sp3s, spsp, pp */
+function overlapSVG(kind, zoom){
+  const S=new Scene();
+  if(kind==="ss"){ const A=[-0.37,0,0], B=[0.37,0,0]; S.sphere(A,22,"so"); S.sphere(B,22,"so"); S.nucleus(A,"H"); S.nucleus(B,"H"); }
+  if(kind==="sp3s"){ const C=[-0.55,0,0], H=[0.55,0,0]; S.lobe(C,[-1,0,0],18,10,"hy"); S.lobe(C,[1,0,0],1.1*OV.s-6,16,"hy"); S.sphere(H,16,"so"); S.nucleus(C,"C"); S.nucleus(H,"H"); }
+  if(kind==="spsp"){ const A=[-0.7,0,0], B=[0.7,0,0]; S.lobe(A,[-1,0,0],18,10,"hy"); S.lobe(B,[1,0,0],18,10,"hy"); S.lobe(A,[1,0,0],0.85*OV.s,16,"hy"); S.lobe(B,[-1,0,0],0.85*OV.s,16,"hy"); S.nucleus(A,"C"); S.nucleus(B,"C"); }
+  if(kind==="pp"){ const A=[-0.67,0,0], B=[0.67,0,0], n=[0,1,0]; [A,B].forEach(X=>{ S.lobe(X,n,44,17,"po"); S.lobe(X,[0,-1,0],44,17,"po"); }); S.cloud(A,B,n,0.62,16); S.cloud(A,B,[0,-1,0],0.62,16); S.nucleus(A,"C"); S.nucleus(B,"C"); }
+  return S.svg(zoom||1.5);
+}
+
+/* Orbitalmodelle von Molekülen
+   Rückgabe: {svg, marks:[{k}]} – Markierungen werden in der angegebenen Reihenfolge nummeriert */
+function omSVG(key, noMarks, zoom){
+  const S=new Scene(), marks=[];
+  const sc=OV.s;
+  const sigmaH=(C,H)=>{ const d=vsub(H,C); S.lobe(C,d,vlen(d)*sc-5,13,"hy"); S.sphere(H,14,"so","H"); };
+  const sigmaCC=(A,B)=>{ const d=vsub(B,A), l=vlen(d)*sc*0.6; S.lobe(A,d,l,14,"hy"); S.lobe(B,vmul(d,-1),l,14,"hy"); };
+  const pOrb=(C,n,L,W)=>{ S.lobe(C,n,L||40,W||15,"po"); S.lobe(C,vmul(n,-1),L||40,W||15,"po"); };
+  const pi=(A,B,n,h)=>{ S.cloud(A,B,n,h||0.62,15); S.cloud(A,B,vmul(n,-1),h||0.62,15); };
+  const mk=(P,k,off)=>{ marks.push({k}); if(!noMarks) S.mark(P, marks.length, off); };
+  const Hof=(C,d,l)=>vadd(C, vmul(vnorm(d), l||1.09));
+
+  if(key==="methan"){
+    const C=[0,0,0], Hs=TETRA.map(d=>Hof(C,d));
+    Hs.forEach(H=>sigmaH(C,H)); S.nucleus(C,"C");
+    mk(vmid(C,Hs[2]), "s3h", [-4,40]);
+  }
+  if(key==="ethan"){
+    const C1=[-0.77,0,0], C2=[0.77,0,0];
+    const d1=[42,162,282].map(f=>[-0.334,0.943*Math.cos(rad(f)),0.943*Math.sin(rad(f))]);
+    const d2=[102,222,342].map(f=>[0.334,0.943*Math.cos(rad(f)),0.943*Math.sin(rad(f))]);
+    const H1=d1.map(d=>Hof(C1,d)), H2=d2.map(d=>Hof(C2,d));
+    sigmaCC(C1,C2); H1.forEach(H=>sigmaH(C1,H)); H2.forEach(H=>sigmaH(C2,H));
+    S.nucleus(C1,"C"); S.nucleus(C2,"C");
+    mk(vmid(C1,C2), "s33", [-8,44]);
+    mk(vmid(C2,H2[1]), "s3h", [34,-22]);
+  }
+  if(key==="ethen"){
+    const C1=[-0.67,0,0], C2=[0.67,0,0], n=[0,1,0];
+    const H1=[[-0.5,0,0.866],[-0.5,0,-0.866]].map(d=>Hof(C1,d)), H2=[[0.5,0,0.866],[0.5,0,-0.866]].map(d=>Hof(C2,d));
+    sigmaCC(C1,C2); H1.forEach(H=>sigmaH(C1,H)); H2.forEach(H=>sigmaH(C2,H));
+    pOrb(C1,n); pOrb(C2,n); pi(C1,C2,n);
+    S.nucleus(C1,"C"); S.nucleus(C2,"C");
+    mk(vmid(C2,H2[1]), "s2h", [30,-26]);
+    mk(vmid(C1,C2), "s22", [-14,62]);
+    mk(vadd(vmid(C1,C2),[0,0.62,0]), "pi", [0,-44]);
+  }
+  if(key==="ethin"){
+    const C1=[-0.60,0,0], C2=[0.60,0,0];
+    const Ha=Hof(C1,[-1,0,0],1.06), Hb=Hof(C2,[1,0,0],1.06);
+    sigmaCC(C1,C2); sigmaH(C1,Ha); sigmaH(C2,Hb);
+    [[0,1,0],[0,0,1]].forEach(n=>{ pOrb(C1,n,36,14); pOrb(C2,n,36,14); pi(C1,C2,n,0.58); });
+    S.nucleus(C1,"C"); S.nucleus(C2,"C");
+    mk(vmid(C2,Hb), "s1h", [16,-36]);
+    mk(vmid(C1,C2), "s11", [-40,50]);
+    mk(vadd(vmid(C1,C2),[0,0.58,0]), "pi", [0,-40]);
+  }
+  if(key==="methanal"){
+    const C=[-0.6,0,0], O=[0.6,0,0], n=[0,1,0];
+    const Hs=[[-0.5,0,0.866],[-0.5,0,-0.866]].map(d=>Hof(C,d));
+    sigmaCC(C,O); Hs.forEach(H=>sigmaH(C,H));
+    [[0.5,0,0.866],[0.5,0,-0.866]].forEach(d=>S.lobe(O,d,40,15,"hy",true));
+    pOrb(C,n); pOrb(O,n); pi(C,O,n);
+    S.nucleus(C,"C"); S.nucleus(O,"O");
+    mk(vmid(C,Hs[1]), "s2h", [-30,-30]);
+    mk(vadd(vmid(C,O),[0,0.62,0]), "pi", [6,-44]);
+    mk(vadd(O,vmul([0.5,0,-0.866],0.5)), "lp2", [38,-14]);
+    mk(vmid(C,O), "s22", [-12,62]);
+  }
+  return {svg:S.svg(zoom), marks};
+}
+
+/* ============================================================
+   DATEN
+   ============================================================ */
+const HY = {sp3:"sp³", sp2:"sp²", sp:"sp", s:"1s"};
+const ARR = {sp3:"tetraedrisch", sp2:"trigonal-planar", sp:"linear"};
+const ANG = {sp3:"109,5°", sp2:"120°", sp:"180°"};
+const NP  = {sp3:0, sp2:1, sp:2};
+const SUBS = s => s.replace(/(\d)/g,"<sub>$1</sub>");
+
+const MOL = {
+  methan:{n:"Methan", f:"CH4", a:[["C",0,0],["H",0,-1.2],["H",0,1.2],["H",-1.2,0],["H",1.2,0]], b:[[0,1],[0,2],[0,3],[0,4]], ask:[0], askB:[0]},
+  ethan:{n:"Ethan", f:"C2H6", a:[["C",0,0],["C",1.35,0],["H",-1.2,0],["H",0,-1.2],["H",0,1.2],["H",2.55,0],["H",1.35,-1.2],["H",1.35,1.2]], b:[[0,1],[0,2],[0,3],[0,4],[1,5],[1,6],[1,7]], ask:[0], askB:[0,1]},
+  ethen:{n:"Ethen", f:"C2H4", a:[["C",0,0],["C",1.35,0],["H",-0.7,-1],["H",-0.7,1],["H",2.05,-1],["H",2.05,1]], b:[[0,1,2],[0,2],[0,3],[1,4],[1,5]], ask:[0], askB:[0,1]},
+  ethin:{n:"Ethin", f:"C2H2", a:[["H",-1.2,0],["C",0,0],["C",1.35,0],["H",2.55,0]], b:[[0,1],[1,2,3],[2,3]], ask:[1], askB:[1,0]},
+  propen:{n:"Propen", f:"C3H6", a:[["C",0,0],["C",1.35,0],["C",2.7,0],["H",-0.7,-1],["H",-0.7,1],["H",1.35,-1.2],["H",3.9,0],["H",2.7,-1.2],["H",2.7,1.2]],
+    b:[[0,1,2],[1,2],[0,3],[0,4],[1,5],[2,6],[2,7],[2,8]], ask:[0,1,2], askB:[0,1,4,5],
+    lab:{0:"C-Atom 1 (=CH₂)",1:"C-Atom 2 (=CH–)",2:"C-Atom 3 (–CH₃)"}, bl:{4:"C–H-Bindung am C-Atom 2",5:"C–H-Bindung am C-Atom 3"}},
+  propin:{n:"Propin", f:"C3H4", a:[["H",-1.2,0],["C",0,0],["C",1.35,0],["C",2.7,0],["H",3.9,0],["H",2.7,-1.2],["H",2.7,1.2]],
+    b:[[0,1],[1,2,3],[2,3],[3,4],[3,5],[3,6]], ask:[1,2,3], askB:[1,2,0],
+    lab:{1:"C-Atom 1 (H–C≡)",2:"C-Atom 2 (≡C–)",3:"C-Atom 3 (–CH₃)"}, bl:{0:"C–H-Bindung am C-Atom 1",2:"C–C-Einfachbindung"}},
+  butadien:{n:"Buta-1,3-dien", f:"C4H6", a:[["C",0,0],["C",1.17,-0.675],["C",2.34,0],["C",3.51,-0.675],["H",-1.04,-0.6],["H",0,1.2],["H",1.17,-1.875],["H",2.34,1.2],["H",4.55,-0.075],["H",3.51,-1.875]],
+    b:[[0,1,2],[1,2],[2,3,2],[0,4],[0,5],[1,6],[2,7],[3,8],[3,9]], ask:[1], askB:[1,0],
+    lab:{1:"C-Atom 2"}, bl:{1:"C–C-Einfachbindung zwischen C-Atom 2 und 3", 0:"C=C-Doppelbindung zwischen C-Atom 1 und 2"}},
+  benzol:{n:"Benzol", f:"C6H6", a:(()=>{ const a=[]; for(let k=0;k<6;k++){ const t=rad(-90+60*k); a.push(["C",1.35*Math.cos(t),1.35*Math.sin(t)]); } for(let k=0;k<6;k++){ const t=rad(-90+60*k); a.push(["H",2.55*Math.cos(t),2.55*Math.sin(t)]); } return a; })(),
+    b:[[0,1,2],[1,2],[2,3,2],[3,4],[4,5,2],[5,0],[0,6],[1,7],[2,8],[3,9],[4,10],[5,11]], ask:[0], askB:[6], lab:{0:"C-Atom"}},
+  allen:{n:"Propadien (Allen)", f:"C3H4", a:[["C",0,0],["C",1.35,0],["C",2.7,0],["H",-0.7,-1],["H",-0.7,1],["H",3.4,-1],["H",3.4,1]],
+    b:[[0,1,2],[1,2,2],[0,3],[0,4],[2,5],[2,6]], ask:[1,0], askB:[0], lab:{0:"äußeres C-Atom",1:"mittleres C-Atom"}},
+  methanal:{n:"Methanal", f:"CH2O", a:[["C",0,0],["O",1.35,0],["H",-0.7,-1],["H",-0.7,1]], b:[[0,1,2],[0,2],[0,3]], ask:[0,1], askB:[0,1]},
+  ethanal:{n:"Ethanal", f:"C2H4O", a:[["C",0,0],["C",1.35,0],["O",2.05,-1.05],["H",-1.2,0],["H",0,-1.2],["H",0,1.2],["H",2.05,1.05]],
+    b:[[0,1],[1,2,2],[0,3],[0,4],[0,5],[1,6]], ask:[0,1,2], askB:[0,1,5],
+    lab:{0:"C-Atom der Methylgruppe",1:"C-Atom der Aldehydgruppe"}, bl:{5:"C–H-Bindung der Aldehydgruppe"}},
+  propanon:{n:"Propanon (Aceton)", f:"C3H6O", a:[["C",0,0],["O",0,-1.3],["C",-1.35,0],["C",1.35,0],["H",-2.55,0],["H",-1.35,-1.2],["H",-1.35,1.2],["H",2.55,0],["H",1.35,-1.2],["H",1.35,1.2]],
+    b:[[0,1,2],[0,2],[0,3],[2,4],[2,5],[2,6],[3,7],[3,8],[3,9]], ask:[0,2,1], askB:[0,1],
+    lab:{0:"C-Atom der Carbonylgruppe",2:"C-Atom einer Methylgruppe"}},
+  ethanol:{n:"Ethanol", f:"C2H6O", a:[["C",0,0],["C",1.35,0],["O",2.7,0],["H",-1.2,0],["H",0,-1.2],["H",0,1.2],["H",1.35,-1.2],["H",1.35,1.2],["H",3.55,0.9]],
+    b:[[0,1],[1,2],[0,3],[0,4],[0,5],[1,6],[1,7],[2,8]], ask:[1,2], askB:[1,7],
+    lab:{1:"C-Atom 1 (–CH₂–OH)"}},
+  essig:{n:"Ethansäure (Essigsäure)", f:"C2H4O2", a:[["C",0,0],["C",1.35,0],["O",2.05,-1.05],["O",2.05,1.05],["H",-1.2,0],["H",0,-1.2],["H",0,1.2],["H",3.25,1.05]],
+    b:[[0,1],[1,2,2],[1,3],[0,4],[0,5],[0,6],[3,7]], ask:[1,0,2], askB:[1,0],
+    lab:{0:"C-Atom der Methylgruppe",1:"C-Atom der Carboxygruppe",2:"O-Atom der C=O-Gruppe"}},
+  ammoniak:{n:"Ammoniak", f:"NH3", a:[["N",0,0],["H",-1.2,0],["H",1.2,0],["H",0,1.2]], b:[[0,1],[0,2],[0,3]], ask:[0], askB:[0]},
+  wasser:{n:"Wasser", f:"H2O", a:[["O",0,0],["H",-1.0,0.75],["H",1.0,0.75]], b:[[0,1],[0,2]], ask:[0], askB:[0]},
+  methylamin:{n:"Methylamin", f:"CH5N", a:[["C",0,0],["N",1.35,0],["H",-1.2,0],["H",0,-1.2],["H",0,1.2],["H",1.35,1.2],["H",2.55,0]],
+    b:[[0,1],[0,2],[0,3],[0,4],[1,5],[1,6]], ask:[1,0], askB:[0,4], bl:{4:"N–H-Bindung"}},
+  co2:{n:"Kohlenstoffdioxid", f:"CO2", a:[["O",-1.35,0],["C",0,0],["O",1.35,0]], b:[[0,1,2],[1,2,2]], ask:[1,0], askB:[0]},
+  hcn:{n:"Blausäure (Cyanwasserstoff)", f:"HCN", a:[["H",-1.2,0],["C",0,0],["N",1.35,0]], b:[[0,1],[1,2,3]], ask:[1,2], askB:[1,0]},
+  acetonitril:{n:"Ethannitril (Acetonitril)", f:"C2H3N", a:[["C",0,0],["C",1.35,0],["N",2.7,0],["H",-1.2,0],["H",0,-1.2],["H",0,1.2]],
+    b:[[0,1],[1,2,3],[0,3],[0,4],[0,5]], ask:[0,1,2], askB:[0,1], lab:{0:"C-Atom der Methylgruppe",1:"C-Atom der Nitrilgruppe"}}
+};
+
+const sumO = (m,i)=>m.b.reduce((s,[x,y,o])=> (x===i||y===i) ? s+(o||1) : s, 0);
+const piOf = (m,i)=>m.b.reduce((s,[x,y,o])=> (x===i||y===i) ? s+((o||1)-1) : s, 0);
+const nSig = (m,i)=>m.b.filter(([x,y])=>x===i||y===i).length;
+const lpOf = (m,i)=>{ const el=m.a[i][0]; return el==="H"||el==="C" ? 0 : (VE[el]-sumO(m,i))/2; };
+const hybOf = (m,i)=> m.a[i][0]==="H" ? "s" : ["sp3","sp2","sp"][piOf(m,i)];
+const elOf = (m,i)=>m.a[i][0];
+function atomLab(m,i){
+  if(m.lab && m.lab[i]) return m.lab[i];
+  const el=elOf(m,i);
+  return el+"-Atom";
+}
+const BSYM = {1:"–", 2:"=", 3:"≡"};
+function bondLab(m,k){
+  if(m.bl && m.bl[k]) return m.bl[k];
+  const [i,j,o]=m.b[k]; let a=elOf(m,i), b=elOf(m,j);
+  if(a==="H"){ [a,b]=[b,a]; }
+  const nm = (o||1)===1 ? "Einfachbindung" : (o===2 ? "Doppelbindung" : "Dreifachbindung");
+  return b==="H" ? `${a}–H-Bindung` : `${a}${BSYM[o||1]}${b}-${nm}`;
+}
+
+/* Zustände in der Kästchenschreibweise */
+const ST = {
+  C_g:{el:"C", rows:[["2p",[1,1,0]],["2s",[2]],["1s",[2]]], st:"g", bind:"two"},
+  C_x:{el:"C", rows:[["2p",[1,1,1]],["2s",[1]],["1s",[2]]], st:"x", bind:"4neq"},
+  C_3:{el:"C", rows:[["sp³",[1,1,1,1]],["1s",[2]]], st:"sp3", bind:"4s"},
+  C_2:{el:"C", rows:[["2p",[1]],["sp²",[1,1,1]],["1s",[2]]], st:"sp2", bind:"3s1p"},
+  C_1:{el:"C", rows:[["2p",[1,1]],["sp",[1,1]],["1s",[2]]], st:"sp", bind:"2s2p"},
+  N_g:{el:"N", rows:[["2p",[1,1,1]],["2s",[2]],["1s",[2]]], st:"g", bind:"N3p"},
+  N_3:{el:"N", rows:[["sp³",[2,1,1,1]],["1s",[2]]], st:"sp3", bind:"3s1lp"},
+  N_1:{el:"N", rows:[["2p",[1,1]],["sp",[2,1]],["1s",[2]]], st:"sp", bind:"1s2p1lp"},
+  O_g:{el:"O", rows:[["2p",[2,1,1]],["2s",[2]],["1s",[2]]], st:"g", bind:"O2p"},
+  O_3:{el:"O", rows:[["sp³",[2,2,1,1]],["1s",[2]]], st:"sp3", bind:"2s2lp"},
+  O_2:{el:"O", rows:[["2p",[1]],["sp²",[2,2,1]],["1s",[2]]], st:"sp2", bind:"1s1p2lp"}
+};
+const STN = {g:"Grundzustand", x:"angeregter Zustand", sp3:"sp³-hybridisiert", sp2:"sp²-hybridisiert", sp:"sp-hybridisiert"};
+const BIND = {
+  two:"nur zwei Atombindungen (zweibindig)",
+  "4neq":"vier Atombindungen, die aber nicht gleichwertig wären",
+  "4s":"vier gleichwertige σ-Bindungen",
+  "3s1p":"drei σ-Bindungen und eine π-Bindung",
+  "2s2p":"zwei σ-Bindungen und zwei π-Bindungen",
+  N3p:"drei Bindungen aus p-Orbitalen mit 90° Bindungswinkel",
+  "3s1lp":"drei σ-Bindungen und ein freies Elektronenpaar",
+  "1s2p1lp":"eine σ-Bindung, zwei π-Bindungen und ein freies Elektronenpaar",
+  O2p:"zwei Bindungen aus p-Orbitalen mit 90° Bindungswinkel",
+  "2s2lp":"zwei σ-Bindungen und zwei freie Elektronenpaare",
+  "1s1p2lp":"eine σ-Bindung, eine π-Bindung und zwei freie Elektronenpaare"
+};
+const CONF = {C_g:"1s² 2s² 2p²", C_x:"1s² 2s¹ 2p³", N_g:"1s² 2s² 2p³", O_g:"1s² 2s² 2p⁴"};
+
+/* Moleküle, in denen ein Element einheitlich in einem Zustand vorliegt */
+const STMOL = [
+  {m:"methan", s:{C:"C_3"}}, {m:"ethan", s:{C:"C_3"}}, {m:"ethen", s:{C:"C_2"}}, {m:"benzol", s:{C:"C_2"}},
+  {m:"ethin", s:{C:"C_1"}}, {m:"co2", s:{C:"C_1", O:"O_2"}}, {m:"hcn", s:{C:"C_1", N:"N_1"}},
+  {m:"methanal", s:{C:"C_2", O:"O_2"}}, {m:"ammoniak", s:{N:"N_3"}}, {m:"methylamin", s:{N:"N_3"}},
+  {m:"acetonitril", s:{N:"N_1"}}, {m:"wasser", s:{O:"O_3"}}, {m:"ethanol", s:{O:"O_3"}}, {m:"propanon", s:{O:"O_2"}}
+];
+
+/* Zielatome für „richtige Kästchenschreibweise wählen“ */
+const A2T = [
+  {m:"methan", i:0, s:"C_3"}, {m:"ethen", i:0, s:"C_2"}, {m:"ethin", i:1, s:"C_1"}, {m:"co2", i:1, s:"C_1"},
+  {m:"ammoniak", i:0, s:"N_3"}, {m:"hcn", i:2, s:"N_1"}, {m:"wasser", i:0, s:"O_3"}, {m:"methanal", i:1, s:"O_2"}
+];
+
+/* Orbitalüberlappung als Text */
+function ovStr(h1,h2,npi){
+  let s = `σ(${HY[h1]}–${HY[h2]})`;
+  if(npi===1) s += " + π(2p–2p)";
+  if(npi===2) s += " + 2 π(2p–2p)";
+  return s;
+}
+
+/* Merkmale in den Orbitalbildern */
+const FL = {
+  s3h:"σ-Bindung: Überlappung sp³–1s", s2h:"σ-Bindung: Überlappung sp²–1s", s1h:"σ-Bindung: Überlappung sp–1s",
+  s33:"σ-Bindung: Überlappung sp³–sp³", s22:"σ-Bindung: Überlappung sp²–sp²", s11:"σ-Bindung: Überlappung sp–sp",
+  pi:"π-Bindung: seitliche Überlappung zweier 2p-Orbitale", lp2:"freies Elektronenpaar in einem sp²-Hybridorbital"
+};
+const OMOL = {
+  methan:{n:"Methan", ex:"Das C-Atom ist <strong>sp³-hybridisiert</strong>. Seine vier sp³-Orbitale zeigen in die Ecken eines Tetraeders (109,5°) und überlappen frontal mit den 1s-Orbitalen der vier H-Atome: vier gleichwertige <strong>σ-Bindungen (sp³–1s)</strong>."},
+  ethan:{n:"Ethan", ex:"Beide C-Atome sind <strong>sp³-hybridisiert</strong>. Die C–C-Bindung entsteht durch frontale Überlappung zweier sp³-Orbitale (<strong>σ, sp³–sp³</strong>), die C–H-Bindungen durch Überlappung von sp³- mit 1s-Orbitalen. Da nur σ-Bindungen vorliegen, ist die C–C-Bindung frei drehbar."},
+  ethen:{n:"Ethen", ex:"Beide C-Atome sind <strong>sp²-hybridisiert</strong>. Die drei sp²-Orbitale liegen trigonal-planar in einer Ebene (120°) und bilden σ-Bindungen zum zweiten C-Atom (sp²–sp²) und zu zwei H-Atomen (sp²–1s). Die nicht hybridisierten p-Orbitale stehen senkrecht auf dieser Ebene und überlappen seitlich zur <strong>π-Bindung</strong>, deren Elektronendichte ober- und unterhalb der Molekülebene liegt. Die Doppelbindung ist deshalb nicht drehbar."},
+  ethin:{n:"Ethin", ex:"Beide C-Atome sind <strong>sp-hybridisiert</strong>. Die sp-Orbitale sind linear angeordnet (180°) und bilden σ-Bindungen zum anderen C-Atom (sp–sp) und zum H-Atom (sp–1s). Je zwei nicht hybridisierte p-Orbitale stehen senkrecht zueinander und bilden <strong>zwei π-Bindungen</strong> in zueinander senkrechten Ebenen. Zusammen umhüllen sie die C–C-Achse fast zylinderförmig."},
+  methanal:{n:"Methanal", ex:"C-Atom und O-Atom sind <strong>sp²-hybridisiert</strong>. Die C=O-Doppelbindung besteht aus einer σ-Bindung (sp²–sp²) und einer <strong>π-Bindung</strong> aus den p-Orbitalen von C und O. Zwei sp²-Orbitale des O-Atoms sind doppelt besetzt – sie enthalten die beiden <strong>freien Elektronenpaare</strong>."}
+};
+
+/* Einzelne Orbitale */
+const ORBK = {
+  s:"ein s-Orbital", p:"ein p-Orbital", p3:"die drei p-Orbitale p<sub>x</sub>, p<sub>y</sub> und p<sub>z</sub>",
+  hyb1:"ein einzelnes Hybridorbital", sp3:"vier sp³-Hybridorbitale", sp2:"drei sp²-Hybridorbitale und ein p-Orbital",
+  sp:"zwei sp-Hybridorbitale und zwei p-Orbitale"
+};
+const ORBEX = {
+  s:"Ein <strong>s-Orbital</strong> ist kugelförmig und besitzt keine Knotenebene durch den Kern. Es kann nur σ-Bindungen bilden, z. B. das 1s-Orbital des H-Atoms.",
+  p:"Ein <strong>p-Orbital</strong> ist hantelförmig. Seine beiden Keulen liegen auf einer Achse, dazwischen liegt am Kern eine <strong>Knotenebene</strong>, in der die Aufenthaltswahrscheinlichkeit null ist. Nicht hybridisierte p-Orbitale bilden π-Bindungen.",
+  p3:"Die drei <strong>p-Orbitale</strong> einer Schale sind energiegleich und stehen paarweise <strong>senkrecht</strong> (90°) aufeinander, entlang der x-, y- und z-Achse.",
+  hyb1:"Ein <strong>Hybridorbital</strong> entsteht durch rechnerisches Mischen von s- und p-Orbitalen desselben Atoms. Es hat eine große und eine kleine Keule; die große Keule zeigt in Bindungsrichtung und ermöglicht eine starke frontale Überlappung (σ-Bindung).",
+  sp3:"Aus dem 2s- und den drei 2p-Orbitalen entstehen <strong>vier sp³-Orbitale</strong>. Sie weichen sich maximal aus und zeigen in die Ecken eines Tetraeders (<strong>109,5°</strong>). Ein sp³-hybridisiertes C-Atom bildet vier σ-Bindungen.",
+  sp2:"Aus dem 2s- und zwei 2p-Orbitalen entstehen <strong>drei sp²-Orbitale</strong> in einer Ebene (<strong>120°</strong>, trigonal-planar). Das verbleibende p-Orbital steht senkrecht dazu und kann eine π-Bindung bilden.",
+  sp:"Aus dem 2s- und einem 2p-Orbital entstehen <strong>zwei sp-Orbitale</strong>, die linear angeordnet sind (<strong>180°</strong>). Die beiden verbleibenden p-Orbitale stehen senkrecht zueinander und zur sp-Achse und können zwei π-Bindungen bilden."
+};
+
+/* Aussagen zu σ- und π-Bindungen */
+const STATEMENTS = [
+  {t:"Eine σ-Bindung entsteht durch frontale Überlappung von Orbitalen auf der Kernverbindungsachse.", v:true},
+  {t:"Eine π-Bindung entsteht durch seitliche Überlappung zweier paralleler p-Orbitale.", v:true},
+  {t:"Eine C=C-Doppelbindung besteht aus zwei σ-Bindungen.", v:false, e:"Eine Doppelbindung besteht aus einer σ- und einer π-Bindung."},
+  {t:"Eine Dreifachbindung besteht aus einer σ- und zwei π-Bindungen.", v:true},
+  {t:"Die beiden π-Bindungen einer Dreifachbindung liegen in zueinander senkrechten Ebenen.", v:true},
+  {t:"Um eine C=C-Doppelbindung ist eine freie Drehung möglich.", v:false, e:"Bei einer Drehung stünden die p-Orbitale nicht mehr parallel – die π-Bindung würde gebrochen."},
+  {t:"π-Bindungen sind schwächer als σ-Bindungen, weil die p-Orbitale weniger stark überlappen.", v:true},
+  {t:"H-Atome können π-Bindungen ausbilden.", v:false, e:"H-Atome besitzen nur ein 1s-Orbital. Ein s-Orbital kann nur σ-Bindungen bilden."},
+  {t:"π-Bindungen werden von Hybridorbitalen gebildet.", v:false, e:"π-Bindungen entstehen aus nicht hybridisierten p-Orbitalen. Hybridorbitale bilden σ-Bindungen oder enthalten freie Elektronenpaare."},
+  {t:"Die Elektronendichte einer π-Bindung liegt ober- und unterhalb der Kernverbindungsachse.", v:true},
+  {t:"Zwischen zwei Atomen kann eine π-Bindung auch ohne σ-Bindung bestehen.", v:false, e:"Zwischen zwei gebundenen Atomen gibt es immer genau eine σ-Bindung. π-Bindungen kommen nur bei Mehrfachbindungen hinzu."},
+  {t:"Die Bindungslänge nimmt von C–C über C=C nach C≡C ab.", v:true},
+  {t:"Ein sp²-hybridisiertes C-Atom kann zwei π-Bindungen ausbilden.", v:false, e:"Ein sp²-hybridisiertes C-Atom besitzt nur ein nicht hybridisiertes p-Orbital und damit höchstens eine π-Bindung."},
+  {t:"Alle Atome, die direkt an die beiden C-Atome einer C=C-Doppelbindung gebunden sind, liegen in einer Ebene.", v:true},
+  {t:"Freie Elektronenpaare befinden sich im Orbitalmodell in Hybridorbitalen, z. B. beim N-Atom im Ammoniak.", v:true},
+  {t:"Das Ethin-Molekül ist gewinkelt.", v:false, e:"Die sp-Hybridorbitale sind linear angeordnet (180°), H–C≡C–H ist deshalb linear."},
+  {t:"Die π-Bindung besitzt eine Knotenebene, in der die Kernverbindungsachse liegt.", v:true},
+  {t:"Ein sp³-hybridisiertes C-Atom kann eine π-Bindung ausbilden.", v:false, e:"Bei sp³ werden alle drei 2p-Orbitale zur Hybridisierung verwendet – für eine π-Bindung bleibt kein p-Orbital übrig."}
+];
+STATEMENTS.forEach(s=>{ if(!s.e) s.e = "Die Aussage ist richtig."; });
+
+/* ============================================================
+   AUFGABEN-GENERATOREN
+   Aufgabe: {typ, title, ctx, groups:[{q, kind, opts:[{k,html,why}], ans}], hints, ex}
+   ============================================================ */
+const TYP = {
+  A:{n:"Orbitale & Elektronenkonfiguration", d:"Kästchenschreibweise von C, N und O: Grundzustand, angeregter Zustand und Hybridzustände deuten und zuordnen."},
+  E:{n:"Elektronen eintragen",               d:"Kästchenschreibweise selbst ausfüllen: Grundzustand und hybridisierter Zustand eines Atoms im Molekül."},
+  B:{n:"Hybridisierung im Molekül",          d:"Für ein markiertes Atom Hybridisierung, Anordnung, Winkel und verbleibende p-Orbitale bestimmen."},
+  C:{n:"σ- und π-Bindungen",                 d:"σ- und π-Bindungen zählen, die Orbitalüberlappung einer Bindung angeben und Aussagen prüfen."},
+  D:{n:"Orbitalmodell-Darstellungen",        d:"Orbitale und Orbitalbilder von Methan, Ethan, Ethen, Ethin und Methanal deuten."}
+};
+const fig = (svg, cap) => `<div class="fig">${svg}${cap?`<div class="cap">${cap}</div>`:""}</div>`;
+const farr = s => `<span class="fig-arrow">${s||"→"}</span>`;
+const molBox = (svg, cap) => `<div class="mol-box">${svg}${cap?`<div class="cap">${cap}</div>`:""}</div>`;
+const ANGOPTS = ["90°","109,5°","120°","180°"];
+const angWhy = k => k==="90°" ? "90° liegen zwischen den p-Orbitalen, nicht zwischen Hybridorbitalen." : "Hybridorbitale weichen sich maximal aus: vier → 109,5°, drei → 120°, zwei → 180°.";
+const piTxt = n => n===0 ? "keine π-Bindung" : n===1 ? "eine π-Bindung" : "zwei π-Bindungen";
+const sigTxt = n => n===1 ? "eine σ-Bindung" : `${["","","zwei","drei","vier"][n]} σ-Bindungen`;
+const lpTxt = n => n===1 ? "ein freies Elektronenpaar" : `${["","","zwei","drei"][n]} freie Elektronenpaare`;
+
+/* A1: Zustand in der Kästchenschreibweise deuten */
+function makeA1(sk){
+  const s=ST[sk], el=s.el;
+  const stKeys = Object.keys(ST).filter(k=>ST[k].el===el);
+  const nameKeys = el==="C" ? ["g","x","sp3","sp2","sp"] : ["g","sp3","sp2","sp"];
+  const groups = [
+    {q:"Welcher <b>Zustand</b> ist dargestellt?", kind:"buttons", ans:s.st, opts:nameKeys.map(k=>({k, html:STN[k], why:
+      k==="g" ? "Im Grundzustand werden die Orbitale nach steigender Energie besetzt (1s, 2s, 2p) – hier ist das nicht der Fall." :
+      k==="x" ? "Im angeregten Zustand gibt es noch ein 2s-Orbital mit einem Elektron und drei einfach besetzte 2p-Orbitale." :
+      "Zähle die Hybridorbitale: vier → sp³, drei → sp², zwei → sp. Im Grundzustand und im angeregten Zustand gibt es keine Hybridorbitale."}))},
+    {q:"Welche <b>Bindungen</b> kann das Atom in diesem Zustand ausbilden?", kind:"buttons", ans:s.bind,
+      opts:shuffle(uniq(stKeys.map(k=>ST[k].bind))).map(k=>({k, html:BIND[k], why:"Einfach besetzte Orbitale können Bindungen bilden: Hybridorbitale σ-Bindungen, p-Orbitale (neben einem Hybridzustand) π-Bindungen. Doppelt besetzte Orbitale enthalten freie Elektronenpaare."}))}
+  ];
+  const yes = STMOL.filter(x=>x.s[el]===sk), no = STMOL.filter(x=>x.s[el] && x.s[el]!==sk);
+  let exMol = null;
+  if(yes.length && s.st!=="g" && s.st!=="x"){
+    exMol = pick(yes);
+    const opts = [exMol].concat(shuffle(no).slice(0,3));
+    groups.push({q:`In welchem Molekül liegt das <b>${el}-Atom</b> in diesem Zustand vor?`, kind:"buttons", ans:exMol.m,
+      opts:shuffle(opts).map(o=>({k:o.m, html:esc(MOL[o.m].n), why: o.m===exMol.m ? "" : `Im ${MOL[o.m].n} ist das ${el}-Atom ${STN[ST[o.s[el]].st]}.`}))});
+  }
+  const ctx = `<p>Die Kästchenschreibweise zeigt die Besetzung der Orbitale eines <b>${el==="C"?"Kohlenstoff":el==="N"?"Stickstoff":"Sauerstoff"}-Atoms</b>. Jedes Kästchen steht für ein Orbital, jeder Pfeil für ein Elektron.</p><div class="mol-row">${boxSVG(s.rows)}</div>`;
+  const allYes = yes.map(x=>MOL[x.m].n).join(", ");
+  let ex = `<div class="figure" style="max-width:260px">${boxSVG(s.rows)}</div>`;
+  if(s.st==="g") ex += `<p>Dargestellt ist der <strong>Grundzustand</strong> (${CONF[sk]}). Die Orbitale sind nach steigender Energie besetzt, die drei energiegleichen 2p-Orbitale nach der Hundschen Regel zunächst einfach. ${el==="C" ? "Mit nur zwei ungepaarten Elektronen wäre das C-Atom <strong>zweibindig</strong> – das widerspricht der Vierbindigkeit des Kohlenstoffs (z. B. CH<sub>4</sub>). Deshalb wird ein angeregter Zustand und die Hybridisierung angenommen." : `Bindungen aus den p-Orbitalen hätten einen Bindungswinkel von 90°. Beobachtet werden aber ca. ${el==="N"?"107° (NH<sub>3</sub>)":"104,5° (H<sub>2</sub>O)"} – das erklärt erst die sp³-Hybridisierung.`}</p>`;
+  else if(s.st==="x") ex += `<p>Dargestellt ist der <strong>angeregte Zustand</strong> (${CONF[sk]}): Ein 2s-Elektron wurde in das leere 2p-Orbital angehoben. Jetzt gibt es vier ungepaarte Elektronen, das C-Atom wäre vierbindig. Eine Bindung über das 2s-Orbital wäre aber anders als die drei über die 2p-Orbitale. Im Methan sind jedoch alle vier C–H-Bindungen <strong>gleichwertig</strong>. Deshalb werden das 2s- und die 2p-Orbitale zu Hybridorbitalen gemischt.</p>`;
+  else {
+    const nh = s.rows.find(r=>/^sp/.test(r[0]))[1].length, np = 4-nh;
+    ex += `<p>Das ${el}-Atom ist <strong>${STN[s.st]}</strong>: Das 2s-Orbital wurde mit ${np===0?"allen drei":np===1?"zwei":"einem"} 2p-Orbital${np===2?"":"en"} zu <strong>${nh} energiegleichen ${HY[s.st]}-Orbitalen</strong> gemischt${np?`, ${np===1?"ein p-Orbital bleibt":"zwei p-Orbitale bleiben"} übrig`:""}. Daraus ergeben sich <strong>${BIND[s.bind]}</strong>.</p>`;
+    if(allYes) ex += `<p>Beispiele: ${esc(allYes)}.</p>`;
+  }
+  return {typ:"A", title:`Kästchenschreibweise: ${el}, ${STN[s.st]}`, ctx, groups,
+    hints:[
+      "Im Grundzustand werden die Orbitale nach steigender Energie besetzt: 1s, 2s, 2p. Energiegleiche Orbitale werden zuerst einfach besetzt (Hundsche Regel).",
+      "Im angeregten Zustand ist ein 2s-Elektron in das leere 2p-Orbital angehoben. Hybridorbitale (sp³, sp², sp) liegen energetisch zwischen 2s und 2p.",
+      "Einfach besetzte Hybridorbitale bilden σ-Bindungen, einfach besetzte p-Orbitale π-Bindungen, doppelt besetzte Orbitale enthalten freie Elektronenpaare."
+    ], ex};
+}
+
+/* A2: passende Kästchenschreibweise zu einem Atom im Molekül */
+const BADROWS = {
+  C_3:[["sp³",[2,1,1,0]],["1s",[2]]], C_2:[["2p",[0]],["sp²",[2,1,1]],["1s",[2]]], C_1:[["2p",[1,0]],["sp",[2,1]],["1s",[2]]],
+  N_3:[["sp³",[2,2,1,0]],["1s",[2]]], N_1:[["2p",[2,0]],["sp",[2,1]],["1s",[2]]],
+  O_3:[["sp³",[2,2,2,0]],["1s",[2]]], O_2:[["2p",[0]],["sp²",[2,2,2]],["1s",[2]]]
+};
+const MIXK = {sp3:"aus dem 2s- und allen drei 2p-Orbitalen", sp2:"aus dem 2s- und zwei 2p-Orbitalen", sp:"aus dem 2s- und einem 2p-Orbital", one:"aus dem 1s- und dem 2s-Orbital", pp:"nur aus 2p-Orbitalen"};
+function makeA2(t){
+  const m=MOL[t.m], s=ST[t.s], el=s.el;
+  const others = shuffle(Object.keys(ST).filter(k=>ST[k].el===el && k!==t.s && ST[k].st!=="x")).slice(0,2);
+  const opts = [{k:"c", html:boxSVG(s.rows)}]
+    .concat(others.map(k=>({k:"o"+k, html:boxSVG(ST[k].rows), why: ST[k].st==="g" ? "Das ist der Grundzustand. Im Molekül ist das Atom hybridisiert." : `Das ist der ${STN[ST[k].st]}e Zustand. Zähle die π-Bindungen des markierten Atoms: Es hat ${piTxt(piOf(m,t.i))}.`})))
+    .concat([{k:"bad", html:boxSVG(BADROWS[t.s]), why:"Die Hybridisierung stimmt, aber nicht die Besetzung: Energiegleiche Orbitale werden zuerst einfach besetzt (Hundsche Regel). So stünden zu wenige ungepaarte Elektronen für die Bindungen zur Verfügung."}]);
+  const ctx = `<p>Betrachtet wird das markierte <b>${el}-Atom</b> im Molekül <b>${esc(m.n)}</b>.</p><div class="mol-row">${molBox(lewisSVG(m,{hlA:[t.i]}), esc(m.n))}</div>`;
+  return {typ:"A", title:`Kästchenschreibweise wählen: ${el} in ${m.n}`, ctx,
+    groups:[
+      {q:"Welche <b>Kästchenschreibweise</b> beschreibt das markierte Atom im Molekül?", kind:"cards", ans:"c", opts:shuffle(opts)},
+      {q:"Aus welchen <b>Atomorbitalen</b> sind seine Hybridorbitale entstanden?", kind:"buttons", ans:s.st,
+        opts:shuffle(["sp3","sp2","sp","one","pp"]).slice(0,5).map(k=>({k, html:MIXK[k], why:
+          k==="one" ? "Die 1s-Elektronen der inneren Schale sind an Bindungen nicht beteiligt." :
+          k==="pp" ? "Bei der Hybridisierung wird immer das 2s-Orbital mit 2p-Orbitalen gemischt." :
+          "Anzahl der Hybridorbitale = 1 (2s) + Anzahl der verwendeten 2p-Orbitale. sp³ → drei, sp² → zwei, sp → ein 2p-Orbital."}))}
+    ],
+    hints:[
+      "Bestimme zuerst die Hybridisierung: Zähle die π-Bindungen des markierten Atoms (keine → sp³, eine → sp², zwei → sp).",
+      "Verteile dann die Valenzelektronen (C: 4, N: 5, O: 6) auf Hybrid- und p-Orbitale. Energiegleiche Orbitale werden zuerst einfach besetzt.",
+      "Die Elektronen in p-Orbitalen bilden π-Bindungen, doppelt besetzte Hybridorbitale enthalten freie Elektronenpaare."
+    ],
+    ex:`<div class="figure" style="max-width:260px">${boxSVG(s.rows)}</div><p>Das ${el}-Atom im ${esc(m.n)} hat ${sigTxt(nSig(m,t.i))}${lpOf(m,t.i)?`, ${lpTxt(lpOf(m,t.i))}`:""} und ${piTxt(piOf(m,t.i))}. Es ist deshalb <strong>${STN[s.st]}</strong>. Die Hybridorbitale entstehen <strong>${MIXK[s.st]}</strong>. Mit ${el==="C"?"vier":el==="N"?"fünf":"sechs"} Valenzelektronen ergeben sich <strong>${BIND[s.bind]}</strong>.</p>`
+  };
+}
+
+/* B: Hybridisierung eines markierten Atoms */
+function makeB(mk, i){
+  const m=MOL[mk], h=hybOf(m,i), pi=piOf(m,i), ns=nSig(m,i), lp=lpOf(m,i), el=elOf(m,i);
+  const lab = atomLab(m,i);
+  let ex = `<div class="figure">${lewisSVG(m,{hlA:[i]})}</div>
+    <p>Das markierte ${esc(lab)} hat ${sigTxt(ns)}${lp?`, ${lpTxt(lp)}`:""} und <strong>${piTxt(pi)}</strong>. Es ist deshalb <strong>${HY[h]}-hybridisiert</strong>.</p>
+    <p>${ns+lp===4?"Vier":ns+lp===3?"Drei":"Zwei"} ${HY[h]}-Hybridorbitale${lp?` (davon ${lp} mit freiem Elektronenpaar)`:""} sind <strong>${ARR[h]}</strong> angeordnet, der ideale Winkel beträgt <strong>${ANG[h]}</strong>. ${NP[h]===0?"Alle drei 2p-Orbitale wurden zur Hybridisierung verwendet.":NP[h]===1?"Ein p-Orbital bleibt übrig und bildet die π-Bindung.":"Zwei p-Orbitale bleiben übrig und bilden die beiden π-Bindungen."}</p>`;
+  if(h==="sp3" && lp && ns>=2) ex += `<p>Der tatsächliche Bindungswinkel ist etwas kleiner als 109,5° (${el==="N"?"im NH<sub>3</sub> ca. 107°":"im H<sub>2</sub>O ca. 104,5°"}), weil freie Elektronenpaare mehr Raum beanspruchen als bindende.</p>`;
+  return {typ:"B", title:`${m.n}: ${lab}`,
+    ctx:`<p>Bestimme für das markierte <b>${esc(lab)}</b> im Molekül <b>${esc(m.n)}</b> die Hybridisierung.</p><div class="mol-row">${molBox(lewisSVG(m,{hlA:[i]}), esc(m.n)+" ("+SUBS(m.f)+")")}</div>`,
+    groups:[
+      {q:"Wie ist das markierte Atom <b>hybridisiert</b>?", kind:"buttons", ans:h, opts:["sp3","sp2","sp"].map(k=>({k, html:HY[k], why:`Zähle die π-Bindungen am markierten Atom – hier: ${piTxt(pi)}. Keine → sp³, eine → sp², zwei → sp.`}))},
+      {q:"Wie sind seine Hybridorbitale <b>angeordnet</b>?", kind:"buttons", ans:h, opts:["sp3","sp2","sp"].map(k=>({k, html:ARR[k], why:"Die Anordnung folgt aus der Zahl der Hybridorbitale: vier → tetraedrisch, drei → trigonal-planar, zwei → linear."}))},
+      {q:"Welcher <b>Winkel</b> liegt idealerweise zwischen den Achsen der Hybridorbitale?", kind:"buttons", ans:ANG[h], opts:ANGOPTS.map(k=>({k, html:k, why:angWhy(k)}))},
+      {q:"Wie viele <b>nicht hybridisierte p-Orbitale</b> besitzt das Atom?", kind:"buttons", ans:String(NP[h]), opts:["0","1","2","3"].map(k=>({k, html:k, why: k==="3" ? "Mindestens ein 2p-Orbital wird immer mit dem 2s-Orbital gemischt." : "sp³ verbraucht alle drei 2p-Orbitale, sp² zwei, sp eins. Jedes verbleibende p-Orbital kann eine π-Bindung bilden."}))}
+    ],
+    hints:[
+      "Zähle die π-Bindungen am markierten Atom: keine → sp³, eine (Doppelbindung) → sp², zwei (Dreifachbindung oder zwei Doppelbindungen) → sp.",
+      "Hybridorbitale weichen sich so weit wie möglich aus: vier → tetraedrisch (109,5°), drei → trigonal-planar (120°), zwei → linear (180°).",
+      "Von den drei 2p-Orbitalen bleiben bei sp³ keins, bei sp² eins und bei sp zwei übrig. Sie bilden die π-Bindungen."
+    ], ex};
+}
+
+/* C1: σ- und π-Bindungen zählen */
+function makeC1(mk){
+  const m=MOL[mk];
+  const nsig = m.b.length, npi = m.b.reduce((s,b)=>s+((b[2]||1)-1),0);
+  const nH = m.b.filter(([i,j])=>elOf(m,i)==="H"||elOf(m,j)==="H").length;
+  const nMult = m.b.filter(b=>(b[2]||1)>1).length, sumMult = m.b.reduce((s,b)=>s+((b[2]||1)>1?b[2]:0),0);
+  const sumAll = nsig + npi;
+  const sigWhy = {}; const sigC = [nsig];
+  if(nH && nsig-nH>0){ sigC.push(nsig-nH); sigWhy[nsig-nH]="Auch die Bindungen zu H-Atomen sind σ-Bindungen."; }
+  if(npi){ sigC.push(sumAll); sigWhy[sumAll]="Eine Mehrfachbindung enthält nur eine σ-Bindung – die weiteren Bindungen sind π-Bindungen."; }
+  [nsig+1, nsig-1, nsig+2].forEach(v=>{ if(v>0) sigC.push(v); });
+  const sigOpts = uniq(sigC).slice(0,4).sort((a,b)=>a-b).map(v=>({k:String(v), html:String(v), why: sigWhy[v] || "Zähle jede Verbindungslinie zwischen zwei Atomen genau einmal – jede enthält genau eine σ-Bindung."}));
+  const piWhy = {};
+  if(nMult && nMult!==npi) piWhy[nMult]="Eine Dreifachbindung enthält zwei π-Bindungen.";
+  if(sumMult && sumMult!==npi) piWhy[sumMult]="Eine Doppelbindung enthält nur eine π-Bindung, eine Dreifachbindung zwei – die erste Bindung ist jeweils eine σ-Bindung.";
+  const piOpts = ["0","1","2","3","4"].map(k=>({k, html:k, why: piWhy[+k] || "Einfachbindung: keine π-Bindung, Doppelbindung: eine, Dreifachbindung: zwei."}));
+  const mults = m.b.map((b,k)=>({b,k})).filter(x=>(x.b[2]||1)>1);
+  return {typ:"C", title:`σ und π zählen: ${m.n}`,
+    ctx:`<p>Betrachte das Molekül <b>${esc(m.n)}</b>.</p><div class="mol-row">${molBox(lewisSVG(m), esc(m.n)+" ("+SUBS(m.f)+")")}</div>`,
+    groups:[
+      {q:"Wie viele <b>σ-Bindungen</b> enthält das Molekül?", kind:"buttons", ans:String(nsig), opts:sigOpts},
+      {q:"Wie viele <b>π-Bindungen</b> enthält das Molekül?", kind:"buttons", ans:String(npi), opts:piOpts}
+    ],
+    hints:[
+      "Jede Bindung zwischen zwei Atomen enthält genau eine σ-Bindung – auch die Bindungen zu H-Atomen.",
+      "Doppelbindung = 1 σ + 1 π, Dreifachbindung = 1 σ + 2 π."
+    ],
+    ex:`<div class="figure">${lewisSVG(m,{hlB:mults.map(x=>x.k)})}</div>
+      <p>${esc(m.n)} enthält ${m.b.length} Bindungen zwischen Atomen, davon ${nH} zu H-Atomen. Jede davon enthält eine σ-Bindung: <strong>${nsig} σ-Bindungen</strong>. ${npi ? `Die orange markierten Mehrfachbindungen enthalten zusätzlich <strong>${npi} π-Bindung${npi>1?"en":""}</strong> (Doppelbindung: 1 π, Dreifachbindung: 2 π).` : "Mehrfachbindungen gibt es nicht, also <strong>keine π-Bindung</strong>."}</p>
+      ${mk==="benzol" ? "<p>Im Benzol sind die sechs π-Elektronen über den ganzen Ring verteilt (delokalisiert). Die Kekulé-Formel zeigt nur eine Grenzformel; an der Anzahl der σ- und π-Bindungen ändert das nichts.</p>" : ""}`
+  };
+}
+
+/* C2: Orbitalüberlappung einer markierten Bindung */
+function makeC2(mk, k){
+  const m=MOL[mk]; let [i,j,o]=m.b[k]; o=o||1;
+  if(elOf(m,i)==="H") [i,j]=[j,i];
+  const hi=hybOf(m,i), hj=hybOf(m,j), npi=o-1, hasH = elOf(m,j)==="H";
+  const corr = ovStr(hi,hj,npi);
+  const cand = [];
+  ["sp3","sp2","sp"].filter(h=>h!==hi).forEach(h=>cand.push({s:ovStr(h,hj,npi), why:`Das ${elOf(m,i)}-Atom hat ${piTxt(piOf(m,i))} und ist deshalb ${HY[hi]}-hybridisiert.`, g:"h"}));
+  if(!hasH) ["sp3","sp2","sp"].filter(h=>h!==hj).forEach(h=>cand.push({s:ovStr(hi,h,npi), why:`Das ${elOf(m,j)}-Atom hat ${piTxt(piOf(m,j))} und ist deshalb ${HY[hj]}-hybridisiert.`, g:"h"}));
+  [0,1,2].filter(n=>n!==npi).forEach(n=>cand.push({s:ovStr(hi,hj,n), why:"Einfachbindung: nur σ. Doppelbindung: σ + π. Dreifachbindung: σ + 2 π.", g:"p"}));
+  if(npi) cand.push({s:(npi===2?"2 π(2p–2p) + π(2p–2p)":"2 π(2p–2p)"), why:"Jede Bindung zwischen zwei Atomen enthält genau eine σ-Bindung – π-Bindungen kommen nur zusätzlich hinzu.", g:"x"});
+  if(hasH) cand.push({s:`σ(2p–1s)`, why:"Im Hybridisierungsmodell bildet das Atom seine σ-Bindungen mit Hybridorbitalen, nicht mit p-Orbitalen.", g:"x"});
+  const pickG = g => { const c=shuffle(cand.filter(x=>x.g===g)); return c[0]; };
+  let chosen = [pickG("h"), pickG("p")].filter(Boolean);
+  shuffle(cand).forEach(c=>{ if(chosen.length<3 && !chosen.some(x=>x.s===c.s) && c.s!==corr) chosen.push(c); });
+  const opts = [{k:"c", html:corr, txt:true}].concat(chosen.slice(0,3).map((c,n)=>({k:"d"+n, html:c.s, txt:true, why:c.why})));
+  const groups = [
+    {q:"Welche Orbitale <b>überlappen</b> in der markierten Bindung?", kind:"cards", cls:"", ans:"c", opts:shuffle(opts)},
+    {q:"Wie viele <b>Elektronen</b> sind an dieser Bindung beteiligt?", kind:"buttons", ans:String(2*o), opts:["2","4","6"].map(x=>({k:x, html:x, why:"Jede einzelne Bindung (σ oder π) wird von einem Elektronenpaar gebildet."}))}
+  ];
+  if(!hasH && mk!=="benzol") groups.push({q:"Ist eine <b>Drehung</b> um diese Bindung möglich, ohne sie zu brechen?", kind:"buttons", ans:o===1?"y":"n",
+    opts:[{k:"y", html:"ja, frei drehbar", why:"Bei einer Drehung stünden die p-Orbitale nicht mehr parallel – die π-Bindung würde gebrochen."},{k:"n", html:"nein, nicht drehbar", why:"Eine reine σ-Bindung ist rotationssymmetrisch zur Kernverbindungsachse – bei einer Drehung bleibt die Überlappung erhalten."}]});
+  const bl = bondLab(m,k);
+  return {typ:"C", title:`Überlappung: ${bl} in ${m.n}`,
+    ctx:`<p>Betrachte die markierte <b>${esc(bl)}</b> im Molekül <b>${esc(m.n)}</b>.</p><div class="mol-row">${molBox(lewisSVG(m,{hlB:[k]}), esc(m.n))}</div>`,
+    groups,
+    hints:[
+      "Bestimme zuerst die Hybridisierung beider Atome (π-Bindungen am Atom zählen). H-Atome binden mit ihrem 1s-Orbital.",
+      "Die σ-Bindung entsteht durch frontale Überlappung der Hybridorbitale (bzw. Hybridorbital und 1s). Jede zusätzliche Bindung ist eine π-Bindung aus zwei p-Orbitalen.",
+      "π-Bindungen erfordern parallele p-Orbitale – eine Drehung würde die Überlappung aufheben."
+    ],
+    ex:`<div class="figure">${lewisSVG(m,{hlB:[k]})}</div>
+      <p>Das ${elOf(m,i)}-Atom ist ${HY[hi]}-hybridisiert${hasH ? ", das H-Atom bindet mit seinem 1s-Orbital" : `, das ${elOf(m,j)}-Atom ${HY[hj]}-hybridisiert`}. Die ${esc(bl)} besteht aus <strong>${corr}</strong>${npi?": einer σ-Bindung durch frontale Überlappung und "+(npi===1?"einer π-Bindung":"zwei π-Bindungen in zueinander senkrechten Ebenen")+" durch seitliche Überlappung paralleler p-Orbitale":""}. Daran sind <strong>${2*o} Elektronen</strong> beteiligt.${!hasH && mk!=="benzol" ? (o===1?" Als reine σ-Bindung ist sie <strong>frei drehbar</strong>.":" Wegen der π-Bindung ist sie <strong>nicht drehbar</strong>.") : ""}</p>`
+  };
+}
+
+/* C3: Aussagen prüfen */
+function makeC3(){
+  const sts = shuffle(STATEMENTS).slice(0,4);
+  return {typ:"C", title:"Aussagen zu σ- und π-Bindungen",
+    ctx:`<p>Prüfe die folgenden Aussagen zu σ- und π-Bindungen.</p>`,
+    groups: sts.map(st=>({q:esc(st.t), inline:true, kind:"buttons", ans: st.v?"y":"n",
+      opts:[{k:"y", html:"trifft zu", why: st.v ? "" : st.e},{k:"n", html:"trifft nicht zu", why: st.v ? "Die Aussage ist richtig." : ""}]})),
+    hints:[
+      "σ-Bindungen: frontale Überlappung, Elektronendichte auf der Kernverbindungsachse. π-Bindungen: seitliche Überlappung paralleler p-Orbitale, Elektronendichte ober- und unterhalb der Achse.",
+      "Zwischen zwei Atomen gibt es immer genau eine σ-Bindung. π-Bindungen entstehen nur aus nicht hybridisierten p-Orbitalen."
+    ],
+    ex:`<ul>${sts.map(st=>`<li>${esc(st.t)} – <strong>${st.v?"trifft zu":"trifft nicht zu"}</strong>${st.v?"":". "+esc(st.e)}</li>`).join("")}</ul>`
+  };
+}
+
+/* D1: einzelne Orbitale bzw. Orbitalsätze deuten */
+function makeD1(kind){
+  const others = shuffle(Object.keys(ORBK).filter(k=>k!==kind)).slice(0,3);
+  const groups = [{q:"Welche <b>Orbitale</b> sind dargestellt?", kind:"buttons", ans:kind,
+    opts:shuffle([kind].concat(others)).map(k=>({k, html:ORBK[k], why:"s: Kugel. p: Hantel mit zwei gleich großen Keulen. Hybridorbital: große und kleine Keule. Türkis = Hybridorbital, orange = p-Orbital."}))}];
+  if(kind==="s"||kind==="p") groups.push({q:"Wie viele <b>Knotenebenen</b> durch den Kern besitzt das Orbital?", kind:"buttons", ans:kind==="s"?"0":"1", opts:["0","1","2"].map(k=>({k, html:k, why:"Eine Knotenebene ist eine Ebene, in der die Aufenthaltswahrscheinlichkeit null ist. Beim p-Orbital liegt sie zwischen den beiden Keulen."}))});
+  if(kind==="p3") groups.push({q:"Welcher <b>Winkel</b> liegt zwischen den Achsen der Orbitale?", kind:"buttons", ans:"90°", opts:ANGOPTS.map(k=>({k, html:k, why:"Die p-Orbitale liegen entlang der x-, y- und z-Achse."}))});
+  if(kind==="sp3"||kind==="sp2"||kind==="sp"){
+    groups.push({q:"Welcher <b>Winkel</b> liegt zwischen den Achsen der Hybridorbitale?", kind:"buttons", ans:ANG[kind], opts:ANGOPTS.map(k=>({k, html:k, why:angWhy(k)}))});
+    groups.push({q:"Welche <b>Bindungen</b> kann ein C-Atom in diesem Zustand ausbilden?", kind:"buttons", ans:ST[{sp3:"C_3",sp2:"C_2",sp:"C_1"}[kind]].bind,
+      opts:["4s","3s1p","2s2p","two"].map(k=>({k, html:BIND[k], why:"Jedes einfach besetzte Hybridorbital bildet eine σ-Bindung, jedes einfach besetzte p-Orbital eine π-Bindung."}))});
+  }
+  if(kind==="hyb1") groups.push({q:"Wie entsteht ein <b>Hybridorbital</b>?", kind:"buttons", ans:"mix",
+    opts:shuffle([{k:"mix", html:"durch Mischen von s- und p-Orbitalen desselben Atoms"},{k:"two", html:"durch Überlappung von Orbitalen zweier Atome", why:"Die Überlappung von Orbitalen zweier Atome ergibt eine Bindung, kein Hybridorbital."},{k:"pp", html:"durch Verschmelzen zweier p-Orbitale", why:"An einem Hybridorbital ist immer das s-Orbital beteiligt."},{k:"ss", html:"durch Anregung eines s-Elektrons", why:"Die Anregung (2s → 2p) geht der Hybridisierung voraus, erzeugt aber selbst kein Hybridorbital."}])});
+  return {typ:"D", title:`Orbitale erkennen: ${ORBK[kind].replace(/<[^>]+>/g,"")}`,
+    ctx:`<p>Die Abbildung zeigt Orbitale an einem Atomkern (gestrichelt: Koordinatenachsen).</p><div class="mol-row">${orbSetSVG(kind)}</div>`,
+    groups,
+    hints:[
+      "s-Orbitale sind kugelförmig, p-Orbitale hantelförmig mit einer Knotenebene am Kern. Ein Hybridorbital hat eine große und eine kleine Keule.",
+      "Farben: türkis = Hybridorbital, orange = p-Orbital, blau = s-Orbital. Zähle die Hybridorbitale: vier → sp³, drei → sp², zwei → sp."
+    ],
+    ex:`<div class="figure" style="max-width:320px">${orbSetSVG(kind)}</div><p>Dargestellt: <strong>${ORBK[kind]}</strong>. ${ORBEX[kind]}</p>`
+  };
+}
+
+/* D2: Orbitalmodell eines Moleküls deuten */
+function makeD2(key){
+  const om = omSVG(key), M = OMOL[key];
+  const molOthers = shuffle(Object.keys(OMOL).filter(k=>k!==key)).slice(0,3);
+  const groups = [{q:"Welches <b>Molekül</b> ist dargestellt?", kind:"buttons", ans:key,
+    opts:shuffle([key].concat(molOthers)).map(k=>({k, html:OMOL[k].n, why:"Zähle die Hybridorbitale an einem C-Atom und achte auf p-Orbitale bzw. π-Wolken: vier Hybridorbitale → sp³ (nur σ), drei + ein p-Orbital → sp², zwei + zwei p-Orbitale → sp."}))}];
+  const own = om.marks.map(x=>x.k);
+  om.marks.forEach((mm,n)=>{
+    const ownOther = shuffle(own.filter(k=>k!==mm.k)).slice(0,2);
+    const rest = shuffle(Object.keys(FL).filter(k=>k!==mm.k && !ownOther.includes(k)));
+    const dist = ownOther.concat(rest).slice(0,3);
+    groups.push({q:`Was ist mit <span class="mkn">${n+1}</span> markiert?`, kind:"buttons", ans:mm.k,
+      opts:shuffle([mm.k].concat(dist)).map(k=>({k, html:FL[k], why:
+        k==="pi" ? "π-Bindungen sind als gestrichelte Wolken ober- und unterhalb der Kernverbindungsachse dargestellt." :
+        k==="lp2" ? "Ein freies Elektronenpaar sitzt in einem Hybridorbital, das zu keinem anderen Atom zeigt (zwei Punkte)." :
+        /h$/.test(k) ? "Eine Überlappung mit einem 1s-Orbital (blaue Kugel) gibt es nur an H-Atomen. Prüfe die Hybridisierung des C-Atoms." :
+        "Prüfe, zwischen welchen Atomen die Überlappung liegt und wie die beteiligten Atome hybridisiert sind."}))});
+  });
+  return {typ:"D", title:`Orbitalmodell: ${M.n}`,
+    ctx:`<p>Die Abbildung zeigt das Orbitalmodell eines Moleküls. Türkis: Hybridorbitale, orange: p-Orbitale und π-Elektronenwolken (gestrichelt), blau: 1s-Orbitale der H-Atome.</p><div class="mol-row">${om.svg}</div>`,
+    groups,
+    hints:[
+      "Zähle die Hybridorbitale an einem C-Atom: vier → sp³, drei und ein p-Orbital → sp², zwei und zwei p-Orbitale → sp.",
+      "Blaue Kugeln sind die 1s-Orbitale der H-Atome. Frontale Überlappungen auf der Kernverbindungsachse sind σ-Bindungen.",
+      "Gestrichelte Wolken ober- und unterhalb der Kernverbindungsachse zeigen π-Bindungen. Zwei Punkte in einer Keule stehen für ein freies Elektronenpaar."
+    ],
+    ex:`<div class="figure" style="max-width:420px">${om.svg}</div><p>Dargestellt ist <strong>${M.n}</strong>. ${M.ex}</p><ul>${om.marks.map((mm,n)=>`<li><span class="mkn">${n+1}</span> ${FL[mm.k]}</li>`).join("")}</ul>`
+  };
+}
+
+/* E: Elektronen selbst eintragen – Grundzustand und hybridisierter Zustand */
+const NEL = {C:6, N:7, O:8};
+const ELN = {C:"Kohlenstoff", N:"Stickstoff", O:"Sauerstoff"};
+const HKEY = {sp3:"3", sp2:"2", sp:"1"};
+const groundRows = ()=>[["2p",[0,0,0]],["2s",[0]],["1s",[0]]];
+function hybRows(h){ const n={sp3:4,sp2:3,sp:2}[h], r=[]; if(n<4) r.push(["2p",Array(4-n).fill(0)]); r.push([HY[h],Array(n).fill(0)]); r.push(["1s",[0]]); return r; }
+const sortD = a => a.slice().sort((x,y)=>y-x).join(",");
+const sumOcc = occ => occ.reduce((s,r)=>s+r.reduce((a,b)=>a+b,0),0);
+function fillDiag(el, rows, occ, exp, hyb){
+  const tot = sumOcc(occ), need = NEL[el];
+  if(tot!==need) return `Das ${el}-Atom hat ${need} Elektronen – eingetragen sind ${tot}.`;
+  const ri = lab => rows.findIndex(r=>r[0]===lab);
+  const i1 = ri("1s");
+  if(occ[i1][0]!==2) return hyb ? "Die beiden 1s-Elektronen sind an der Hybridisierung nicht beteiligt – das 1s-Orbital bleibt doppelt besetzt." : "Energieprinzip: Das 1s-Orbital hat die niedrigste Energie und wird zuerst vollständig besetzt.";
+  if(!hyb){
+    const i2 = ri("2s"), ip = ri("2p");
+    if(occ[i2][0]!==2) return "Energieprinzip: Das 2s-Orbital liegt tiefer als die 2p-Orbitale und wird vor ihnen vollständig besetzt.";
+    if(occ[ip].includes(2) && occ[ip].includes(0)) return "Hundsche Regel: Die drei energiegleichen 2p-Orbitale werden zuerst einfach besetzt, bevor ein Orbital ein zweites Elektron erhält.";
+  } else {
+    const ih = rows.findIndex(r=>/^sp/.test(r[0])), ip = ri("2p");
+    const p = ip>=0 ? occ[ip] : [], h = occ[ih];
+    if(p.includes(2)) return "Die freien Elektronenpaare befinden sich in den Hybridorbitalen. Die p-Orbitale sind einfach besetzt – sie bilden die π-Bindungen.";
+    if((h.includes(2) && (h.includes(0) || p.includes(0))) || (p.includes(0) && el==="C")) return el==="C"
+      ? "Hundsche Regel: Im hybridisierten C-Atom ist jedes der vier Valenzorbitale einfach besetzt – nur so kann es vier Bindungen eingehen."
+      : "Hundsche Regel: Energiegleiche Orbitale werden zuerst einfach besetzt. Erst danach erhalten Hybridorbitale ein zweites Elektron (freies Elektronenpaar).";
+  }
+  return "Die Verteilung stimmt noch nicht. Vergleiche mit den Bindungen und freien Elektronenpaaren des Atoms.";
+}
+const E_T = [
+  {m:"methan",i:0},{m:"ethan",i:0},{m:"ethen",i:0},{m:"benzol",i:0},{m:"ethin",i:1},{m:"co2",i:1},{m:"allen",i:1},
+  {m:"ammoniak",i:0},{m:"methylamin",i:1},{m:"hcn",i:2},{m:"acetonitril",i:2},
+  {m:"wasser",i:0},{m:"ethanol",i:2},{m:"methanal",i:1},{m:"propanon",i:1},{m:"essig",i:2}
+];
+function makeE(t){
+  const m=MOL[t.m], el=elOf(m,t.i), h=hybOf(m,t.i), sk=el+"_"+HKEY[h], gk=el+"_g";
+  const expG = ST[gk].rows.map(r=>r[1]);
+  const expH = ST[sk].rows.map(r=>r[1]);
+  const lab = atomLab(m,t.i);
+  const gG = {q:`Trage die Elektronen des ${el}-Atoms im <b>Grundzustand</b> ein.`, kind:"fill", need:NEL[el], step:true,
+    rowsFor:()=>groundRows(), exp:()=>expG.map(r=>r.slice()),
+    grade(){ const rows=groundRows(); const ok = rows.every((r,i)=>sortD(this.occ[i])===sortD(expG[i])); return {ok, why: ok?"":fillDiag(el, rows, this.occ, expG, false)}; }};
+  const gB = {q:`Wie ist das markierte ${esc(lab)} im ${esc(m.n)} <b>hybridisiert</b>?`, kind:"buttons", ans:h, step:true,
+    opts:["sp3","sp2","sp"].map(k=>({k, html:HY[k], why:`Zähle die π-Bindungen am markierten Atom – hier: ${piTxt(piOf(m,t.i))}. Keine → sp³, eine → sp², zwei → sp.`}))};
+  const gH = {q:`Trage die Elektronen des ${el}-Atoms im <b>hybridisierten Zustand</b> ein.`, kind:"fill", need:NEL[el], dep:1,
+    rowsFor:k=>hybRows(k), exp:()=>expH.map(r=>r.slice()),
+    grade(T){ const b=T.groups[1]; if(b.sel!==b.ans) return {ok:false, why:"Die Orbitale passen nicht zum Atom, weil die Hybridisierung in b) noch nicht stimmt."};
+      const rows=hybRows(h); const ok = rows.every((r,i)=>sortD(this.occ[i])===sortD(expH[i])); return {ok, why: ok?"":fillDiag(el, rows, this.occ, expH, true)}; }};
+  const lp=lpOf(m,t.i);
+  return {typ:"E", title:`Elektronen eintragen: ${el} in ${m.n}`,
+    ctx:`<p>Betrachtet wird das markierte <b>${esc(lab)}</b> im Molekül <b>${esc(m.n)}</b>. Tippe ein Kästchen an, um Elektronen einzutragen: <span style="white-space:nowrap">leer → ↑ → ↑↓ → leer</span>.</p><div class="mol-row">${molBox(lewisSVG(m,{hlA:[t.i]}), esc(m.n)+" ("+SUBS(m.f)+")")}</div>`,
+    groups:[gG, gB, gH],
+    hints:[
+      `Ein ${ELN[el]}-Atom hat ${NEL[el]} Elektronen. Im Grundzustand gilt: zuerst 1s, dann 2s, dann 2p – energiegleiche Orbitale zuerst einfach besetzen (Hundsche Regel).`,
+      "Die Hybridisierung erkennst du an den π-Bindungen des Atoms: keine → sp³, eine → sp², zwei → sp.",
+      el==="C" ? "Im hybridisierten C-Atom bleibt 1s doppelt besetzt; die vier Valenzelektronen verteilen sich einzeln auf Hybrid- und p-Orbitale." : `Im hybridisierten ${el}-Atom bleibt 1s doppelt besetzt. Die freien Elektronenpaare liegen in Hybridorbitalen, die p-Orbitale sind einfach besetzt.`
+    ],
+    ex:`<div class="fig-row">${fig(boxSVG(ST[gk].rows),"Grundzustand: "+CONF[gk])}${farr("→")}${fig(boxSVG(ST[sk].rows),`${STN[ST[sk].st]} im ${esc(m.n)}`)}</div>
+      <p><strong>Grundzustand:</strong> Die ${NEL[el]} Elektronen werden nach steigender Energie verteilt (1s, 2s, 2p); die drei 2p-Orbitale werden nach der Hundschen Regel zuerst einfach besetzt.</p>
+      <p><strong>Im Molekül:</strong> Das ${esc(lab)} hat ${sigTxt(nSig(m,t.i))}${lp?`, ${lpTxt(lp)}`:""} und ${piTxt(piOf(m,t.i))} – es ist <strong>${STN[ST[sk].st]}</strong>. Das 1s-Orbital bleibt doppelt besetzt. ${el==="C" ? "Die vier Valenzelektronen besetzen die Hybridorbitale" + (h==="sp3"?"":" und die p-Orbitale") + " jeweils einzeln" : `Die ${NEL[el]-2} Valenzelektronen verteilen sich so, dass ${lp===1?"ein Hybridorbital":"zwei Hybridorbitale"} doppelt besetzt ${lp===1?"ist":"sind"} (freie Elektronenpaare)${h!=="sp3"?" und die p-Orbitale einfach besetzt sind":""}`}. Daraus ergeben sich <strong>${BIND[ST[sk].bind]}</strong>.</p>`
+  };
+}
+
+/* gezielte Auswahl */
+const CATALOG = [];
+Object.keys(ST).forEach(k=>CATALOG.push({typ:"A", label:`Kästchenschreibweise deuten: ${ST[k].el}, ${STN[ST[k].st]}`, make:()=>makeA1(k)}));
+A2T.forEach(t=>CATALOG.push({typ:"A", label:`Kästchenschreibweise wählen: ${ST[t.s].el} in ${MOL[t.m].n}`, make:()=>makeA2(t)}));
+Object.keys(MOL).forEach(mk=>MOL[mk].ask.forEach(i=>CATALOG.push({typ:"B", label:`${MOL[mk].n}: ${atomLab(MOL[mk],i)}`, make:()=>makeB(mk,i)})));
+Object.keys(MOL).forEach(mk=>CATALOG.push({typ:"C", label:`σ und π zählen: ${MOL[mk].n}`, make:()=>makeC1(mk)}));
+Object.keys(MOL).forEach(mk=>MOL[mk].askB.forEach(k=>CATALOG.push({typ:"C", label:`Überlappung: ${bondLab(MOL[mk],k)} in ${MOL[mk].n}`, make:()=>makeC2(mk,k)})));
+CATALOG.push({typ:"C", label:"Aussagen zu σ- und π-Bindungen prüfen", make:()=>makeC3()});
+E_T.forEach(t=>CATALOG.push({typ:"E", label:`Elektronen eintragen: ${elOf(MOL[t.m],t.i)} in ${MOL[t.m].n}`, make:()=>makeE(t)}));
+Object.keys(ORBK).forEach(k=>CATALOG.push({typ:"D", label:`Orbitale erkennen: ${ORBK[k].replace(/<[^>]+>/g,"")}`, make:()=>makeD1(k)}));
+Object.keys(OMOL).forEach(k=>CATALOG.push({typ:"D", label:`Orbitalmodell: ${OMOL[k].n}`, make:()=>makeD2(k)}));
+
+/* ============================================================
+   ZUSTAND & DARSTELLUNG
+   ============================================================ */
+const enabled = {A:true, E:true, B:true, C:true, D:true};
+const stats = {solved:0, first:0, streak:0, shown:0};
+const history = [];
+let T = null, taskNo = 0, lastLabel = "";
+
+function renderTypes(){
+  $("typeList").innerHTML = Object.keys(TYP).map(k=>`
+    <label class="type-item ${enabled[k]?"on":""}" data-k="${k}">
+      <input type="checkbox" ${enabled[k]?"checked":""} data-k="${k}">
+      <span><span class="tt">${TYP[k].n}</span><span class="td" style="display:block">${TYP[k].d}</span></span>
+    </label>`).join("");
+}
+$("typeList").addEventListener("change", e=>{
+  const k = e.target.dataset.k; if(!k) return;
+  enabled[k] = e.target.checked;
+  renderTypes();
+});
+
+function renderSelect(){
+  $("taskSelect").innerHTML = Object.keys(TYP).map(t=>`<optgroup label="${esc(TYP[t].n)}">${
+    CATALOG.map((c,i)=>c.typ===t?`<option value="${i}">${esc(c.label)}</option>`:"").join("")}</optgroup>`).join("");
+}
+
+function renderOverview(){
+  $("ovwBody").innerHTML = [
+    ["sp³","2s + drei 2p","4","tetraedrisch","109,5°","0","4 σ","CH<sub>4</sub>, C<sub>2</sub>H<sub>6</sub>; N in NH<sub>3</sub>, O in H<sub>2</sub>O"],
+    ["sp²","2s + zwei 2p","3","trigonal-planar","120°","1","3 σ + 1 π","C<sub>2</sub>H<sub>4</sub>, Benzol, C und O in HCHO"],
+    ["sp","2s + ein 2p","2","linear","180°","2","2 σ + 2 π","C<sub>2</sub>H<sub>2</sub>, CO<sub>2</sub> (C), HCN"]
+  ].map(r=>`<tr>${r.map((c,i)=>`<td${i===0?' class="k"':""}>${c}</td>`).join("")}</tr>`).join("");
+  $("ovwBody2").innerHTML = [
+    ["Entstehung","frontale Überlappung (Hybrid–Hybrid, Hybrid–1s)","seitliche Überlappung zweier paralleler p-Orbitale"],
+    ["Elektronendichte","auf der Kernverbindungsachse","ober- und unterhalb der Achse, Knotenebene in der Achse"],
+    ["Drehbarkeit","frei drehbar (rotationssymmetrisch)","verhindert die Drehung"],
+    ["Stärke","stärker","schwächer (geringere Überlappung)"],
+    ["Vorkommen","in jeder Atombindung genau eine","zusätzlich in Doppel- (1 π) und Dreifachbindungen (2 π)"]
+  ].map(r=>`<tr><td class="k">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join("");
+}
+
+function setStatus(kind, txt){
+  const b=$("statusBadge"); b.className="status "+kind; $("statusText").textContent=txt;
+}
+function renderStats(){
+  $("roSolved").textContent=stats.solved; $("roFirst").textContent=stats.first;
+  $("roStreak").textContent=stats.streak; $("roShown").textContent=stats.shown;
+}
+function renderHistory(){
+  if(!history.length){ $("histBody").innerHTML=`<tr><td colspan="4" class="empty-hint">Noch keine Aufgaben bearbeitet.</td></tr>`; return; }
+  const lab = {first:["s-first","im 1. Versuch gelöst"], ok:["s-ok","gelöst"], help:["s-help","mit Hilfen gelöst"], shown:["s-shown","Lösung angesehen"], open:["s-open","nicht beendet"]};
+  $("histBody").innerHTML = history.slice().reverse().map(h=>`<tr><td class="mono">${h.no}</td><td>${esc(TYP[h.typ].n)}</td><td>${esc(h.title)}</td><td class="${lab[h.st][0]}">${lab[h.st][1]}${h.tries>1&&(h.st==="ok"||h.st==="help")?` (${h.tries} Versuche)`:""}</td></tr>`).join("");
+}
+
+function loadTask(t){
+  if(T && !T.done && (T.tries>0 || T.hintIdx>0)) history.push({no:taskNo, typ:T.typ, title:T.title, st:"open", tries:T.tries});
+  T = t; taskNo++;
+  T.tries=0; T.hintIdx=0; T.done=false; T.shown=false; T.stepErr=false;
+  T.groups.forEach(g=>{ g.sel=null; g.state=""; g.why=""; g.whyInfo=false; g.occ=null; g.occFor=null; });
+  lastLabel = T.title;
+  $("taskNum").textContent = "Aufgabe "+taskNo;
+  const chip=$("taskChip"); chip.className="chip t"+T.typ; chip.textContent=TYP[T.typ].n;
+  $("ctx").innerHTML = T.ctx;
+  $("groups").innerHTML = T.groups.map((g,gi)=>`
+    <div class="q-group${g.inline?" inline":""}" data-g="${gi}">
+      <div class="q${g.qcls?" "+g.qcls:""}">${T.groups.length>1&&!g.inline?`<span class="qn">${String.fromCharCode(97+gi)})</span>`:""}${g.q}<span class="mark"></span></div>
+      ${g.kind==="fill" ? `<div class="fillwrap"></div>` : `<div class="${g.kind==="cards" ? "cards"+(g.wide?" wide":"")+(g.cls?" "+g.cls:"") : "choices"}">
+        ${g.opts.map(o=>`<button type="button" class="opt${g.kind==="cards"?" card":""}${o.txt?" txt":""}" data-k="${esc(o.k)}">${o.html}</button>`).join("")}
+      </div>`}
+      ${g.step ? `<div class="step-row"><button type="button" class="btn ghost" data-step="${gi}">Schritt prüfen</button></div>` : ""}
+      <div class="why" hidden></div>
+    </div>`).join("");
+  T.groups.forEach((g,gi)=>{ if(g.kind==="fill") renderFill(gi); });
+  $("feedback").innerHTML="";
+  $("expBox").innerHTML=`<div class="empty-hint">Die Erklärung erscheint, sobald die Aufgabe gelöst oder die Lösung angezeigt wurde.</div>`;
+  $("btnCheck").disabled=false; $("btnHint").disabled=false; $("btnSolve").disabled=false;
+  setStatus("running","Aufgabe offen");
+  renderHistory();
+}
+
+/* Zeilen einer Ausfüll-Gruppe (bei abhängigen Gruppen erst nach Wahl der Hybridisierung) */
+function fillKey(g){ return g.dep!=null ? T.groups[g.dep].sel : "g"; }
+function renderFill(gi){
+  const g=T.groups[gi], wrap=$("groups").querySelector(`.q-group[data-g="${gi}"] .fillwrap`);
+  const key=fillKey(g);
+  if(key==null){ g.occ=null; wrap.innerHTML=`<div class="fill-wait">Wähle zuerst in ${String.fromCharCode(97+g.dep)}) die Hybridisierung – dann erscheinen hier die passenden Orbitale.</div>`; return; }
+  const rows=g.rowsFor(key);
+  if(!g.occ || g.occFor!==key){ g.occ=rows.map(r=>r[1].map(()=>0)); g.occFor=key; }
+  const n=sumOcc(g.occ);
+  wrap.innerHTML = fillSVG(rows, g.occ) + `<div class="fill-ctl"><span class="cnt${n===g.need?" full":n>g.need?" over":""}">${n} von ${g.need} Elektronen eingetragen</span>${T.done?"":`<button type="button" class="btn ghost" data-reset="${gi}">Leeren</button>`}</div>`;
+}
+
+function paintGroup(gi){
+  const g=T.groups[gi], el=$("groups").querySelector(`.q-group[data-g="${gi}"]`);
+  if(g.kind==="fill") renderFill(gi);
+  el.classList.toggle("ok", g.state==="ok");
+  el.classList.toggle("bad", g.state==="bad");
+  el.classList.toggle("done", T.done);
+  el.querySelectorAll(".opt").forEach(b=>b.classList.toggle("sel", b.dataset.k===g.sel));
+  const w=el.querySelector(".why");
+  w.classList.toggle("info", !!g.whyInfo);
+  if(g.why){ w.innerHTML=g.why; w.hidden=false; } else { w.hidden=true; w.innerHTML=""; }
+}
+
+$("groups").addEventListener("click", e=>{
+  if(!T || T.done) return;
+  const st = e.target.closest("[data-step]");
+  if(st){ checkStep(+st.dataset.step); return; }
+  const box = e.target.closest("[data-box]"), rs = e.target.closest("[data-reset]");
+  if(box || rs){
+    const gi = +e.target.closest(".q-group").dataset.g, g=T.groups[gi];
+    if(rs) g.occ = g.occ.map(r=>r.map(()=>0));
+    else { const [r,k]=box.dataset.box.split(",").map(Number); g.occ[r][k]=(g.occ[r][k]+1)%3; }
+    g.state=""; g.why=""; g.whyInfo=false; paintGroup(gi);
+    return;
+  }
+  const b = e.target.closest(".opt"); if(!b) return;
+  const gi = +b.closest(".q-group").dataset.g, g=T.groups[gi];
+  const changed = g.sel!==b.dataset.k;
+  g.sel = b.dataset.k; g.state=""; g.why=""; g.whyInfo=false;
+  paintGroup(gi);
+  if(changed) T.groups.forEach((h,hi)=>{ if(h.dep===gi){ h.occ=null; h.state=""; h.why=""; paintGroup(hi); } });
+});
+
+function fb(cls, html, append){
+  const div = `<div class="fb ${cls}">${html}</div>`;
+  if(append) $("feedback").insertAdjacentHTML("beforeend", div); else $("feedback").innerHTML = div;
+}
+
+function finish(st){
+  T.done=true;
+  T.groups.forEach((g,gi)=>paintGroup(gi));
+  $("btnCheck").disabled=true; $("btnHint").disabled=true; $("btnSolve").disabled=true;
+  $("expBox").innerHTML = `<div class="explain">${T.ex}</div>`;
+  history.push({no:taskNo, typ:T.typ, title:T.title, st, tries:T.tries});
+  renderHistory(); renderStats();
+}
+
+function isOpen(g){ return g.kind==="fill" ? (fillKey(g)==null || !g.occ || sumOcc(g.occ)===0) : g.sel==null; }
+function gradeGroup(g){
+  if(g.kind==="fill") return g.grade(T);
+  const ok = g.sel===g.ans;
+  return {ok, why: ok ? "" : ((g.opts.find(o=>o.k===g.sel)||{}).why||"")};
+}
+/* Zwischenschritt prüfen: zählt nicht als Versuch, ein Fehler verhindert aber „im 1. Versuch gelöst“ */
+function checkStep(gi){
+  if(!T || T.done) return;
+  const g=T.groups[gi];
+  if(isOpen(g)){ g.state=""; g.whyInfo=true; g.why = g.kind==="fill" ? "Trage zuerst Elektronen ein." : "Wähle zuerst eine Antwort."; paintGroup(gi); return; }
+  const r=gradeGroup(g);
+  g.whyInfo=false; g.state = r.ok?"ok":"bad"; g.why = r.ok ? "" : r.why;
+  if(!r.ok) T.stepErr=true;
+  paintGroup(gi);
+}
+
+function check(){
+  if(!T || T.done) return;
+  const open = T.groups.filter(isOpen).length;
+  if(open){ fb("info", open===1 ? "Eine Teilaufgabe ist noch nicht beantwortet." : `${open} Teilaufgaben sind noch nicht beantwortet.`); return; }
+  T.tries++;
+  let nOk=0;
+  T.groups.forEach((g,gi)=>{
+    const r=gradeGroup(g), ok=r.ok;
+    g.state = ok?"ok":"bad";
+    g.why = r.why; g.whyInfo=false;
+    if(ok) nOk++;
+    paintGroup(gi);
+  });
+  const n=T.groups.length;
+  if(nOk===n){
+    const first = T.tries===1 && !T.stepErr;
+    stats.solved++; if(first) stats.first++; stats.streak++;
+    fb("good", first ? "Alles richtig – im ersten Versuch! Die Erklärung steht unten im Tab „Erklärung“." : "Alles richtig! Die Erklärung steht unten im Tab „Erklärung“.");
+    setStatus("done","gelöst");
+    finish(T.hintIdx>0?"help":(first?"first":"ok"));
+  } else {
+    stats.streak=0; renderStats();
+    fb("bad", n===1 ? "Das stimmt noch nicht. Ändere deine Auswahl und prüfe erneut." : `${nOk} von ${n} Teilaufgaben richtig. Ändere die rot markierten Antworten und prüfe erneut.`);
+  }
+}
+
+function hint(){
+  if(!T || T.done) return;
+  if(T.hintIdx < T.hints.length){
+    fb("hint", `<strong>Tipp ${T.hintIdx+1}:</strong> ${T.hints[T.hintIdx]}`, true);
+    T.hintIdx++;
+  } else fb("info","Keine weiteren Tipps – nutze „Lösung zeigen“, um die Lösung anzuzeigen.", true);
+}
+
+function solve(){
+  if(!T || T.done) return;
+  T.groups.forEach(g=>{ if(g.kind!=="fill") g.sel=g.ans; g.state="ok"; g.why=""; });
+  T.groups.forEach(g=>{ if(g.kind==="fill"){ g.occ=g.exp(); g.occFor=fillKey(g); } });
+  T.shown=true; stats.shown++; stats.streak=0;
+  fb("info","Die richtigen Antworten sind markiert. Die Aufgabe zählt nicht als gelöst – die Erklärung steht unten im Tab „Erklärung“.");
+  setStatus("shown","Lösung angezeigt");
+  finish("shown");
+}
+
+function newTask(){
+  if(!Object.keys(enabled).some(k=>enabled[k])){
+    fb("hint","<strong>Kein Aufgabentyp gewählt.</strong> Markiere links unter „Aufgabentypen“ mindestens einen Typ und starte dann eine neue Aufgabe.");
+    return;
+  }
+  const pool = CATALOG.filter(c=>enabled[c.typ]);
+  let t, guard=0;
+  do {
+    const typ = pick(Object.keys(enabled).filter(k=>enabled[k]));
+    const c = pick(pool.filter(p=>p.typ===typ));
+    t = c.make(); guard++;
+  } while(t.title===lastLabel && guard<10);
+  loadTask(t);
+}
+
+/* Bedienung */
+$("btnNew").addEventListener("click", newTask);
+$("btnCheck").addEventListener("click", check);
+$("btnHint").addEventListener("click", hint);
+$("btnSolve").addEventListener("click", solve);
+$("btnLoad").addEventListener("click", ()=>{ const c=CATALOG[+$("taskSelect").value]; if(c) loadTask(c.make()); });
+
+document.querySelectorAll(".tabbtn").forEach(b=>b.addEventListener("click", ()=>{
+  document.querySelectorAll(".tabbtn").forEach(x=>x.classList.toggle("active", x===b));
+  document.querySelectorAll(".tabpanel").forEach(p=>p.classList.toggle("active", p.id==="tab-"+b.dataset.tab));
+}));
+
+const gbd=$("guideBackdrop");
+$("btnGuide").addEventListener("click", e=>{ e.preventDefault(); gbd.classList.add("open"); });
+$("closeGuide").addEventListener("click", ()=>gbd.classList.remove("open"));
+gbd.addEventListener("click", e=>{ if(e.target===gbd) gbd.classList.remove("open"); });
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") gbd.classList.remove("open"); });
+
+/* ============================================================
+   GRUNDLAGEN
+   ============================================================ */
+const BASICS = [
+  {t:"Atomorbitale", html:()=>`
+    <p>Im <strong>Orbitalmodell</strong> wird nicht angegeben, wo sich ein Elektron genau befindet. Ein <strong>Orbital</strong> ist der Raum um den Atomkern, in dem ein Elektron mit hoher Wahrscheinlichkeit (z. B. 90 %) anzutreffen ist. Jedes Orbital kann höchstens <strong>zwei Elektronen</strong> mit entgegengesetztem Spin aufnehmen (Pauli-Prinzip).</p>
+    <div class="fig-row">${fig(orbSetSVG("s",1.05),"<strong>s-Orbital</strong>: kugelförmig, keine Knotenebene")}${fig(orbSetSVG("p",1.05),"<strong>p-Orbital</strong>: hantelförmig, zwei Keulen, eine Knotenebene am Kern")}${fig(orbSetSVG("p3",1.05),"<strong>drei p-Orbitale</strong> p<sub>x</sub>, p<sub>y</sub>, p<sub>z</sub>: energiegleich, senkrecht zueinander (90°)")}</div>
+    <p>Die erste Schale besitzt nur das <strong>1s-Orbital</strong>. Ab der zweiten Schale gibt es ein <strong>2s-Orbital</strong> und drei <strong>2p-Orbitale</strong>. Die 2p-Orbitale liegen energetisch höher als das 2s-Orbital.</p>
+    <p>In der <strong>Knotenebene</strong> des p-Orbitals ist die Aufenthaltswahrscheinlichkeit null. Das wird später bei der π-Bindung wichtig: Ihre Elektronendichte liegt ober- und unterhalb der Kernverbindungsachse, nicht auf ihr.</p>`},
+  {t:"Elektronenkonfiguration", html:()=>`
+    <p>In der <strong>Kästchenschreibweise</strong> steht jedes Kästchen für ein Orbital und jeder Pfeil für ein Elektron; die Pfeilrichtung symbolisiert den Spin. Die Höhe gibt die Energie an.</p>
+    <div class="fig-row">${fig(boxSVG(ST.C_g.rows),"Kohlenstoff: 1s² 2s² 2p²")}${fig(boxSVG(ST.N_g.rows),"Stickstoff: 1s² 2s² 2p³")}${fig(boxSVG(ST.O_g.rows),"Sauerstoff: 1s² 2s² 2p⁴")}</div>
+    <p>Für die Besetzung gelten drei Regeln:</p>
+    <ul>
+      <li><strong>Energieprinzip:</strong> Die Orbitale werden nach steigender Energie besetzt: 1s, 2s, 2p.</li>
+      <li><strong>Pauli-Prinzip:</strong> Ein Orbital fasst höchstens zwei Elektronen mit entgegengesetztem Spin.</li>
+      <li><strong>Hundsche Regel:</strong> Energiegleiche Orbitale (z. B. die drei 2p-Orbitale) werden zuerst einfach besetzt.</li>
+    </ul>
+    <p><strong>Das Problem:</strong> Im Grundzustand hat das C-Atom nur zwei ungepaarte Elektronen. Es wäre damit zweibindig – Kohlenstoff ist in seinen Verbindungen aber vierbindig, z. B. im Methan CH<sub>4</sub> mit vier gleichwertigen Bindungen.</p>`},
+  {t:"Anregung & Hybridisierung", html:()=>`
+    <p>Um die Vierbindigkeit zu erklären, wird ein 2s-Elektron in das leere 2p-Orbital angehoben (<strong>angeregter Zustand</strong>). Dafür muss Energie aufgewendet werden; sie wird durch die Bildung von zwei zusätzlichen Bindungen mehr als zurückgewonnen.</p>
+    <div class="fig-row">${fig(boxSVG(ST.C_g.rows),"Grundzustand")}${farr("→")}${fig(boxSVG(ST.C_x.rows),"angeregter Zustand")}${farr("→")}${fig(boxSVG(ST.C_3.rows),"sp³-hybridisiert")}</div>
+    <p>Im angeregten Zustand wären die Bindungen aber nicht gleichwertig: eine über das kugelförmige 2s-Orbital, drei über die 2p-Orbitale. Deshalb werden das 2s-Orbital und 2p-Orbitale rechnerisch zu <strong>Hybridorbitalen</strong> gemischt („hybridisiert“).</p>
+    <ul>
+      <li>Aus <strong>n</strong> gemischten Atomorbitalen entstehen <strong>n</strong> Hybridorbitale.</li>
+      <li>Die Hybridorbitale sind untereinander <strong>energiegleich und gleich geformt</strong>; ihre Energie liegt zwischen 2s und 2p.</li>
+      <li>Der Name gibt die Zusammensetzung an: <strong>sp³</strong> = ein s- und drei p-Orbitale, <strong>sp²</strong> = ein s- und zwei p-Orbitale, <strong>sp</strong> = ein s- und ein p-Orbital.</li>
+      <li>Nicht verwendete p-Orbitale bleiben unverändert und können <strong>π-Bindungen</strong> bilden.</li>
+    </ul>
+    <div class="fig-row">${fig(orbSetSVG("hyb1",1.05),"Ein Hybridorbital hat eine große und eine kleine Keule. Die große Keule zeigt in Bindungsrichtung und überlappt stark.")}</div>`},
+  {t:"sp³-Hybridisierung", html:()=>`
+    <p>Das 2s-Orbital und <strong>alle drei 2p-Orbitale</strong> werden zu <strong>vier sp³-Orbitalen</strong> gemischt. Sie weichen sich maximal aus und zeigen in die Ecken eines Tetraeders: <strong>tetraedrisch, 109,5°</strong>. Es bleibt kein p-Orbital übrig.</p>
+    <div class="fig-row">${fig(boxSVG(ST.C_3.rows),"vier einfach besetzte sp³-Orbitale")}${fig(orbSetSVG("sp3",1.05),"tetraedrische Anordnung der sp³-Orbitale")}${fig(omSVG("methan",true,1.5).svg,"Methan: vier σ-Bindungen (sp³–1s)")}</div>
+    <p>Ein sp³-hybridisiertes C-Atom bildet <strong>vier σ-Bindungen</strong> und keine π-Bindung. Typisch für alle C-Atome mit vier Einfachbindungen: Alkane wie Methan und Ethan, die CH<sub>3</sub>-Gruppen in anderen Molekülen, das C-Atom mit OH-Gruppe im Ethanol.</p>
+    <div class="fig-row">${fig(omSVG("ethan",true,1.4).svg,"Ethan: C–C-Bindung σ(sp³–sp³), frei drehbar")}</div>`},
+  {t:"sp²-Hybridisierung", html:()=>`
+    <p>Das 2s-Orbital und <strong>zwei 2p-Orbitale</strong> werden zu <strong>drei sp²-Orbitalen</strong> gemischt. Sie liegen in einer Ebene: <strong>trigonal-planar, 120°</strong>. Das dritte p-Orbital bleibt übrig und steht <strong>senkrecht</strong> auf dieser Ebene.</p>
+    <div class="fig-row">${fig(boxSVG(ST.C_2.rows),"drei sp²-Orbitale und ein p-Orbital, jeweils einfach besetzt")}${fig(orbSetSVG("sp2",1.05),"sp²-Orbitale (türkis) in einer Ebene, p-Orbital (orange) senkrecht dazu")}</div>
+    <p>Ein sp²-hybridisiertes C-Atom bildet <strong>drei σ-Bindungen und eine π-Bindung</strong>. Das ist bei jeder C=C- oder C=O-Doppelbindung der Fall, z. B. im Ethen, in Aldehyden, Ketonen und Carbonsäuren und im Benzol.</p>
+    <div class="fig-row">${fig(omSVG("ethen",true,1.5).svg,"Ethen: σ-Gerüst aus sp²-Orbitalen, die p-Orbitale überlappen seitlich zur π-Bindung (gestrichelt)")}</div>
+    <p>Weil die π-Bindung parallele p-Orbitale braucht, liegen alle sechs Atome des Ethens in <strong>einer Ebene</strong>, und die Doppelbindung ist <strong>nicht drehbar</strong>.</p>`},
+  {t:"sp-Hybridisierung", html:()=>`
+    <p>Das 2s-Orbital und <strong>ein 2p-Orbital</strong> werden zu <strong>zwei sp-Orbitalen</strong> gemischt. Sie zeigen in entgegengesetzte Richtungen: <strong>linear, 180°</strong>. Zwei p-Orbitale bleiben übrig; sie stehen senkrecht zueinander und zur sp-Achse.</p>
+    <div class="fig-row">${fig(boxSVG(ST.C_1.rows),"zwei sp-Orbitale und zwei p-Orbitale, jeweils einfach besetzt")}${fig(orbSetSVG("sp",1.05),"sp-Orbitale (türkis) linear, zwei p-Orbitale (orange) senkrecht dazu")}</div>
+    <p>Ein sp-hybridisiertes C-Atom bildet <strong>zwei σ-Bindungen und zwei π-Bindungen</strong> – entweder als Dreifachbindung (Ethin, Nitrile, HCN) oder als zwei Doppelbindungen (mittleres C-Atom im CO<sub>2</sub> und im Allen).</p>
+    <div class="fig-row">${fig(omSVG("ethin",true,1.5).svg,"Ethin: σ(sp–sp) und zwei π-Bindungen in zueinander senkrechten Ebenen")}</div>
+    <p>Die beiden π-Bindungen umhüllen die C–C-Achse fast zylinderförmig. Das Ethin-Molekül ist <strong>linear</strong>.</p>`},
+  {t:"σ- und π-Bindungen", html:()=>`
+    <p>Eine Atombindung entsteht, wenn sich zwei einfach besetzte Orbitale verschiedener Atome <strong>überlappen</strong>. Die beiden Elektronen bilden dann ein gemeinsames Elektronenpaar. Je stärker die Überlappung, desto stabiler die Bindung.</p>
+    <div class="fig-row">${fig(overlapSVG("ss",1.4),"σ: s–s (H<sub>2</sub>)")}${fig(overlapSVG("sp3s",1.4),"σ: Hybridorbital–1s (C–H)")}${fig(overlapSVG("spsp",1.4),"σ: Hybridorbital–Hybridorbital (C–C)")}</div>
+    <p><strong>σ-Bindung:</strong> Die Orbitale überlappen <strong>frontal</strong>. Die Elektronendichte liegt auf der Kernverbindungsachse und ist rotationssymmetrisch zu ihr – um eine reine σ-Bindung ist deshalb freie Drehung möglich.</p>
+    <div class="fig-row">${fig(overlapSVG("pp",1.4),"π: seitliche Überlappung zweier paralleler p-Orbitale")}</div>
+    <p><strong>π-Bindung:</strong> Zwei parallele p-Orbitale überlappen <strong>seitlich</strong>. Die Elektronendichte liegt ober- und unterhalb der Kernverbindungsachse, in der Achse selbst liegt eine Knotenebene. Die Überlappung ist schwächer, die π-Bindung also weniger stabil als die σ-Bindung. Eine Drehung würde die p-Orbitale gegeneinander verdrehen und die π-Bindung brechen.</p>
+    <div class="table-wrap"><table class="hist"><thead><tr><th>Bindung</th><th>Zusammensetzung</th><th>Beispiel</th></tr></thead><tbody>
+      <tr><td class="k">Einfachbindung</td><td>1 σ</td><td>C–C im Ethan, C–H</td></tr>
+      <tr><td class="k">Doppelbindung</td><td>1 σ + 1 π</td><td>C=C im Ethen, C=O im Methanal</td></tr>
+      <tr><td class="k">Dreifachbindung</td><td>1 σ + 2 π</td><td>C≡C im Ethin, C≡N</td></tr>
+    </tbody></table></div>
+    <p>Zwischen zwei gebundenen Atomen gibt es also immer <strong>genau eine σ-Bindung</strong>; π-Bindungen kommen nur hinzu. Die Bindungen werden mit jeder π-Bindung kürzer: C–C &gt; C=C &gt; C≡C.</p>`},
+  {t:"Freie Elektronenpaare (N, O)", html:()=>`
+    <p>Auch <strong>N- und O-Atome</strong> werden im Orbitalmodell als hybridisiert beschrieben. Ihre zusätzlichen Valenzelektronen besetzen Hybridorbitale doppelt – diese enthalten die <strong>freien Elektronenpaare</strong> und bilden keine Bindung.</p>
+    <div class="fig-row">${fig(boxSVG(ST.N_3.rows),"N im NH<sub>3</sub>: sp³, ein freies Elektronenpaar")}${fig(lewisSVG(MOL.ammoniak,{hlA:[0]}),"Ammoniak")}${fig(boxSVG(ST.O_3.rows),"O im H<sub>2</sub>O: sp³, zwei freie Elektronenpaare")}${fig(lewisSVG(MOL.wasser,{hlA:[0]}),"Wasser")}</div>
+    <p>Die Orbitale sind tetraedrisch angeordnet. Die tatsächlichen Bindungswinkel sind aber kleiner als 109,5° – im <strong>NH<sub>3</sub> ca. 107°</strong>, im <strong>H<sub>2</sub>O ca. 104,5°</strong> –, weil freie Elektronenpaare mehr Raum beanspruchen als bindende.</p>
+    <div class="fig-row">${fig(boxSVG(ST.O_2.rows),"O in der C=O-Gruppe: sp², zwei freie Elektronenpaare, ein p-Orbital für die π-Bindung")}${fig(omSVG("methanal",true,1.4).svg,"Methanal: freie Elektronenpaare in zwei sp²-Orbitalen des O-Atoms (Punkte)")}</div>
+    <p>Ein N-Atom mit Dreifachbindung (Nitrile, HCN) ist entsprechend <strong>sp-hybridisiert</strong>: Ein sp-Orbital bindet, das andere enthält das freie Elektronenpaar.</p>`},
+  {t:"Hybridisierung bestimmen", html:()=>{
+    const m=MOL.acetonitril, ids=[0,1,2];
+    return `
+    <p>So bestimmst du die Hybridisierung eines C-, N- oder O-Atoms:</p>
+    <ul style="list-style:none; padding-left:4px">
+      <li><strong>1.</strong> Valenzstrichformel mit allen Bindungen und freien Elektronenpaaren zeichnen.</li>
+      <li><strong>2.</strong> Die <strong>π-Bindungen am Atom</strong> zählen: Doppelbindung = 1 π, Dreifachbindung = 2 π.</li>
+      <li><strong>3.</strong> Zuordnen: <strong>keine π-Bindung → sp³</strong>, <strong>eine → sp²</strong>, <strong>zwei → sp</strong>.</li>
+      <li><strong>4.</strong> Daraus folgen Anordnung und Winkel: tetraedrisch 109,5°, trigonal-planar 120°, linear 180°.</li>
+    </ul>
+    <p>Gleichwertig: Anzahl der Bindungspartner + freie Elektronenpaare = Anzahl der Hybridorbitale (4 → sp³, 3 → sp², 2 → sp).</p>
+    <div class="fig-row">${fig(lewisSVG(m,{hlA:ids}),"Beispiel: Ethannitril (Acetonitril)")}</div>
+    <div class="table-wrap"><table class="hist"><thead><tr><th>Atom</th><th>Bindungspartner</th><th>freie Elektronenpaare</th><th>π-Bindungen</th><th>Hybridisierung</th><th>Winkel</th></tr></thead><tbody>
+      ${ids.map(i=>`<tr><td class="k">${esc(atomLab(m,i))}</td><td>${nSig(m,i)}</td><td>${lpOf(m,i)}</td><td>${piOf(m,i)}</td><td>${HY[hybOf(m,i)]}</td><td>${ANG[hybOf(m,i)]}</td></tr>`).join("")}
+    </tbody></table></div>
+    <p>H-Atome werden nicht hybridisiert; sie binden immer mit ihrem 1s-Orbital und können nur σ-Bindungen eingehen.</p>`;}}
+];
+
+let bIdx = 0;
+const bbd = $("basicsBackdrop");
+function showBasic(i){
+  bIdx = (i+BASICS.length)%BASICS.length;
+  const b = BASICS[bIdx];
+  $("basicsNum").textContent = (bIdx+1)+".";
+  $("basicsTitle").textContent = b.t;
+  $("basicsBody").innerHTML = b.html();
+  $("basicsPos").textContent = `Thema ${bIdx+1} von ${BASICS.length}`;
+  $("basicsPrev").disabled = bIdx===0;
+  $("basicsNext").disabled = bIdx===BASICS.length-1;
+  bbd.querySelector(".modal-box").scrollTop = 0;
+  bbd.classList.add("open");
+}
+$("basicsList").innerHTML = BASICS.map((b,i)=>`<button type="button" class="basic-item" data-i="${i}"><span class="nr">${i+1}</span>${esc(b.t)}<span class="go">›</span></button>`).join("");
+$("basicsList").addEventListener("click", e=>{ const b=e.target.closest(".basic-item"); if(b) showBasic(+b.dataset.i); });
+$("basicsPrev").addEventListener("click", ()=>showBasic(bIdx-1));
+$("basicsNext").addEventListener("click", ()=>showBasic(bIdx+1));
+$("closeBasics").addEventListener("click", ()=>bbd.classList.remove("open"));
+bbd.addEventListener("click", e=>{ if(e.target===bbd) bbd.classList.remove("open"); });
+document.addEventListener("keydown", e=>{
+  if(!bbd.classList.contains("open")) return;
+  if(e.key==="Escape") bbd.classList.remove("open");
+  if(e.key==="ArrowRight" && bIdx<BASICS.length-1) showBasic(bIdx+1);
+  if(e.key==="ArrowLeft" && bIdx>0) showBasic(bIdx-1);
+});
+
+renderTypes(); renderSelect(); renderOverview(); renderStats();
+loadTask(makeD2("ethen"));
+})();
+</script>
+
+<script>
+(function(){
+  const bd = document.getElementById("changelogBackdrop");
+  document.getElementById("btnChangelog").addEventListener("click", e=>{ e.preventDefault(); bd.classList.add("open"); });
+  document.getElementById("closeChangelog").addEventListener("click", ()=>bd.classList.remove("open"));
+  bd.addEventListener("click", e=>{ if(e.target===bd) bd.classList.remove("open"); });
+  document.addEventListener("keydown", e=>{ if(e.key==="Escape") bd.classList.remove("open"); });
+})();
+</script>
+<script>
+/* Höhe der Kopfzeile für die feststehende linke Spalte */
+(function(){
+  const hdr = document.querySelector("header");
+  if(!hdr) return;
+  const set = () => document.documentElement.style.setProperty("--hdr", Math.max(0, Math.round(hdr.getBoundingClientRect().bottom)) + "px");
+  addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
+})();
+</script>
+</body>
+</html>

@@ -254,7 +254,7 @@ table.hist{width:100%; border-collapse:collapse; font-size:12.8px;}
 table.hist thead th{text-align:left; font-weight:500; color:var(--text-faint); font-size:11px; padding:6px 8px; border-bottom:1px solid var(--line); white-space:nowrap;}
 table.hist td{padding:7px 8px; border-bottom:1px solid var(--line-soft); white-space:nowrap;}
 table.hist td sub{font-size:.72em;}
-.s-first{color:var(--good);} .s-ok{color:var(--teal);} .s-shown{color:var(--danger);} .s-open{color:var(--text-faint); font-style:italic;}
+.s-first{color:var(--good);} .s-ok{color:var(--teal);} .s-help{color:var(--amber);} .s-shown{color:var(--danger);} .s-open{color:var(--text-faint); font-style:italic;}
 
 footer{padding:16px 28px 30px; color:var(--text-faint); font-size:11.5px; border-top:1px solid var(--line-soft); margin-top:10px;}
 footer p{margin:0;}
@@ -276,6 +276,22 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
 .vh-ver:first-child{margin-top:0;}
 .vh-ver .v{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:13px; color:var(--amber); border:1px solid var(--amber-dim); border-radius:var(--radius); padding:1px 7px;}
 .vh-ver .d{font-size:12px; color:var(--text-faint);}
+
+/* Linke Spalte: steht beim Scrollen still und scrollt als Ganzes (ein einziger Scrollbereich) */
+@media (min-width:921px){
+  .sidebar{
+    position:sticky; top:0; align-self:start;
+    height:calc(100vh - var(--hdr, 70px)); height:calc(100dvh - var(--hdr, 70px)); max-height:none;
+    overflow-y:auto; overscroll-behavior:contain; background:var(--bg);
+  }
+  /* Tabellenwerk wie bei „Freie Enthalpie“: Überschrift und Suche bleiben oben stehen, die Tabelle scrollt mit der linken Spalte */
+  .lib-block{margin-bottom:0;}
+  .lib-block .lib-head{position:sticky; top:-20px; z-index:3; background:var(--bg); padding-top:20px; margin-top:-20px;}
+  .lib-block .lib-head .field-full{margin-bottom:0; padding-bottom:10px;}
+  .lib-block .lib-wrap{max-height:none; overflow:visible;}
+  .lib-block .lib-table thead th{top:calc(var(--lh, 90px) - 20px); z-index:2;}
+}
+.lib-wrap{overscroll-behavior:contain;}
 </style>
 </head>
 <body>
@@ -384,18 +400,20 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
       </div>
     </section>
 
-    <section class="block">
+    <section class="block lib-block">
+      <div class="lib-head" id="libHead">
       <h2>Standardbildungsenthalpien Δ<sub>f</sub>H° (25 °C, 1 bar)</h2>
       <div class="field-full">
         <input type="search" id="libSearch" placeholder="Stoff oder Formel suchen, z. B. Methan oder CO2" aria-label="Tabelle durchsuchen">
       </div>
+      </div>
+      <p class="note" style="margin:0 0 8px;">Klick auf eine Zeile überträgt den Wert in das zuletzt gewählte Eingabefeld.</p>
       <div class="lib-wrap">
         <table class="lib-table"><colgroup><col class="c1"><col><col class="c3"></colgroup>
           <thead><tr><th>Formel</th><th>Stoff</th><th class="num">kJ/mol</th></tr></thead>
           <tbody id="libBody"></tbody>
         </table>
       </div>
-      <p class="note">Klick auf eine Zeile überträgt den Wert in das zuletzt gewählte Eingabefeld.</p>
     </section>
 
   </div>
@@ -923,7 +941,7 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
       const firstTry = !task.wrong && task.hint === 0 && task.bhint === 0;
       if(firstTry) stats.first++;
       stats.streak++;
-      logHistory(task, firstTry ? "first" : "ok");
+      logHistory(task, firstTry ? "first" : ((task.hint>0 || task.bhint>0) ? "help" : "ok"));
       const word = task.sol.dr < 0 ? "exotherm" : "endotherm";
       let msg = `Richtig! Δ<sub>r</sub>H° = ${fmt(task.sol.dr)} kJ/mol, die Reaktion ist ${word}.`;
       if(step && rowEmpty) msg += " Einige Zwischenschritte waren leer, der Lösungsweg zeigt sie vollständig.";
@@ -1200,7 +1218,7 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
   }
   function renderHistory(){
     if(!history.length) return;
-    const label = {first:["gelöst im 1. Versuch","s-first"], ok:["gelöst","s-ok"], shown:["Lösung angesehen","s-shown"], open:["abgebrochen","s-open"]};
+    const label = {first:["gelöst im 1. Versuch","s-first"], ok:["gelöst","s-ok"], help:["mit Hilfen gelöst","s-help"], shown:["Lösung angesehen","s-shown"], open:["abgebrochen","s-open"]};
     $("histBody").innerHTML = history.slice().reverse().map(h=>
       `<tr><td class="mono">${h.num}</td><td class="mono">${eqShort(h.r)}</td><td class="mono">${h.status==="open"?"–":fmt(h.dr)}</td><td class="${label[h.status][1]}">${label[h.status][0]}</td></tr>`
     ).join("");
@@ -1244,6 +1262,19 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
   document.getElementById("closeChangelog").addEventListener("click", ()=>bd.classList.remove("open"));
   bd.addEventListener("click", e=>{ if(e.target===bd) bd.classList.remove("open"); });
   document.addEventListener("keydown", e=>{ if(e.key==="Escape") bd.classList.remove("open"); });
+})();
+</script>
+<script>
+/* Höhe der Kopfzeile für die feststehende linke Spalte */
+(function(){
+  const hdr = document.querySelector("header");
+  if(!hdr) return;
+  const lh = document.getElementById("libHead");
+  const set = () => {
+    document.documentElement.style.setProperty("--hdr", Math.max(0, Math.round(hdr.getBoundingClientRect().bottom)) + "px");
+    if(lh) document.documentElement.style.setProperty("--lh", lh.offsetHeight + "px");
+  };
+  addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
 })();
 </script>
 </body>

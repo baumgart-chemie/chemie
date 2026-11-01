@@ -271,7 +271,7 @@ table.hist td{padding:7px 8px; border-bottom:1px solid var(--line-soft); vertica
 table.hist td sub{font-size:.72em;}
 table.hist tr.grp td{color:var(--text-faint); font-size:10.5px; letter-spacing:.4px; text-transform:uppercase; padding-top:12px; background:var(--panel);}
 table.hist td.k{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; color:var(--amber); white-space:nowrap;}
-.s-first{color:var(--good);} .s-ok{color:var(--teal);} .s-shown{color:var(--danger);} .s-open{color:var(--text-faint); font-style:italic;}
+.s-first{color:var(--good);} .s-ok{color:var(--teal);} .s-help{color:var(--amber);} .s-shown{color:var(--danger);} .s-open{color:var(--text-faint); font-style:italic;}
 
 footer{padding:16px 28px 30px; color:var(--text-faint); font-size:11.5px; border-top:1px solid var(--line-soft); margin-top:10px;}
 footer p{margin:0;}
@@ -401,6 +401,15 @@ svg.mol text.ix{text-anchor:middle; dominant-baseline:central;}
 .explain .figure .eqs{padding:2px 0;}
 .ox-up{color:var(--oxy);} .ox-down{color:var(--nitro);}
 table.hist td .fx{font-size:14px;}
+
+/* Linke Spalte: steht beim Scrollen still und scrollt als Ganzes (ein einziger Scrollbereich) */
+@media (min-width:921px){
+  .sidebar{
+    position:sticky; top:0; align-self:start;
+    height:calc(100vh - var(--hdr, 70px)); height:calc(100dvh - var(--hdr, 70px)); max-height:none;
+    overflow-y:auto; overscroll-behavior:contain; background:var(--bg);
+  }
+}
 </style>
 </head>
 <body>
@@ -1186,8 +1195,8 @@ function setStatus(kind, txt){ const b=$("statusBadge"); b.className="status "+k
 function renderStats(){ $("roSolved").textContent=stats.solved; $("roFirst").textContent=stats.first; $("roStreak").textContent=stats.streak; $("roShown").textContent=stats.shown; }
 function renderHistory(){
   if(!history.length){ $("histBody").innerHTML=`<tr><td colspan="4" class="empty-hint">Noch keine Aufgaben bearbeitet.</td></tr>`; return; }
-  const lab={first:["s-first","im 1. Versuch gelöst"], ok:["s-ok","gelöst"], shown:["s-shown","Lösung angesehen"], open:["s-open","nicht beendet"]};
-  $("histBody").innerHTML = history.slice().reverse().map(h=>`<tr><td class="mono">${h.no}</td><td>${esc(TYP[h.cls][h.typ].n)}</td><td>${esc(h.title)}</td><td class="${lab[h.st][0]}">${lab[h.st][1]}${h.tries>1&&h.st==="ok"?` (${h.tries} Versuche)`:""}</td></tr>`).join("");
+  const lab={first:["s-first","im 1. Versuch gelöst"], ok:["s-ok","gelöst"], help:["s-help","mit Hilfen gelöst"], shown:["s-shown","Lösung angesehen"], open:["s-open","nicht beendet"]};
+  $("histBody").innerHTML = history.slice().reverse().map(h=>`<tr><td class="mono">${h.no}</td><td>${esc(TYP[h.cls][h.typ].n)}</td><td>${esc(h.title)}</td><td class="${lab[h.st][0]}">${lab[h.st][1]}${h.tries>1&&(h.st==="ok"||h.st==="help")?` (${h.tries} Versuche)`:""}</td></tr>`).join("");
 }
 function renderTypes(){
   if(!CLS) return;
@@ -1372,7 +1381,7 @@ function check(){
     stats.solved++; if(T.tries===1) stats.first++; stats.streak++;
     fb("good", T.tries===1 ? "Alles richtig – im ersten Versuch! Den Lösungsweg findest du unten im Tab „Erklärung“." : "Alles richtig! Den Lösungsweg findest du unten im Tab „Erklärung“.");
     setStatus("done","gelöst");
-    finish(T.tries===1?"first":"ok");
+    finish(T.hintIdx>0?"help":(T.tries===1?"first":"ok"));
   } else {
     stats.streak=0; renderStats();
     const wrong=T.slots.filter(s=>s.st==="bad").length;
@@ -1505,6 +1514,15 @@ window.__OX = {AN, RX, ORG, ORX, S, build, CATALOG, molSVG};
   document.getElementById("closeChangelog").addEventListener("click", ()=>bd.classList.remove("open"));
   bd.addEventListener("click", e=>{ if(e.target===bd) bd.classList.remove("open"); });
   document.addEventListener("keydown", e=>{ if(e.key==="Escape") bd.classList.remove("open"); });
+})();
+</script>
+<script>
+/* Höhe der Kopfzeile für die feststehende linke Spalte */
+(function(){
+  const hdr = document.querySelector("header");
+  if(!hdr) return;
+  const set = () => document.documentElement.style.setProperty("--hdr", Math.max(0, Math.round(hdr.getBoundingClientRect().bottom)) + "px");
+  addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
 })();
 </script>
 </body>

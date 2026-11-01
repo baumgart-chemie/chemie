@@ -295,6 +295,15 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
 .vh-ver:first-child{margin-top:0;}
 .vh-ver .v{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:13px; color:var(--amber); border:1px solid var(--amber-dim); border-radius:var(--radius); padding:1px 7px;}
 .vh-ver .d{font-size:12px; color:var(--text-faint);}
+
+/* Linke Spalte: steht beim Scrollen still und scrollt als Ganzes (ein einziger Scrollbereich) */
+@media (min-width:921px){
+  .sidebar{
+    position:sticky; top:0; align-self:start;
+    height:calc(100vh - var(--hdr, 70px)); height:calc(100dvh - var(--hdr, 70px)); max-height:none;
+    overflow-y:auto; overscroll-behavior:contain; background:var(--bg);
+  }
+}
 </style>
 </head>
 <body>
@@ -2238,6 +2247,15 @@ requestAnimationFrame(loop);
   document.getElementById("closeChangelog").addEventListener("click", ()=>bd.classList.remove("open"));
   bd.addEventListener("click", e=>{ if(e.target===bd) bd.classList.remove("open"); });
   document.addEventListener("keydown", e=>{ if(e.key==="Escape") bd.classList.remove("open"); });
+})();
+</script>
+<script>
+/* Höhe der Kopfzeile für die feststehende linke Spalte */
+(function(){
+  const hdr = document.querySelector("header");
+  if(!hdr) return;
+  const set = () => document.documentElement.style.setProperty("--hdr", Math.max(0, Math.round(hdr.getBoundingClientRect().bottom)) + "px");
+  addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
 })();
 </script>
 </body>

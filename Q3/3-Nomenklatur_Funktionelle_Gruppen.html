@@ -205,7 +205,7 @@ input.name-in[readonly]{color:var(--teal);}
 table.hist{width:100%; border-collapse:collapse; font-size:12.8px;}
 table.hist thead th{text-align:left; font-weight:500; color:var(--text-faint); font-size:11px; padding:6px 8px; border-bottom:1px solid var(--line); white-space:nowrap;}
 table.hist td{padding:7px 8px; border-bottom:1px solid var(--line-soft); white-space:nowrap;}
-.s-first{color:var(--good);} .s-ok{color:var(--teal);} .s-shown{color:var(--danger);} .s-open{color:var(--text-faint); font-style:italic;}
+.s-first{color:var(--good);} .s-ok{color:var(--teal);} .s-help{color:var(--amber);} .s-shown{color:var(--danger);} .s-open{color:var(--text-faint); font-style:italic;}
 
 /* Stoffklassen (Mehrfachauswahl) */
 .cls-grid{display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:16px;}
@@ -262,6 +262,15 @@ svg .lp.n{stroke:var(--nitro);}
 .cls-grid button.active .fgf{color:var(--text-dim);}
 .lib-table td.p{color:var(--text-dim); font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
 .lib-table td.r{color:var(--text-faint); width:1%; white-space:nowrap; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+
+/* Linke Spalte: steht beim Scrollen still und scrollt als Ganzes (ein einziger Scrollbereich) */
+@media (min-width:921px){
+  .sidebar{
+    position:sticky; top:0; align-self:start;
+    height:calc(100vh - var(--hdr, 70px)); height:calc(100dvh - var(--hdr, 70px)); max-height:none;
+    overflow-y:auto; overscroll-behavior:contain; background:var(--bg);
+  }
+}
 </style>
 </head>
 <body>
@@ -1313,7 +1322,7 @@ svg .lp.n{stroke:var(--nitro);}
       const firstTry = !t.wrong && t.hint===0;
       if(firstTry) stats.first++;
       stats.streak++;
-      logHistory(t, firstTry?"first":"ok");
+      logHistory(t, firstTry?"first":(t.hint>0?"help":"ok"));
       let extra = "";
       if(hit.kind==="old") extra = fb("info", `Du hast die ältere Schreibweise verwendet. Nach aktueller IUPAC-Regel: ${nmSpan(t.canon)}`);
       else if(hit.kind==="alt") extra = fb("info", `Ebenfalls richtig. Üblich ist ${nmSpan(t.canon)}`);
@@ -1416,7 +1425,7 @@ svg .lp.n{stroke:var(--nitro);}
   function logHistory(t, status){
     const ex = history.find(h=>h.num===t.num);
     if(ex) ex.status = status; else history.push({num:t.num, types:t.types, name:t.canon, status, type:t.type});
-    const label = {first:["gelöst im 1. Versuch","s-first"], ok:["gelöst","s-ok"], shown:["Lösung angesehen","s-shown"], open:["abgebrochen","s-open"], selfbad:["mit Fehlern (Selbstkontrolle)","s-shown"]};
+    const label = {first:["gelöst im 1. Versuch","s-first"], ok:["gelöst","s-ok"], help:["mit Hilfen gelöst","s-help"], shown:["Lösung angesehen","s-shown"], open:["abgebrochen","s-open"], selfbad:["mit Fehlern (Selbstkontrolle)","s-shown"]};
     $("histBody").innerHTML = history.slice().reverse().map(h=>
       `<tr><td class="mono">${h.num}</td><td>${typesLabel(h.types)}${h.type==="draw"?" · gezeichnet":""}</td><td class="mono">${h.status==="open" && h.type!=="draw"?"–":esc(h.name)}</td><td class="${label[h.status][1]}">${label[h.status][0]}</td></tr>`).join("");
   }
@@ -1757,7 +1766,7 @@ svg .lp.n{stroke:var(--nitro);}
     const firstTry = !t.wrong && t.hint===0;
     if(firstTry) stats.first++;
     stats.streak++;
-    logHistory(t, firstTry?"first":"ok");
+    logHistory(t, firstTry?"first":(t.hint>0?"help":"ok"));
     $("feedback").innerHTML = fb("good", `Richtig! Das ist ${nmSpan(t.canon)}.`) + (extra||"");
     renderTask(); renderWay(); renderStats();
   }
@@ -1933,5 +1942,14 @@ svg .lp.n{stroke:var(--nitro);}
 
 </script>
 
+<script>
+/* Höhe der Kopfzeile für die feststehende linke Spalte */
+(function(){
+  const hdr = document.querySelector("header");
+  if(!hdr) return;
+  const set = () => document.documentElement.style.setProperty("--hdr", Math.max(0, Math.round(hdr.getBoundingClientRect().bottom)) + "px");
+  addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
+})();
+</script>
 </body>
 </html>

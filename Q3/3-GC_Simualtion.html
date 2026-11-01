@@ -246,6 +246,15 @@ footer a:hover{border-bottom-color:var(--teal);}
 .vh-ver .d{font-size:12px; color:var(--text-faint);}
 footer a{color:var(--text-dim); text-decoration:none; border-bottom:1px solid var(--line);}
 footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
+
+/* Linke Spalte: steht beim Scrollen still und scrollt als Ganzes (ein einziger Scrollbereich) */
+@media (min-width:921px){
+  .sidebar{
+    position:sticky; top:0; align-self:start;
+    height:calc(100vh - var(--hdr, 70px)); height:calc(100dvh - var(--hdr, 70px)); max-height:none;
+    overflow-y:auto; overscroll-behavior:contain; background:var(--bg);
+  }
+}
 </style>
 </head>
 <body>
@@ -1233,6 +1242,15 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
   renderMixtureSelect();
   fitCanvas();
   draw();
+})();
+</script>
+<script>
+/* Höhe der Kopfzeile für die feststehende linke Spalte */
+(function(){
+  const hdr = document.querySelector("header");
+  if(!hdr) return;
+  const set = () => document.documentElement.style.setProperty("--hdr", Math.max(0, Math.round(hdr.getBoundingClientRect().bottom)) + "px");
+  addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
 })();
 </script>
 </body>

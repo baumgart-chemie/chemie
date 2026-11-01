@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Berechnung der freien Enthalpie</title>
+<style>
+:root{
+  --bg:#14171a; --panel:#1b1f23; --panel-alt:#20252a; --raise:#262c32;
+  --line:#31383e; --line-soft:#262c31;
+  --text:#e7e4dd; --text-dim:#9aa2a9; --text-faint:#5f6870;
+  --amber:#ffb454; --amber-dim:#8a6535;
+  --teal:#4fd1c5; --teal-dim:#2c5b56;
+  --good:#7fd68a;
+  --danger:#e4785b; --danger-dim:#6b3a2d;
+  --screen:#0e1113; --grid:#233029;
+  --radius:3px;
+  color-scheme: dark;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.mono{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-variant-numeric:tabular-nums;}
+h1,h2,h3{font-weight:600; margin:0;}
+
+/* header */
+header{
+  padding:22px 28px 18px; border-bottom:1px solid var(--line);
+  display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;
+}
+header h1{font-size:20px; letter-spacing:.2px;}
+header .tag{color:var(--text-dim); font-size:13.5px;}
+header .status{
+  margin-left:auto; font-size:12.5px; padding:4px 10px; border:1px solid var(--line);
+  border-radius:20px; color:var(--text-dim); display:flex; align-items:center; gap:7px;
+}
+header .status .dot{width:7px;height:7px;border-radius:50%;background:var(--text-faint);}
+header .status.running .dot{background:var(--amber); box-shadow:0 0 6px var(--amber);}
+header .status.running{color:var(--amber); border-color:var(--amber-dim);}
+header .status.done .dot{background:var(--teal); box-shadow:0 0 6px var(--teal);}
+header .status.done{color:var(--teal); border-color:var(--teal-dim);}
+.back-btn{
+  display:inline-flex; align-items:center; gap:6px; align-self:center; color:var(--text-dim); font-size:13px; text-decoration:none;
+  border:1px solid var(--line); border-radius:var(--radius); background:var(--panel-alt); padding:5px 11px 5px 9px; white-space:nowrap;
+}
+.back-btn:hover{color:var(--text); border-color:var(--text-faint);}
+.back-btn:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.back-btn .ar{color:var(--teal); font-size:14px; line-height:1;}
+.guide-link{
+  color:var(--teal); font-size:13.5px; text-decoration:none; border-bottom:1px solid var(--teal-dim);
+  padding-bottom:1px;
+}
+.guide-link:hover{border-bottom-color:var(--teal);}
+@media (max-width:600px){ header{padding:18px 16px 14px;} }
+
+.modal-backdrop{
+  display:none; position:fixed; inset:0; background:rgba(8,10,12,.7); z-index:100;
+  align-items:center; justify-content:center; padding:24px 16px;
+}
+.modal-backdrop.open{display:flex;}
+.modal-box{
+  background:var(--panel); border:1px solid var(--line); border-radius:5px;
+  width:100%; max-width:640px; max-height:82vh; overflow-y:auto; padding:22px 26px 26px;
+}
+.modal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;}
+.modal-head h2{font-size:17px;}
+.modal-close{background:none; border:none; color:var(--text-dim); font-size:22px; line-height:1; cursor:pointer; padding:2px 6px;}
+.modal-close:hover{color:var(--text);}
+.modal-body h3{font-size:13.5px; color:var(--amber); margin:18px 0 6px; font-weight:600;}
+.modal-body h3:first-child{margin-top:0;}
+.modal-body p{font-size:13.5px; line-height:1.6; color:var(--text-dim); margin:0 0 6px;}
+.modal-body strong{color:var(--text); font-weight:600;}
+.formula-box{
+  font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:13px; color:var(--text);
+  background:var(--screen); border:1px solid var(--line-soft); border-radius:4px; padding:10px 12px; margin:6px 0 8px;
+  overflow-x:auto; white-space:nowrap;
+}
+
+/* layout */
+.wrap{display:grid; grid-template-columns: 330px 1fr; gap:0; align-items:start;}
+@media (max-width:920px){ .wrap{grid-template-columns:1fr;} }
+.sidebar{
+  border-right:1px solid var(--line); padding:20px 20px 60px;
+  max-height:calc(100vh - 70px); overflow-y:auto;
+}
+@media (max-width:920px){ .sidebar{border-right:none; border-bottom:1px solid var(--line); max-height:none; padding-bottom:24px;} }
+.main{padding:20px 24px 60px; min-width:0;}
+@media (max-width:600px){ .sidebar{padding:18px 16px 24px;} .main{padding:18px 16px 50px;} }
+
+section.block{margin-bottom:26px;}
+.block h2{
+  font-size:12.5px; color:var(--text-dim); font-weight:600;
+  padding-bottom:8px; border-bottom:1px solid var(--line-soft); margin-bottom:14px; letter-spacing:.2px;
+}
+.sub-label{font-size:13px; color:var(--text-dim); margin:0 0 6px;}
+
+.mode-toggle{display:flex; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; margin-bottom:16px;}
+.mode-toggle button{
+  flex:1; background:var(--panel-alt); color:var(--text-dim); border:none; padding:8px 6px;
+  font-size:12.5px; cursor:pointer; font-family:inherit;
+}
+.mode-toggle button + button{border-left:1px solid var(--line);}
+.mode-toggle button.active{background:var(--teal-dim); color:var(--text);}
+.mode-toggle button:focus-visible{outline:2px solid var(--teal); outline-offset:-2px;}
+
+.check-row{display:flex; align-items:center; gap:9px; font-size:13px; color:var(--text-dim); margin-bottom:16px; cursor:pointer;}
+.check-row input{accent-color:var(--teal); width:15px; height:15px; margin:0;}
+
+.field-full{margin-bottom:14px;}
+.field-full label{display:block; font-size:13px; color:var(--text-dim); margin-bottom:6px;}
+select, input[type=text], input[type=search]{
+  width:100%; background:var(--panel-alt); border:1px solid var(--line); color:var(--text);
+  padding:7px 9px; border-radius:var(--radius); font-size:13.5px; font-family:inherit;
+}
+select:focus, input:focus{outline:2px solid var(--teal-dim); outline-offset:1px;}
+
+.btn{
+  border-radius:var(--radius); border:1px solid var(--line); background:var(--panel-alt);
+  color:var(--text); font-size:13px; padding:8px 14px; cursor:pointer; font-family:inherit; font-weight:500;
+}
+.btn:hover{border-color:var(--text-faint);}
+.btn.primary{background:var(--teal); border-color:var(--teal); color:#0d1614;}
+.btn.primary:hover{filter:brightness(1.08);}
+.btn.ghost{background:transparent;}
+.btn:disabled{opacity:.4; cursor:not-allowed;}
+.btn:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.btn-row{display:flex; gap:8px; flex-wrap:wrap;}
+
+/* Tabelle der Bildungsenthalpien */
+.lib-wrap{max-height:380px; overflow-y:auto; border:1px solid var(--line-soft); border-radius:4px;}
+.lib-table{width:100%; border-collapse:collapse; font-size:12.5px; table-layout:fixed;}
+.lib-table col.c1{width:34%;} .lib-table col.c3{width:80px;}
+.lib-table td.nm{overflow-wrap:anywhere;}
+.lib-table thead th{
+  position:sticky; top:0; background:var(--panel-alt); text-align:left; font-weight:500; color:var(--text-faint);
+  font-size:11px; padding:6px 8px; border-bottom:1px solid var(--line);
+}
+.lib-table thead th.num{text-align:right;}
+.lib-table td{padding:6px 8px; border-bottom:1px solid var(--line-soft);}
+.lib-table td.num{text-align:right; color:var(--amber);}
+.lib-table td.nm{color:var(--text-dim); font-size:11.5px;}
+.lib-table tbody tr{cursor:pointer;}
+.lib-table tbody tr:hover{background:var(--raise);}
+.lib-table tr.grp td{color:var(--text-faint); font-size:10.5px; letter-spacing:.4px; text-transform:uppercase; padding-top:10px; cursor:default; background:var(--bg);}
+.lib-table tr.grp:hover{background:var(--bg);}
+.note{font-size:12px; color:var(--text-faint); line-height:1.5; margin-top:10px; max-width:62ch;}
+
+/* Aufgaben-Screen */
+.screen-card{border:1px solid var(--line); background:var(--screen); border-radius:4px; padding:14px 14px 6px;}
+.screen-top{display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap;}
+.screen-top .spacer{margin-left:auto;}
+.task-meta{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px;}
+.task-num{font-size:11.5px; color:var(--text-faint);}
+.chip{font-size:11px; padding:2px 8px; border-radius:20px; border:1px solid var(--line); color:var(--text-dim);}
+.chip.l1{color:var(--good); border-color:#35573a;}
+.chip.l2{color:var(--amber); border-color:var(--amber-dim);}
+.chip.l3{color:var(--danger); border-color:var(--danger-dim);}
+.task-ctx{font-size:13px; color:var(--text-dim);}
+.equation{
+  font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:21px; color:var(--text); padding:14px 2px 18px;
+  line-height:1.5; overflow-x:auto; white-space:nowrap;
+}
+.equation sub{font-size:.66em;}
+.equation .st{font-size:.62em; color:var(--text-dim); margin-left:1px;}
+.equation .co{color:var(--amber); margin-right:3px;}
+.equation input.coef{
+  width:42px; background:var(--panel-alt); border:1px solid var(--line); color:var(--amber);
+  padding:3px 4px; margin-right:5px; border-radius:var(--radius); font-size:.8em; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;
+  text-align:center; vertical-align:middle;
+}
+.equation input.coef:focus{outline:2px solid var(--teal-dim); outline-offset:1px;}
+table.calc td.nu.open{color:var(--text-faint);}
+.equation .arr{color:var(--teal); margin:0 12px;}
+.equation .plus{color:var(--text-faint); margin:0 8px;}
+@media (max-width:600px){ .equation{font-size:16px;} }
+
+.table-wrap{overflow-x:auto; border:1px solid var(--line-soft); border-radius:4px;}
+table.calc{width:100%; border-collapse:collapse; font-size:13px;}
+table.calc thead th{
+  text-align:left; font-weight:500; color:var(--text-faint); font-size:11px; padding:7px 8px;
+  border-bottom:1px solid var(--line); white-space:nowrap;
+}
+table.calc td{padding:6px 8px; border-bottom:1px solid var(--line-soft); white-space:nowrap; vertical-align:middle;}
+table.calc tr.side td{color:var(--text-faint); font-size:10.5px; letter-spacing:.4px; text-transform:uppercase; padding-top:10px; padding-bottom:5px; background:var(--panel);}
+table.calc td.sp{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+table.calc td.sp sub{font-size:.72em;}
+table.calc td.sp .st{color:var(--text-dim); font-size:.85em;}
+table.calc td.nu{color:var(--amber); font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; text-align:center; width:48px;}
+table.calc input{
+  width:128px; background:var(--panel-alt); border:1px solid var(--line); color:var(--text);
+  padding:6px 8px; border-radius:var(--radius); font-size:13px; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;
+  text-align:right; font-variant-numeric:tabular-nums;
+}
+table.calc input[readonly]{background:transparent; border-color:transparent; color:var(--amber);}
+table.calc .times{color:var(--text-faint); font-size:12px; margin-right:6px;}
+input.ok{border-color:var(--teal) !important; box-shadow:0 0 0 1px var(--teal-dim);}
+input.bad{border-color:var(--danger) !important; box-shadow:0 0 0 1px var(--danger-dim);}
+
+.sum-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(210px,1fr)); gap:12px; margin-top:14px;}
+.sum-box{border:1px solid var(--line-soft); background:var(--panel); border-radius:4px; padding:10px 12px;}
+.sum-box label{display:block; font-size:12px; color:var(--text-dim); margin-bottom:6px;}
+.sum-box .unit-in{display:flex; align-items:center; gap:8px;}
+.sum-box input{
+  width:100%; background:var(--panel-alt); border:1px solid var(--line); color:var(--text);
+  padding:7px 9px; border-radius:var(--radius); font-size:14px; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; text-align:right;
+}
+.sum-box .unit{font-size:12px; color:var(--text-faint); white-space:nowrap;}
+.result-box{border-color:var(--amber-dim);}
+.result-box label{color:var(--amber);}
+.cls-toggle{margin:10px 0 0;}
+
+.feedback{display:flex; flex-direction:column; gap:6px; margin:14px 0 4px;}
+.feedback:empty{display:none;}
+.eq-check{margin:-6px 0 14px;}
+.eq-check[hidden]{display:none;}
+#eqFeedback{margin:0 0 14px;}
+.calc-check{margin-top:10px; display:flex; justify-content:flex-end;}
+.fb{font-size:13px; line-height:1.5; padding:8px 11px; border-radius:4px; border:1px solid var(--line-soft); background:var(--panel);}
+.fb.good{color:var(--good); border-color:#35573a;}
+.fb.bad{color:var(--danger); border-color:var(--danger-dim);}
+.fb.hint{color:var(--amber); border-color:var(--amber-dim);}
+.fb.info{color:var(--text-dim);}
+.fb sub{font-size:.75em;}
+
+.readout-bar{display:flex; gap:26px; padding:12px 4px 12px; flex-wrap:wrap; border-top:1px solid var(--line-soft); margin-top:12px;}
+.readout{display:flex; flex-direction:column; gap:2px;}
+.readout .k{font-size:10.5px; color:var(--text-faint);}
+.readout .v{font-size:15px; color:var(--amber);}
+
+/* tabs */
+.tabs{display:flex; gap:2px; margin:26px 0 0; border-bottom:1px solid var(--line); overflow-x:auto;}
+.tabs button{
+  background:none; border:none; color:var(--text-dim); font-size:13px; padding:9px 4px; margin-right:22px;
+  cursor:pointer; font-family:inherit; border-bottom:2px solid transparent; font-weight:500; white-space:nowrap;
+}
+.tabs button.active{color:var(--text); border-bottom-color:var(--amber);}
+.tabpanel{display:none; padding-top:18px;}
+.tabpanel.active{display:block;}
+.empty-hint{color:var(--text-faint); font-size:13px; padding:22px 4px;}
+
+.way{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:13.5px; line-height:2; background:var(--screen); border:1px solid var(--line-soft); border-radius:4px; padding:12px 16px; overflow-x:auto; white-space:nowrap;}
+.way sub{font-size:.72em;}
+.way .c{color:var(--text-faint);}
+.way .a{color:var(--amber);}
+.way .t{color:var(--teal);}
+
+canvas#diag{width:100%; height:320px; display:block; border-radius:4px; border:1px solid var(--line-soft); background:var(--screen);}
+
+table.hist{width:100%; border-collapse:collapse; font-size:12.8px;}
+table.hist thead th{text-align:left; font-weight:500; color:var(--text-faint); font-size:11px; padding:6px 8px; border-bottom:1px solid var(--line); white-space:nowrap;}
+table.hist td{padding:7px 8px; border-bottom:1px solid var(--line-soft); white-space:nowrap;}
+table.hist td sub{font-size:.72em;}
+.s-first{color:var(--good);} .s-ok{color:var(--teal);} .s-help{color:var(--amber);} .s-shown{color:var(--danger);} .s-open{color:var(--text-faint); font-style:italic;}
+
+footer{padding:16px 28px 30px; color:var(--text-faint); font-size:11.5px; border-top:1px solid var(--line-soft); margin-top:10px;}
+footer p{margin:0;}
+footer a{color:var(--text-dim); text-decoration:none; border-bottom:1px solid var(--line);}
+footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
+footer .footer-credit{margin-top:8px; color:var(--text-dim);}
+@media (max-width:600px){ footer{padding:16px 16px 30px;} }
+::-webkit-scrollbar{width:9px; height:9px;}
+::-webkit-scrollbar-thumb{background:var(--line); border-radius:5px;}
+@media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+</style>
+
+<style>
+/* Versionshinweise */
+.modal-body ul{padding-left:18px; margin:0 0 6px;}
+.modal-body li{font-size:13.5px; line-height:1.6; color:var(--text-dim); margin:0 0 6px;}
+.modal-body li strong{color:var(--text); font-weight:600;}
+.vh-ver{display:flex; align-items:baseline; gap:10px; margin:18px 0 6px;}
+.vh-ver:first-child{margin-top:0;}
+.vh-ver .v{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:13px; color:var(--amber); border:1px solid var(--amber-dim); border-radius:var(--radius); padding:1px 7px;}
+.vh-ver .d{font-size:12px; color:var(--text-faint);}
+</style>
+
+<style>
+/* Freie Enthalpie: gegebene Tabellen, Teilschritte */
+.lib-table.two col.c1{width:46%;} .lib-table.two col.c2, .lib-table.two col.c3{width:27%;}
+.lib-table td.fm{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.lib-table td.fm .nm2{display:block; font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; color:var(--text-faint); font-size:10.5px; margin-top:1px; overflow-wrap:anywhere;}
+.lib-table td.num.s0{color:var(--teal);}
+.lib-table td.num:hover{text-decoration:underline; text-decoration-color:var(--text-faint);}
+.equation sup{font-size:.6em;}
+table.calc td.sp sup, .way sup, .given sup, .fb sup, .lib-table sup, table.hist sup{font-size:.7em;}
+
+.temp-line{font-size:14px; color:var(--text-dim); margin:-8px 0 16px; display:flex; gap:18px; flex-wrap:wrap; align-items:baseline;}
+.temp-line b{color:var(--amber); font-weight:600; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+
+.given-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(250px,1fr)); gap:12px; margin:0 0 18px;}
+.given-grid[hidden]{display:none;}
+.given-box{border:1px solid var(--line-soft); border-radius:4px; background:var(--panel); overflow:hidden;}
+.given-box h4{font-size:11.5px; font-weight:500; color:var(--text-dim); margin:0; padding:8px 10px; border-bottom:1px solid var(--line-soft); background:var(--panel-alt);}
+table.given{width:100%; border-collapse:collapse; font-size:13px;}
+table.given td{padding:5px 10px; border-bottom:1px solid var(--line-soft); white-space:nowrap;}
+table.given tr:last-child td{border-bottom:none;}
+table.given td.sp{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+table.given td.sp sub{font-size:.72em;}
+table.given td.sp .st{color:var(--text-dim); font-size:.85em;}
+table.given td.num{text-align:right; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; color:var(--amber);}
+table.given.s0 td.num{color:var(--teal);}
+.given-hidden{font-size:13px; color:var(--text-faint); border:1px dashed var(--line); border-radius:4px; padding:10px 12px; margin:0 0 18px;}
+.given-hidden[hidden]{display:none;}
+.given-hidden:not([hidden]){display:flex; align-items:center; gap:12px; flex-wrap:wrap; justify-content:space-between;}
+
+.step{border:1px solid var(--line-soft); border-radius:4px; background:var(--panel); margin:0 0 14px;}
+.step.active{border-color:var(--amber-dim);}
+.step.done{border-color:var(--teal-dim);}
+.step-head{display:flex; align-items:center; gap:10px; padding:10px 12px; border-bottom:1px solid var(--line-soft); flex-wrap:wrap;}
+.step-no{width:24px; height:24px; border-radius:50%; border:1px solid var(--line); display:inline-flex; align-items:center; justify-content:center; font-size:12px; color:var(--text-dim); font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; flex:none;}
+.step.active .step-no{border-color:var(--amber); color:var(--amber);}
+.step.done .step-no{border-color:var(--teal); color:var(--teal); background:var(--teal-dim);}
+.step-head h3{font-size:14px;}
+.step-head .chip{margin-left:auto;}
+.chip.st-open{color:var(--amber); border-color:var(--amber-dim);}
+.chip.st-done{color:var(--teal); border-color:var(--teal-dim);}
+.chip.st-lock{color:var(--text-faint);}
+.step-body{padding:12px 12px 4px;}
+.step.locked .step-body{opacity:.32; pointer-events:none; user-select:none;}
+.step .formula-box{margin:0 0 12px; font-size:13.5px;}
+.step .formula-box sub{font-size:.72em;}
+.step .sum-grid{margin-top:12px;}
+.step .table-wrap{background:var(--screen);}
+.step .feedback{margin:10px 0 8px;}
+.step .calc-check{margin-top:10px;}
+.carry{display:flex; gap:26px; flex-wrap:wrap; margin:0 0 4px; padding:0 2px;}
+.carry .readout .v{font-size:14px;}
+.carry .readout .k sub{font-size:.8em;}
+.lead{font-size:13px; color:var(--text-dim); margin:0 0 10px; line-height:1.5;}
+.cls-wide{max-width:420px; margin:4px 0 0;}
+
+/* Linke Spalte: steht beim Scrollen der Aufgabe still und scrollt als Ganzes (ein einziger Scrollbereich) */
+@media (min-width:921px){
+  .sidebar{
+    position:sticky; top:0; align-self:start;
+    height:calc(100vh - var(--hdr, 70px)); height:calc(100dvh - var(--hdr, 70px)); max-height:none;
+    overflow-y:auto; overscroll-behavior:contain; background:var(--bg); padding-bottom:24px;
+  }
+  .lib-block{margin-bottom:0;}
+  .lib-block .lib-head{position:sticky; top:-20px; z-index:3; background:var(--bg); padding-top:20px; margin-top:-20px;}
+  .lib-block .lib-head .field-full{margin-bottom:0; padding-bottom:10px;}
+  .lib-block .lib-wrap{max-height:none; overflow:visible;}
+  .lib-block .lib-table thead th{top:calc(var(--lh, 90px) - 20px); z-index:2;}
+}
+.lib-wrap{overscroll-behavior:contain;}
+
+canvas#diag{width:100%; height:340px; display:block; border-radius:4px; border:1px solid var(--line-soft); background:var(--screen);}
+</style>
+</head>
+<body>
+
+
+<header>
+  <a href="../index.html" class="back-btn" title="Zur Übersicht aller Simulationen"><span class="ar" aria-hidden="true">←</span>Zurück</a>
+  <h1>Berechnung der freien Enthalpie</h1>
+  <span class="tag">Freie Standardreaktionsenthalpie mit der Gibbs-Helmholtz-Gleichung</span>
+  <a href="#" class="guide-link" id="btnGuide">Anleitung</a>
+  <span class="status running" id="statusBadge"><span class="dot"></span><span id="statusText">Schritt 1 von 4</span></span>
+</header>
+
+<div class="modal-backdrop" id="guideBackdrop">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+    <div class="modal-head">
+      <h2 id="guideTitle">Anleitung</h2>
+      <button class="modal-close" id="closeGuide" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body">
+      <h3>Worum es geht</h3>
+      <p>Ob eine Reaktion von selbst ablaufen kann, entscheidet nicht die Reaktionsenthalpie allein, sondern die <strong>freie Reaktionsenthalpie Δ<sub>r</sub>G°</strong>. Sie verbindet den Enthalpieterm Δ<sub>r</sub>H° mit dem Entropieterm T · Δ<sub>r</sub>S°.</p>
+      <div class="formula-box">Δ<sub>r</sub>G° = Δ<sub>r</sub>H° − T · Δ<sub>r</sub>S°&nbsp;&nbsp;&nbsp;(Gibbs-Helmholtz-Gleichung)</div>
+      <p>Δ<sub>r</sub>G° &lt; 0: Die Reaktion ist <strong>exergonisch</strong> und kann unter diesen Bedingungen freiwillig ablaufen. Δ<sub>r</sub>G° &gt; 0: Die Reaktion ist <strong>endergonisch</strong> und läuft nicht freiwillig ab. Über die Geschwindigkeit sagt Δ<sub>r</sub>G° nichts aus.</p>
+
+      <h3>Die vier Teilschritte</h3>
+      <p><strong>1. Reaktionsenthalpie:</strong> Δ<sub>r</sub>H° = Σ ν · Δ<sub>f</sub>H°(Produkte) − Σ ν · Δ<sub>f</sub>H°(Edukte), dazu die Einordnung exotherm oder endotherm. Elemente in ihrer stabilsten Form haben Δ<sub>f</sub>H° = 0 kJ/mol.</p>
+      <p><strong>2. Reaktionsentropie:</strong> Δ<sub>r</sub>S° = Σ ν · S°(Produkte) − Σ ν · S°(Edukte), dazu die Einordnung, ob die Entropie zu- oder abnimmt. <strong>Achtung:</strong> Tabelliert sind die molaren Standardentropien S°. Anders als bei den Bildungsenthalpien haben auch Elemente einen Wert größer als null.</p>
+      <p><strong>3. Gibbs-Helmholtz-Gleichung:</strong> Temperatur in Kelvin umrechnen (T = ϑ + 273,15), Δ<sub>r</sub>S° von J/(mol·K) in kJ/(mol·K) umrechnen (durch 1000 teilen), den Entropieterm T · Δ<sub>r</sub>S° berechnen und Δ<sub>r</sub>G° bestimmen.</p>
+      <p><strong>4. Einordnung:</strong> exergonisch oder endergonisch.</p>
+      <p>Jeder Teilschritt wird mit seinem eigenen Button „Prüfen“ abgeschlossen. Erst wenn alle Felder eines Schritts stimmen, wird der nächste Schritt freigeschaltet und die Ergebnisse werden übernommen.</p>
+
+      <h3>Aufgabentyp „Grenztemperatur“</h3>
+      <p>Hier wird keine Temperatur vorgegeben, sondern berechnet. Haben Δ<sub>r</sub>H° und Δ<sub>r</sub>S° dasselbe Vorzeichen, wechselt Δ<sub>r</sub>G° bei einer bestimmten Temperatur das Vorzeichen. Dort gilt Δ<sub>r</sub>G° = 0:</p>
+      <div class="formula-box">0 = Δ<sub>r</sub>H° − T · Δ<sub>r</sub>S°&nbsp;&nbsp;⇒&nbsp;&nbsp;T = Δ<sub>r</sub>H° / Δ<sub>r</sub>S°</div>
+      <p>Schritt 1 und 2 sind gleich. In Schritt 3 wird Δ<sub>r</sub>S° in kJ/(mol·K) umgerechnet und die Grenztemperatur in K und °C berechnet. In Schritt 4 wird angegeben, ob die Reaktion <strong>oberhalb</strong> oder <strong>unterhalb</strong> dieser Temperatur exergonisch ist. Endotherme Reaktionen mit Entropiezunahme laufen oberhalb exergonisch ab, exotherme Reaktionen mit Entropieabnahme unterhalb. Angeboten werden nur Reaktionen, bei denen dieser Vorzeichenwechsel zwischen etwa 200 K und 3000 K liegt. Für T wird eine Abweichung von ±0,6 % (mindestens ±2 K) akzeptiert.</p>
+
+      <h3>Aufgabe einstellen</h3>
+      <p><strong>Aufgabentyp:</strong> „Δ<sub>r</sub>G° berechnen“ bei vorgegebener Temperatur oder „Grenztemperatur“ berechnen.</p>
+      <p><strong>Schwierigkeit:</strong> Leicht (wenige Stoffe, Faktoren meist 1), Mittel, Schwer (viele Stoffe, große Faktoren) oder Gemischt.</p>
+      <p><strong>Temperatur:</strong> „25 °C“ rechnet unter Standardbedingungen. „Andere T“ wählt Reaktionen bei ihrer typischen Prozesstemperatur, zum Beispiel das Kalkbrennen bei 900 °C. „Gemischt“ wechselt zufällig. Bei anderen Temperaturen werden Δ<sub>r</sub>H° und Δ<sub>r</sub>S° näherungsweise als temperaturunabhängig angenommen.</p>
+      <p><strong>Bearbeitung:</strong> „Schrittweise“ fragt alle Zwischenwerte ab: Tabellenwerte, Produkte ν · Wert, Summen, Umrechnungen. „Nur Ergebnisse“ fragt je Schritt nur das Ergebnis und die Einordnung ab.</p>
+      <p><strong>Tabellenwerte:</strong> Standardmäßig müssen Δ<sub>f</sub>H° und S° der beteiligten Stoffe aus dem Tabellenwerk links herausgesucht werden. Ein Klick auf einen Wert im Tabellenwerk trägt ihn in das zuletzt ausgewählte Eingabefeld ein. Als <strong>Hilfe</strong> lassen sich die benötigten Werte in der Aufgabe als Tabellen anzeigen, über das Häkchen links oder den Button in der Aufgabe. Die Tabellenwerte in der Rechentabelle sind dann schon eingetragen. Eine Aufgabe mit angezeigten Werten zählt nicht als „im 1. Versuch“ gelöst.</p>
+      <p>Über „Reaktion gezielt wählen“ lässt sich jede Reaktion mit einer ihrer Temperaturen direkt aufrufen, zum Beispiel für die gemeinsame Besprechung im Unterricht.</p>
+
+      <h3>Eingabe &amp; Prüfung</h3>
+      <p>Zahlen mit Komma oder Punkt eingeben, negative Werte mit Minuszeichen. Richtige Felder werden türkis, falsche rot markiert. Für Δ<sub>r</sub>H°, Δ<sub>r</sub>S° und Δ<sub>r</sub>G° wird eine Abweichung von ±1 als Rundungsfehler akzeptiert. Für T sind 273 und 273,15 als Umrechnung erlaubt. Δ<sub>r</sub>S° in kJ/(mol·K) darf auf zwei Nachkommastellen gerundet werden (z. B. 0,16 statt 0,1606). Folgewerte, die mit dem gerundeten Wert gerechnet sind, gelten ebenfalls als richtig.</p>
+      <p>„Tipp“ gibt Hinweise zum gerade offenen Schritt. „Lösung zeigen“ füllt alle Felder aus, die Aufgabe zählt dann nicht als gelöst.</p>
+
+      <h3>Auswertung</h3>
+      <p>Nach dem Lösen zeigt der Tab <strong>Lösungsweg</strong> die vollständige Rechnung. Das <strong>ΔG-T-Diagramm</strong> zeigt, wie Δ<sub>r</sub>G° von der Temperatur abhängt, und markiert die Temperatur, bei der die Reaktion von endergonisch zu exergonisch wechselt (oder umgekehrt). Im <strong>Verlauf</strong> stehen alle bearbeiteten Aufgaben dieser Sitzung.</p>
+
+      <h3>Typische Fehler</h3>
+      <p>Edukte minus Produkte gerechnet · stöchiometrische Faktoren vergessen · Elementen bei S° den Wert 0 gegeben · Δ<sub>r</sub>S° nicht in kJ umgerechnet · Temperatur in °C statt in K eingesetzt · „plus“ statt „minus“ T · Δ<sub>r</sub>S°. Die Prüfung erkennt diese Fehler und weist gezielt darauf hin.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="changelogBackdrop">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="changelogTitle">
+    <div class="modal-head">
+      <h2 id="changelogTitle">Versionshinweise</h2>
+      <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.0</span><span class="d">01.11.2026</span></div>
+      <ul>
+        <li>Erste Version: Freie Standardreaktionsenthalpie mit der Gibbs-Helmholtz-Gleichung berechnen.</li>
+        <li>Aufgabentyp „Δ<sub>r</sub>G° berechnen“ mit vier geprüften Teilschritten: Δ<sub>r</sub>H°, Δ<sub>r</sub>S°, Δ<sub>r</sub>G° und Einordnung exergonisch/endergonisch.</li>
+        <li>Aufgabentyp „Grenztemperatur“: Temperatur berechnen, bei der Δ<sub>r</sub>G° = 0 ist, und angeben, ob die Reaktion oberhalb oder unterhalb davon exergonisch abläuft.</li>
+        <li>Tabellenwerk der Standardbildungsenthalpien und Standardentropien mit Suche, die benötigten Werte lassen sich als Hilfe in der Aufgabe anzeigen.</li>
+        <li>Rechnungen bei 25 °C oder bei Prozesstemperaturen, Δ<sub>r</sub>S° darf auf zwei Nachkommastellen gerundet werden.</li>
+        <li>Tipps, Lösungsweg, ΔG-T-Diagramm und Verlauf.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <section class="block">
+      <h2>Aufgabe</h2>
+      <p class="sub-label">Aufgabentyp</p>
+      <div class="mode-toggle" id="typeToggle">
+        <button data-type="G" class="active">Δ<sub>r</sub>G° berechnen</button>
+        <button data-type="T">Grenztemperatur</button>
+      </div>
+      <p class="sub-label">Schwierigkeit</p>
+      <div class="mode-toggle" id="levelToggle">
+        <button data-level="1">Leicht</button>
+        <button data-level="2">Mittel</button>
+        <button data-level="3">Schwer</button>
+        <button data-level="0" class="active">Gemischt</button>
+      </div>
+      <div id="tempWrap">
+      <p class="sub-label">Temperatur</p>
+      <div class="mode-toggle" id="tempToggle">
+        <button data-temp="std" class="active">25 °C</button>
+        <button data-temp="real">Andere T</button>
+        <button data-temp="mix">Gemischt</button>
+      </div>
+      </div>
+      <p class="sub-label">Bearbeitung</p>
+      <div class="mode-toggle" id="modeToggle">
+        <button data-mode="step" class="active">Schrittweise</button>
+        <button data-mode="direct">Nur Ergebnisse</button>
+      </div>
+      <label class="check-row" for="chkShow"><input type="checkbox" id="chkShow"><span>Tabellenwerte als Hilfe in der Aufgabe anzeigen</span></label>
+      <div class="field-full">
+        <label for="reactionSelect">Reaktion gezielt wählen</label>
+        <select id="reactionSelect" style="margin-bottom:6px;"></select>
+        <div style="display:flex; gap:6px;">
+          <select id="tempSelect" style="flex:1; min-width:0;" aria-label="Temperatur für die gewählte Reaktion"></select>
+          <span id="tempSelectNote" class="sub-label" style="flex:1; margin:0; align-self:center;" hidden>Grenztemperatur gesucht</span>
+          <button class="btn ghost" id="btnLoad" style="flex:none;">Laden</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="block lib-block">
+      <div class="lib-head" id="libHead">
+      <h2>Tabellenwerk (25 °C, 1 bar)</h2>
+      <div class="field-full">
+        <input type="search" id="libSearch" placeholder="Stoff oder Formel suchen, z. B. Ammoniak oder NH3" aria-label="Tabellenwerk durchsuchen">
+      </div>
+      </div>
+      <p class="note" style="margin:0 0 8px;">Klick auf einen Wert überträgt ihn in das zuletzt gewählte Eingabefeld.</p>
+      <div class="lib-wrap">
+        <table class="lib-table two"><colgroup><col class="c1"><col class="c2"><col class="c3"></colgroup>
+          <thead><tr><th>Stoff</th><th class="num">Δ<sub>f</sub>H° in kJ/mol</th><th class="num">S° in J/(mol·K)</th></tr></thead>
+          <tbody id="libBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <div class="screen-card">
+      <div class="screen-top">
+        <button class="btn primary" id="btnNew">Neue Aufgabe</button>
+        <button class="btn ghost" id="btnHint">Tipp</button>
+        <button class="btn ghost" id="btnSolve">Lösung zeigen</button>
+      </div>
+
+      <div class="task-meta">
+        <span class="task-num mono" id="taskNum">Aufgabe 1</span>
+        <span class="chip" id="taskLevel">leicht</span>
+        <span class="task-ctx" id="taskCtx"></span>
+      </div>
+      <div class="equation" id="equation"></div>
+      <div class="temp-line" id="tempLine"></div>
+
+      <div class="given-grid" id="givenGrid"></div>
+      <div class="given-hidden" id="givenHidden" hidden><span>Suche Δ<sub>f</sub>H° und S° der beteiligten Stoffe im Tabellenwerk heraus.</span><button class="btn ghost" id="btnShowVals">Werte als Hilfe anzeigen</button></div>
+
+      <div id="steps"></div>
+
+      <div class="readout-bar">
+        <div class="readout"><span class="k">gelöst</span><span class="v mono" id="roSolved">0</span></div>
+        <div class="readout"><span class="k">davon im 1. Versuch</span><span class="v mono" id="roFirst">0</span></div>
+        <div class="readout"><span class="k">Serie</span><span class="v mono" id="roStreak">0</span></div>
+        <div class="readout"><span class="k">Lösung angesehen</span><span class="v mono" id="roShown">0</span></div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tabbtn active" data-tab="way">Lösungsweg</button>
+      <button class="tabbtn" data-tab="diag">ΔG-T-Diagramm</button>
+      <button class="tabbtn" data-tab="hist">Verlauf</button>
+    </div>
+
+    <div class="tabpanel active" id="tab-way">
+      <div id="wayBox"><div class="empty-hint">Der vollständige Lösungsweg erscheint, sobald die Aufgabe gelöst oder die Lösung angezeigt wurde.</div></div>
+    </div>
+
+    <div class="tabpanel" id="tab-diag">
+      <canvas id="diag" width="1000" height="340"></canvas>
+      <p class="note">Δ<sub>r</sub>G°(T) = Δ<sub>r</sub>H° − T · Δ<sub>r</sub>S° als Gerade, unter der Näherung, dass Δ<sub>r</sub>H° und Δ<sub>r</sub>S° nicht von der Temperatur abhängen. Unterhalb der Nulllinie ist die Reaktion exergonisch. Der Punkt markiert die Temperatur der Aufgabe bzw. die Grenztemperatur.</p>
+    </div>
+
+    <div class="tabpanel" id="tab-hist">
+      <div class="table-wrap">
+        <table class="hist">
+          <thead><tr><th>#</th><th>Reaktion</th><th>Vorgabe</th><th>Ergebnis</th><th>Einordnung</th><th>Status</th></tr></thead>
+          <tbody id="histBody"><tr><td colspan="6" class="empty-hint">Noch keine Aufgaben bearbeitet.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <p class="footer-note">Tabellenwerte für 25 °C und 1 bar nach gängigen Tabellenwerken (NIST, CRC Handbook), auf eine Nachkommastelle gerundet. Einzelne Schulbücher geben teilweise leicht abweichende Werte an.</p>
+  <p class="footer-credit">Bastian Baumgart · Berechnung der freien Enthalpie V1.0 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Stoffdaten (298,15 K, 1 bar) ----------
+  // h: Standardbildungsenthalpie in kJ/mol, S0: molare Standardentropie in J/(mol·K)
+  // el: Element in stabilster Form (ΔfH° = 0, aber S° > 0), ch: Ladung
+  const S = {
+    H2:{f:"H2",s:"g",h:0,S0:130.7,n:"Wasserstoff",el:1},
+    O2:{f:"O2",s:"g",h:0,S0:205.2,n:"Sauerstoff",el:1},
+    N2:{f:"N2",s:"g",h:0,S0:191.6,n:"Stickstoff",el:1},
+    C:{f:"C",s:"s",h:0,S0:5.7,n:"Kohlenstoff (Graphit)",el:1},
+    Mg:{f:"Mg",s:"s",h:0,S0:32.7,n:"Magnesium",el:1},
+    Al:{f:"Al",s:"s",h:0,S0:28.3,n:"Aluminium",el:1},
+    Fe:{f:"Fe",s:"s",h:0,S0:27.3,n:"Eisen",el:1},
+    Cu:{f:"Cu",s:"s",h:0,S0:33.2,n:"Kupfer",el:1},
+    Zn:{f:"Zn",s:"s",h:0,S0:41.6,n:"Zink",el:1},
+    Hg:{f:"Hg",s:"l",h:0,S0:75.9,n:"Quecksilber",el:1},
+
+    O3:{f:"O3",s:"g",h:142.7,S0:238.9,n:"Ozon"},
+    H2O_l:{f:"H2O",s:"l",h:-285.8,S0:70.0,n:"Wasser (flüssig)"},
+    H2O_g:{f:"H2O",s:"g",h:-241.8,S0:188.8,n:"Wasser (gasförmig)"},
+    H2O2:{f:"H2O2",s:"l",h:-187.8,S0:109.6,n:"Wasserstoffperoxid"},
+    CO:{f:"CO",s:"g",h:-110.5,S0:197.7,n:"Kohlenstoffmonooxid"},
+    CO2:{f:"CO2",s:"g",h:-393.5,S0:213.8,n:"Kohlenstoffdioxid"},
+    CH4:{f:"CH4",s:"g",h:-74.8,S0:186.3,n:"Methan"},
+    C2H6:{f:"C2H6",s:"g",h:-84.0,S0:229.6,n:"Ethan"},
+    C3H8:{f:"C3H8",s:"g",h:-103.8,S0:270.3,n:"Propan"},
+    C8H18:{f:"C8H18",s:"l",h:-250.1,S0:361.2,n:"n-Octan"},
+    C2H4:{f:"C2H4",s:"g",h:52.4,S0:219.3,n:"Ethen"},
+    C2H2:{f:"C2H2",s:"g",h:226.7,S0:200.9,n:"Ethin"},
+    C6H6:{f:"C6H6",s:"l",h:49.0,S0:173.4,n:"Benzol"},
+    C6H12:{f:"C6H12",s:"l",h:-156.4,S0:204.4,n:"Cyclohexan"},
+    CH3OH:{f:"CH3OH",s:"l",h:-238.7,S0:126.8,n:"Methanol"},
+    C2H5OH:{f:"C2H5OH",s:"l",h:-277.7,S0:160.7,n:"Ethanol"},
+    CH3COOH:{f:"CH3COOH",s:"l",h:-484.3,S0:159.8,n:"Essigsäure"},
+    EtOAc:{f:"CH3COOC2H5",s:"l",h:-479.3,S0:257.7,n:"Ethylacetat"},
+    C6H12O6:{f:"C6H12O6",s:"s",h:-1273.3,S0:212.1,n:"Glucose"},
+    NH3:{f:"NH3",s:"g",h:-45.9,S0:192.8,n:"Ammoniak"},
+    NH4Cl:{f:"NH4Cl",s:"s",h:-314.4,S0:94.6,n:"Ammoniumchlorid"},
+    NH4NO3:{f:"NH4NO3",s:"s",h:-365.6,S0:151.1,n:"Ammoniumnitrat"},
+    NH4_aq:{f:"NH4",ch:"+",s:"aq",h:-132.5,S0:113.4,n:"Ammonium-Ion (gelöst)"},
+    NO3_aq:{f:"NO3",ch:"−",s:"aq",h:-205.0,S0:146.4,n:"Nitrat-Ion (gelöst)"},
+    NO:{f:"NO",s:"g",h:90.3,S0:210.8,n:"Stickstoffmonooxid"},
+    NO2:{f:"NO2",s:"g",h:33.2,S0:240.1,n:"Stickstoffdioxid"},
+    N2O4:{f:"N2O4",s:"g",h:9.2,S0:304.4,n:"Distickstofftetraoxid"},
+    HNO3:{f:"HNO3",s:"l",h:-174.1,S0:155.6,n:"Salpetersäure"},
+    N2H4:{f:"N2H4",s:"l",h:50.6,S0:121.2,n:"Hydrazin"},
+    SO2:{f:"SO2",s:"g",h:-296.8,S0:248.2,n:"Schwefeldioxid"},
+    SO3:{f:"SO3",s:"g",h:-395.7,S0:256.8,n:"Schwefeltrioxid"},
+    H2SO4:{f:"H2SO4",s:"l",h:-814.0,S0:156.9,n:"Schwefelsäure"},
+    H2S:{f:"H2S",s:"g",h:-20.6,S0:205.8,n:"Schwefelwasserstoff"},
+    HCl:{f:"HCl",s:"g",h:-92.3,S0:186.9,n:"Chlorwasserstoff"},
+    NaHCO3:{f:"NaHCO3",s:"s",h:-950.8,S0:101.7,n:"Natriumhydrogencarbonat"},
+    Na2CO3:{f:"Na2CO3",s:"s",h:-1130.7,S0:135.0,n:"Natriumcarbonat"},
+    CaCO3:{f:"CaCO3",s:"s",h:-1206.9,S0:92.9,n:"Calciumcarbonat"},
+    CaO:{f:"CaO",s:"s",h:-635.1,S0:39.7,n:"Calciumoxid"},
+    CaOH2:{f:"Ca(OH)2",s:"s",h:-986.1,S0:83.4,n:"Calciumhydroxid"},
+    CaC2:{f:"CaC2",s:"s",h:-59.8,S0:70.0,n:"Calciumcarbid"},
+    MgO:{f:"MgO",s:"s",h:-601.6,S0:26.9,n:"Magnesiumoxid"},
+    Fe2O3:{f:"Fe2O3",s:"s",h:-824.2,S0:87.4,n:"Eisen(III)-oxid"},
+    Al2O3:{f:"Al2O3",s:"s",h:-1675.7,S0:50.9,n:"Aluminiumoxid"},
+    CuO:{f:"CuO",s:"s",h:-157.3,S0:42.6,n:"Kupfer(II)-oxid"},
+    HgO:{f:"HgO",s:"s",h:-90.8,S0:70.3,n:"Quecksilber(II)-oxid"},
+    ZnO:{f:"ZnO",s:"s",h:-350.5,S0:43.6,n:"Zinkoxid"},
+    ZnS:{f:"ZnS",s:"s",h:-206.0,S0:57.7,n:"Zinksulfid"}
+  };
+
+  // ---------- Reaktionen: d = Schwierigkeit, T = mögliche Temperaturen in °C ----------
+  const R = [
+    {d:1, c:"Verbrennung von Kohlenstoff", e:[[1,"C"],[1,"O2"]], p:[[1,"CO2"]], T:[25]},
+    {d:1, c:"Kalkbrennen", e:[[1,"CaCO3"]], p:[[1,"CaO"],[1,"CO2"]], T:[25,900]},
+    {d:1, c:"Kalklöschen", e:[[1,"CaO"],[1,"H2O_l"]], p:[[1,"CaOH2"]], T:[25]},
+    {d:1, c:"Bildung von Ammoniumchlorid", e:[[1,"NH3"],[1,"HCl"]], p:[[1,"NH4Cl"]], T:[25]},
+    {d:1, c:"Zersetzung von Ammoniumchlorid", e:[[1,"NH4Cl"]], p:[[1,"NH3"],[1,"HCl"]], T:[25,400]},
+    {d:1, c:"Lösen von Ammoniumnitrat in Wasser (Kältepack)", e:[[1,"NH4NO3"]], p:[[1,"NH4_aq"],[1,"NO3_aq"]], T:[25]},
+    {d:1, c:"Hydrierung von Ethen", e:[[1,"C2H4"],[1,"H2"]], p:[[1,"C2H6"]], T:[25]},
+    {d:1, c:"Wassergas-Shift-Reaktion", e:[[1,"CO"],[1,"H2O_g"]], p:[[1,"CO2"],[1,"H2"]], T:[25,900]},
+    {d:1, c:"Verdampfen von Wasser", e:[[1,"H2O_l"]], p:[[1,"H2O_g"]], T:[25,150]},
+    {d:1, c:"Reduktion von Kupferoxid mit Wasserstoff", e:[[1,"CuO"],[1,"H2"]], p:[[1,"Cu"],[1,"H2O_l"]], T:[25]},
+    {d:1, c:"Wassergasreaktion (Kohlevergasung)", e:[[1,"C"],[1,"H2O_g"]], p:[[1,"CO"],[1,"H2"]], T:[25,1000]},
+
+    {d:2, c:"Verbrennung von Erdgas", e:[[1,"CH4"],[2,"O2"]], p:[[1,"CO2"],[2,"H2O_g"]], T:[25]},
+    {d:2, c:"Ammoniaksynthese (Haber-Bosch-Verfahren)", e:[[1,"N2"],[3,"H2"]], p:[[2,"NH3"]], T:[25,450]},
+    {d:2, c:"Kontaktverfahren (Schwefelsäureherstellung)", e:[[2,"SO2"],[1,"O2"]], p:[[2,"SO3"]], T:[25,450,1000]},
+    {d:2, c:"Oxidation von Stickstoffmonooxid an der Luft", e:[[2,"NO"],[1,"O2"]], p:[[2,"NO2"]], T:[25]},
+    {d:2, c:"Dimerisierung von Stickstoffdioxid", e:[[2,"NO2"]], p:[[1,"N2O4"]], T:[25,100]},
+    {d:2, c:"Boudouard-Gleichgewicht", e:[[1,"C"],[1,"CO2"]], p:[[2,"CO"]], T:[25,1000]},
+    {d:2, c:"Dampfreformierung von Methan", e:[[1,"CH4"],[1,"H2O_g"]], p:[[1,"CO"],[3,"H2"]], T:[25,900]},
+    {d:2, c:"Thermitreaktion (Schienenschweißen)", e:[[1,"Fe2O3"],[2,"Al"]], p:[[1,"Al2O3"],[2,"Fe"]], T:[25]},
+    {d:2, c:"Zerfall von Wasserstoffperoxid", e:[[2,"H2O2"]], p:[[2,"H2O_l"],[1,"O2"]], T:[25]},
+    {d:2, c:"Bildung von Ozon", e:[[3,"O2"]], p:[[2,"O3"]], T:[25]},
+    {d:2, c:"Verbrennung von Magnesium", e:[[2,"Mg"],[1,"O2"]], p:[[2,"MgO"]], T:[25]},
+    {d:2, c:"Zersetzung von Natron (Backpulver)", e:[[2,"NaHCO3"]], p:[[1,"Na2CO3"],[1,"CO2"],[1,"H2O_g"]], T:[25,200]},
+    {d:2, c:"Zersetzung von Quecksilberoxid (Lavoisier)", e:[[2,"HgO"]], p:[[2,"Hg"],[1,"O2"]], T:[25,600]},
+    {d:2, c:"Entwässern von gelöschtem Kalk", e:[[1,"CaOH2"]], p:[[1,"CaO"],[1,"H2O_g"]], T:[25,600]},
+    {d:2, c:"Methanolsynthese", e:[[1,"CO"],[2,"H2"]], p:[[1,"CH3OH"]], T:[25]},
+    {d:2, c:"Gewinnung von Zink aus Zinkoxid", e:[[1,"ZnO"],[1,"C"]], p:[[1,"Zn"],[1,"CO"]], T:[25,1100]},
+    {d:2, c:"Hydrazin als Raketentreibstoff", e:[[1,"N2H4"],[1,"O2"]], p:[[1,"N2"],[2,"H2O_g"]], T:[25]},
+
+    {d:3, c:"Verbrennung von Ethanol", e:[[1,"C2H5OH"],[3,"O2"]], p:[[2,"CO2"],[3,"H2O_g"]], T:[25]},
+    {d:3, c:"Verbrennung von Propan (Gasbrenner)", e:[[1,"C3H8"],[5,"O2"]], p:[[3,"CO2"],[4,"H2O_g"]], T:[25]},
+    {d:3, c:"Reduktion von Eisenoxid im Hochofen", e:[[1,"Fe2O3"],[3,"CO"]], p:[[2,"Fe"],[3,"CO2"]], T:[25,800]},
+    {d:3, c:"Verbrennung von Methanol", e:[[2,"CH3OH"],[3,"O2"]], p:[[2,"CO2"],[4,"H2O_g"]], T:[25]},
+    {d:3, c:"Zellatmung (Oxidation von Glucose)", e:[[1,"C6H12O6"],[6,"O2"]], p:[[6,"CO2"],[6,"H2O_l"]], T:[25]},
+    {d:3, c:"Fotosynthese (Bildung von Glucose)", e:[[6,"CO2"],[6,"H2O_l"]], p:[[1,"C6H12O6"],[6,"O2"]], T:[25]},
+    {d:3, c:"Verbrennung von Octan (Benzinbestandteil)", e:[[2,"C8H18"],[25,"O2"]], p:[[16,"CO2"],[18,"H2O_g"]], T:[25]},
+    {d:3, c:"Ammoniakverbrennung (Ostwald-Verfahren)", e:[[4,"NH3"],[5,"O2"]], p:[[4,"NO"],[6,"H2O_g"]], T:[25,900]},
+    {d:3, c:"Bildung von Salpetersäure (Ostwald-Verfahren)", e:[[3,"NO2"],[1,"H2O_l"]], p:[[2,"HNO3"],[1,"NO"]], T:[25]},
+    {d:3, c:"Rösten von Zinkblende", e:[[2,"ZnS"],[3,"O2"]], p:[[2,"ZnO"],[2,"SO2"]], T:[25,800]},
+    {d:3, c:"Carbidlampe (Ethin aus Calciumcarbid)", e:[[1,"CaC2"],[2,"H2O_l"]], p:[[1,"C2H2"],[1,"CaOH2"]], T:[25]},
+    {d:3, c:"Verbrennung von Ethin (Schweißbrenner)", e:[[2,"C2H2"],[5,"O2"]], p:[[4,"CO2"],[2,"H2O_g"]], T:[25]},
+    {d:3, c:"Veresterung von Essigsäure mit Ethanol", e:[[1,"CH3COOH"],[1,"C2H5OH"]], p:[[1,"EtOAc"],[1,"H2O_l"]], T:[25]},
+    {d:3, c:"Verbrennung von Benzol", e:[[2,"C6H6"],[15,"O2"]], p:[[12,"CO2"],[6,"H2O_g"]], T:[25]},
+    {d:3, c:"Verbrennung von Schwefelwasserstoff (Claus-Verfahren)", e:[[2,"H2S"],[3,"O2"]], p:[[2,"SO2"],[2,"H2O_g"]], T:[25]},
+    {d:3, c:"Reduktion von Eisenoxid mit Kohlenstoff", e:[[2,"Fe2O3"],[3,"C"]], p:[[4,"Fe"],[3,"CO2"]], T:[25,1000]},
+    {d:3, c:"Hydrierung von Benzol zu Cyclohexan", e:[[1,"C6H6"],[3,"H2"]], p:[[1,"C6H12"]], T:[25]},
+    {d:3, c:"Methanisierung (Power-to-Gas)", e:[[1,"CO"],[3,"H2"]], p:[[1,"CH4"],[1,"H2O_g"]], T:[25,500]}
+  ];
+  const LEVEL_NAMES = ["gemischt","leicht","mittel","schwer"];
+  const STEP_TITLES = ["", "Reaktionsenthalpie Δ<sub>r</sub>H°", "Reaktionsentropie Δ<sub>r</sub>S°", "Gibbs-Helmholtz-Gleichung", "Einordnung"];
+  function stepTitle(n){
+    if(task.type === "T"){ if(n === 3) return "Grenztemperatur (Δ<sub>r</sub>G° = 0)"; if(n === 4) return "Temperaturbereich"; }
+    return STEP_TITLES[n];
+  }
+
+  // ---------- Hilfsfunktionen ----------
+  const $ = id => document.getElementById(id);
+  const rnd = (x,d) => { const f = Math.pow(10,d); return Math.round(x*f)/f; };
+  const r1 = x => rnd(x,1);
+  function fmt(x, d){
+    if(d == null) d = 1;
+    const v = rnd(x,d);
+    const s = Math.abs(v).toLocaleString("de-DE",{minimumFractionDigits:d, maximumFractionDigits:d, useGrouping:false});
+    return (v < 0 ? "−" : "") + s;
+  }
+  function fmtT(x){ return Math.abs(x - Math.round(x)) < 1e-9 ? String(Math.round(x)) : fmt(x,2); }
+  function parseNum(s){
+    if(s == null) return null;
+    s = String(s).trim().replace(/\s/g,"").replace(/[−–]/g,"-").replace(",",".").replace(/(kJ|J)\/?\(?mol.*$/i,"").replace(/K$/,"");
+    if(s === "" || s === "-" || s === "+") return null;
+    const v = Number(s);
+    return isFinite(v) ? v : NaN;
+  }
+  function fHTML(f){ return f.replace(/(\d+)/g,"<sub>$1</sub>"); }
+  function spHTML(key){ const sp=S[key]; return fHTML(sp.f)+(sp.ch?"<sup>"+sp.ch+"</sup>":"")+'<span class="st">('+sp.s+')</span>'; }
+  function eqHTML(r){
+    const side = arr => arr.map(([nu,k])=>(nu>1?'<span class="co">'+nu+'</span>':'') + spHTML(k)).join('<span class="plus">+</span>');
+    return side(r.e)+'<span class="arr">⟶</span>'+side(r.p);
+  }
+  function eqShort(r){
+    const side = arr => arr.map(([nu,k])=>(nu>1?nu+" ":"")+fHTML(S[k].f)+(S[k].ch?"<sup>"+S[k].ch+"</sup>":"")).join(" + ");
+    return side(r.e)+" → "+side(r.p);
+  }
+  const VAL = { H: k=>S[k].h, S: k=>S[k].S0 };
+  function sums(r, f){
+    const se = r1(r.e.reduce((a,[nu,k])=>a+nu*f(k),0));
+    const sp = r1(r.p.reduce((a,[nu,k])=>a+nu*f(k),0));
+    return {se, sp, dr: r1(sp-se)};
+  }
+  function solve(r, theta){
+    const H = sums(r, VAL.H), Sx = sums(r, VAL.S);
+    const T = theta + 273.15;
+    const dSk = Sx.dr/1000;
+    const TS = T*dSk;
+    const dG = r1(H.dr - TS);
+    const Ti = H.dr / dSk;
+    return {H, S:Sx, theta, T, dSk, TS, dG, Ti, thetaI: Ti - 273.15};
+  }
+  // Reaktionen, bei denen ΔrG° bei einer sinnvollen Temperatur das Vorzeichen wechselt
+  function eligibleT(r){ const s = solve(r, 25); return s.H.dr*s.S.dr > 0 && s.Ti > 200 && s.Ti < 3000; }
+  // erlaubte Werte für ΔrS° in kJ/(mol·K): exakt, auf 3 oder auf 2 Nachkommastellen gerundet
+  function skVariants(s){ return [...new Set([s.dSk, rnd(s.dSk,3), rnd(s.dSk,2)])].filter(d=>d !== 0); }
+  function gasMoles(arr){ return arr.reduce((a,[nu,k])=>a+(S[k].s==="g"?nu:0),0); }
+
+  // ---------- Zustand ----------
+  let level = 0, mode = "step", hide = true, tempMode = "std", taskType = "G";
+  let task = null, taskCounter = 0;
+  const stats = {solved:0, first:0, streak:0, shown:0};
+  const history = [];
+  let lastFocus = null;
+
+  // ---------- Tabellenwerk ----------
+  function renderLib(){
+    const q = $("libSearch").value.trim().toLowerCase().replace(/[₀-₉]/g, c=>String(c.charCodeAt(0)-8320));
+    const keys = Object.keys(S);
+    const match = k => !q || S[k].n.toLowerCase().includes(q) || S[k].f.toLowerCase().includes(q);
+    const els = keys.filter(k=>S[k].el && match(k)).sort((a,b)=>S[a].n.localeCompare(S[b].n,"de"));
+    const cps = keys.filter(k=>!S[k].el && match(k)).sort((a,b)=>S[a].n.localeCompare(S[b].n,"de"));
+    const row = k => `<tr data-k="${k}"><td class="fm">${spHTML(k)}<span class="nm2">${S[k].n}</span></td><td class="num mono" data-col="H">${fmt(S[k].h)}</td><td class="num s0 mono" data-col="S">${fmt(S[k].S0)}</td></tr>`;
+    let html = "";
+    if(cps.length) html += `<tr class="grp"><td colspan="3">Verbindungen &amp; Ionen</td></tr>` + cps.map(row).join("");
+    if(els.length) html += `<tr class="grp"><td colspan="3">Elemente (stabilste Form)</td></tr>` + els.map(row).join("");
+    if(!html) html = `<tr class="grp"><td colspan="3">Kein Treffer</td></tr>`;
+    $("libBody").innerHTML = html;
+  }
+  $("libSearch").addEventListener("input", renderLib);
+  $("libBody").addEventListener("click", e=>{
+    const tr = e.target.closest("tr[data-k]");
+    if(!tr || !lastFocus || !document.body.contains(lastFocus) || lastFocus.readOnly || lastFocus.disabled) return;
+    const td = e.target.closest("td[data-col]");
+    const col = td ? td.dataset.col : (lastFocus.dataset.kind || "H");
+    lastFocus.value = fmt(VAL[col](tr.dataset.k));
+    lastFocus.dispatchEvent(new Event("input", {bubbles:true}));
+    lastFocus.focus();
+  });
+
+  // ---------- Reaktionsauswahl ----------
+  function renderReactionSelect(){
+    let html = "";
+    [1,2,3].forEach(d=>{
+      const opts = R.map((r,i)=>({r,i})).filter(o=>o.r.d===d && (taskType==="G" || eligibleT(o.r)));
+      if(!opts.length) return;
+      html += `<optgroup label="${LEVEL_NAMES[d][0].toUpperCase()+LEVEL_NAMES[d].slice(1)}">`;
+      opts.forEach(o=>{ html += `<option value="${o.i}">${o.r.c}</option>`; });
+      html += `</optgroup>`;
+    });
+    $("reactionSelect").innerHTML = html;
+    $("tempSelect").hidden = taskType === "T";
+    $("tempSelectNote").hidden = taskType !== "T";
+    renderTempSelect();
+  }
+  function renderTempSelect(){
+    const r = R[+$("reactionSelect").value];
+    $("tempSelect").innerHTML = r.T.map(t=>`<option value="${t}">${t} °C${t===25?" (Standard)":""}</option>`).join("");
+  }
+  $("reactionSelect").addEventListener("change", renderTempSelect);
+  $("btnLoad").addEventListener("click", ()=> newTask(+$("reactionSelect").value, +$("tempSelect").value));
+
+  // ---------- Toggles ----------
+  function setupToggle(id, attr, cb){
+    $(id).querySelectorAll("button").forEach(b=>{
+      b.addEventListener("click", ()=>{
+        $(id).querySelectorAll("button").forEach(x=>x.classList.remove("active"));
+        b.classList.add("active");
+        cb(b.dataset[attr]);
+      });
+    });
+  }
+  setupToggle("typeToggle","type", v=>{ taskType=v; $("tempWrap").hidden = v==="T"; renderReactionSelect(); newTask(); });
+  setupToggle("levelToggle","level", v=>{ level=+v; newTask(); });
+  setupToggle("tempToggle","temp", v=>{ tempMode=v; newTask(); });
+  setupToggle("modeToggle","mode", v=>{ mode=v; task.marks = {}; renderTask(); });
+  $("chkShow").addEventListener("change", e=>{
+    hide = !e.target.checked;
+    if(!hide && task && !task.done) task.helpUsed = true;
+    renderTask();
+  });
+  $("btnShowVals").addEventListener("click", ()=>{
+    $("chkShow").checked = true;
+    $("chkShow").dispatchEvent(new Event("change"));
+  });
+
+  // ---------- Aufgabe erzeugen ----------
+  function newTask(index, theta){
+    if(task && !task.done && task.touched) logHistory(task, "open");
+    let idx = index;
+    if(idx == null){
+      let pool = R.map((r,i)=>i).filter(i=> level===0 || R[i].d===level);
+      if(taskType === "T"){
+        pool = pool.filter(i=>eligibleT(R[i]));
+        if(!pool.length) pool = R.map((r,i)=>i).filter(i=>eligibleT(R[i]));
+      } else if(tempMode === "real"){
+        const hot = pool.filter(i=>R[i].T.some(t=>t!==25));
+        if(hot.length) pool = hot;
+      }
+      const avoid = task ? task.idx : -1;
+      const cand = pool.length>1 ? pool.filter(i=>i!==avoid) : pool;
+      idx = cand[Math.floor(Math.random()*cand.length)];
+    }
+    const r = R[idx];
+    if(taskType === "T") theta = 25;
+    if(theta == null){
+      const others = r.T.filter(t=>t!==25);
+      if(tempMode === "std" || !others.length) theta = 25;
+      else if(tempMode === "real") theta = others[Math.floor(Math.random()*others.length)];
+      else { const all = [25, ...others]; theta = all[Math.floor(Math.random()*all.length)]; }
+    }
+    const rows = [];
+    r.e.forEach(([nu,k])=>rows.push({side:"e",nu,k}));
+    r.p.forEach(([nu,k])=>rows.push({side:"p",nu,k}));
+    task = {type:taskType, idx, r, rows, theta, vals:{}, cls:{}, marks:{}, fbs:{}, step:1, wrong:false, done:false, shown:false,
+            hints:{1:0,2:0,3:0,4:0}, hintsUsed:0, helpUsed:!hide, touched:false, sol:solve(r, theta), num:++taskCounter};
+    renderTask();
+    renderWay(); drawDiagram();
+  }
+
+  // ---------- Darstellung ----------
+  function inp(id, kind, step, cls){
+    const v = task.vals[id] ?? "";
+    const ro = task.step > step || task.done;
+    const m = task.marks[id];
+    const mc = m === true ? " ok" : m === false ? " bad" : "";
+    return `<input type="text" inputmode="decimal" autocomplete="off" id="${id}" data-id="${id}" data-kind="${kind}" data-step="${step}" class="${(cls||"")+mc}" value="${v}" ${ro?"readonly":""} ${task.step < step ? "disabled" : ""} aria-label="Eingabe">`;
+  }
+  function stepState(n){ return task.done || task.step > n ? "done" : task.step === n ? "active" : "locked"; }
+  function chipHTML(n){
+    const st = stepState(n);
+    if(st === "done") return `<span class="chip st-done">${task.shown?"Lösung":"geprüft ✓"}</span>`;
+    if(st === "active") return `<span class="chip st-open">offen</span>`;
+    return `<span class="chip st-lock">gesperrt</span>`;
+  }
+  function stepWrap(n, inner){
+    const st = stepState(n);
+    return `<div class="step ${st}" id="step${n}">
+      <div class="step-head"><span class="step-no">${n}</span><h3>${stepTitle(n)}</h3>${chipHTML(n)}</div>
+      <div class="step-body">${inner}</div>
+    </div>`;
+  }
+  function checkBtn(n){
+    const st = stepState(n);
+    return `<div class="calc-check"><button class="btn" data-check="${n}" ${st!=="active"?"disabled":""}>Prüfen</button></div>`;
+  }
+  function toggleHTML(n, opts){
+    return `<div class="mode-toggle cls-toggle cls-wide" data-step="${n}" style="margin-bottom:0;">` +
+      opts.map(([v,label])=>`<button data-cls="${v}" class="${task.cls[n]===v?"active":""}">${label}</button>`).join("") + `</div>`;
+  }
+  function fbHTML(n){ return `<div class="feedback" id="fb${n}">${task.fbs[n]||""}</div>`; }
+
+  // Schritt 1 und 2: Summenrechnung nach dem Satz von Hess
+  function stepSumHTML(n){
+    const K = n===1 ? "H" : "S";
+    const sym = n===1 ? "Δ<sub>f</sub>H°" : "S°";
+    const unit = n===1 ? "kJ/mol" : "J/(mol·K)";
+    const res = n===1 ? "Δ<sub>r</sub>H°" : "Δ<sub>r</sub>S°";
+    const step = mode === "step";
+    let h = `<div class="formula-box">${res} = Σ ν · ${sym}(Produkte) − Σ ν · ${sym}(Edukte)</div>`;
+    if(step){
+      h += `<div class="table-wrap"><table class="calc"><thead><tr><th>Stoff</th><th style="text-align:center">ν</th><th>${sym} in ${unit}</th><th>ν · ${sym} in ${unit}</th></tr></thead><tbody>`;
+      ["e","p"].forEach(side=>{
+        h += `<tr class="side"><td colspan="4">${side==="e"?"Edukte":"Produkte"}</td></tr>`;
+        task.rows.forEach((row,i)=>{
+          if(row.side!==side) return;
+          const tv = VAL[K](row.k);
+          const tcell = (!hide || task.shown && task.done)
+            ? `<input type="text" readonly value="${fmt(tv)}" tabindex="-1" aria-label="Tabellenwert">`
+            : inp(K+"t"+i, K, n);
+          h += `<tr><td class="sp">${spHTML(row.k)}</td><td class="nu">${row.nu}</td><td>${tcell}</td><td><span class="times">${row.nu} ·</span>${inp(K+"p"+i, K, n)}</td></tr>`;
+        });
+      });
+      h += `</tbody></table></div>`;
+    }
+    h += `<div class="sum-grid">`;
+    if(step){
+      h += `<div class="sum-box"><label for="${K}SP">Σ ν · ${sym} (Produkte)</label><div class="unit-in">${inp(K+"SP",K,n)}<span class="unit">${unit}</span></div></div>`;
+      h += `<div class="sum-box"><label for="${K}SE">Σ ν · ${sym} (Edukte)</label><div class="unit-in">${inp(K+"SE",K,n)}<span class="unit">${unit}</span></div></div>`;
+    }
+    h += `<div class="sum-box result-box"><label for="${K}R">${res} = Σ Produkte − Σ Edukte</label><div class="unit-in">${inp(K+"R",K,n)}<span class="unit">${unit}</span></div>`;
+    h += n===1 ? toggleHTML(1, [["exo","exotherm"],["endo","endotherm"]]) : toggleHTML(2, [["zu","Entropie nimmt zu"],["ab","Entropie nimmt ab"]]);
+    h += `</div></div>`;
+    return stepWrap(n, h + checkBtn(n) + fbHTML(n));
+  }
+
+  function step3HTML(){
+    const s = task.sol, step = mode === "step";
+    const known = task.step > 1 ? fmt(s.H.dr)+" kJ/mol" : "–";
+    const knownS = task.step > 2 ? fmt(s.S.dr)+" J/(mol·K)" : "–";
+    let h = `<div class="formula-box">Δ<sub>r</sub>G° = Δ<sub>r</sub>H° − T · Δ<sub>r</sub>S°</div>`;
+    h += `<div class="carry">
+      <div class="readout"><span class="k">Δ<sub>r</sub>H° (Schritt 1)</span><span class="v mono">${known}</span></div>
+      <div class="readout"><span class="k">Δ<sub>r</sub>S° (Schritt 2)</span><span class="v mono">${knownS}</span></div>
+      <div class="readout"><span class="k">Temperatur ϑ</span><span class="v mono">${task.theta} °C</span></div>
+    </div>`;
+    h += `<div class="sum-grid">`;
+    if(step){
+      h += `<div class="sum-box"><label for="GT">Temperatur T</label><div class="unit-in">${inp("GT","T",3)}<span class="unit">K</span></div></div>`;
+      h += `<div class="sum-box"><label for="GSk">Δ<sub>r</sub>S° umgerechnet</label><div class="unit-in">${inp("GSk","Sk",3)}<span class="unit">kJ/(mol·K)</span></div></div>`;
+      h += `<div class="sum-box"><label for="GTS">Entropieterm T · Δ<sub>r</sub>S°</label><div class="unit-in">${inp("GTS","TS",3)}<span class="unit">kJ/mol</span></div></div>`;
+    }
+    h += `<div class="sum-box result-box"><label for="GR">Δ<sub>r</sub>G° = Δ<sub>r</sub>H° − T · Δ<sub>r</sub>S°</label><div class="unit-in">${inp("GR","G",3)}<span class="unit">kJ/mol</span></div></div>`;
+    h += `</div>`;
+    return stepWrap(3, h + checkBtn(3) + fbHTML(3));
+  }
+
+  function step4HTML(){
+    const g = task.step > 3 ? `Δ<sub>r</sub>G° = <span class="mono" style="color:var(--amber)">${fmt(task.sol.dG)} kJ/mol</span> bei ϑ = ${task.theta} °C.` : "Δ<sub>r</sub>G° aus Schritt 3.";
+    let h = `<p class="lead">${g} Ordne die Reaktion ein.</p>`;
+    h += toggleHTML(4, [["exer","exergonisch (Δ<sub>r</sub>G° &lt; 0)"],["ender","endergonisch (Δ<sub>r</sub>G° &gt; 0)"]]);
+    return stepWrap(4, h + checkBtn(4) + fbHTML(4));
+  }
+
+  function step3THTML(){
+    const s = task.sol, step = mode === "step";
+    const known = task.step > 1 ? fmt(s.H.dr)+" kJ/mol" : "–";
+    const knownS = task.step > 2 ? fmt(s.S.dr)+" J/(mol·K)" : "–";
+    let h = `<div class="formula-box">Δ<sub>r</sub>G° = Δ<sub>r</sub>H° − T · Δ<sub>r</sub>S° = 0&nbsp;&nbsp;⇒&nbsp;&nbsp;T = Δ<sub>r</sub>H° / Δ<sub>r</sub>S°</div>`;
+    h += `<div class="carry">
+      <div class="readout"><span class="k">Δ<sub>r</sub>H° (Schritt 1)</span><span class="v mono">${known}</span></div>
+      <div class="readout"><span class="k">Δ<sub>r</sub>S° (Schritt 2)</span><span class="v mono">${knownS}</span></div>
+    </div>`;
+    h += `<div class="sum-grid">`;
+    if(step) h += `<div class="sum-box"><label for="TSk">Δ<sub>r</sub>S° umgerechnet</label><div class="unit-in">${inp("TSk","Sk",3)}<span class="unit">kJ/(mol·K)</span></div></div>`;
+    h += `<div class="sum-box result-box"><label for="TT">Grenztemperatur T = Δ<sub>r</sub>H° / Δ<sub>r</sub>S°</label><div class="unit-in">${inp("TT","T",3)}<span class="unit">K</span></div></div>`;
+    if(step) h += `<div class="sum-box"><label for="TC">Grenztemperatur in °C</label><div class="unit-in">${inp("TC","C",3)}<span class="unit">°C</span></div></div>`;
+    h += `</div>`;
+    return stepWrap(3, h + checkBtn(3) + fbHTML(3));
+  }
+
+  function step4THTML(){
+    const s = task.sol;
+    const g = task.step > 3 ? `Bei T ≈ <span class="mono" style="color:var(--amber)">${fmt(s.Ti,0)} K (${fmt(s.thetaI,0)} °C)</span> ist Δ<sub>r</sub>G° = 0.` : "Grenztemperatur aus Schritt 3.";
+    let h = `<p class="lead">${g} In welchem Temperaturbereich läuft die Reaktion exergonisch ab?</p>`;
+    h += toggleHTML(4, [["oben","oberhalb dieser Temperatur"],["unten","unterhalb dieser Temperatur"]]);
+    return stepWrap(4, h + checkBtn(4) + fbHTML(4));
+  }
+
+  function renderTask(){
+    if(!task) return;
+    const r = task.r;
+    $("taskNum").textContent = "Aufgabe " + task.num;
+    $("taskLevel").textContent = LEVEL_NAMES[r.d];
+    $("taskLevel").className = "chip l"+r.d;
+    $("taskCtx").textContent = r.c;
+    $("equation").innerHTML = eqHTML(r);
+    $("tempLine").innerHTML = task.type === "T"
+      ? `<span>Gesucht: <b>Temperatur, ab der die Reaktion ${task.sol.H.dr > 0 ? "exergonisch" : "endergonisch"} abläuft</b></span><span>Druck: <b>p = 1 bar</b></span>`
+      : `<span>Temperatur: <b>ϑ = ${task.theta} °C</b></span><span>Druck: <b>p = 1 bar</b></span>`;
+
+    // gegebene Tabellen
+    const keys = [];
+    task.rows.forEach(row=>{ if(!keys.includes(row.k)) keys.push(row.k); });
+    const tbl = (K, cls) => `<table class="given ${cls}"><tbody>` + keys.map(k=>`<tr><td class="sp">${spHTML(k)}</td><td class="num">${fmt(VAL[K](k))}</td></tr>`).join("") + `</tbody></table>`;
+    $("givenGrid").innerHTML =
+      `<div class="given-box"><h4>Standardbildungsenthalpien Δ<sub>f</sub>H° in kJ/mol</h4>${tbl("H","")}</div>` +
+      `<div class="given-box"><h4>Standardentropien S° in J/(mol·K)</h4>${tbl("S","s0")}</div>`;
+    $("givenGrid").hidden = hide;
+    $("givenHidden").hidden = !hide;
+
+    $("steps").innerHTML = stepSumHTML(1) + stepSumHTML(2) + (task.type === "T" ? step3THTML() + step4THTML() : step3HTML() + step4HTML());
+    $("btnHint").disabled = task.done;
+    $("btnSolve").disabled = task.done;
+    setStatus();
+  }
+
+  // Ereignisse in den Teilschritten (Delegation)
+  $("steps").addEventListener("input", e=>{
+    const t = e.target;
+    if(!t.dataset || !t.dataset.id) return;
+    task.vals[t.dataset.id] = t.value;
+    task.touched = true;
+    t.classList.remove("ok","bad");
+    delete task.marks[t.dataset.id];
+  });
+  $("steps").addEventListener("focusin", e=>{
+    if(e.target.tagName === "INPUT" && e.target.dataset.id) lastFocus = e.target;
+  });
+  $("steps").addEventListener("click", e=>{
+    const cb = e.target.closest("button[data-cls]");
+    if(cb){
+      const n = +cb.parentElement.dataset.step;
+      if(task.done || task.step !== n) return;
+      task.cls[n] = cb.dataset.cls; task.touched = true;
+      cb.parentElement.querySelectorAll("button").forEach(x=>x.classList.toggle("active", x===cb));
+      return;
+    }
+    const ck = e.target.closest("button[data-check]");
+    if(ck) checkStep(+ck.dataset.check);
+  });
+
+  function setStatus(){
+    const b = $("statusBadge");
+    b.classList.remove("running","done");
+    if(!task.done){ b.classList.add("running"); $("statusText").textContent = "Schritt " + task.step + " von 4"; }
+    else if(task.shown){ $("statusText").textContent = "Lösung angezeigt"; }
+    else { b.classList.add("done"); $("statusText").textContent = "gelöst"; }
+  }
+
+  // ---------- Prüfen ----------
+  function near(a,b,tol){ return a!=null && !isNaN(a) && Math.abs(a-b) <= tol; }
+  function fb(type, html){ return `<div class="fb ${type}">${html}</div>`; }
+  function finishCheck(n, out, passed, okMsg){
+    task.touched = true;
+    if(passed){
+      out.push(fb("good", okMsg));
+      task.step = n + 1;
+      if(n === 4) completeTask();
+    } else {
+      stats.streak = 0;
+    }
+    task.fbs[n] = out.join("");
+    renderTask(); renderStats();
+    if(passed && n < 4){
+      const nx = $("step"+(n+1));
+      if(nx){
+        const first = nx.querySelector("input:not([readonly]):not([disabled])");
+        if(first && window.matchMedia("(pointer:fine)").matches) first.focus({preventScroll:true});
+        nx.scrollIntoView({behavior:"smooth", block:"nearest"});
+      }
+    }
+  }
+
+  function diagnoseSum(n, v){
+    const K = n===1 ? "H" : "S", r = task.r, sol = task.sol[K], f = VAL[K];
+    const msgs = [];
+    if(near(v, -sol.dr, 1) && Math.abs(sol.dr) > 1) msgs.push("Das Vorzeichen stimmt nicht. Es gilt: Summe der Produkte <strong>minus</strong> Summe der Edukte.");
+    const noCoef = r1(r.p.reduce((a,[nu,k])=>a+f(k),0) - r.e.reduce((a,[nu,k])=>a+f(k),0));
+    if(Math.abs(noCoef - sol.dr) > 1 && (near(v,noCoef,1) || near(v,-noCoef,1))) msgs.push("Die stöchiometrischen Faktoren wurden offenbar nicht berücksichtigt. Jeder Tabellenwert wird mit seinem Faktor ν multipliziert.");
+    if(K === "S" && [...r.e,...r.p].some(([nu,k])=>S[k].el)){
+      const noEl = r1(r.p.reduce((a,[nu,k])=>a+nu*(S[k].el?0:f(k)),0) - r.e.reduce((a,[nu,k])=>a+nu*(S[k].el?0:f(k)),0));
+      if(near(v, noEl, 1)) msgs.push("Elemente haben zwar Δ<sub>f</sub>H° = 0, aber <strong>keine</strong> Standardentropie von null. Setze für die Elemente die Werte aus der Tabelle ein.");
+    }
+    const swap = {H2O_l:"H2O_g", H2O_g:"H2O_l"};
+    if([...r.e,...r.p].some(([nu,k])=>swap[k])){
+      const fs = k => swap[k] ? f(swap[k]) : f(k);
+      const alt = r1(r.p.reduce((a,[nu,k])=>a+nu*fs(k),0) - r.e.reduce((a,[nu,k])=>a+nu*fs(k),0));
+      if(near(v,alt,1)) msgs.push("Auf den Aggregatzustand von Wasser achten: H<sub>2</sub>O(l) und H<sub>2</sub>O(g) haben unterschiedliche Tabellenwerte.");
+    }
+    return msgs;
+  }
+
+  function checkSum(n){
+    const K = n===1 ? "H" : "S", sol = task.sol[K], f = VAL[K];
+    const unit = n===1 ? "kJ/mol" : "J/(mol·K)";
+    const res = n===1 ? "Δ<sub>r</sub>H°" : "Δ<sub>r</sub>S°";
+    const step = mode === "step";
+    const marks = {}, out = [];
+    let errors = 0, empty = 0;
+    const field = (id, target, tol) => {
+      const v = parseNum(task.vals[id]);
+      if(v == null){ empty++; return null; }
+      const ok = near(v, target, tol); marks[id] = ok; if(!ok) errors++;
+      return v;
+    };
+    if(step){
+      task.rows.forEach((row,i)=>{
+        const tv = f(row.k);
+        if(hide){
+          const v = field(K+"t"+i, tv, 0.06);
+          if(v != null && !near(v,tv,0.06) && S[row.k].el){
+            if(K==="H" && v !== 0) out.push(fb("bad", `${fHTML(S[row.k].f)} ist ein Element in seiner stabilsten Form. Seine Standardbildungsenthalpie ist 0 kJ/mol.`));
+            if(K==="S" && v === 0) out.push(fb("bad", `Auch Elemente wie ${fHTML(S[row.k].f)} haben eine Standardentropie größer als null. Nur die Bildungsenthalpie ist für Elemente 0.`));
+          }
+        }
+        field(K+"p"+i, row.nu*tv, 0.15);
+      });
+      field(K+"SP", sol.sp, 0.3);
+      const se = field(K+"SE", sol.se, 0.3);
+      const sp = parseNum(task.vals[K+"SP"]);
+      if(marks[K+"SP"]===false && marks[K+"SE"]===false && near(sp,sol.se,0.3) && near(se,sol.sp,0.3))
+        out.push(fb("bad","Die beiden Summen sind vertauscht: links stehen die Produkte, daneben die Edukte."));
+    }
+    const rv = parseNum(task.vals[K+"R"]);
+    let finalOk = false;
+    if(rv == null) out.push(fb("info", `Trage das Ergebnis ${res} ein.`));
+    else if(isNaN(rv)){ marks[K+"R"] = false; out.push(fb("bad","Das Ergebnis ist keine gültige Zahl. Beispiel für eine richtige Eingabe: −198,1")); }
+    else {
+      finalOk = near(rv, sol.dr, 1.0);
+      marks[K+"R"] = finalOk;
+      if(!finalOk){ const d = diagnoseSum(n, rv); out.push(fb("bad", `Das Ergebnis für ${res} stimmt noch nicht.` + (d.length ? " " + d.join(" ") : ""))); }
+    }
+    let clsOk = false;
+    if(finalOk){
+      const right = n===1 ? (sol.dr < 0 ? "exo" : "endo") : (sol.dr > 0 ? "zu" : "ab");
+      const words = {exo:"exotherm", endo:"endotherm", zu:"die Entropie nimmt zu", ab:"die Entropie nimmt ab"};
+      if(!task.cls[n]) out.push(fb("info", n===1 ? "Δ<sub>r</sub>H° ist richtig. Ordne die Reaktion noch als exotherm oder endotherm ein." : "Δ<sub>r</sub>S° ist richtig. Gib noch an, ob die Entropie zu- oder abnimmt."));
+      else if(task.cls[n] !== right){ task.wrong = true; out.push(fb("bad", `Die Einordnung passt nicht zum Vorzeichen: ${res} ${sol.dr<0?"&lt;":"&gt;"} 0 bedeutet: ${words[right]}.`)); }
+      else clsOk = true;
+    }
+    if(step && errors) out.unshift(fb("bad", `${errors} ${errors===1?"Zwischenwert ist":"Zwischenwerte sind"} falsch (rot markiert).`));
+    if(step && empty && finalOk && clsOk) out.unshift(fb("info", `Fülle auch ${empty===1?"das leere Feld":"die "+empty+" leeren Felder"} aus. In diesem Modus wird jeder Zwischenschritt geprüft.`));
+    if(errors || (rv!=null && !finalOk) || (finalOk && task.cls[n] && !clsOk)) task.wrong = true;
+    Object.assign(task.marks, marks);
+    const passed = finalOk && clsOk && errors === 0 && !(step && empty);
+    const okMsg = n===1
+      ? `Schritt 1 ist richtig: Δ<sub>r</sub>H° = ${fmt(sol.dr)} kJ/mol, die Reaktion ist ${sol.dr<0?"exotherm":"endotherm"}. Weiter mit der Reaktionsentropie.`
+      : `Schritt 2 ist richtig: Δ<sub>r</sub>S° = ${fmt(sol.dr)} J/(mol·K), die Entropie nimmt ${sol.dr>0?"zu":"ab"}. Weiter mit ${task.type==="T"?"der Grenztemperatur":"der Gibbs-Helmholtz-Gleichung"}.`;
+    finishCheck(n, out, passed, okMsg);
+  }
+
+  function checkG(){
+    const s = task.sol, step = mode === "step";
+    const marks = {}, out = [];
+    let errors = 0, empty = 0;
+    const T15 = s.T, T0 = task.theta + 273;
+    if(step){
+      const tv = parseNum(task.vals.GT);
+      if(tv == null) empty++;
+      else {
+        marks.GT = near(tv, T15, 0.01) || near(tv, T0, 0.01);
+        if(!marks.GT){ errors++; out.push(fb("bad", near(tv, task.theta, 0.01) ? `Die Temperatur muss in Kelvin angegeben werden: T = ϑ + 273,15.` : `Die Temperatur stimmt nicht. Umrechnung: T = ϑ + 273,15.`)); }
+      }
+      const sk = parseNum(task.vals.GSk);
+      if(sk == null) empty++;
+      else {
+        marks.GSk = skVariants(s).some(d=>near(sk, d, 0.0006));
+        if(!marks.GSk){ errors++; out.push(fb("bad", near(sk, s.S.dr, 0.6) ? "Δ<sub>r</sub>S° steht noch in J/(mol·K). Teile durch 1000, um kJ/(mol·K) zu erhalten." : near(sk,-s.dSk,0.0006) ? "Beim umgerechneten Δ<sub>r</sub>S° stimmt das Vorzeichen nicht." : "Die Umrechnung von Δ<sub>r</sub>S° stimmt nicht: 1 J = 0,001 kJ.")); }
+      }
+      const ts = parseNum(task.vals.GTS);
+      if(ts == null) empty++;
+      else {
+        marks.GTS = skVariants(s).some(d=>near(ts, T15*d, 0.5) || near(ts, T0*d, 0.5));
+        if(!marks.GTS){
+          errors++;
+          let m = "Der Entropieterm T · Δ<sub>r</sub>S° stimmt nicht.";
+          const big = T15*s.S.dr;
+          if(near(ts, big, Math.max(2, Math.abs(big)*0.005)) || near(ts, task.theta*s.S.dr, Math.max(2, Math.abs(task.theta*s.S.dr)*0.005))) m += " Δ<sub>r</sub>S° muss vorher in kJ/(mol·K) umgerechnet werden.";
+          else if(near(ts, task.theta*s.dSk, 0.5)) m += " Die Temperatur muss in Kelvin eingesetzt werden, nicht in °C.";
+          out.push(fb("bad", m));
+        }
+      }
+    }
+    const gv = parseNum(task.vals.GR);
+    let ok = false;
+    if(gv == null) out.push(fb("info","Trage das Ergebnis Δ<sub>r</sub>G° ein."));
+    else if(isNaN(gv)){ marks.GR = false; out.push(fb("bad","Das Ergebnis ist keine gültige Zahl. Beispiel für eine richtige Eingabe: −32,8")); }
+    else {
+      ok = skVariants(s).some(d=>near(gv, s.H.dr - T15*d, 1.0) || near(gv, s.H.dr - T0*d, 1.0));
+      marks.GR = ok;
+      if(!ok){
+        const msgs = [];
+        const big = s.H.dr - T15*s.S.dr, bigC = s.H.dr - task.theta*s.S.dr;
+        if(near(gv, big, Math.max(3, Math.abs(big)*0.005)) || near(gv, bigC, Math.max(3, Math.abs(bigC)*0.005))) msgs.push("Δ<sub>r</sub>S° wurde nicht in kJ/(mol·K) umgerechnet. Δ<sub>r</sub>H° und T · Δ<sub>r</sub>S° müssen dieselbe Einheit haben.");
+        else if(near(gv, s.H.dr - task.theta*s.dSk, 1) && Math.abs(T15 - task.theta) > 1) msgs.push("Die Temperatur wurde in °C eingesetzt. In der Gibbs-Helmholtz-Gleichung steht T in Kelvin.");
+        else if(near(gv, s.H.dr + s.TS, 1)) msgs.push("Achte auf das Rechenzeichen: Δ<sub>r</sub>G° = Δ<sub>r</sub>H° <strong>minus</strong> T · Δ<sub>r</sub>S°. Ist Δ<sub>r</sub>S° negativ, wird aus „minus“ mal „minus“ ein „plus“.");
+        else if(near(gv, -s.dG, 1)) msgs.push("Das Vorzeichen stimmt nicht.");
+        out.push(fb("bad", "Das Ergebnis für Δ<sub>r</sub>G° stimmt noch nicht." + (msgs.length ? " " + msgs.join(" ") : "")));
+      }
+    }
+    if(step && errors) out.unshift(fb("bad", `${errors} ${errors===1?"Zwischenwert ist":"Zwischenwerte sind"} falsch (rot markiert).`));
+    if(step && empty && ok) out.unshift(fb("info", `Fülle auch ${empty===1?"das leere Feld":"die "+empty+" leeren Felder"} aus. In diesem Modus wird jeder Zwischenschritt geprüft.`));
+    if(errors || (gv != null && !ok)) task.wrong = true;
+    Object.assign(task.marks, marks);
+    const passed = ok && errors === 0 && !(step && empty);
+    finishCheck(3, out, passed, `Schritt 3 ist richtig: Δ<sub>r</sub>G° = ${fmt(s.H.dr)} kJ/mol − (${fmt(s.TS)} kJ/mol) = ${fmt(s.dG)} kJ/mol. Ordne die Reaktion jetzt ein.`);
+  }
+
+  function checkClass(){
+    const s = task.sol, out = [];
+    const right = s.dG < 0 ? "exer" : "ender";
+    let passed = false;
+    if(!task.cls[4]) out.push(fb("info","Wähle exergonisch oder endergonisch aus."));
+    else if(task.cls[4] !== right){
+      task.wrong = true;
+      out.push(fb("bad", `Das passt nicht zum Vorzeichen: Δ<sub>r</sub>G° ${s.dG<0?"&lt;":"&gt;"} 0 bedeutet ${right==="exer"?"exergonisch":"endergonisch"}.` + (s.H.dr<0 && right==="ender" || s.H.dr>0 && right==="exer" ? " Entscheidend ist Δ<sub>r</sub>G°, nicht Δ<sub>r</sub>H°: exotherm heißt nicht automatisch exergonisch." : "")));
+    } else passed = true;
+    const word = right==="exer" ? "exergonisch" : "endergonisch";
+    const drive = s.dG<0 ? (s.H.dr<0 && s.S.dr<0 ? " Der Enthalpieterm überwiegt den ungünstigen Entropieterm." : s.H.dr>0 && s.S.dr>0 ? " Der Entropieterm überwiegt den ungünstigen Enthalpieterm, die Reaktion ist entropiegetrieben." : "")
+                         : (s.H.dr<0 && s.S.dr<0 ? " Bei dieser Temperatur überwiegt der ungünstige Entropieterm." : s.H.dr>0 && s.S.dr>0 ? " Bei dieser Temperatur überwiegt der ungünstige Enthalpieterm." : "");
+    finishCheck(4, out, passed, `Richtig! Δ<sub>r</sub>G° = ${fmt(s.dG)} kJ/mol bei ${task.theta} °C: Die Reaktion ist ${word} und läuft unter diesen Bedingungen ${right==="exer"?"freiwillig":"nicht freiwillig"} ab.${drive}`);
+  }
+
+  function checkTi(){
+    const s = task.sol, step = mode === "step";
+    const marks = {}, out = [];
+    let errors = 0, empty = 0;
+    const tol = Math.max(2, Math.abs(s.Ti)*0.006);
+    if(step){
+      const sk = parseNum(task.vals.TSk);
+      if(sk == null) empty++;
+      else {
+        marks.TSk = skVariants(s).some(d=>near(sk, d, 0.0006));
+        if(!marks.TSk){ errors++; out.push(fb("bad", near(sk, s.S.dr, 0.6) ? "Δ<sub>r</sub>S° steht noch in J/(mol·K). Teile durch 1000, um kJ/(mol·K) zu erhalten." : near(sk,-s.dSk,0.0006) ? "Beim umgerechneten Δ<sub>r</sub>S° stimmt das Vorzeichen nicht." : "Die Umrechnung von Δ<sub>r</sub>S° stimmt nicht: 1 J = 0,001 kJ.")); }
+      }
+    }
+    const tv = parseNum(task.vals.TT);
+    let ok = false;
+    if(tv == null) out.push(fb("info","Trage die Grenztemperatur T in Kelvin ein."));
+    else if(isNaN(tv)){ marks.TT = false; out.push(fb("bad","Die Temperatur ist keine gültige Zahl. Beispiel für eine richtige Eingabe: 1110")); }
+    else {
+      ok = skVariants(s).some(d=>{ const t = s.H.dr/d; return near(tv, t, Math.max(2, Math.abs(t)*0.006)); });
+      marks.TT = ok;
+      if(!ok){
+        let m = "Die Grenztemperatur stimmt noch nicht.";
+        const raw = s.H.dr / s.S.dr;
+        if(near(tv, raw, Math.max(0.02, Math.abs(raw)*0.01))) m += " Δ<sub>r</sub>S° wurde nicht in kJ/(mol·K) umgerechnet, das Ergebnis ist deshalb 1000-mal zu klein.";
+        else if(near(tv, -s.Ti, tol)) m += " Eine Temperatur in Kelvin kann nicht negativ sein. Δ<sub>r</sub>H° und Δ<sub>r</sub>S° haben hier dasselbe Vorzeichen.";
+        else if(near(tv, s.thetaI, tol)) m += " Das ist bereits der Wert in °C. Im Ergebnisfeld ist T in Kelvin gefragt.";
+        else if(near(tv, s.dSk/s.H.dr, Math.abs(s.dSk/s.H.dr)*0.02) || near(tv, s.S.dr/s.H.dr, Math.abs(s.S.dr/s.H.dr)*0.02)) m += " Bruch umgedreht: T = Δ<sub>r</sub>H° / Δ<sub>r</sub>S°, nicht umgekehrt.";
+        else m += " Ansatz: Δ<sub>r</sub>G° = 0 setzen und nach T auflösen.";
+        out.push(fb("bad", m));
+      }
+    }
+    if(step){
+      const cv = parseNum(task.vals.TC);
+      if(cv == null) empty++;
+      else {
+        marks.TC = skVariants(s).some(d=>{ const t = s.H.dr/d, tl = Math.max(2, Math.abs(t)*0.006); return near(cv, t - 273.15, tl) || near(cv, t - 273, tl); });
+        if(!marks.TC){
+          errors++;
+          out.push(fb("bad", near(cv, s.Ti, tol) ? "Rechne die Grenztemperatur noch in °C um: ϑ = T − 273,15." : near(cv, s.Ti + 273.15, tol) ? "Von Kelvin nach °C wird 273,15 abgezogen, nicht addiert." : "Die Temperatur in °C stimmt nicht: ϑ = T − 273,15."));
+        }
+      }
+    }
+    if(step && errors) out.unshift(fb("bad", `${errors} ${errors===1?"Zwischenwert ist":"Zwischenwerte sind"} falsch (rot markiert).`));
+    if(step && empty && ok) out.unshift(fb("info", `Fülle auch ${empty===1?"das leere Feld":"die "+empty+" leeren Felder"} aus. In diesem Modus wird jeder Zwischenschritt geprüft.`));
+    if(errors || (tv != null && !ok)) task.wrong = true;
+    Object.assign(task.marks, marks);
+    const passed = ok && errors === 0 && !(step && empty);
+    finishCheck(3, out, passed, `Schritt 3 ist richtig: T = ${fmt(s.H.dr)} kJ/mol / (${fmt(s.dSk,4)} kJ/(mol·K)) ≈ ${fmt(s.Ti,0)} K, das sind etwa ${fmt(s.thetaI,0)} °C. Bestimme jetzt den exergonischen Temperaturbereich.`);
+  }
+
+  function checkRange(){
+    const s = task.sol, out = [];
+    const right = s.H.dr > 0 ? "oben" : "unten";
+    let passed = false;
+    if(!task.cls[4]) out.push(fb("info","Wähle oberhalb oder unterhalb aus."));
+    else if(task.cls[4] !== right){
+      task.wrong = true;
+      out.push(fb("bad", right === "oben"
+        ? "Noch nicht. Die Reaktion ist endotherm, die Entropie nimmt aber zu. Der Term −T · Δ<sub>r</sub>S° ist negativ und wird mit steigender Temperatur immer stärker negativ. Erst bei hohen Temperaturen überwiegt er das positive Δ<sub>r</sub>H°."
+        : "Noch nicht. Die Reaktion ist exotherm, die Entropie nimmt aber ab. Der Term −T · Δ<sub>r</sub>S° ist positiv und wächst mit der Temperatur. Bei hohen Temperaturen überwiegt er das negative Δ<sub>r</sub>H°."));
+    } else passed = true;
+    const at25 = s.dG < 0 ? "exergonisch" : "endergonisch";
+    const msg = right === "oben"
+      ? `Richtig! Oberhalb von etwa ${fmt(s.Ti,0)} K (${fmt(s.thetaI,0)} °C) läuft die Reaktion exergonisch ab, darunter ist sie endergonisch. Bei 25 °C ist sie ${at25}.`
+      : `Richtig! Unterhalb von etwa ${fmt(s.Ti,0)} K (${fmt(s.thetaI,0)} °C) läuft die Reaktion exergonisch ab, darüber ist sie endergonisch. Bei 25 °C ist sie ${at25}.`;
+    finishCheck(4, out, passed, msg);
+  }
+
+  function checkStep(n){
+    if(!task || task.done || task.step !== n) return;
+    if(n <= 2) checkSum(n);
+    else if(n === 3) (task.type === "T" ? checkTi : checkG)();
+    else (task.type === "T" ? checkRange : checkClass)();
+  }
+
+  function completeTask(){
+    task.done = true;
+    stats.solved++;
+    const firstTry = !task.wrong && task.hintsUsed === 0 && !task.helpUsed;
+    if(firstTry) stats.first++;
+    stats.streak++;
+    logHistory(task, firstTry ? "first" : ((task.hintsUsed>0 || task.helpUsed) ? "help" : "ok"));
+    renderWay(); drawDiagram();
+  }
+
+  // ---------- Tipps ----------
+  function hint(){
+    if(!task || task.done) return;
+    task.touched = true;
+    const n = task.step, r = task.r, s = task.sol;
+    const all = [...r.e, ...r.p];
+    const els = [...new Set(all.filter(([nu,k])=>S[k].el).map(([nu,k])=>k))];
+    const water = all.filter(([nu,k])=>k.startsWith("H2O_"));
+    let list;
+    if(n === 1) list = [
+      "Satz von Hess: Δ<sub>r</sub>H° = Σ ν · Δ<sub>f</sub>H°(Produkte) − Σ ν · Δ<sub>f</sub>H°(Edukte).",
+      els.length ? `Elemente in ihrer stabilsten Form haben Δ<sub>f</sub>H° = 0 kJ/mol. In dieser Reaktion: ${els.map(k=>fHTML(S[k].f)).join(", ")}.` : "In dieser Reaktion kommt kein Element vor. Jeder Stoff hat einen eigenen Tabellenwert.",
+      water.length ? "Aggregatzustand beachten: Hier wird " + water.map(([nu,k])=>spHTML(k)).join(" und ") + " gebraucht." : "Jeden Tabellenwert mit dem stöchiometrischen Faktor aus der Reaktionsgleichung multiplizieren.",
+      `Zwischenergebnis: Σ ν · Δ<sub>f</sub>H°(Edukte) = ${fmt(s.H.se)} kJ/mol.`,
+      `Zwischenergebnis: Σ ν · Δ<sub>f</sub>H°(Produkte) = ${fmt(s.H.sp)} kJ/mol.`
+    ];
+    else if(n === 2){
+      const gl = gasMoles(r.e), gr = gasMoles(r.p);
+      list = [
+        "Die Rechnung läuft genauso wie bei der Enthalpie: Δ<sub>r</sub>S° = Σ ν · S°(Produkte) − Σ ν · S°(Edukte).",
+        els.length ? `Achtung: Elemente haben eine Standardentropie größer als null. In dieser Reaktion: ${els.map(k=>fHTML(S[k].f)+" mit "+fmt(S[k].S0)+" J/(mol·K)").join(", ")}.` : "In dieser Reaktion kommt kein Element vor. Achte auf die Einheit J/(mol·K).",
+        `Faustregel zur Kontrolle: Gase haben eine viel größere Entropie als Feststoffe und Flüssigkeiten. Links stehen ${String(gl).replace(".",",")} mol Gas, rechts ${String(gr).replace(".",",")} mol Gas.` + (gl!==gr ? ` Die Entropie sollte also eher ${gr>gl?"zunehmen":"abnehmen"}.` : ""),
+        `Zwischenergebnis: Σ ν · S°(Edukte) = ${fmt(s.S.se)} J/(mol·K).`,
+        `Zwischenergebnis: Σ ν · S°(Produkte) = ${fmt(s.S.sp)} J/(mol·K).`
+      ];
+    }
+    else if(n === 3 && task.type === "T") list = [
+      "Ansatz: An der Grenztemperatur ist Δ<sub>r</sub>G° = 0. Aus 0 = Δ<sub>r</sub>H° − T · Δ<sub>r</sub>S° folgt T = Δ<sub>r</sub>H° / Δ<sub>r</sub>S°.",
+      `Einheiten angleichen: ${fmt(s.S.dr)} J/(mol·K) = ${fmt(s.dSk,4)} kJ/(mol·K).`,
+      `Zwischenergebnis: T = ${fmt(s.H.dr)} kJ/mol / (${fmt(s.dSk,4)} kJ/(mol·K)) ≈ ${fmt(s.Ti,0)} K.`,
+      "Umrechnung in °C: ϑ = T − 273,15."
+    ];
+    else if(n === 4 && task.type === "T") list = [
+      "Überlege, wie sich der Entropieterm −T · Δ<sub>r</sub>S° verändert, wenn die Temperatur steigt.",
+      s.S.dr > 0 ? "Δ<sub>r</sub>S° &gt; 0: Der Term −T · Δ<sub>r</sub>S° ist negativ und wird mit steigender Temperatur immer stärker negativ." : "Δ<sub>r</sub>S° &lt; 0: Der Term −T · Δ<sub>r</sub>S° ist positiv und wird mit steigender Temperatur immer größer.",
+      `Probe bei 25 °C: Δ<sub>r</sub>G° = ${fmt(s.H.dr)} kJ/mol − 298,15 K · (${fmt(s.dSk,4)} kJ/(mol·K)) = ${fmt(solve(task.r,25).dG)} kJ/mol.`
+    ];
+    else if(n === 3) list = [
+      "Gibbs-Helmholtz-Gleichung: Δ<sub>r</sub>G° = Δ<sub>r</sub>H° − T · Δ<sub>r</sub>S°.",
+      `Die Temperatur wird in Kelvin eingesetzt: T = ${task.theta} + 273,15 = ${fmt(s.T,2)} K.`,
+      `Einheiten angleichen: Δ<sub>r</sub>H° steht in kJ/mol, Δ<sub>r</sub>S° in J/(mol·K). Also Δ<sub>r</sub>S° durch 1000 teilen: ${fmt(s.S.dr)} J/(mol·K) = ${fmt(s.dSk,4)} kJ/(mol·K).`,
+      `Zwischenergebnis: T · Δ<sub>r</sub>S° = ${fmt(s.T,2)} K · (${fmt(s.dSk,4)} kJ/(mol·K)) = ${fmt(s.TS)} kJ/mol.`
+    ];
+    else list = [
+      "Δ<sub>r</sub>G° &lt; 0: exergonisch, die Reaktion kann freiwillig ablaufen. Δ<sub>r</sub>G° &gt; 0: endergonisch.",
+      "Nicht verwechseln: exotherm/endotherm bezieht sich auf Δ<sub>r</sub>H°, exergonisch/endergonisch auf Δ<sub>r</sub>G°."
+    ];
+    const box = $("fb"+n);
+    if(task.hints[n] >= list.length){
+      task.fbs[n] = (task.fbs[n]||"") + fb("info","Keine weiteren Tipps zu diesem Schritt. Mit „Lösung zeigen“ wird die vollständige Rechnung eingeblendet.");
+    } else {
+      task.fbs[n] = (task.fbs[n]||"") + fb("hint", `Tipp ${task.hints[n]+1}: ${list[task.hints[n]]}`);
+      task.hints[n]++; task.hintsUsed++;
+    }
+    if(box) box.innerHTML = task.fbs[n];
+  }
+
+  // ---------- Lösung zeigen ----------
+  function showSolution(){
+    if(!task || task.done) return;
+    task.touched = true;
+    const s = task.sol;
+    ["H","S"].forEach(K=>{
+      task.rows.forEach((row,i)=>{
+        task.vals[K+"t"+i] = fmt(VAL[K](row.k));
+        task.vals[K+"p"+i] = fmt(row.nu*VAL[K](row.k));
+      });
+      task.vals[K+"SP"] = fmt(s[K].sp); task.vals[K+"SE"] = fmt(s[K].se); task.vals[K+"R"] = fmt(s[K].dr);
+    });
+    task.vals.GT = fmt(s.T,2); task.vals.GSk = fmt(s.dSk,4); task.vals.GTS = fmt(s.TS); task.vals.GR = fmt(s.dG);
+    task.vals.TSk = fmt(s.dSk,4); task.vals.TT = fmt(s.Ti,0); task.vals.TC = fmt(s.thetaI,0);
+    task.cls = {1: s.H.dr<0?"exo":"endo", 2: s.S.dr>0?"zu":"ab", 4: task.type==="T" ? (s.H.dr>0?"oben":"unten") : (s.dG<0?"exer":"ender")};
+    task.marks = {}; task.fbs = {4: fb("info","Die Lösung ist eingetragen. Im Tab „Lösungsweg“ steht die vollständige Rechnung.")};
+    task.step = 5; task.done = true; task.shown = true;
+    stats.shown++; stats.streak = 0;
+    logHistory(task, "shown");
+    renderTask(); renderWay(); drawDiagram(); renderStats();
+    activateTab("way");
+  }
+
+  // ---------- Lösungsweg ----------
+  const IND = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+  function renderWay(){
+    const box = $("wayBox");
+    if(!task || !task.done){
+      box.innerHTML = `<div class="empty-hint">Der vollständige Lösungsweg erscheint, sobald die Aufgabe gelöst oder die Lösung angezeigt wurde.</div>`;
+      return;
+    }
+    const r = task.r, s = task.sol;
+    const term = (arr,K) => arr.map(([nu,k])=>`${nu} · (${fmt(VAL[K](k))})`).join(" + ");
+    const sp = k => fHTML(S[k].f)+(S[k].ch?"<sup>"+S[k].ch+"</sup>":"")+`<span class="c">,${S[k].s}</span>`;
+    const names = (arr,sym) => arr.map(([nu,k])=>`${nu} · ${sym}(${sp(k)})`).join(" + ");
+    const dG = s.dG;
+    let inv = "";
+    if(s.H.dr * s.S.dr > 0){
+      const Ti = s.H.dr / s.dSk;
+      inv = `<br><span class="c">Temperatur, bei der Δ<sub>r</sub>G° = 0 wird:</span> T = Δ<sub>r</sub>H° / Δ<sub>r</sub>S° = ${fmt(s.H.dr)} kJ/mol / (${fmt(s.dSk,4)} kJ/(mol·K)) ≈ <span class="a">${fmt(Ti,0)} K</span> (${fmt(Ti-273.15,0)} °C)<br>` +
+            `<span class="t">${s.H.dr>0 ? "Oberhalb" : "Unterhalb"} dieser Temperatur ist die Reaktion exergonisch.</span>`;
+    } else {
+      inv = `<br><span class="t">${s.H.dr<0 ? "Exotherm und Entropiezunahme: Die Reaktion ist bei jeder Temperatur exergonisch." : "Endotherm und Entropieabnahme: Die Reaktion ist bei jeder Temperatur endergonisch."}</span>`;
+    }
+    const partG = `<span class="c">3. Gibbs-Helmholtz-Gleichung</span>&nbsp;&nbsp;<span class="c">T = ${task.theta} + 273,15 = ${fmt(s.T,2)} K</span><br>
+      Δ<sub>r</sub>G° = Δ<sub>r</sub>H° − T · Δ<sub>r</sub>S°<br>
+      ${IND}= ${fmt(s.H.dr)} kJ/mol − ${fmt(s.T,2)} K · (${fmt(s.dSk,4)} kJ/(mol·K))<br>
+      ${IND}= ${fmt(s.H.dr)} kJ/mol − (${fmt(s.TS)} kJ/mol)<br>
+      ${IND}= <span class="a">${fmt(dG)} kJ/mol</span><br><br>
+      <span class="c">4. Einordnung</span><br>
+      <span class="t">Δ<sub>r</sub>G° ${dG<0?"&lt;":"&gt;"} 0 → die Reaktion ist bei ${task.theta} °C ${dG<0?"exergonisch":"endergonisch"}.</span>${inv}`;
+    const up = s.H.dr > 0;
+    const partT = `<span class="c">3. Grenztemperatur</span><br>
+      Δ<sub>r</sub>G° = Δ<sub>r</sub>H° − T · Δ<sub>r</sub>S° = 0&nbsp;&nbsp;⇒&nbsp;&nbsp;T = Δ<sub>r</sub>H° / Δ<sub>r</sub>S°<br>
+      ${IND}T = ${fmt(s.H.dr)} kJ/mol / (${fmt(s.dSk,4)} kJ/(mol·K))<br>
+      ${IND}T ≈ <span class="a">${fmt(s.Ti,0)} K</span>&nbsp;&nbsp;<span class="c">→ ϑ = ${fmt(s.Ti,0)} − 273,15 ≈ ${fmt(s.thetaI,0)} °C</span><br><br>
+      <span class="c">4. Temperaturbereich</span><br>
+      ${up ? "Δ<sub>r</sub>H° &gt; 0 und Δ<sub>r</sub>S° &gt; 0: Der Entropieterm −T · Δ<sub>r</sub>S° wird mit steigender Temperatur immer stärker negativ." : "Δ<sub>r</sub>H° &lt; 0 und Δ<sub>r</sub>S° &lt; 0: Der Entropieterm −T · Δ<sub>r</sub>S° ist positiv und wächst mit der Temperatur."}<br>
+      <span class="t">→ Die Reaktion läuft ${up ? "oberhalb" : "unterhalb"} von etwa ${fmt(s.Ti,0)} K (${fmt(s.thetaI,0)} °C) exergonisch ab.</span><br>
+      <span class="c">Probe bei 25 °C:</span> Δ<sub>r</sub>G° = ${fmt(s.H.dr)} kJ/mol − 298,15 K · (${fmt(s.dSk,4)} kJ/(mol·K)) = ${fmt(s.dG)} kJ/mol → ${s.dG<0?"exergonisch":"endergonisch"}`;
+    box.innerHTML = `<div class="way">
+      <span class="c">Reaktion:</span> ${eqShort(r)}&nbsp;&nbsp;&nbsp;<span class="c">${task.type === "T" ? "gesucht: Grenztemperatur" : "ϑ = " + task.theta + " °C"}</span><br><br>
+      <span class="c">1. Reaktionsenthalpie</span><br>
+      Δ<sub>r</sub>H° = [${names(r.p,"Δ<sub>f</sub>H°")}] − [${names(r.e,"Δ<sub>f</sub>H°")}]<br>
+      ${IND}= [${term(r.p,"H")}] kJ/mol − [${term(r.e,"H")}] kJ/mol<br>
+      ${IND}= (${fmt(s.H.sp)} kJ/mol) − (${fmt(s.H.se)} kJ/mol) = <span class="a">${fmt(s.H.dr)} kJ/mol</span> <span class="t">→ ${s.H.dr<0?"exotherm":"endotherm"}</span><br><br>
+      <span class="c">2. Reaktionsentropie</span><br>
+      Δ<sub>r</sub>S° = [${names(r.p,"S°")}] − [${names(r.e,"S°")}]<br>
+      ${IND}= [${term(r.p,"S")}] J/(mol·K) − [${term(r.e,"S")}] J/(mol·K)<br>
+      ${IND}= (${fmt(s.S.sp)} J/(mol·K)) − (${fmt(s.S.se)} J/(mol·K)) = <span class="a">${fmt(s.S.dr)} J/(mol·K)</span> = ${fmt(s.dSk,4)} kJ/(mol·K) <span class="t">→ Entropie nimmt ${s.S.dr>0?"zu":"ab"}</span><br><br>
+      ${task.type === "T" ? partT : partG}
+    </div>`;
+  }
+
+  // ---------- ΔG-T-Diagramm ----------
+  const canvas = $("diag"), ctx = canvas.getContext("2d");
+  function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+  function niceStep(raw){ const mag = Math.pow(10, Math.floor(Math.log10(raw))); return [1,2,2.5,5,10].map(m=>m*mag).find(st=>st>=raw) || 10*mag; }
+  function drawDiagram(){
+    const rect = canvas.getBoundingClientRect();
+    if(rect.width < 10) return;
+    const dpr = window.devicePixelRatio || 1, W = rect.width, H = 340;
+    canvas.width = Math.round(W*dpr); canvas.height = Math.round(H*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.fillStyle = css("--screen"); ctx.fillRect(0,0,W,H);
+    const faint = css("--text-faint"), dim = css("--text-dim"), text = css("--text");
+    const amber = css("--amber"), teal = css("--teal"), grid = css("--grid"), danger = css("--danger");
+    const sans = "system-ui, 'Segoe UI', Roboto, sans-serif", mono = "ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace";
+
+    if(!task || !task.done){
+      ctx.fillStyle = faint; ctx.font = "13px " + sans;
+      ctx.fillText("Das Diagramm erscheint, sobald die Aufgabe gelöst ist.", 20, H/2);
+      return;
+    }
+    const s = task.sol;
+    const G = T => s.H.dr - T*s.dSk;
+    let Ti = (s.H.dr*s.S.dr > 0) ? s.H.dr/s.dSk : null;
+    let Tmax = Math.max(1000, s.T*1.35);
+    if(Ti && Ti > 0 && Ti < 3000) Tmax = Math.max(Tmax, Ti*1.35);
+    const tStep = niceStep(Tmax/6);
+    Tmax = Math.ceil(Tmax/tStep)*tStep;
+    const g0 = G(0), g1 = G(Tmax);
+    let lo = Math.min(0, g0, g1), hi = Math.max(0, g0, g1);
+    const span = Math.max(hi - lo, 10);
+    lo -= span*0.1; hi += span*0.1;
+    const padT = 18, padB = 40, padL = 66, padR = 18;
+    const plotH = H - padT - padB, plotW = W - padL - padR;
+    const x = T => padL + T/Tmax*plotW;
+    const y = v => padT + (hi - v)/(hi - lo)*plotH;
+
+    // exergonischer Bereich
+    ctx.fillStyle = "rgba(79,209,197,0.06)";
+    ctx.fillRect(padL, y(0), plotW, padT+plotH - y(0));
+    ctx.fillStyle = "rgba(228,120,91,0.05)";
+    ctx.fillRect(padL, padT, plotW, y(0)-padT);
+
+    // Gitter y
+    const gStep = niceStep((hi-lo)/6);
+    ctx.font = "10.5px " + mono; ctx.textAlign = "right"; ctx.textBaseline = "middle";
+    for(let v = Math.ceil(lo/gStep)*gStep; v <= hi; v += gStep){
+      ctx.strokeStyle = grid; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(padL, y(v)); ctx.lineTo(W-padR, y(v)); ctx.stroke();
+      ctx.fillStyle = faint; ctx.fillText(fmt(v,0), padL-8, y(v));
+    }
+    // Gitter x
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    for(let T = 0; T <= Tmax + 1e-9; T += tStep){
+      ctx.strokeStyle = grid; ctx.beginPath(); ctx.moveTo(x(T), padT); ctx.lineTo(x(T), padT+plotH); ctx.stroke();
+      ctx.fillStyle = faint; ctx.fillText(fmt(T,0), x(T), padT+plotH+6);
+    }
+    ctx.fillStyle = dim; ctx.font = "11px " + sans;
+    ctx.fillText("T in K", padL + plotW/2, padT+plotH+22);
+    ctx.save(); ctx.translate(14, padT+plotH/2); ctx.rotate(-Math.PI/2);
+    ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("ΔrG° in kJ/mol", 0, 0); ctx.restore();
+
+    // Nulllinie
+    ctx.strokeStyle = dim; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.moveTo(padL, y(0)); ctx.lineTo(W-padR, y(0)); ctx.stroke();
+    ctx.font = "11px " + sans; ctx.textAlign = "left";
+    ctx.fillStyle = danger; ctx.textBaseline = "bottom"; ctx.fillText("endergonisch", padL+8, y(0)-5);
+    ctx.fillStyle = teal; ctx.textBaseline = "top"; ctx.fillText("exergonisch", padL+8, y(0)+5);
+
+    // Inversionstemperatur
+    const isT = task.type === "T";
+    if(Ti && Ti > 0 && Ti <= Tmax && !isT){
+      ctx.strokeStyle = faint; ctx.setLineDash([4,4]); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x(Ti), padT); ctx.lineTo(x(Ti), padT+plotH); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = dim; ctx.font = "11px " + mono; ctx.textAlign = "left"; ctx.textBaseline = "top";
+      ctx.fillText("ΔrG° = 0 bei " + fmt(Ti,0) + " K", Math.min(x(Ti)+6, W-padR-150), padT+4);
+    }
+
+    // Gerade
+    ctx.strokeStyle = amber; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(x(0), y(g0)); ctx.lineTo(x(Tmax), y(g1)); ctx.stroke();
+
+    // Punkt der Aufgabe
+    const px = x(isT ? s.Ti : s.T), py = y(isT ? 0 : s.dG);
+    ctx.strokeStyle = text; ctx.setLineDash([2,3]); ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(px, y(0)); ctx.lineTo(px, py); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = isT ? text : (s.dG < 0 ? teal : danger);
+    ctx.beginPath(); ctx.arc(px, py, 5.5, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = css("--screen"); ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.font = "600 12px " + mono; ctx.fillStyle = text; ctx.textBaseline = "middle";
+    const label = isT ? `Grenztemperatur ${fmt(s.Ti,0)} K (${fmt(s.thetaI,0)} °C)` : `${task.theta} °C: ${fmt(s.dG)} kJ/mol`;
+    const tw = ctx.measureText(label).width;
+    const right = px + 10 + tw < W - padR;
+    ctx.textAlign = right ? "left" : "right";
+    const ly = Math.max(padT+10, Math.min(padT+plotH-10, py + (isT ? (s.S.dr > 0 ? -16 : 16) : (s.dG < 0 ? 16 : -16))));
+    ctx.fillText(label, right ? px+10 : px-10, ly);
+  }
+  window.addEventListener("resize", drawDiagram);
+
+  // Höhe der Kopfzeile für die feststehende linke Spalte
+  function setHeaderHeight(){
+    const st = document.documentElement.style;
+    st.setProperty("--hdr", Math.max(0, Math.round(document.querySelector("header").getBoundingClientRect().bottom)) + "px");
+    st.setProperty("--lh", $("libHead").offsetHeight + "px");
+  }
+  window.addEventListener("resize", setHeaderHeight);
+  window.addEventListener("scroll", setHeaderHeight, {passive:true});
+  setHeaderHeight();
+
+  // ---------- Tabs ----------
+  function activateTab(name){
+    document.querySelectorAll(".tabbtn").forEach(x=>x.classList.toggle("active", x.dataset.tab===name));
+    document.querySelectorAll(".tabpanel").forEach(x=>x.classList.toggle("active", x.id==="tab-"+name));
+    if(name==="diag") drawDiagram();
+  }
+  document.querySelectorAll(".tabbtn").forEach(b=> b.addEventListener("click", ()=>activateTab(b.dataset.tab)));
+
+  // ---------- Verlauf & Statistik ----------
+  function logHistory(t, status){
+    const existing = history.find(h=>h.num===t.num);
+    if(existing){ existing.status = status; }
+    else history.push({num:t.num, r:t.r, type:t.type, theta:t.theta, sol:t.sol, status});
+    renderHistory();
+  }
+  function renderHistory(){
+    if(!history.length) return;
+    const label = {first:["gelöst im 1. Versuch","s-first"], ok:["gelöst","s-ok"], help:["mit Hilfen gelöst","s-help"], shown:["Lösung angesehen","s-shown"], open:["abgebrochen","s-open"]};
+    $("histBody").innerHTML = history.slice().reverse().map(h=>{
+      const open = h.status==="open";
+      const s = h.sol, isT = h.type === "T";
+      const pre = isT ? "Grenztemperatur" : h.theta + " °C";
+      const res = open ? "–" : isT ? `T ≈ ${fmt(s.Ti,0)} K` : `Δ<sub>r</sub>G° = ${fmt(s.dG)} kJ/mol`;
+      const cls = open ? "–" : isT ? `exergonisch ${s.H.dr>0?"oberhalb":"unterhalb"}` : (s.dG<0?"exergonisch":"endergonisch");
+      return `<tr><td class="mono">${h.num}</td><td class="mono">${eqShort(h.r)}</td><td class="mono">${pre}</td><td class="mono">${res}</td><td>${cls}</td><td class="${label[h.status][1]}">${label[h.status][0]}</td></tr>`;
+    }).join("");
+  }
+  function renderStats(){
+    $("roSolved").textContent = stats.solved;
+    $("roFirst").textContent = stats.first;
+    $("roStreak").textContent = stats.streak;
+    $("roShown").textContent = stats.shown;
+  }
+
+  // ---------- Buttons ----------
+  $("btnNew").addEventListener("click", ()=>newTask());
+  $("btnHint").addEventListener("click", hint);
+  $("btnSolve").addEventListener("click", showSolution);
+  document.addEventListener("keydown", e=>{
+    if(e.key==="Enter" && e.target.tagName==="INPUT" && e.target.dataset.step && !$("guideBackdrop").classList.contains("open")){
+      e.preventDefault(); checkStep(+e.target.dataset.step);
+    }
+    if(e.key==="Escape") $("guideBackdrop").classList.remove("open");
+  });
+
+  // ---------- Anleitung ----------
+  $("btnGuide").addEventListener("click", e=>{ e.preventDefault(); $("guideBackdrop").classList.add("open"); });
+  $("closeGuide").addEventListener("click", ()=>$("guideBackdrop").classList.remove("open"));
+  $("guideBackdrop").addEventListener("click", e=>{ if(e.target.id==="guideBackdrop") $("guideBackdrop").classList.remove("open"); });
+
+  // ---------- Start: Beispielaufgabe Ammoniaksynthese ----------
+  renderLib();
+  renderReactionSelect();
+  renderStats();
+  newTask(R.findIndex(r=>r.c.startsWith("Ammoniaksynthese")), 25);
+})();
+</script>
+
+
+<script>
+(function(){
+  const bd = document.getElementById("changelogBackdrop");
+  document.getElementById("btnChangelog").addEventListener("click", e=>{ e.preventDefault(); bd.classList.add("open"); });
+  document.getElementById("closeChangelog").addEventListener("click", ()=>bd.classList.remove("open"));
+  bd.addEventListener("click", e=>{ if(e.target===bd) bd.classList.remove("open"); });
+  document.addEventListener("keydown", e=>{ if(e.key==="Escape") bd.classList.remove("open"); });
+})();
+</script>
+</body>
+</html>
