@@ -303,6 +303,44 @@ footer sub{font-size:.75em;}
 ::-webkit-scrollbar-thumb{background:var(--line); border-radius:5px;}
 @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
 
+
+/* Zusammenfassung / Druck */
+.ex-sum-ctl{display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center; margin-bottom:14px;}
+.ex-sum-ctl label{display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text-dim);}
+.ex-sum-ctl input.sumf{width:220px; min-width:0; text-align:left; font-family:inherit;}
+.paper-wrap{overflow-x:auto; padding:4px 0 8px;}
+.paper{background:#fff; color:#111; width:794px; max-width:100%; min-width:640px; padding:40px 46px; border-radius:3px; box-shadow:0 2px 14px rgba(0,0,0,.45);}
+#printRoot{display:none;}
+.sheet{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; font-size:12.5px; line-height:1.45; color:#111; -webkit-print-color-adjust:exact; print-color-adjust:exact;}
+.sheet h1{font-size:19px; margin:0; color:#111;}
+.sheet h2{font-size:13.5px; margin:0 0 6px; color:#111; border-bottom:1.5px solid #222; padding-bottom:2px;}
+.sheet p{margin:0 0 6px;}
+.sheet sub,.sheet sup{font-size:.72em;}
+.sheet .s-kick{font-size:11px; letter-spacing:.8px; text-transform:uppercase; color:#555;}
+.sheet .s-fields{display:flex; gap:22px; margin:14px 0 6px;}
+.sheet .sf{flex:1; display:flex; gap:8px; align-items:flex-end; border-bottom:1px solid #333; padding-bottom:2px;}
+.sheet .sf:last-child{flex:0 0 150px;}
+.sheet .sl{font-size:11px; color:#555;}
+.sheet .sv{font-size:13px; font-weight:600;}
+.sheet .s-sec{margin-top:16px;}
+.sheet .s-keep{break-inside:avoid; page-break-inside:avoid;}
+.sheet .s-eq{font-size:13px;}
+.sheet .s-small{font-size:11px; color:#333;}
+.sheet table.s-tab{width:100%; border-collapse:collapse; font-size:11px; margin:4px 0 6px;}
+.sheet table.s-tab th,.sheet table.s-tab td{border:1px solid #888; padding:3px 4px; text-align:center; white-space:nowrap;}
+.sheet table.s-tab th{background:#eef0f2; font-weight:600;}
+.sheet table.s-tab tr{break-inside:avoid;}
+.sheet .ast{color:#b45309; font-weight:700; margin-left:1px;}
+.sheet .s-img{display:block; width:100%; height:auto; border:1px solid #bbb;}
+.sheet .s-status{border:1px solid #bbb; background:#f6f7f8; padding:8px 10px 4px; border-radius:3px;}
+.sheet .s-status h2{border:none; padding:0; margin-bottom:4px;}
+.sheet .s-foot{margin-top:16px; padding-top:6px; border-top:1px solid #aaa; font-size:10px; color:#555;}
+@media print{
+  @page{size:A4; margin:14mm 14mm 14mm 14mm;}
+  :root, html, body.pr{background:#fff !important; color:#111; color-scheme:light !important;}
+  body.pr > *:not(#printRoot){display:none !important;}
+  body.pr #printRoot{display:block;}
+}
 /* Auswahl Simulation / Übung */
 .mode-sel{display:flex; flex-direction:column; gap:8px;}
 .mode-sel button{
@@ -428,7 +466,7 @@ input.cell.shown{border-color:var(--amber-dim); color:var(--amber);}
       <p>Ist „Bedingungen variieren“ angehakt, lassen sich mit „Erklärungen anzeigen“ unter der Reaktionsgleichung die Definition der Reaktionsgeschwindigkeit, die Stoßtheorie und eine Deutung der gewählten Bedingungen einblenden.</p>
 
       <h3>Übung: Zink + Salzsäure</h3>
-      <p>In der linken Spalte wählst du direkt unter „Grundlagen“, welche Aufgabenart du bearbeitest – die <strong>Simulation</strong> oder die <strong>Übung</strong>; die übrigen Bedienelemente erscheinen erst nach dieser Auswahl. Du kannst jederzeit wechseln. In der Übung nimmst du am Kolbenprober Messwerte zu festen Zeitpunkten auf, berechnest Schritt für Schritt V in Litern, n(H<sub>2</sub>), n(Zn<sup>2+</sup>), c(Zn<sup>2+</sup>), n(H<sup>+</sup>) und c(H<sup>+</sup>), zeichnest das c-t-Diagramm für Zn<sup>2+</sup> und H<sup>+</sup> und bestimmst Durchschnittsgeschwindigkeiten. Jeder Wert wird sofort geprüft; „Tipp“ zeigt eine Beispielrechnung, „Rest ausfüllen“ ergänzt eine Spalte, sobald zwei Werte selbst richtig berechnet sind.</p>
+      <p>In der linken Spalte wählst du direkt unter „Grundlagen“, welche Aufgabenart du bearbeitest – die <strong>Simulation</strong> oder die <strong>Übung</strong>; die übrigen Bedienelemente erscheinen erst nach dieser Auswahl. Du kannst jederzeit wechseln. In der Übung nimmst du am Kolbenprober Messwerte zu festen Zeitpunkten auf, berechnest Schritt für Schritt V in Litern, n(H<sub>2</sub>), n(Zn<sup>2+</sup>), c(Zn<sup>2+</sup>), n(H<sup>+</sup>) und c(H<sup>+</sup>), zeichnest das c-t-Diagramm für Zn<sup>2+</sup> und H<sup>+</sup> und bestimmst Durchschnittsgeschwindigkeiten. Jeder Wert wird sofort geprüft; „Tipp“ zeigt eine Beispielrechnung, „Rest ausfüllen“ ergänzt eine Spalte, sobald zwei Werte selbst richtig berechnet sind. Im letzten Schritt entsteht eine <strong>Zusammenfassung als PDF</strong> (mit Name und Kurs, die nicht gespeichert werden). Mit „Zwischenstand speichern“ lassen sich alle Eingaben jederzeit als Datei auf dem Gerät sichern und mit „Zwischenstand laden“ wieder einlesen; dabei werden keine Daten ins Internet übertragen.</p>
 
       <h3>Grundlagen</h3>
       <p>Der Knopf <strong>Grundlagen</strong> in der linken Spalte klappt neun Themen auf – von der Definition der Reaktionsgeschwindigkeit über die Stoßtheorie bis zum Katalysator. Mit den Pfeiltasten oder den Knöpfen unten blätterst du weiter.</p>
@@ -470,7 +508,7 @@ input.cell.shown{border-color:var(--amber-dim); color:var(--amber);}
         <li>Versuchsaufbau mit Kolbenprober bzw. „verschwindendem Kreuz“ und schematische <strong>Teilchenebene</strong> mit wirksamen Zusammenstößen.</li>
         <li>Erklärungen zu Reaktionsgeschwindigkeit, Stoßtheorie und Einflussfaktoren zuschaltbar, sobald „Bedingungen variieren“ gewählt ist.</li>
         <li>Messreihen vergleichen, Durchschnitts- und Momentangeschwindigkeit, Messwerttabelle mit CSV-Export, Temperaturabhängigkeit (RGT-Regel, Arrhenius-Darstellung).</li>
-        <li><strong>Übung „Zink + Salzsäure“</strong>: Messwerte am Kolbenprober zu festen Zeitpunkten ablesen (mit Lupe), Protokoll Schritt für Schritt berechnen (V in L, n(H<sub>2</sub>), n(Zn<sup>2+</sup>), c(Zn<sup>2+</sup>), n(H<sup>+</sup>), c(H<sup>+</sup>)), c-t-Diagramm für Zn<sup>2+</sup> und H<sup>+</sup> in zwei Farben mit dem Stift zeichnen („Punkte löschen“ für einzelne Punkte), Durchschnittsgeschwindigkeiten berechnen.</li>
+        <li><strong>Übung „Zink + Salzsäure“</strong>: Messwerte am Kolbenprober zu festen Zeitpunkten ablesen (mit Lupe), Protokoll Schritt für Schritt berechnen (V in L, n(H<sub>2</sub>), n(Zn<sup>2+</sup>), c(Zn<sup>2+</sup>), n(H<sup>+</sup>), c(H<sup>+</sup>)), c-t-Diagramm für Zn<sup>2+</sup> und H<sup>+</sup> in zwei Farben mit dem Stift zeichnen („Punkte löschen“ für einzelne Punkte), Durchschnittsgeschwindigkeiten berechnen, Zusammenfassung als PDF; Zwischenstand als Datei speichern und wieder laden.</li>
         <li>Auswahl <strong>Simulation oder Übung</strong> in der linken Spalte direkt unter „Grundlagen“; alle weiteren Inhalte erscheinen erst nach der Auswahl.</li>
         <li><strong>Rubrik „Grundlagen“</strong> (über den Knopf „Grundlagen“ in der linken Spalte aufklappbar) mit neun Themen, Grafiken und Erklärtext. Bedienbar mit iPad und Stift.</li>
       </ul>
@@ -718,7 +756,13 @@ input.cell.shown{border-color:var(--amber-dim); color:var(--amber);}
     <section class="block">
       <h2>Arbeitsschritte</h2>
       <div class="basics-list" id="exSteps"></div>
-      <button class="btn ghost" id="exRestart" style="margin-top:14px">Übung neu beginnen</button>
+      <div class="btn-row" style="margin-top:14px">
+        <button class="btn ghost" id="exSave">Zwischenstand speichern</button>
+        <button class="btn ghost" id="exLoad">Zwischenstand laden</button>
+      </div>
+      <input type="file" id="exFile" accept=".json,application/json" hidden>
+      <p class="note">Speichert alle Eingaben als Datei auf diesem Gerät (iPad: „Dateien → Downloads“). Es werden keine Daten ins Internet übertragen.</p>
+      <button class="btn ghost" id="exRestart" style="margin-top:6px">Übung neu beginnen</button>
     </section>
   </div>
 
@@ -762,6 +806,15 @@ input.cell.shown{border-color:var(--amber-dim); color:var(--amber);}
     </div>
 
     <div class="table-wrap" id="exRates" style="margin-top:16px"><table class="ex-tab" id="exRateTable"></table></div>
+    <div id="exSummary" style="margin-top:16px" hidden>
+      <div class="ex-sum-ctl" id="exSumCtl">
+        <label>Name <input class="cell sumf" id="exSumName" autocomplete="off" maxlength="60" placeholder="Vor- und Nachname"></label>
+        <label>Kurs <input class="cell sumf" id="exSumKurs" autocomplete="off" maxlength="40" placeholder="z. B. Ch 12"></label>
+        <button class="btn primary" id="exPrint">Protokoll als PDF</button>
+        <button class="btn ghost" id="exSave2">Zwischenstand speichern</button>
+      </div>
+      <div class="paper-wrap"><div class="paper" id="exPaper"></div></div>
+    </div>
     <div class="table-wrap" id="exTableWrap" style="margin-top:16px"><table class="ex-tab" id="exTable"></table></div>
 
     <div id="exCtlWrap">
@@ -2179,13 +2232,17 @@ const STEPS=[
     <p>Die <strong>Durchschnittsgeschwindigkeit</strong> v̄ gibt an, wie stark sich eine Konzentration in einem Zeitraum im Mittel pro Sekunde ändert. Nimm die Konzentrationen aus dem Protokoll.</p>
     <div class="formula-box">v̄(Zn<sup>2+</sup>) = ${fr("Δc(Zn<sup>2+</sup>)","Δt")} = ${fr("c<sub>2</sub>(Zn<sup>2+</sup>) − c<sub>1</sub>(Zn<sup>2+</sup>)","t<sub>2</sub> − t<sub>1</sub>")} &nbsp;&nbsp;&nbsp;&nbsp; v̄(H<sup>+</sup>) = −${fr("Δc(H<sup>+</sup>)","Δt")} = −${fr("c<sub>2</sub>(H<sup>+</sup>) − c<sub>1</sub>(H<sup>+</sup>)","t<sub>2</sub> − t<sub>1</sub>")}</div>
     <p><strong>So gehst du vor:</strong> 1. Berechne die Konzentrationsänderung Δc = c<sub>2</sub> − c<sub>1</sub> im Zeitraum. 2. <strong>Teile das Ergebnis durch die Anzahl der Sekunden des Zeitraums</strong>, Δt = t<sub>2</sub> − t<sub>1</sub> (z. B. für 0 s – 30 s durch 30 s, für 120 s – 180 s durch 60 s). Erst dadurch erhältst du die Änderung <em>pro Sekunde</em>.</p>
-    <p>c(H<sup>+</sup>) nimmt ab, Δc(H<sup>+</sup>) ist also negativ – das Minuszeichen sorgt dafür, dass die Geschwindigkeit positiv ist. Einheit: mol/(L·s). Runde auf drei gültige Ziffern (z. B. <span class="mono">4,77·10^-4</span>).</p>`}
+    <p>c(H<sup>+</sup>) nimmt ab, Δc(H<sup>+</sup>) ist also negativ – das Minuszeichen sorgt dafür, dass die Geschwindigkeit positiv ist. Einheit: mol/(L·s). Runde auf drei gültige Ziffern (z. B. <span class="mono">4,77·10^-4</span>).</p>`},
+  {t:"Zusammenfassung als PDF", html:()=>`
+    <p>Hier siehst du dein <strong>Protokoll</strong> mit Messwerten, Berechnungen, c-t-Diagramm und Durchschnittsgeschwindigkeiten. Trage Name und Kurs ein und tippe auf <strong>„Protokoll als PDF“</strong>.</p>
+    <p><strong>iPad:</strong> Im Druckdialog oben auf das Teilen-Symbol tippen und „In Dateien sichern“ wählen. <strong>Computer:</strong> Als Drucker „Als PDF speichern“ bzw. „Microsoft Print to PDF“ wählen.</p>
+    <p>Name und Kurs erscheinen nur im PDF und werden nicht gespeichert. Mit „Zwischenstand speichern“ sicherst du zusätzlich alle Eingaben als Datei, um später weiterzuarbeiten.</p>`}
 ];
 
 let EX;
 const exBubbles=[]; let exBubAcc=0;
 function exReset(){
-  EX={step:0, maxStep:0, done:{}, val:{}, st:{}, n0:"", n0st:"", n0ok:false,
+  EX={step:0, maxStep:0, done:{}, val:{}, st:{}, n0:"", n0st:"", n0ok:false, name:"", kurs:"",
       m:{t:0, running:false, speed:1, next:1, waiting:false, tries:0, started:false},
       pts:{zn:[],h:[]}, ptSt:{zn:[],h:[]}, series:"zn", strokes:[], drawing:null, plotMode:"pts",
       rv:{zn:EXI.map(()=>""), h:EXI.map(()=>"")}, rs:{zn:EXI.map(()=>""), h:EXI.map(()=>"")},
@@ -2206,8 +2263,8 @@ function completeStep(s,msg){
 function renderEx(){
   const s=EX.step;
   const b=$("statusBadge");
-  b.className="status"+(EX.done[STEPS.length-1]?" done":" running");
-  $("statusText").textContent=EX.done[STEPS.length-1]?"Übung abgeschlossen":`Übung: Schritt ${s+1} von ${STEPS.length}`;
+  b.className="status"+(EX.done[8]?" done":" running");
+  $("statusText").textContent=EX.done[8]?"Übung abgeschlossen":`Übung: Schritt ${s+1} von ${STEPS.length}`;
   $("exSteps").innerHTML=STEPS.map((st,i)=>`<button type="button" class="basic-item ex-st ${i===s?"cur":""} ${EX.done[i]?"done":""}" data-s="${i}" ${i>EX.maxStep?"disabled":""}><span class="nr">${i+1}</span>${esc(st.t)}<span class="go">${EX.done[i]?"✓":i>EX.maxStep?"🔒":"›"}</span></button>`).join("");
   $("exNum").textContent=`Schritt ${s+1} von ${STEPS.length}`;
   $("exTitle").textContent=STEPS[s].t;
@@ -2216,17 +2273,19 @@ function renderEx(){
   $("exPlot").hidden = s!==7;
   $("exRates").hidden = s!==8;
   $("exTableWrap").hidden = s>8;
+  $("exSummary").hidden = s!==9;
   renderExTable();
   if(s===0){ renderPrompt(); renderExRun(); }
   if(s===7) renderPlotInfo();
   if(s===8) renderRates();
+  if(s===9) renderSummary();
   renderCtl();
-  const anchor = s===0?$("exMeasure"): s===7?$("exPlot"): s===8?$("exRates"): $("exTableWrap");
+  const anchor = s===0?$("exMeasure"): s===7?$("exPlot"): s===8?$("exRates"): s===9?$("exSumCtl"): $("exTableWrap");
   anchor.after($("exCtlWrap"));
   renderFb();
   $("exPrev").disabled = s===0;
   $("exNext").disabled = !(EX.done[s] && s<STEPS.length-1);
-  $("exPos").textContent = EX.done[s] ? (s<STEPS.length-1?"Schritt erledigt – weiter geht’s.":"Alle Schritte erledigt.") : "Schritt noch offen";
+  $("exPos").textContent = s===STEPS.length-1 ? "Letzter Schritt" : EX.done[s] ? "Schritt erledigt – weiter geht’s." : "Schritt noch offen";
 }
 function renderExTable(){
   const s=EX.step;
@@ -2452,13 +2511,28 @@ const AX={
   h: {min:0.86, max:1.00, step:0.02, minor:0.004, col:"#8fb4ff", lab:"c(H⁺) in mol/L",   html:"c(H<sup>+</sup>)",   side:"rechte", key:"cH",  tol:0.004}
 };
 const SER=["zn","h"];
-function pgeo(){ const W=pc.clientWidth, H=pc.clientHeight; return {W,H,pw:W-PX.L-PX.R, ph:H-PX.T-PX.B}; }
-function toPx(t,c,k){ const g=pgeo(), a=AX[k]; return [PX.L+t/PX.xmax*g.pw, PX.T+g.ph-(c-a.min)/(a.max-a.min)*g.ph]; }
-function toData(x,y,k){ const g=pgeo(), a=AX[k]; return [(x-PX.L)/g.pw*PX.xmax, a.min+(PX.T+g.ph-y)/g.ph*(a.max-a.min)]; }
+const PAL_SCREEN={bg:"#0e1113", major:"#2b3a33", minor:"#18211d", tick:"#5f6870", axis:"#9aa2a9", text:"#9aa2a9", zn:"#ffb454", h:"#8fb4ff", ok:"#7fd68a", bad:"#e4785b", status:true};
+const PAL_PRINT ={bg:"#ffffff", major:"#bfc5cb", minor:"#e7eaed", tick:"#444", axis:"#222", text:"#222", zn:"#d9480f", h:"#1d4ed8", status:false};
+function mkGeo(W,H,sc){ const L=PX.L*sc, R=PX.R*sc, T=PX.T*sc, B=PX.B*sc; return {W,H,sc,L,R,T,B,pw:W-L-R,ph:H-T-B}; }
+const gX=(g,t)=>g.L+t/PX.xmax*g.pw;
+const gY=(g,c,k)=>{ const a=AX[k]; return g.T+g.ph-(c-a.min)/(a.max-a.min)*g.ph; };
+function pgeo(){ return mkGeo(pc.clientWidth, pc.clientHeight, 1); }
+function toPx(t,c,k){ const g=pgeo(); return [gX(g,t), gY(g,c,k)]; }
+function toData(x,y,k){ const g=pgeo(), a=AX[k]; return [(x-g.L)/g.pw*PX.xmax, a.min+(g.T+g.ph-y)/g.ph*(a.max-a.min)]; }
 const nearIdx = t => { let b=0; EXT.forEach((x,i)=>{ if(Math.abs(x-t)<Math.abs(EXT[b]-t)) b=i; }); return b; };
-/* Messzeitpunkte, für die in Reihe k noch kein Punkt in der Nähe liegt */
 function missing(k){ return EXT.map((t,i)=>i).filter(i=>!EX.pts[k].some(p=>Math.abs(p.t-EXT[i])<=5)); }
 function serDone(k){ return EX.pts[k].length===EXT.length && EX.ptSt[k].every(x=>x==="ok"); }
+/* Bewertet alle Punkte einer Reihe: jeder Punkt wird dem nächsten Messzeitpunkt zugeordnet */
+function computePtSt(k){
+  const a=AX[k], used=new Set(), res=[], msgs=[];
+  EX.pts[k].forEach(p=>{
+    const i=nearIdx(p.t), tOk=Math.abs(p.t-EXT[i])<=5, cOk=Math.abs(p.c-vNum(a.key,i))<=a.tol, dup=used.has(i);
+    const ok=tOk&&cOk&&!dup; if(ok) used.add(i);
+    res.push(ok?"ok":"bad");
+    if(!ok) msgs.push(!tOk ? `Ein Punkt liegt bei etwa ${Math.round(p.t)} s – dort gibt es keinen Messwert.` : dup ? `Für t = ${EXT[i]} s ist schon ein Punkt gesetzt – ein Punkt ist doppelt.` : `Bei t = ${EXT[i]} s stimmt die Konzentration nicht (getroffen etwa ${f3(p.c)} mol/L, richtig ${esc(EX.val[a.key][i])} mol/L). Achte auf die ${a.side} Achse.`);
+  });
+  return {res, msgs};
+}
 function renderPlotInfo(){
   [...$("plotModeGrp").children].forEach(b=>b.classList.toggle("active", b.dataset.pm===EX.plotMode));
   [...$("plotSerGrp").children].forEach(b=>b.classList.toggle("active", b.dataset.ser===EX.series));
@@ -2506,53 +2580,69 @@ $("strokeClear").addEventListener("click", ()=>{ EX.strokes=EX.strokes.filter(s=
 $("ptCheck").addEventListener("click", ()=>{
   const k=EX.series, a=AX[k], P=EX.pts[k];
   if(!P.length){ setFb([{cls:"hint",html:`Setze zuerst die Punkte für ${a.html}.`}]); return; }
-  const used=new Set(); let bad=0, firstMsg="";
-  P.forEach((p,j)=>{
-    const i=nearIdx(p.t), tOk=Math.abs(p.t-EXT[i])<=5, cOk=Math.abs(p.c-vNum(a.key,i))<=a.tol, dup=used.has(i);
-    const ok=tOk && cOk && !dup;
-    if(ok) used.add(i);
-    EX.ptSt[k][j]=ok?"ok":"bad";
-    if(!ok){ bad++; if(!firstMsg) firstMsg = !tOk ? `Ein Punkt liegt bei etwa ${Math.round(p.t)} s – dort gibt es keinen Messwert.` : dup ? `Für t = ${EXT[i]} s ist schon ein Punkt gesetzt – ein Punkt ist doppelt.` : `Bei t = ${EXT[i]} s stimmt die Konzentration nicht (getroffen etwa ${f3(p.c)} mol/L, richtig ${esc(EX.val[a.key][i])} mol/L). Achte auf die ${a.side} Achse.`; }
-  });
-  const miss=missing(k).length;
-  if(bad) setFb([{cls:"bad",html:`${a.html}: ${bad} Punkt${bad>1?"e sind":" ist"} falsch (rot). ${firstMsg} Lösche falsche Punkte mit „Punkte löschen“ und setze sie neu.`}]);
+  const {res,msgs}=computePtSt(k); EX.ptSt[k]=res;
+  const bad=msgs.length, miss=missing(k).length;
+  if(bad) setFb([{cls:"bad",html:`${a.html}: ${bad} Punkt${bad>1?"e sind":" ist"} falsch (rot). ${msgs[0]} Lösche falsche Punkte mit „Punkte löschen“ und setze sie neu.`}]);
   else if(miss) setFb([{cls:"good",html:`${a.html}: Die ${P.length} gesetzten Punkte stimmen. Es fehlen noch ${miss}.`}]);
   else if(SER.every(serDone)){ completeStep(7,"Alle Punkte beider Reihen stimmen! Zeichne jetzt mit „Kurve zeichnen“ je eine Ausgleichskurve. Beachte: c(H<sup>+</sup>) nimmt doppelt so stark ab, wie c(Zn<sup>2+</sup>) zunimmt – deshalb verlaufen die Kurven spiegelbildlich."); EX.plotMode="draw"; renderEx(); return; }
   else { const o=k==="zn"?"h":"zn"; EX.series=o; setFb([{cls:"good",html:`Alle Punkte für ${a.html} stimmen. Jetzt folgt ${AX[o].html} (${AX[o].side} Achse).`}]); }
   renderPlotInfo();
 });
-function drawExPlot(){
-  const d=fitCanvas(pc), c=pc.getContext("2d"), {W,H,pw,ph}=pgeo(); if(!W) return;
-  c.setTransform(d,0,0,d,0,0); c.fillStyle=C.bg; c.fillRect(0,0,W,H);
-  c.lineWidth=1;
-  for(let t=0;t<=PX.xmax+1e-9;t+=10){ const [x]=toPx(t,0,"zn"); c.strokeStyle=t%30===0?"#2b3a33":"#18211d"; c.beginPath(); c.moveTo(x,PX.T); c.lineTo(x,PX.T+ph); c.stroke(); }
+/* Zeichnet das c-t-Diagramm auf einen beliebigen Kontext (Bildschirm oder Druckbild) */
+function drawCT(c, g, P, erase){
+  const sc=g.sc, MONOf=(s)=>`${s*sc}px ${MONO}`, SANSf=(s)=>`${s*sc}px ${SANS}`;
+  c.fillStyle=P.bg; c.fillRect(0,0,g.W,g.H);
+  c.lineWidth=1*sc;
+  for(let t=0;t<=PX.xmax+1e-9;t+=10){ const x=gX(g,t); c.strokeStyle=t%30===0?P.major:P.minor; c.beginPath(); c.moveTo(x,g.T); c.lineTo(x,g.T+g.ph); c.stroke(); }
   const nMin=Math.round((AX.zn.max-AX.zn.min)/AX.zn.minor);
-  for(let j=0;j<=nMin;j++){ const y=PX.T+ph-j/nMin*ph; c.strokeStyle=j%5===0?"#2b3a33":"#18211d"; c.beginPath(); c.moveTo(PX.L,y); c.lineTo(PX.L+pw,y); c.stroke(); }
-  c.font="10.5px "+MONO; c.textBaseline="top"; c.textAlign="center"; c.fillStyle=C.faint;
-  for(let t=0;t<=PX.xmax;t+=30){ const [x]=toPx(t,0,"zn"); c.fillText(String(t),x,PX.T+ph+6); }
+  for(let j=0;j<=nMin;j++){ const y=g.T+g.ph-j/nMin*g.ph; c.strokeStyle=j%5===0?P.major:P.minor; c.beginPath(); c.moveTo(g.L,y); c.lineTo(g.L+g.pw,y); c.stroke(); }
+  c.font=MONOf(10.5); c.textBaseline="top"; c.textAlign="center"; c.fillStyle=P.tick;
+  for(let t=0;t<=PX.xmax;t+=30) c.fillText(String(t),gX(g,t),g.T+g.ph+6*sc);
   c.textBaseline="middle";
   SER.forEach(k=>{
     const a=AX[k], n=Math.round((a.max-a.min)/a.step);
-    c.fillStyle=a.col; c.textAlign=k==="zn"?"right":"left";
-    for(let j=0;j<=n;j++){ const v=a.min+j*a.step, [,y]=toPx(0,v,k); c.fillText(de(v.toFixed(2)), k==="zn"?PX.L-7:PX.L+pw+7, y); }
+    c.fillStyle=P[k]; c.textAlign=k==="zn"?"right":"left";
+    for(let j=0;j<=n;j++){ const v=a.min+j*a.step; c.fillText(de(v.toFixed(2)), k==="zn"?g.L-7*sc:g.L+g.pw+7*sc, gY(g,v,k)); }
   });
-  c.lineWidth=1.4;
-  c.strokeStyle=AX.zn.col; c.beginPath(); c.moveTo(PX.L,PX.T); c.lineTo(PX.L,PX.T+ph); c.stroke();
-  c.strokeStyle=AX.h.col; c.beginPath(); c.moveTo(PX.L+pw,PX.T); c.lineTo(PX.L+pw,PX.T+ph); c.stroke();
-  c.strokeStyle=C.dim; c.beginPath(); c.moveTo(PX.L,PX.T+ph); c.lineTo(PX.L+pw,PX.T+ph); c.stroke();
-  c.fillStyle=C.dim; c.font="11.5px "+SANS; c.textAlign="center"; c.textBaseline="top"; c.fillText("Zeit t (s)",PX.L+pw/2,PX.T+ph+24);
-  c.save(); c.translate(14,PX.T+ph/2); c.rotate(-Math.PI/2); c.textBaseline="middle"; c.fillStyle=AX.zn.col; c.fillText(AX.zn.lab,0,0); c.restore();
-  c.save(); c.translate(W-12,PX.T+ph/2); c.rotate(Math.PI/2); c.textBaseline="middle"; c.fillStyle=AX.h.col; c.fillText(AX.h.lab,0,0); c.restore();
-  c.lineWidth=2.2; c.lineJoin="round"; c.lineCap="round";
-  EX.strokes.forEach(sk=>{ c.strokeStyle=AX[sk.k].col; c.beginPath(); sk.p.forEach(([t,v],j)=>{ const [x,y]=toPx(t,v,sk.k); j?c.lineTo(x,y):c.moveTo(x,y); }); c.stroke(); });
+  c.lineWidth=1.4*sc;
+  c.strokeStyle=P.zn; c.beginPath(); c.moveTo(g.L,g.T); c.lineTo(g.L,g.T+g.ph); c.stroke();
+  c.strokeStyle=P.h; c.beginPath(); c.moveTo(g.L+g.pw,g.T); c.lineTo(g.L+g.pw,g.T+g.ph); c.stroke();
+  c.strokeStyle=P.axis; c.beginPath(); c.moveTo(g.L,g.T+g.ph); c.lineTo(g.L+g.pw,g.T+g.ph); c.stroke();
+  c.fillStyle=P.text; c.font=SANSf(11.5); c.textAlign="center"; c.textBaseline="top"; c.fillText("Zeit t (s)",g.L+g.pw/2,g.T+g.ph+24*sc);
+  c.save(); c.translate(14*sc,g.T+g.ph/2); c.rotate(-Math.PI/2); c.textBaseline="middle"; c.fillStyle=P.zn; c.fillText(AX.zn.lab,0,0); c.restore();
+  c.save(); c.translate(g.W-12*sc,g.T+g.ph/2); c.rotate(Math.PI/2); c.textBaseline="middle"; c.fillStyle=P.h; c.fillText(AX.h.lab,0,0); c.restore();
+  c.lineWidth=2.2*sc; c.lineJoin="round"; c.lineCap="round";
+  EX.strokes.forEach(sk=>{ c.strokeStyle=P[sk.k]; c.beginPath(); sk.p.forEach(([t,v],j)=>{ const x=gX(g,t), y=gY(g,v,sk.k); j?c.lineTo(x,y):c.moveTo(x,y); }); c.stroke(); });
   SER.forEach(k=>EX.pts[k].forEach((p,i)=>{
-    const [x,y]=toPx(p.t,p.c,k), st=EX.ptSt[k][i];
-    c.strokeStyle= st==="bad" ? C.danger : AX[k].col; c.lineWidth=2.2;
-    if(k==="zn"){ c.beginPath(); c.moveTo(x-5,y-5); c.lineTo(x+5,y+5); c.moveTo(x+5,y-5); c.lineTo(x-5,y+5); c.stroke(); }
-    else { c.beginPath(); c.moveTo(x-6,y); c.lineTo(x+6,y); c.moveTo(x,y-6); c.lineTo(x,y+6); c.stroke(); }
-    if(st==="ok"){ c.strokeStyle="#7fd68a"; c.lineWidth=1.2; c.beginPath(); c.arc(x,y,8,0,Math.PI*2); c.stroke(); }
-    if(EX.plotMode==="erase"){ c.strokeStyle="rgba(228,120,91,.55)"; c.lineWidth=1; c.setLineDash([2,2]); c.beginPath(); c.arc(x,y,11,0,Math.PI*2); c.stroke(); c.setLineDash([]); }
+    const x=gX(g,p.t), y=gY(g,p.c,k), st=EX.ptSt[k][i], s5=5*sc, s6=6*sc;
+    c.strokeStyle= P.status&&st==="bad" ? P.bad : P[k]; c.lineWidth=2.2*sc;
+    c.beginPath();
+    if(k==="zn"){ c.moveTo(x-s5,y-s5); c.lineTo(x+s5,y+s5); c.moveTo(x+s5,y-s5); c.lineTo(x-s5,y+s5); }
+    else { c.moveTo(x-s6,y); c.lineTo(x+s6,y); c.moveTo(x,y-s6); c.lineTo(x,y+s6); }
+    c.stroke();
+    if(P.status && st==="ok"){ c.strokeStyle=P.ok; c.lineWidth=1.2*sc; c.beginPath(); c.arc(x,y,8*sc,0,Math.PI*2); c.stroke(); }
+    if(erase){ c.strokeStyle="rgba(228,120,91,.55)"; c.lineWidth=1; c.setLineDash([2,2]); c.beginPath(); c.arc(x,y,11,0,Math.PI*2); c.stroke(); c.setLineDash([]); }
   }));
+}
+function drawExPlot(){
+  const d=fitCanvas(pc), c=pc.getContext("2d"), g=pgeo(); if(!g.W) return;
+  c.setTransform(d,0,0,d,0,0);
+  drawCT(c, g, PAL_SCREEN, EX.plotMode==="erase");
+}
+/* Druckbild des Diagramms (weißer Hintergrund) als Daten-URL */
+function ctImage(){
+  const W=1500, H=820, cv=document.createElement("canvas"); cv.width=W; cv.height=H;
+  const c=cv.getContext("2d"); drawCT(c, mkGeo(W,H,2), PAL_PRINT, false);
+  // Legende
+  c.font=`22px ${SANS}`; c.textBaseline="middle"; c.textAlign="left";
+  let lx=mkGeo(W,H,2).L+20; const ly=mkGeo(W,H,2).T+26;
+  [["zn","c(Zn²⁺) – linke Achse"],["h","c(H⁺) – rechte Achse"]].forEach(([k,txt])=>{
+    c.fillStyle="#fff"; const w=c.measureText(txt).width; c.fillRect(lx-8,ly-18,w+52,36);
+    c.strokeStyle=PAL_PRINT[k]; c.lineWidth=4; c.beginPath();
+    if(k==="zn"){ c.moveTo(lx,ly-8); c.lineTo(lx+16,ly+8); c.moveTo(lx+16,ly-8); c.lineTo(lx,ly+8); } else { c.moveTo(lx-2,ly); c.lineTo(lx+18,ly); c.moveTo(lx+8,ly-10); c.lineTo(lx+8,ly+10); }
+    c.stroke(); c.fillStyle=PAL_PRINT[k]; c.fillText(txt,lx+28,ly); lx+=w+70;
+  });
+  return cv.toDataURL("image/png");
 }
 
 /* ---------- Schritt 9: Durchschnittsgeschwindigkeit ---------- */
@@ -2587,7 +2677,7 @@ function rateInput(inp){
 }
 function ratesDone(){
   const all=["zn","h"].every(k=>EX.rs[k].every(s=>s==="ok"||s==="shown"));
-  if(all && !EX.done[8]){ completeStep(8,"Alle Durchschnittsgeschwindigkeiten stimmen. Vergleiche: v̄(H<sup>+</sup>) ist immer doppelt so groß wie v̄(Zn<sup>2+</sup>), und beide nehmen im Verlauf der Reaktion ab. Die Übung ist abgeschlossen!"); renderEx(); }
+  if(all && !EX.done[8]){ completeStep(8,"Alle Durchschnittsgeschwindigkeiten stimmen. Vergleiche: v̄(H<sup>+</sup>) ist immer doppelt so groß wie v̄(Zn<sup>2+</sup>), und beide nehmen im Verlauf der Reaktion ab. Weiter mit Schritt 10: Zusammenfassung als PDF."); renderEx(); }
 }
 function rateTip(){
   const [a,b]=EXI[0], dt=EXT[b]-EXT[a];
@@ -2604,6 +2694,184 @@ $("exRateTable").addEventListener("keydown", e=>{
   e.preventDefault(); rateInput(inp);
   const all=[...$("exRateTable").querySelectorAll("input.cell:not([readonly])")]; if(all.length) all[0].focus();
 });
+
+
+/* ---------- Schritt 10: Zusammenfassung als PDF ---------- */
+const pad2=n=>String(n).padStart(2,"0");
+function exCounts(){
+  let own=0, auto=0;
+  COLS.forEach(c=>EXT.forEach((_,i)=>{ if(c.key==="V_ml"&&i===0) return; const s=EX.st[c.key][i]; if(s==="ok") own++; else if(s==="shown") auto++; }));
+  ["zn","h"].forEach(k=>EX.rs[k].forEach(s=>{ if(s==="ok") own++; else if(s==="shown") auto++; }));
+  const ptsOk=SER.reduce((n,k)=>n+EX.ptSt[k].filter(s=>s==="ok").length,0);
+  const stepsDone=Array.from({length:9},(_,i)=>i).filter(i=>EX.done[i]).length;
+  return {own, auto, ptsOk, stepsDone};
+}
+function sumHTML(){
+  const d=new Date(), date=`${pad2(d.getDate())}.${pad2(d.getMonth()+1)}.${d.getFullYear()}`;
+  const fld=(lab,v)=>`<div class="sf"><span class="sl">${lab}</span><span class="sv">${v?esc(v):"&nbsp;"}</span></div>`;
+  const cell=(k,i)=>{ const v=EX.val[k][i], s=EX.st[k][i]; if(v==="") return "–"; return esc(v)+(s==="shown"?'<span class="ast">*</span>':""); };
+  const rows=EXT.map((t,i)=>`<tr><td><b>${t}</b></td>${COLS.map(c=>`<td>${cell(c.key,i)}</td>`).join("")}</tr>`).join("");
+  const rcell=(k,j)=>{ const v=EX.rv[k][j], s=EX.rs[k][j]; if(v==="") return "–"; return esc(v)+(s==="shown"?'<span class="ast">*</span>':""); };
+  const cnt=exCounts();
+  const url = /^https?:/.test(location.protocol) ? location.host+location.pathname.replace(/\/[^/]*$/,"/") : "chemie.mail-baumgart.de";
+  return `<div class="sheet">
+  <div class="s-head">
+    <div><div class="s-kick">Protokoll</div><h1>Reaktionsgeschwindigkeit: Zink + Salzsäure</h1></div>
+  </div>
+  <div class="s-fields">${fld("Name",EX.name)}${fld("Kurs",EX.kurs)}${fld("Datum",date)}</div>
+
+  <div class="s-sec">
+    <h2>1 Versuch</h2>
+    <p class="s-eq">Zn(s) + 2 HCl(aq) → ZnCl<sub>2</sub>(aq) + H<sub>2</sub>(g) &nbsp;&nbsp;|&nbsp;&nbsp; Zn + 2 H<sup>+</sup> → Zn<sup>2+</sup> + H<sub>2</sub></p>
+    <p>0,20 g Zink (Granalien) reagieren mit 50 mL Salzsäure, c(HCl) = 1 mol/L, bei 25 °C und 1013 hPa. Das Volumen des entstehenden Wasserstoffs wird zu festen Zeitpunkten am Kolbenprober abgelesen.</p>
+  </div>
+
+  <div class="s-sec">
+    <h2>2 Messwerte und Berechnungen</h2>
+    <p class="s-small">V [L] = V [mL] : 1000 &nbsp;·&nbsp; n(H<sub>2</sub>) = V(H<sub>2</sub>) : V<sub>m</sub> mit V<sub>m</sub> = 24,5 L/mol &nbsp;·&nbsp; n(Zn<sup>2+</sup>) = n(H<sub>2</sub>) &nbsp;·&nbsp; c = n : V(Lösung) mit V(Lösung) = 0,050 L &nbsp;·&nbsp; n(H<sup>+</sup>) = n<sub>0</sub>(H<sup>+</sup>) − 2 · n(Zn<sup>2+</sup>) mit n<sub>0</sub>(H<sup>+</sup>) = ${EX.n0?esc(EX.n0):"–"} mol</p>
+    <table class="s-tab">
+      <thead><tr><th>t<br>[s]</th>${COLS.map(c=>`<th>${c.head}</th>`).join("")}</tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>
+
+  <div class="s-sec s-keep">
+    <h2>3 c-t-Diagramm</h2>
+    <img class="s-img" src="${ctImage()}" alt="c-t-Diagramm">
+    <p class="s-small">Zwei y-Achsen: links c(Zn<sup>2+</sup>) von 0 bis 0,07 mol/L, rechts c(H<sup>+</sup>) von 0,86 bis 1,00 mol/L. Punkte und Ausgleichskurven wurden selbst gesetzt bzw. gezeichnet.</p>
+  </div>
+
+  <div class="s-sec s-keep">
+    <h2>4 Durchschnittsgeschwindigkeit</h2>
+    <p class="s-small">v̄(Zn<sup>2+</sup>) = Δc(Zn<sup>2+</sup>) : Δt &nbsp;&nbsp;·&nbsp;&nbsp; v̄(H<sup>+</sup>) = −Δc(H<sup>+</sup>) : Δt &nbsp;&nbsp;(Δc durch die Anzahl der Sekunden des Zeitraums geteilt)</p>
+    <table class="s-tab">
+      <thead><tr><th>Zeitraum</th>${EXI.map(([a,b])=>`<th>${EXT[a]} s – ${EXT[b]} s</th>`).join("")}</tr></thead>
+      <tbody>
+        <tr><td><b>Δt</b></td>${EXI.map(([a,b])=>`<td>${EXT[b]-EXT[a]} s</td>`).join("")}</tr>
+        <tr><td><b>v̄(Zn<sup>2+</sup>)</b> [mol/(L·s)]</td>${EXI.map((_,j)=>`<td>${rcell("zn",j)}</td>`).join("")}</tr>
+        <tr><td><b>v̄(H<sup>+</sup>)</b> [mol/(L·s)]</td>${EXI.map((_,j)=>`<td>${rcell("h",j)}</td>`).join("")}</tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="s-sec s-keep s-status">
+    <h2>Bearbeitungsstand</h2>
+    <p>Abgeschlossene Arbeitsschritte: <b>${cnt.stepsDone} von 9</b> &nbsp;·&nbsp; selbst ermittelte Werte: <b>${cnt.own}</b> &nbsp;·&nbsp; automatisch ergänzte Werte: <b>${cnt.auto}</b> &nbsp;·&nbsp; richtig gesetzte Diagrammpunkte: <b>${cnt.ptsOk} von ${EXT.length*2}</b></p>
+    <p class="s-small"><span class="ast">*</span> automatisch ergänzt („Wert anzeigen“, „Rest ausfüllen“ oder „Lösung zeigen“). Alle anderen Werte wurden selbst eingegeben und von der Simulation als richtig geprüft.</p>
+  </div>
+
+  <div class="s-foot">Erstellt mit der Simulation „Reaktionsgeschwindigkeit“ (Übung Zink + Salzsäure) von Bastian Baumgart · ${esc(url)} · Lizenz: CC BY-NC-SA 4.0</div>
+</div>`;
+}
+let sumTimer=null;
+function renderSummary(){
+  if(document.activeElement!==$("exSumName")) $("exSumName").value=EX.name||"";
+  if(document.activeElement!==$("exSumKurs")) $("exSumKurs").value=EX.kurs||"";
+  $("exPaper").innerHTML=sumHTML();
+}
+["exSumName","exSumKurs"].forEach(id=>$(id).addEventListener("input", ()=>{
+  EX.name=$("exSumName").value.slice(0,60); EX.kurs=$("exSumKurs").value.slice(0,40);
+  clearTimeout(sumTimer); sumTimer=setTimeout(renderSummary,300);
+}));
+function exPrint(){
+  EX.name=$("exSumName").value.slice(0,60); EX.kurs=$("exSumKurs").value.slice(0,40);
+  $("printRoot").innerHTML=sumHTML();
+  document.body.classList.add("pr");
+  setTimeout(()=>window.print(),60);
+}
+$("exPrint").addEventListener("click", exPrint);
+window.addEventListener("afterprint", ()=>{
+  document.body.classList.remove("pr");
+  if(MODE==="ex" && EX.step===9 && !EX.done[9]){ EX.done[9]=true; renderEx(); }
+});
+
+/* ---------- Zwischenstand als Datei speichern / laden ---------- */
+const EX_APP="Reaktionsgeschwindigkeit-Uebung-Zink-Salzsaeure";
+function exSerialize(){
+  return {app:EX_APP, format:1, saved:new Date().toISOString(), step:EX.step,
+    val:EX.val, shown:Object.fromEntries(COLS.map(c=>[c.key, EX.st[c.key].map(s=>s==="shown")])),
+    n0:EX.n0,
+    pts:{zn:EX.pts.zn.map(p=>[+p.t.toFixed(2), +p.c.toFixed(5)]), h:EX.pts.h.map(p=>[+p.t.toFixed(2), +p.c.toFixed(5)])},
+    strokes:EX.strokes.map(s=>({k:s.k, p:s.p.map(([t,c])=>[+t.toFixed(1), +c.toFixed(5)])})),
+    rv:EX.rv, rshown:{zn:EX.rs.zn.map(s=>s==="shown"), h:EX.rs.h.map(s=>s==="shown")}};
+}
+function exSaveFile(){
+  const d=new Date(), name=`Reaktionsgeschwindigkeit_Zwischenstand_${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}_${pad2(d.getHours())}-${pad2(d.getMinutes())}.json`;
+  const blob=new Blob([JSON.stringify(exSerialize())],{type:"application/json"}), a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500);
+  setFb([{cls:"good",html:`Zwischenstand gespeichert als <b>${esc(name)}</b> (auf dem iPad in „Dateien → Downloads“). Name und Kurs werden nicht mitgespeichert.`}]);
+}
+function exLoadObj(o){
+  if(!o || typeof o!=="object" || o.app!==EX_APP) throw new Error("Diese Datei ist kein Zwischenstand dieser Übung.");
+  const keepName=EX.name, keepKurs=EX.kurs;
+  exReset(); EX.name=keepName; EX.kurs=keepKurs;
+  const str=v=>typeof v==="string" ? v.trim().slice(0,30) : "";
+  const num=v=>typeof v==="number" && isFinite(v) ? v : NaN;
+  const arrOf=(o,k)=>o && Array.isArray(o[k]) ? o[k] : [];
+  // Werte übernehmen, Status neu bestimmen
+  COLS.forEach(c=>{ const v=arrOf(o.val,c.key), sh=arrOf(o.shown,c.key); EXT.forEach((_,i)=>{ EX.val[c.key][i]=str(v[i]); EX.st[c.key][i]=(sh[i]===true&&EX.val[c.key][i]!=="")?"shown":""; }); });
+  EX.val.V_ml[0]="0"; EX.st.V_ml[0]="ok";
+  // Messwerte: nur lückenlos und innerhalb der Ablesegenauigkeit
+  let next=1;
+  for(let i=1;i<EXT.length;i++){
+    const x=parseNum(EX.val.V_ml[i]);
+    const ok = EX.st.V_ml[i]==="shown" ? isFinite(x) : (isFinite(x) && Math.abs(x-exVol(EXT[i]))<=1.0);
+    if(ok && next===i){ if(EX.st.V_ml[i]!=="shown") EX.st.V_ml[i]="ok"; next=i+1; }
+    else { EX.val.V_ml[i]=""; EX.st.V_ml[i]=""; }
+  }
+  EX.m.next=next; EX.m.t=EXT[next-1]; EX.m.started=next>1; EX.m.running=false; EX.m.waiting=false;
+  EX.done[0]= next>=EXT.length;
+  EX.n0=str(o.n0); EX.n0ok=Math.abs(parseNum(EX.n0)-N0)<=1e-6; EX.n0st=EX.n0ok?"ok":"";
+  for(let s=1;s<=6;s++){
+    const col=COLBY[s], allowed=EX.done[s-1] && (s!==5||EX.n0ok);
+    EXT.forEach((_,i)=>{
+      if(!allowed){ EX.val[col.key][i]=""; EX.st[col.key][i]=""; return; }
+      if(EX.val[col.key][i]===""){ EX.st[col.key][i]=""; return; }
+      const x=parseNum(EX.val[col.key][i]), e=col.exp(i);
+      if(EX.st[col.key][i]==="shown"){ if(!(isFinite(x)&&col.ok(x,e))){ EX.val[col.key][i]=col.fmt(e); } return; }
+      EX.st[col.key][i]= isFinite(x)&&col.ok(x,e) ? "ok" : "bad";
+    });
+    EX.done[s]= allowed && EX.st[col.key].every(x=>x==="ok"||x==="shown");
+  }
+  // Diagramm
+  if(EX.done[6]){
+    SER.forEach(k=>{ EX.pts[k]=arrOf(o.pts,k).slice(0,EXT.length).map(p=>Array.isArray(p)?{t:num(p[0]),c:num(p[1])}:null).filter(p=>p&&isFinite(p.t)&&isFinite(p.c)); EX.ptSt[k]=computePtSt(k).res; });
+    let total=0;
+    EX.strokes=(Array.isArray(o.strokes)?o.strokes:[]).filter(s=>s&&(s.k==="zn"||s.k==="h")&&Array.isArray(s.p)).map(s=>({k:s.k, p:s.p.filter(q=>Array.isArray(q)&&isFinite(num(q[0]))&&isFinite(num(q[1]))).map(q=>[q[0],q[1]])})).filter(s=>{ total+=s.p.length; return s.p.length && total<=30000; });
+  }
+  EX.done[7]= EX.done[6] && SER.every(serDone);
+  // Durchschnittsgeschwindigkeiten
+  if(EX.done[7]){
+    ["zn","h"].forEach(k=>EXI.forEach((_,j)=>{
+      const v=str(arrOf(o.rv,k)[j]), sh=arrOf(o.rshown,k)[j]===true, e=rateExp(k,j), x=parseNum(v);
+      EX.rv[k][j]=v;
+      if(v===""){ EX.rs[k][j]=""; return; }
+      if(sh){ EX.rs[k][j]="shown"; if(!(isFinite(x)&&Math.abs(x-e)<=0.05*Math.abs(e)+1e-9)) EX.rv[k][j]=f3(e); return; }
+      EX.rs[k][j]= isFinite(x)&&Math.abs(x-e)<=0.05*Math.abs(e)+1e-9 ? "ok" : "bad";
+    }));
+  }
+  EX.done[8]= EX.done[7] && ["zn","h"].every(k=>EX.rs[k].every(s=>s==="ok"||s==="shown"));
+  let ms=0; while(ms<9 && EX.done[ms]) ms++;
+  EX.maxStep=ms;
+  const st=typeof o.step==="number"?Math.round(o.step):0;
+  EX.step=clamp(st,0,EX.maxStep);
+  if(EX.step===7) EX.plotMode = EX.done[7] ? "draw" : "pts";
+  const when = typeof o.saved==="string" && !isNaN(Date.parse(o.saved)) ? (()=>{ const d=new Date(o.saved); return `${pad2(d.getDate())}.${pad2(d.getMonth()+1)}.${d.getFullYear()}, ${pad2(d.getHours())}:${pad2(d.getMinutes())} Uhr`; })() : "";
+  EX.fb=[{cls:"good",html:`Zwischenstand${when?" vom "+when:""} geladen. Alle Werte wurden neu geprüft – weiter mit Schritt ${EX.step+1}.`}];
+  renderEx();
+}
+$("exSave").addEventListener("click", exSaveFile);
+$("exLoad").addEventListener("click", ()=>{ $("exFile").value=""; $("exFile").click(); });
+$("exFile").addEventListener("change", async ()=>{
+  const f=$("exFile").files[0]; if(!f) return;
+  try{
+    if(f.size>2e6) throw new Error("Die Datei ist zu groß für einen Zwischenstand.");
+    const o=JSON.parse(await f.text());
+    exLoadObj(o);
+  }catch(err){ setFb([{cls:"bad",html:"Laden nicht möglich: "+esc(err && err.message && !/JSON|Unexpected|token/i.test(err.message) ? err.message : "Die Datei ist beschädigt oder kein Zwischenstand dieser Übung.")}]); }
+});
+$("exSave2").addEventListener("click", exSaveFile);
 
 /* ---------- Navigation & Modus ---------- */
 function goStep(s){ if(s<0||s>EX.maxStep||s>=STEPS.length) return; EX.step=s; EX.fb=[]; renderEx(); window.scrollTo({top:0,behavior:"smooth"}); }
@@ -2652,5 +2920,6 @@ requestAnimationFrame(frame);
   addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
 })();
 </script>
+<div id="printRoot"></div>
 </body>
 </html>
