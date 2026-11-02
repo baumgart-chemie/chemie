@@ -276,6 +276,54 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
     overflow-y:auto; overscroll-behavior:contain; background:var(--bg);
   }
 }
+
+/* Rubrik Grundlagen */
+.gl-toggle{display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; cursor:pointer; text-align:left;
+  border:1px solid var(--teal-dim); border-radius:4px; background:var(--panel-alt); color:var(--text);
+  font-size:14px; font-weight:600; font-family:inherit; touch-action:manipulation;}
+.gl-toggle:hover{border-color:var(--teal);}
+.gl-toggle:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-toggle .gl-n{font-size:12px; font-weight:400; color:var(--text-faint);}
+.gl-toggle .gl-ch{margin-left:auto; color:var(--teal); font-size:13px;}
+.gl-toggle .gl-ch::after{content:"▸";}
+.gl-toggle[aria-expanded="true"] .gl-ch::after{content:"▾";}
+.gl-panel{margin-top:8px;}
+.gl-list{display:flex; flex-direction:column; gap:6px;}
+.gl-item{display:flex; gap:10px; align-items:center; width:100%; text-align:left; padding:8px 11px; cursor:pointer;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel); color:var(--text);
+  font-size:13px; font-family:inherit; font-weight:500; touch-action:manipulation;}
+.gl-item:hover{border-color:var(--text-faint); background:var(--panel-alt);}
+.gl-item:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-item .nr{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--amber); min-width:14px;}
+.gl-item .go{margin-left:auto; color:var(--text-faint); font-size:12px;}
+.gl-note{font-size:12px; color:var(--text-faint); line-height:1.5; margin:8px 0 0;}
+.modal-box.gl-wide{max-width:900px; width:100%; max-height:88vh; overflow-y:auto;}
+.gl-wide .gl-num{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--text-faint); margin-right:10px;}
+.gl-body p, .gl-body li{font-size:13.5px; line-height:1.6; color:var(--text-dim);}
+.gl-body p{margin:0 0 10px;}
+.gl-body ul, .gl-body ol{margin:0 0 12px; padding-left:22px;}
+.gl-body strong{color:var(--text); font-weight:600;}
+.gl-body sub, .gl-body sup{font-size:.72em;}
+.gl-row{display:flex; flex-wrap:wrap; gap:12px; align-items:stretch; margin:8px 0 14px;}
+.gl-fig{margin:0; flex:1 1 220px; background:var(--screen, #0e1113); border:1px solid var(--line-soft); border-radius:4px; padding:10px 12px 8px;
+  display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:6px; max-width:100%; overflow-x:auto;}
+.gl-fig figcaption{font-size:12px; color:var(--text-dim); text-align:center; line-height:1.45; max-width:420px;}
+.gl-tw{overflow-x:auto; margin:6px 0 12px; border:1px solid var(--line-soft); border-radius:4px;}
+.gl-table{width:100%; border-collapse:collapse; font-size:12.8px;}
+.gl-table th{text-align:left; font-weight:500; color:var(--text-faint); font-size:11.5px; padding:6px 9px; border-bottom:1px solid var(--line); background:var(--panel-alt);}
+.gl-table td{padding:6px 9px; border-bottom:1px solid var(--line-soft); color:var(--text-dim); vertical-align:top;}
+.gl-table tr:last-child td{border-bottom:none;}
+.gl-table td:first-child{color:var(--text);}
+.gl-steps{counter-reset:gls; list-style:none; padding-left:0 !important;}
+.gl-steps li{counter-increment:gls; position:relative; padding-left:30px; margin-bottom:6px;}
+.gl-steps li::before{content:counter(gls); position:absolute; left:0; top:1px; width:20px; height:20px; border-radius:50%; border:1px solid var(--teal-dim);
+  color:var(--teal); font-size:11.5px; display:flex; align-items:center; justify-content:center; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.gl-box{border:1px solid var(--line-soft); border-left:3px solid var(--teal); background:var(--panel-alt); border-radius:3px; padding:9px 12px; margin:8px 0 12px;
+  font-size:13.5px; line-height:1.65; color:var(--text);}
+.gl-box.gl-warn{border-left-color:var(--amber);}
+.gl-box small{color:var(--text-faint); font-size:12px;}
+.gl-nav{display:flex; align-items:center; gap:10px; border-top:1px solid var(--line-soft); padding-top:14px; margin-top:16px;}
+.gl-nav .sp{flex:1; text-align:center; font-size:12px; color:var(--text-faint);}
 </style>
 </head>
 <body>
@@ -335,6 +383,12 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
       <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.3</span><span class="d">01.11.2026</span></div>
+      <ul>
+        <li><strong>Neue Rubrik „Grundlagen“:</strong> Der Knopf „Grundlagen“ oben in der linken Spalte klappt 4 Themen mit Erklärtext und Grafiken zu den fachlichen und methodischen Grundlagen auf. Mit den Knöpfen unten oder den Pfeiltasten blättert man zwischen den Themen.</li>
+        <li><strong>Linke Spalte:</strong> Sie bleibt beim Scrollen der Aufgabe stehen, füllt die Bildschirmhöhe und scrollt als Ganzes in einem einzigen Bereich.</li>
+        <li><strong>Lösungshistorie:</strong> neue Kategorie „mit Hilfen gelöst“ für Aufgaben, die nach einem Tipp richtig gelöst wurden.</li>
+      </ul>
       <div class="vh-ver"><span class="v">V1.2</span><span class="d">28.10.2026</span></div>
       <ul>
         <li><strong>Gerundete Atommassen im PSE:</strong> Ist „gerundet“ gewählt, zeigt auch das Periodensystem die gerundeten Werte (ganze Zahlen; Chlor 36 und Kupfer 64 werden aufgerundet). Bei „eine Nachkommastelle“ bleibt es wie bisher.</li>
@@ -358,6 +412,17 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
 
 <div class="wrap">
   <div class="sidebar">
+
+    <section class="block">
+      <button type="button" class="gl-toggle" id="glToggle" aria-expanded="false" aria-controls="glPanel">
+        <span>Grundlagen</span><span class="gl-n">4 Themen</span><span class="gl-ch" aria-hidden="true"></span>
+      </button>
+      <div class="gl-panel" id="glPanel" hidden>
+        <div class="gl-list" id="glList"></div>
+        <p class="gl-note">Erklärungen mit Grafiken zum Nachlesen – auch zur Besprechung im Unterricht.</p>
+      </div>
+    </section>
+
     <section class="block">
       <h2>Aufgabe</h2>
       <p class="sub-label">Art der Formel</p>
@@ -490,7 +555,7 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
 
 <footer>
   <p class="footer-note">Molare Masse aus der Summenformel: M = Σ (Anzahl · Atommasse). Atommassen gerundet bzw. auf eine Nachkommastelle nach IUPAC; Werte in Klammern gelten für radioaktive Elemente (Massenzahl des langlebigsten Isotops).</p>
-  <p class="footer-credit">Bastian Baumgart · Molare-Masse-Trainer V1.2 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Molare-Masse-Trainer V1.3 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <script>
@@ -1061,6 +1126,58 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
   if(!hdr) return;
   const set = () => document.documentElement.style.setProperty("--hdr", Math.max(0, Math.round(hdr.getBoundingClientRect().bottom)) + "px");
   addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
+})();
+</script>
+
+<div class="modal-backdrop" id="glBackdrop">
+  <div class="modal-box gl-wide" role="dialog" aria-modal="true" aria-labelledby="glTitle">
+    <div class="modal-head">
+      <h2><span class="gl-num" id="glNum"></span><span id="glTitle"></span></h2>
+      <button class="modal-close" id="glClose" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body gl-body" id="glBody"></div>
+    <div class="gl-nav">
+      <button class="btn ghost" id="glPrev">← Vorheriges Thema</button>
+      <span class="sp" id="glPos"></span>
+      <button class="btn" id="glNext">Nächstes Thema →</button>
+    </div>
+  </div>
+</div>
+<script>
+/* Rubrik Grundlagen */
+(function(){
+  const GL = [{"t": "Stoffmenge und Mol", "h": "<p>Atome und Moleküle sind so klein, dass man sie nicht einzeln abzählen kann. Chemiker fassen deshalb eine feste, sehr große Anzahl von Teilchen zur Einheit <strong>1 Mol<\/strong> zusammen – so wie ein Dutzend 12 Stück bedeutet.<\/p> <div class=\"gl-box gl-info\">1 mol enthält <strong>6,022 · 10<sup>23<\/sup> Teilchen<\/strong> (Avogadro-Konstante N<sub>A<\/sub> = 6,022 · 10<sup>23<\/sup> mol<sup>−1<\/sup>).<\/div> <p>Die Größe <strong>Stoffmenge n<\/strong> mit der Einheit mol gibt an, wie viele Teilchen eine Stoffportion enthält. 2 mol Wasser sind also 2 · 6,022 · 10<sup>23<\/sup> Wassermoleküle.<\/p>"}, {"t": "Atommasse und molare Masse", "h": "<p>Die <strong>Atommasse<\/strong> steht im Periodensystem und wird in der atomaren Masseneinheit u angegeben (Wasserstoff ≈ 1 u, Kohlenstoff ≈ 12 u).<\/p> <p>Die <strong>molare Masse M<\/strong> ist die Masse von 1 mol eines Stoffes in g/mol. Der Zahlenwert ist derselbe wie bei der Atom- bzw. Molekülmasse in u:<\/p> <div class=\"gl-tw\"><table class=\"gl-table\"><thead><tr><th>Teilchen<\/th><th>Masse eines Teilchens<\/th><th>molare Masse<\/th><\/tr><\/thead><tbody><tr><td>C-Atom<\/td><td>12,0 u<\/td><td>12,0 g/mol<\/td><\/tr><tr><td>O-Atom<\/td><td>16,0 u<\/td><td>16,0 g/mol<\/td><\/tr><tr><td>H<sub>2<\/sub>O-Molekül<\/td><td>18,0 u<\/td><td>18,0 g/mol<\/td><\/tr><\/tbody><\/table><\/div> <p>So lassen sich Teilchenzahl und Masse verbinden: 18 g Wasser enthalten genau 1 mol, also 6,022 · 10<sup>23<\/sup> Moleküle.<\/p>"}, {"t": "Summenformeln richtig lesen", "h": "<p>Für die molare Masse musst du zuerst zählen, wie viele Atome jedes Elements in der Formel stecken:<\/p> <ul><li>Der <strong>Index<\/strong> gilt für das Symbol direkt davor: H<sub>2<\/sub>SO<sub>4<\/sub> → 2 H, 1 S, 4 O.<\/li> <li>Ein Index hinter einer <strong>Klammer<\/strong> gilt für alles in der Klammer: Ca(OH)<sub>2<\/sub> → 1 Ca, 2 O, 2 H; Al<sub>2<\/sub>(SO<sub>4<\/sub>)<sub>3<\/sub> → 2 Al, 3 S, 12 O.<\/li> <li>Beim <strong>Kristallwasser<\/strong> gilt die Zahl vor H<sub>2<\/sub>O für das ganze Wassermolekül: CuSO<sub>4<\/sub> · 5 H<sub>2<\/sub>O → 1 Cu, 1 S, 4 + 5 = 9 O, 10 H.<\/li><\/ul>"}, {"t": "Rechenweg", "h": "<ol class=\"gl-steps\"><li>Atome jedes Elements zählen (Indizes, Klammern, Kristallwasser beachten).<\/li><li>Atommassen im Periodensystem ablesen.<\/li><li>Für jedes Element <strong>Anzahl · Atommasse<\/strong> berechnen.<\/li><li>Alle Teilergebnisse addieren; Einheit g/mol.<\/li><\/ol> <div class=\"gl-box gl-info\"><strong>Beispiel Calciumhydroxid Ca(OH)<sub>2<\/sub>:<\/strong><br>M = 1 · 40,1 + 2 · 16,0 + 2 · 1,0 = 40,1 + 32,0 + 2,0 = <strong>74,1 g/mol<\/strong><\/div> <p>Ob du mit ganzen Zahlen oder mit einer Nachkommastelle rechnest, hängt von der Vorgabe ab. Wichtig ist, dass du dieselbe Genauigkeit durchgehend beibehältst und erst am Ende rundest.<\/p>"}];
+  const g = id => document.getElementById(id);
+  const bd = g("glBackdrop"), box = bd.querySelector(".modal-box");
+  let idx = 0;
+  function show(i){
+    idx = Math.max(0, Math.min(GL.length - 1, i));
+    g("glNum").textContent = (idx + 1) + ".";
+    g("glTitle").innerHTML = GL[idx].t;
+    g("glBody").innerHTML = GL[idx].h;
+    g("glPos").textContent = "Thema " + (idx + 1) + " von " + GL.length;
+    g("glPrev").disabled = idx === 0;
+    g("glNext").disabled = idx === GL.length - 1;
+    box.scrollTop = 0;
+    bd.classList.add("open");
+  }
+  g("glList").innerHTML = GL.map((b, i) => '<button type="button" class="gl-item" data-i="' + i + '"><span class="nr">' + (i + 1) + '</span>' + b.t + '<span class="go">›</span></button>').join("");
+  g("glToggle").addEventListener("click", () => {
+    const open = g("glToggle").getAttribute("aria-expanded") !== "true";
+    g("glToggle").setAttribute("aria-expanded", String(open));
+    g("glPanel").hidden = !open;
+  });
+  g("glList").addEventListener("click", e => { const b = e.target.closest(".gl-item"); if (b) show(+b.dataset.i); });
+  g("glPrev").addEventListener("click", () => show(idx - 1));
+  g("glNext").addEventListener("click", () => show(idx + 1));
+  g("glClose").addEventListener("click", () => bd.classList.remove("open"));
+  bd.addEventListener("click", e => { if (e.target === bd) bd.classList.remove("open"); });
+  document.addEventListener("keydown", e => {
+    if (!bd.classList.contains("open")) return;
+    if (e.key === "Escape") bd.classList.remove("open");
+    if (e.key === "ArrowRight" && idx < GL.length - 1) show(idx + 1);
+    if (e.key === "ArrowLeft" && idx > 0) show(idx - 1);
+  });
 })();
 </script>
 </body>

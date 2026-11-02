@@ -247,6 +247,54 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
     overflow-y:auto; overscroll-behavior:contain; background:var(--bg);
   }
 }
+
+/* Rubrik Grundlagen */
+.gl-toggle{display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; cursor:pointer; text-align:left;
+  border:1px solid var(--teal-dim); border-radius:4px; background:var(--panel-alt); color:var(--text);
+  font-size:14px; font-weight:600; font-family:inherit; touch-action:manipulation;}
+.gl-toggle:hover{border-color:var(--teal);}
+.gl-toggle:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-toggle .gl-n{font-size:12px; font-weight:400; color:var(--text-faint);}
+.gl-toggle .gl-ch{margin-left:auto; color:var(--teal); font-size:13px;}
+.gl-toggle .gl-ch::after{content:"▸";}
+.gl-toggle[aria-expanded="true"] .gl-ch::after{content:"▾";}
+.gl-panel{margin-top:8px;}
+.gl-list{display:flex; flex-direction:column; gap:6px;}
+.gl-item{display:flex; gap:10px; align-items:center; width:100%; text-align:left; padding:8px 11px; cursor:pointer;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel); color:var(--text);
+  font-size:13px; font-family:inherit; font-weight:500; touch-action:manipulation;}
+.gl-item:hover{border-color:var(--text-faint); background:var(--panel-alt);}
+.gl-item:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-item .nr{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--amber); min-width:14px;}
+.gl-item .go{margin-left:auto; color:var(--text-faint); font-size:12px;}
+.gl-note{font-size:12px; color:var(--text-faint); line-height:1.5; margin:8px 0 0;}
+.modal-box.gl-wide{max-width:900px; width:100%; max-height:88vh; overflow-y:auto;}
+.gl-wide .gl-num{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--text-faint); margin-right:10px;}
+.gl-body p, .gl-body li{font-size:13.5px; line-height:1.6; color:var(--text-dim);}
+.gl-body p{margin:0 0 10px;}
+.gl-body ul, .gl-body ol{margin:0 0 12px; padding-left:22px;}
+.gl-body strong{color:var(--text); font-weight:600;}
+.gl-body sub, .gl-body sup{font-size:.72em;}
+.gl-row{display:flex; flex-wrap:wrap; gap:12px; align-items:stretch; margin:8px 0 14px;}
+.gl-fig{margin:0; flex:1 1 220px; background:var(--screen, #0e1113); border:1px solid var(--line-soft); border-radius:4px; padding:10px 12px 8px;
+  display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:6px; max-width:100%; overflow-x:auto;}
+.gl-fig figcaption{font-size:12px; color:var(--text-dim); text-align:center; line-height:1.45; max-width:420px;}
+.gl-tw{overflow-x:auto; margin:6px 0 12px; border:1px solid var(--line-soft); border-radius:4px;}
+.gl-table{width:100%; border-collapse:collapse; font-size:12.8px;}
+.gl-table th{text-align:left; font-weight:500; color:var(--text-faint); font-size:11.5px; padding:6px 9px; border-bottom:1px solid var(--line); background:var(--panel-alt);}
+.gl-table td{padding:6px 9px; border-bottom:1px solid var(--line-soft); color:var(--text-dim); vertical-align:top;}
+.gl-table tr:last-child td{border-bottom:none;}
+.gl-table td:first-child{color:var(--text);}
+.gl-steps{counter-reset:gls; list-style:none; padding-left:0 !important;}
+.gl-steps li{counter-increment:gls; position:relative; padding-left:30px; margin-bottom:6px;}
+.gl-steps li::before{content:counter(gls); position:absolute; left:0; top:1px; width:20px; height:20px; border-radius:50%; border:1px solid var(--teal-dim);
+  color:var(--teal); font-size:11.5px; display:flex; align-items:center; justify-content:center; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.gl-box{border:1px solid var(--line-soft); border-left:3px solid var(--teal); background:var(--panel-alt); border-radius:3px; padding:9px 12px; margin:8px 0 12px;
+  font-size:13.5px; line-height:1.65; color:var(--text);}
+.gl-box.gl-warn{border-left-color:var(--amber);}
+.gl-box small{color:var(--text-faint); font-size:12px;}
+.gl-nav{display:flex; align-items:center; gap:10px; border-top:1px solid var(--line-soft); padding-top:14px; margin-top:16px;}
+.gl-nav .sp{flex:1; text-align:center; font-size:12px; color:var(--text-faint);}
 </style>
 </head>
 <body>
@@ -300,6 +348,12 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
       <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.2</span><span class="d">01.11.2026</span></div>
+      <ul>
+        <li><strong>Neue Rubrik „Grundlagen“:</strong> Der Knopf „Grundlagen“ oben in der linken Spalte klappt 5 Themen mit Erklärtext und Grafiken zu den fachlichen und methodischen Grundlagen auf. Mit den Knöpfen unten oder den Pfeiltasten blättert man zwischen den Themen.</li>
+        <li><strong>Linke Spalte:</strong> Sie bleibt beim Scrollen der Aufgabe stehen, füllt die Bildschirmhöhe und scrollt als Ganzes in einem einzigen Bereich.</li>
+        <li><strong>Lösungshistorie:</strong> neue Kategorie „mit Hilfen gelöst“ für Aufgaben, die nach einem Tipp richtig gelöst wurden.</li>
+      </ul>
       <div class="vh-ver"><span class="v">V1.1</span><span class="d">02.10.2026</span></div>
       <ul>
         <li>Funktionsumfang dieser Version: Schalenmodell nach Bohr für die Hauptgruppenelemente der 1. bis 3. Periode aufstellen, wahlweise auch der 4. Periode (Schale N).</li>
@@ -313,6 +367,17 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
 
 <div class="wrap">
   <div class="sidebar">
+
+    <section class="block">
+      <button type="button" class="gl-toggle" id="glToggle" aria-expanded="false" aria-controls="glPanel">
+        <span>Grundlagen</span><span class="gl-n">5 Themen</span><span class="gl-ch" aria-hidden="true"></span>
+      </button>
+      <div class="gl-panel" id="glPanel" hidden>
+        <div class="gl-list" id="glList"></div>
+        <p class="gl-note">Erklärungen mit Grafiken zum Nachlesen – auch zur Besprechung im Unterricht.</p>
+      </div>
+    </section>
+
     <section class="block">
       <h2>Aufgabe</h2>
       <p class="sub-label">Periode</p>
@@ -434,7 +499,7 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
 
 <footer>
   <p class="footer-note">Vereinfachtes Atommodell nach Niels Bohr (1913) für die Hauptgruppenelemente der ersten drei Perioden, wahlweise mit der 4. Periode. Atommassen gerundet nach IUPAC-Standardwerten.</p>
-  <p class="footer-credit">Bastian Baumgart · Schalenmodell-Trainer V1.1 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Schalenmodell-Trainer V1.2 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <script>
@@ -890,6 +955,58 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
   if(!hdr) return;
   const set = () => document.documentElement.style.setProperty("--hdr", Math.max(0, Math.round(hdr.getBoundingClientRect().bottom)) + "px");
   addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
+})();
+</script>
+
+<div class="modal-backdrop" id="glBackdrop">
+  <div class="modal-box gl-wide" role="dialog" aria-modal="true" aria-labelledby="glTitle">
+    <div class="modal-head">
+      <h2><span class="gl-num" id="glNum"></span><span id="glTitle"></span></h2>
+      <button class="modal-close" id="glClose" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body gl-body" id="glBody"></div>
+    <div class="gl-nav">
+      <button class="btn ghost" id="glPrev">← Vorheriges Thema</button>
+      <span class="sp" id="glPos"></span>
+      <button class="btn" id="glNext">Nächstes Thema →</button>
+    </div>
+  </div>
+</div>
+<script>
+/* Rubrik Grundlagen */
+(function(){
+  const GL = [{"t": "Bau des Atoms", "h": "<p>Ein Atom besteht aus dem winzigen <strong>Atomkern<\/strong> und der viel größeren <strong>Atomhülle<\/strong>. Im Kern sitzen die positiv geladenen <strong>Protonen<\/strong> und die ungeladenen <strong>Neutronen<\/strong>; in der Hülle bewegen sich die negativ geladenen <strong>Elektronen<\/strong>.<\/p> <div class=\"gl-tw\"><table class=\"gl-table\"><thead><tr><th>Teilchen<\/th><th>Ort<\/th><th>Ladung<\/th><th>Masse (gerundet)<\/th><\/tr><\/thead><tbody><tr><td>Proton p<sup>+<\/sup><\/td><td>Kern<\/td><td>+1<\/td><td>1 u<\/td><\/tr><tr><td>Neutron n<\/td><td>Kern<\/td><td>0<\/td><td>1 u<\/td><\/tr><tr><td>Elektron e<sup>−<\/sup><\/td><td>Hülle<\/td><td>−1<\/td><td>≈ 0,0005 u<\/td><\/tr><\/tbody><\/table><\/div> <p>Fast die gesamte Masse steckt im Kern. Weil ein Atom gleich viele Protonen und Elektronen hat, ist es nach außen <strong>elektrisch neutral<\/strong>.<\/p>"}, {"t": "Ordnungszahl, Massenzahl, Isotope", "h": "<p>Die <strong>Ordnungszahl Z<\/strong> gibt die Zahl der Protonen an. Sie legt fest, um welches Element es sich handelt, und steht im Periodensystem oben links in der Zelle. Im neutralen Atom gilt: <strong>Protonenzahl = Elektronenzahl = Ordnungszahl<\/strong>.<\/p> <p>Die <strong>Massenzahl A<\/strong> ist die Summe aus Protonen und Neutronen. Daraus folgt: <strong>Neutronenzahl = Massenzahl − Ordnungszahl<\/strong>.<\/p> <div class=\"gl-row\"><figure class=\"gl-fig\"><svg viewBox=\"0 0 200 90\" width=\"200\" style=\"max-width:200px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><text x=\"110\" y=\"58\" font-size=\"40\" fill=\"var(--text)\" text-anchor=\"middle\" font-weight=\"600\" >Cl<\/text><text x=\"78\" y=\"36\" font-size=\"15\" fill=\"var(--amber)\" text-anchor=\"end\" font-weight=\"400\" >37<\/text><text x=\"78\" y=\"72\" font-size=\"15\" fill=\"var(--teal)\" text-anchor=\"end\" font-weight=\"400\" >17<\/text><text x=\"150\" y=\"40\" font-size=\"11\" fill=\"var(--amber)\" text-anchor=\"start\" font-weight=\"400\" >A = p + n<\/text><text x=\"150\" y=\"72\" font-size=\"11\" fill=\"var(--teal)\" text-anchor=\"start\" font-weight=\"400\" >Z = p<\/text><\/svg><figcaption>Chlor-37: 17 Protonen, 17 Elektronen, 37 − 17 = 20 Neutronen<\/figcaption><\/figure><\/div> <p><strong>Isotope<\/strong> sind Atome desselben Elements mit unterschiedlicher Neutronenzahl, z. B. Chlor-35 und Chlor-37 oder Kohlenstoff-12 und Kohlenstoff-14. Sie haben gleich viele Protonen und Elektronen und verhalten sich chemisch gleich.<\/p> <p>Die Atommasse im Periodensystem (z. B. Cl: 35,5 u) ist ein Mittelwert über die natürlich vorkommenden Isotope; deshalb ist sie meist keine ganze Zahl.<\/p>"}, {"t": "Das Schalenmodell", "h": "<p>Im <strong>Schalenmodell nach Bohr<\/strong> bewegen sich die Elektronen auf Schalen um den Kern. Die Schalen werden von innen nach außen mit K, L, M, N bezeichnet. Je weiter außen eine Schale liegt, desto energiereicher sind ihre Elektronen.<\/p> <div class=\"gl-row\"><figure class=\"gl-fig\"><svg viewBox=\"0 0 220 220\" width=\"220\" style=\"max-width:220px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><circle cx=\"110.0\" cy=\"110.0\" r=\"17\" fill=\"var(--panel-alt)\" stroke=\"var(--amber)\" stroke-width=\"1.6\"/><text x=\"110.0\" y=\"114.5\" font-size=\"13\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"600\" >Na<\/text><circle cx=\"110.0\" cy=\"110.0\" r=\"34\" fill=\"none\" stroke=\"var(--line)\" stroke-width=\"1.2\"/><circle cx=\"110.0\" cy=\"76.0\" r=\"4.3\" fill=\"var(--teal)\"/><circle cx=\"110.0\" cy=\"144.0\" r=\"4.3\" fill=\"var(--teal)\"/><circle cx=\"110.0\" cy=\"110.0\" r=\"58\" fill=\"none\" stroke=\"var(--line)\" stroke-width=\"1.2\"/><circle cx=\"116.9\" cy=\"52.4\" r=\"4.3\" fill=\"var(--teal)\"/><circle cx=\"155.6\" cy=\"74.2\" r=\"4.3\" fill=\"var(--teal)\"/><circle cx=\"167.6\" cy=\"116.9\" r=\"4.3\" fill=\"var(--teal)\"/><circle cx=\"145.8\" cy=\"155.6\" r=\"4.3\" fill=\"var(--teal)\"/><circle cx=\"103.1\" cy=\"167.6\" r=\"4.3\" fill=\"var(--teal)\"/><circle cx=\"64.4\" cy=\"145.8\" r=\"4.3\" fill=\"var(--teal)\"/><circle cx=\"52.4\" cy=\"103.1\" r=\"4.3\" fill=\"var(--teal)\"/><circle cx=\"74.2\" cy=\"64.4\" r=\"4.3\" fill=\"var(--teal)\"/><circle cx=\"110.0\" cy=\"110.0\" r=\"82\" fill=\"none\" stroke=\"var(--line)\" stroke-width=\"1.2\"/><circle cx=\"110.0\" cy=\"28.0\" r=\"4.3\" fill=\"var(--teal)\"/><\/svg><figcaption>Natrium (Z = 11): K 2 · L 8 · M 1<\/figcaption><\/figure><figure class=\"gl-fig\"><svg viewBox=\"0 0 220 220\" width=\"220\" style=\"max-width:220px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><circle cx=\"110.0\" cy=\"110.0\" r=\"17\" fill=\"var(--panel-alt)\" stroke=\"var(--amber)\" stroke-width=\"1.6\"/><text x=\"110.0\" y=\"114.5\" font-size=\"13\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"600\" >O<\/text><circle cx=\"110.0\" cy=\"110.0\" r=\"34\" fill=\"none\" stroke=\"var(--line)\" stroke-width=\"1.2\"/><circle cx=\"110.0\" cy=\"76.0\" r=\"4.3\" fill=\"var(--teal)\"/><circle cx=\"110.0\" cy=\"144.0\" r=\"4.3\" fill=\"var(--teal)\"/><circle cx=\"110.0\" cy=\"110.0\" r=\"58\" fill=\"none\" stroke=\"var(--line)\" stroke-width=\"1.2\"/><circle cx=\"116.9\" cy=\"52.4\" r=\"4.3\" fill=\"var(--teal)\"/><circle cx=\"163.3\" cy=\"87.2\" r=\"4.3\" fill=\"var(--teal)\"/><circle cx=\"156.4\" cy=\"144.8\" r=\"4.3\" fill=\"var(--teal)\"/><circle cx=\"103.1\" cy=\"167.6\" r=\"4.3\" fill=\"var(--teal)\"/><circle cx=\"56.7\" cy=\"132.8\" r=\"4.3\" fill=\"var(--teal)\"/><circle cx=\"63.6\" cy=\"75.2\" r=\"4.3\" fill=\"var(--teal)\"/><\/svg><figcaption>Sauerstoff (Z = 8): K 2 · L 6<\/figcaption><\/figure><\/div> <div class=\"gl-tw\"><table class=\"gl-table\"><thead><tr><th>Schale<\/th><th>K<\/th><th>L<\/th><th>M<\/th><th>N<\/th><\/tr><\/thead><tbody><tr><td>höchstens<\/td><td> 2 e<sup>−<\/sup><\/td><td>8 e<sup>−<\/sup><\/td><td>8 e<sup>−<\/sup> *<\/td><td>…<\/td><\/tr><\/tbody><\/table><\/div> <p>* Für die Hauptgruppenelemente der ersten vier Perioden genügt die Regel <strong>2 – 8 – 8<\/strong>: Die M-Schale nimmt bei ihnen höchstens acht Elektronen auf, bevor die N-Schale besetzt wird (Kalium: 2 · 8 · 8 · 1). Die Schalen werden <strong>von innen nach außen<\/strong> aufgefüllt.<\/p>"}, {"t": "Schalenmodell und Periodensystem", "h": "<p>Der Aufbau der Atomhülle erklärt die Anordnung im Periodensystem:<\/p> <ul><li>Die <strong>Periode<\/strong> (Zeile) gibt die Anzahl der besetzten Schalen an.<\/li> <li>Die <strong>Hauptgruppe<\/strong> (Spalte) gibt die Anzahl der Elektronen auf der äußersten Schale an, die <strong>Valenzelektronen<\/strong>.<\/li><\/ul> <div class=\"gl-tw\"><table class=\"gl-table\"><thead><tr><th>Element<\/th><th>Periode<\/th><th>Hauptgruppe<\/th><th>Schalen<\/th><th>Valenzelektronen<\/th><\/tr><\/thead><tbody><tr><td>Li<\/td><td>2<\/td><td>I<\/td><td>2 · 1<\/td><td>1<\/td><\/tr><tr><td>C<\/td><td>2<\/td><td>IV<\/td><td>2 · 4<\/td><td>4<\/td><\/tr><tr><td>Mg<\/td><td>3<\/td><td>II<\/td><td>2 · 8 · 2<\/td><td>2<\/td><\/tr><tr><td>Cl<\/td><td>3<\/td><td>VII<\/td><td>2 · 8 · 7<\/td><td>7<\/td><\/tr><tr><td>Ar<\/td><td>3<\/td><td>VIII<\/td><td>2 · 8 · 8<\/td><td>8<\/td><\/tr><\/tbody><\/table><\/div> <p>Elemente einer Hauptgruppe haben gleich viele Valenzelektronen und deshalb ähnliche Eigenschaften. Die Edelgase haben eine voll besetzte Außenschale (He: 2, sonst 8 Elektronen), die besonders stabil ist.<\/p>"}, {"t": "Vorgehen", "h": "<p>So stellst du das Schalenmodell eines Atoms auf:<\/p> <ol class=\"gl-steps\"><li>Element im Periodensystem suchen und die <strong>Ordnungszahl<\/strong> ablesen.<\/li><li><strong>Protonen = Elektronen = Ordnungszahl.<\/strong><\/li><li><strong>Neutronen = Massenzahl − Ordnungszahl.<\/strong> Ist keine Massenzahl angegeben, nimm die gerundete Atommasse des häufigsten Isotops (z. B. Na: 23).<\/li><li>Elektronen <strong>von innen nach außen<\/strong> verteilen: K bis 2, L bis 8, M bis 8, dann N.<\/li><li>Kontrolle: Zahl der Schalen = Periode, Elektronen außen = Hauptgruppe.<\/li><\/ol> <div class=\"gl-box gl-info\"><strong>Beispiel Aluminium<\/strong> (Z = 13, A = 27): 13 p<sup>+<\/sup>, 13 e<sup>−<\/sup>, 14 n; Schalen 2 · 8 · 3 → 3. Periode, III. Hauptgruppe.<\/div>"}];
+  const g = id => document.getElementById(id);
+  const bd = g("glBackdrop"), box = bd.querySelector(".modal-box");
+  let idx = 0;
+  function show(i){
+    idx = Math.max(0, Math.min(GL.length - 1, i));
+    g("glNum").textContent = (idx + 1) + ".";
+    g("glTitle").innerHTML = GL[idx].t;
+    g("glBody").innerHTML = GL[idx].h;
+    g("glPos").textContent = "Thema " + (idx + 1) + " von " + GL.length;
+    g("glPrev").disabled = idx === 0;
+    g("glNext").disabled = idx === GL.length - 1;
+    box.scrollTop = 0;
+    bd.classList.add("open");
+  }
+  g("glList").innerHTML = GL.map((b, i) => '<button type="button" class="gl-item" data-i="' + i + '"><span class="nr">' + (i + 1) + '</span>' + b.t + '<span class="go">›</span></button>').join("");
+  g("glToggle").addEventListener("click", () => {
+    const open = g("glToggle").getAttribute("aria-expanded") !== "true";
+    g("glToggle").setAttribute("aria-expanded", String(open));
+    g("glPanel").hidden = !open;
+  });
+  g("glList").addEventListener("click", e => { const b = e.target.closest(".gl-item"); if (b) show(+b.dataset.i); });
+  g("glPrev").addEventListener("click", () => show(idx - 1));
+  g("glNext").addEventListener("click", () => show(idx + 1));
+  g("glClose").addEventListener("click", () => bd.classList.remove("open"));
+  bd.addEventListener("click", e => { if (e.target === bd) bd.classList.remove("open"); });
+  document.addEventListener("keydown", e => {
+    if (!bd.classList.contains("open")) return;
+    if (e.key === "Escape") bd.classList.remove("open");
+    if (e.key === "ArrowRight" && idx < GL.length - 1) show(idx + 1);
+    if (e.key === "ArrowLeft" && idx > 0) show(idx - 1);
+  });
 })();
 </script>
 </body>

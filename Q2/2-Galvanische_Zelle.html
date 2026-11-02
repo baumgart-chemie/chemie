@@ -212,6 +212,54 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
     overflow-y:auto; overscroll-behavior:contain; background:var(--bg);
   }
 }
+
+/* Rubrik Grundlagen */
+.gl-toggle{display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; cursor:pointer; text-align:left;
+  border:1px solid var(--teal-dim); border-radius:4px; background:var(--panel-alt); color:var(--text);
+  font-size:14px; font-weight:600; font-family:inherit; touch-action:manipulation;}
+.gl-toggle:hover{border-color:var(--teal);}
+.gl-toggle:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-toggle .gl-n{font-size:12px; font-weight:400; color:var(--text-faint);}
+.gl-toggle .gl-ch{margin-left:auto; color:var(--teal); font-size:13px;}
+.gl-toggle .gl-ch::after{content:"▸";}
+.gl-toggle[aria-expanded="true"] .gl-ch::after{content:"▾";}
+.gl-panel{margin-top:8px;}
+.gl-list{display:flex; flex-direction:column; gap:6px;}
+.gl-item{display:flex; gap:10px; align-items:center; width:100%; text-align:left; padding:8px 11px; cursor:pointer;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel); color:var(--text);
+  font-size:13px; font-family:inherit; font-weight:500; touch-action:manipulation;}
+.gl-item:hover{border-color:var(--text-faint); background:var(--panel-alt);}
+.gl-item:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-item .nr{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--amber); min-width:14px;}
+.gl-item .go{margin-left:auto; color:var(--text-faint); font-size:12px;}
+.gl-note{font-size:12px; color:var(--text-faint); line-height:1.5; margin:8px 0 0;}
+.modal-box.gl-wide{max-width:900px; width:100%; max-height:88vh; overflow-y:auto;}
+.gl-wide .gl-num{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--text-faint); margin-right:10px;}
+.gl-body p, .gl-body li{font-size:13.5px; line-height:1.6; color:var(--text-dim);}
+.gl-body p{margin:0 0 10px;}
+.gl-body ul, .gl-body ol{margin:0 0 12px; padding-left:22px;}
+.gl-body strong{color:var(--text); font-weight:600;}
+.gl-body sub, .gl-body sup{font-size:.72em;}
+.gl-row{display:flex; flex-wrap:wrap; gap:12px; align-items:stretch; margin:8px 0 14px;}
+.gl-fig{margin:0; flex:1 1 220px; background:var(--screen, #0e1113); border:1px solid var(--line-soft); border-radius:4px; padding:10px 12px 8px;
+  display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:6px; max-width:100%; overflow-x:auto;}
+.gl-fig figcaption{font-size:12px; color:var(--text-dim); text-align:center; line-height:1.45; max-width:420px;}
+.gl-tw{overflow-x:auto; margin:6px 0 12px; border:1px solid var(--line-soft); border-radius:4px;}
+.gl-table{width:100%; border-collapse:collapse; font-size:12.8px;}
+.gl-table th{text-align:left; font-weight:500; color:var(--text-faint); font-size:11.5px; padding:6px 9px; border-bottom:1px solid var(--line); background:var(--panel-alt);}
+.gl-table td{padding:6px 9px; border-bottom:1px solid var(--line-soft); color:var(--text-dim); vertical-align:top;}
+.gl-table tr:last-child td{border-bottom:none;}
+.gl-table td:first-child{color:var(--text);}
+.gl-steps{counter-reset:gls; list-style:none; padding-left:0 !important;}
+.gl-steps li{counter-increment:gls; position:relative; padding-left:30px; margin-bottom:6px;}
+.gl-steps li::before{content:counter(gls); position:absolute; left:0; top:1px; width:20px; height:20px; border-radius:50%; border:1px solid var(--teal-dim);
+  color:var(--teal); font-size:11.5px; display:flex; align-items:center; justify-content:center; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.gl-box{border:1px solid var(--line-soft); border-left:3px solid var(--teal); background:var(--panel-alt); border-radius:3px; padding:9px 12px; margin:8px 0 12px;
+  font-size:13.5px; line-height:1.65; color:var(--text);}
+.gl-box.gl-warn{border-left-color:var(--amber);}
+.gl-box small{color:var(--text-faint); font-size:12px;}
+.gl-nav{display:flex; align-items:center; gap:10px; border-top:1px solid var(--line-soft); padding-top:14px; margin-top:16px;}
+.gl-nav .sp{flex:1; text-align:center; font-size:12px; color:var(--text-faint);}
 </style>
 </head>
 <body>
@@ -270,6 +318,11 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
       <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.1</span><span class="d">01.11.2026</span></div>
+      <ul>
+        <li><strong>Neue Rubrik „Grundlagen“:</strong> Der Knopf „Grundlagen“ oben in der linken Spalte klappt 7 Themen mit Erklärtext und Grafiken zu den fachlichen und methodischen Grundlagen auf. Mit den Knöpfen unten oder den Pfeiltasten blättert man zwischen den Themen.</li>
+        <li><strong>Linke Spalte:</strong> Sie bleibt beim Scrollen der Aufgabe stehen, füllt die Bildschirmhöhe und scrollt als Ganzes in einem einzigen Bereich.</li>
+      </ul>
       <div class="vh-ver"><span class="v">V1.0</span><span class="d">28.09.2026</span></div>
       <ul>
         <li>Erste Version: Zwei Halbzellen aus Elektrodenmetall und Metallsulfat-Lösung kombinieren, Konzentration der Metall-Ionen von 0,0001 bis 2 mol/L einstellbar.</li>
@@ -284,6 +337,17 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
 <div class="wrap">
   <!-- SIDEBAR -->
   <div class="sidebar">
+
+    <section class="block">
+      <button type="button" class="gl-toggle" id="glToggle" aria-expanded="false" aria-controls="glPanel">
+        <span>Grundlagen</span><span class="gl-n">7 Themen</span><span class="gl-ch" aria-hidden="true"></span>
+      </button>
+      <div class="gl-panel" id="glPanel" hidden>
+        <div class="gl-list" id="glList"></div>
+        <p class="gl-note">Erklärungen mit Grafiken zum Nachlesen – auch zur Besprechung im Unterricht.</p>
+      </div>
+    </section>
+
     <section class="block">
       <h2>Halbzelle links <span class="role" id="roleL">–</span></h2>
       <div class="field-full"><label for="mL">Elektrode</label><select id="mL"></select></div>
@@ -385,7 +449,7 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
 
 <footer>
   <p class="footer-note">Simulierte Daten zu Lehrzwecken · 25 °C, Aktivitäten durch Konzentrationen ersetzt, Nernst-Faktor 0,059 V. Standardpotentiale sind Tabellenwerte und können je nach Schulbuch um wenige Hundertstel Volt abweichen.</p>
-  <p class="footer-credit">Bastian Baumgart · Simulation „Galvanische Zelle“ V1.0 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Simulation „Galvanische Zelle“ V1.1 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <script>
@@ -1063,6 +1127,58 @@ requestAnimationFrame(loop);
   if(!hdr) return;
   const set = () => document.documentElement.style.setProperty("--hdr", Math.max(0, Math.round(hdr.getBoundingClientRect().bottom)) + "px");
   addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
+})();
+</script>
+
+<div class="modal-backdrop" id="glBackdrop">
+  <div class="modal-box gl-wide" role="dialog" aria-modal="true" aria-labelledby="glTitle">
+    <div class="modal-head">
+      <h2><span class="gl-num" id="glNum"></span><span id="glTitle"></span></h2>
+      <button class="modal-close" id="glClose" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body gl-body" id="glBody"></div>
+    <div class="gl-nav">
+      <button class="btn ghost" id="glPrev">← Vorheriges Thema</button>
+      <span class="sp" id="glPos"></span>
+      <button class="btn" id="glNext">Nächstes Thema →</button>
+    </div>
+  </div>
+</div>
+<script>
+/* Rubrik Grundlagen */
+(function(){
+  const GL = [{"t": "Redoxreaktionen und Halbzellen", "h": "<p>Taucht man ein Zinkblech in eine Kupfersulfatlösung, scheidet sich Kupfer ab und Zink geht in Lösung: Zn + Cu<sup>2+<\/sup> → Zn<sup>2+<\/sup> + Cu. Die Elektronen gehen dabei direkt vom Zink auf die Kupfer-Ionen über.<\/p> <p>Trennt man die beiden Teilreaktionen räumlich, müssen die Elektronen durch einen äußeren Leiter fließen – man kann die Energie als elektrische Energie nutzen. Jede Teilreaktion läuft in einer <strong>Halbzelle<\/strong> ab: einer Elektrode in der Lösung ihrer Ionen, z. B. Zn/Zn<sup>2+<\/sup>. Elektrode und Ionen bilden ein <strong>korrespondierendes Redoxpaar<\/strong>.<\/p>"}, {"t": "Elektrochemische Doppelschicht", "h": "<p>Taucht ein Metall in die Lösung seiner Ionen, stellt sich an der Grenzfläche Metall\/Lösung ein Gleichgewicht ein: Me ⇌ Me<sup>z+<\/sup> + z e<sup>−<\/sup>. Metall-Ionen verlassen das Metallgitter und gehen in Lösung, die Elektronen bleiben im Metall zurück. Gleichzeitig nehmen Ionen aus der Lösung Elektronen auf und werden als Metallatome wieder eingebaut.<\/p> <div class=\"gl-row\"><figure class=\"gl-fig\"><svg viewBox=\"0 0 220 230\" width=\"220\" style=\"max-width:220px;width:100%;height:auto;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><text x=\"110\" y=\"16\" font-size=\"11.5\" fill=\"var(--text)\" text-anchor=\"middle\" font-weight=\"600\">Zn ⇌ Zn²⁺ + 2 e⁻<\/text><rect x=\"20\" y=\"70\" width=\"190\" height=\"125\" fill=\"rgba(79,209,197,.07)\"\/><line x1=\"20\" y1=\"70\" x2=\"210\" y2=\"70\" stroke=\"var(--text-faint)\" stroke-width=\"1\" stroke-dasharray=\"3 3\"\/><rect x=\"30\" y=\"30\" width=\"44\" height=\"160\" rx=\"2\" fill=\"var(--panel-alt)\" stroke=\"var(--teal)\" stroke-width=\"1.8\"\/><text x=\"52\" y=\"50\" font-size=\"13\" fill=\"var(--teal)\" text-anchor=\"middle\" font-weight=\"600\">Zn<\/text><text x=\"66\" y=\"90\" font-size=\"13\" fill=\"var(--teal)\" text-anchor=\"middle\" font-weight=\"700\">−<\/text><circle cx=\"95\" cy=\"86\" r=\"11\" fill=\"#4fd1c5\" opacity=\".9\"\/><text x=\"95\" y=\"89\" font-size=\"7.5\" fill=\"#0e1113\" text-anchor=\"middle\" font-weight=\"700\">Zn²⁺<\/text><text x=\"66\" y=\"112\" font-size=\"13\" fill=\"var(--teal)\" text-anchor=\"middle\" font-weight=\"700\">−<\/text><circle cx=\"95\" cy=\"108\" r=\"11\" fill=\"#4fd1c5\" opacity=\".9\"\/><text x=\"95\" y=\"111\" font-size=\"7.5\" fill=\"#0e1113\" text-anchor=\"middle\" font-weight=\"700\">Zn²⁺<\/text><text x=\"66\" y=\"134\" font-size=\"13\" fill=\"var(--teal)\" text-anchor=\"middle\" font-weight=\"700\">−<\/text><circle cx=\"95\" cy=\"130\" r=\"11\" fill=\"#4fd1c5\" opacity=\".9\"\/><text x=\"95\" y=\"133\" font-size=\"7.5\" fill=\"#0e1113\" text-anchor=\"middle\" font-weight=\"700\">Zn²⁺<\/text><text x=\"66\" y=\"156\" font-size=\"13\" fill=\"var(--teal)\" text-anchor=\"middle\" font-weight=\"700\">−<\/text><circle cx=\"95\" cy=\"152\" r=\"11\" fill=\"#4fd1c5\" opacity=\".9\"\/><text x=\"95\" y=\"155\" font-size=\"7.5\" fill=\"#0e1113\" text-anchor=\"middle\" font-weight=\"700\">Zn²⁺<\/text><text x=\"66\" y=\"178\" font-size=\"13\" fill=\"var(--teal)\" text-anchor=\"middle\" font-weight=\"700\">−<\/text><circle cx=\"95\" cy=\"174\" r=\"11\" fill=\"#4fd1c5\" opacity=\".9\"\/><text x=\"95\" y=\"177\" font-size=\"7.5\" fill=\"#0e1113\" text-anchor=\"middle\" font-weight=\"700\">Zn²⁺<\/text><circle cx=\"150\" cy=\"92\" r=\"8\" fill=\"#4fd1c5\" opacity=\".35\"\/><circle cx=\"180\" cy=\"128\" r=\"8\" fill=\"#4fd1c5\" opacity=\".35\"\/><circle cx=\"140\" cy=\"160\" r=\"8\" fill=\"#4fd1c5\" opacity=\".35\"\/><circle cx=\"190\" cy=\"178\" r=\"8\" fill=\"#4fd1c5\" opacity=\".35\"\/><path d=\"M60 202 L60 208 L108 208 L108 202\" fill=\"none\" stroke=\"var(--amber)\" stroke-width=\"1.4\"\/><text x=\"84\" y=\"222\" font-size=\"10.5\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"400\">Doppelschicht<\/text><\/svg><figcaption>Zink: Ionen gehen in Lösung, die Elektronen bleiben zurück – die Elektrode lädt sich negativ auf, Zn²⁺-Ionen lagern sich davor an.<\/figcaption><\/figure><figure class=\"gl-fig\"><svg viewBox=\"0 0 220 230\" width=\"220\" style=\"max-width:220px;width:100%;height:auto;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><text x=\"110\" y=\"16\" font-size=\"11.5\" fill=\"var(--text)\" text-anchor=\"middle\" font-weight=\"600\">Cu²⁺ + 2 e⁻ ⇌ Cu<\/text><rect x=\"20\" y=\"70\" width=\"190\" height=\"125\" fill=\"rgba(255,180,84,.07)\"\/><line x1=\"20\" y1=\"70\" x2=\"210\" y2=\"70\" stroke=\"var(--text-faint)\" stroke-width=\"1\" stroke-dasharray=\"3 3\"\/><rect x=\"30\" y=\"30\" width=\"44\" height=\"160\" rx=\"2\" fill=\"var(--panel-alt)\" stroke=\"var(--amber)\" stroke-width=\"1.8\"\/><text x=\"52\" y=\"50\" font-size=\"13\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"600\">Cu<\/text><text x=\"66\" y=\"90\" font-size=\"13\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"700\">+<\/text><circle cx=\"95\" cy=\"86\" r=\"11\" fill=\"#ffb454\" opacity=\".9\"\/><text x=\"95\" y=\"89\" font-size=\"7.5\" fill=\"#0e1113\" text-anchor=\"middle\" font-weight=\"700\">SO₄²⁻<\/text><text x=\"66\" y=\"112\" font-size=\"13\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"700\">+<\/text><circle cx=\"95\" cy=\"108\" r=\"11\" fill=\"#ffb454\" opacity=\".9\"\/><text x=\"95\" y=\"111\" font-size=\"7.5\" fill=\"#0e1113\" text-anchor=\"middle\" font-weight=\"700\">SO₄²⁻<\/text><text x=\"66\" y=\"134\" font-size=\"13\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"700\">+<\/text><circle cx=\"95\" cy=\"130\" r=\"11\" fill=\"#ffb454\" opacity=\".9\"\/><text x=\"95\" y=\"133\" font-size=\"7.5\" fill=\"#0e1113\" text-anchor=\"middle\" font-weight=\"700\">SO₄²⁻<\/text><text x=\"66\" y=\"156\" font-size=\"13\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"700\">+<\/text><circle cx=\"95\" cy=\"152\" r=\"11\" fill=\"#ffb454\" opacity=\".9\"\/><text x=\"95\" y=\"155\" font-size=\"7.5\" fill=\"#0e1113\" text-anchor=\"middle\" font-weight=\"700\">SO₄²⁻<\/text><text x=\"66\" y=\"178\" font-size=\"13\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"700\">+<\/text><circle cx=\"95\" cy=\"174\" r=\"11\" fill=\"#ffb454\" opacity=\".9\"\/><text x=\"95\" y=\"177\" font-size=\"7.5\" fill=\"#0e1113\" text-anchor=\"middle\" font-weight=\"700\">SO₄²⁻<\/text><circle cx=\"150\" cy=\"92\" r=\"8\" fill=\"#ffb454\" opacity=\".35\"\/><circle cx=\"180\" cy=\"128\" r=\"8\" fill=\"#ffb454\" opacity=\".35\"\/><circle cx=\"140\" cy=\"160\" r=\"8\" fill=\"#ffb454\" opacity=\".35\"\/><circle cx=\"190\" cy=\"178\" r=\"8\" fill=\"#ffb454\" opacity=\".35\"\/><path d=\"M60 202 L60 208 L108 208 L108 202\" fill=\"none\" stroke=\"var(--amber)\" stroke-width=\"1.4\"\/><text x=\"84\" y=\"222\" font-size=\"10.5\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"400\">Doppelschicht<\/text><\/svg><figcaption>Kupfer: Ionen scheiden sich bevorzugt ab – die Elektrode lädt sich positiv auf, Sulfat-Ionen reichern sich davor an.<\/figcaption><\/figure><\/div> <ul><li><strong>Unedles Metall (z. B. Zink):<\/strong> Das In-Lösung-Gehen überwiegt. Im Metall bleibt ein Elektronenüberschuss zurück, die Elektrode lädt sich <strong>negativ<\/strong> auf. Die positiven Zn<sup>2+<\/sup>-Ionen werden von der negativen Oberfläche angezogen und bilden davor eine Ionenschicht.<\/li> <li><strong>Edleres Metall (z. B. Kupfer):<\/strong> Die Abscheidung überwiegt. Dem Metall werden Elektronen entzogen, es lädt sich <strong>positiv<\/strong> auf; vor der Oberfläche reichern sich Anionen (SO<sub>4<\/sub><sup>2−<\/sup>) an.<\/li><\/ul> <p>Die Ladung auf der Metalloberfläche und die entgegengesetzt geladene Ionenschicht in der Lösung bilden zusammen die <strong>elektrochemische Doppelschicht<\/strong>. Sie ist nur wenige Moleküldurchmesser dick und wirkt wie ein winziger Kondensator. Mit zunehmender Aufladung wird der weitere Ladungsübergang gebremst, bis ein <strong>dynamisches Gleichgewicht<\/strong> erreicht ist: Pro Zeiteinheit gehen genauso viele Ionen in Lösung, wie sich abscheiden. Die dabei umgesetzten Stoffmengen sind so klein, dass man sie nicht bemerkt.<\/p> <div class=\"gl-box gl-info\">Die Potentialdifferenz zwischen Metall und Lösung ist das <strong>Elektrodenpotential<\/strong>. Es lässt sich nicht direkt messen, weil jedes Messgerät eine zweite Elektrode braucht – messbar ist nur die Spannung zwischen zwei Halbzellen. Deshalb bezieht man alle Potentiale auf die Standard-Wasserstoffhalbzelle.<\/div> <ul><li>Je unedler das Metall, desto stärker lädt es sich negativ auf und desto negativer ist sein Potential.<\/li> <li>Eine höhere Ionenkonzentration verschiebt das Gleichgewicht zur Metallseite: Weniger Ionen gehen in Lösung, das Potential wird positiver. Diesen Zusammenhang beschreibt die Nernst-Gleichung.<\/li><\/ul> <div class=\"gl-box gl-warn\">Erst wenn der äußere Stromkreis geschlossen wird, fließen Elektronen vom stärker negativ geladenen Metall (Minuspol) zum Pluspol. Die Doppelschichten werden dadurch ständig abgebaut und neu gebildet, und die Reaktion läuft weiter, statt im Gleichgewicht stehen zu bleiben.<\/div>"}, {"t": "Aufbau des Daniell-Elements", "h": "<div class=\"gl-row\"><figure class=\"gl-fig\"><svg viewBox=\"0 0 400 230\" width=\"400\" style=\"max-width:400px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><defs><marker id=\"ce\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--amber)\"/><\/marker><\/defs><path d=\"M40 80 L40 200 Q40 210 50 210 L140 210 Q150 210 150 200 L150 80\" stroke=\"var(--text-dim)\" stroke-width=\"1.6\" fill=\"none\" /><rect x=\"45\" y=\"130\" width=\"100\" height=\"75\" rx=\"0\" fill=\"rgba(79,209,197,.08)\" stroke=\"none\" stroke-width=\"1.3\" /><rect x=\"85\" y=\"55\" width=\"20\" height=\"120\" rx=\"2\" fill=\"var(--panel-alt)\" stroke=\"var(--teal)\" stroke-width=\"1.8\" /><text x=\"80\" y=\"72\" font-size=\"13\" fill=\"var(--teal)\" text-anchor=\"end\" font-weight=\"600\" >Zn<\/text><text x=\"125\" y=\"195\" font-size=\"11\" fill=\"var(--teal)\" text-anchor=\"middle\" font-weight=\"400\" >Zn²⁺<\/text><path d=\"M250 80 L250 200 Q250 210 260 210 L350 210 Q360 210 360 200 L360 80\" stroke=\"var(--text-dim)\" stroke-width=\"1.6\" fill=\"none\" /><rect x=\"255\" y=\"130\" width=\"100\" height=\"75\" rx=\"0\" fill=\"rgba(255,180,84,.08)\" stroke=\"none\" stroke-width=\"1.3\" /><rect x=\"295\" y=\"55\" width=\"20\" height=\"120\" rx=\"2\" fill=\"var(--panel-alt)\" stroke=\"var(--amber)\" stroke-width=\"1.8\" /><text x=\"290\" y=\"72\" font-size=\"13\" fill=\"var(--amber)\" text-anchor=\"end\" font-weight=\"600\" >Cu<\/text><text x=\"335\" y=\"195\" font-size=\"11\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"400\" >Cu²⁺<\/text><path d=\"M120 140 L120 95 Q120 85 130 85 L270 85 Q280 85 280 95 L280 140\" stroke=\"var(--text-faint)\" stroke-width=\"10\" fill=\"none\" stroke-linecap=\"round\" opacity=\".35\"/><text x=\"200\" y=\"78\" font-size=\"10.5\" fill=\"var(--text-faint)\" text-anchor=\"middle\" font-weight=\"400\" >Salzbrücke / Diaphragma<\/text><line x1=\"95\" y1=\"55\" x2=\"95\" y2=\"20\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><line x1=\"95\" y1=\"20\" x2=\"175\" y2=\"20\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><line x1=\"225\" y1=\"20\" x2=\"305\" y2=\"20\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><line x1=\"305\" y1=\"20\" x2=\"305\" y2=\"55\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><circle cx=\"200\" cy=\"20\" r=\"18\" fill=\"var(--panel)\" stroke=\"var(--text)\" stroke-width=\"1.5\"/><text x=\"200\" y=\"25\" font-size=\"14\" fill=\"var(--text)\" text-anchor=\"middle\" font-weight=\"600\" >V<\/text><text x=\"70\" y=\"228\" font-size=\"10.5\" fill=\"var(--teal)\" text-anchor=\"middle\" font-weight=\"400\" >Minuspol: Oxidation (Anode)<\/text><text x=\"310\" y=\"228\" font-size=\"10.5\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"400\" >Pluspol: Reduktion (Kathode)<\/text><line x1=\"140\" y1=\"36\" x2=\"170\" y2=\"36\" stroke=\"var(--amber)\" stroke-width=\"1.4\" marker-end=\"url(#ce)\"/><text x=\"130\" y=\"40\" font-size=\"11\" fill=\"var(--amber)\" text-anchor=\"end\" font-weight=\"400\" >e⁻<\/text><\/svg><figcaption>Galvanische Zelle aus Zink- und Kupferhalbzelle<\/figcaption><\/figure><\/div> <ul><li><strong>Anode<\/strong> (Ort der Oxidation): Zn → Zn<sup>2+<\/sup> + 2 e<sup>−<\/sup>. In der galvanischen Zelle ist sie der <strong>Minuspol<\/strong>.<\/li> <li><strong>Kathode<\/strong> (Ort der Reduktion): Cu<sup>2+<\/sup> + 2 e<sup>−<\/sup> → Cu. Sie ist der <strong>Pluspol<\/strong>.<\/li> <li>Die Elektronen fließen im äußeren Leiter vom Minus- zum Pluspol.<\/li> <li>Die <strong>Salzbrücke<\/strong> (oder ein Diaphragma) schließt den Stromkreis durch Ionenwanderung und verhindert, dass sich die Lösungen aufladen.<\/li><\/ul>"}, {"t": "Standardpotentiale und Spannungsreihe", "h": "<p>Wie stark ein Redoxpaar Elektronen abgibt oder aufnimmt, wird durch sein <strong>Standardpotential E°<\/strong> beschrieben. Es wird gegen die <strong>Standard-Wasserstoffhalbzelle<\/strong> gemessen, deren Potential als 0 V festgelegt ist (25 °C, c = 1 mol/L, p = 1013 hPa).<\/p> <div class=\"gl-tw\"><table class=\"gl-table\"><thead><tr><th>Redoxpaar<\/th><th>E° in V<\/th><\/tr><\/thead><tbody><tr><td>Zn / Zn<sup>2+<\/sup><\/td><td>−0,76<\/td><\/tr><tr><td>Fe / Fe<sup>2+<\/sup><\/td><td>−0,41<\/td><\/tr><tr><td>H<sub>2<\/sub> / 2 H<sub>3<\/sub>O<sup>+<\/sup><\/td><td>0,00<\/td><\/tr><tr><td>Cu / Cu<sup>2+<\/sup><\/td><td>+0,34<\/td><\/tr><tr><td>Ag / Ag<sup>+<\/sup><\/td><td>+0,80<\/td><\/tr><\/tbody><\/table><\/div> <p>Geordnet nach E° ergibt sich die <strong>elektrochemische Spannungsreihe<\/strong>. Je negativer E°, desto leichter gibt die reduzierte Form Elektronen ab (unedles Metall, starkes Reduktionsmittel); je positiver, desto stärker nimmt die oxidierte Form Elektronen auf (starkes Oxidationsmittel).<\/p>"}, {"t": "Zellspannung", "h": "<p>Die Spannung einer galvanischen Zelle ergibt sich aus der Differenz der Elektrodenpotentiale:<\/p> <div class=\"gl-box gl-info\">ΔE = E(Kathode) − E(Anode) = E(Akzeptorhalbzelle) − E(Donatorhalbzelle)<\/div> <p>Die Halbzelle mit dem <strong>höheren<\/strong> Potential nimmt Elektronen auf (Kathode, Pluspol), die mit dem niedrigeren gibt sie ab (Anode, Minuspol). Die Zellspannung einer freiwillig ablaufenden Reaktion ist immer positiv.<\/p> <div class=\"gl-box gl-info\"><strong>Daniell-Element:<\/strong> ΔE° = +0,34 V − (−0,76 V) = <strong>1,10 V<\/strong><\/div>"}, {"t": "Nernst-Gleichung", "h": "<p>Das Elektrodenpotential hängt von der Konzentration der Ionen ab. Für eine Metallhalbzelle Me/Me<sup>z+<\/sup> bei 25 °C gilt die <strong>Nernst-Gleichung<\/strong>:<\/p> <div class=\"gl-box gl-info\">E = E° + (0,059 V / z) · lg c(Me<sup>z+<\/sup>)<br><small>allgemein: E = E° + (0,059 V / z) · lg ( c(Ox) / c(Red) ); z = Zahl der übertragenen Elektronen<\/small><\/div> <ul><li>Eine Verzehnfachung der Ionenkonzentration erhöht das Potential um 0,059 V / z.<\/li> <li>Feste Stoffe (Metalle) tauchen in der Gleichung nicht auf.<\/li><\/ul> <div class=\"gl-box gl-info\"><strong>Beispiel:<\/strong> Cu/Cu<sup>2+<\/sup> mit c = 0,01 mol/L: E = 0,34 V + (0,059 V / 2) · lg 0,01 = 0,34 V − 0,059 V = <strong>0,28 V<\/strong><\/div>"}, {"t": "Konzentrationszellen", "h": "<p>Auch zwei Halbzellen aus <strong>demselben<\/strong> Redoxpaar mit unterschiedlicher Ionenkonzentration liefern eine Spannung. Nach der Nernst-Gleichung hat die Halbzelle mit der höheren Konzentration das höhere Potential.<\/p> <div class=\"gl-box gl-info\">ΔE = (0,059 V / z) · lg ( c<sub>konzentriert<\/sub> / c<sub>verdünnt<\/sub> )<\/div> <p>In der verdünnten Halbzelle geht Metall in Lösung (Anode), in der konzentrierten scheidet sich Metall ab (Kathode). Die Zelle arbeitet, bis beide Konzentrationen gleich sind. Beispiel: Ag/Ag<sup>+<\/sup> mit 1 mol/L und 0,001 mol/L: ΔE = 0,059 V · 3 = 0,18 V.<\/p>"}];
+  const g = id => document.getElementById(id);
+  const bd = g("glBackdrop"), box = bd.querySelector(".modal-box");
+  let idx = 0;
+  function show(i){
+    idx = Math.max(0, Math.min(GL.length - 1, i));
+    g("glNum").textContent = (idx + 1) + ".";
+    g("glTitle").innerHTML = GL[idx].t;
+    g("glBody").innerHTML = GL[idx].h;
+    g("glPos").textContent = "Thema " + (idx + 1) + " von " + GL.length;
+    g("glPrev").disabled = idx === 0;
+    g("glNext").disabled = idx === GL.length - 1;
+    box.scrollTop = 0;
+    bd.classList.add("open");
+  }
+  g("glList").innerHTML = GL.map((b, i) => '<button type="button" class="gl-item" data-i="' + i + '"><span class="nr">' + (i + 1) + '</span>' + b.t + '<span class="go">›</span></button>').join("");
+  g("glToggle").addEventListener("click", () => {
+    const open = g("glToggle").getAttribute("aria-expanded") !== "true";
+    g("glToggle").setAttribute("aria-expanded", String(open));
+    g("glPanel").hidden = !open;
+  });
+  g("glList").addEventListener("click", e => { const b = e.target.closest(".gl-item"); if (b) show(+b.dataset.i); });
+  g("glPrev").addEventListener("click", () => show(idx - 1));
+  g("glNext").addEventListener("click", () => show(idx + 1));
+  g("glClose").addEventListener("click", () => bd.classList.remove("open"));
+  bd.addEventListener("click", e => { if (e.target === bd) bd.classList.remove("open"); });
+  document.addEventListener("keydown", e => {
+    if (!bd.classList.contains("open")) return;
+    if (e.key === "Escape") bd.classList.remove("open");
+    if (e.key === "ArrowRight" && idx < GL.length - 1) show(idx + 1);
+    if (e.key === "ArrowLeft" && idx > 0) show(idx - 1);
+  });
 })();
 </script>
 </body>

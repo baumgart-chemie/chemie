@@ -255,6 +255,54 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
     overflow-y:auto; overscroll-behavior:contain; background:var(--bg);
   }
 }
+
+/* Rubrik Grundlagen */
+.gl-toggle{display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; cursor:pointer; text-align:left;
+  border:1px solid var(--teal-dim); border-radius:4px; background:var(--panel-alt); color:var(--text);
+  font-size:14px; font-weight:600; font-family:inherit; touch-action:manipulation;}
+.gl-toggle:hover{border-color:var(--teal);}
+.gl-toggle:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-toggle .gl-n{font-size:12px; font-weight:400; color:var(--text-faint);}
+.gl-toggle .gl-ch{margin-left:auto; color:var(--teal); font-size:13px;}
+.gl-toggle .gl-ch::after{content:"▸";}
+.gl-toggle[aria-expanded="true"] .gl-ch::after{content:"▾";}
+.gl-panel{margin-top:8px;}
+.gl-list{display:flex; flex-direction:column; gap:6px;}
+.gl-item{display:flex; gap:10px; align-items:center; width:100%; text-align:left; padding:8px 11px; cursor:pointer;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel); color:var(--text);
+  font-size:13px; font-family:inherit; font-weight:500; touch-action:manipulation;}
+.gl-item:hover{border-color:var(--text-faint); background:var(--panel-alt);}
+.gl-item:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-item .nr{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--amber); min-width:14px;}
+.gl-item .go{margin-left:auto; color:var(--text-faint); font-size:12px;}
+.gl-note{font-size:12px; color:var(--text-faint); line-height:1.5; margin:8px 0 0;}
+.modal-box.gl-wide{max-width:900px; width:100%; max-height:88vh; overflow-y:auto;}
+.gl-wide .gl-num{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--text-faint); margin-right:10px;}
+.gl-body p, .gl-body li{font-size:13.5px; line-height:1.6; color:var(--text-dim);}
+.gl-body p{margin:0 0 10px;}
+.gl-body ul, .gl-body ol{margin:0 0 12px; padding-left:22px;}
+.gl-body strong{color:var(--text); font-weight:600;}
+.gl-body sub, .gl-body sup{font-size:.72em;}
+.gl-row{display:flex; flex-wrap:wrap; gap:12px; align-items:stretch; margin:8px 0 14px;}
+.gl-fig{margin:0; flex:1 1 220px; background:var(--screen, #0e1113); border:1px solid var(--line-soft); border-radius:4px; padding:10px 12px 8px;
+  display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:6px; max-width:100%; overflow-x:auto;}
+.gl-fig figcaption{font-size:12px; color:var(--text-dim); text-align:center; line-height:1.45; max-width:420px;}
+.gl-tw{overflow-x:auto; margin:6px 0 12px; border:1px solid var(--line-soft); border-radius:4px;}
+.gl-table{width:100%; border-collapse:collapse; font-size:12.8px;}
+.gl-table th{text-align:left; font-weight:500; color:var(--text-faint); font-size:11.5px; padding:6px 9px; border-bottom:1px solid var(--line); background:var(--panel-alt);}
+.gl-table td{padding:6px 9px; border-bottom:1px solid var(--line-soft); color:var(--text-dim); vertical-align:top;}
+.gl-table tr:last-child td{border-bottom:none;}
+.gl-table td:first-child{color:var(--text);}
+.gl-steps{counter-reset:gls; list-style:none; padding-left:0 !important;}
+.gl-steps li{counter-increment:gls; position:relative; padding-left:30px; margin-bottom:6px;}
+.gl-steps li::before{content:counter(gls); position:absolute; left:0; top:1px; width:20px; height:20px; border-radius:50%; border:1px solid var(--teal-dim);
+  color:var(--teal); font-size:11.5px; display:flex; align-items:center; justify-content:center; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.gl-box{border:1px solid var(--line-soft); border-left:3px solid var(--teal); background:var(--panel-alt); border-radius:3px; padding:9px 12px; margin:8px 0 12px;
+  font-size:13.5px; line-height:1.65; color:var(--text);}
+.gl-box.gl-warn{border-left-color:var(--amber);}
+.gl-box small{color:var(--text-faint); font-size:12px;}
+.gl-nav{display:flex; align-items:center; gap:10px; border-top:1px solid var(--line-soft); padding-top:14px; margin-top:16px;}
+.gl-nav .sp{flex:1; text-align:center; font-size:12px; color:var(--text-faint);}
 </style>
 </head>
 <body>
@@ -327,6 +375,11 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
       <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.2</span><span class="d">01.11.2026</span></div>
+      <ul>
+        <li><strong>Neue Rubrik „Grundlagen“:</strong> Der Knopf „Grundlagen“ oben in der linken Spalte klappt 5 Themen mit Erklärtext und Grafiken zu den fachlichen und methodischen Grundlagen auf. Mit den Knöpfen unten oder den Pfeiltasten blättert man zwischen den Themen.</li>
+        <li><strong>Linke Spalte:</strong> Sie bleibt beim Scrollen der Aufgabe stehen, füllt die Bildschirmhöhe und scrollt als Ganzes in einem einzigen Bereich.</li>
+      </ul>
       <div class="vh-ver"><span class="v">V1.1</span><span class="d">03.10.2026</span></div>
         <ul>
           <li><strong>Luftpeak:</strong> Die mit der Spritze injizierte Luft erscheint als erster Peak bei der Totzeit (10 s bei 1,5 mL/min). Er ist in der Peaktabelle als „Luft (Totzeit)“ gekennzeichnet und zählt nicht zu den Flächenprozenten.</li>
@@ -350,6 +403,17 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
 <div class="wrap">
   <!-- SIDEBAR: Methode -->
   <div class="sidebar">
+
+    <section class="block">
+      <button type="button" class="gl-toggle" id="glToggle" aria-expanded="false" aria-controls="glPanel">
+        <span>Grundlagen</span><span class="gl-n">5 Themen</span><span class="gl-ch" aria-hidden="true"></span>
+      </button>
+      <div class="gl-panel" id="glPanel" hidden>
+        <div class="gl-list" id="glList"></div>
+        <p class="gl-note">Erklärungen mit Grafiken zum Nachlesen – auch zur Besprechung im Unterricht.</p>
+      </div>
+    </section>
+
 
     <section class="block">
       <h2>Ofentemperatur</h2>
@@ -504,7 +568,7 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
 
 <footer>
   <p class="footer-note">Simulierte Daten zu Lehrzwecken · Retentionszeiten, Peakformen und Rauschen werden aus vereinfachten physikalischen Modellen berechnet und bilden kein reales Säulen-/Detektorverhalten exakt ab.</p>
-  <p class="footer-credit">Bastian Baumgart · Simulation „Gaschromatograph“ V1.1 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Simulation „Gaschromatograph“ V1.2 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <script>
@@ -1251,6 +1315,58 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
   if(!hdr) return;
   const set = () => document.documentElement.style.setProperty("--hdr", Math.max(0, Math.round(hdr.getBoundingClientRect().bottom)) + "px");
   addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
+})();
+</script>
+
+<div class="modal-backdrop" id="glBackdrop">
+  <div class="modal-box gl-wide" role="dialog" aria-modal="true" aria-labelledby="glTitle">
+    <div class="modal-head">
+      <h2><span class="gl-num" id="glNum"></span><span id="glTitle"></span></h2>
+      <button class="modal-close" id="glClose" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body gl-body" id="glBody"></div>
+    <div class="gl-nav">
+      <button class="btn ghost" id="glPrev">← Vorheriges Thema</button>
+      <span class="sp" id="glPos"></span>
+      <button class="btn" id="glNext">Nächstes Thema →</button>
+    </div>
+  </div>
+</div>
+<script>
+/* Rubrik Grundlagen */
+(function(){
+  const GL = [{"t": "Prinzip der Chromatographie", "h": "<p>Chromatographie trennt Stoffgemische durch die unterschiedliche Verteilung der Stoffe zwischen einer <strong>mobilen Phase<\/strong>, die sich bewegt, und einer <strong>stationären Phase<\/strong>, die festsitzt.<\/p> <p>Ein Stoff, der stark mit der stationären Phase wechselwirkt oder sich gut darin löst, hält sich länger dort auf und wandert langsamer. Ein Stoff, der sich vor allem in der mobilen Phase aufhält, wird schnell transportiert. So kommen die Bestandteile nacheinander am Ende der Trennstrecke an.<\/p> <p>Bei der <strong>Gaschromatographie (GC)<\/strong> ist die mobile Phase ein inertes <strong>Trägergas<\/strong> (z. B. Helium, Stickstoff, Wasserstoff), die stationäre Phase ein dünner Flüssigkeitsfilm auf der Innenwand einer langen, dünnen <strong>Kapillarsäule<\/strong>.<\/p>"}, {"t": "Aufbau eines Gaschromatographen", "h": "<div class=\"gl-row\"><figure class=\"gl-fig\"><svg viewBox=\"0 0 440 170\" width=\"440\" style=\"max-width:440px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><defs><marker id=\"gs\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--teal)\"/><\/marker><\/defs><rect x=\"10\" y=\"60\" width=\"62\" height=\"40\" rx=\"3\" fill=\"var(--panel-alt)\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" /><text x=\"41\" y=\"84\" font-size=\"10.5\" fill=\"var(--text)\" text-anchor=\"middle\" font-weight=\"400\" >Trägergas<\/text><line x1=\"72\" y1=\"80\" x2=\"108\" y2=\"80\" stroke=\"var(--teal)\" stroke-width=\"1.8\" marker-end=\"url(#gs)\"/><rect x=\"108\" y=\"55\" width=\"50\" height=\"50\" rx=\"3\" fill=\"var(--panel-alt)\" stroke=\"var(--amber)\" stroke-width=\"1.3\" /><text x=\"133\" y=\"76\" font-size=\"10\" fill=\"var(--text)\" text-anchor=\"middle\" font-weight=\"400\" >Injektor<\/text><text x=\"133\" y=\"90\" font-size=\"9.5\" fill=\"var(--text-faint)\" text-anchor=\"middle\" font-weight=\"400\" >(Probe)<\/text><rect x=\"175\" y=\"25\" width=\"140\" height=\"115\" rx=\"6\" fill=\"rgba(255,180,84,.06)\" stroke=\"var(--amber)\" stroke-width=\"1.3\" /><text x=\"245\" y=\"18\" font-size=\"10.5\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"400\" >Säulenofen<\/text><circle cx=\"245\" cy=\"82\" r=\"38\" fill=\"none\" stroke=\"var(--teal)\" stroke-width=\"2.4\"/><circle cx=\"245\" cy=\"82\" r=\"30\" fill=\"none\" stroke=\"var(--teal)\" stroke-width=\"2.4\"/><circle cx=\"245\" cy=\"82\" r=\"22\" fill=\"none\" stroke=\"var(--teal)\" stroke-width=\"2.4\"/><text x=\"245\" y=\"132\" font-size=\"10\" fill=\"var(--text)\" text-anchor=\"middle\" font-weight=\"400\" >Trennsäule<\/text><line x1=\"158\" y1=\"80\" x2=\"207\" y2=\"82\" stroke=\"var(--teal)\" stroke-width=\"1.8\"/><line x1=\"283\" y1=\"82\" x2=\"330\" y2=\"82\" stroke=\"var(--teal)\" stroke-width=\"1.8\" marker-end=\"url(#gs)\"/><rect x=\"330\" y=\"60\" width=\"52\" height=\"44\" rx=\"3\" fill=\"var(--panel-alt)\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" /><text x=\"356\" y=\"86\" font-size=\"10\" fill=\"var(--text)\" text-anchor=\"middle\" font-weight=\"400\" >Detektor<\/text><line x1=\"382\" y1=\"82\" x2=\"400\" y2=\"82\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><rect x=\"400\" y=\"52\" width=\"34\" height=\"60\" rx=\"3\" fill=\"none\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" /><path d=\"M404 105 L410 105 L413 70 L416 105 L421 105 L424 88 L427 105 L431 105\" stroke=\"var(--teal)\" stroke-width=\"1.4\" fill=\"none\" /><text x=\"417\" y=\"128\" font-size=\"9.5\" fill=\"var(--text-faint)\" text-anchor=\"middle\" font-weight=\"400\" >Signal<\/text><\/svg><figcaption>Schema eines Gaschromatographen<\/figcaption><\/figure><\/div> <ul><li><strong>Injektor:<\/strong> Die flüssige Probe wird mit einer Spritze eingespritzt und sofort verdampft.<\/li> <li><strong>Trennsäule im Ofen:<\/strong> Hier findet die Trennung statt. Die Ofentemperatur bestimmt, wie schnell die Stoffe wandern.<\/li> <li><strong>Detektor:<\/strong> registriert die austretenden Stoffe und erzeugt ein elektrisches Signal, das gegen die Zeit aufgezeichnet wird – das <strong>Chromatogramm<\/strong>.<\/li><\/ul>"}, {"t": "Retentionszeit", "h": "<div class=\"gl-row\"><figure class=\"gl-fig\"><svg viewBox=\"0 0 360 200\" width=\"360\" style=\"max-width:360px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><defs><marker id=\"ax60250\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--text-dim)\"/><\/marker><\/defs><line x1=\"69.07692307692308\" y1=\"14\" x2=\"69.07692307692308\" y2=\"164\" stroke=\"var(--text-faint)\" stroke-width=\"1\" stroke-dasharray=\"4 3\"/><text x=\"72.07692307692308\" y=\"24\" font-size=\"10.5\" fill=\"var(--text-faint)\" text-anchor=\"start\" font-weight=\"400\" >t₀<\/text><path d=\"M46.0 161.1 L47.0 161.1 L48.0 161.1 L49.0 161.1 L50.0 161.1 L51.0 161.1 L52.0 161.1 L53.0 161.1 L54.0 161.1 L55.0 161.1 L56.0 161.1 L57.0 161.1 L58.0 161.1 L59.0 161.1 L60.0 161.1 L61.0 161.1 L62.0 160.8 L63.0 160.0 L64.0 158.0 L65.0 153.6 L66.0 146.5 L67.0 137.3 L68.0 129.1 L69.0 125.4 L70.0 128.2 L71.0 135.9 L72.0 145.1 L73.0 152.7 L74.0 157.5 L75.0 159.8 L76.0 160.7 L77.0 161.0 L78.0 161.1 L79.0 161.1 L80.0 161.1 L81.0 161.1 L82.0 161.1 L83.0 161.1 L84.0 161.1 L85.0 161.1 L86.0 161.1 L87.0 161.1 L88.0 161.1 L89.0 161.1 L90.0 161.1 L91.0 161.1 L92.0 161.1 L93.0 161.1 L94.0 161.1 L95.0 161.1 L96.0 161.1 L97.0 161.1 L98.0 161.1 L99.0 161.1 L100.0 161.1 L101.0 161.1 L102.0 161.1 L103.0 161.1 L104.0 161.1 L105.0 161.1 L106.0 161.1 L107.0 161.1 L108.0 161.1 L109.0 161.1 L110.0 161.1 L111.0 161.1 L112.0 161.1 L113.0 161.1 L114.0 161.1 L115.0 161.1 L116.0 161.1 L117.0 161.1 L118.0 161.1 L119.0 161.1 L120.0 161.1 L121.0 161.1 L122.0 161.1 L123.0 161.1 L124.0 161.1 L125.0 161.1 L126.0 161.1 L127.0 161.0 L128.0 160.9 L129.0 160.7 L130.0 160.3 L131.0 159.7 L132.0 158.6 L133.0 157.0 L134.0 154.7 L135.0 151.2 L136.0 146.5 L137.0 140.1 L138.0 132.0 L139.0 122.0 L140.0 110.2 L141.0 97.1 L142.0 83.2 L143.0 69.2 L144.0 56.3 L145.0 45.4 L146.0 37.4 L147.0 33.2 L148.0 33.0 L149.0 37.0 L150.0 44.7 L151.0 55.4 L152.0 68.2 L153.0 82.1 L154.0 96.0 L155.0 109.3 L156.0 121.1 L157.0 131.3 L158.0 139.5 L159.0 146.0 L160.0 150.9 L161.0 154.4 L162.0 156.9 L163.0 158.5 L164.0 159.6 L165.0 160.3 L166.0 160.6 L167.0 160.9 L168.0 161.0 L169.0 161.1 L170.0 161.1 L171.0 161.1 L172.0 161.1 L173.0 161.1 L174.0 161.1 L175.0 161.1 L176.0 161.1 L177.0 161.1 L178.0 161.0 L179.0 160.9 L180.0 160.8 L181.0 160.6 L182.0 160.3 L183.0 159.9 L184.0 159.3 L185.0 158.4 L186.0 157.2 L187.0 155.6 L188.0 153.4 L189.0 150.7 L190.0 147.4 L191.0 143.3 L192.0 138.5 L193.0 133.0 L194.0 126.9 L195.0 120.3 L196.0 113.5 L197.0 106.7 L198.0 100.1 L199.0 94.2 L200.0 89.3 L201.0 85.5 L202.0 83.3 L203.0 82.6 L204.0 83.5 L205.0 86.0 L206.0 90.0 L207.0 95.1 L208.0 101.1 L209.0 107.7 L210.0 114.5 L211.0 121.4 L212.0 127.9 L213.0 133.9 L214.0 139.3 L215.0 144.0 L216.0 147.9 L217.0 151.2 L218.0 153.8 L219.0 155.8 L220.0 157.4 L221.0 158.5 L222.0 159.4 L223.0 160.0 L224.0 160.4 L225.0 160.7 L226.0 160.8 L227.0 161.0 L228.0 161.0 L229.0 161.1 L230.0 161.1 L231.0 161.1 L232.0 161.1 L233.0 161.1 L234.0 161.1 L235.0 161.1 L236.0 161.1 L237.0 161.1 L238.0 161.1 L239.0 161.1 L240.0 161.1 L241.0 161.1 L242.0 161.1 L243.0 161.1 L244.0 161.1 L245.0 161.1 L246.0 161.1 L247.0 161.0 L248.0 161.0 L249.0 160.9 L250.0 160.8 L251.0 160.7 L252.0 160.5 L253.0 160.2 L254.0 159.8 L255.0 159.3 L256.0 158.7 L257.0 157.9 L258.0 156.8 L259.0 155.5 L260.0 153.8 L261.0 151.8 L262.0 149.3 L263.0 146.4 L264.0 143.0 L265.0 139.0 L266.0 134.4 L267.0 129.3 L268.0 123.7 L269.0 117.6 L270.0 111.1 L271.0 104.2 L272.0 97.2 L273.0 90.2 L274.0 83.3 L275.0 76.8 L276.0 70.8 L277.0 65.4 L278.0 61.0 L279.0 57.5 L280.0 55.2 L281.0 54.1 L282.0 54.2 L283.0 55.6 L284.0 58.2 L285.0 61.9 L286.0 66.6 L287.0 72.1 L288.0 78.3 L289.0 84.9 L290.0 91.8 L291.0 98.9 L292.0 105.8 L293.0 112.6 L294.0 119.0 L295.0 125.0 L296.0 130.6 L297.0 135.5 L298.0 139.9 L299.0 143.8 L300.0 147.1 L301.0 149.9 L302.0 152.3 L303.0 154.2 L304.0 155.8 L305.0 157.1 L306.0 158.1 L307.0 158.9 L308.0 159.5 L309.0 159.9 L310.0 160.3 L311.0 160.5 L312.0 160.7 L313.0 160.8 L314.0 160.9 L315.0 161.0 L316.0 161.0 L317.0 161.1 L318.0 161.1 L319.0 161.1 L320.0 161.1 L321.0 161.1 L322.0 161.1 L323.0 161.1 L324.0 161.1 L325.0 161.1 L326.0 161.1 L327.0 161.1 L328.0 161.1 L329.0 161.1 L330.0 161.1 L331.0 161.1 L332.0 161.1 L333.0 161.1 L334.0 161.1 L335.0 161.1 L336.0 161.1 L337.0 161.1 L338.0 161.1 L339.0 161.1 L340.0 161.1 L341.0 161.1 L342.0 161.1 L343.0 161.1 L344.0 161.1 L345.0 161.1 L346.0 161.1\" stroke=\"var(--teal)\" stroke-width=\"2\" fill=\"none\" /><circle cx=\"147.5\" cy=\"32.6\" r=\"3.6\" fill=\"var(--amber)\"/><text x=\"153.53846153846155\" y=\"30.571428571428584\" font-size=\"10.5\" fill=\"var(--amber)\" text-anchor=\"start\" font-weight=\"400\" >tR<\/text><line x1=\"46\" y1=\"164\" x2=\"352\" y2=\"164\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" marker-end=\"url(#ax60250)\"/><line x1=\"46\" y1=\"164\" x2=\"46\" y2=\"8\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" marker-end=\"url(#ax60250)\"/><line x1=\"46.0\" y1=\"164\" x2=\"46.0\" y2=\"168\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"46.0\" y=\"179\" font-size=\"10\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >0<\/text><line x1=\"138.30769230769232\" y1=\"164\" x2=\"138.30769230769232\" y2=\"168\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"138.30769230769232\" y=\"179\" font-size=\"10\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >2<\/text><line x1=\"230.6153846153846\" y1=\"164\" x2=\"230.6153846153846\" y2=\"168\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"230.6153846153846\" y=\"179\" font-size=\"10\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >4<\/text><line x1=\"322.92307692307696\" y1=\"164\" x2=\"322.92307692307696\" y2=\"168\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"322.92307692307696\" y=\"179\" font-size=\"10\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >6<\/text><text x=\"196.0\" y=\"196\" font-size=\"11\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >Zeit in min<\/text><text x=\"13\" y=\"89.0\" font-size=\"11\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" transform=\"rotate(-90 13 89.0)\">Signal<\/text><\/svg><figcaption>Chromatogramm: Luftpeak bei der Totzeit t₀, danach die Peaks der Probenbestandteile<\/figcaption><\/figure><\/div> <p>Die <strong>Retentionszeit t<sub>R<\/sub><\/strong> ist die Zeit von der Injektion bis zum Maximum eines Peaks. Unter gleichen Bedingungen ist sie für jeden Stoff charakteristisch. Die <strong>Totzeit t<sub>0<\/sub><\/strong> braucht ein Stoff, der gar nicht mit der stationären Phase wechselwirkt, z. B. die mit eingespritzte Luft.<\/p> <p>Die Retentionszeit wird größer bei<\/p> <ul><li>höherer Siedetemperatur des Stoffes (stärkere zwischenmolekulare Kräfte),<\/li><li>ähnlicher Polarität von Stoff und stationärer Phase,<\/li><li>niedrigerer Ofentemperatur, kleinerem Gasfluss und längerer Säule.<\/li><\/ul>"}, {"t": "Temperaturprogramm und Auflösung", "h": "<p>Bei <strong>isothermer<\/strong> Arbeitsweise bleibt die Ofentemperatur konstant. Ist sie niedrig, werden leichtflüchtige Stoffe gut getrennt, schwerflüchtige brauchen aber sehr lange und geben breite, flache Peaks. Ist sie hoch, laufen die Peaks früh und eng zusammen.<\/p> <p>Ein <strong>Temperaturprogramm<\/strong> löst das Problem: Man beginnt bei niedriger Temperatur und heizt dann mit einer festen Rate auf. So werden alle Bestandteile in vertretbarer Zeit mit schmalen Peaks getrennt.<\/p> <div class=\"gl-box gl-info\">Die <strong>Auflösung R<\/strong> beschreibt, wie gut zwei benachbarte Peaks getrennt sind: R = 2 · (t<sub>R2<\/sub> − t<sub>R1<\/sub>) / (w<sub>1<\/sub> + w<sub>2<\/sub>), w = Peakbreite an der Basis. Ab R ≈ 1,5 gelten zwei Peaks als vollständig getrennt.<\/div>"}, {"t": "Qualitative und quantitative Auswertung", "h": "<p><strong>Qualitativ – welcher Stoff?<\/strong> Man vergleicht die Retentionszeiten mit denen von Vergleichssubstanzen, die unter genau denselben Bedingungen gemessen wurden. Stimmt die Retentionszeit überein, ist der Stoff wahrscheinlich gleich; sicher ist es erst, wenn er auch unter anderen Bedingungen übereinstimmt.<\/p> <p><strong>Quantitativ – wie viel?<\/strong> Die <strong>Peakfläche<\/strong> ist proportional zur Stoffmenge des Stoffes. Bei der Flächenprozent-Methode teilt man jede Peakfläche durch die Summe aller Flächen:<\/p> <div class=\"gl-box gl-info\">Anteil (Flächen-%) = A<sub>i<\/sub> / ΣA · 100 %<\/div> <p>Weil der Detektor nicht auf jeden Stoff gleich stark anspricht, korrigiert man für genaue Ergebnisse mit <strong>Responsefaktoren<\/strong>, die mit bekannten Mischungen bestimmt werden. Der Luftpeak wird bei der Auswertung nicht mitgerechnet.<\/p>"}];
+  const g = id => document.getElementById(id);
+  const bd = g("glBackdrop"), box = bd.querySelector(".modal-box");
+  let idx = 0;
+  function show(i){
+    idx = Math.max(0, Math.min(GL.length - 1, i));
+    g("glNum").textContent = (idx + 1) + ".";
+    g("glTitle").innerHTML = GL[idx].t;
+    g("glBody").innerHTML = GL[idx].h;
+    g("glPos").textContent = "Thema " + (idx + 1) + " von " + GL.length;
+    g("glPrev").disabled = idx === 0;
+    g("glNext").disabled = idx === GL.length - 1;
+    box.scrollTop = 0;
+    bd.classList.add("open");
+  }
+  g("glList").innerHTML = GL.map((b, i) => '<button type="button" class="gl-item" data-i="' + i + '"><span class="nr">' + (i + 1) + '</span>' + b.t + '<span class="go">›</span></button>').join("");
+  g("glToggle").addEventListener("click", () => {
+    const open = g("glToggle").getAttribute("aria-expanded") !== "true";
+    g("glToggle").setAttribute("aria-expanded", String(open));
+    g("glPanel").hidden = !open;
+  });
+  g("glList").addEventListener("click", e => { const b = e.target.closest(".gl-item"); if (b) show(+b.dataset.i); });
+  g("glPrev").addEventListener("click", () => show(idx - 1));
+  g("glNext").addEventListener("click", () => show(idx + 1));
+  g("glClose").addEventListener("click", () => bd.classList.remove("open"));
+  bd.addEventListener("click", e => { if (e.target === bd) bd.classList.remove("open"); });
+  document.addEventListener("keydown", e => {
+    if (!bd.classList.contains("open")) return;
+    if (e.key === "Escape") bd.classList.remove("open");
+    if (e.key === "ArrowRight" && idx < GL.length - 1) show(idx + 1);
+    if (e.key === "ArrowLeft" && idx > 0) show(idx - 1);
+  });
 })();
 </script>
 </body>

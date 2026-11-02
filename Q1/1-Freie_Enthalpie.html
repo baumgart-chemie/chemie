@@ -349,6 +349,54 @@ table.given.s0 td.num{color:var(--teal);}
 .lib-wrap{overscroll-behavior:contain;}
 
 canvas#diag{width:100%; height:340px; display:block; border-radius:4px; border:1px solid var(--line-soft); background:var(--screen);}
+
+/* Rubrik Grundlagen */
+.gl-toggle{display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; cursor:pointer; text-align:left;
+  border:1px solid var(--teal-dim); border-radius:4px; background:var(--panel-alt); color:var(--text);
+  font-size:14px; font-weight:600; font-family:inherit; touch-action:manipulation;}
+.gl-toggle:hover{border-color:var(--teal);}
+.gl-toggle:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-toggle .gl-n{font-size:12px; font-weight:400; color:var(--text-faint);}
+.gl-toggle .gl-ch{margin-left:auto; color:var(--teal); font-size:13px;}
+.gl-toggle .gl-ch::after{content:"▸";}
+.gl-toggle[aria-expanded="true"] .gl-ch::after{content:"▾";}
+.gl-panel{margin-top:8px;}
+.gl-list{display:flex; flex-direction:column; gap:6px;}
+.gl-item{display:flex; gap:10px; align-items:center; width:100%; text-align:left; padding:8px 11px; cursor:pointer;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel); color:var(--text);
+  font-size:13px; font-family:inherit; font-weight:500; touch-action:manipulation;}
+.gl-item:hover{border-color:var(--text-faint); background:var(--panel-alt);}
+.gl-item:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-item .nr{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--amber); min-width:14px;}
+.gl-item .go{margin-left:auto; color:var(--text-faint); font-size:12px;}
+.gl-note{font-size:12px; color:var(--text-faint); line-height:1.5; margin:8px 0 0;}
+.modal-box.gl-wide{max-width:900px; width:100%; max-height:88vh; overflow-y:auto;}
+.gl-wide .gl-num{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--text-faint); margin-right:10px;}
+.gl-body p, .gl-body li{font-size:13.5px; line-height:1.6; color:var(--text-dim);}
+.gl-body p{margin:0 0 10px;}
+.gl-body ul, .gl-body ol{margin:0 0 12px; padding-left:22px;}
+.gl-body strong{color:var(--text); font-weight:600;}
+.gl-body sub, .gl-body sup{font-size:.72em;}
+.gl-row{display:flex; flex-wrap:wrap; gap:12px; align-items:stretch; margin:8px 0 14px;}
+.gl-fig{margin:0; flex:1 1 220px; background:var(--screen, #0e1113); border:1px solid var(--line-soft); border-radius:4px; padding:10px 12px 8px;
+  display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:6px; max-width:100%; overflow-x:auto;}
+.gl-fig figcaption{font-size:12px; color:var(--text-dim); text-align:center; line-height:1.45; max-width:420px;}
+.gl-tw{overflow-x:auto; margin:6px 0 12px; border:1px solid var(--line-soft); border-radius:4px;}
+.gl-table{width:100%; border-collapse:collapse; font-size:12.8px;}
+.gl-table th{text-align:left; font-weight:500; color:var(--text-faint); font-size:11.5px; padding:6px 9px; border-bottom:1px solid var(--line); background:var(--panel-alt);}
+.gl-table td{padding:6px 9px; border-bottom:1px solid var(--line-soft); color:var(--text-dim); vertical-align:top;}
+.gl-table tr:last-child td{border-bottom:none;}
+.gl-table td:first-child{color:var(--text);}
+.gl-steps{counter-reset:gls; list-style:none; padding-left:0 !important;}
+.gl-steps li{counter-increment:gls; position:relative; padding-left:30px; margin-bottom:6px;}
+.gl-steps li::before{content:counter(gls); position:absolute; left:0; top:1px; width:20px; height:20px; border-radius:50%; border:1px solid var(--teal-dim);
+  color:var(--teal); font-size:11.5px; display:flex; align-items:center; justify-content:center; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.gl-box{border:1px solid var(--line-soft); border-left:3px solid var(--teal); background:var(--panel-alt); border-radius:3px; padding:9px 12px; margin:8px 0 12px;
+  font-size:13.5px; line-height:1.65; color:var(--text);}
+.gl-box.gl-warn{border-left-color:var(--amber);}
+.gl-box small{color:var(--text-faint); font-size:12px;}
+.gl-nav{display:flex; align-items:center; gap:10px; border-top:1px solid var(--line-soft); padding-top:14px; margin-top:16px;}
+.gl-nav .sp{flex:1; text-align:center; font-size:12px; color:var(--text-faint);}
 </style>
 </head>
 <body>
@@ -414,6 +462,11 @@ canvas#diag{width:100%; height:340px; display:block; border-radius:4px; border:1
       <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.1</span><span class="d">01.11.2026</span></div>
+      <ul>
+        <li><strong>Neue Rubrik „Grundlagen“:</strong> Der Knopf „Grundlagen“ oben in der linken Spalte klappt 5 Themen mit Erklärtext und Grafiken zu den fachlichen und methodischen Grundlagen auf. Mit den Knöpfen unten oder den Pfeiltasten blättert man zwischen den Themen.</li>
+        <li><strong>Lösungshistorie:</strong> neue Kategorie „mit Hilfen gelöst“ für Aufgaben, die nach einem Tipp richtig gelöst wurden.</li>
+      </ul>
       <div class="vh-ver"><span class="v">V1.0</span><span class="d">01.11.2026</span></div>
       <ul>
         <li>Erste Version: Freie Standardreaktionsenthalpie mit der Gibbs-Helmholtz-Gleichung berechnen.</li>
@@ -430,6 +483,17 @@ canvas#diag{width:100%; height:340px; display:block; border-radius:4px; border:1
 <div class="wrap">
   <!-- SIDEBAR -->
   <div class="sidebar">
+
+    <section class="block">
+      <button type="button" class="gl-toggle" id="glToggle" aria-expanded="false" aria-controls="glPanel">
+        <span>Grundlagen</span><span class="gl-n">5 Themen</span><span class="gl-ch" aria-hidden="true"></span>
+      </button>
+      <div class="gl-panel" id="glPanel" hidden>
+        <div class="gl-list" id="glList"></div>
+        <p class="gl-note">Erklärungen mit Grafiken zum Nachlesen – auch zur Besprechung im Unterricht.</p>
+      </div>
+    </section>
+
 
     <section class="block">
       <h2>Aufgabe</h2>
@@ -548,7 +612,7 @@ canvas#diag{width:100%; height:340px; display:block; border-radius:4px; border:1
 
 <footer>
   <p class="footer-note">Tabellenwerte für 25 °C und 1 bar nach gängigen Tabellenwerken (NIST, CRC Handbook), auf eine Nachkommastelle gerundet. Einzelne Schulbücher geben teilweise leicht abweichende Werte an.</p>
-  <p class="footer-credit">Bastian Baumgart · Berechnung der freien Enthalpie V1.0 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Berechnung der freien Enthalpie V1.1 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <script>
@@ -1582,6 +1646,58 @@ canvas#diag{width:100%; height:340px; display:block; border-radius:4px; border:1
   document.getElementById("closeChangelog").addEventListener("click", ()=>bd.classList.remove("open"));
   bd.addEventListener("click", e=>{ if(e.target===bd) bd.classList.remove("open"); });
   document.addEventListener("keydown", e=>{ if(e.key==="Escape") bd.classList.remove("open"); });
+})();
+</script>
+
+<div class="modal-backdrop" id="glBackdrop">
+  <div class="modal-box gl-wide" role="dialog" aria-modal="true" aria-labelledby="glTitle">
+    <div class="modal-head">
+      <h2><span class="gl-num" id="glNum"></span><span id="glTitle"></span></h2>
+      <button class="modal-close" id="glClose" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body gl-body" id="glBody"></div>
+    <div class="gl-nav">
+      <button class="btn ghost" id="glPrev">← Vorheriges Thema</button>
+      <span class="sp" id="glPos"></span>
+      <button class="btn" id="glNext">Nächstes Thema →</button>
+    </div>
+  </div>
+</div>
+<script>
+/* Rubrik Grundlagen */
+(function(){
+  const GL = [{"t": "Entropie", "h": "<p>Ob eine Reaktion freiwillig abläuft, hängt nicht nur von der Enthalpie ab. Ein zweiter Faktor ist die <strong>Entropie S<\/strong>, ein Maß für die Zahl der Möglichkeiten, die Teilchen und ihre Energie zu verteilen – anschaulich „blaue Kugeln“.<\/p> <ul><li>Gase haben eine viel höhere Entropie als Flüssigkeiten, diese eine höhere als Feststoffe: S°(H<sub>2<\/sub>O, g) = 188,8, S°(H<sub>2<\/sub>O, l) = 70,0 J/(mol·K).<\/li> <li>Mehr Teilchen, besonders mehr Gasteilchen, bedeuten höhere Entropie.<\/li> <li>Anders als bei Δ<sub>f<\/sub>H° haben auch <strong>Elemente<\/strong> eine Standardentropie größer als null.<\/li><\/ul> <div class=\"gl-box gl-info\">Δ<sub>r<\/sub>S° = Σ ν · S°(Produkte) − Σ ν · S°(Edukte) &nbsp;&nbsp; Einheit: J/(mol·K)<\/div>"}, {"t": "Freie Enthalpie und Gibbs-Helmholtz-Gleichung", "h": "<p>Enthalpie und Entropie werden in der <strong>freien Enthalpie G<\/strong> zusammengefasst. Für die Reaktion gilt die <strong>Gibbs-Helmholtz-Gleichung<\/strong>:<\/p> <div class=\"gl-box gl-info\">Δ<sub>r<\/sub>G = Δ<sub>r<\/sub>H − T · Δ<sub>r<\/sub>S<\/div> <ul><li><strong>Δ<sub>r<\/sub>G &lt; 0: exergonisch<\/strong> – die Reaktion läuft freiwillig ab.<\/li> <li><strong>Δ<sub>r<\/sub>G &gt; 0: endergonisch<\/strong> – die Reaktion läuft nicht freiwillig ab (die Rückreaktion schon).<\/li> <li>Δ<sub>r<\/sub>G = 0: Gleichgewicht.<\/li><\/ul> <div class=\"gl-box gl-warn\"><strong>Einheiten beachten:<\/strong> Δ<sub>r<\/sub>H in kJ/mol, Δ<sub>r<\/sub>S in J/(mol·K) – vor dem Einsetzen Δ<sub>r<\/sub>S durch 1000 teilen. T immer in <strong>Kelvin<\/strong> (T = θ + 273,15).<\/div> <p>„Freiwillig“ sagt nichts über die Geschwindigkeit: Manche exergonischen Reaktionen brauchen eine Aktivierung, um in Gang zu kommen.<\/p>"}, {"t": "Die vier Fälle", "h": "<div class=\"gl-tw\"><table class=\"gl-table\"><thead><tr><th>Δ<sub>r<\/sub>H<\/th><th>Δ<sub>r<\/sub>S<\/th><th>Δ<sub>r<\/sub>G<\/th><th>freiwillig?<\/th><\/tr><\/thead><tbody><tr><td>&lt; 0<\/td><td>&gt; 0<\/td><td>immer &lt; 0<\/td><td>bei jeder Temperatur<\/td><\/tr><tr><td>&gt; 0<\/td><td>&lt; 0<\/td><td>immer &gt; 0<\/td><td>bei keiner Temperatur<\/td><\/tr><tr><td>&lt; 0<\/td><td>&lt; 0<\/td><td>&lt; 0 bei niedriger T<\/td><td>nur unterhalb der Grenztemperatur<\/td><\/tr><tr><td>&gt; 0<\/td><td>&gt; 0<\/td><td>&lt; 0 bei hoher T<\/td><td>nur oberhalb der Grenztemperatur<\/td><\/tr><\/tbody><\/table><\/div> <div class=\"gl-row\"><figure class=\"gl-fig\"><svg viewBox=\"0 0 330 200\" width=\"330\" style=\"max-width:330px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><defs><marker id=\"ax60727\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--text-dim)\"/><\/marker><\/defs><line x1=\"46\" y1=\"80.66666666666666\" x2=\"316\" y2=\"80.66666666666666\" stroke=\"var(--text-faint)\" stroke-width=\"1\" stroke-dasharray=\"4 3\"/><path d=\"M46.0 157.2 L46.9 156.7 L47.8 156.3 L48.7 155.8 L49.6 155.4 L50.5 155.0 L51.4 154.5 L52.3 154.1 L53.2 153.6 L54.1 153.2 L55.0 152.8 L55.9 152.3 L56.8 151.9 L57.7 151.4 L58.6 151.0 L59.5 150.6 L60.4 150.1 L61.3 149.7 L62.2 149.2 L63.1 148.8 L64.0 148.4 L64.9 147.9 L65.8 147.5 L66.7 147.0 L67.6 146.6 L68.5 146.2 L69.4 145.7 L70.3 145.3 L71.2 144.8 L72.1 144.4 L73.0 144.0 L73.9 143.5 L74.8 143.1 L75.7 142.6 L76.6 142.2 L77.5 141.8 L78.4 141.3 L79.3 140.9 L80.2 140.4 L81.1 140.0 L82.0 139.6 L82.9 139.1 L83.8 138.7 L84.7 138.2 L85.6 137.8 L86.5 137.4 L87.4 136.9 L88.3 136.5 L89.2 136.0 L90.1 135.6 L91.0 135.2 L91.9 134.7 L92.8 134.3 L93.7 133.8 L94.6 133.4 L95.5 133.0 L96.4 132.5 L97.3 132.1 L98.2 131.6 L99.1 131.2 L100.0 130.8 L100.9 130.3 L101.8 129.9 L102.7 129.4 L103.6 129.0 L104.5 128.6 L105.4 128.1 L106.3 127.7 L107.2 127.2 L108.1 126.8 L109.0 126.4 L109.9 125.9 L110.8 125.5 L111.7 125.0 L112.6 124.6 L113.5 124.2 L114.4 123.7 L115.3 123.3 L116.2 122.8 L117.1 122.4 L118.0 121.9 L118.9 121.5 L119.8 121.1 L120.7 120.6 L121.6 120.2 L122.5 119.7 L123.4 119.3 L124.3 118.9 L125.2 118.4 L126.1 118.0 L127.0 117.5 L127.9 117.1 L128.8 116.7 L129.7 116.2 L130.6 115.8 L131.5 115.3 L132.4 114.9 L133.3 114.5 L134.2 114.0 L135.1 113.6 L136.0 113.1 L136.9 112.7 L137.8 112.3 L138.7 111.8 L139.6 111.4 L140.5 110.9 L141.4 110.5 L142.3 110.1 L143.2 109.6 L144.1 109.2 L145.0 108.7 L145.9 108.3 L146.8 107.9 L147.7 107.4 L148.6 107.0 L149.5 106.5 L150.4 106.1 L151.3 105.7 L152.2 105.2 L153.1 104.8 L154.0 104.3 L154.9 103.9 L155.8 103.5 L156.7 103.0 L157.6 102.6 L158.5 102.1 L159.4 101.7 L160.3 101.3 L161.2 100.8 L162.1 100.4 L163.0 99.9 L163.9 99.5 L164.8 99.1 L165.7 98.6 L166.6 98.2 L167.5 97.7 L168.4 97.3 L169.3 96.9 L170.2 96.4 L171.1 96.0 L172.0 95.5 L172.9 95.1 L173.8 94.7 L174.7 94.2 L175.6 93.8 L176.5 93.3 L177.4 92.9 L178.3 92.5 L179.2 92.0 L180.1 91.6 L181.0 91.1 L181.9 90.7 L182.8 90.3 L183.7 89.8 L184.6 89.4 L185.5 88.9 L186.4 88.5 L187.3 88.1 L188.2 87.6 L189.1 87.2 L190.0 86.7 L190.9 86.3 L191.8 85.9 L192.7 85.4 L193.6 85.0 L194.5 84.5 L195.4 84.1 L196.3 83.6 L197.2 83.2 L198.1 82.8 L199.0 82.3 L199.9 81.9 L200.8 81.4 L201.7 81.0 L202.6 80.6 L203.5 80.1 L204.4 79.7 L205.3 79.2 L206.2 78.8 L207.1 78.4 L208.0 77.9 L208.9 77.5 L209.8 77.0 L210.7 76.6 L211.6 76.2 L212.5 75.7 L213.4 75.3 L214.3 74.8 L215.2 74.4 L216.1 74.0 L217.0 73.5 L217.9 73.1 L218.8 72.6 L219.7 72.2 L220.6 71.8 L221.5 71.3 L222.4 70.9 L223.3 70.4 L224.2 70.0 L225.1 69.6 L226.0 69.1 L226.9 68.7 L227.8 68.2 L228.7 67.8 L229.6 67.4 L230.5 66.9 L231.4 66.5 L232.3 66.0 L233.2 65.6 L234.1 65.2 L235.0 64.7 L235.9 64.3 L236.8 63.8 L237.7 63.4 L238.6 63.0 L239.5 62.5 L240.4 62.1 L241.3 61.6 L242.2 61.2 L243.1 60.8 L244.0 60.3 L244.9 59.9 L245.8 59.4 L246.7 59.0 L247.6 58.6 L248.5 58.1 L249.4 57.7 L250.3 57.2 L251.2 56.8 L252.1 56.4 L253.0 55.9 L253.9 55.5 L254.8 55.0 L255.7 54.6 L256.6 54.2 L257.5 53.7 L258.4 53.3 L259.3 52.8 L260.2 52.4 L261.1 52.0 L262.0 51.5 L262.9 51.1 L263.8 50.6 L264.7 50.2 L265.6 49.8 L266.5 49.3 L267.4 48.9 L268.3 48.4 L269.2 48.0 L270.1 47.6 L271.0 47.1 L271.9 46.7 L272.8 46.2 L273.7 45.8 L274.6 45.4 L275.5 44.9 L276.4 44.5 L277.3 44.0 L278.2 43.6 L279.1 43.1 L280.0 42.7 L280.9 42.3 L281.8 41.8 L282.7 41.4 L283.6 40.9 L284.5 40.5 L285.4 40.1 L286.3 39.6 L287.2 39.2 L288.1 38.7 L289.0 38.3 L289.9 37.9 L290.8 37.4 L291.7 37.0 L292.6 36.5 L293.5 36.1 L294.4 35.7 L295.3 35.2 L296.2 34.8 L297.1 34.3 L298.0 33.9 L298.9 33.5 L299.8 33.0 L300.7 32.6 L301.6 32.1 L302.5 31.7 L303.4 31.3 L304.3 30.8 L305.2 30.4 L306.1 29.9 L307.0 29.5 L307.9 29.1 L308.8 28.6 L309.7 28.2 L310.6 27.7 L311.5 27.3 L312.4 26.9 L313.3 26.4 L314.2 26.0 L315.1 25.5 L316.0 25.1\" stroke=\"var(--teal)\" stroke-width=\"2\" fill=\"none\" /><circle cx=\"202.3\" cy=\"80.7\" r=\"3.6\" fill=\"var(--amber)\"/><text x=\"210.2625\" y=\"72.66666666666666\" font-size=\"10.5\" fill=\"var(--amber)\" text-anchor=\"start\" font-weight=\"400\" >Grenztemperatur<\/text><line x1=\"46\" y1=\"164\" x2=\"322\" y2=\"164\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" marker-end=\"url(#ax60727)\"/><line x1=\"46\" y1=\"164\" x2=\"46\" y2=\"8\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" marker-end=\"url(#ax60727)\"/><line x1=\"46.0\" y1=\"164\" x2=\"46.0\" y2=\"168\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"46.0\" y=\"179\" font-size=\"10\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >0<\/text><line x1=\"181.0\" y1=\"164\" x2=\"181.0\" y2=\"168\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"181.0\" y=\"179\" font-size=\"10\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >400<\/text><line x1=\"316.0\" y1=\"164\" x2=\"316.0\" y2=\"168\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"316.0\" y=\"179\" font-size=\"10\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >800<\/text><line x1=\"42\" y1=\"147.33333333333334\" x2=\"46\" y2=\"147.33333333333334\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"39\" y=\"150.83333333333334\" font-size=\"10\" fill=\"var(--text-dim)\" text-anchor=\"end\" font-weight=\"400\" >−80<\/text><line x1=\"42\" y1=\"80.66666666666666\" x2=\"46\" y2=\"80.66666666666666\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"39\" y=\"84.16666666666666\" font-size=\"10\" fill=\"var(--text-dim)\" text-anchor=\"end\" font-weight=\"400\" >0<\/text><line x1=\"42\" y1=\"47.33333333333333\" x2=\"46\" y2=\"47.33333333333333\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"39\" y=\"50.83333333333333\" font-size=\"10\" fill=\"var(--text-dim)\" text-anchor=\"end\" font-weight=\"400\" >40<\/text><text x=\"181.0\" y=\"196\" font-size=\"11\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >T in K<\/text><text x=\"13\" y=\"89.0\" font-size=\"11\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" transform=\"rotate(-90 13 89.0)\">ΔrG in kJ/mol<\/text><\/svg><figcaption>Ammoniaksynthese: Δ<sub>r<\/sub>H und Δ<sub>r<\/sub>S negativ – mit steigender Temperatur wird Δ<sub>r<\/sub>G positiv.<\/figcaption><\/figure><\/div>"}, {"t": "Grenztemperatur", "h": "<p>Haben Δ<sub>r<\/sub>H und Δ<sub>r<\/sub>S dasselbe Vorzeichen, wechselt Δ<sub>r<\/sub>G bei einer bestimmten Temperatur das Vorzeichen. Setzt man Δ<sub>r<\/sub>G = 0, erhält man die <strong>Grenztemperatur<\/strong>:<\/p> <div class=\"gl-box gl-info\">T<sub>G<\/sub> = Δ<sub>r<\/sub>H / Δ<sub>r<\/sub>S &nbsp;&nbsp; (Δ<sub>r<\/sub>S in kJ/(mol·K))<\/div> <p>Dabei nimmt man an, dass sich Δ<sub>r<\/sub>H und Δ<sub>r<\/sub>S mit der Temperatur kaum ändern – eine Näherung, die für Schulrechnungen gut genug ist.<\/p>"}, {"t": "Rechenweg mit Beispiel", "h": "<ol class=\"gl-steps\"><li>Reaktionsgleichung mit Aggregatzuständen aufstellen.<\/li><li>Δ<sub>r<\/sub>H° aus den Bildungsenthalpien berechnen (Produkte minus Edukte).<\/li><li>Δ<sub>r<\/sub>S° aus den Standardentropien berechnen (Elemente nicht vergessen!).<\/li><li>Δ<sub>r<\/sub>S in kJ/(mol·K) umrechnen, Temperatur in K.<\/li><li>Δ<sub>r<\/sub>G = Δ<sub>r<\/sub>H − T · Δ<sub>r<\/sub>S berechnen und deuten.<\/li><\/ol> <div class=\"gl-box gl-info\"><strong>Ammoniaksynthese<\/strong> N<sub>2<\/sub>(g) + 3 H<sub>2<\/sub>(g) → 2 NH<sub>3<\/sub>(g)<br>Δ<sub>r<\/sub>H° = 2 · (−45,9) − 0 = −91,8 kJ/mol<br>Δ<sub>r<\/sub>S° = 2 · 192,8 − (191,6 + 3 · 130,7) = −198,1 J/(mol·K)<br>Δ<sub>r<\/sub>G°(298 K) = −91,8 − 298,15 · (−0,1981) = <strong>−32,7 kJ/mol<\/strong> → exergonisch<br>T<sub>G<\/sub> = −91,8 / −0,1981 ≈ <strong>463 K<\/strong> (≈ 190 °C)<\/div>"}];
+  const g = id => document.getElementById(id);
+  const bd = g("glBackdrop"), box = bd.querySelector(".modal-box");
+  let idx = 0;
+  function show(i){
+    idx = Math.max(0, Math.min(GL.length - 1, i));
+    g("glNum").textContent = (idx + 1) + ".";
+    g("glTitle").innerHTML = GL[idx].t;
+    g("glBody").innerHTML = GL[idx].h;
+    g("glPos").textContent = "Thema " + (idx + 1) + " von " + GL.length;
+    g("glPrev").disabled = idx === 0;
+    g("glNext").disabled = idx === GL.length - 1;
+    box.scrollTop = 0;
+    bd.classList.add("open");
+  }
+  g("glList").innerHTML = GL.map((b, i) => '<button type="button" class="gl-item" data-i="' + i + '"><span class="nr">' + (i + 1) + '</span>' + b.t + '<span class="go">›</span></button>').join("");
+  g("glToggle").addEventListener("click", () => {
+    const open = g("glToggle").getAttribute("aria-expanded") !== "true";
+    g("glToggle").setAttribute("aria-expanded", String(open));
+    g("glPanel").hidden = !open;
+  });
+  g("glList").addEventListener("click", e => { const b = e.target.closest(".gl-item"); if (b) show(+b.dataset.i); });
+  g("glPrev").addEventListener("click", () => show(idx - 1));
+  g("glNext").addEventListener("click", () => show(idx + 1));
+  g("glClose").addEventListener("click", () => bd.classList.remove("open"));
+  bd.addEventListener("click", e => { if (e.target === bd) bd.classList.remove("open"); });
+  document.addEventListener("keydown", e => {
+    if (!bd.classList.contains("open")) return;
+    if (e.key === "Escape") bd.classList.remove("open");
+    if (e.key === "ArrowRight" && idx < GL.length - 1) show(idx + 1);
+    if (e.key === "ArrowLeft" && idx > 0) show(idx - 1);
+  });
 })();
 </script>
 </body>

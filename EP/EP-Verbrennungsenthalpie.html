@@ -321,6 +321,59 @@ body.nocolor .bdot{display:none;}
     overflow-y:auto; overscroll-behavior:contain; background:var(--bg);
   }
 }
+
+/* Rubrik Grundlagen */
+.gl-toggle{display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; cursor:pointer; text-align:left;
+  border:1px solid var(--teal-dim); border-radius:4px; background:var(--panel-alt); color:var(--text);
+  font-size:14px; font-weight:600; font-family:inherit; touch-action:manipulation;}
+.gl-toggle:hover{border-color:var(--teal);}
+.gl-toggle:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-toggle .gl-n{font-size:12px; font-weight:400; color:var(--text-faint);}
+.gl-toggle .gl-ch{margin-left:auto; color:var(--teal); font-size:13px;}
+.gl-toggle .gl-ch::after{content:"▸";}
+.gl-toggle[aria-expanded="true"] .gl-ch::after{content:"▾";}
+.gl-panel{margin-top:8px;}
+.gl-list{display:flex; flex-direction:column; gap:6px;}
+.gl-item{display:flex; gap:10px; align-items:center; width:100%; text-align:left; padding:8px 11px; cursor:pointer;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel); color:var(--text);
+  font-size:13px; font-family:inherit; font-weight:500; touch-action:manipulation;}
+.gl-item:hover{border-color:var(--text-faint); background:var(--panel-alt);}
+.gl-item:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-item .nr{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--amber); min-width:14px;}
+.gl-item .go{margin-left:auto; color:var(--text-faint); font-size:12px;}
+.gl-note{font-size:12px; color:var(--text-faint); line-height:1.5; margin:8px 0 0;}
+.modal-box.gl-wide{max-width:900px; width:100%; max-height:88vh; overflow-y:auto;}
+.gl-wide .gl-num{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--text-faint); margin-right:10px;}
+.gl-body p, .gl-body li{font-size:13.5px; line-height:1.6; color:var(--text-dim);}
+.gl-body p{margin:0 0 10px;}
+.gl-body ul, .gl-body ol{margin:0 0 12px; padding-left:22px;}
+.gl-body strong{color:var(--text); font-weight:600;}
+.gl-body sub, .gl-body sup{font-size:.72em;}
+.gl-row{display:flex; flex-wrap:wrap; gap:12px; align-items:stretch; margin:8px 0 14px;}
+.gl-fig{margin:0; flex:1 1 220px; background:var(--screen, #0e1113); border:1px solid var(--line-soft); border-radius:4px; padding:10px 12px 8px;
+  display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:6px; max-width:100%; overflow-x:auto;}
+.gl-fig figcaption{font-size:12px; color:var(--text-dim); text-align:center; line-height:1.45; max-width:420px;}
+.gl-tw{overflow-x:auto; margin:6px 0 12px; border:1px solid var(--line-soft); border-radius:4px;}
+.gl-table{width:100%; border-collapse:collapse; font-size:12.8px;}
+.gl-table th{text-align:left; font-weight:500; color:var(--text-faint); font-size:11.5px; padding:6px 9px; border-bottom:1px solid var(--line); background:var(--panel-alt);}
+.gl-table td{padding:6px 9px; border-bottom:1px solid var(--line-soft); color:var(--text-dim); vertical-align:top;}
+.gl-table tr:last-child td{border-bottom:none;}
+.gl-table td:first-child{color:var(--text);}
+.gl-steps{counter-reset:gls; list-style:none; padding-left:0 !important;}
+.gl-steps li{counter-increment:gls; position:relative; padding-left:30px; margin-bottom:6px;}
+.gl-steps li::before{content:counter(gls); position:absolute; left:0; top:1px; width:20px; height:20px; border-radius:50%; border:1px solid var(--teal-dim);
+  color:var(--teal); font-size:11.5px; display:flex; align-items:center; justify-content:center; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.gl-box{border:1px solid var(--line-soft); border-left:3px solid var(--teal); background:var(--panel-alt); border-radius:3px; padding:9px 12px; margin:8px 0 12px;
+  font-size:13.5px; line-height:1.65; color:var(--text);}
+.gl-box.gl-warn{border-left-color:var(--amber);}
+.gl-box small{color:var(--text-faint); font-size:12px;}
+.gl-nav{display:flex; align-items:center; gap:10px; border-top:1px solid var(--line-soft); padding-top:14px; margin-top:16px;}
+.gl-nav .sp{flex:1; text-align:center; font-size:12px; color:var(--text-faint);}
+
+.vh-ver{display:flex; align-items:baseline; gap:10px; margin:18px 0 6px;}
+.vh-ver:first-child{margin-top:0;}
+.vh-ver .v{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:13px; color:var(--amber); border:1px solid var(--amber-dim); border-radius:var(--radius); padding:1px 7px;}
+.vh-ver .d{font-size:12px; color:var(--text-faint);}
 </style>
 
 </head>
@@ -376,6 +429,17 @@ body.nocolor .bdot{display:none;}
 <div class="wrap">
   <!-- SIDEBAR -->
   <div class="sidebar">
+
+    <section class="block">
+      <button type="button" class="gl-toggle" id="glToggle" aria-expanded="false" aria-controls="glPanel">
+        <span>Grundlagen</span><span class="gl-n">5 Themen</span><span class="gl-ch" aria-hidden="true"></span>
+      </button>
+      <div class="gl-panel" id="glPanel" hidden>
+        <div class="gl-list" id="glList"></div>
+        <p class="gl-note">Erklärungen mit Grafiken zum Nachlesen – auch zur Besprechung im Unterricht.</p>
+      </div>
+    </section>
+
 
     <section class="block">
       <h2>Aufgabe</h2>
@@ -539,7 +603,7 @@ body.nocolor .bdot{display:none;}
 
 <footer>
   <p class="footer-note">Mittlere Bindungsenthalpien nach gängigen Schulbuch-Tabellenwerken, gerundet auf ganze kJ/mol. Einzelne Schulbücher geben teilweise leicht abweichende Werte an. Die Berechnung mit mittleren Bindungsenthalpien liefert Näherungswerte.</p>
-  <p class="footer-credit">Bastian Baumgart · Verbrennungsenthalpie von Alkanen V1.2 (erstellt mit Claude Pro) · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Verbrennungsenthalpie von Alkanen V1.3 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 <script>
 (function(){
@@ -1491,6 +1555,88 @@ body.nocolor .bdot{display:none;}
   if(!hdr) return;
   const set = () => document.documentElement.style.setProperty("--hdr", Math.max(0, Math.round(hdr.getBoundingClientRect().bottom)) + "px");
   addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
+})();
+</script>
+
+<div class="modal-backdrop" id="glBackdrop">
+  <div class="modal-box gl-wide" role="dialog" aria-modal="true" aria-labelledby="glTitle">
+    <div class="modal-head">
+      <h2><span class="gl-num" id="glNum"></span><span id="glTitle"></span></h2>
+      <button class="modal-close" id="glClose" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body gl-body" id="glBody"></div>
+    <div class="gl-nav">
+      <button class="btn ghost" id="glPrev">← Vorheriges Thema</button>
+      <span class="sp" id="glPos"></span>
+      <button class="btn" id="glNext">Nächstes Thema →</button>
+    </div>
+  </div>
+</div>
+<script>
+/* Rubrik Grundlagen */
+(function(){
+  const GL = [{"t": "Vollständige Verbrennung von Alkanen", "h": "<p>Bei der vollständigen Verbrennung reagiert ein Alkan mit Sauerstoff zu <strong>Kohlenstoffdioxid und Wasser<\/strong>. Allgemein gilt:<\/p> <div class=\"gl-box gl-info\">C<sub>n<\/sub>H<sub>2n+2<\/sub> + <sup>3n+1<\/sup>⁄<sub>2<\/sub> O<sub>2<\/sub> → n CO<sub>2<\/sub> + (n+1) H<sub>2<\/sub>O<\/div> <p>Ausgleichen: erst C (n CO<sub>2<\/sub>), dann H ((n+1) H<sub>2<\/sub>O), zuletzt O. Ergibt sich für O<sub>2<\/sub> ein halbzahliger Koeffizient, verdoppelt man alle Koeffizienten oder rechnet für 1 mol Alkan mit dem Bruch weiter.<\/p> <div class=\"gl-box gl-info\">Propan: C<sub>3<\/sub>H<sub>8<\/sub> + 5 O<sub>2<\/sub> → 3 CO<sub>2<\/sub> + 4 H<sub>2<\/sub>O<br>Ethan: C<sub>2<\/sub>H<sub>6<\/sub> + 3,5 O<sub>2<\/sub> → 2 CO<sub>2<\/sub> + 3 H<sub>2<\/sub>O<\/div>"}, {"t": "Bindungsenthalpie", "h": "<p>Um eine Bindung zu spalten, muss Energie aufgewendet werden; wird eine Bindung gebildet, wird dieselbe Energie frei. Die <strong>Bindungsenthalpie BE<\/strong> gibt diese Energie für 1 mol Bindungen in der Gasphase an.<\/p> <p>Weil die Stärke einer Bindung etwas vom Molekül abhängt, verwendet man <strong>mittlere Bindungsenthalpien<\/strong> – Durchschnittswerte über viele Verbindungen. Deshalb liefert die Rechnung nur einen <strong>Näherungswert<\/strong>.<\/p> <div class=\"gl-tw\"><table class=\"gl-table\"><thead><tr><th>Bindung<\/th><th>typische mittlere BE<\/th><\/tr><\/thead><tbody><tr><td>C–H<\/td><td>≈ 413 kJ/mol<\/td><\/tr><tr><td>C–C<\/td><td>≈ 348 kJ/mol<\/td><\/tr><tr><td>O=O<\/td><td>≈ 498 kJ/mol<\/td><\/tr><tr><td>C=O allgemein<\/td><td>≈ 745 kJ/mol<\/td><\/tr><tr><td>C=O im CO<sub>2<\/sub><\/td><td>≈ 803 kJ/mol<\/td><\/tr><tr><td>O–H<\/td><td>≈ 463 kJ/mol<\/td><\/tr><\/tbody><\/table><\/div> <p>Für die Aufgaben gelten die Werte aus der Tabelle in der linken Spalte.<\/p>"}, {"t": "Reaktionsenthalpie aus Bindungsenthalpien", "h": "<p>Man denkt sich die Reaktion in zwei Schritten: Alle Bindungen der Edukte werden gespalten (Energie wird aufgenommen), dann alle Bindungen der Produkte gebildet (Energie wird frei).<\/p> <div class=\"gl-box gl-info\">Δ<sub>c<\/sub>H ≈ ΣBE(gespaltene Bindungen) − ΣBE(gebildete Bindungen)<\/div> <div class=\"gl-row\"><figure class=\"gl-fig\"><svg viewBox=\"0 0 360 215\" width=\"360\" style=\"max-width:360px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><defs><marker id=\"bv\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--text-dim)\"/><\/marker><marker id=\"bvt\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--teal)\"/><\/marker><marker id=\"bva\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--amber)\"/><\/marker><\/defs><line x1=\"30\" y1=\"199\" x2=\"30\" y2=\"10\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" marker-end=\"url(#bv)\"/><text x=\"16\" y=\"107.5\" font-size=\"11\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" transform=\"rotate(-90 16 107.5)\">Enthalpie H<\/text><line x1=\"40\" y1=\"40\" x2=\"320\" y2=\"40\" stroke=\"var(--text-dim)\" stroke-width=\"2.4\"/><text x=\"180.0\" y=\"33\" font-size=\"11.5\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >Atome (gasförmig)<\/text><line x1=\"40\" y1=\"120\" x2=\"150\" y2=\"120\" stroke=\"var(--teal)\" stroke-width=\"2.4\"/><text x=\"95.0\" y=\"113\" font-size=\"11.5\" fill=\"var(--teal)\" text-anchor=\"middle\" font-weight=\"400\" >Edukte<\/text><line x1=\"180\" y1=\"185\" x2=\"320\" y2=\"185\" stroke=\"var(--amber)\" stroke-width=\"2.4\"/><text x=\"250.0\" y=\"178\" font-size=\"11.5\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"400\" >Produkte<\/text><line x1=\"55\" y1=\"118\" x2=\"55\" y2=\"44\" stroke=\"var(--teal)\" stroke-width=\"1.6\" marker-end=\"url(#bvt)\"/><text x=\"61\" y=\"85.0\" font-size=\"11.5\" fill=\"var(--teal)\" text-anchor=\"start\" font-weight=\"400\" >+ΣBE Edukte<\/text><line x1=\"200\" y1=\"44\" x2=\"200\" y2=\"181\" stroke=\"var(--amber)\" stroke-width=\"1.6\" marker-end=\"url(#bva)\"/><text x=\"206\" y=\"116.5\" font-size=\"11.5\" fill=\"var(--amber)\" text-anchor=\"start\" font-weight=\"400\" >−ΣBE Produkte<\/text><\/svg><figcaption>Wird beim Bilden mehr Energie frei als beim Spalten nötig ist, ist die Reaktion exotherm (Δ<sub>c<\/sub>H &lt; 0).<\/figcaption><\/figure><\/div>"}, {"t": "Bindungen zählen", "h": "<p>Ein Alkan C<sub>n<\/sub>H<sub>2n+2<\/sub> enthält <strong>(n − 1) C–C-Bindungen<\/strong> und <strong>(2n + 2) C–H-Bindungen<\/strong>. Ein CO<sub>2<\/sub>-Molekül hat zwei C=O-Bindungen, ein H<sub>2<\/sub>O-Molekül zwei O–H-Bindungen.<\/p> <div class=\"gl-box gl-info\"><strong>Beispiel Methan:<\/strong> CH<sub>4<\/sub> + 2 O<sub>2<\/sub> → CO<sub>2<\/sub> + 2 H<sub>2<\/sub>O<br>gespalten: 4 · C–H + 2 · O=O = 4 · 413 + 2 · 498 = 2648 kJ<br>gebildet: 2 · C=O + 4 · O–H = 2 · 803 + 4 · 463 = 3458 kJ<br>Δ<sub>c<\/sub>H ≈ 2648 − 3458 = <strong>−810 kJ/mol<\/strong><\/div> <p>Der Tabellenwert (mit gasförmigem Wasser) liegt bei −802 kJ/mol. Die Abweichung entsteht durch die mittleren Bindungsenthalpien.<\/p>"}, {"t": "Energiebilanz und Brennstoffe", "h": "<p>Mit jeder zusätzlichen CH<sub>2<\/sub>-Gruppe kommen eine C–C- und zwei C–H-Bindungen hinzu; die molare Verbrennungsenthalpie wird dadurch um rund 600–650 kJ/mol negativer. Langkettige Alkane liefern pro Mol also deutlich mehr Energie.<\/p> <p>Für den Vergleich von Brennstoffen ist oft die Energie <strong>pro Masse<\/strong> sinnvoller (Heizwert in kJ/g): Man teilt die molare Verbrennungsenthalpie durch die molare Masse. Dieser Wert ist bei allen Alkanen ähnlich (etwa 45–50 kJ/g).<\/p> <div class=\"gl-box gl-warn\">Rechnungen mit Bindungsenthalpien beziehen sich auf <strong>gasförmige<\/strong> Stoffe. Entsteht flüssiges Wasser, wird zusätzlich die Kondensationsenthalpie frei; der Betrag von Δ<sub>c<\/sub>H wird größer.<\/div>"}];
+  const g = id => document.getElementById(id);
+  const bd = g("glBackdrop"), box = bd.querySelector(".modal-box");
+  let idx = 0;
+  function show(i){
+    idx = Math.max(0, Math.min(GL.length - 1, i));
+    g("glNum").textContent = (idx + 1) + ".";
+    g("glTitle").innerHTML = GL[idx].t;
+    g("glBody").innerHTML = GL[idx].h;
+    g("glPos").textContent = "Thema " + (idx + 1) + " von " + GL.length;
+    g("glPrev").disabled = idx === 0;
+    g("glNext").disabled = idx === GL.length - 1;
+    box.scrollTop = 0;
+    bd.classList.add("open");
+  }
+  g("glList").innerHTML = GL.map((b, i) => '<button type="button" class="gl-item" data-i="' + i + '"><span class="nr">' + (i + 1) + '</span>' + b.t + '<span class="go">›</span></button>').join("");
+  g("glToggle").addEventListener("click", () => {
+    const open = g("glToggle").getAttribute("aria-expanded") !== "true";
+    g("glToggle").setAttribute("aria-expanded", String(open));
+    g("glPanel").hidden = !open;
+  });
+  g("glList").addEventListener("click", e => { const b = e.target.closest(".gl-item"); if (b) show(+b.dataset.i); });
+  g("glPrev").addEventListener("click", () => show(idx - 1));
+  g("glNext").addEventListener("click", () => show(idx + 1));
+  g("glClose").addEventListener("click", () => bd.classList.remove("open"));
+  bd.addEventListener("click", e => { if (e.target === bd) bd.classList.remove("open"); });
+  document.addEventListener("keydown", e => {
+    if (!bd.classList.contains("open")) return;
+    if (e.key === "Escape") bd.classList.remove("open");
+    if (e.key === "ArrowRight" && idx < GL.length - 1) show(idx + 1);
+    if (e.key === "ArrowLeft" && idx > 0) show(idx - 1);
+  });
+})();
+</script>
+
+<div class="modal-backdrop" id="changelogBackdrop">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="changelogTitle">
+    <div class="modal-head">
+      <h2 id="changelogTitle">Versionshinweise</h2>
+      <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.3</span><span class="d">01.11.2026</span></div>
+      <ul>
+        <li><strong>Neue Rubrik „Grundlagen“:</strong> Der Knopf „Grundlagen“ oben in der linken Spalte klappt 5 Themen mit Erklärtext und Grafiken zu den fachlichen und methodischen Grundlagen auf. Mit den Knöpfen unten oder den Pfeiltasten blättert man zwischen den Themen.</li>
+        <li><strong>Linke Spalte:</strong> Sie bleibt beim Scrollen der Aufgabe stehen, füllt die Bildschirmhöhe und scrollt als Ganzes in einem einzigen Bereich.</li>
+        <li><strong>Lösungshistorie:</strong> neue Kategorie „mit Hilfen gelöst“ für Aufgaben, die nach einem Tipp richtig gelöst wurden.</li>
+      </ul>
+      <div class="vh-ver"><span class="v">V1.2</span><span class="d">bis Oktober 2026</span></div>
+      <ul>
+        <li>Für V1.2 und frühere Versionen liegen keine Versionshinweise vor.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  const bd = document.getElementById("changelogBackdrop");
+  document.getElementById("btnChangelog").addEventListener("click", e => { e.preventDefault(); bd.classList.add("open"); });
+  document.getElementById("closeChangelog").addEventListener("click", () => bd.classList.remove("open"));
+  bd.addEventListener("click", e => { if (e.target === bd) bd.classList.remove("open"); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") bd.classList.remove("open"); });
 })();
 </script>
 </body>

@@ -284,6 +284,7 @@ svg.mol{display:block; max-width:none; overflow:visible;}
 svg.mol line{stroke:var(--bond); stroke-width:1.4; stroke-linecap:round;}
 svg.mol text{fill:var(--text); font-size:13px; font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; text-anchor:middle; dominant-baseline:central;}
 svg.mol text.ox{fill:var(--oxy);}
+svg.mol text.oz{fill:var(--amber); font-size:11px; font-weight:600; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
 svg.mol circle.chg{fill:none; stroke:var(--text); stroke-width:1.1;}
 svg.mol line.chg{stroke:var(--text); stroke-width:1.2;}
 svg.mol line.lp{stroke-width:1.6;}
@@ -382,6 +383,56 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
     overflow-y:auto; overscroll-behavior:contain; background:var(--bg);
   }
 }
+
+/* Rubrik Grundlagen */
+.gl-toggle{display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; cursor:pointer; text-align:left;
+  border:1px solid var(--teal-dim); border-radius:4px; background:var(--panel-alt); color:var(--text);
+  font-size:14px; font-weight:600; font-family:inherit; touch-action:manipulation;}
+.gl-toggle:hover{border-color:var(--teal);}
+.gl-toggle:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-toggle .gl-n{font-size:12px; font-weight:400; color:var(--text-faint);}
+.gl-toggle .gl-ch{margin-left:auto; color:var(--teal); font-size:13px;}
+.gl-toggle .gl-ch::after{content:"▸";}
+.gl-toggle[aria-expanded="true"] .gl-ch::after{content:"▾";}
+.gl-panel{margin-top:8px;}
+.gl-list{display:flex; flex-direction:column; gap:6px;}
+.gl-item{display:flex; gap:10px; align-items:center; width:100%; text-align:left; padding:8px 11px; cursor:pointer;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel); color:var(--text);
+  font-size:13px; font-family:inherit; font-weight:500; touch-action:manipulation;}
+.gl-item:hover{border-color:var(--text-faint); background:var(--panel-alt);}
+.gl-item:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-item .nr{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--amber); min-width:14px;}
+.gl-item .go{margin-left:auto; color:var(--text-faint); font-size:12px;}
+.gl-note{font-size:12px; color:var(--text-faint); line-height:1.5; margin:8px 0 0;}
+.modal-box.gl-wide{max-width:900px; width:100%; max-height:88vh; overflow-y:auto;}
+.gl-wide .gl-num{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--text-faint); margin-right:10px;}
+.gl-body p, .gl-body li{font-size:13.5px; line-height:1.6; color:var(--text-dim);}
+.gl-body p{margin:0 0 10px;}
+.gl-body ul, .gl-body ol{margin:0 0 12px; padding-left:22px;}
+.gl-body strong{color:var(--text); font-weight:600;}
+.gl-body sub, .gl-body sup{font-size:.72em;}
+.gl-row{display:flex; flex-wrap:wrap; gap:12px; align-items:stretch; margin:8px 0 14px;}
+.gl-fig{margin:0; flex:1 1 220px; background:var(--screen, #0e1113); border:1px solid var(--line-soft); border-radius:4px; padding:10px 12px 8px;
+  display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:6px; max-width:100%; overflow-x:auto;}
+.gl-fig figcaption{font-size:12px; color:var(--text-dim); text-align:center; line-height:1.45; max-width:420px;}
+.gl-tw{overflow-x:auto; margin:6px 0 12px; border:1px solid var(--line-soft); border-radius:4px;}
+.gl-table{width:100%; border-collapse:collapse; font-size:12.8px;}
+.gl-table th{text-align:left; font-weight:500; color:var(--text-faint); font-size:11.5px; padding:6px 9px; border-bottom:1px solid var(--line); background:var(--panel-alt);}
+.gl-table td{padding:6px 9px; border-bottom:1px solid var(--line-soft); color:var(--text-dim); vertical-align:top;}
+.gl-table tr:last-child td{border-bottom:none;}
+.gl-table td:first-child{color:var(--text);}
+.gl-steps{counter-reset:gls; list-style:none; padding-left:0 !important;}
+.gl-steps li{counter-increment:gls; position:relative; padding-left:30px; margin-bottom:6px;}
+.gl-steps li::before{content:counter(gls); position:absolute; left:0; top:1px; width:20px; height:20px; border-radius:50%; border:1px solid var(--teal-dim);
+  color:var(--teal); font-size:11.5px; display:flex; align-items:center; justify-content:center; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.gl-box{border:1px solid var(--line-soft); border-left:3px solid var(--teal); background:var(--panel-alt); border-radius:3px; padding:9px 12px; margin:8px 0 12px;
+  font-size:13.5px; line-height:1.65; color:var(--text);}
+.gl-box.gl-warn{border-left-color:var(--amber);}
+.gl-eq{display:flex; flex-wrap:wrap; align-items:center; gap:4px 10px; margin:8px 0 2px; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:15px; color:var(--text); overflow-x:auto;}
+.gl-eq .ar{color:var(--teal); font-size:18px;}
+.gl-box small{color:var(--text-faint); font-size:12px;}
+.gl-nav{display:flex; align-items:center; gap:10px; border-top:1px solid var(--line-soft); padding-top:14px; margin-top:16px;}
+.gl-nav .sp{flex:1; text-align:center; font-size:12px; color:var(--text-faint);}
 </style>
 </head>
 <body>
@@ -444,6 +495,12 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
       <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.1</span><span class="d">01.11.2026</span></div>
+      <ul>
+        <li><strong>Neue Rubrik „Grundlagen“:</strong> Der Knopf „Grundlagen“ oben in der linken Spalte klappt 5 Themen mit Erklärtext und Grafiken zu den fachlichen und methodischen Grundlagen auf. Mit den Knöpfen unten oder den Pfeiltasten blättert man zwischen den Themen.</li>
+        <li><strong>Linke Spalte:</strong> Sie bleibt beim Scrollen der Aufgabe stehen, füllt die Bildschirmhöhe und scrollt als Ganzes in einem einzigen Bereich.</li>
+        <li><strong>Lösungshistorie:</strong> neue Kategorie „mit Hilfen gelöst“ für Aufgaben, die nach einem Tipp richtig gelöst wurden.</li>
+      </ul>
       <div class="vh-ver"><span class="v">V1.0</span><span class="d">26.10.2026</span></div>
       <ul>
         <li>44 Redoxreaktionen: 24 <strong>anorganische</strong> und 20 <strong>organische</strong>, jeweils in den Stufen Leicht, Mittel und Schwer.</li>
@@ -461,6 +518,17 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
 
 <div class="wrap">
   <div class="sidebar">
+
+    <section class="block">
+      <button type="button" class="gl-toggle" id="glToggle" aria-expanded="false" aria-controls="glPanel">
+        <span>Grundlagen</span><span class="gl-n">5 Themen</span><span class="gl-ch" aria-hidden="true"></span>
+      </button>
+      <div class="gl-panel" id="glPanel" hidden>
+        <div class="gl-list" id="glList"></div>
+        <p class="gl-note">Erklärungen mit Grafiken zum Nachlesen – auch zur Besprechung im Unterricht.</p>
+      </div>
+    </section>
+
     <section class="block">
       <h2>Aufgabe</h2>
       <p class="sub-label">Reaktionen</p>
@@ -591,7 +659,7 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
 
 <footer>
   <p class="footer-note">Redoxgleichungen in Ionenschreibweise ohne Zustandsangaben, Koeffizienten als kleinstmögliche ganze Zahlen. Organische Teilchen als Valenzstrichformeln mit freien Elektronenpaaren; organische Teilgleichungen werden formal mit H<sup>+</sup> ausgeglichen, H<sub>3</sub>O<sup>+</sup> wird gleichwertig akzeptiert. Fehling-Probe und Silberspiegelprobe sind vereinfacht dargestellt.</p>
-  <p class="footer-credit">Bastian Baumgart · Redoxgleichungen V1.0 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Redoxgleichungen V1.1 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <script>
@@ -1082,7 +1150,7 @@ function lpDirs(M,i){
   return res;
 }
 const UU=34,MOLS={};
-function molSVG(id,scale){
+function molSVG(id,scale,oz){
   const M=MOLS[id]||(MOLS[id]=buildMol(MOLSPEC[id]));
   const xs=M.A.map(a=>a.x),ys=M.A.map(a=>a.y),minX=Math.min(...xs),minY=Math.min(...ys);
   const pad=14,W=(Math.max(...xs)-minX)*UU+2*pad,H=(Math.max(...ys)-minY)*UU+2*pad;
@@ -1101,15 +1169,18 @@ function molSVG(id,scale){
     if(a.q){const qx=cx+12.5,qy=cy-12.5;
       out.push(`<circle class="chg" cx="${qx}" cy="${qy}" r="5"/><line class="chg" x1="${qx-2.6}" y1="${qy}" x2="${qx+2.6}" y2="${qy}"/>`+(a.q>0?`<line class="chg" x1="${qx}" y1="${qy-2.6}" x2="${qx}" y2="${qy+2.6}"/>`:''))}
   });
+  /* optional: Oxidationszahl an einem Atom (oz = {i: Atomindex, v: Text}) */
+  if(oz&&M.A[oz.i]){const a=M.A[oz.i];out.push(`<text class="oz" x="${X(a)-16}" y="${Y(a)-14}">${oz.v}</text>`)}
   return `<svg class="mol" viewBox="0 0 ${W} ${H}" width="${Math.round(W*scale)}" height="${Math.round(H*scale)}" role="img" aria-label="Strukturformel ${esc(SP[id].n)}">${out.join('')}</svg>`;
 }
 /* Formel für die Anzeige: organische Teilchen als Strukturformel, sonst Summenformel */
-function fs(id,size){
+function fs(id,size,oz){
   if(!MOLSPEC[id])return '<span class="fx">'+fh(id)+'</span>';
   const M=MOLS[id]||(MOLS[id]=buildMol(MOLSPEC[id]));
-  return `<span class="mol-w" title="${esc(SP[id].n)}">${molSVG(id,size==='sm'?0.68:1)}${M.sfx?`<span class="sfx">${M.sfx}</span>`:''}</span>`;
+  return `<span class="mol-w" title="${esc(SP[id].n)}">${molSVG(id,size==='sm'?0.68:1,oz)}${M.sfx?`<span class="sfx">${M.sfx}</span>`:''}</span>`;
 }
 const nmh=id=>MOLSPEC[id]?'<b>'+esc(SP[id].n)+'</b>':fm(fh(id));
+window.__redoxMol=(id,i,v)=>MOLSPEC[id]?fs(id,'',i!=null?{i:+i,v}:null):id;
 const specIds=spec=>P(spec).flat().map(x=>x[1]);
 /* vereinfachte Teilgleichung: nur Redoxpaar und Elektronen (O, H und Ladung erst in der Gesamtgleichung) */
 function simpleT(h){return P(h.eq).map(side=>side.filter(([c,id])=>id===h.from||id===h.to||id==='e'))}
@@ -1542,6 +1613,58 @@ fillSelect();updateReadouts();newTask();
   if(!hdr) return;
   const set = () => document.documentElement.style.setProperty("--hdr", Math.max(0, Math.round(hdr.getBoundingClientRect().bottom)) + "px");
   addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
+})();
+</script>
+
+<div class="modal-backdrop" id="glBackdrop">
+  <div class="modal-box gl-wide" role="dialog" aria-modal="true" aria-labelledby="glTitle">
+    <div class="modal-head">
+      <h2><span class="gl-num" id="glNum"></span><span id="glTitle"></span></h2>
+      <button class="modal-close" id="glClose" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body gl-body" id="glBody"></div>
+    <div class="gl-nav">
+      <button class="btn ghost" id="glPrev">← Vorheriges Thema</button>
+      <span class="sp" id="glPos"></span>
+      <button class="btn" id="glNext">Nächstes Thema →</button>
+    </div>
+  </div>
+</div>
+<script>
+/* Rubrik Grundlagen */
+(function(){
+  const GL = [{"t": "Oxidation, Reduktion, Redoxpaare", "h": "<p>Eine <strong>Redoxreaktion<\/strong> ist eine Elektronenübertragung. Sie setzt sich aus zwei Teilreaktionen zusammen, die immer gekoppelt ablaufen:<\/p> <ul><li><strong>Oxidation:<\/strong> Elektronenabgabe, die Oxidationszahl steigt. Das Teilchen ist das <strong>Reduktionsmittel<\/strong> (Elektronendonator).<\/li> <li><strong>Reduktion:<\/strong> Elektronenaufnahme, die Oxidationszahl sinkt. Das Teilchen ist das <strong>Oxidationsmittel<\/strong> (Elektronenakzeptor).<\/li><\/ul> <p>Die reduzierte und die oxidierte Form eines Teilchens bilden ein <strong>korrespondierendes Redoxpaar<\/strong>, z. B. Fe<sup>2+<\/sup>/Fe<sup>3+<\/sup> oder Mn<sup>2+<\/sup>/MnO<sub>4<\/sub><sup>−<\/sup>.<\/p>"}, {"t": "Teilgleichungen aufstellen", "h": "<ol class=\"gl-steps\"><li>Für jedes Redoxpaar die Formeln notieren und die <strong>Oxidationszahlen<\/strong> bestimmen.<\/li><li>Die Atomsorte, deren OZ sich ändert, ausgleichen.<\/li><li><strong>Elektronen<\/strong> ergänzen: Anzahl = Änderung der OZ × Anzahl der Atome.<\/li><li><strong>Ladungen ausgleichen<\/strong>: in saurer Lösung mit H<sub>3<\/sub>O<sup>+<\/sup>, in basischer Lösung mit OH<sup>−<\/sup>.<\/li><li><strong>Wasserstoff und Sauerstoff<\/strong> mit H<sub>2<\/sub>O ausgleichen; zum Schluss alle Atome und Ladungen prüfen.<\/li><\/ol> <div class=\"gl-box gl-info\"><strong>Permanganat in saurer Lösung<\/strong> (Mn: +VII → +II):<br>MnO<sub>4<\/sub><sup>−<\/sup> + 5 e<sup>−<\/sup> → Mn<sup>2+<\/sup><br>Ladung links −6, rechts +2 → 8 H<sub>3<\/sub>O<sup>+<\/sup> links<br>MnO<sub>4<\/sub><sup>−<\/sup> + 8 H<sub>3<\/sub>O<sup>+<\/sup> + 5 e<sup>−<\/sup> → Mn<sup>2+<\/sup> + 12 H<sub>2<\/sub>O<\/div> <p>Statt H<sub>3<\/sub>O<sup>+<\/sup> schreibt man vereinfacht auch H<sup>+<\/sup>; dann ändern sich die Wassermoleküle entsprechend (MnO<sub>4<\/sub><sup>−<\/sup> + 8 H<sup>+<\/sup> + 5 e<sup>−<\/sup> → Mn<sup>2+<\/sup> + 4 H<sub>2<\/sub>O).<\/p>"}, {"t": "Gesamtgleichung", "h": "<p>In der Gesamtreaktion müssen genauso viele Elektronen abgegeben wie aufgenommen werden. Deshalb multipliziert man die Teilgleichungen so, dass die Elektronenzahl gleich ist – mit dem <strong>kgV<\/strong> der beiden Elektronenzahlen.<\/p> <div class=\"gl-box gl-info\">Oxidation: Fe<sup>2+<\/sup> → Fe<sup>3+<\/sup> + e<sup>−<\/sup> &nbsp;&nbsp; | · 5<br>Reduktion: MnO<sub>4<\/sub><sup>−<\/sup> + 8 H<sub>3<\/sub>O<sup>+<\/sup> + 5 e<sup>−<\/sup> → Mn<sup>2+<\/sup> + 12 H<sub>2<\/sub>O &nbsp;&nbsp; | · 1<br><strong>Gesamt: MnO<sub>4<\/sub><sup>−<\/sup> + 5 Fe<sup>2+<\/sup> + 8 H<sub>3<\/sub>O<sup>+<\/sup> → Mn<sup>2+<\/sup> + 5 Fe<sup>3+<\/sup> + 12 H<sub>2<\/sub>O<\/strong><\/div> <p>Dann werden die Gleichungen addiert; die Elektronen kürzen sich heraus, ebenso Teilchen, die auf beiden Seiten stehen. Kontrolle: Atome und Gesamtladung müssen links und rechts übereinstimmen (hier jeweils +17).<\/p>"}, {"t": "Stoffgleichung", "h": "<p>Die Gesamtgleichung enthält nur die Teilchen, die tatsächlich reagieren (Ionengleichung). In der <strong>Stoffgleichung<\/strong> werden die eingesetzten Stoffe mit ihren Gegenionen angegeben, z. B. Kaliumpermanganat KMnO<sub>4<\/sub>, Eisen(II)-sulfat FeSO<sub>4<\/sub> und Schwefelsäure H<sub>2<\/sub>SO<sub>4<\/sub>.<\/p> <p>Die Gegenionen (hier K<sup>+<\/sup> und SO<sub>4<\/sub><sup>2−<\/sup>) nehmen an der Elektronenübertragung nicht teil; man nennt sie <strong>Begleit-Ionen<\/strong>. Sie werden auf beiden Seiten in gleicher Zahl ergänzt, sodass neutrale Formeln entstehen.<\/p>"}, {"t": "Organische Redoxreaktionen", "h": "<p>Auch die Oxidation organischer Stoffe lässt sich mit Teilgleichungen beschreiben. Man bestimmt die Oxidationszahl des <strong>reagierenden C-Atoms<\/strong> aus der Strukturformel.<\/p> <div class=\"gl-box gl-info\">Ethanol → Ethanal (C-1: −I → +I, Abgabe von 2 e<sup>−<\/sup>):<br><div class=\"gl-eq\">{{EtOH|1|−I}}<span>+ 2 H<sub>2<\/sub>O<\/span><span class=\"ar\">→<\/span>{{EtAl|1|+I}}<span>+ 2 H<sub>3<\/sub>O<sup>+<\/sup> + 2 e<sup>−<\/sup><\/span><\/div><\/div> <p>Typische Oxidationsmittel sind Permanganat (MnO<sub>4<\/sub><sup>−<\/sup> → Mn<sup>2+<\/sup>), Dichromat (Cr<sub>2<\/sub>O<sub>7<\/sub><sup>2−<\/sup> → 2 Cr<sup>3+<\/sup>) und Kupfer(II)-oxid (Cu<sup>2+<\/sup> → Cu). Primäre Alkohole werden zu Aldehyden und weiter zu Carbonsäuren oxidiert, sekundäre zu Ketonen; tertiäre Alkohole lassen sich so nicht oxidieren.<\/p>"}];
+  const g = id => document.getElementById(id);
+  const bd = g("glBackdrop"), box = bd.querySelector(".modal-box");
+  let idx = 0;
+  function show(i){
+    idx = Math.max(0, Math.min(GL.length - 1, i));
+    g("glNum").textContent = (idx + 1) + ".";
+    g("glTitle").innerHTML = GL[idx].t;
+    g("glBody").innerHTML = GL[idx].h.replace(/\{\{(\w+)(?:\|(\d+)\|([^}]+))?\}\}/g, (m, id, i, v) => window.__redoxMol ? window.__redoxMol(id, i, v) : id);
+    g("glPos").textContent = "Thema " + (idx + 1) + " von " + GL.length;
+    g("glPrev").disabled = idx === 0;
+    g("glNext").disabled = idx === GL.length - 1;
+    box.scrollTop = 0;
+    bd.classList.add("open");
+  }
+  g("glList").innerHTML = GL.map((b, i) => '<button type="button" class="gl-item" data-i="' + i + '"><span class="nr">' + (i + 1) + '</span>' + b.t + '<span class="go">›</span></button>').join("");
+  g("glToggle").addEventListener("click", () => {
+    const open = g("glToggle").getAttribute("aria-expanded") !== "true";
+    g("glToggle").setAttribute("aria-expanded", String(open));
+    g("glPanel").hidden = !open;
+  });
+  g("glList").addEventListener("click", e => { const b = e.target.closest(".gl-item"); if (b) show(+b.dataset.i); });
+  g("glPrev").addEventListener("click", () => show(idx - 1));
+  g("glNext").addEventListener("click", () => show(idx + 1));
+  g("glClose").addEventListener("click", () => bd.classList.remove("open"));
+  bd.addEventListener("click", e => { if (e.target === bd) bd.classList.remove("open"); });
+  document.addEventListener("keydown", e => {
+    if (!bd.classList.contains("open")) return;
+    if (e.key === "Escape") bd.classList.remove("open");
+    if (e.key === "ArrowRight" && idx < GL.length - 1) show(idx + 1);
+    if (e.key === "ArrowLeft" && idx > 0) show(idx - 1);
+  });
 })();
 </script>
 </body>

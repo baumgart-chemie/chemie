@@ -349,6 +349,18 @@ svg.orb .mk text{fill:var(--amber); font-size:7px; font-weight:700; font-family:
 .chip.tE{color:var(--nitro); border-color:#34466b;}
 
 /* Rubrik Grundlagen */
+.basics-toggle{
+  display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; cursor:pointer; text-align:left;
+  border:1px solid var(--teal-dim); border-radius:4px; background:var(--panel-alt); color:var(--text);
+  font-size:14px; font-weight:600; font-family:inherit; touch-action:manipulation;
+}
+.basics-toggle:hover{border-color:var(--teal);}
+.basics-toggle:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.basics-toggle .bt-n{font-size:12px; font-weight:400; color:var(--text-faint);}
+.basics-toggle .bt-ch{margin-left:auto; color:var(--teal); font-size:13px;}
+.basics-toggle .bt-ch::after{content:"▸";}
+.basics-toggle[aria-expanded="true"] .bt-ch::after{content:"▾";}
+.basics-panel{margin-top:8px;}
 .basics-list{display:flex; flex-direction:column; gap:6px;}
 .basic-item{
   display:flex; gap:10px; align-items:center; width:100%; text-align:left; padding:8px 11px; cursor:pointer;
@@ -418,7 +430,7 @@ svg.orb .mk text{fill:var(--amber); font-size:7px; font-weight:700; font-family:
       <p>Strukturformeln sind <strong>Valenzstrichformeln</strong> mit freien Elektronenpaaren, das markierte Atom bzw. die markierte Bindung ist orange. In den Orbitalbildern sind Hybridorbitale <strong>türkis</strong>, p-Orbitale und π-Elektronenwolken <strong>orange</strong> und 1s-Orbitale der H-Atome <strong>blau</strong>. In der Kästchenschreibweise steht jedes Kästchen für ein Orbital, die Pfeile für Elektronen.</p>
 
       <h3>Bedienung</h3>
-      <p>Unter <strong>Grundlagen</strong> in der linken Spalte öffnet jedes Thema eine Erklärung mit Grafiken; mit den Pfeiltasten oder den Knöpfen unten blätterst du zum nächsten Thema.</p>
+      <p>Der Knopf <strong>Grundlagen</strong> in der linken Spalte klappt die Themenliste auf und wieder zu. Jedes Thema öffnet eine Erklärung mit Grafiken; mit den Pfeiltasten oder den Knöpfen unten blätterst du zum nächsten Thema.</p>
       <p>Links wählst du die <strong>Aufgabentypen</strong> aus, mehrere gleichzeitig sind möglich. Du kannst auch alle abwählen und dann neu auswählen; ohne markierten Typ startet keine neue Aufgabe.</p>
       <p>Beim Typ <strong>Elektronen eintragen</strong> tippst du auf ein Kästchen, um Elektronen einzutragen (leer → ↑ → ↑↓ → leer). Die Kästchen für den hybridisierten Zustand erscheinen, sobald du die Hybridisierung gewählt hast. Mit „Schritt prüfen“ kontrollierst du den Grundzustand und die Hybridisierung schon vorab; ein Fehler dabei zählt nicht als Versuch, die Aufgabe gilt dann aber nicht mehr als „im 1. Versuch gelöst“.</p>
       <p>„Neue Aufgabe“ wählt zufällig eine Aufgabe aus den markierten Typen. Über „Aufgabe gezielt wählen“ lässt sich jede Aufgabe direkt aufrufen, zum Beispiel für die Besprechung im Unterricht.</p>
@@ -450,11 +462,16 @@ svg.orb .mk text{fill:var(--amber); font-size:7px; font-weight:700; font-family:
       <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.1</span><span class="d">01.11.2026</span></div>
+      <ul>
+        <li><strong>Linke Spalte:</strong> Sie bleibt beim Scrollen der Aufgabe stehen, füllt die Bildschirmhöhe und scrollt als Ganzes in einem einzigen Bereich.</li>
+        <li><strong>Lösungshistorie:</strong> neue Kategorie „mit Hilfen gelöst“ für Aufgaben, die nach einem Tipp richtig gelöst wurden.</li>
+      </ul>
       <div class="vh-ver"><span class="v">V1.0</span><span class="d">01.11.2026</span></div>
       <ul>
         <li>Erste Version mit fünf Aufgabentypen: <strong>Orbitale &amp; Elektronenkonfiguration</strong>, <strong>Elektronen eintragen</strong>, <strong>Hybridisierung im Molekül</strong>, <strong>σ- und π-Bindungen</strong> sowie <strong>Orbitalmodell-Darstellungen</strong>.</li>
         <li><strong>Elektronen eintragen:</strong> Kästchenschreibweise eines markierten C-, N- oder O-Atoms selbst ausfüllen – Grundzustand, Hybridisierung, hybridisierter Zustand. Antippen schaltet leer → ↑ → ↑↓ → leer; Zwischenschritte lassen sich mit „Schritt prüfen“ einzeln kontrollieren.</li>
-        <li><strong>Rubrik „Grundlagen“</strong> mit neun Themen, Grafiken und Erklärtext: Atomorbitale, Elektronenkonfiguration, Anregung &amp; Hybridisierung, sp³, sp², sp, σ- und π-Bindungen, freie Elektronenpaare (N, O), Hybridisierung bestimmen.</li>
+        <li><strong>Rubrik „Grundlagen“</strong> (über den Knopf „Grundlagen“ in der linken Spalte aufklappbar) mit neun Themen, Grafiken und Erklärtext: Atomorbitale, Elektronenkonfiguration, Anregung &amp; Hybridisierung, sp³, sp², sp, σ- und π-Bindungen, freie Elektronenpaare (N, O), Hybridisierung bestimmen.</li>
         <li>Kästchenschreibweise für C, N und O, Valenzstrichformeln mit freien Elektronenpaaren und markiertem Atom bzw. markierter Bindung, Orbitalbilder von Methan, Ethan, Ethen, Ethin und Methanal.</li>
         <li>Frei wählbare Aufgabentypen (auch alle abwählbar), gezielte Aufgabenwahl, Tipps, Rückmeldung zu typischen Fehlern, Erklärung, Übersicht und Verlauf. Bedienbar mit iPad und Stift.</li>
       </ul>
@@ -467,9 +484,13 @@ svg.orb .mk text{fill:var(--amber); font-size:7px; font-weight:700; font-family:
   <div class="sidebar">
 
     <section class="block">
-      <h2>Grundlagen</h2>
-      <div class="basics-list" id="basicsList"></div>
-      <p class="note">Erklärungen mit Grafiken zum Nachlesen – auch zur Besprechung im Unterricht.</p>
+      <button type="button" class="basics-toggle" id="basicsToggle" aria-expanded="false" aria-controls="basicsPanel">
+        <span class="bt-t">Grundlagen</span><span class="bt-n">9 Themen</span><span class="bt-ch" aria-hidden="true"></span>
+      </button>
+      <div class="basics-panel" id="basicsPanel" hidden>
+        <div class="basics-list" id="basicsList"></div>
+        <p class="note">Erklärungen mit Grafiken zum Nachlesen – auch zur Besprechung im Unterricht.</p>
+      </div>
     </section>
 
     <section class="block">
@@ -574,7 +595,7 @@ svg.orb .mk text{fill:var(--amber); font-size:7px; font-weight:700; font-family:
 
 <footer>
   <p class="footer-note">Valenzstrichformeln mit freien Elektronenpaaren; Orbitaldarstellungen schematisch, nicht maßstabsgetreu. Hybridisierung nach dem Schulmodell.</p>
-  <p class="footer-credit">Bastian Baumgart · Orbitalmodell V1.0 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Orbitalmodell V1.1 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <script>
@@ -1718,6 +1739,11 @@ function showBasic(i){
   bbd.classList.add("open");
 }
 $("basicsList").innerHTML = BASICS.map((b,i)=>`<button type="button" class="basic-item" data-i="${i}"><span class="nr">${i+1}</span>${esc(b.t)}<span class="go">›</span></button>`).join("");
+$("basicsToggle").addEventListener("click", ()=>{
+  const open = $("basicsToggle").getAttribute("aria-expanded")!=="true";
+  $("basicsToggle").setAttribute("aria-expanded", String(open));
+  $("basicsPanel").hidden = !open;
+});
 $("basicsList").addEventListener("click", e=>{ const b=e.target.closest(".basic-item"); if(b) showBasic(+b.dataset.i); });
 $("basicsPrev").addEventListener("click", ()=>showBasic(bIdx-1));
 $("basicsNext").addEventListener("click", ()=>showBasic(bIdx+1));

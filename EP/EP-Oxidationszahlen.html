@@ -410,6 +410,69 @@ table.hist td .fx{font-size:14px;}
     overflow-y:auto; overscroll-behavior:contain; background:var(--bg);
   }
 }
+
+/* Rubrik Grundlagen */
+.gl-toggle{display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; cursor:pointer; text-align:left;
+  border:1px solid var(--teal-dim); border-radius:4px; background:var(--panel-alt); color:var(--text);
+  font-size:14px; font-weight:600; font-family:inherit; touch-action:manipulation;}
+.gl-toggle:hover{border-color:var(--teal);}
+.gl-toggle:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-toggle .gl-n{font-size:12px; font-weight:400; color:var(--text-faint);}
+.gl-toggle .gl-ch{margin-left:auto; color:var(--teal); font-size:13px;}
+.gl-toggle .gl-ch::after{content:"▸";}
+.gl-toggle[aria-expanded="true"] .gl-ch::after{content:"▾";}
+.gl-panel{margin-top:8px;}
+.gl-list{display:flex; flex-direction:column; gap:6px;}
+.gl-item{display:flex; gap:10px; align-items:center; width:100%; text-align:left; padding:8px 11px; cursor:pointer;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel); color:var(--text);
+  font-size:13px; font-family:inherit; font-weight:500; touch-action:manipulation;}
+.gl-item:hover{border-color:var(--text-faint); background:var(--panel-alt);}
+.gl-item:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-item .nr{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--amber); min-width:14px;}
+.gl-item .go{margin-left:auto; color:var(--text-faint); font-size:12px;}
+.gl-note{font-size:12px; color:var(--text-faint); line-height:1.5; margin:8px 0 0;}
+.modal-box.gl-wide{max-width:900px; width:100%; max-height:88vh; overflow-y:auto;}
+.gl-wide .gl-num{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--text-faint); margin-right:10px;}
+.gl-body p, .gl-body li{font-size:13.5px; line-height:1.6; color:var(--text-dim);}
+.gl-body p{margin:0 0 10px;}
+.gl-body ul, .gl-body ol{margin:0 0 12px; padding-left:22px;}
+.gl-body strong{color:var(--text); font-weight:600;}
+.gl-body sub, .gl-body sup{font-size:.72em;}
+.gl-row{display:flex; flex-wrap:wrap; gap:12px; align-items:stretch; margin:8px 0 14px;}
+.gl-fig{margin:0; flex:1 1 220px; background:var(--screen, #0e1113); border:1px solid var(--line-soft); border-radius:4px; padding:10px 12px 8px;
+  display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:6px; max-width:100%; overflow-x:auto;}
+.gl-fig figcaption{font-size:12px; color:var(--text-dim); text-align:center; line-height:1.45; max-width:420px;}
+.gl-tw{overflow-x:auto; margin:6px 0 12px; border:1px solid var(--line-soft); border-radius:4px;}
+.gl-table{width:100%; border-collapse:collapse; font-size:12.8px;}
+.gl-table th{text-align:left; font-weight:500; color:var(--text-faint); font-size:11.5px; padding:6px 9px; border-bottom:1px solid var(--line); background:var(--panel-alt);}
+.gl-table td{padding:6px 9px; border-bottom:1px solid var(--line-soft); color:var(--text-dim); vertical-align:top;}
+.gl-table tr:last-child td{border-bottom:none;}
+.gl-table td:first-child{color:var(--text);}
+.gl-steps{counter-reset:gls; list-style:none; padding-left:0 !important;}
+.gl-steps li{counter-increment:gls; position:relative; padding-left:30px; margin-bottom:6px;}
+.gl-steps li::before{content:counter(gls); position:absolute; left:0; top:1px; width:20px; height:20px; border-radius:50%; border:1px solid var(--teal-dim);
+  color:var(--teal); font-size:11.5px; display:flex; align-items:center; justify-content:center; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.gl-box{border:1px solid var(--line-soft); border-left:3px solid var(--teal); background:var(--panel-alt); border-radius:3px; padding:9px 12px; margin:8px 0 12px;
+  font-size:13.5px; line-height:1.65; color:var(--text);}
+.gl-box.gl-warn{border-left-color:var(--amber);}
+.gl-box small{color:var(--text-faint); font-size:12px;}
+svg.mol.asg circle.ea{fill:var(--teal); stroke:var(--screen); stroke-width:1.8;}
+svg.mol.asg circle.ea.ox{fill:var(--oxy);}
+svg.mol.asg circle.ea.hal{fill:var(--hal);}
+svg.mol.asg circle.ea.ni{fill:var(--nitro);}
+svg.mol.asg line.cut{stroke:var(--text-dim); stroke-width:1.3; stroke-dasharray:2.5 2.5;}
+.gl-fig.gl-mini{flex:1 1 150px;}
+.gl-series .gl-fig{flex:1 1 170px;}
+.gl-ex .gl-fig{flex:1 1 270px;}
+.gl-body h3{font-size:13.5px; color:var(--amber); margin:18px 0 8px; font-weight:600;}
+.gl-legend{font-size:12.5px !important; display:flex; flex-wrap:wrap; align-items:center; gap:4px 6px;}
+.gl-dot{display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--teal); margin-left:6px;}
+.gl-dot.ox{background:var(--oxy);} .gl-dot.hal{background:var(--hal);} .gl-dot.ni{background:var(--nitro);}
+.gl-cut{display:inline-block; width:0; height:13px; border-left:1.5px dashed var(--text-dim); margin:0 4px 0 10px;}
+.gl-legend .li{white-space:nowrap; margin-right:10px;}
+.gl-count li{margin-bottom:4px;}
+.gl-nav{display:flex; align-items:center; gap:10px; border-top:1px solid var(--line-soft); padding-top:14px; margin-top:16px;}
+.gl-nav .sp{flex:1; text-align:center; font-size:12px; color:var(--text-faint);}
 </style>
 </head>
 <body>
@@ -455,6 +518,14 @@ table.hist td .fx{font-size:14px;}
       <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.1</span><span class="d">02.11.2026</span></div>
+      <ul>
+        <li><strong>Neue Rubrik „Grundlagen“:</strong> Der Knopf „Grundlagen“ oben in der linken Spalte klappt 4 Themen mit Erklärtext und Grafiken zu den fachlichen und methodischen Grundlagen auf. Mit den Knöpfen unten oder den Pfeiltasten blättert man zwischen den Themen.</li>
+        <li><strong>Grundlagen „Oxidationszahlen in organischen Molekülen“ überarbeitet:</strong> Alle Moleküle sind jetzt Valenzstrichformeln mit freien Elektronenpaaren. Die Bindungselektronen sind als Punkte bei dem Atom eingezeichnet, dem sie zugesprochen werden, geteilte C–C-Bindungen sind mit einem Trennstrich markiert.</li>
+        <li>Neu: Vorgehen in vier Schritten, Ethanol als ausgezähltes Beispiel (Valenzelektronen − zugeordnete Elektronen), weitere Beispiele (Ethanal, Ethansäure, Chlormethan) und die Oxidationsreihe des Methans als Strukturformeln.</li>
+        <li><strong>Linke Spalte:</strong> Sie bleibt beim Scrollen der Aufgabe stehen, füllt die Bildschirmhöhe und scrollt als Ganzes in einem einzigen Bereich.</li>
+        <li><strong>Lösungshistorie:</strong> neue Kategorie „mit Hilfen gelöst“ für Aufgaben, die nach einem Tipp richtig gelöst wurden.</li>
+      </ul>
       <div class="vh-ver"><span class="v">V1.0</span><span class="d">26.10.2026</span></div>
       <ul>
         <li>Startauswahl zwischen <strong>anorganischen</strong> und <strong>organischen Verbindungen</strong>, jederzeit umschaltbar.</li>
@@ -469,6 +540,17 @@ table.hist td .fx{font-size:14px;}
 <div class="wrap">
   <!-- SIDEBAR -->
   <div class="sidebar">
+
+    <section class="block">
+      <button type="button" class="gl-toggle" id="glToggle" aria-expanded="false" aria-controls="glPanel">
+        <span>Grundlagen</span><span class="gl-n">4 Themen</span><span class="gl-ch" aria-hidden="true"></span>
+      </button>
+      <div class="gl-panel" id="glPanel" hidden>
+        <div class="gl-list" id="glList"></div>
+        <p class="gl-note">Erklärungen mit Grafiken zum Nachlesen – auch zur Besprechung im Unterricht.</p>
+      </div>
+    </section>
+
 
     <section class="block">
       <h2>Verbindungen</h2>
@@ -594,7 +676,7 @@ table.hist td .fx{font-size:14px;}
 
 <footer>
   <p class="footer-note">Oxidationszahlen nach der Elektronegativität (Pauling-Werte); organische Formeln als Valenzstrichformeln mit freien Elektronenpaaren. Bei Teilchen mit gleichen Atomen in verschiedener Bindungssituation wird jedes Atom einzeln bestimmt.</p>
-  <p class="footer-credit">Bastian Baumgart · Oxidationszahlen V1.0 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Oxidationszahlen V1.1 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <script>
@@ -1502,8 +1584,149 @@ document.addEventListener("keydown", e=>{ if(e.key==="Escape") gbd.classList.rem
 $("heteroWrap").hidden=true; $("legendBlock").hidden=true;
 renderRules(); renderStart(); renderStats();
 
+/* ============================================================
+   Grundlagen: Strukturformeln mit Zuordnung der Bindungselektronen
+   Bindungselektronen = Punkte auf dem Bindungsstrich, beim Atom,
+   dem sie zugesprochen werden; C–C-Bindungen: je ein Elektron.
+   ============================================================ */
+function assignSVG(M, o){
+  o=o||{};
+  const G=o.u||60;
+  const xs=M.A.map(a=>a.x), ys=M.A.map(a=>a.y);
+  const minX=Math.min(...xs), maxX=Math.max(...xs), minY=Math.min(...ys), maxY=Math.max(...ys);
+  const padL=26, padR=o.ox?50:26, padT=o.ox?44:26, padB=26;
+  const W=(maxX-minX)*G+padL+padR, H=(maxY-minY)*G+padT+padB;
+  const X=a=>(a.x-minX)*G+padL, Y=a=>(a.y-minY)*G+padT;
+  const lines=[], dots=[], txt=[];
+  const sh=(a,dx)=> dx!==0 ? (twoL(a.el)?14:9) : 10;
+  const dot=(x,y,c)=>dots.push(`<circle class="ea${c?" "+c:""}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.9"/>`);
+  M.B.forEach(b=>{
+    const p=M.A[b.i], q=M.A[b.j];
+    const dx=Math.sign(q.x-p.x), dy=Math.sign(q.y-p.y);
+    const x1=X(p)+dx*sh(p,dx), y1=Y(p)+dy*sh(p,dx);
+    const x2=X(q)-dx*sh(q,dx), y2=Y(q)-dy*sh(q,dx);
+    const len=Math.hypot(x2-x1,y2-y1);
+    const offs=b.o===1?[0]:b.o===2?[-3.6,3.6]:[-5.4,0,5.4];
+    // Empfänger der Bindungselektronen
+    const recv = p.el===q.el ? null : (EN[p.el]>EN[q.el] ? "p" : "q");
+    const cls = recv ? (ELCLS[(recv==="p"?p:q).el]||"cc") : "cc";
+    offs.forEach(f=>{
+      const ox=-dy*f, oy=dx*f;
+      lines.push(`<line x1="${(x1+ox).toFixed(1)}" y1="${(y1+oy).toFixed(1)}" x2="${(x2+ox).toFixed(1)}" y2="${(y2+oy).toFixed(1)}"/>`);
+      const at=(d)=>[x1+ox+dx*d, y1+oy+dy*d];
+      if(recv==="q"){ const a=at(len-5), c=at(len-12.5); dot(...a,cls); dot(...c,cls); }
+      else if(recv==="p"){ const a=at(5), c=at(12.5); dot(...a,cls); dot(...c,cls); }
+      else { const a=at(6), c=at(len-6); dot(...a,cls); dot(...c,cls); }
+    });
+    if(!recv){ // Trennstrich: Bindung wird geteilt
+      const mx=(x1+x2)/2, my=(y1+y2)/2, ext=b.o===1?7:b.o===2?10:12;
+      lines.push(`<line class="cut" x1="${(mx-dy*ext).toFixed(1)}" y1="${(my-dx*ext).toFixed(1)}" x2="${(mx+dy*ext).toFixed(1)}" y2="${(my+dx*ext).toFixed(1)}"/>`);
+    }
+  });
+  M.A.forEach((a,i)=>{
+    const cx=X(a), cy=Y(a), cls=ELCLS[a.el]||"";
+    txt.push(`<text class="el ${cls}" x="${cx}" y="${cy}">${a.el}</text>`);
+    const slotOn = o.ox && (a.el==="C" || (o.het && a.el!=="H"));
+    (a.el==="C" ? [] : lpDirs(M,i,slotOn)).forEach(deg=>{
+      const t=deg*Math.PI/180, c=Math.cos(t), s=Math.sin(t);
+      const R = twoL(a.el) ? (Math.abs(c)>0.5 ? 17 : 13) : 12.5;
+      const mx=cx+R*c, my=cy+R*s, hx=-s*4.6, hy=c*4.6;
+      lines.push(`<line class="lp ${cls}" x1="${(mx+hx).toFixed(1)}" y1="${(my+hy).toFixed(1)}" x2="${(mx-hx).toFixed(1)}" y2="${(my-hy).toFixed(1)}"/>`);
+    });
+    if(o.idx && a.el==="C" && M.nC>1) txt.push(`<text class="ix" x="${cx-15}" y="${cy+18}">${a.cno}</text>`);
+    if(slotOn){
+      const sx=cx+25, sy=cy-24;
+      txt.push(`<g class="slot static"><rect class="box" x="${sx-18}" y="${sy-11}" width="36" height="22" rx="3"/><text x="${sx}" y="${sy+0.5}">${rn(a.ox)}</text></g>`);
+    }
+  });
+  const sc=o.scale||1;
+  return `<svg class="mol asg" viewBox="0 0 ${W} ${H}" width="${Math.round(W*sc)}" height="${Math.round(H*sc)}" role="img" aria-label="Strukturformel ${esc(M.n)} mit Zuordnung der Bindungselektronen">${lines.join("")}${dots.join("")}${txt.join("")}</svg>`;
+}
+
+function countLine(M, i){
+  const a=M.A[i];
+  const parts=[];
+  if(a.lp) parts.push(`${2*a.lp} aus freien Elektronenpaaren`);
+  const grp={};
+  a.nbr.forEach(n=>{
+    const b=M.A[n.k];
+    const per = EN[b.el]<EN[a.el] ? 2*n.o : (b.el===a.el ? n.o : 0);
+    const k=a.el+BSYM[n.o]+b.el+"|"+per; grp[k]=(grp[k]||0)+1;
+  });
+  Object.keys(grp).forEach(k=>{
+    const [nm,per]=k.split("|"); const n=grp[k];
+    parts.push(`${n>1?n+" × ":""}${nm}: ${n>1?"je ":""}${per}`);
+  });
+  const lbl = a.el==="C" && M.nC>1 ? "C"+a.cno : a.el;
+  return `<li><strong>${lbl}</strong>: ${parts.join(", ")} → ${a.asg} Elektronen · OZ = ${VE[a.el]} − ${a.asg} = <strong>${rn(a.ox)}</strong></li>`;
+}
+
+function glFig(key, opt, cap){
+  const M = typeof key==="string" ? build(ORG[key]) : build(key);
+  return `<figure class="gl-fig">${assignSVG(M, Object.assign({ox:true, idx:true}, opt||{}))}<figcaption>${cap||esc(M.n)}</figcaption></figure>`;
+}
+
+function glOrg(){
+  const ETH = build(ORG.ethanol);
+  const CO2 = {n:"Kohlenstoffdioxid", a:[["O",0,0,0],["C",1,0,0],["O",2,0,0]], b:[[0,1,2],[1,2,2]]};
+  const legend = (spec, cap) => `<figure class="gl-fig gl-mini">${assignSVG(build(spec),{u:62})}<figcaption>${cap}</figcaption></figure>`;
+  const ethList = `<ul class="gl-count">` + ETH.A.map((a,i)=>(a.el==="C"||a.el==="O")?countLine(ETH,i):"").join("") + `</ul>`;
+  return `
+<p>In organischen Molekülen bestimmt man die Oxidationszahl <strong>jedes C-Atoms einzeln</strong> aus der Strukturformel. Dazu ordnet man jedes bindende Elektronenpaar dem <strong>elektronegativeren</strong> Bindungspartner zu. In den Formeln unten sind die Bindungselektronen deshalb als <strong>Punkte</strong> eingezeichnet – sie sitzen bei dem Atom, dem sie zugesprochen werden.</p>
+<div class="gl-tw"><table class="gl-table"><thead><tr><th>Element</th><th>H</th><th>C</th><th>N</th><th>Br</th><th>Cl</th><th>O</th></tr></thead>
+<tbody><tr><td>Elektronegativität</td><td>2,2</td><td>2,6</td><td>3,0</td><td>3,0</td><td>3,2</td><td>3,4</td></tr></tbody></table></div>
+
+<div class="gl-row">
+  ${legend({n:"C–H", a:[["C",0,0,0],["H",1,0,0]], b:[[0,1]]}, "<strong>C–H:</strong> C ist elektronegativer – beide Elektronen gehen an C")}
+  ${legend({n:"C–C", a:[["C",0,0,0],["C",1,0,0]], b:[[0,1]]}, "<strong>C–C:</strong> gleiche Partner – jedes C erhält ein Elektron")}
+  ${legend({n:"C–O–H", a:[["C",0,0,0],["O",1,0,1,"r"]], b:[[0,1]]}, "<strong>C–O:</strong> O ist elektronegativer – beide Elektronen gehen an O (ebenso bei O–H)")}
+  ${legend({n:"C=O", a:[["C",0,0,0],["O",1,0,0]], b:[[0,1,2]]}, "<strong>C=O:</strong> beide Elektronenpaare gehen an O")}
+</div>
+<p class="gl-legend"><span class="li"><span class="gl-dot cc"></span> Elektronen beim C-Atom</span><span class="li"><span class="gl-dot ox"></span> Elektronen gehen an O</span><span class="li"><span class="gl-dot hal"></span> an ein Halogen</span><span class="li"><span class="gl-dot ni"></span> an N</span><span class="li"><span class="gl-cut"></span> Bindung wird geteilt</span></p>
+
+<h3>Vorgehen</h3>
+<ol class="gl-steps">
+  <li>Strukturformel mit <strong>allen</strong> Bindungen und freien Elektronenpaaren zeichnen.</li>
+  <li>Jedes bindende Elektronenpaar dem elektronegativeren Atom zuordnen. Bei zwei gleichen Atomen wird geteilt.</li>
+  <li>Die Elektronen zählen, die einem Atom jetzt gehören. Freie Elektronenpaare gehören immer dem Atom selbst.</li>
+  <li>Oxidationszahl = Anzahl der Valenzelektronen − Anzahl der zugeordneten Elektronen.</li>
+</ol>
+
+<h3>Beispiel Ethanol</h3>
+<div class="gl-row">${`<figure class="gl-fig">${assignSVG(ETH,{ox:true, idx:true, het:true, scale:1.1})}<figcaption>Ethanol: Die Punkte zeigen, wem die Bindungselektronen zugesprochen werden.</figcaption></figure>`}</div>
+${ethList}
+<p>Zur Kontrolle: Die H-Atome erhalten keine Elektronen (1 − 0 = +I). Die Summe aller Oxidationszahlen ist null: 2 · C (−III, −I) + O (−II) + 6 · H (+I) = 0.</p>
+
+<h3>Weitere Beispiele</h3>
+<div class="gl-row gl-ex">
+  ${glFig("ethanal", null, "Ethanal: Die C=O-Doppelbindung liefert dem C-Atom 2 keine Elektronen – es behält nur 1 aus C–C und 2 aus C–H → +I")}
+  ${glFig("ethansre", null, "Ethansäure: C2 gibt alle Elektronen aus C=O und C–O ab und behält nur 1 aus C–C → +III")}
+  ${glFig("chlormethan", null, "Chlormethan: Das Elektronenpaar der C–Cl-Bindung geht an Cl → C: 4 − 6 = −II")}
+</div>
+
+<h3>Kurzregel</h3>
+<p>Wer die Zuordnung verstanden hat, kann direkt abzählen: Jede Bindung des C-Atoms trägt einen festen Betrag zu seiner Oxidationszahl bei.</p>
+<div class="gl-tw"><table class="gl-table"><thead><tr><th>Bindung am C-Atom</th><th>Bindungselektronen gehen an …</th><th>Beitrag zur OZ des C-Atoms</th></tr></thead><tbody>
+<tr><td>C–H</td><td>C</td><td>−I</td></tr>
+<tr><td>C–C, C=C</td><td>je zur Hälfte an beide C</td><td>0</td></tr>
+<tr><td>C–O, C–N, C–Cl, C–Br</td><td>das Heteroatom</td><td>+I je Bindungsstrich</td></tr>
+<tr><td>C=O</td><td>O</td><td>+II</td></tr>
+<tr><td>C≡N</td><td>N</td><td>+III</td></tr>
+</tbody></table></div>
+
+<h3>Oxidationsreihe des Methans</h3>
+<p>Je mehr Bindungselektronen das C-Atom an Sauerstoff abgibt, desto höher ist seine Oxidationszahl:</p>
+<div class="gl-row gl-series">
+  ${glFig("methan", null, "Methan · −IV")}
+  ${glFig("methanol", null, "Methanol · −II")}
+  ${glFig("methanal", null, "Methanal · 0")}
+  ${glFig("methansre", null, "Methansäure · +II")}
+  ${glFig(CO2, null, "Kohlenstoffdioxid · +IV")}
+</div>`;
+}
+
 /* Für automatische Tests */
-window.__OX = {AN, RX, ORG, ORX, S, build, CATALOG, molSVG};
+window.__OX = {AN, RX, ORG, ORX, S, build, CATALOG, molSVG, glOrg};
 })();
 </script>
 
@@ -1523,6 +1746,59 @@ window.__OX = {AN, RX, ORG, ORX, S, build, CATALOG, molSVG};
   if(!hdr) return;
   const set = () => document.documentElement.style.setProperty("--hdr", Math.max(0, Math.round(hdr.getBoundingClientRect().bottom)) + "px");
   addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
+})();
+</script>
+
+<div class="modal-backdrop" id="glBackdrop">
+  <div class="modal-box gl-wide" role="dialog" aria-modal="true" aria-labelledby="glTitle">
+    <div class="modal-head">
+      <h2><span class="gl-num" id="glNum"></span><span id="glTitle"></span></h2>
+      <button class="modal-close" id="glClose" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body gl-body" id="glBody"></div>
+    <div class="gl-nav">
+      <button class="btn ghost" id="glPrev">← Vorheriges Thema</button>
+      <span class="sp" id="glPos"></span>
+      <button class="btn" id="glNext">Nächstes Thema →</button>
+    </div>
+  </div>
+</div>
+<script>
+/* Rubrik Grundlagen */
+(function(){
+  const GL = [{"t": "Was ist eine Oxidationszahl?", "h": "<p>Die <strong>Oxidationszahl<\/strong> (OZ) ist eine gedachte Ladung: Man tut so, als bestünde jede Bindung aus Ionen und das bindende Elektronenpaar gehöre vollständig dem <strong>elektronegativeren<\/strong> Atom. Die Ladung, die ein Atom dann hätte, ist seine Oxidationszahl.<\/p> <p>Sie wird mit römischen Ziffern über das Symbol geschrieben, mit Vorzeichen: +I, −II, 0. Oxidationszahlen helfen, Redoxreaktionen zu erkennen und Teilgleichungen aufzustellen.<\/p> <div class=\"gl-box gl-info\"><strong>Oxidation<\/strong> = Erhöhung der Oxidationszahl (Elektronenabgabe)<br><strong>Reduktion<\/strong> = Erniedrigung der Oxidationszahl (Elektronenaufnahme)<\/div>"}, {"t": "Regeln für anorganische Stoffe", "h": "<ol class=\"gl-steps\"><li>Atome in <strong>elementaren Stoffen<\/strong> haben die OZ 0 (Fe, O<sub>2<\/sub>, Cl<sub>2<\/sub>).<\/li><li>Bei <strong>einatomigen Ionen<\/strong> ist die OZ gleich der Ladung (Na<sup>+<\/sup>: +I, S<sup>2−<\/sup>: −II).<\/li><li><strong>Fluor<\/strong> hat in Verbindungen immer −I.<\/li><li><strong>Wasserstoff<\/strong> hat meist +I (in Metallhydriden wie NaH −I).<\/li><li><strong>Sauerstoff<\/strong> hat meist −II (in Peroxiden wie H<sub>2<\/sub>O<sub>2<\/sub> −I).<\/li><li>Die <strong>Summe<\/strong> aller OZ ist gleich der Ladung des Teilchens: 0 im Molekül, Ionenladung im Ion.<\/li><\/ol> <div class=\"gl-box gl-info\"><strong>Beispiel Schwefelsäure H<sub>2<\/sub>SO<sub>4<\/sub>:<\/strong> 2 · (+I) + x + 4 · (−II) = 0 → x = <strong>+VI<\/strong><br><strong>Beispiel Permanganat MnO<sub>4<\/sub><sup>−<\/sup>:<\/strong> x + 4 · (−II) = −1 → x = <strong>+VII<\/strong><\/div>"}, {"t": "Oxidationszahlen in organischen Molekülen", "h": ""}, {"t": "Redoxreaktionen erkennen", "h": "<p>Eine Reaktion ist eine <strong>Redoxreaktion<\/strong>, wenn sich Oxidationszahlen ändern. Das Teilchen, dessen OZ steigt, wird oxidiert – es ist das <strong>Reduktionsmittel<\/strong>. Das Teilchen, dessen OZ sinkt, wird reduziert – es ist das <strong>Oxidationsmittel<\/strong>.<\/p> <div class=\"gl-box gl-info\">Cl<sub>2<\/sub> + 2 Br<sup>−<\/sup> → 2 Cl<sup>−<\/sup> + Br<sub>2<\/sub><br>Cl: 0 → −I (Reduktion) &nbsp;·&nbsp; Br: −I → 0 (Oxidation)<\/div> <p>In der organischen Chemie sind z. B. die Oxidation eines primären Alkohols zum Aldehyd (C: −I → +I) und weiter zur Carbonsäure (+I → +III) Redoxreaktionen. Säure-Base-Reaktionen und Fällungen sind dagegen keine Redoxreaktionen – dort bleiben alle OZ gleich.<\/p>"}];
+  if (window.__OX && window.__OX.glOrg) GL[2].h = window.__OX.glOrg();
+  const g = id => document.getElementById(id);
+  const bd = g("glBackdrop"), box = bd.querySelector(".modal-box");
+  let idx = 0;
+  function show(i){
+    idx = Math.max(0, Math.min(GL.length - 1, i));
+    g("glNum").textContent = (idx + 1) + ".";
+    g("glTitle").innerHTML = GL[idx].t;
+    g("glBody").innerHTML = GL[idx].h;
+    g("glPos").textContent = "Thema " + (idx + 1) + " von " + GL.length;
+    g("glPrev").disabled = idx === 0;
+    g("glNext").disabled = idx === GL.length - 1;
+    box.scrollTop = 0;
+    bd.classList.add("open");
+  }
+  g("glList").innerHTML = GL.map((b, i) => '<button type="button" class="gl-item" data-i="' + i + '"><span class="nr">' + (i + 1) + '</span>' + b.t + '<span class="go">›</span></button>').join("");
+  g("glToggle").addEventListener("click", () => {
+    const open = g("glToggle").getAttribute("aria-expanded") !== "true";
+    g("glToggle").setAttribute("aria-expanded", String(open));
+    g("glPanel").hidden = !open;
+  });
+  g("glList").addEventListener("click", e => { const b = e.target.closest(".gl-item"); if (b) show(+b.dataset.i); });
+  g("glPrev").addEventListener("click", () => show(idx - 1));
+  g("glNext").addEventListener("click", () => show(idx + 1));
+  g("glClose").addEventListener("click", () => bd.classList.remove("open"));
+  bd.addEventListener("click", e => { if (e.target === bd) bd.classList.remove("open"); });
+  document.addEventListener("keydown", e => {
+    if (!bd.classList.contains("open")) return;
+    if (e.key === "Escape") bd.classList.remove("open");
+    if (e.key === "ArrowRight" && idx < GL.length - 1) show(idx + 1);
+    if (e.key === "ArrowLeft" && idx > 0) show(idx - 1);
+  });
 })();
 </script>
 </body>

@@ -271,6 +271,59 @@ svg .lp.n{stroke:var(--nitro);}
     overflow-y:auto; overscroll-behavior:contain; background:var(--bg);
   }
 }
+
+/* Rubrik Grundlagen */
+.gl-toggle{display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; cursor:pointer; text-align:left;
+  border:1px solid var(--teal-dim); border-radius:4px; background:var(--panel-alt); color:var(--text);
+  font-size:14px; font-weight:600; font-family:inherit; touch-action:manipulation;}
+.gl-toggle:hover{border-color:var(--teal);}
+.gl-toggle:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-toggle .gl-n{font-size:12px; font-weight:400; color:var(--text-faint);}
+.gl-toggle .gl-ch{margin-left:auto; color:var(--teal); font-size:13px;}
+.gl-toggle .gl-ch::after{content:"▸";}
+.gl-toggle[aria-expanded="true"] .gl-ch::after{content:"▾";}
+.gl-panel{margin-top:8px;}
+.gl-list{display:flex; flex-direction:column; gap:6px;}
+.gl-item{display:flex; gap:10px; align-items:center; width:100%; text-align:left; padding:8px 11px; cursor:pointer;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel); color:var(--text);
+  font-size:13px; font-family:inherit; font-weight:500; touch-action:manipulation;}
+.gl-item:hover{border-color:var(--text-faint); background:var(--panel-alt);}
+.gl-item:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-item .nr{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--amber); min-width:14px;}
+.gl-item .go{margin-left:auto; color:var(--text-faint); font-size:12px;}
+.gl-note{font-size:12px; color:var(--text-faint); line-height:1.5; margin:8px 0 0;}
+.modal-box.gl-wide{max-width:900px; width:100%; max-height:88vh; overflow-y:auto;}
+.gl-wide .gl-num{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--text-faint); margin-right:10px;}
+.gl-body p, .gl-body li{font-size:13.5px; line-height:1.6; color:var(--text-dim);}
+.gl-body p{margin:0 0 10px;}
+.gl-body ul, .gl-body ol{margin:0 0 12px; padding-left:22px;}
+.gl-body strong{color:var(--text); font-weight:600;}
+.gl-body sub, .gl-body sup{font-size:.72em;}
+.gl-row{display:flex; flex-wrap:wrap; gap:12px; align-items:stretch; margin:8px 0 14px;}
+.gl-fig{margin:0; flex:1 1 220px; background:var(--screen, #0e1113); border:1px solid var(--line-soft); border-radius:4px; padding:10px 12px 8px;
+  display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:6px; max-width:100%; overflow-x:auto;}
+.gl-fig figcaption{font-size:12px; color:var(--text-dim); text-align:center; line-height:1.45; max-width:420px;}
+.gl-tw{overflow-x:auto; margin:6px 0 12px; border:1px solid var(--line-soft); border-radius:4px;}
+.gl-table{width:100%; border-collapse:collapse; font-size:12.8px;}
+.gl-table th{text-align:left; font-weight:500; color:var(--text-faint); font-size:11.5px; padding:6px 9px; border-bottom:1px solid var(--line); background:var(--panel-alt);}
+.gl-table td{padding:6px 9px; border-bottom:1px solid var(--line-soft); color:var(--text-dim); vertical-align:top;}
+.gl-table tr:last-child td{border-bottom:none;}
+.gl-table td:first-child{color:var(--text);}
+.gl-steps{counter-reset:gls; list-style:none; padding-left:0 !important;}
+.gl-steps li{counter-increment:gls; position:relative; padding-left:30px; margin-bottom:6px;}
+.gl-steps li::before{content:counter(gls); position:absolute; left:0; top:1px; width:20px; height:20px; border-radius:50%; border:1px solid var(--teal-dim);
+  color:var(--teal); font-size:11.5px; display:flex; align-items:center; justify-content:center; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.gl-box{border:1px solid var(--line-soft); border-left:3px solid var(--teal); background:var(--panel-alt); border-radius:3px; padding:9px 12px; margin:8px 0 12px;
+  font-size:13.5px; line-height:1.65; color:var(--text);}
+.gl-box.gl-warn{border-left-color:var(--amber);}
+.gl-box small{color:var(--text-faint); font-size:12px;}
+.gl-table td.gl-sfc{vertical-align:middle;}
+.gl-sf{display:block; max-width:none; height:auto;}
+.gl-sfn{display:block; font-size:11.5px; color:var(--text-faint); margin-top:2px;}
+.gl-sfnote{font-size:12px !important; color:var(--text-faint) !important; margin-top:-4px !important;}
+svg .lbl.r{fill:var(--amber);}
+.gl-nav{display:flex; align-items:center; gap:10px; border-top:1px solid var(--line-soft); padding-top:14px; margin-top:16px;}
+.gl-nav .sp{flex:1; text-align:center; font-size:12px; color:var(--text-faint);}
 </style>
 </head>
 <body>
@@ -338,6 +391,12 @@ svg .lp.n{stroke:var(--nitro);}
       <button class="modal-close" id="closeCl" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
+      <div class="cl-ver"><span class="v">V1.2</span><span class="d">01.11.2026</span></div>
+      <ul>
+        <li><strong>Neue Rubrik „Grundlagen“:</strong> Der Knopf „Grundlagen“ oben in der linken Spalte klappt 5 Themen mit Erklärtext und Grafiken zu den fachlichen und methodischen Grundlagen auf. Mit den Knöpfen unten oder den Pfeiltasten blättert man zwischen den Themen.</li>
+        <li><strong>Linke Spalte:</strong> Sie bleibt beim Scrollen der Aufgabe stehen, füllt die Bildschirmhöhe und scrollt als Ganzes in einem einzigen Bereich.</li>
+        <li><strong>Lösungshistorie:</strong> neue Kategorie „mit Hilfen gelöst“ für Aufgaben, die nach einem Tipp richtig gelöst wurden.</li>
+      </ul>
       <div class="cl-ver"><span class="v">V1.1</span><span class="d">18.10.2026</span></div>
       <ul>
         <li><strong>Freie Elektronenpaare</strong> an O- und N-Atomen in Struktur-, Halbstruktur- und Skelettformel (abschaltbar).</li>
@@ -361,6 +420,17 @@ svg .lp.n{stroke:var(--nitro);}
 
 <div class="wrap">
   <div class="sidebar">
+
+    <section class="block">
+      <button type="button" class="gl-toggle" id="glToggle" aria-expanded="false" aria-controls="glPanel">
+        <span>Grundlagen</span><span class="gl-n">5 Themen</span><span class="gl-ch" aria-hidden="true"></span>
+      </button>
+      <div class="gl-panel" id="glPanel" hidden>
+        <div class="gl-list" id="glList"></div>
+        <p class="gl-note">Erklärungen mit Grafiken zum Nachlesen – auch zur Besprechung im Unterricht.</p>
+      </div>
+    </section>
+
     <section class="block">
       <h2>Aufgabe</h2>
       <p class="sub-label">Aufgabentyp</p>
@@ -546,7 +616,7 @@ svg .lp.n{stroke:var(--nitro);}
 
 <footer>
   <p class="footer-note">Benennung nach den IUPAC-Regeln (substitutive Nomenklatur) für acyclische Verbindungen mit Carboxy-, Aldehyd-, Keto-, Hydroxy- und Aminogruppen (primäre Amine). Die Strukturen werden zufällig erzeugt und automatisch benannt.</p>
-  <p class="footer-credit">Bastian Baumgart · Nomenklatur-Trainer Funktionelle Gruppen V1.1 (erstellt mit Claude Pro) · <a href="#" id="btnCl">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Nomenklatur-Trainer Funktionelle Gruppen V1.2 (erstellt mit Claude Pro) · <a href="#" id="btnCl">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <script>
@@ -1949,6 +2019,58 @@ svg .lp.n{stroke:var(--nitro);}
   if(!hdr) return;
   const set = () => document.documentElement.style.setProperty("--hdr", Math.max(0, Math.round(hdr.getBoundingClientRect().bottom)) + "px");
   addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
+})();
+</script>
+
+<div class="modal-backdrop" id="glBackdrop">
+  <div class="modal-box gl-wide" role="dialog" aria-modal="true" aria-labelledby="glTitle">
+    <div class="modal-head">
+      <h2><span class="gl-num" id="glNum"></span><span id="glTitle"></span></h2>
+      <button class="modal-close" id="glClose" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body gl-body" id="glBody"></div>
+    <div class="gl-nav">
+      <button class="btn ghost" id="glPrev">← Vorheriges Thema</button>
+      <span class="sp" id="glPos"></span>
+      <button class="btn" id="glNext">Nächstes Thema →</button>
+    </div>
+  </div>
+</div>
+<script>
+/* Rubrik Grundlagen */
+(function(){
+  const GL = [{"t": "Funktionelle Gruppen", "h": "<p>Eine <strong>funktionelle Gruppe<\/strong> ist eine Atomgruppe, die die Eigenschaften und Reaktionen eines Moleküls bestimmt. Sie legt die Stoffklasse und die Endung des Namens fest.<\/p> <div class=\"gl-tw\"><table class=\"gl-table\"><thead><tr><th>Stoffklasse<\/th><th>Gruppe<\/th><th>Endung (Suffix)<\/th><th>Vorsilbe (Präfix)<\/th><th>Beispiel<\/th><\/tr><\/thead><tbody><tr><td>Carbonsäuren<\/td><td class=\"gl-sfc\"><svg class=\"gl-sf\" viewBox=\"-18.0 -68.0 176.0 86.0\" width=\"176\" height=\"86\" role=\"img\" aria-label=\"Carboxygruppe\"><line class=\"bond\" x1=\"11.0\" y1=\"0.0\" x2=\"39.0\" y2=\"0.0\"/><line class=\"bond\" x1=\"46.7\" y1=\"-13.0\" x2=\"46.7\" y2=\"-37.0\"/><line class=\"bond\" x1=\"53.3\" y1=\"-13.0\" x2=\"53.3\" y2=\"-37.0\"/><line class=\"bond\" x1=\"61.0\" y1=\"0.0\" x2=\"89.0\" y2=\"0.0\"/><line class=\"bond\" x1=\"111.0\" y1=\"0.0\" x2=\"131.0\" y2=\"0.0\"/><text class=\"lbl h\" x=\"140.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">H<\/text><text class=\"lbl r\" x=\"0.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">R<\/text><text class=\"lbl \" x=\"50.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">C<\/text><text class=\"lbl o\" x=\"50.0\" y=\"-50.0\" text-anchor=\"middle\" dominant-baseline=\"central\">O<\/text><text class=\"lbl o\" x=\"100.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">O<\/text><line class=\"lp o\" x1=\"43.2\" y1=\"-59.7\" x2=\"38.2\" y2=\"-51.0\"/><line class=\"lp o\" x1=\"61.8\" y1=\"-51.0\" x2=\"56.8\" y2=\"-59.7\"/><line class=\"lp o\" x1=\"95.0\" y1=\"14.5\" x2=\"105.0\" y2=\"14.5\"/><line class=\"lp o\" x1=\"105.0\" y1=\"-14.5\" x2=\"95.0\" y2=\"-14.5\"/><\/svg><span class=\"gl-sfn\">Carboxygruppe<\/span><\/td><td>-säure<\/td><td>carboxy-<\/td><td>Ethansäure<\/td><\/tr><tr><td>Aldehyde<\/td><td class=\"gl-sfc\"><svg class=\"gl-sf\" viewBox=\"-18.0 -68.0 126.0 86.0\" width=\"126\" height=\"86\" role=\"img\" aria-label=\"Aldehydgruppe\"><line class=\"bond\" x1=\"11.0\" y1=\"0.0\" x2=\"39.0\" y2=\"0.0\"/><line class=\"bond\" x1=\"46.7\" y1=\"-13.0\" x2=\"46.7\" y2=\"-37.0\"/><line class=\"bond\" x1=\"53.3\" y1=\"-13.0\" x2=\"53.3\" y2=\"-37.0\"/><line class=\"bond\" x1=\"61.0\" y1=\"0.0\" x2=\"81.0\" y2=\"0.0\"/><text class=\"lbl h\" x=\"90.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">H<\/text><text class=\"lbl r\" x=\"0.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">R<\/text><text class=\"lbl \" x=\"50.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">C<\/text><text class=\"lbl o\" x=\"50.0\" y=\"-50.0\" text-anchor=\"middle\" dominant-baseline=\"central\">O<\/text><line class=\"lp o\" x1=\"43.2\" y1=\"-59.7\" x2=\"38.2\" y2=\"-51.0\"/><line class=\"lp o\" x1=\"61.8\" y1=\"-51.0\" x2=\"56.8\" y2=\"-59.7\"/><\/svg><span class=\"gl-sfn\">Aldehydgruppe<\/span><\/td><td>-al<\/td><td>oxo-<\/td><td>Propanal<\/td><\/tr><tr><td>Ketone<\/td><td class=\"gl-sfc\"><svg class=\"gl-sf\" viewBox=\"-18.0 -68.0 136.0 86.0\" width=\"136\" height=\"86\" role=\"img\" aria-label=\"Ketogruppe\"><line class=\"bond\" x1=\"11.0\" y1=\"0.0\" x2=\"39.0\" y2=\"0.0\"/><line class=\"bond\" x1=\"46.7\" y1=\"-13.0\" x2=\"46.7\" y2=\"-37.0\"/><line class=\"bond\" x1=\"53.3\" y1=\"-13.0\" x2=\"53.3\" y2=\"-37.0\"/><line class=\"bond\" x1=\"61.0\" y1=\"0.0\" x2=\"85.0\" y2=\"0.0\"/><text class=\"lbl r\" x=\"0.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">R<\/text><text class=\"lbl \" x=\"50.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">C<\/text><text class=\"lbl o\" x=\"50.0\" y=\"-50.0\" text-anchor=\"middle\" dominant-baseline=\"central\">O<\/text><text class=\"lbl r\" x=\"100.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">R'<\/text><line class=\"lp o\" x1=\"43.2\" y1=\"-59.7\" x2=\"38.2\" y2=\"-51.0\"/><line class=\"lp o\" x1=\"61.8\" y1=\"-51.0\" x2=\"56.8\" y2=\"-59.7\"/><\/svg><span class=\"gl-sfn\">Ketogruppe (C=O in der Kette)<\/span><\/td><td>-on<\/td><td>oxo-<\/td><td>Propanon<\/td><\/tr><tr><td>Alkohole<\/td><td class=\"gl-sfc\"><svg class=\"gl-sf\" viewBox=\"-18.0 -18.0 126.0 36.0\" width=\"126\" height=\"36\" role=\"img\" aria-label=\"Hydroxygruppe\"><line class=\"bond\" x1=\"11.0\" y1=\"0.0\" x2=\"39.0\" y2=\"0.0\"/><line class=\"bond\" x1=\"61.0\" y1=\"0.0\" x2=\"81.0\" y2=\"0.0\"/><text class=\"lbl h\" x=\"90.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">H<\/text><text class=\"lbl r\" x=\"0.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">R<\/text><text class=\"lbl o\" x=\"50.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">O<\/text><line class=\"lp o\" x1=\"45.0\" y1=\"14.5\" x2=\"55.0\" y2=\"14.5\"/><line class=\"lp o\" x1=\"55.0\" y1=\"-14.5\" x2=\"45.0\" y2=\"-14.5\"/><\/svg><span class=\"gl-sfn\">Hydroxygruppe<\/span><\/td><td>-ol<\/td><td>hydroxy-<\/td><td>Ethanol<\/td><\/tr><tr><td>Amine<\/td><td class=\"gl-sfc\"><svg class=\"gl-sf\" viewBox=\"-18.0 -18.0 126.0 76.0\" width=\"126\" height=\"76\" role=\"img\" aria-label=\"Aminogruppe\"><line class=\"bond\" x1=\"11.0\" y1=\"0.0\" x2=\"39.0\" y2=\"0.0\"/><line class=\"bond\" x1=\"61.0\" y1=\"0.0\" x2=\"81.0\" y2=\"0.0\"/><line class=\"bond\" x1=\"50.0\" y1=\"13.0\" x2=\"50.0\" y2=\"31.0\"/><text class=\"lbl h\" x=\"90.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">H<\/text><text class=\"lbl h\" x=\"50.0\" y=\"40.0\" text-anchor=\"middle\" dominant-baseline=\"central\">H<\/text><text class=\"lbl r\" x=\"0.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">R<\/text><text class=\"lbl n\" x=\"50.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">N<\/text><line class=\"lp n\" x1=\"55.0\" y1=\"-14.5\" x2=\"45.0\" y2=\"-14.5\"/><\/svg><span class=\"gl-sfn\">Aminogruppe<\/span><\/td><td>-amin<\/td><td>amino-<\/td><td>Ethanamin<\/td><\/tr><\/tbody><\/table><\/div> <p class=\"gl-sfnote\">R und R' stehen für Kohlenwasserstoffreste (Alkylreste). An O- und N-Atomen sind die freien Elektronenpaare eingezeichnet.<\/p> <p>Bei Carbonsäuren und Aldehyden gehört das C-Atom der funktionellen Gruppe zur Hauptkette und erhält immer die Nummer 1 – deshalb entfällt der Lokant (Propanal, nicht Propan-1-al).<\/p>"}, {"t": "Rangfolge", "h": "<p>Enthält ein Molekül mehrere verschiedene funktionelle Gruppen, bestimmt die <strong>ranghöchste<\/strong> Gruppe die Endung. Alle anderen werden als <strong>Vorsilben<\/strong> genannt.<\/p> <div class=\"gl-box gl-info\">Carbonsäure &gt; Aldehyd &gt; Keton &gt; Alkohol &gt; Amin<\/div> <div class=\"gl-tw\"><table class=\"gl-table\"><thead><tr><th>Beispiel<\/th><th>ranghöchste Gruppe<\/th><th>Name<\/th><\/tr><\/thead><tbody><tr><td class=\"gl-sfc\"><svg class=\"gl-sf\" viewBox=\"-58.0 -68.0 266.0 176.0\" width=\"266\" height=\"176\" role=\"img\" aria-label=\"2-Hydroxypropansäure\"><line class=\"bond\" x1=\"11.0\" y1=\"0.0\" x2=\"39.0\" y2=\"0.0\"/><line class=\"bond\" x1=\"61.0\" y1=\"0.0\" x2=\"89.0\" y2=\"0.0\"/><line class=\"bond\" x1=\"50.0\" y1=\"13.0\" x2=\"50.0\" y2=\"37.0\"/><line class=\"bond\" x1=\"96.7\" y1=\"-13.0\" x2=\"96.7\" y2=\"-37.0\"/><line class=\"bond\" x1=\"103.3\" y1=\"-13.0\" x2=\"103.3\" y2=\"-37.0\"/><line class=\"bond\" x1=\"111.0\" y1=\"0.0\" x2=\"139.0\" y2=\"0.0\"/><line class=\"bond\" x1=\"-11.0\" y1=\"0.0\" x2=\"-31.0\" y2=\"0.0\"/><line class=\"bond\" x1=\"0.0\" y1=\"13.0\" x2=\"0.0\" y2=\"31.0\"/><line class=\"bond\" x1=\"-0.0\" y1=\"-13.0\" x2=\"-0.0\" y2=\"-31.0\"/><line class=\"bond\" x1=\"50.0\" y1=\"-13.0\" x2=\"50.0\" y2=\"-31.0\"/><line class=\"bond\" x1=\"50.0\" y1=\"63.0\" x2=\"50.0\" y2=\"81.0\"/><line class=\"bond\" x1=\"161.0\" y1=\"0.0\" x2=\"181.0\" y2=\"0.0\"/><text class=\"lbl h\" x=\"-40.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">H<\/text><text class=\"lbl h\" x=\"0.0\" y=\"40.0\" text-anchor=\"middle\" dominant-baseline=\"central\">H<\/text><text class=\"lbl h\" x=\"-0.0\" y=\"-40.0\" text-anchor=\"middle\" dominant-baseline=\"central\">H<\/text><text class=\"lbl h\" x=\"50.0\" y=\"-40.0\" text-anchor=\"middle\" dominant-baseline=\"central\">H<\/text><text class=\"lbl h\" x=\"50.0\" y=\"90.0\" text-anchor=\"middle\" dominant-baseline=\"central\">H<\/text><text class=\"lbl h\" x=\"190.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">H<\/text><text class=\"lbl \" x=\"0.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">C<\/text><text class=\"lbl \" x=\"50.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">C<\/text><text class=\"lbl \" x=\"100.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">C<\/text><text class=\"lbl o\" x=\"50.0\" y=\"50.0\" text-anchor=\"middle\" dominant-baseline=\"central\">O<\/text><text class=\"lbl o\" x=\"100.0\" y=\"-50.0\" text-anchor=\"middle\" dominant-baseline=\"central\">O<\/text><text class=\"lbl o\" x=\"150.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">O<\/text><line class=\"lp o\" x1=\"60.0\" y1=\"55.0\" x2=\"60.0\" y2=\"45.0\"/><line class=\"lp o\" x1=\"40.0\" y1=\"45.0\" x2=\"40.0\" y2=\"55.0\"/><line class=\"lp o\" x1=\"93.2\" y1=\"-59.7\" x2=\"88.2\" y2=\"-51.0\"/><line class=\"lp o\" x1=\"111.8\" y1=\"-51.0\" x2=\"106.8\" y2=\"-59.7\"/><line class=\"lp o\" x1=\"145.0\" y1=\"14.5\" x2=\"155.0\" y2=\"14.5\"/><line class=\"lp o\" x1=\"155.0\" y1=\"-14.5\" x2=\"145.0\" y2=\"-14.5\"/><\/svg><\/td><td>Carbonsäure<\/td><td>2-Hydroxypropansäure (Milchsäure)<\/td><\/tr><tr><td class=\"gl-sfc\"><svg class=\"gl-sf\" viewBox=\"-58.0 -68.0 316.0 126.0\" width=\"316\" height=\"126\" role=\"img\" aria-label=\"4-Hydroxybutan-2-on\"><line class=\"bond\" x1=\"11.0\" y1=\"0.0\" x2=\"39.0\" y2=\"0.0\"/><line class=\"bond\" x1=\"46.7\" y1=\"-13.0\" x2=\"46.7\" y2=\"-37.0\"/><line class=\"bond\" x1=\"53.3\" y1=\"-13.0\" x2=\"53.3\" y2=\"-37.0\"/><line class=\"bond\" x1=\"61.0\" y1=\"0.0\" x2=\"89.0\" y2=\"0.0\"/><line class=\"bond\" x1=\"111.0\" y1=\"0.0\" x2=\"139.0\" y2=\"0.0\"/><line class=\"bond\" x1=\"161.0\" y1=\"0.0\" x2=\"189.0\" y2=\"0.0\"/><line class=\"bond\" x1=\"-11.0\" y1=\"0.0\" x2=\"-31.0\" y2=\"0.0\"/><line class=\"bond\" x1=\"0.0\" y1=\"13.0\" x2=\"0.0\" y2=\"31.0\"/><line class=\"bond\" x1=\"-0.0\" y1=\"-13.0\" x2=\"-0.0\" y2=\"-31.0\"/><line class=\"bond\" x1=\"100.0\" y1=\"13.0\" x2=\"100.0\" y2=\"31.0\"/><line class=\"bond\" x1=\"100.0\" y1=\"-13.0\" x2=\"100.0\" y2=\"-31.0\"/><line class=\"bond\" x1=\"150.0\" y1=\"13.0\" x2=\"150.0\" y2=\"31.0\"/><line class=\"bond\" x1=\"150.0\" y1=\"-13.0\" x2=\"150.0\" y2=\"-31.0\"/><line class=\"bond\" x1=\"211.0\" y1=\"0.0\" x2=\"231.0\" y2=\"0.0\"/><text class=\"lbl h\" x=\"-40.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">H<\/text><text class=\"lbl h\" x=\"0.0\" y=\"40.0\" text-anchor=\"middle\" dominant-baseline=\"central\">H<\/text><text class=\"lbl h\" x=\"-0.0\" y=\"-40.0\" text-anchor=\"middle\" dominant-baseline=\"central\">H<\/text><text class=\"lbl h\" x=\"100.0\" y=\"40.0\" text-anchor=\"middle\" dominant-baseline=\"central\">H<\/text><text class=\"lbl h\" x=\"100.0\" y=\"-40.0\" text-anchor=\"middle\" dominant-baseline=\"central\">H<\/text><text class=\"lbl h\" x=\"150.0\" y=\"40.0\" text-anchor=\"middle\" dominant-baseline=\"central\">H<\/text><text class=\"lbl h\" x=\"150.0\" y=\"-40.0\" text-anchor=\"middle\" dominant-baseline=\"central\">H<\/text><text class=\"lbl h\" x=\"240.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">H<\/text><text class=\"lbl \" x=\"0.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">C<\/text><text class=\"lbl \" x=\"50.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">C<\/text><text class=\"lbl o\" x=\"50.0\" y=\"-50.0\" text-anchor=\"middle\" dominant-baseline=\"central\">O<\/text><text class=\"lbl \" x=\"100.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">C<\/text><text class=\"lbl \" x=\"150.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">C<\/text><text class=\"lbl o\" x=\"200.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">O<\/text><line class=\"lp o\" x1=\"43.2\" y1=\"-59.7\" x2=\"38.2\" y2=\"-51.0\"/><line class=\"lp o\" x1=\"61.8\" y1=\"-51.0\" x2=\"56.8\" y2=\"-59.7\"/><line class=\"lp o\" x1=\"195.0\" y1=\"14.5\" x2=\"205.0\" y2=\"14.5\"/><line class=\"lp o\" x1=\"205.0\" y1=\"-14.5\" x2=\"195.0\" y2=\"-14.5\"/><\/svg><\/td><td>Keton<\/td><td>4-Hydroxybutan-2-on<\/td><\/tr><tr><td class=\"gl-sfc\"><svg class=\"gl-sf\" viewBox=\"-58.0 -68.0 266.0 126.0\" width=\"266\" height=\"126\" role=\"img\" aria-label=\"Aminoethansäure\"><line class=\"bond\" x1=\"11.0\" y1=\"0.0\" x2=\"39.0\" y2=\"0.0\"/><line class=\"bond\" x1=\"61.0\" y1=\"0.0\" x2=\"89.0\" y2=\"0.0\"/><line class=\"bond\" x1=\"96.7\" y1=\"-13.0\" x2=\"96.7\" y2=\"-37.0\"/><line class=\"bond\" x1=\"103.3\" y1=\"-13.0\" x2=\"103.3\" y2=\"-37.0\"/><line class=\"bond\" x1=\"111.0\" y1=\"0.0\" x2=\"139.0\" y2=\"0.0\"/><line class=\"bond\" x1=\"-11.0\" y1=\"0.0\" x2=\"-31.0\" y2=\"0.0\"/><line class=\"bond\" x1=\"0.0\" y1=\"13.0\" x2=\"0.0\" y2=\"31.0\"/><line class=\"bond\" x1=\"50.0\" y1=\"13.0\" x2=\"50.0\" y2=\"31.0\"/><line class=\"bond\" x1=\"50.0\" y1=\"-13.0\" x2=\"50.0\" y2=\"-31.0\"/><line class=\"bond\" x1=\"161.0\" y1=\"0.0\" x2=\"181.0\" y2=\"0.0\"/><text class=\"lbl h\" x=\"-40.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">H<\/text><text class=\"lbl h\" x=\"0.0\" y=\"40.0\" text-anchor=\"middle\" dominant-baseline=\"central\">H<\/text><text class=\"lbl h\" x=\"50.0\" y=\"40.0\" text-anchor=\"middle\" dominant-baseline=\"central\">H<\/text><text class=\"lbl h\" x=\"50.0\" y=\"-40.0\" text-anchor=\"middle\" dominant-baseline=\"central\">H<\/text><text class=\"lbl h\" x=\"190.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">H<\/text><text class=\"lbl n\" x=\"0.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">N<\/text><text class=\"lbl \" x=\"50.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">C<\/text><text class=\"lbl \" x=\"100.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">C<\/text><text class=\"lbl o\" x=\"100.0\" y=\"-50.0\" text-anchor=\"middle\" dominant-baseline=\"central\">O<\/text><text class=\"lbl o\" x=\"150.0\" y=\"0.0\" text-anchor=\"middle\" dominant-baseline=\"central\">O<\/text><line class=\"lp n\" x1=\"5.0\" y1=\"-14.5\" x2=\"-5.0\" y2=\"-14.5\"/><line class=\"lp o\" x1=\"93.2\" y1=\"-59.7\" x2=\"88.2\" y2=\"-51.0\"/><line class=\"lp o\" x1=\"111.8\" y1=\"-51.0\" x2=\"106.8\" y2=\"-59.7\"/><line class=\"lp o\" x1=\"145.0\" y1=\"14.5\" x2=\"155.0\" y2=\"14.5\"/><line class=\"lp o\" x1=\"155.0\" y1=\"-14.5\" x2=\"145.0\" y2=\"-14.5\"/><\/svg><\/td><td>Carbonsäure<\/td><td>Aminoethansäure (Glycin)<\/td><\/tr><\/tbody><\/table><\/div>"}, {"t": "Hauptkette und Nummerierung", "h": "<ol class=\"gl-steps\"><li><strong>Ranghöchste Gruppe<\/strong> bestimmen – sie liefert die Endung.<\/li><li><strong>Hauptkette<\/strong>: die längste Kette, die das C-Atom der ranghöchsten Gruppe enthält (bei Carbonsäuren und Aldehyden das C-Atom der Gruppe selbst).<\/li><li><strong>Nummerieren<\/strong>, sodass die ranghöchste Gruppe die kleinste Zahl erhält; danach die übrigen Gruppen und Seitenketten möglichst kleine Zahlen.<\/li><li><strong>Vorsilben<\/strong> (Alkylreste und untergeordnete Gruppen) alphabetisch vor den Stammnamen setzen; Zahlwörter (di-, tri-) zählen beim Alphabet nicht.<\/li><li><strong>Endung<\/strong> mit Lokant direkt davor anhängen: Butan-2-ol, Pentan-3-on.<\/li><\/ol> <div class=\"gl-box gl-info\">Bei mehreren gleichen Hauptgruppen werden Zahlwörter verwendet: Ethan-1,2-diol, Propan-1,2,3-triol, Ethandisäure. Bei Disäuren und Diolen bleibt das „-an“ des Stammnamens erhalten.<\/div>"}, {"t": "Trivialnamen und ältere Schreibweisen", "h": "<p>Viele Stoffe sind unter Trivialnamen bekannt. In den Aufgaben werden sie erkannt, gesucht ist aber der systematische Name.<\/p> <div class=\"gl-tw\"><table class=\"gl-table\"><thead><tr><th>systematischer Name<\/th><th>Trivialname<\/th><\/tr><\/thead><tbody><tr><td>Methansäure<\/td><td>Ameisensäure<\/td><\/tr><tr><td>Ethansäure<\/td><td>Essigsäure<\/td><\/tr><tr><td>Methanal<\/td><td>Formaldehyd<\/td><\/tr><tr><td>Ethanal<\/td><td>Acetaldehyd<\/td><\/tr><tr><td>Propanon<\/td><td>Aceton<\/td><\/tr><tr><td>Propan-1,2,3-triol<\/td><td>Glycerin<\/td><\/tr><\/tbody><\/table><\/div> <p>Nach aktueller IUPAC-Regel stehen die Lokanten direkt vor der Endung (Butan-2-on). Die ältere Schreibweise mit vorangestellter Zahl (2-Butanon) ist noch weit verbreitet und meint denselben Stoff.<\/p>"}, {"t": "Eigenschaften der Stoffklassen", "h": "<p>Die funktionellen Gruppen sind polar. Gruppen mit O–H- oder N–H-Bindungen bilden <strong>Wasserstoffbrücken<\/strong>:<\/p> <ul><li>Alkohole, Carbonsäuren und Amine haben deutlich höhere Siedetemperaturen als Alkane ähnlicher Molekülmasse.<\/li> <li>Aldehyde und Ketone sind polar, bilden untereinander aber keine Wasserstoffbrücken – ihre Siedetemperaturen liegen dazwischen.<\/li> <li>Kurzkettige Vertreter sind gut wasserlöslich; mit wachsendem unpolarem Kettenanteil nimmt die Wasserlöslichkeit ab.<\/li> <li>Carbonsäuren reagieren sauer, Amine basisch.<\/li><\/ul>"}];
+  const g = id => document.getElementById(id);
+  const bd = g("glBackdrop"), box = bd.querySelector(".modal-box");
+  let idx = 0;
+  function show(i){
+    idx = Math.max(0, Math.min(GL.length - 1, i));
+    g("glNum").textContent = (idx + 1) + ".";
+    g("glTitle").innerHTML = GL[idx].t;
+    g("glBody").innerHTML = GL[idx].h;
+    g("glPos").textContent = "Thema " + (idx + 1) + " von " + GL.length;
+    g("glPrev").disabled = idx === 0;
+    g("glNext").disabled = idx === GL.length - 1;
+    box.scrollTop = 0;
+    bd.classList.add("open");
+  }
+  g("glList").innerHTML = GL.map((b, i) => '<button type="button" class="gl-item" data-i="' + i + '"><span class="nr">' + (i + 1) + '</span>' + b.t + '<span class="go">›</span></button>').join("");
+  g("glToggle").addEventListener("click", () => {
+    const open = g("glToggle").getAttribute("aria-expanded") !== "true";
+    g("glToggle").setAttribute("aria-expanded", String(open));
+    g("glPanel").hidden = !open;
+  });
+  g("glList").addEventListener("click", e => { const b = e.target.closest(".gl-item"); if (b) show(+b.dataset.i); });
+  g("glPrev").addEventListener("click", () => show(idx - 1));
+  g("glNext").addEventListener("click", () => show(idx + 1));
+  g("glClose").addEventListener("click", () => bd.classList.remove("open"));
+  bd.addEventListener("click", e => { if (e.target === bd) bd.classList.remove("open"); });
+  document.addEventListener("keydown", e => {
+    if (!bd.classList.contains("open")) return;
+    if (e.key === "Escape") bd.classList.remove("open");
+    if (e.key === "ArrowRight" && idx < GL.length - 1) show(idx + 1);
+    if (e.key === "ArrowLeft" && idx > 0) show(idx - 1);
+  });
 })();
 </script>
 </body>

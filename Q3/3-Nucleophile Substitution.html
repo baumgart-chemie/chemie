@@ -320,6 +320,54 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
     overflow-y:auto; overscroll-behavior:contain; background:var(--bg);
   }
 }
+
+/* Rubrik Grundlagen */
+.gl-toggle{display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; cursor:pointer; text-align:left;
+  border:1px solid var(--teal-dim); border-radius:4px; background:var(--panel-alt); color:var(--text);
+  font-size:14px; font-weight:600; font-family:inherit; touch-action:manipulation;}
+.gl-toggle:hover{border-color:var(--teal);}
+.gl-toggle:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-toggle .gl-n{font-size:12px; font-weight:400; color:var(--text-faint);}
+.gl-toggle .gl-ch{margin-left:auto; color:var(--teal); font-size:13px;}
+.gl-toggle .gl-ch::after{content:"▸";}
+.gl-toggle[aria-expanded="true"] .gl-ch::after{content:"▾";}
+.gl-panel{margin-top:8px;}
+.gl-list{display:flex; flex-direction:column; gap:6px;}
+.gl-item{display:flex; gap:10px; align-items:center; width:100%; text-align:left; padding:8px 11px; cursor:pointer;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel); color:var(--text);
+  font-size:13px; font-family:inherit; font-weight:500; touch-action:manipulation;}
+.gl-item:hover{border-color:var(--text-faint); background:var(--panel-alt);}
+.gl-item:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-item .nr{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--amber); min-width:14px;}
+.gl-item .go{margin-left:auto; color:var(--text-faint); font-size:12px;}
+.gl-note{font-size:12px; color:var(--text-faint); line-height:1.5; margin:8px 0 0;}
+.modal-box.gl-wide{max-width:900px; width:100%; max-height:88vh; overflow-y:auto;}
+.gl-wide .gl-num{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--text-faint); margin-right:10px;}
+.gl-body p, .gl-body li{font-size:13.5px; line-height:1.6; color:var(--text-dim);}
+.gl-body p{margin:0 0 10px;}
+.gl-body ul, .gl-body ol{margin:0 0 12px; padding-left:22px;}
+.gl-body strong{color:var(--text); font-weight:600;}
+.gl-body sub, .gl-body sup{font-size:.72em;}
+.gl-row{display:flex; flex-wrap:wrap; gap:12px; align-items:stretch; margin:8px 0 14px;}
+.gl-fig{margin:0; flex:1 1 220px; background:var(--screen, #0e1113); border:1px solid var(--line-soft); border-radius:4px; padding:10px 12px 8px;
+  display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:6px; max-width:100%; overflow-x:auto;}
+.gl-fig figcaption{font-size:12px; color:var(--text-dim); text-align:center; line-height:1.45; max-width:420px;}
+.gl-tw{overflow-x:auto; margin:6px 0 12px; border:1px solid var(--line-soft); border-radius:4px;}
+.gl-table{width:100%; border-collapse:collapse; font-size:12.8px;}
+.gl-table th{text-align:left; font-weight:500; color:var(--text-faint); font-size:11.5px; padding:6px 9px; border-bottom:1px solid var(--line); background:var(--panel-alt);}
+.gl-table td{padding:6px 9px; border-bottom:1px solid var(--line-soft); color:var(--text-dim); vertical-align:top;}
+.gl-table tr:last-child td{border-bottom:none;}
+.gl-table td:first-child{color:var(--text);}
+.gl-steps{counter-reset:gls; list-style:none; padding-left:0 !important;}
+.gl-steps li{counter-increment:gls; position:relative; padding-left:30px; margin-bottom:6px;}
+.gl-steps li::before{content:counter(gls); position:absolute; left:0; top:1px; width:20px; height:20px; border-radius:50%; border:1px solid var(--teal-dim);
+  color:var(--teal); font-size:11.5px; display:flex; align-items:center; justify-content:center; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.gl-box{border:1px solid var(--line-soft); border-left:3px solid var(--teal); background:var(--panel-alt); border-radius:3px; padding:9px 12px; margin:8px 0 12px;
+  font-size:13.5px; line-height:1.65; color:var(--text);}
+.gl-box.gl-warn{border-left-color:var(--amber);}
+.gl-box small{color:var(--text-faint); font-size:12px;}
+.gl-nav{display:flex; align-items:center; gap:10px; border-top:1px solid var(--line-soft); padding-top:14px; margin-top:16px;}
+.gl-nav .sp{flex:1; text-align:center; font-size:12px; color:var(--text-faint);}
 </style>
 </head>
 <body>
@@ -368,6 +416,11 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
       <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.1</span><span class="d">01.11.2026</span></div>
+      <ul>
+        <li><strong>Neue Rubrik „Grundlagen“:</strong> Der Knopf „Grundlagen“ oben in der linken Spalte klappt 5 Themen mit Erklärtext und Grafiken zu den fachlichen und methodischen Grundlagen auf. Mit den Knöpfen unten oder den Pfeiltasten blättert man zwischen den Themen.</li>
+        <li><strong>Linke Spalte:</strong> Sie bleibt beim Scrollen der Aufgabe stehen, füllt die Bildschirmhöhe und scrollt als Ganzes in einem einzigen Bereich.</li>
+      </ul>
       <div class="vh-ver"><span class="v">V1.0</span><span class="d">18.10.2026</span></div>
         <ul>
           <li>Erste Version: animierte Mechanismen S<sub>N</sub>1, S<sub>N</sub>2, E1 und E2 als Valenzstrichformeln mit freien Elektronenpaaren und Elektronenpaar-Pfeilen, inklusive Übergangszuständen, Carbokation und Walden-Umkehr.</li>
@@ -382,6 +435,17 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
 <div class="wrap">
   <!-- SIDEBAR -->
   <div class="sidebar">
+
+    <section class="block">
+      <button type="button" class="gl-toggle" id="glToggle" aria-expanded="false" aria-controls="glPanel">
+        <span>Grundlagen</span><span class="gl-n">5 Themen</span><span class="gl-ch" aria-hidden="true"></span>
+      </button>
+      <div class="gl-panel" id="glPanel" hidden>
+        <div class="gl-list" id="glList"></div>
+        <p class="gl-note">Erklärungen mit Grafiken zum Nachlesen – auch zur Besprechung im Unterricht.</p>
+      </div>
+    </section>
+
     <div class="mode-toggle app" id="appMode">
       <button data-m="sim" class="active">Simulation</button>
       <button data-m="train">Trainer</button>
@@ -580,7 +644,7 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
 
 <footer>
   <p class="footer-note">Vereinfachtes Modell zu Lehrzwecken · Geschwindigkeitskonstanten, Produktanteile und Energieniveaus werden aus Faustregeln zu Substrat, Nucleophil, Abgangsgruppe, Lösemittel und Temperatur berechnet und sind nur qualitativ richtig. Konkurrenz zwischen Nucleophil und Lösemittel beim S<sub>N</sub>1-Mechanismus wird nicht berücksichtigt.</p>
-  <p class="footer-credit">Bastian Baumgart · Simulation „Nucleophile Substitution“ mit Trainer V1.0 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Simulation „Nucleophile Substitution“ mit Trainer V1.1 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <script>
@@ -1687,6 +1751,58 @@ renderStats();
   if(!hdr) return;
   const set = () => document.documentElement.style.setProperty("--hdr", Math.max(0, Math.round(hdr.getBoundingClientRect().bottom)) + "px");
   addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
+})();
+</script>
+
+<div class="modal-backdrop" id="glBackdrop">
+  <div class="modal-box gl-wide" role="dialog" aria-modal="true" aria-labelledby="glTitle">
+    <div class="modal-head">
+      <h2><span class="gl-num" id="glNum"></span><span id="glTitle"></span></h2>
+      <button class="modal-close" id="glClose" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body gl-body" id="glBody"></div>
+    <div class="gl-nav">
+      <button class="btn ghost" id="glPrev">← Vorheriges Thema</button>
+      <span class="sp" id="glPos"></span>
+      <button class="btn" id="glNext">Nächstes Thema →</button>
+    </div>
+  </div>
+</div>
+<script>
+/* Rubrik Grundlagen */
+(function(){
+  const GL = [{"t": "Begriffe", "h": "<p>Bei einer <strong>nucleophilen Substitution<\/strong> wird in einem <strong>Substrat<\/strong> eine <strong>Abgangsgruppe<\/strong> (z. B. ein Halogenatom) durch ein <strong>Nucleophil<\/strong> ersetzt:<\/p> <div class=\"gl-box gl-info\">R–X + Nu<sup>−<\/sup> → R–Nu + X<sup>−<\/sup> &nbsp;&nbsp; z. B. CH<sub>3<\/sub>–Br + OH<sup>−<\/sup> → CH<sub>3<\/sub>–OH + Br<sup>−<\/sup><\/div> <ul><li>Das C-Atom an der Abgangsgruppe ist durch die polare C–X-Bindung positiv polarisiert (δ+) – es ist das <strong>elektrophile Zentrum<\/strong>.<\/li> <li>Ein <strong>Nucleophil<\/strong> („kernliebend“) besitzt ein freies Elektronenpaar und greift das δ+-C-Atom an: OH<sup>−<\/sup>, CN<sup>−<\/sup>, I<sup>−<\/sup>, H<sub>2<\/sub>O, NH<sub>3<\/sub>.<\/li> <li>Eine gute <strong>Abgangsgruppe<\/strong> kann die negative Ladung gut stabilisieren: I<sup>−<\/sup> &gt; Br<sup>−<\/sup> &gt; Cl<sup>−<\/sup> &gt;&gt; F<sup>−<\/sup>.<\/li><\/ul> <p>In Mechanismen zeigen gebogene Pfeile, wohin sich ein <strong>Elektronenpaar<\/strong> verschiebt – immer vom Elektronenpaar weg zum Atom hin.<\/p>"}, {"t": "S<sub>N<\/sub>2-Mechanismus", "h": "<p>Beim <strong>S<sub>N<\/sub>2-Mechanismus<\/strong> (bimolekular) greift das Nucleophil das C-Atom von der Rückseite an, genau gegenüber der Abgangsgruppe. Bindungsbildung und Bindungsbruch laufen gleichzeitig ab, in <strong>einem Schritt<\/strong>.<\/p> <ul><li>Im <strong>Übergangszustand<\/strong> ist das C-Atom von fünf Partnern umgeben; die drei übrigen Substituenten liegen in einer Ebene.<\/li> <li>Die Konfiguration kehrt sich um wie ein Regenschirm im Wind (<strong>Walden-Umkehr<\/strong>). Aus einem chiralen Substrat entsteht ein einheitliches Produkt mit umgekehrter Konfiguration.<\/li> <li>Geschwindigkeit: v = k · c(R–X) · c(Nu) – sie hängt von <strong>beiden<\/strong> Konzentrationen ab.<\/li><\/ul> <p>S<sub>N<\/sub>2 ist typisch für <strong>Methyl- und primäre<\/strong> Substrate mit starkem Nucleophil, besonders in polar aprotischen Lösemitteln.<\/p>"}, {"t": "S<sub>N<\/sub>1-Mechanismus", "h": "<p>Beim <strong>S<sub>N<\/sub>1-Mechanismus<\/strong> (monomolekular) verläuft die Reaktion in <strong>zwei Schritten<\/strong>:<\/p> <ol class=\"gl-steps\"><li>Die Abgangsgruppe löst sich langsam ab; es entsteht ein planares <strong>Carbokation<\/strong> (geschwindigkeitsbestimmender Schritt).<\/li><li>Das Nucleophil greift das Carbokation schnell an – von oben oder unten mit gleicher Wahrscheinlichkeit.<\/li><\/ol> <ul><li>Aus einem chiralen Substrat entsteht ein <strong>Racemat<\/strong> (1 : 1-Gemisch beider Enantiomere).<\/li> <li>Geschwindigkeit: v = k · c(R–X) – sie hängt nur vom Substrat ab.<\/li> <li>Carbokationen werden durch Alkylgruppen stabilisiert: tertiär &gt; sekundär &gt; primär. S<sub>N<\/sub>1 ist deshalb typisch für <strong>tertiäre<\/strong> Substrate, schwache Nucleophile und polar protische Lösemittel, die Ionen gut solvatisieren.<\/li><\/ul> <div class=\"gl-row\"><figure class=\"gl-fig\"><svg viewBox=\"0 0 250 190\" width=\"250\" style=\"max-width:250px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><defs><marker id=\"ax74512\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--text-dim)\"/><\/marker><\/defs><path d=\"M46.0 112.0 L46.6 112.0 L47.3 112.0 L47.9 112.0 L48.5 112.0 L49.2 112.0 L49.8 112.0 L50.4 112.0 L51.1 112.0 L51.7 112.0 L52.3 112.0 L53.0 112.0 L53.6 112.0 L54.2 112.0 L54.9 112.0 L55.5 112.0 L56.1 112.0 L56.8 112.0 L57.4 112.0 L58.0 112.0 L58.7 112.0 L59.3 112.0 L59.9 112.0 L60.6 112.0 L61.2 112.0 L61.8 112.0 L62.5 112.0 L63.1 112.0 L63.7 112.0 L64.4 112.0 L65.0 112.0 L65.6 112.0 L66.3 112.0 L66.9 112.0 L67.5 112.0 L68.2 112.0 L68.8 112.0 L69.4 112.0 L70.1 112.0 L70.7 112.0 L71.3 112.0 L72.0 112.0 L72.6 112.0 L73.2 112.0 L73.9 112.0 L74.5 112.0 L75.1 112.0 L75.8 111.9 L76.4 111.8 L77.0 111.7 L77.7 111.6 L78.3 111.4 L78.9 111.2 L79.6 110.9 L80.2 110.6 L80.8 110.3 L81.5 109.9 L82.1 109.5 L82.7 109.1 L83.4 108.7 L84.0 108.2 L84.6 107.7 L85.3 107.1 L85.9 106.6 L86.5 105.9 L87.2 105.3 L87.8 104.6 L88.4 104.0 L89.1 103.2 L89.7 102.5 L90.3 101.7 L91.0 100.9 L91.6 100.1 L92.2 99.3 L92.9 98.4 L93.5 97.5 L94.1 96.6 L94.8 95.7 L95.4 94.7 L96.0 93.7 L96.7 92.8 L97.3 91.7 L97.9 90.7 L98.6 89.7 L99.2 88.6 L99.8 87.6 L100.5 86.5 L101.1 85.4 L101.7 84.3 L102.4 83.2 L103.0 82.1 L103.6 80.9 L104.3 79.8 L104.9 78.7 L105.5 77.5 L106.2 76.4 L106.8 75.2 L107.4 74.1 L108.1 72.9 L108.7 71.8 L109.3 70.6 L110.0 69.5 L110.6 68.3 L111.2 67.2 L111.9 66.1 L112.5 64.9 L113.1 63.8 L113.8 62.7 L114.4 61.6 L115.0 60.5 L115.7 59.4 L116.3 58.4 L116.9 57.3 L117.6 56.3 L118.2 55.3 L118.8 54.2 L119.5 53.3 L120.1 52.3 L120.7 51.3 L121.4 50.4 L122.0 49.5 L122.6 48.6 L123.3 47.7 L123.9 46.9 L124.5 46.1 L125.2 45.3 L125.8 44.5 L126.4 43.8 L127.1 43.0 L127.7 42.4 L128.3 41.7 L129.0 41.1 L129.6 40.4 L130.2 39.9 L130.9 39.3 L131.5 38.8 L132.1 38.3 L132.8 37.9 L133.4 37.5 L134.0 37.1 L134.7 36.7 L135.3 36.4 L135.9 36.1 L136.6 35.8 L137.2 35.6 L137.8 35.4 L138.5 35.3 L139.1 35.2 L139.7 35.1 L140.4 35.0 L141.0 35.0 L141.6 35.0 L142.3 35.1 L142.9 35.2 L143.5 35.3 L144.2 35.5 L144.8 35.7 L145.4 36.0 L146.1 36.3 L146.7 36.6 L147.3 37.0 L148.0 37.4 L148.6 37.9 L149.2 38.4 L149.9 38.9 L150.5 39.5 L151.1 40.1 L151.8 40.8 L152.4 41.4 L153.0 42.2 L153.7 42.9 L154.3 43.7 L154.9 44.5 L155.6 45.4 L156.2 46.2 L156.8 47.1 L157.5 48.1 L158.1 49.1 L158.7 50.1 L159.4 51.1 L160.0 52.1 L160.6 53.2 L161.3 54.3 L161.9 55.4 L162.5 56.6 L163.2 57.8 L163.8 58.9 L164.4 60.1 L165.1 61.4 L165.7 62.6 L166.3 63.9 L167.0 65.2 L167.6 66.4 L168.2 67.7 L168.9 69.1 L169.5 70.4 L170.1 71.7 L170.8 73.0 L171.4 74.4 L172.0 75.7 L172.7 77.1 L173.3 78.5 L173.9 79.8 L174.6 81.2 L175.2 82.5 L175.8 83.9 L176.5 85.3 L177.1 86.6 L177.7 88.0 L178.4 89.3 L179.0 90.6 L179.6 91.9 L180.3 93.3 L180.9 94.6 L181.5 95.8 L182.2 97.1 L182.8 98.4 L183.4 99.6 L184.1 100.9 L184.7 102.1 L185.3 103.2 L186.0 104.4 L186.6 105.6 L187.2 106.7 L187.9 107.8 L188.5 108.9 L189.1 109.9 L189.8 110.9 L190.4 111.9 L191.0 112.9 L191.7 113.9 L192.3 114.8 L192.9 115.6 L193.6 116.5 L194.2 117.3 L194.8 118.1 L195.5 118.8 L196.1 119.6 L196.7 120.2 L197.4 120.9 L198.0 121.5 L198.6 122.1 L199.3 122.6 L199.9 123.1 L200.5 123.6 L201.2 124.0 L201.8 124.4 L202.4 124.7 L203.1 125.0 L203.7 125.3 L204.3 125.5 L205.0 125.7 L205.6 125.8 L206.2 125.9 L206.9 126.0 L207.5 126.0 L208.1 126.0 L208.8 126.0 L209.4 126.0 L210.0 126.0 L210.7 126.0 L211.3 126.0 L211.9 126.0 L212.6 126.0 L213.2 126.0 L213.8 126.0 L214.5 126.0 L215.1 126.0 L215.7 126.0 L216.4 126.0 L217.0 126.0 L217.6 126.0 L218.3 126.0 L218.9 126.0 L219.5 126.0 L220.2 126.0 L220.8 126.0 L221.4 126.0 L222.1 126.0 L222.7 126.0 L223.3 126.0 L224.0 126.0 L224.6 126.0 L225.2 126.0 L225.9 126.0 L226.5 126.0 L227.1 126.0 L227.8 126.0 L228.4 126.0 L229.0 126.0 L229.7 126.0 L230.3 126.0 L230.9 126.0 L231.6 126.0 L232.2 126.0 L232.8 126.0 L233.5 126.0 L234.1 126.0 L234.7 126.0 L235.4 126.0 L236.0 126.0\" stroke=\"var(--teal)\" stroke-width=\"2\" fill=\"none\" /><text x=\"141.0\" y=\"23.799999999999983\" font-size=\"10.5\" fill=\"var(--teal)\" text-anchor=\"middle\" font-weight=\"400\" >Übergangszustand<\/text><line x1=\"46\" y1=\"154\" x2=\"242\" y2=\"154\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" marker-end=\"url(#ax74512)\"/><line x1=\"46\" y1=\"154\" x2=\"46\" y2=\"8\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" marker-end=\"url(#ax74512)\"/><text x=\"141.0\" y=\"186\" font-size=\"11\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >Reaktionsverlauf<\/text><text x=\"13\" y=\"84.0\" font-size=\"11\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" transform=\"rotate(-90 13 84.0)\">Energie<\/text><\/svg><figcaption><strong>S<sub>N<\/sub>2:<\/strong> ein Schritt, ein Übergangszustand<\/figcaption><\/figure><figure class=\"gl-fig\"><svg viewBox=\"0 0 250 190\" width=\"250\" style=\"max-width:250px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><defs><marker id=\"ax74512\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--text-dim)\"/><\/marker><\/defs><path d=\"M46.0 112.0 L46.6 112.0 L47.3 112.0 L47.9 112.0 L48.5 112.0 L49.2 112.0 L49.8 112.0 L50.4 112.0 L51.1 112.0 L51.7 112.0 L52.3 112.0 L53.0 112.0 L53.6 112.0 L54.2 112.0 L54.9 112.0 L55.5 112.0 L56.1 112.0 L56.8 112.0 L57.4 112.0 L58.0 112.0 L58.7 112.0 L59.3 112.0 L59.9 112.0 L60.6 112.0 L61.2 112.0 L61.8 112.0 L62.5 112.0 L63.1 112.0 L63.7 112.0 L64.4 112.0 L65.0 112.0 L65.6 112.0 L66.3 112.0 L66.9 112.0 L67.5 112.0 L68.2 112.0 L68.8 112.0 L69.4 111.9 L70.1 111.7 L70.7 111.4 L71.3 111.0 L72.0 110.4 L72.6 109.7 L73.2 108.9 L73.9 107.9 L74.5 106.8 L75.1 105.7 L75.8 104.4 L76.4 103.0 L77.0 101.5 L77.7 99.9 L78.3 98.2 L78.9 96.5 L79.6 94.7 L80.2 92.8 L80.8 90.8 L81.5 88.7 L82.1 86.7 L82.7 84.5 L83.4 82.4 L84.0 80.2 L84.6 78.0 L85.3 75.7 L85.9 73.5 L86.5 71.3 L87.2 69.0 L87.8 66.8 L88.4 64.6 L89.1 62.5 L89.7 60.3 L90.3 58.3 L91.0 56.2 L91.6 54.3 L92.2 52.3 L92.9 50.5 L93.5 48.8 L94.1 47.1 L94.8 45.5 L95.4 44.0 L96.0 42.6 L96.7 41.3 L97.3 40.2 L97.9 39.1 L98.6 38.1 L99.2 37.3 L99.8 36.6 L100.5 36.0 L101.1 35.6 L101.7 35.3 L102.4 35.1 L103.0 35.0 L103.6 35.0 L104.3 35.1 L104.9 35.3 L105.5 35.5 L106.2 35.8 L106.8 36.1 L107.4 36.5 L108.1 37.0 L108.7 37.5 L109.3 38.1 L110.0 38.7 L110.6 39.4 L111.2 40.1 L111.9 40.9 L112.5 41.8 L113.1 42.6 L113.8 43.6 L114.4 44.5 L115.0 45.5 L115.7 46.5 L116.3 47.6 L116.9 48.7 L117.6 49.8 L118.2 51.0 L118.8 52.1 L119.5 53.3 L120.1 54.5 L120.7 55.7 L121.4 56.9 L122.0 58.1 L122.6 59.3 L123.3 60.5 L123.9 61.7 L124.5 62.9 L125.2 64.1 L125.8 65.2 L126.4 66.4 L127.1 67.5 L127.7 68.6 L128.3 69.6 L129.0 70.7 L129.6 71.7 L130.2 72.6 L130.9 73.6 L131.5 74.4 L132.1 75.3 L132.8 76.1 L133.4 76.8 L134.0 77.5 L134.7 78.1 L135.3 78.7 L135.9 79.2 L136.6 79.7 L137.2 80.1 L137.8 80.4 L138.5 80.7 L139.1 80.9 L139.7 81.1 L140.4 81.2 L141.0 81.2 L141.6 81.2 L142.3 81.1 L142.9 81.0 L143.5 80.8 L144.2 80.6 L144.8 80.3 L145.4 80.0 L146.1 79.7 L146.7 79.3 L147.3 78.9 L148.0 78.4 L148.6 77.9 L149.2 77.4 L149.9 76.8 L150.5 76.2 L151.1 75.6 L151.8 75.0 L152.4 74.3 L153.0 73.6 L153.7 72.9 L154.3 72.2 L154.9 71.5 L155.6 70.7 L156.2 70.0 L156.8 69.3 L157.5 68.5 L158.1 67.8 L158.7 67.1 L159.4 66.4 L160.0 65.7 L160.6 65.0 L161.3 64.4 L161.9 63.8 L162.5 63.2 L163.2 62.6 L163.8 62.1 L164.4 61.6 L165.1 61.1 L165.7 60.7 L166.3 60.3 L167.0 60.0 L167.6 59.7 L168.2 59.4 L168.9 59.2 L169.5 59.0 L170.1 58.9 L170.8 58.8 L171.4 58.8 L172.0 58.9 L172.7 59.0 L173.3 59.3 L173.9 59.7 L174.6 60.2 L175.2 60.8 L175.8 61.5 L176.5 62.4 L177.1 63.3 L177.7 64.3 L178.4 65.4 L179.0 66.7 L179.6 68.0 L180.3 69.3 L180.9 70.8 L181.5 72.3 L182.2 73.9 L182.8 75.6 L183.4 77.3 L184.1 79.1 L184.7 80.9 L185.3 82.8 L186.0 84.7 L186.6 86.6 L187.2 88.5 L187.9 90.4 L188.5 92.4 L189.1 94.4 L189.8 96.3 L190.4 98.2 L191.0 100.1 L191.7 102.0 L192.3 103.9 L192.9 105.7 L193.6 107.5 L194.2 109.2 L194.8 110.9 L195.5 112.5 L196.1 114.0 L196.7 115.5 L197.4 116.8 L198.0 118.1 L198.6 119.4 L199.3 120.5 L199.9 121.5 L200.5 122.4 L201.2 123.3 L201.8 124.0 L202.4 124.6 L203.1 125.1 L203.7 125.5 L204.3 125.8 L205.0 125.9 L205.6 126.0 L206.2 126.0 L206.9 126.0 L207.5 126.0 L208.1 126.0 L208.8 126.0 L209.4 126.0 L210.0 126.0 L210.7 126.0 L211.3 126.0 L211.9 126.0 L212.6 126.0 L213.2 126.0 L213.8 126.0 L214.5 126.0 L215.1 126.0 L215.7 126.0 L216.4 126.0 L217.0 126.0 L217.6 126.0 L218.3 126.0 L218.9 126.0 L219.5 126.0 L220.2 126.0 L220.8 126.0 L221.4 126.0 L222.1 126.0 L222.7 126.0 L223.3 126.0 L224.0 126.0 L224.6 126.0 L225.2 126.0 L225.9 126.0 L226.5 126.0 L227.1 126.0 L227.8 126.0 L228.4 126.0 L229.0 126.0 L229.7 126.0 L230.3 126.0 L230.9 126.0 L231.6 126.0 L232.2 126.0 L232.8 126.0 L233.5 126.0 L234.1 126.0 L234.7 126.0 L235.4 126.0 L236.0 126.0\" stroke=\"var(--amber)\" stroke-width=\"2\" fill=\"none\" /><text x=\"141.0\" y=\"95.2\" font-size=\"10.5\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"400\" >Carbokation<\/text><text x=\"103.0\" y=\"23.799999999999983\" font-size=\"10.5\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"400\" >ÜZ 1<\/text><text x=\"171.39999999999998\" y=\"47.599999999999994\" font-size=\"10.5\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"400\" >ÜZ 2<\/text><line x1=\"46\" y1=\"154\" x2=\"242\" y2=\"154\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" marker-end=\"url(#ax74512)\"/><line x1=\"46\" y1=\"154\" x2=\"46\" y2=\"8\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" marker-end=\"url(#ax74512)\"/><text x=\"141.0\" y=\"186\" font-size=\"11\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >Reaktionsverlauf<\/text><text x=\"13\" y=\"84.0\" font-size=\"11\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" transform=\"rotate(-90 13 84.0)\">Energie<\/text><\/svg><figcaption><strong>S<sub>N<\/sub>1:<\/strong> zwei Schritte mit zwei Übergangszuständen (ÜZ), Carbokation als Zwischenstufe<\/figcaption><\/figure><\/div>"}, {"t": "Einflussfaktoren", "h": "<div class=\"gl-tw\"><table class=\"gl-table\"><thead><tr><th>Faktor<\/th><th>begünstigt S<sub>N<\/sub>1<\/th><th>begünstigt S<sub>N<\/sub>2<\/th><\/tr><\/thead><tbody><tr><td>Substrat<\/td><td>tertiär (sekundär)<\/td><td>Methyl, primär (sekundär)<\/td><\/tr><tr><td>Nucleophil<\/td><td>schwach (H<sub>2<\/sub>O, Alkohole)<\/td><td>stark (OH<sup>−<\/sup>, CN<sup>−<\/sup>, I<sup>−<\/sup>)<\/td><\/tr><tr><td>Lösemittel<\/td><td>polar protisch (Wasser, Ethanol)<\/td><td>polar aprotisch (Aceton, DMSO)<\/td><\/tr><tr><td>Abgangsgruppe<\/td><td>gut (I<sup>−<\/sup>, Br<sup>−<\/sup>)<\/td><td>gut (I<sup>−<\/sup>, Br<sup>−<\/sup>)<\/td><\/tr><\/tbody><\/table><\/div> <p>Bei tertiären Substraten schirmen die großen Alkylgruppen die Rückseite ab (<strong>sterische Hinderung<\/strong>) – S<sub>N<\/sub>2 ist dort praktisch unmöglich. Bei Methyl- und primären Substraten wäre das Carbokation zu instabil – S<sub>N<\/sub>1 findet nicht statt. Sekundäre Substrate liegen dazwischen; hier entscheiden Nucleophil und Lösemittel.<\/p>"}, {"t": "Konkurrenz: Eliminierung", "h": "<p>Nucleophile sind oft zugleich <strong>Basen<\/strong>. Statt das C-Atom anzugreifen, können sie ein H-Atom vom benachbarten C-Atom abspalten. Dann entsteht eine C=C-Doppelbindung – eine <strong>Eliminierung<\/strong>.<\/p> <ul><li><strong>E2:<\/strong> einstufig, starke Base, analog zu S<sub>N<\/sub>2.<\/li> <li><strong>E1:<\/strong> zweistufig über das Carbokation, Konkurrenz zu S<sub>N<\/sub>1.<\/li> <li>Eliminierung wird begünstigt durch <strong>starke, sperrige Basen<\/strong>, <strong>hohe Temperatur<\/strong> und <strong>tertiäre<\/strong> Substrate.<\/li> <li>Meist entsteht bevorzugt das höher substituierte Alken (<strong>Regel von Saytzeff<\/strong>).<\/li><\/ul> <div class=\"gl-box gl-info\">Beispiel: 2-Brom-2-methylpropan mit Wasser bei Raumtemperatur → überwiegend 2-Methylpropan-2-ol (S<sub>N<\/sub>1); mit konzentrierter KOH in Ethanol und Wärme → überwiegend 2-Methylpropen (E2).<\/div>"}];
+  const g = id => document.getElementById(id);
+  const bd = g("glBackdrop"), box = bd.querySelector(".modal-box");
+  let idx = 0;
+  function show(i){
+    idx = Math.max(0, Math.min(GL.length - 1, i));
+    g("glNum").textContent = (idx + 1) + ".";
+    g("glTitle").innerHTML = GL[idx].t;
+    g("glBody").innerHTML = GL[idx].h;
+    g("glPos").textContent = "Thema " + (idx + 1) + " von " + GL.length;
+    g("glPrev").disabled = idx === 0;
+    g("glNext").disabled = idx === GL.length - 1;
+    box.scrollTop = 0;
+    bd.classList.add("open");
+  }
+  g("glList").innerHTML = GL.map((b, i) => '<button type="button" class="gl-item" data-i="' + i + '"><span class="nr">' + (i + 1) + '</span>' + b.t + '<span class="go">›</span></button>').join("");
+  g("glToggle").addEventListener("click", () => {
+    const open = g("glToggle").getAttribute("aria-expanded") !== "true";
+    g("glToggle").setAttribute("aria-expanded", String(open));
+    g("glPanel").hidden = !open;
+  });
+  g("glList").addEventListener("click", e => { const b = e.target.closest(".gl-item"); if (b) show(+b.dataset.i); });
+  g("glPrev").addEventListener("click", () => show(idx - 1));
+  g("glNext").addEventListener("click", () => show(idx + 1));
+  g("glClose").addEventListener("click", () => bd.classList.remove("open"));
+  bd.addEventListener("click", e => { if (e.target === bd) bd.classList.remove("open"); });
+  document.addEventListener("keydown", e => {
+    if (!bd.classList.contains("open")) return;
+    if (e.key === "Escape") bd.classList.remove("open");
+    if (e.key === "ArrowRight" && idx < GL.length - 1) show(idx + 1);
+    if (e.key === "ArrowLeft" && idx > 0) show(idx - 1);
+  });
 })();
 </script>
 </body>

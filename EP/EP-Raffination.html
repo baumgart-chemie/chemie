@@ -248,6 +248,65 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
     overflow-y:auto; overscroll-behavior:contain; background:var(--bg);
   }
 }
+
+/* Rubrik Grundlagen */
+.gl-toggle{display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; cursor:pointer; text-align:left;
+  border:1px solid var(--teal-dim); border-radius:4px; background:var(--panel-alt); color:var(--text);
+  font-size:14px; font-weight:600; font-family:inherit; touch-action:manipulation;}
+.gl-toggle:hover{border-color:var(--teal);}
+.gl-toggle:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-toggle .gl-n{font-size:12px; font-weight:400; color:var(--text-faint);}
+.gl-toggle .gl-ch{margin-left:auto; color:var(--teal); font-size:13px;}
+.gl-toggle .gl-ch::after{content:"▸";}
+.gl-toggle[aria-expanded="true"] .gl-ch::after{content:"▾";}
+.gl-panel{margin-top:8px;}
+.gl-list{display:flex; flex-direction:column; gap:6px;}
+.gl-item{display:flex; gap:10px; align-items:center; width:100%; text-align:left; padding:8px 11px; cursor:pointer;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel); color:var(--text);
+  font-size:13px; font-family:inherit; font-weight:500; touch-action:manipulation;}
+.gl-item:hover{border-color:var(--text-faint); background:var(--panel-alt);}
+.gl-item:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-item .nr{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--amber); min-width:14px;}
+.gl-item .go{margin-left:auto; color:var(--text-faint); font-size:12px;}
+.gl-note{font-size:12px; color:var(--text-faint); line-height:1.5; margin:8px 0 0;}
+.modal-box.gl-wide{max-width:900px; width:100%; max-height:88vh; overflow-y:auto;}
+.gl-wide .gl-num{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--text-faint); margin-right:10px;}
+.gl-body p, .gl-body li{font-size:13.5px; line-height:1.6; color:var(--text-dim);}
+.gl-body p{margin:0 0 10px;}
+.gl-body ul, .gl-body ol{margin:0 0 12px; padding-left:22px;}
+.gl-body strong{color:var(--text); font-weight:600;}
+.gl-body sub, .gl-body sup{font-size:.72em;}
+.gl-row{display:flex; flex-wrap:wrap; gap:12px; align-items:stretch; margin:8px 0 14px;}
+.gl-fig{margin:0; flex:1 1 220px; background:var(--screen, #0e1113); border:1px solid var(--line-soft); border-radius:4px; padding:10px 12px 8px;
+  display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:6px; max-width:100%; overflow-x:auto;}
+.gl-fig figcaption{font-size:12px; color:var(--text-dim); text-align:center; line-height:1.45; max-width:420px;}
+.gl-tw{overflow-x:auto; margin:6px 0 12px; border:1px solid var(--line-soft); border-radius:4px;}
+.gl-table{width:100%; border-collapse:collapse; font-size:12.8px;}
+.gl-table th{text-align:left; font-weight:500; color:var(--text-faint); font-size:11.5px; padding:6px 9px; border-bottom:1px solid var(--line); background:var(--panel-alt);}
+.gl-table td{padding:6px 9px; border-bottom:1px solid var(--line-soft); color:var(--text-dim); vertical-align:top; white-space:normal;}
+.gl-table tr:last-child td{border-bottom:none;}
+.gl-table td:first-child{color:var(--text);}
+.gl-steps{counter-reset:gls; list-style:none; padding-left:0 !important;}
+.gl-steps li{counter-increment:gls; position:relative; padding-left:30px; margin-bottom:6px;}
+.gl-steps li::before{content:counter(gls); position:absolute; left:0; top:1px; width:20px; height:20px; border-radius:50%; border:1px solid var(--teal-dim);
+  color:var(--teal); font-size:11.5px; display:flex; align-items:center; justify-content:center; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.gl-box{border:1px solid var(--line-soft); border-left:3px solid var(--teal); background:var(--panel-alt); border-radius:3px; padding:9px 12px; margin:8px 0 12px;
+  font-size:13.5px; line-height:1.65; color:var(--text);}
+.gl-box.gl-warn{border-left-color:var(--amber);}
+.gl-box small{color:var(--text-faint); font-size:12px;}
+.gl-nav{display:flex; align-items:center; gap:10px; border-top:1px solid var(--line-soft); padding-top:14px; margin-top:16px;}
+.gl-nav .sp{flex:1; text-align:center; font-size:12px; color:var(--text-faint);}
+/* Strukturformeln und Anlagenschema in den Grundlagen */
+.gl-body .mol-eq{background:#0e1113; border:1px solid var(--line-soft); border-radius:4px; padding:10px 8px 6px; margin:4px 0 8px; overflow-x:auto; -webkit-overflow-scrolling:touch;}
+.gl-body .mol-eq svg{display:block; margin:0 auto; max-width:100%; height:auto;}
+.gl-body .mol-cap{font-size:12.5px; color:var(--text-faint); line-height:1.5; margin:0 0 14px;}
+.gl-body .mol-cap b{color:var(--danger); font-weight:600;} .gl-body .mol-cap i{color:var(--amber); font-style:normal; font-weight:600;}
+.gl-fcc{align-items:stretch; margin:8px 0 14px;}
+.gl-fcc svg{display:block; width:100%; min-width:520px; height:auto;}
+.gl-fcc figcaption{align-self:center;}
+.flow{stroke-dasharray:7 7; animation:flowmove 1.1s linear infinite;}
+@keyframes flowmove{to{stroke-dashoffset:-14;}}
+@media (prefers-reduced-motion: reduce){ .flow{animation:none;} }
 </style>
 </head>
 <body>
@@ -302,6 +361,14 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
       <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.2</span><span class="d">01.11.2026</span></div>
+      <ul>
+        <li><strong>Neue Rubrik „Grundlagen“:</strong> Der Knopf „Grundlagen“ oben in der linken Spalte klappt 7 Themen mit Erklärtext und Grafiken zu den fachlichen und methodischen Grundlagen auf. Mit den Knöpfen unten oder den Pfeiltasten blättert man zwischen den Themen.</li>
+        <li><strong>Grundlagen „Cracken“:</strong> Bindungsbruch und H-Übertragung an zwei Beispielen in Strukturformeln (Octan, Decan), allgemeine Gleichung, Vergleich von thermischem und katalytischem Cracken.</li>
+        <li><strong>Neues Grundlagen-Thema „Aufbau einer Crackanlage“:</strong> stark vereinfachtes Schema mit Reaktor, Regenerator und Trennkolonne sowie Erläuterung des Katalysatorkreislaufs.</li>
+        <li><strong>Grundlagen „Reformieren“:</strong> drei Beispiele in Strukturformeln (Cyclohexan → Benzol, Methylcyclohexan → Toluol, Heptan → Toluol).</li>
+        <li><strong>Linke Spalte:</strong> Sie bleibt beim Scrollen der Aufgabe stehen, füllt die Bildschirmhöhe und scrollt als Ganzes in einem einzigen Bereich.</li>
+      </ul>
       <div class="vh-ver"><span class="v">V1.1</span><span class="d">29.10.2026</span></div>
         <ul>
           <li>Hydrocracker und Isomerisierung entfernt; zur Auswahl stehen Vakuumdestillation, Entschwefelung, katalytischer Cracker und Reformer.</li>
@@ -323,6 +390,17 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
 <div class="wrap">
   <!-- SIDEBAR -->
   <div class="sidebar">
+
+    <section class="block">
+      <button type="button" class="gl-toggle" id="glToggle" aria-expanded="false" aria-controls="glPanel">
+        <span>Grundlagen</span><span class="gl-n">7 Themen</span><span class="gl-ch" aria-hidden="true"></span>
+      </button>
+      <div class="gl-panel" id="glPanel" hidden>
+        <div class="gl-list" id="glList"></div>
+        <p class="gl-note">Erklärungen mit Grafiken zum Nachlesen – auch zur Besprechung im Unterricht.</p>
+      </div>
+    </section>
+
 
     <section class="block">
       <h2>Rohöl</h2>
@@ -476,7 +554,7 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
 
 <footer>
   <p class="footer-note">Simulierte Daten zu Lehrzwecken · Siedekurven, Ausbeuten, Oktanzahlen und Schwefelgehalte beruhen auf stark vereinfachten Modellen und gerundeten Richtwerten; sie bilden keine reale Raffinerie exakt ab.</p>
-  <p class="footer-credit">Bastian Baumgart · Simulation „Erdölraffination“ V1.1 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Simulation „Erdölraffination“ V1.2 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <script>
@@ -1259,6 +1337,240 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
   if(!hdr) return;
   const set = () => document.documentElement.style.setProperty("--hdr", Math.max(0, Math.round(hdr.getBoundingClientRect().bottom)) + "px");
   addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
+})();
+</script>
+
+<div class="modal-backdrop" id="glBackdrop">
+  <div class="modal-box gl-wide" role="dialog" aria-modal="true" aria-labelledby="glTitle">
+    <div class="modal-head">
+      <h2><span class="gl-num" id="glNum"></span><span id="glTitle"></span></h2>
+      <button class="modal-close" id="glClose" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body gl-body" id="glBody"></div>
+    <div class="gl-nav">
+      <button class="btn ghost" id="glPrev">← Vorheriges Thema</button>
+      <span class="sp" id="glPos"></span>
+      <button class="btn" id="glNext">Nächstes Thema →</button>
+    </div>
+  </div>
+</div>
+<script>
+/* Rubrik Grundlagen */
+(function(){
+  const GL = [{"t": "Erdöl – ein Stoffgemisch", "h": "<p>Rohöl ist ein Gemisch aus sehr vielen Kohlenwasserstoffen, vor allem Alkanen, Cycloalkanen und Aromaten mit wenigen bis über 40 C-Atomen. Dazu kommen Schwefel-, Stickstoff- und Sauerstoffverbindungen.<\/p> <p>Je nach Herkunft unterscheidet sich die Zusammensetzung: <strong>leichte<\/strong> Rohöle enthalten viele kurzkettige Bestandteile, <strong>schwere<\/strong> viele langkettige; „saure“ Rohöle enthalten viel Schwefel.<\/p> <p>In der Raffinerie wird das Rohöl zuerst getrennt und dann chemisch umgewandelt, damit möglichst viel von den gefragten Produkten Benzin, Diesel und Kerosin entsteht – in der geforderten Qualität.<\/p>"}, {"t": "Fraktionierte Destillation", "h": "<p>Das Rohöl wird auf etwa 350–400 °C erhitzt und in eine <strong>Destillationskolonne<\/strong> geleitet. Die Kolonne ist unten heiß und oben kühler. Die Dämpfe steigen auf und kondensieren auf der Höhe, auf der die Temperatur unter ihre Siedetemperatur fällt.<\/p> <div class=\"gl-row\"><figure class=\"gl-fig\"><svg viewBox=\"0 0 380 300\" width=\"380\" style=\"max-width:380px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><defs><marker id=\"cl\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--amber)\"/><\/marker><marker id=\"cg\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--teal)\"/><\/marker><\/defs><rect x=\"130\" y=\"20\" width=\"70\" height=\"260\" rx=\"6\" fill=\"var(--panel-alt)\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" /><line x1=\"200\" y1=\"40\" x2=\"235\" y2=\"40\" stroke=\"var(--teal)\" stroke-width=\"1.6\" marker-end=\"url(#cg)\"/><text x=\"240\" y=\"44\" font-size=\"11\" fill=\"var(--text)\" text-anchor=\"start\" font-weight=\"400\" >Gas (Propan, Butan)<\/text><text x=\"240\" y=\"58\" font-size=\"10\" fill=\"var(--text-faint)\" text-anchor=\"start\" font-weight=\"400\" >&lt; 30 °C<\/text><line x1=\"200\" y1=\"92\" x2=\"235\" y2=\"92\" stroke=\"var(--teal)\" stroke-width=\"1.6\" marker-end=\"url(#cg)\"/><text x=\"240\" y=\"96\" font-size=\"11\" fill=\"var(--text)\" text-anchor=\"start\" font-weight=\"400\" >Benzin<\/text><text x=\"240\" y=\"110\" font-size=\"10\" fill=\"var(--text-faint)\" text-anchor=\"start\" font-weight=\"400\" >30–180 °C<\/text><line x1=\"135\" y1=\"66\" x2=\"195\" y2=\"66\" stroke=\"var(--line)\" stroke-width=\"1\" stroke-dasharray=\"3 3\"/><line x1=\"200\" y1=\"144\" x2=\"235\" y2=\"144\" stroke=\"var(--teal)\" stroke-width=\"1.6\" marker-end=\"url(#cg)\"/><text x=\"240\" y=\"148\" font-size=\"11\" fill=\"var(--text)\" text-anchor=\"start\" font-weight=\"400\" >Kerosin<\/text><text x=\"240\" y=\"162\" font-size=\"10\" fill=\"var(--text-faint)\" text-anchor=\"start\" font-weight=\"400\" >180–250 °C<\/text><line x1=\"135\" y1=\"118\" x2=\"195\" y2=\"118\" stroke=\"var(--line)\" stroke-width=\"1\" stroke-dasharray=\"3 3\"/><line x1=\"200\" y1=\"196\" x2=\"235\" y2=\"196\" stroke=\"var(--teal)\" stroke-width=\"1.6\" marker-end=\"url(#cg)\"/><text x=\"240\" y=\"200\" font-size=\"11\" fill=\"var(--text)\" text-anchor=\"start\" font-weight=\"400\" >Diesel/Heizöl<\/text><text x=\"240\" y=\"214\" font-size=\"10\" fill=\"var(--text-faint)\" text-anchor=\"start\" font-weight=\"400\" >250–350 °C<\/text><line x1=\"135\" y1=\"170\" x2=\"195\" y2=\"170\" stroke=\"var(--line)\" stroke-width=\"1\" stroke-dasharray=\"3 3\"/><line x1=\"200\" y1=\"248\" x2=\"235\" y2=\"248\" stroke=\"var(--teal)\" stroke-width=\"1.6\" marker-end=\"url(#cg)\"/><text x=\"240\" y=\"252\" font-size=\"11\" fill=\"var(--text)\" text-anchor=\"start\" font-weight=\"400\" >Rückstand<\/text><text x=\"240\" y=\"266\" font-size=\"10\" fill=\"var(--text-faint)\" text-anchor=\"start\" font-weight=\"400\" >&gt; 350 °C<\/text><line x1=\"135\" y1=\"222\" x2=\"195\" y2=\"222\" stroke=\"var(--line)\" stroke-width=\"1\" stroke-dasharray=\"3 3\"/><line x1=\"40\" y1=\"250\" x2=\"128\" y2=\"250\" stroke=\"var(--amber)\" stroke-width=\"2\" marker-end=\"url(#cl)\"/><text x=\"70\" y=\"240\" font-size=\"11\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"400\" >Rohöl<\/text><text x=\"70\" y=\"268\" font-size=\"10\" fill=\"var(--text-faint)\" text-anchor=\"middle\" font-weight=\"400\" >(≈ 380 °C)<\/text><text x=\"165\" y=\"296\" font-size=\"10.5\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >Destillationskolonne<\/text><text x=\"165\" y=\"14\" font-size=\"10\" fill=\"var(--text-faint)\" text-anchor=\"middle\" font-weight=\"400\" >kühler<\/text><\/svg><figcaption>Fraktionen mit ungefähren Siedebereichen<\/figcaption><\/figure><\/div> <p>So entstehen <strong>Fraktionen<\/strong> – Gemische ähnlicher Siedetemperatur. Die Siedetemperatur steigt mit der Kettenlänge, weil die Van-der-Waals-Kräfte zwischen den Molekülen zunehmen.<\/p>"}, {"t": "Vakuumdestillation", "h": "<p>Der Rückstand der ersten Destillation enthält sehr langkettige Kohlenwasserstoffe. Würde man ihn weiter erhitzen, zersetzten sich die Moleküle, bevor sie sieden.<\/p> <p>Deshalb destilliert man den Rückstand bei <strong>vermindertem Druck<\/strong>: Die Siedetemperaturen sinken, und man erhält Vakuumgasöl (Ausgangsstoff für den Cracker, Schmieröle) und als Rest Bitumen.<\/p>"}, {"t": "Cracken", "h": "<p>Bei der Destillation fällt viel mehr schweres Gasöl und Rückstand an, als gebraucht wird, aber zu wenig Benzin. Beim <strong>Cracken<\/strong> (engl. <em>to crack<\/em> = spalten) werden langkettige Alkanmoleküle in kürzere zerlegt.<\/p>\n<p>Dabei bricht eine <strong>C–C-Bindung<\/strong>. Die Wasserstoffatome reichen nicht für zwei gesättigte Bruchstücke. Deshalb wandert ein H-Atom auf das eine Bruchstück: Es entstehen ein <strong>kürzeres Alkan<\/strong> und ein <strong>Alken<\/strong> mit einer C=C-Doppelbindung. Die Zahl der C- und H-Atome bleibt insgesamt erhalten.<\/p>\n<p><strong>Beispiel 1: Octan → Butan + But-1-en<\/strong><\/p>\n<div class=\"mol-eq\" data-eq=\"crack1\"><\/div>\n<p class=\"mol-cap\"><b>rot gestrichelt:<\/b> die C–C-Bindung, die bricht · <i>orange:<\/i> das H-Atom, das vom rechten auf das linke Bruchstück übergeht. Links entsteht so ein vollständiges Alkan, rechts bildet sich die Doppelbindung.<\/p>\n<p><strong>Beispiel 2: Decan → Heptan + Propen<\/strong><\/p>\n<div class=\"mol-eq\" data-eq=\"crack2\"><\/div>\n<p>Die Kette kann an verschiedenen Stellen brechen. Deshalb entsteht beim Cracken immer ein <strong>Gemisch<\/strong> aus vielen Alkanen und Alkenen unterschiedlicher Kettenlänge. Kurze Alkene wie Ethen und Propen sind wichtige Grundstoffe für Kunststoffe.<\/p>\n<div class=\"gl-box gl-info\">C<sub>n<\/sub>H<sub>2n+2<\/sub> → C<sub>m<\/sub>H<sub>2m+2<\/sub> + C<sub>n−m<\/sub>H<sub>2(n−m)<\/sub><br>Alkan → kürzeres Alkan + Alken<br><small>Nachweis der Alkene: Crackprodukte entfärben Bromwasser.<\/small><\/div>\n<p><strong>Thermisches und katalytisches Cracken<\/strong><\/p>\n<div class=\"gl-tw\"><table class=\"gl-table\"><thead><tr><th><\/th><th>thermisches Cracken<\/th><th>katalytisches Cracken<\/th><\/tr><\/thead><tbody>\n<tr><td>Temperatur<\/td><td>450–850 °C, teils unter Druck<\/td><td>ca. 500 °C, Normaldruck<\/td><\/tr>\n<tr><td>Katalysator<\/td><td>keiner – nur Hitze<\/td><td>Zeolith: poröses Alumosilicat mit sehr großer innerer Oberfläche<\/td><\/tr>\n<tr><td>Produkte<\/td><td>viel Gas und Koks, unverzweigte Ketten<\/td><td>vor allem Benzin; viele verzweigte Alkane und Aromaten → höhere Oktanzahl<\/td><\/tr>\n<tr><td>Einsatz<\/td><td>Rückstandsverarbeitung, Steamcracker (Ethen, Propen)<\/td><td>Vakuumgasöl → Benzin (in dieser Simulation)<\/td><\/tr>\n<\/tbody><\/table><\/div>\n<p>Wie eine katalytische Crackanlage aufgebaut ist, zeigt das nächste Thema.<\/p>"}, {"t": "Aufbau einer Crackanlage", "h": "<p>Die Abbildung zeigt eine <strong>stark vereinfachte<\/strong> katalytische Crackanlage. Sie besteht im Kern aus drei Teilen: dem <strong>Reaktor<\/strong>, in dem gespalten wird, dem <strong>Regenerator<\/strong>, in dem der Katalysator gereinigt wird, und der <strong>Trennkolonne<\/strong>, in der die Produkte getrennt werden.<\/p>\n<div class=\"gl-fig gl-fcc\"><svg viewBox=\"0 0 640 330\" role=\"img\" aria-label=\"Stark vereinfachter Aufbau einer katalytischen Crackanlage mit Reaktor, Regenerator und Trennkolonne\">\n<defs>\n<marker id=\"sO\" viewBox=\"0 0 10 10\" refX=\"7\" refY=\"5\" markerUnits=\"userSpaceOnUse\" markerWidth=\"11\" markerHeight=\"11\" orient=\"auto-start-reverse\"><path d=\"M0,0 L10,5 L0,10 z\" fill=\"#ffb454\"/><\/marker>\n<marker id=\"sT\" viewBox=\"0 0 10 10\" refX=\"7\" refY=\"5\" markerUnits=\"userSpaceOnUse\" markerWidth=\"12\" markerHeight=\"12\" orient=\"auto-start-reverse\"><path d=\"M0,0 L10,5 L0,10 z\" fill=\"#4fd1c5\"/><\/marker>\n<marker id=\"sK\" viewBox=\"0 0 10 10\" refX=\"7\" refY=\"5\" markerUnits=\"userSpaceOnUse\" markerWidth=\"12\" markerHeight=\"12\" orient=\"auto-start-reverse\"><path d=\"M0,0 L10,5 L0,10 z\" fill=\"#a68a6d\"/><\/marker>\n<marker id=\"sB\" viewBox=\"0 0 10 10\" refX=\"7\" refY=\"5\" markerUnits=\"userSpaceOnUse\" markerWidth=\"10\" markerHeight=\"10\" orient=\"auto-start-reverse\"><path d=\"M0,0 L10,5 L0,10 z\" fill=\"#9fd3ff\"/><\/marker>\n<marker id=\"sG\" viewBox=\"0 0 10 10\" refX=\"7\" refY=\"5\" markerUnits=\"userSpaceOnUse\" markerWidth=\"10\" markerHeight=\"10\" orient=\"auto-start-reverse\"><path d=\"M0,0 L10,5 L0,10 z\" fill=\"#9aa2a9\"/><\/marker>\n<pattern id=\"sCat\" width=\"9\" height=\"9\" patternUnits=\"userSpaceOnUse\"><circle cx=\"4.5\" cy=\"4.5\" r=\"1.5\" fill=\"#4fd1c5\" opacity=\".6\"/><\/pattern>\n<pattern id=\"sCatK\" width=\"9\" height=\"9\" patternUnits=\"userSpaceOnUse\"><circle cx=\"4.5\" cy=\"4.5\" r=\"1.5\" fill=\"#a68a6d\" opacity=\".8\"/><\/pattern>\n<\/defs>\n<style>\n.sl{font:600 13px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; fill:#e7e4dd;}\n.ss{font:11.5px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; fill:#9aa2a9;}\n.st{font:11.5px ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; fill:#ffb454;}\n.sv{fill:#171b1f; stroke:#4a535b; stroke-width:1.6;}\n.sn circle{fill:#ffb454;} .sn text{font:700 12px system-ui,sans-serif; fill:#14171a; text-anchor:middle; dominant-baseline:central;}\n<\/style>\n<!-- Reaktor -->\n<rect class=\"sv\" x=\"200\" y=\"50\" width=\"130\" height=\"115\" rx=\"14\"/>\n<rect x=\"210\" y=\"96\" width=\"110\" height=\"60\" rx=\"8\" fill=\"url(#sCat)\"/>\n<text class=\"sl\" x=\"265\" y=\"72\" text-anchor=\"middle\">Reaktor<\/text>\n<text class=\"st\" x=\"265\" y=\"88\" text-anchor=\"middle\">≈ 500 °C<\/text>\n<!-- Regenerator -->\n<rect class=\"sv\" x=\"200\" y=\"220\" width=\"130\" height=\"95\" rx=\"14\"/>\n<rect x=\"210\" y=\"256\" width=\"110\" height=\"50\" rx=\"8\" fill=\"url(#sCat)\"/>\n<text class=\"sl\" x=\"265\" y=\"240\" text-anchor=\"middle\">Regenerator<\/text>\n<!-- Vakuumgasöl rein -->\n<path d=\"M40,110 L196,110\" stroke=\"#ffb454\" stroke-width=\"4\" fill=\"none\" marker-end=\"url(#sO)\" class=\"flow\"/>\n<text class=\"sl\" x=\"40\" y=\"98\" style=\"fill:#ffb454\">Vakuumgasöl<\/text>\n<text class=\"ss\" x=\"40\" y=\"128\">(lange Moleküle)<\/text>\n<!-- Katalysatorkreislauf -->\n<path d=\"M300,168 L300,216\" stroke=\"#a68a6d\" stroke-width=\"6\" fill=\"none\" marker-end=\"url(#sK)\" class=\"flow\"/>\n<text class=\"ss\" x=\"310\" y=\"190\" style=\"fill:#c4a785\">verkokter<\/text>\n<text class=\"ss\" x=\"310\" y=\"204\" style=\"fill:#c4a785\">Katalysator<\/text>\n<path d=\"M230,216 L230,168\" stroke=\"#4fd1c5\" stroke-width=\"6\" fill=\"none\" marker-end=\"url(#sT)\" class=\"flow\"/>\n<text class=\"ss\" x=\"220\" y=\"190\" text-anchor=\"end\" style=\"fill:#4fd1c5\">gereinigter, heißer<\/text>\n<text class=\"ss\" x=\"220\" y=\"204\" text-anchor=\"end\" style=\"fill:#4fd1c5\">Katalysator<\/text>\n<!-- Luft / Abgas -->\n<path d=\"M120,290 L196,290\" stroke=\"#9fd3ff\" stroke-width=\"3\" fill=\"none\" marker-end=\"url(#sB)\" class=\"flow\"/>\n<text class=\"ss\" x=\"120\" y=\"280\">Luft<\/text>\n<path d=\"M334,290 L410,290\" stroke=\"#9aa2a9\" stroke-width=\"3\" fill=\"none\" marker-end=\"url(#sG)\" class=\"flow\"/>\n<text class=\"ss\" x=\"342\" y=\"280\">Abgas (CO₂, H₂O)<\/text>\n<!-- Crackprodukte -->\n<path d=\"M265,50 L265,20 L480,20 L480,44\" stroke=\"#ffb454\" stroke-width=\"4\" fill=\"none\" marker-end=\"url(#sO)\" class=\"flow\"/>\n<text class=\"ss\" x=\"300\" y=\"13\">Crackprodukte (dampfförmig)<\/text>\n<!-- Trennkolonne -->\n<rect class=\"sv\" x=\"455\" y=\"48\" width=\"50\" height=\"240\" rx=\"22\"/>\n<g stroke=\"#31383e\" stroke-width=\"1\"><line x1=\"461\" y1=\"92\" x2=\"499\" y2=\"92\"/><line x1=\"461\" y1=\"130\" x2=\"499\" y2=\"130\"/><line x1=\"461\" y1=\"168\" x2=\"499\" y2=\"168\"/><line x1=\"461\" y1=\"206\" x2=\"499\" y2=\"206\"/><line x1=\"461\" y1=\"244\" x2=\"499\" y2=\"244\"/><\/g>\n<text class=\"sl\" x=\"480\" y=\"308\" text-anchor=\"middle\">Trennkolonne<\/text>\n<path d=\"M505,72 L546,72\" stroke=\"#b79cf2\" stroke-width=\"3\" marker-end=\"url(#sG)\"/><text class=\"sl\" x=\"552\" y=\"76\" style=\"fill:#b79cf2\">Gas<\/text>\n<path d=\"M505,130 L546,130\" stroke=\"#ffd166\" stroke-width=\"3\" marker-end=\"url(#sG)\"/><text class=\"sl\" x=\"552\" y=\"134\" style=\"fill:#ffd166\">Benzin<\/text>\n<path d=\"M505,200 L546,200\" stroke=\"#e8955c\" stroke-width=\"3\" marker-end=\"url(#sG)\"/><text class=\"sl\" x=\"552\" y=\"198\" style=\"fill:#e8955c\">Diesel/<\/text><text class=\"sl\" x=\"552\" y=\"213\" style=\"fill:#e8955c\">Heizöl<\/text>\n<path d=\"M505,266 L546,266\" stroke=\"#a68a6d\" stroke-width=\"3\" marker-end=\"url(#sG)\"/><text class=\"sl\" x=\"552\" y=\"270\" style=\"fill:#a68a6d\">Rückstand<\/text>\n<!-- Nummern -->\n<g class=\"sn\"><circle cx=\"318\" cy=\"64\" r=\"11\"/><text x=\"318\" y=\"64\">1<\/text><\/g>\n<g class=\"sn\"><circle cx=\"300\" cy=\"148\" r=\"0\" style=\"display:none\"/><\/g>\n<g class=\"sn\"><circle cx=\"265\" cy=\"192\" r=\"11\"/><text x=\"265\" y=\"192\">2<\/text><\/g>\n<g class=\"sn\"><circle cx=\"318\" cy=\"234\" r=\"11\"/><text x=\"318\" y=\"234\">3<\/text><\/g>\n<g class=\"sn\"><circle cx=\"480\" cy=\"70\" r=\"11\"/><text x=\"480\" y=\"70\">4<\/text><\/g>\n<\/svg><figcaption>Stark vereinfachter Aufbau einer katalytischen Crackanlage<\/figcaption><\/div>\n<ol class=\"gl-steps\">\n<li><strong>Reaktor:<\/strong> Das vorgewärmte Vakuumgasöl verdampft und trifft bei etwa 500 °C auf den pulverförmigen Katalysator. An seiner Oberfläche werden die langen Moleküle in kürzere gespalten. Dabei lagert sich auf dem Katalysator Koks (fast reiner Kohlenstoff) ab.<\/li>\n<li><strong>Katalysatorkreislauf:<\/strong> Der verkokte Katalysator wirkt kaum noch. Er wird laufend in den Regenerator geleitet, während gereinigter Katalysator von dort zurück in den Reaktor strömt.<\/li>\n<li><strong>Regenerator:<\/strong> Mit eingeblasener Luft verbrennt der Koks: C + O<sub>2<\/sub> → CO<sub>2<\/sub>. Der Katalysator ist danach wieder wirksam – und durch die Verbrennungswärme heiß. Diese Wärme bringt er in den Reaktor mit.<\/li>\n<li><strong>Trennkolonne:<\/strong> Die dampfförmigen Crackprodukte werden wie bei der Erdöldestillation nach ihren Siedetemperaturen getrennt: Gas, Benzin, Diesel/Heizöl und Rückstand.<\/li>\n<\/ol>\n<div class=\"gl-box gl-info\">Der Katalysator wird nicht verbraucht: Er läuft im Kreislauf zwischen Reaktor und Regenerator. Die Verbrennung des Kokses liefert die Wärme für das Cracken.<\/div>"}, {"t": "Reformieren und Oktanzahl", "h": "<p>Ottomotoren brauchen <strong>klopffestes<\/strong> Benzin, das sich erst durch den Zündfunken und nicht schon durch die Verdichtung entzündet. Ein Maß dafür ist die <strong>Research-Oktanzahl (ROZ)<\/strong>:<\/p> <div class=\"gl-tw\"><table class=\"gl-table\"><thead><tr><th>Bezugsstoff<\/th><th>ROZ<\/th><\/tr><\/thead><tbody><tr><td>n-Heptan (unverzweigt)<\/td><td>0<\/td><\/tr><tr><td>2,2,4-Trimethylpentan („Isooctan“, stark verzweigt)<\/td><td>100<\/td><\/tr><\/tbody><\/table><\/div> <p>Unverzweigte Alkane haben niedrige, verzweigte Alkane, Cycloalkane und Aromaten hohe Oktanzahlen. Im <strong>Reformer<\/strong> werden die Moleküle des Schwerbenzins bei etwa 500 °C an einem <strong>Platinkatalysator<\/strong> umgebaut, ohne dass sich die Zahl der C-Atome ändert: Aus Cycloalkanen und unverzweigten Alkanen entstehen <strong>Aromaten<\/strong>. Dabei wird <strong>Wasserstoff<\/strong> abgespalten. Schwefel vergiftet den Katalysator – das Schwerbenzin muss vorher entschwefelt werden.<\/p>\n<p><strong>Beispiel 1 – Dehydrierung: Cyclohexan → Benzol + 3 H<sub>2<\/sub><\/strong><\/p>\n<div class=\"mol-eq\" data-eq=\"ref1\"><\/div>\n<p class=\"mol-cap\">Aus dem gesättigten Sechsring werden sechs H-Atome abgespalten; es entsteht der aromatische Benzolring.<\/p>\n<p><strong>Beispiel 2 – Dehydrierung: Methylcyclohexan → Toluol + 3 H<sub>2<\/sub><\/strong><\/p>\n<div class=\"mol-eq\" data-eq=\"ref2\"><\/div>\n<p><strong>Beispiel 3 – Ringschluss und Dehydrierung: Heptan → Toluol + 4 H<sub>2<\/sub><\/strong><\/p>\n<div class=\"mol-eq\" data-eq=\"ref3\"><\/div>\n<p class=\"mol-cap\">Die Kette schließt sich zwischen C1 und C6 (<i>orange<\/i>) zum Ring, anschließend wird der Ring dehydriert. Die Oktanzahl steigt dabei von 0 auf etwa 120.<\/p> <div class=\"gl-box gl-info\">Normalbenzin: ROZ ≥ 91 · Super: ROZ ≥ 95<\/div>"}, {"t": "Entschwefelung", "h": "<p>Schwefelverbindungen würden bei der Verbrennung zu Schwefeldioxid und damit zu saurem Regen führen und Abgaskatalysatoren schädigen. Deshalb werden sie entfernt.<\/p> <p>Bei der <strong>Hydrodesulfurierung<\/strong> reagieren die Schwefelverbindungen mit Wasserstoff an einem Katalysator; der Schwefel wird als <strong>Schwefelwasserstoff H<sub>2<\/sub>S<\/strong> abgetrennt. Im <strong>Claus-Verfahren<\/strong> wird daraus elementarer Schwefel gewonnen.<\/p> <div class=\"gl-box gl-info\">Der Wasserstoff für die Entschwefelung stammt zu einem großen Teil aus dem Reformer – die Verfahren sind in der Raffinerie eng miteinander verknüpft.<\/div>"}];
+  const g = id => document.getElementById(id);
+  const bd = g("glBackdrop"), box = bd.querySelector(".modal-box");
+  let idx = 0;
+  function show(i){
+    idx = Math.max(0, Math.min(GL.length - 1, i));
+    g("glNum").textContent = (idx + 1) + ".";
+    g("glTitle").innerHTML = GL[idx].t;
+    g("glBody").innerHTML = GL[idx].h;
+    if (window.__glMol) window.__glMol(g("glBody"));
+    g("glPos").textContent = "Thema " + (idx + 1) + " von " + GL.length;
+    g("glPrev").disabled = idx === 0;
+    g("glNext").disabled = idx === GL.length - 1;
+    box.scrollTop = 0;
+    bd.classList.add("open");
+  }
+  g("glList").innerHTML = GL.map((b, i) => '<button type="button" class="gl-item" data-i="' + i + '"><span class="nr">' + (i + 1) + '</span>' + b.t + '<span class="go">›</span></button>').join("");
+  g("glToggle").addEventListener("click", () => {
+    const open = g("glToggle").getAttribute("aria-expanded") !== "true";
+    g("glToggle").setAttribute("aria-expanded", String(open));
+    g("glPanel").hidden = !open;
+  });
+  g("glList").addEventListener("click", e => { const b = e.target.closest(".gl-item"); if (b) show(+b.dataset.i); });
+  g("glPrev").addEventListener("click", () => show(idx - 1));
+  g("glNext").addEventListener("click", () => show(idx + 1));
+  g("glClose").addEventListener("click", () => bd.classList.remove("open"));
+  bd.addEventListener("click", e => { if (e.target === bd) bd.classList.remove("open"); });
+  document.addEventListener("keydown", e => {
+    if (!bd.classList.contains("open")) return;
+    if (e.key === "Escape") bd.classList.remove("open");
+    if (e.key === "ArrowRight" && idx < GL.length - 1) show(idx + 1);
+    if (e.key === "ArrowLeft" && idx > 0) show(idx - 1);
+  });
+})();
+</script>
+<script>
+/* Strukturformeln (Valenzstrichformeln mit allen H-Atomen) als SVG */
+(function(){
+  "use strict";
+  const U = 30;                         // Bindungslänge in px
+  const C_TXT = "#e7e4dd", H_TXT = "#9aa2a9", BOND = "#9aa2a9", BREAK = "#e4785b", MOVE = "#ffb454";
+  const FONT = "system-ui,-apple-system,'Segoe UI',Roboto,sans-serif";
+
+  // Molekül: atoms [{el,x,y,col?}], bonds [[i,j,ord,style?]] – Koordinaten in Bindungslängen
+  function chain(n, dbl, opt){
+    opt = opt || {};
+    const A = [], B = [], C = [];
+    for(let i=0;i<n;i++){ C.push(A.length); A.push({el:"C", x:i, y:0}); }
+    for(let i=0;i<n-1;i++){
+      const st = (opt.breakAt===i) ? "break" : null;
+      B.push([C[i], C[i+1], dbl===i ? 2 : 1, st]);
+    }
+    const addH = (ci, x, y, tag) => {
+      const col = (opt.hl && opt.hl.some(h=> h[0]===ci && h[1]===tag)) ? MOVE : null;
+      const k = A.length; A.push({el:"H", x, y, col}); B.push([C[ci], k, 1, col ? "move" : null]);
+    };
+    for(let i=0;i<n;i++){
+      const inDbl = (dbl===i || dbl===i-1);
+      if(i===0) addH(i, -1, 0, "l");
+      if(i===n-1) addH(i, n, 0, "r");
+      addH(i, i, -1, "u");
+      if(!inDbl) addH(i, i, 1, "d");
+    }
+    return {atoms:A, bonds:B};
+  }
+  // Sechsring; kind: "cyclo" | "aro"; methyl: true = CH3 an oberstem C
+  function ring(kind, methyl){
+    const A = [], B = [], C = [];
+    const R = 1.3;                                   // Abstand Mitte–Ecke (größer für Platz der H-Atome)
+    for(let k=0;k<6;k++){
+      const ang = (-90 + 60*k)*Math.PI/180;
+      C.push(A.length); A.push({el:"C", x:R*Math.cos(ang), y:R*Math.sin(ang), ang});
+    }
+    for(let k=0;k<6;k++) B.push([C[k], C[(k+1)%6], (kind==="aro" && k%2===0) ? 2 : 1, kind==="aro" ? "inner" : null]);
+    const out = (ci, dAng, d) => {
+      const a = A[ci].ang + dAng*Math.PI/180;
+      return [A[ci].x + d*Math.cos(a), A[ci].y + d*Math.sin(a)];
+    };
+    for(let k=0;k<6;k++){
+      const subst = methyl && k===0;
+      if(kind==="aro"){
+        if(subst) continue;
+        const [x,y] = out(C[k], 0, 0.95); const h = A.length; A.push({el:"H", x, y}); B.push([C[k], h, 1]);
+      } else {
+        const angs = subst ? [38] : [-34, 34];
+        angs.forEach(da=>{ const [x,y] = out(C[k], da, 0.9); const h = A.length; A.push({el:"H", x, y}); B.push([C[k], h, 1]); });
+      }
+    }
+    if(methyl){
+      const top = C[0];
+      const [mx,my] = out(top, kind==="aro" ? 0 : -38, 1);
+      const m = A.length; A.push({el:"C", x:mx, y:my}); B.push([top, m, 1]);
+      const hs = kind==="aro" ? [[0,-0.9],[-0.9,0],[0.9,0]] : [[0,-0.9],[-0.9,0],[0.65,-0.6]];
+      hs.forEach(([dx,dy])=>{ const h = A.length; A.push({el:"H", x:mx+dx, y:my+dy}); B.push([m, h, 1]); });
+    }
+    return {atoms:A, bonds:B};
+  }
+  // Heptan als offene Kette, die sich zum Ring schließt (zur Anschauung der Dehydrocyclisierung)
+  function heptaneArc(){
+    const m = chain(7, null, {});
+    m.atoms[0].col = MOVE; m.atoms[5].col = MOVE;
+    return m;
+  }
+  function h2(){ return {atoms:[{el:"H",x:0,y:0},{el:"H",x:1,y:0}], bonds:[[0,1,1]]}; }
+
+  function bbox(m){
+    let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
+    m.atoms.forEach(a=>{ x0=Math.min(x0,a.x); x1=Math.max(x1,a.x); y0=Math.min(y0,a.y); y1=Math.max(y1,a.y); });
+    return {x0,x1,y0,y1};
+  }
+  function drawMol(m, ox, oy, extra){
+    let s = "";
+    const P = a => [ox + a.x*U, oy + a.y*U];
+    const cx = m.atoms.filter(a=>a.el==="C").reduce((t,a)=>t+a.x,0)/Math.max(1,m.atoms.filter(a=>a.el==="C").length);
+    const cy = m.atoms.filter(a=>a.el==="C").reduce((t,a)=>t+a.y,0)/Math.max(1,m.atoms.filter(a=>a.el==="C").length);
+    m.bonds.forEach(([i,j,ord,st])=>{
+      const [x1,y1] = P(m.atoms[i]), [x2,y2] = P(m.atoms[j]);
+      const dx = x2-x1, dy = y2-y1, L = Math.hypot(dx,dy), ux = dx/L, uy = dy/L;
+      const r = 8.5;
+      const a1 = [x1+ux*r, y1+uy*r], a2 = [x2-ux*r, y2-uy*r];
+      const col = st==="break" ? BREAK : (st==="move" ? MOVE : (st==="close" ? MOVE : BOND));
+      const dash = st==="break" ? ' stroke-dasharray="4 3"' : "";
+      const w = (st==="break" || st==="move" || st==="close") ? 2.2 : 1.5;
+      const line = (p,q) => `<line x1="${p[0].toFixed(1)}" y1="${p[1].toFixed(1)}" x2="${q[0].toFixed(1)}" y2="${q[1].toFixed(1)}" stroke="${col}" stroke-width="${w}"${dash} stroke-linecap="round"/>`;
+      if(ord===2){
+        const nx = -uy, ny = ux;
+        if(st==="inner"){
+          // Kekulé-Doppelbindung: zweite Linie zur Ringmitte versetzt und verkürzt
+          s += line(a1,a2);
+          const mx = (x1+x2)/2, my = (y1+y2)/2, tx = ox+cx*U - mx, ty = oy+cy*U - my, tl = Math.hypot(tx,ty);
+          const sx = tx/tl*4.5, sy = ty/tl*4.5, sh = 4;
+          s += line([a1[0]+sx+ux*sh, a1[1]+sy+uy*sh],[a2[0]+sx-ux*sh, a2[1]+sy-uy*sh]);
+        } else {
+          s += line([a1[0]+nx*2.6, a1[1]+ny*2.6],[a2[0]+nx*2.6, a2[1]+ny*2.6]);
+          s += line([a1[0]-nx*2.6, a1[1]-ny*2.6],[a2[0]-nx*2.6, a2[1]-ny*2.6]);
+        }
+      } else s += line(a1,a2);
+    });
+    if(extra) s += extra(P);
+    m.atoms.forEach(a=>{
+      const [x,y] = P(a);
+      const col = a.col || (a.el==="C" ? C_TXT : H_TXT);
+      const wt = a.el==="C" ? 600 : (a.col ? 700 : 400);
+      s += `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" fill="${col}" font-family="${FONT}" font-size="${a.el==="C"?14:13}" font-weight="${wt}" text-anchor="middle" dominant-baseline="central">${a.el}</text>`;
+    });
+    return s;
+  }
+
+  // Gleichung zeichnen: items = [{mol, name, sub, ron, coef}, "→", "+", ...]
+  function equation(el, items){
+    const PAD = 14, GAP = 22;
+    let x = PAD, parts = [], yTop = 0, yBot = 0;
+    items.forEach(it=>{
+      if(typeof it === "string"){ parts.push({t:it, x, w:34}); x += 34 + 8; return; }
+      const b = bbox(it.mol);
+      const coefW = it.coef ? 18 : 0;
+      const w = (b.x1 - b.x0)*U + 20;
+      parts.push({it, b, x: x + coefW, w, coefX: x});
+      yTop = Math.min(yTop, b.y0*U); yBot = Math.max(yBot, b.y1*U, it.extra ? 2.35*U : 0);
+      x += coefW + w + GAP;
+    });
+    const W = x - GAP + PAD, top = -yTop + 20, H = top + yBot + 62;
+    let s = "";
+    parts.forEach(p=>{
+      if(p.t){
+        s += `<text x="${p.x + 17}" y="${top}" fill="#e7e4dd" font-family="${FONT}" font-size="22" text-anchor="middle" dominant-baseline="central">${p.t}</text>`;
+        return;
+      }
+      const it = p.it, ox = p.x + 10 - p.b.x0*U;
+      if(it.coef) s += `<text x="${p.coefX+6}" y="${top}" fill="#e7e4dd" font-family="${FONT}" font-size="17" font-weight="600" text-anchor="middle" dominant-baseline="central">${it.coef}</text>`;
+      s += drawMol(it.mol, ox, top, it.extra);
+      const mx = p.x + p.w/2, ly = top + yBot + 24;
+      s += `<text x="${mx}" y="${ly}" fill="#e7e4dd" font-family="${FONT}" font-size="12.5" font-weight="600" text-anchor="middle">${it.name}</text>`;
+      if(it.sub) s += `<text x="${mx}" y="${ly+15}" fill="#9aa2a9" font-family="${FONT}" font-size="11.5" text-anchor="middle">${it.sub}</text>`;
+      if(it.ron!==undefined) s += `<text x="${mx}" y="${ly+30}" fill="#ffb454" font-family="ui-monospace,Consolas,Menlo,monospace" font-size="11" text-anchor="middle">ROZ ${it.ron}</text>`;
+    });
+    el.innerHTML = `<svg viewBox="0 0 ${W.toFixed(0)} ${H.toFixed(0)}" width="${W.toFixed(0)}" role="img">${s}</svg>`;
+  }
+
+  // Ringschluss im Heptan andeuten: Bogen zwischen C1 und C6 (Index 0 und 5)
+  const closeArc = P => {
+    const [x1,y1] = P({x:0,y:0}), [x2,y2] = P({x:5,y:0});
+    const ys = y1 + 1.45*U, yb = y1 + 2.7*U;
+    return `<path d="M${x1},${ys} C${x1},${yb} ${x2},${yb} ${x2},${ys}" fill="none" stroke="${MOVE}" stroke-width="1.8" stroke-dasharray="5 4"/>`;
+  };
+
+  const EQ = {
+    crack1: [
+      {mol: chain(8, null, {breakAt:3, hl:[[5,"d"]]}), name:"Octan", sub:"C₈H₁₈"}, "→",
+      {mol: (()=>{ const m = chain(4, null, {hl:[[3,"r"]]}); return m; })(), name:"Butan", sub:"C₄H₁₀"}, "+",
+      {mol: chain(4, 0, {}), name:"But-1-en", sub:"C₄H₈"}
+    ],
+    crack2: [
+      {mol: chain(10, null, {breakAt:6, hl:[[8,"d"]]}), name:"Decan", sub:"C₁₀H₂₂"}, "→",
+      {mol: chain(7, null, {hl:[[6,"r"]]}), name:"Heptan", sub:"C₇H₁₆"}, "+",
+      {mol: chain(3, 0, {}), name:"Propen", sub:"C₃H₆"}
+    ],
+    ref1: [
+      {mol: ring("cyclo", false), name:"Cyclohexan", sub:"C₆H₁₂", ron:83}, "→",
+      {mol: ring("aro", false), name:"Benzol", sub:"C₆H₆", ron:"≈ 100"}, "+",
+      {mol: h2(), coef:"3", name:"Wasserstoff", sub:"3 H₂"}
+    ],
+    ref2: [
+      {mol: ring("cyclo", true), name:"Methylcyclohexan", sub:"C₇H₁₄", ron:75}, "→",
+      {mol: ring("aro", true), name:"Toluol", sub:"C₇H₈", ron:"≈ 120"}, "+",
+      {mol: h2(), coef:"3", name:"Wasserstoff", sub:"3 H₂"}
+    ],
+    ref3: [
+      {mol: heptaneArc(), name:"Heptan", sub:"C₇H₁₆", ron:0, extra:closeArc}, "→",
+      {mol: ring("aro", true), name:"Toluol", sub:"C₇H₈", ron:"≈ 120"}, "+",
+      {mol: h2(), coef:"4", name:"Wasserstoff", sub:"4 H₂"}
+    ]
+  };
+  window.__glMol = root => root.querySelectorAll("[data-eq]").forEach(el=>{ const d = EQ[el.dataset.eq]; if(d) equation(el, d); });
 })();
 </script>
 </body>

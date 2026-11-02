@@ -1,0 +1,2656 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simulation „Reaktionsgeschwindigkeit“</title>
+<style>
+:root{
+  --bg:#14171a; --panel:#1b1f23; --panel-alt:#20252a; --raise:#262c32;
+  --line:#31383e; --line-soft:#262c31;
+  --text:#e7e4dd; --text-dim:#9aa2a9; --text-faint:#5f6870;
+  --amber:#ffb454; --amber-dim:#8a6535;
+  --teal:#4fd1c5; --teal-dim:#2c5b56;
+  --good:#7fd68a;
+  --danger:#e4785b; --danger-dim:#6b3a2d;
+  --oxy:#ff8a7a; --nitro:#8fb4ff;
+  --screen:#0e1113; --grid:#233029;
+  --radius:3px;
+  color-scheme: dark;
+}
+*{box-sizing:border-box;}
+[hidden]{display:none !important;}
+html,body{height:100%;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.mono{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-variant-numeric:tabular-nums;}
+h1,h2,h3{font-weight:600; margin:0;}
+
+/* header */
+header{
+  padding:22px 28px 18px; border-bottom:1px solid var(--line);
+  display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;
+}
+header h1{font-size:20px; letter-spacing:.2px;}
+header .tag{color:var(--text-dim); font-size:13.5px;}
+header .status{
+  margin-left:auto; font-size:12.5px; padding:4px 10px; border:1px solid var(--line);
+  border-radius:20px; color:var(--text-dim); display:flex; align-items:center; gap:7px;
+}
+header .status .dot{width:7px;height:7px;border-radius:50%;background:var(--text-faint);}
+header .status.running .dot{background:var(--amber); box-shadow:0 0 6px var(--amber);}
+header .status.running{color:var(--amber); border-color:var(--amber-dim);}
+header .status.done .dot{background:var(--teal); box-shadow:0 0 6px var(--teal);}
+header .status.done{color:var(--teal); border-color:var(--teal-dim);}
+.guide-link{
+  color:var(--teal); font-size:13.5px; text-decoration:none; border-bottom:1px solid var(--teal-dim);
+  padding-bottom:1px;
+}
+.guide-link:hover{border-bottom-color:var(--teal);}
+@media (max-width:600px){ header{padding:18px 16px 14px;} }
+
+.back-btn{
+  display:inline-flex; align-items:center; gap:6px; align-self:center; color:var(--text-dim); font-size:13px; text-decoration:none;
+  border:1px solid var(--line); border-radius:var(--radius); background:var(--panel-alt); padding:5px 11px 5px 9px; white-space:nowrap;
+}
+.back-btn:hover{color:var(--text); border-color:var(--text-faint);}
+.back-btn:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.back-btn .ar{color:var(--teal); font-size:14px; line-height:1;}
+
+/* Modale Fenster */
+.modal-backdrop{
+  display:none; position:fixed; inset:0; background:rgba(8,10,12,.7); z-index:100;
+  align-items:center; justify-content:center; padding:24px 16px;
+}
+.modal-backdrop.open{display:flex;}
+.modal-box{
+  background:var(--panel); border:1px solid var(--line); border-radius:5px;
+  width:100%; max-width:640px; max-height:82vh; overflow-y:auto; padding:22px 26px 26px;
+}
+.modal-box.wide{max-width:900px; max-height:88vh;}
+.modal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;}
+.modal-head h2{font-size:17px;}
+.modal-head .bnum{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--text-faint); margin-right:10px;}
+.modal-close{background:none; border:none; color:var(--text-dim); font-size:22px; line-height:1; cursor:pointer; padding:2px 6px;}
+.modal-close:hover{color:var(--text);}
+.modal-body h3{font-size:13.5px; color:var(--amber); margin:18px 0 6px; font-weight:600;}
+.modal-body h3:first-child{margin-top:0;}
+.modal-body p{font-size:13.5px; line-height:1.6; color:var(--text-dim); margin:0 0 8px;}
+.modal-body strong{color:var(--text); font-weight:600;}
+.modal-body ul{padding-left:18px; margin:0 0 8px;}
+.modal-body li{font-size:13.5px; line-height:1.6; color:var(--text-dim); margin:0 0 5px;}
+.modal-body li strong{color:var(--text); font-weight:600;}
+.formula-box{
+  font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:13.5px; color:var(--text);
+  background:var(--screen); border:1px solid var(--line-soft); border-radius:4px; padding:10px 12px; margin:6px 0 10px;
+  overflow-x:auto; line-height:1.9;
+}
+.formula-box sub,.formula-box sup{font-size:.72em;}
+.vh-ver{display:flex; align-items:baseline; gap:10px; margin:18px 0 6px;}
+.vh-ver:first-child{margin-top:0;}
+.vh-ver .v{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:13px; color:var(--amber); border:1px solid var(--amber-dim); border-radius:var(--radius); padding:1px 7px;}
+.vh-ver .d{font-size:12px; color:var(--text-faint);}
+
+/* layout */
+.wrap{display:grid; grid-template-columns: 330px 1fr; gap:0; align-items:start;}
+@media (max-width:920px){ .wrap{grid-template-columns:1fr;} }
+.sidebar{
+  border-right:1px solid var(--line); padding:20px 20px 60px;
+  max-height:calc(100vh - 70px); overflow-y:auto;
+}
+@media (max-width:920px){ .sidebar{border-right:none; border-bottom:1px solid var(--line); max-height:none; padding-bottom:24px;} }
+@media (min-width:921px){
+  .sidebar{
+    position:sticky; top:0; align-self:start;
+    height:calc(100vh - var(--hdr, 70px)); height:calc(100dvh - var(--hdr, 70px)); max-height:none;
+    overflow-y:auto; overscroll-behavior:contain; background:var(--bg);
+  }
+}
+.main{padding:20px 24px 60px; min-width:0;}
+@media (max-width:600px){ .sidebar{padding:18px 16px 24px;} .main{padding:18px 16px 50px;} }
+
+section.block{margin-bottom:26px;}
+.block h2{
+  font-size:12.5px; color:var(--text-dim); font-weight:600;
+  padding-bottom:8px; border-bottom:1px solid var(--line-soft); margin-bottom:14px; letter-spacing:.2px;
+  display:flex; align-items:center; gap:8px;
+}
+.block h2 .chip{margin-left:auto; font-weight:500;}
+.chip{font-size:11px; padding:2px 8px; border-radius:20px; border:1px solid var(--line); color:var(--text-dim); white-space:nowrap;}
+.chip.std{color:var(--teal); border-color:var(--teal-dim);}
+.chip.var{color:var(--amber); border-color:var(--amber-dim);}
+
+.row{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px;}
+.row label{font-size:13px; color:var(--text-dim);}
+.row .val{font-size:13px; color:var(--amber); min-width:64px; text-align:right;}
+input[type=range]{width:100%; accent-color: var(--teal); height:22px; background:transparent; cursor:pointer; margin:0 0 10px; touch-action:manipulation;}
+input[type=range]:disabled{opacity:.35; cursor:not-allowed;}
+.field-full{margin-bottom:12px;}
+.field-full label{display:block; font-size:13px; color:var(--text-dim); margin-bottom:6px;}
+select{
+  width:100%; background:var(--panel-alt); border:1px solid var(--line); color:var(--text);
+  padding:7px 9px; border-radius:var(--radius); font-size:13.5px; font-family:inherit;
+}
+select:disabled{opacity:.4;}
+select:focus{outline:2px solid var(--teal-dim); outline-offset:1px;}
+.hint{font-size:11.5px; color:var(--text-faint); line-height:1.5; margin:0 0 12px;}
+.hint b{color:var(--text-dim); font-weight:600;}
+.note{font-size:12px; color:var(--text-faint); line-height:1.5; margin-top:10px; max-width:70ch;}
+.rx-eq{font-size:13.5px; color:var(--text); line-height:1.7; margin:2px 0 8px; padding:8px 10px; background:var(--panel); border:1px solid var(--line-soft); border-radius:4px;}
+.rx-eq sub,.rx-eq sup{font-size:.72em;}
+
+.switch-item{
+  display:flex; gap:10px; align-items:flex-start; padding:9px 11px; cursor:pointer; margin-bottom:14px;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel);
+}
+.switch-item:hover{border-color:var(--text-faint);}
+.switch-item input{accent-color:var(--teal); width:16px; height:16px; margin:2px 0 0; flex:none;}
+.switch-item .tt{font-size:13px; color:var(--text); font-weight:500;}
+.switch-item .td{font-size:12px; color:var(--text-faint); line-height:1.45; margin-top:2px;}
+.switch-item.on{border-color:var(--teal-dim); background:var(--panel-alt);}
+.cond-box{transition:opacity .15s;}
+.cond-box.locked .row label{color:var(--text-faint);}
+
+.seg{display:flex; gap:4px; flex-wrap:wrap; margin-bottom:12px;}
+.seg button{
+  flex:1; background:var(--panel-alt); border:1px solid var(--line); color:var(--text-dim); font-size:12.5px;
+  padding:7px 8px; border-radius:var(--radius); cursor:pointer; font-family:inherit; touch-action:manipulation; min-height:34px;
+}
+.seg button.active{background:var(--teal-dim); color:var(--text); border-color:var(--teal);}
+.seg button:disabled{opacity:.4; cursor:not-allowed;}
+
+.btn{
+  border-radius:var(--radius); border:1px solid var(--line); background:var(--panel-alt);
+  color:var(--text); font-size:13px; padding:8px 14px; cursor:pointer; font-family:inherit; font-weight:500;
+  touch-action:manipulation; min-height:36px;
+}
+.btn:hover{border-color:var(--text-faint);}
+.btn.primary{background:var(--teal); border-color:var(--teal); color:#0d1614;}
+.btn.primary:hover{filter:brightness(1.08);}
+.btn.ghost{background:transparent;}
+.btn:disabled{opacity:.4; cursor:not-allowed;}
+.btn:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.btn-row{display:flex; gap:8px; flex-wrap:wrap;}
+.chk{font-size:12.5px; color:var(--text-dim); display:inline-flex; gap:7px; align-items:center; cursor:pointer;}
+.chk input{accent-color:var(--teal); width:15px; height:15px;}
+
+/* Rubrik Grundlagen */
+.basics-toggle{
+  display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; cursor:pointer; text-align:left;
+  border:1px solid var(--teal-dim); border-radius:4px; background:var(--panel-alt); color:var(--text);
+  font-size:14px; font-weight:600; font-family:inherit; touch-action:manipulation;
+}
+.basics-toggle:hover{border-color:var(--teal);}
+.basics-toggle:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.basics-toggle .bt-n{font-size:12px; font-weight:400; color:var(--text-faint);}
+.basics-toggle .bt-ch{margin-left:auto; color:var(--teal); font-size:13px;}
+.basics-toggle .bt-ch::after{content:"▸";}
+.basics-toggle[aria-expanded="true"] .bt-ch::after{content:"▾";}
+.basics-panel{margin-top:8px;}
+.basics-list{display:flex; flex-direction:column; gap:6px;}
+.basic-item{
+  display:flex; gap:10px; align-items:center; width:100%; text-align:left; padding:8px 11px; cursor:pointer;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel); color:var(--text);
+  font-size:13px; font-family:inherit; font-weight:500; touch-action:manipulation;
+}
+.basic-item:hover{border-color:var(--text-faint); background:var(--panel-alt);}
+.basic-item:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.basic-item .nr{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--amber); min-width:14px;}
+.basic-item .go{margin-left:auto; color:var(--text-faint); font-size:12px;}
+.fig-row{display:flex; flex-wrap:wrap; gap:12px; align-items:stretch; margin:8px 0 14px;}
+.fig{background:var(--screen); border:1px solid var(--line-soft); border-radius:4px; padding:10px 12px 8px;
+  display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:6px; max-width:100%; overflow-x:auto;}
+.fig .cap{font-size:12px; color:var(--text-dim); text-align:center; line-height:1.45; max-width:320px;}
+.fig .cap sub,.fig .cap sup{font-size:.75em;}
+.fig-arrow{color:var(--teal); font-size:22px; align-self:center; padding:0 2px;}
+.basics-nav{display:flex; align-items:center; gap:10px; border-top:1px solid var(--line-soft); padding-top:14px; margin-top:16px;}
+.basics-nav .sp{flex:1; text-align:center; font-size:12px; color:var(--text-faint);}
+svg.gfig{display:block; max-width:100%; height:auto; overflow:visible;}
+svg.gfig text{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; font-size:11px; fill:#9aa2a9;}
+
+/* Bildschirm */
+.screen-card{border:1px solid var(--line); background:var(--screen); border-radius:4px; padding:14px 14px 6px;}
+.screen-top{display:flex; align-items:center; gap:8px; margin-bottom:12px; flex-wrap:wrap;}
+.grp{display:flex; gap:4px;}
+.grp.right{margin-left:auto;}
+.grp button{
+  background:var(--panel-alt); border:1px solid var(--line); color:var(--text-dim); font-size:12px;
+  padding:6px 10px; border-radius:var(--radius); cursor:pointer; font-family:inherit; min-height:32px; touch-action:manipulation;
+}
+.grp button.mono{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px;}
+.grp button.active{background:var(--teal-dim); color:var(--text); border-color:var(--teal);}
+.screen-grid{display:grid; grid-template-columns: 300px 1fr; gap:12px;}
+@media (max-width:760px){ .screen-grid{grid-template-columns:1fr;} }
+canvas{display:block; width:100%;}
+canvas#vessel{height:340px; border-radius:3px;}
+canvas#chart{height:340px; touch-action:manipulation; cursor:crosshair;}
+canvas#kplot{height:280px;}
+.under{display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px; padding:8px 2px 4px;}
+.under .lbl{font-size:12px; color:var(--text-faint);}
+.legend{display:flex; flex-wrap:wrap; gap:4px 14px; font-size:12px; color:var(--text-dim);}
+.legend span{display:inline-flex; align-items:center;}
+.legend .sw{width:14px; height:3px; border-radius:2px; margin-right:6px; display:inline-block;}
+.legend .sw.dash{background:repeating-linear-gradient(90deg, currentColor 0 4px, transparent 4px 7px) !important;}
+.legend sub,.legend sup{font-size:.75em;}
+.readout-bar{display:flex; gap:24px; padding:10px 4px 12px; flex-wrap:wrap; border-top:1px solid var(--line-soft); margin-top:6px;}
+.readout{display:flex; flex-direction:column; gap:2px;}
+.readout .k{font-size:10.5px; color:var(--text-faint);}
+.readout .k sub,.readout .k sup{font-size:.8em;}
+.readout .v{font-size:15px; color:var(--amber);}
+
+/* Reaktionskarte */
+.eq-card{margin-top:18px; border:1px solid var(--line-soft); background:var(--panel); border-radius:4px; padding:16px 18px;}
+.eq{font-size:18px; text-align:center; line-height:1.8;}
+.eq sub,.eq sup{font-size:.7em;}
+.eq .arr{color:var(--teal); margin:0 .35em;}
+.eq-ion{text-align:center; font-size:13px; color:var(--text-dim); margin-top:2px;}
+.eq-ion sub,.eq-ion sup{font-size:.75em;}
+.defs{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:16px;}
+@media (max-width:760px){ .defs{grid-template-columns:1fr;} }
+.def{border:1px solid var(--line-soft); background:var(--panel-alt); border-radius:4px; padding:12px 14px;}
+.def h3{font-size:13px; color:var(--amber); margin:0 0 6px; font-weight:600;}
+.def p{font-size:12.8px; line-height:1.55; color:var(--text-dim); margin:0 0 6px;}
+.def p:last-child{margin:0;}
+.def strong{color:var(--text); font-weight:600;}
+.def sub,.def sup{font-size:.75em;}
+.def .formula{text-align:center; color:var(--text); font-size:14px; margin:8px 0; line-height:1.9;}
+.frac{display:inline-flex; flex-direction:column; align-items:center; vertical-align:middle; margin:0 3px; line-height:1.35;}
+.frac>span{padding:0 5px;}
+.frac>span:first-child{border-bottom:1.5px solid var(--text-dim);}
+.explain{margin-top:16px; border-left:2px solid var(--teal); background:var(--panel-alt); padding:10px 14px; font-size:13.5px; line-height:1.6; color:var(--text-dim);}
+.explain p{margin:0 0 6px;} .explain p:last-child{margin:0;}
+.explain b{color:var(--text); font-weight:600;}
+.explain sub,.explain sup{font-size:.75em;}
+.fac{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; color:var(--amber);}
+
+/* Tabs */
+.tabs{display:flex; gap:2px; margin:26px 0 0; border-bottom:1px solid var(--line); overflow-x:auto;}
+.tabs button{
+  background:none; border:none; color:var(--text-dim); font-size:13px; padding:9px 4px; margin-right:22px;
+  cursor:pointer; font-family:inherit; border-bottom:2px solid transparent; font-weight:500; white-space:nowrap;
+}
+.tabs button.active{color:var(--text); border-bottom-color:var(--amber);}
+.tabpanel{display:none; padding-top:18px;}
+.tabpanel.active{display:block;}
+table{width:100%; border-collapse:collapse; font-size:12.8px;}
+thead th{text-align:left; font-weight:500; color:var(--text-faint); font-size:11px; padding:6px 8px; border-bottom:1px solid var(--line); white-space:nowrap;}
+thead th sub, thead th sup, td sub, td sup{font-size:.75em;}
+tbody td{padding:7px 8px; border-bottom:1px solid var(--line-soft); white-space:nowrap;}
+tbody tr:hover{background:var(--panel-alt);}
+.table-wrap{overflow-x:auto; border:1px solid var(--line-soft); border-radius:4px;}
+.empty-hint{color:var(--text-faint); font-size:13px; padding:22px 4px;}
+.dotc{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:7px; vertical-align:0;}
+.aus-grid{display:grid; grid-template-columns: minmax(240px,340px) 1fr; gap:20px; align-items:start;}
+@media (max-width:820px){ .aus-grid{grid-template-columns:1fr;} }
+.res-card{border:1px solid var(--line-soft); background:var(--panel); border-radius:4px; padding:12px 14px; font-size:13px; color:var(--text-dim); line-height:1.75;}
+.res-card b{color:var(--text); font-weight:600;}
+.res-card .big{font-size:16px; color:var(--amber);}
+.res-card sub,.res-card sup{font-size:.75em;}
+.kgrid{display:grid; grid-template-columns: 1fr 300px; gap:20px; align-items:start;}
+@media (max-width:820px){ .kgrid{grid-template-columns:1fr;} }
+
+footer{padding:16px 28px 30px; color:var(--text-faint); font-size:11.5px; border-top:1px solid var(--line-soft); margin-top:10px;}
+footer p{margin:0;}
+footer a{color:var(--text-dim); text-decoration:none; border-bottom:1px solid var(--line);}
+footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
+footer .footer-credit{margin-top:8px; color:var(--text-dim);}
+footer sub{font-size:.75em;}
+@media (max-width:600px){ footer{padding:16px 16px 30px;} }
+::-webkit-scrollbar{width:9px; height:9px;}
+::-webkit-scrollbar-thumb{background:var(--line); border-radius:5px;}
+@media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+
+/* Auswahl Simulation / Übung */
+.mode-sel{display:flex; flex-direction:column; gap:8px;}
+.mode-sel button{
+  display:flex; flex-direction:column; align-items:flex-start; gap:3px; width:100%; text-align:left; padding:10px 12px; cursor:pointer;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel); color:var(--text); font-family:inherit; touch-action:manipulation;
+}
+.mode-sel button:hover{border-color:var(--text-faint);}
+.mode-sel button:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.mode-sel button.active{border-color:var(--teal); background:var(--teal-dim);}
+.mode-sel .ms-t{font-size:13.5px; font-weight:600;}
+.mode-sel .ms-d{font-size:12px; color:var(--text-faint); line-height:1.4;}
+.mode-sel button.active .ms-d{color:var(--text-dim);}
+.wrap.pick .sidebar > section.block:not(.keep){display:none;}
+.wrap.pick .main > *:not(.pick-hint){display:none;}
+.pick-hint{display:none; border:1px dashed var(--line); border-radius:4px; padding:22px 24px; color:var(--text-dim); font-size:13.5px; line-height:1.6; max-width:640px;}
+.pick-hint h2{font-size:16px; color:var(--text); margin-bottom:8px;}
+.pick-hint p{margin:0;}
+.pick-hint strong{color:var(--text);}
+.wrap.pick .pick-hint{display:block;}
+/* Modus-Umschalter */
+.mode-grp{display:flex; gap:4px; align-self:center;}
+.mode-grp button{
+  background:var(--panel-alt); border:1px solid var(--line); color:var(--text-dim); font-size:12.5px;
+  padding:6px 12px; border-radius:var(--radius); cursor:pointer; font-family:inherit; min-height:32px; touch-action:manipulation;
+}
+.mode-grp button.active{background:var(--teal-dim); color:var(--text); border-color:var(--teal);}
+
+/* Übung */
+.ex-card{border:1px solid var(--line-soft); background:var(--panel); border-radius:4px; padding:16px 18px;}
+.ex-head{display:flex; align-items:baseline; gap:10px; margin-bottom:10px;}
+.ex-head h2{font-size:16px;}
+.ex-num{font-size:11.5px; color:var(--text-faint);}
+.ex-instr{font-size:13.5px; line-height:1.65; color:var(--text-dim); max-width:90ch;}
+.ex-instr p{margin:0 0 8px;}
+.ex-instr strong{color:var(--text); font-weight:600;}
+.ex-instr sub,.ex-instr sup{font-size:.72em;}
+.ex-data{display:flex; flex-direction:column; gap:7px; font-size:12.5px; color:var(--text-dim);}
+.ex-data div{display:flex; justify-content:space-between; gap:8px;}
+.ex-data b{color:var(--amber); font-weight:500; text-align:right;}
+.ex-data sub{font-size:.75em;}
+.ex-n0{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:4px 0 12px; font-size:13.5px; color:var(--text);}
+.ex-n0 sub,.ex-n0 sup{font-size:.72em;}
+.ex-n0 input{width:110px;}
+canvas#exCanvas{height:300px;}
+canvas#exPlotCanvas{height:460px; touch-action:none; cursor:crosshair;}
+.ex-prompt{padding:10px 4px 8px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:13.5px; color:var(--text-dim); border-top:1px solid var(--line-soft); margin-top:8px;}
+.ex-prompt input.cell, .ex-n0 input.cell{width:120px; min-width:0; flex:none;}
+#toolSeg{flex-direction:column;}
+#toolSeg button{flex:none;}
+table.ex-tab{width:100%; border-collapse:collapse; font-size:13px;}
+table.ex-tab thead th{text-align:center; font-weight:600; color:var(--text-dim); font-size:12px; padding:7px 6px; border-bottom:1px solid var(--line); border-right:1px solid var(--line-soft); line-height:1.35; background:var(--panel);}
+table.ex-tab thead th.cur{color:var(--amber); box-shadow:inset 0 -2px 0 var(--amber);}
+table.ex-tab td{padding:5px 6px; border-bottom:1px solid var(--line-soft); border-right:1px solid var(--line-soft); text-align:center; white-space:nowrap; min-width:84px;}
+table.ex-tab td.tt{color:var(--text); font-weight:600; min-width:54px;}
+table.ex-tab td.lock{background:rgba(255,255,255,.012);}
+table.ex-tab td.val{color:var(--text);}
+table.ex-tab td.st-shown{color:var(--amber);}
+table.ex-tab td.rl{text-align:left; color:var(--text); min-width:120px;}
+table.ex-tab td.rl .u{font-size:11px; color:var(--text-faint);}
+table.ex-tab tr.wait td{background:rgba(255,180,84,.09);}
+table.ex-tab tbody tr:hover{background:transparent;}
+table.ex-tab sub, table.ex-tab sup{font-size:.72em;}
+input.cell{
+  width:100%; min-width:76px; background:var(--panel-alt); border:1px solid var(--line); color:var(--text);
+  font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:13px; padding:7px 6px; border-radius:var(--radius); text-align:center;
+}
+input.cell:focus{outline:2px solid var(--teal-dim); outline-offset:1px;}
+input.cell.ok{border-color:var(--good); background:#1d3322; color:var(--good);}
+input.cell.bad{border-color:var(--danger); background:#33201b;}
+input.cell.shown{border-color:var(--amber-dim); color:var(--amber);}
+.ex-ctl{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:12px;}
+.ex-nav{display:flex; align-items:center; gap:10px; margin-top:20px; border-top:1px solid var(--line-soft); padding-top:14px;}
+.ex-nav .sp{flex:1; text-align:center; font-size:12px; color:var(--text-faint);}
+.feedback{display:flex; flex-direction:column; gap:6px; margin:12px 0 4px;}
+.feedback:empty{display:none;}
+.fb{font-size:13px; line-height:1.55; padding:8px 11px; border-radius:4px; border:1px solid var(--line-soft); background:var(--panel); color:var(--text-dim);}
+.fb.good{color:var(--good); border-color:#35573a;}
+.fb.bad{color:var(--danger); border-color:var(--danger-dim);}
+.fb.hint{color:var(--amber); border-color:var(--amber-dim);}
+.fb b{color:var(--text);}
+.fb sub,.fb sup{font-size:.75em;}
+.basic-item.ex-st.cur{border-color:var(--teal); background:var(--panel-alt);}
+.basic-item.ex-st.done .go{color:var(--good);}
+.basic-item.ex-st:disabled{opacity:.42; cursor:not-allowed;}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="../index.html" class="back-btn" title="Zur Übersicht aller Simulationen"><span class="ar" aria-hidden="true">←</span>Zurück</a>
+  <h1>Simulation „Reaktionsgeschwindigkeit“</h1>
+  <span class="tag">Messen, auswerten, deuten</span>
+  <a href="#" class="guide-link" id="btnGuide">Anleitung</a>
+  <span class="status" id="statusBadge"><span class="dot"></span><span id="statusText">bereit</span></span>
+</header>
+
+<!-- Anleitung -->
+<div class="modal-backdrop" id="guideBackdrop">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+    <div class="modal-head">
+      <h2 id="guideTitle">Anleitung</h2>
+      <button class="modal-close" id="closeGuide" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body">
+      <h3>Worum es geht</h3>
+      <p>Die Simulation zeigt, wie schnell eine Reaktion abläuft und wovon das abhängt. Gemessen wird – wie im Schulversuch – das entstehende Gasvolumen im <strong>Kolbenprober</strong>, die Zeit bis zur <strong>Trübung</strong> oder die Änderung der <strong>Konzentrationen</strong>.</p>
+
+      <h3>Reaktion auswählen</h3>
+      <p>Voreingestellt ist <strong>Zink + Salzsäure</strong> bei Standardbedingungen (25 °C, 1013 hPa, c(HCl) = 1 mol/L). Im Auswahlfeld „Reaktion“ stehen fünf weitere Reaktionen bereit: Magnesium bzw. Marmor mit Salzsäure, Natriumthiosulfat mit Salzsäure („verschwindendes Kreuz“), die katalysierte Zersetzung von Wasserstoffperoxid und die Bildung von Iodwasserstoff in der Gasphase.</p>
+
+      <h3>Bedingungen variieren</h3>
+      <p>Solange „Bedingungen variieren“ nicht angehakt ist, läuft jede Messung unter Standardbedingungen. Mit dem Haken lassen sich <strong>Temperatur, Druck und Konzentration</strong> einstellen, bei Feststoffen zusätzlich der <strong>Zerteilungsgrad</strong>, bei Wasserstoffperoxid der <strong>Katalysator</strong>. „Standardbedingungen“ stellt alles zurück. Während einer laufenden Messung sind die Regler gesperrt.</p>
+      <p>Der Druck wirkt sich nur bei der Gasreaktion auf die Geschwindigkeit aus. Bei den Reaktionen in Lösung ändert er lediglich das gemessene Gasvolumen (V = n · R · T / p) – ein guter Anlass zum Nachdenken.</p>
+
+      <h3>Messen</h3>
+      <p>„Reaktion starten“ beginnt die Messung, derselbe Knopf pausiert und setzt fort. Mit den Knöpfen ×1 bis ×600 lässt sich die Zeit raffen; „Bis zum Ende“ springt direkt zum Ergebnis. „Versuchsaufbau“ zeigt die Apparatur, „Teilchenebene“ ein schematisches Teilchenmodell: Jeder Lichtblitz steht für einen <strong>wirksamen Zusammenstoß</strong>.</p>
+      <p>Jede abgeschlossene Messung wird als <strong>Messreihe</strong> gespeichert und bleibt im Diagramm sichtbar. So lassen sich Messungen unter verschiedenen Bedingungen direkt vergleichen. Unter dem Diagramm wählst du die dargestellte Größe (z. B. Gasvolumen oder Konzentration).</p>
+
+      <h3>Auswerten</h3>
+      <p>Im Tab <strong>Auswertung</strong> bestimmst du die <strong>Durchschnittsgeschwindigkeit</strong> zwischen zwei Zeitpunkten oder die <strong>Momentangeschwindigkeit</strong> zu einem Zeitpunkt. Tippe dazu auch direkt in das Diagramm. Der Tab <strong>Messreihen</strong> vergleicht Halbwertszeit und Anfangsgeschwindigkeit aller Messungen, <strong>Messwerte</strong> listet die Werte der aktuellen Messung (CSV-Export), <strong>Temperaturabhängigkeit</strong> zeigt die RGT-Regel.</p>
+
+      <h3>Erklärungen</h3>
+      <p>Ist „Bedingungen variieren“ angehakt, lassen sich mit „Erklärungen anzeigen“ unter der Reaktionsgleichung die Definition der Reaktionsgeschwindigkeit, die Stoßtheorie und eine Deutung der gewählten Bedingungen einblenden.</p>
+
+      <h3>Übung: Zink + Salzsäure</h3>
+      <p>In der linken Spalte wählst du direkt unter „Grundlagen“, welche Aufgabenart du bearbeitest – die <strong>Simulation</strong> oder die <strong>Übung</strong>; die übrigen Bedienelemente erscheinen erst nach dieser Auswahl. Du kannst jederzeit wechseln. In der Übung nimmst du am Kolbenprober Messwerte zu festen Zeitpunkten auf, berechnest Schritt für Schritt V in Litern, n(H<sub>2</sub>), n(Zn<sup>2+</sup>), c(Zn<sup>2+</sup>), n(H<sup>+</sup>) und c(H<sup>+</sup>), zeichnest das c-t-Diagramm für Zn<sup>2+</sup> und H<sup>+</sup> und bestimmst Durchschnittsgeschwindigkeiten. Jeder Wert wird sofort geprüft; „Tipp“ zeigt eine Beispielrechnung, „Rest ausfüllen“ ergänzt eine Spalte, sobald zwei Werte selbst richtig berechnet sind.</p>
+
+      <h3>Grundlagen</h3>
+      <p>Der Knopf <strong>Grundlagen</strong> in der linken Spalte klappt neun Themen auf – von der Definition der Reaktionsgeschwindigkeit über die Stoßtheorie bis zum Katalysator. Mit den Pfeiltasten oder den Knöpfen unten blätterst du weiter.</p>
+
+      <h3>Ideen zum Ausprobieren</h3>
+      <p>Verdopple die Salzsäurekonzentration: Wie ändern sich Anfangsgeschwindigkeit und Endvolumen? Erhöhe die Temperatur in 10-K-Schritten (RGT-Regel). Vergleiche Granalien und Pulver. Warum steigt bei Katalase die Geschwindigkeit nur bis etwa 45 °C? Warum beschleunigt Druckerhöhung die Iodwasserstoff-Bildung, aber nicht die Reaktion von Zink mit Salzsäure?</p>
+    </div>
+  </div>
+</div>
+
+<!-- Grundlagen -->
+<div class="modal-backdrop" id="basicsBackdrop">
+  <div class="modal-box wide" role="dialog" aria-modal="true" aria-labelledby="basicsTitle">
+    <div class="modal-head">
+      <h2><span class="bnum mono" id="basicsNum"></span><span id="basicsTitle"></span></h2>
+      <button class="modal-close" id="closeBasics" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body" id="basicsBody"></div>
+    <div class="basics-nav">
+      <button class="btn ghost" id="basicsPrev">← Vorheriges Thema</button>
+      <span class="sp" id="basicsPos"></span>
+      <button class="btn" id="basicsNext">Nächstes Thema →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Versionshinweise -->
+<div class="modal-backdrop" id="changelogBackdrop">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="changelogTitle">
+    <div class="modal-head">
+      <h2 id="changelogTitle">Versionshinweise</h2>
+      <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.0</span><span class="d">02.11.2026</span></div>
+      <ul>
+        <li>Erste Version mit sechs Reaktionen: <strong>Zink + Salzsäure</strong> (Standard), Magnesium + Salzsäure, Marmor + Salzsäure, Natriumthiosulfat + Salzsäure, Zersetzung von Wasserstoffperoxid und Iodwasserstoff-Bildung in der Gasphase.</li>
+        <li>Standardbedingungen voreingestellt; wahlweise <strong>Temperatur, Druck und Konzentration</strong> variierbar, dazu Zerteilungsgrad (Feststoffe) und Katalysator (Wasserstoffperoxid, inkl. Katalase mit Temperaturoptimum).</li>
+        <li>Versuchsaufbau mit Kolbenprober bzw. „verschwindendem Kreuz“ und schematische <strong>Teilchenebene</strong> mit wirksamen Zusammenstößen.</li>
+        <li>Erklärungen zu Reaktionsgeschwindigkeit, Stoßtheorie und Einflussfaktoren zuschaltbar, sobald „Bedingungen variieren“ gewählt ist.</li>
+        <li>Messreihen vergleichen, Durchschnitts- und Momentangeschwindigkeit, Messwerttabelle mit CSV-Export, Temperaturabhängigkeit (RGT-Regel, Arrhenius-Darstellung).</li>
+        <li><strong>Übung „Zink + Salzsäure“</strong>: Messwerte am Kolbenprober zu festen Zeitpunkten ablesen (mit Lupe), Protokoll Schritt für Schritt berechnen (V in L, n(H<sub>2</sub>), n(Zn<sup>2+</sup>), c(Zn<sup>2+</sup>), n(H<sup>+</sup>), c(H<sup>+</sup>)), c-t-Diagramm für Zn<sup>2+</sup> und H<sup>+</sup> in zwei Farben mit dem Stift zeichnen („Punkte löschen“ für einzelne Punkte), Durchschnittsgeschwindigkeiten berechnen.</li>
+        <li>Auswahl <strong>Simulation oder Übung</strong> in der linken Spalte direkt unter „Grundlagen“; alle weiteren Inhalte erscheinen erst nach der Auswahl.</li>
+        <li><strong>Rubrik „Grundlagen“</strong> (über den Knopf „Grundlagen“ in der linken Spalte aufklappbar) mit neun Themen, Grafiken und Erklärtext. Bedienbar mit iPad und Stift.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="wrap pick" id="simWrap">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <section class="block keep">
+      <button type="button" class="basics-toggle" id="basicsToggle" aria-expanded="false" aria-controls="basicsPanel">
+        <span class="bt-t">Grundlagen</span><span class="bt-n" id="basicsCount">9 Themen</span><span class="bt-ch" aria-hidden="true"></span>
+      </button>
+      <div class="basics-panel" id="basicsPanel" hidden>
+        <div class="basics-list" id="basicsList"></div>
+        <p class="note">Erklärungen mit Grafiken zum Nachlesen – auch zur Besprechung im Unterricht.</p>
+      </div>
+    </section>
+
+    <section class="block keep">
+      <h2>Aufgabenart wählen</h2>
+      <div class="mode-sel">
+        <button type="button" data-mode="sim"><span class="ms-t">Simulation</span><span class="ms-d">Sechs Reaktionen, Bedingungen variieren, Messreihen vergleichen</span></button>
+        <button type="button" data-mode="ex"><span class="ms-t">Übung: Zink + Salzsäure</span><span class="ms-d">Messprotokoll, Berechnungen, c-t-Diagramm, Durchschnittsgeschwindigkeit</span></button>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>Reaktion</h2>
+      <div class="field-full">
+        <select id="rxSelect" aria-label="Reaktion auswählen"></select>
+      </div>
+      <div class="rx-eq" id="rxEq"></div>
+      <p class="hint" id="rxInfo"></p>
+    </section>
+
+    <section class="block">
+      <h2>Reaktionsbedingungen <span class="chip std" id="condChip">Standard</span></h2>
+      <label class="switch-item" id="varItem">
+        <input type="checkbox" id="varChk">
+        <div><div class="tt">Bedingungen variieren</div><div class="td">Ohne Haken läuft jede Messung unter Standardbedingungen.</div></div>
+      </label>
+      <label class="switch-item" id="explItem" hidden>
+        <input type="checkbox" id="explChk">
+        <div><div class="tt">Erklärungen anzeigen</div><div class="td">Reaktionsgeschwindigkeit, Stoßtheorie und Einfluss der gewählten Bedingungen unter der Reaktionsgleichung einblenden.</div></div>
+      </label>
+      <div class="cond-box locked" id="condBox">
+        <div class="row"><label for="sT">Temperatur ϑ</label><span class="val mono" id="lT"></span></div>
+        <input type="range" id="sT">
+        <div class="row"><label for="sP">Druck p</label><span class="val mono" id="lP"></span></div>
+        <input type="range" id="sP">
+        <div id="cWrap">
+          <div class="row"><label for="sC" id="lCname">Konzentration</label><span class="val mono" id="lC"></span></div>
+          <input type="range" id="sC">
+        </div>
+        <div id="sizeWrap">
+          <div class="row"><label>Zerteilungsgrad</label></div>
+          <div class="seg" id="sizeSeg"></div>
+        </div>
+        <div id="catWrap" class="field-full">
+          <label for="catSel">Katalysator</label>
+          <select id="catSel"></select>
+        </div>
+        <p class="hint" id="condHint"></p>
+        <button class="btn ghost" id="btnStd">Standardbedingungen</button>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>Messreihen</h2>
+      <label class="chk" style="margin-bottom:10px"><input type="checkbox" id="showRuns" checked> frühere Messreihen im Diagramm zeigen</label>
+      <p class="hint" id="runsInfo">Noch keine Messreihe abgeschlossen.</p>
+      <button class="btn ghost" id="btnClearRuns">Alle Messreihen löschen</button>
+    </section>
+
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="pick-hint">
+      <h2>Aufgabenart wählen</h2>
+      <p>Wähle als Aufgabenart die <strong>Simulation</strong> oder die <strong>Übung „Zink + Salzsäure“</strong> – die Auswahl findest du unter „Grundlagen“. Die Grundlagen kannst du jederzeit aufklappen.</p>
+    </div>
+    <div class="screen-card">
+      <div class="screen-top">
+        <button class="btn primary" id="bStart">Reaktion starten</button>
+        <button class="btn" id="bEnd">Bis zum Ende</button>
+        <button class="btn ghost" id="bReset">Zurücksetzen</button>
+        <div class="grp right" id="viewGrp">
+          <button data-view="setup" class="active">Versuchsaufbau</button>
+          <button data-view="particles">Teilchenebene</button>
+        </div>
+        <div class="grp" id="speedGrp">
+          <button class="mono" data-speed="1">×1</button>
+          <button class="mono" data-speed="10">×10</button>
+          <button class="mono" data-speed="60">×60</button>
+          <button class="mono" data-speed="600">×600</button>
+        </div>
+      </div>
+      <div class="screen-grid">
+        <canvas id="vessel" aria-label="Versuchsaufbau"></canvas>
+        <div style="min-width:0">
+          <canvas id="chart" aria-label="Diagramm"></canvas>
+        </div>
+      </div>
+      <div class="under">
+        <span class="lbl">Diagramm:</span>
+        <div class="grp" id="qGrp"></div>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="readout-bar">
+        <div class="readout"><span class="k">Zeit t</span><span class="v mono" id="roTime">0 s</span></div>
+        <div class="readout"><span class="k" id="roQk">Messgröße</span><span class="v mono" id="roQ">–</span></div>
+        <div class="readout"><span class="k">Momentangeschwindigkeit</span><span class="v mono" id="roV">–</span></div>
+        <div class="readout"><span class="k">Umsatz</span><span class="v mono" id="roX">–</span></div>
+        <div class="readout"><span class="k" id="roHk">Halbwertszeit t<sub>½</sub></span><span class="v mono" id="roH">–</span></div>
+        <div class="readout"><span class="k">Anfangsgeschw. relativ zum Standard</span><span class="v mono" id="roRel">–</span></div>
+      </div>
+    </div>
+
+    <div class="eq-card">
+      <div class="eq" id="eq"></div>
+      <div class="eq-ion" id="eqIon"></div>
+      <div id="explBox" hidden>
+      <div class="defs">
+        <div class="def">
+          <h3>Reaktionsgeschwindigkeit v</h3>
+          <p>Änderung der Konzentration (bzw. einer dazu proportionalen Größe) eines Stoffes pro Zeit. Edukte werden verbraucht, deshalb steht vor ihren Änderungen ein Minuszeichen:</p>
+          <p class="formula" id="vDef"></p>
+          <p id="vDef2"></p>
+        </div>
+        <div class="def">
+          <h3>Stoßtheorie</h3>
+          <p>Teilchen reagieren nur, wenn sie <strong>zusammenstoßen</strong>. Wirksam ist ein Stoß nur mit <strong>ausreichender Energie</strong> (mindestens die Aktivierungsenergie E<sub>A</sub>) und <strong>geeigneter Orientierung</strong>.</p>
+          <p>Je mehr wirksame Zusammenstöße pro Zeit, desto größer die Reaktionsgeschwindigkeit. Konzentration, Druck (bei Gasen) und Zerteilungsgrad erhöhen die Zahl der Stöße, die Temperatur vor allem den Anteil wirksamer Stöße, ein Katalysator senkt E<sub>A</sub>.</p>
+        </div>
+      </div>
+      <div class="explain" id="explain"></div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tabbtn active" data-tab="aus">Auswertung</button>
+      <button class="tabbtn" data-tab="runs">Messreihen</button>
+      <button class="tabbtn" data-tab="data">Messwerte</button>
+      <button class="tabbtn" data-tab="kt">Temperaturabhängigkeit</button>
+    </div>
+
+    <div class="tabpanel active" id="tab-aus">
+      <div class="aus-grid">
+        <div>
+          <div class="seg" id="toolSeg">
+            <button data-mode="off" class="active">aus</button>
+            <button data-mode="sec">Durchschnittsgeschwindigkeit</button>
+            <button data-mode="tan">Momentangeschwindigkeit</button>
+          </div>
+          <div id="secCtl" hidden>
+            <div class="row"><label for="sT1">Zeitpunkt t<sub>1</sub></label><span class="val mono" id="lT1"></span></div>
+            <input type="range" id="sT1" min="0" max="1000" value="100">
+            <div class="row"><label for="sT2">Zeitpunkt t<sub>2</sub></label><span class="val mono" id="lT2"></span></div>
+            <input type="range" id="sT2" min="0" max="1000" value="400">
+          </div>
+          <div id="tanCtl" hidden>
+            <div class="row"><label for="sTt">Zeitpunkt t</label><span class="val mono" id="lTt"></span></div>
+            <input type="range" id="sTt" min="0" max="1000" value="200">
+          </div>
+          <p class="hint">Tipp: Ein Tippen ins Diagramm setzt den Zeitpunkt (bei der Durchschnittsgeschwindigkeit den näher liegenden der beiden). Ausgewertet wird die aktuelle Messung im gerade angezeigten Diagramm.</p>
+        </div>
+        <div class="res-card" id="ausRes"><span class="empty-hint" style="padding:0">Wähle „Durchschnittsgeschwindigkeit“ oder „Momentangeschwindigkeit“. Die Auswertung ist möglich, sobald Messwerte vorliegen.</span></div>
+      </div>
+    </div>
+
+    <div class="tabpanel" id="tab-runs">
+      <div class="table-wrap">
+        <table>
+          <thead id="runsHead"></thead>
+          <tbody id="runsBody"></tbody>
+        </table>
+      </div>
+      <div class="btn-row" style="margin-top:12px;">
+        <button class="btn ghost" id="btnRunsCsv">Messreihen als CSV exportieren</button>
+      </div>
+      <p class="note">t<sub>½</sub>: Zeit, bis die Hälfte des Umsatzes erreicht ist. v<sub>0</sub>: Anfangsgeschwindigkeit (Momentangeschwindigkeit bei t = 0) in der jeweils ersten Diagrammgröße. Beim Thiosulfat-Versuch ist 1/t ein Maß für die Reaktionsgeschwindigkeit.</p>
+    </div>
+
+    <div class="tabpanel" id="tab-data">
+      <div class="table-wrap">
+        <table>
+          <thead id="dataHead"></thead>
+          <tbody id="dataBody"></tbody>
+        </table>
+      </div>
+      <div class="btn-row" style="margin-top:12px;">
+        <button class="btn ghost" id="btnDataCsv">Messwerte als CSV exportieren</button>
+      </div>
+    </div>
+
+    <div class="tabpanel" id="tab-kt">
+      <div class="kgrid">
+        <canvas id="kplot"></canvas>
+        <div>
+          <label class="chk"><input type="checkbox" id="arrChk"> Arrhenius-Darstellung (ln k gegen 1/T)</label>
+          <p class="note" id="kinfo"></p>
+          <p class="note">Arrhenius-Gleichung:<br><span class="mono" style="color:var(--text-dim)">k = A · e<sup>−E<sub>A</sub>/(R·T)</sup></span><br>Der Punkt markiert die eingestellte Temperatur.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap" id="exWrap" hidden>
+  <!-- SIDEBAR Übung -->
+  <div class="sidebar">
+    <section class="block">
+      <button type="button" class="basics-toggle" id="basicsToggle2" aria-expanded="false" aria-controls="basicsPanel2">
+        <span class="bt-t">Grundlagen</span><span class="bt-n basicsCountX">9 Themen</span><span class="bt-ch" aria-hidden="true"></span>
+      </button>
+      <div class="basics-panel" id="basicsPanel2" hidden>
+        <div class="basics-list" id="basicsList2"></div>
+      </div>
+    </section>
+
+    <section class="block keep">
+      <h2>Aufgabenart wählen</h2>
+      <div class="mode-sel">
+        <button type="button" data-mode="sim"><span class="ms-t">Simulation</span><span class="ms-d">Sechs Reaktionen, Bedingungen variieren, Messreihen vergleichen</span></button>
+        <button type="button" data-mode="ex"><span class="ms-t">Übung: Zink + Salzsäure</span><span class="ms-d">Messprotokoll, Berechnungen, c-t-Diagramm, Durchschnittsgeschwindigkeit</span></button>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>Versuch</h2>
+      <div class="rx-eq">Zn(s) + 2 HCl(aq) → ZnCl<sub>2</sub>(aq) + H<sub>2</sub>(g)</div>
+      <div class="ex-data">
+        <div><span>Zink (Granalien)</span><b class="mono">m = 0,20 g</b></div>
+        <div><span>Salzsäure</span><b class="mono">50 mL, c = 1 mol/L</b></div>
+        <div><span>Bedingungen</span><b class="mono">25 °C, 1013 hPa</b></div>
+        <div><span>molares Volumen</span><b class="mono">V<sub>m</sub> = 24,5 L/mol</b></div>
+        <div><span>Kolbenprober</span><b class="mono">0 – 100 mL</b></div>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>Arbeitsschritte</h2>
+      <div class="basics-list" id="exSteps"></div>
+      <button class="btn ghost" id="exRestart" style="margin-top:14px">Übung neu beginnen</button>
+    </section>
+  </div>
+
+  <!-- MAIN Übung -->
+  <div class="main">
+    <div class="ex-card">
+      <div class="ex-head"><span class="ex-num mono" id="exNum"></span><h2 id="exTitle"></h2></div>
+      <div class="ex-instr" id="exInstr"></div>
+    </div>
+
+    <div class="screen-card" id="exMeasure" style="margin-top:16px">
+      <div class="screen-top">
+        <button class="btn primary" id="exRun">Messung starten</button>
+        <div class="grp right" id="exSpeed">
+          <button class="mono" data-speed="1">×1</button>
+          <button class="mono" data-speed="2">×2</button>
+          <button class="mono" data-speed="5">×5</button>
+          <button class="mono" data-speed="10">×10</button>
+        </div>
+      </div>
+      <canvas id="exCanvas" aria-label="Versuchsaufbau mit Kolbenprober"></canvas>
+      <div class="ex-prompt" id="exPrompt"></div>
+    </div>
+
+    <div class="screen-card" id="exPlot" style="margin-top:16px">
+      <div class="screen-top">
+        <div class="grp" id="plotSerGrp">
+          <button data-ser="zn" class="active" style="color:#ffb454">✕ c(Zn<sup>2+</sup>)</button>
+          <button data-ser="h" style="color:#8fb4ff">+ c(H<sup>+</sup>)</button>
+        </div>
+        <div class="grp" id="plotModeGrp">
+          <button data-pm="pts" class="active">Punkte setzen</button>
+          <button data-pm="draw">Kurve zeichnen</button>
+          <button data-pm="erase">Punkte löschen</button>
+        </div>
+        <button class="btn" id="ptCheck">Punkte prüfen</button>
+        <button class="btn ghost" id="strokeClear">Kurve löschen</button>
+      </div>
+      <canvas id="exPlotCanvas" aria-label="c-t-Diagramm zum Zeichnen"></canvas>
+      <div class="under"><span class="legend"><span style="color:#ffb454">✕ c(Zn<sup>2+</sup>) – linke Achse</span><span style="color:#8fb4ff">+ c(H<sup>+</sup>) – rechte Achse</span></span><span class="lbl" id="exPlotInfo"></span></div>
+    </div>
+
+    <div class="table-wrap" id="exRates" style="margin-top:16px"><table class="ex-tab" id="exRateTable"></table></div>
+    <div class="table-wrap" id="exTableWrap" style="margin-top:16px"><table class="ex-tab" id="exTable"></table></div>
+
+    <div id="exCtlWrap">
+      <div class="ex-ctl" id="exCtl"></div>
+      <div class="feedback" id="exFb"></div>
+    </div>
+
+    <div class="ex-nav">
+      <button class="btn ghost" id="exPrev">← Vorheriger Schritt</button>
+      <span class="sp" id="exPos"></span>
+      <button class="btn primary" id="exNext">Nächster Schritt →</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p class="footer-note">Simulierte Daten zu Lehrzwecken · Geschwindigkeitsgesetze vereinfacht (Feststoffe: Oberfläche schrumpft mit dem Umsatz; Thiosulfat und H<sub>2</sub>O<sub>2</sub> 1. Ordnung; HI-Bildung 2. Ordnung mit Rückreaktion). Aktivierungsenergien und Geschwindigkeitskonstanten gerundet bzw. Modellwerte. Gasvolumen im Kolbenprober bei 25 °C und dem eingestellten Druck, ideales Gas; Löslichkeit der Gase vernachlässigt.</p>
+  <p class="footer-credit">Bastian Baumgart · Simulation „Reaktionsgeschwindigkeit“ V1.0 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+</footer>
+
+<script>
+(function(){
+"use strict";
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const R = 8.314;
+const T_ROOM = 298.15;
+const P_STD = 1013, T_STD = 25;
+const SUPD = {"-":"⁻","0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹"};
+
+function fmt(v,d){ let s=(Math.round(v*Math.pow(10,d))/Math.pow(10,d)).toFixed(d); if(/^-0[.,]?0*$/.test(s)) s=s.slice(1); return s.replace(".",","); }
+function fmtSig(v,sig){
+  sig = sig||3;
+  if(v==null || !isFinite(v)) return "–";
+  if(v===0) return "0";
+  const a=Math.abs(v);
+  if(a>=1e5 || a<1e-3){
+    let e=Math.floor(Math.log10(a)), m=v/Math.pow(10,e);
+    if(Math.abs(Math.round(m*Math.pow(10,sig-1))/Math.pow(10,sig-1))>=10){ m/=10; e+=1; }
+    return fmt(m,sig-1)+" · 10"+String(e).split("").map(ch=>SUPD[ch]).join("");
+  }
+  const d=Math.max(0, sig-1-Math.floor(Math.log10(a)));
+  return fmt(v, Math.min(d,6));
+}
+function fmtTime(t){
+  if(t==null || !isFinite(t)) return "–";
+  if(t<100) return fmt(t,1)+" s";
+  if(t<600) return Math.round(t)+" s";
+  if(t<7200){ const m=Math.floor(t/60), s=Math.floor(t%60); return m+" min "+String(s).padStart(2,"0")+" s"; }
+  if(t<3.6e5){ const h=Math.floor(t/3600), m=Math.floor((t%3600)/60); return h+" h "+String(m).padStart(2,"0")+" min"; }
+  return fmtSig(t/86400/365.25,2)+" Jahre";
+}
+function niceStep(x){ const e=Math.pow(10,Math.floor(Math.log10(x))), m=x/e; return (m<1.5?1:m<3?2:m<7?5:10)*e; }
+const axl=v=>fmtSig(v,3).replace(/(,\d*?)0+$/,"$1").replace(/,$/,"");
+function niceCeil(x){ if(!(x>0)) return 1; const st=niceStep(x/5); return Math.ceil(x/st-1e-9)*st; }
+
+/* ============================================================
+   REAKTIONEN
+   type: metal  – Feststoff + Salzsäure, Gas im Kolbenprober
+         thio   – Natriumthiosulfat + Salzsäure, Trübung
+         h2o2   – katalysierte Zersetzung, O2 im Kolbenprober
+         gas    – H2 + I2 ⇌ 2 HI in der Gasphase
+   k298 und Ea: Modellwerte (gerundet, an Schulversuche angepasst)
+   ============================================================ */
+const RX = [
+{ id:"zn", name:"Zink + Salzsäure", type:"metal",
+  eq:'Zn(s) + 2 HCl(aq) <span class="arr">→</span> ZnCl<sub>2</sub>(aq) + H<sub>2</sub>(g)',
+  ion:'Ionengleichung: Zn + 2 H<sub>3</sub>O<sup>+</sup> → Zn<sup>2+</sup> + H<sub>2</sub> + 2 H<sub>2</sub>O',
+  solid:{name:"Zink", f:"Zn", m:0.50, M:65.38, col:"#a9b2ba"},
+  gas:{html:"H<sub>2</sub>", txt:"H₂", col:"#c9ced4"},
+  V:0.050, c:{min:0.1,max:3,def:1,step:0.1, html:"c(HCl)", txt:"c(HCl)", unit:"mol/L", dec:1},
+  T:{min:0,max:80,def:25}, p:{min:800,max:2000,def:1013},
+  k298:2.63e-5, Ea:55,
+  sizes:[{n:"Granalien",f:1,count:6},{n:"Grieß",f:4,count:22},{n:"Pulver",f:12,count:70}], sizeDef:0,
+  speed:10, cap:10800,
+  info:"0,50 g Zink und 50 mL Salzsäure im Erlenmeyerkolben (Wasserbad). Der Wasserstoff wird im Kolbenprober aufgefangen.",
+  vDef:'v = <span class="frac"><span>ΔV(H<sub>2</sub>)</span><span>Δt</span></span> &nbsp; bzw. &nbsp; v = −<span class="frac"><span>1</span><span>2</span></span> · <span class="frac"><span>Δc(H<sub>3</sub>O<sup>+</sup>)</span><span>Δt</span></span>',
+  vDef2:"Gemessen wird das Volumen des entstehenden Wasserstoffs. Es ist proportional zur Stoffmenge n(H<sub>2</sub>) und damit zur umgesetzten Stoffmenge Zink."},
+{ id:"mg", name:"Magnesium + Salzsäure", type:"metal",
+  eq:'Mg(s) + 2 HCl(aq) <span class="arr">→</span> MgCl<sub>2</sub>(aq) + H<sub>2</sub>(g)',
+  ion:'Ionengleichung: Mg + 2 H<sub>3</sub>O<sup>+</sup> → Mg<sup>2+</sup> + H<sub>2</sub> + 2 H<sub>2</sub>O',
+  solid:{name:"Magnesium", f:"Mg", m:0.15, M:24.31, col:"#d5dade"},
+  gas:{html:"H<sub>2</sub>", txt:"H₂", col:"#c9ced4"},
+  V:0.050, c:{min:0.1,max:3,def:1,step:0.1, html:"c(HCl)", txt:"c(HCl)", unit:"mol/L", dec:1},
+  T:{min:0,max:80,def:25}, p:{min:800,max:2000,def:1013},
+  k298:1.91e-4, Ea:38,
+  sizes:[{n:"Band",f:1,count:3},{n:"Späne",f:3,count:16},{n:"Pulver",f:10,count:70}], sizeDef:0,
+  speed:1, cap:10800,
+  info:"0,15 g Magnesium und 50 mL Salzsäure. Magnesium ist unedler als Zink und reagiert deutlich schneller.",
+  vDef:'v = <span class="frac"><span>ΔV(H<sub>2</sub>)</span><span>Δt</span></span> &nbsp; bzw. &nbsp; v = −<span class="frac"><span>1</span><span>2</span></span> · <span class="frac"><span>Δc(H<sub>3</sub>O<sup>+</sup>)</span><span>Δt</span></span>',
+  vDef2:"Gemessen wird das Volumen des entstehenden Wasserstoffs im Kolbenprober."},
+{ id:"caco3", name:"Marmor + Salzsäure", type:"metal",
+  eq:'CaCO<sub>3</sub>(s) + 2 HCl(aq) <span class="arr">→</span> CaCl<sub>2</sub>(aq) + H<sub>2</sub>O(l) + CO<sub>2</sub>(g)',
+  ion:'Ionengleichung: CaCO<sub>3</sub> + 2 H<sub>3</sub>O<sup>+</sup> → Ca<sup>2+</sup> + CO<sub>2</sub> + 3 H<sub>2</sub>O',
+  solid:{name:"Marmor", f:"CaCO₃", m:0.75, M:100.09, col:"#e8e4da"},
+  gas:{html:"CO<sub>2</sub>", txt:"CO₂", col:"#aab3bb"},
+  V:0.050, c:{min:0.1,max:3,def:1,step:0.1, html:"c(HCl)", txt:"c(HCl)", unit:"mol/L", dec:1},
+  T:{min:0,max:80,def:25}, p:{min:800,max:2000,def:1013},
+  k298:5.15e-5, Ea:45,
+  sizes:[{n:"Stücke",f:1,count:5},{n:"Splitt",f:3,count:18},{n:"Pulver",f:10,count:70}], sizeDef:0,
+  speed:10, cap:10800,
+  info:"0,75 g Marmor (Calciumcarbonat) und 50 mL Salzsäure. Das Kohlenstoffdioxid wird im Kolbenprober aufgefangen.",
+  vDef:'v = <span class="frac"><span>ΔV(CO<sub>2</sub>)</span><span>Δt</span></span> &nbsp; bzw. &nbsp; v = −<span class="frac"><span>1</span><span>2</span></span> · <span class="frac"><span>Δc(H<sub>3</sub>O<sup>+</sup>)</span><span>Δt</span></span>',
+  vDef2:"Alternativ lässt sich die Massenabnahme des offenen Kolbens auf einer Waage verfolgen – das entweichende CO<sub>2</sub> ist proportional zur umgesetzten Stoffmenge."},
+{ id:"thio", name:"Natriumthiosulfat + Salzsäure", type:"thio",
+  eq:'Na<sub>2</sub>S<sub>2</sub>O<sub>3</sub>(aq) + 2 HCl(aq) <span class="arr">→</span> 2 NaCl(aq) + S(s) + SO<sub>2</sub>(aq) + H<sub>2</sub>O(l)',
+  ion:'Ionengleichung: S<sub>2</sub>O<sub>3</sub><sup>2−</sup> + 2 H<sub>3</sub>O<sup>+</sup> → S + SO<sub>2</sub> + 3 H<sub>2</sub>O',
+  c:{min:0.02,max:0.30,def:0.10,step:0.01, html:"c(Na<sub>2</sub>S<sub>2</sub>O<sub>3</sub>)", txt:"c(Na₂S₂O₃)", unit:"mol/L", dec:2},
+  T:{min:0,max:80,def:25}, p:{min:800,max:2000,def:1013},
+  k298:5.63e-4, Ea:55, cStar:0.0025,
+  speed:1, cap:1800,
+  info:"Natriumthiosulfat-Lösung wird mit Salzsäure im Überschuss versetzt. Fein verteilter Schwefel trübt die Lösung, bis das Kreuz unter dem Becherglas nicht mehr zu sehen ist.",
+  vDef:'v = <span class="frac"><span>Δc(S)</span><span>Δt</span></span> = −<span class="frac"><span>Δc(S<sub>2</sub>O<sub>3</sub><sup>2−</sup>)</span><span>Δt</span></span> &nbsp; ~ &nbsp; <span class="frac"><span>1</span><span>t</span></span>',
+  vDef2:"Bis das Kreuz verschwindet, muss stets dieselbe Menge Schwefel entstanden sein. Je kürzer die Zeit t, desto größer ist v; 1/t dient als Maß für die Anfangsgeschwindigkeit."},
+{ id:"h2o2", name:"Zersetzung von Wasserstoffperoxid", type:"h2o2",
+  eq:'2 H<sub>2</sub>O<sub>2</sub>(aq) <span class="arr">→</span> 2 H<sub>2</sub>O(l) + O<sub>2</sub>(g)',
+  ion:'katalysiert durch Kaliumiodid, Braunstein (MnO<sub>2</sub>) oder das Enzym Katalase',
+  gas:{html:"O<sub>2</sub>", txt:"O₂", col:"#ff8a7a"},
+  V:0.010, c:{min:0.1,max:1.5,def:1.0,step:0.1, html:"c(H<sub>2</sub>O<sub>2</sub>)", txt:"c(H₂O₂)", unit:"mol/L", dec:1},
+  T:{min:0,max:80,def:25}, p:{min:800,max:2000,def:1013},
+  cats:[
+    {n:"ohne Katalysator", k298:2e-8, Ea:75},
+    {n:"Kaliumiodid-Lösung", k298:0.012, Ea:56},
+    {n:"Braunstein (MnO₂)", k298:0.025, Ea:50},
+    {n:"Katalase (Hefe)", k298:0.07, Ea:23, enzyme:true}], catDef:2,
+  speed:1, cap:10800,
+  info:"10 mL Wasserstoffperoxid-Lösung (c = 1 mol/L entspricht etwa 3,4 %) mit Katalysator. Der Sauerstoff wird im Kolbenprober aufgefangen.",
+  vDef:'v = <span class="frac"><span>ΔV(O<sub>2</sub>)</span><span>Δt</span></span> &nbsp; bzw. &nbsp; v = −<span class="frac"><span>1</span><span>2</span></span> · <span class="frac"><span>Δc(H<sub>2</sub>O<sub>2</sub>)</span><span>Δt</span></span>',
+  vDef2:"Ohne Katalysator zerfällt Wasserstoffperoxid bei Raumtemperatur nur unmerklich langsam."},
+{ id:"hi", name:"Wasserstoff + Iod (Gasphase)", type:"gas",
+  eq:'H<sub>2</sub>(g) + I<sub>2</sub>(g) <span class="arr">⇌</span> 2 HI(g)',
+  ion:'homogene Gasreaktion im geschlossenen Gefäß, gleiche Stoffmengen H<sub>2</sub> und I<sub>2</sub>',
+  T:{min:200,max:500,def:450}, p:{min:200,max:5000,def:1013},
+  A:1.0e11, Ea:165, K700:54, dH:-9.5,
+  speed:600, cap:10800,
+  species:[{html:"H<sub>2</sub>",txt:"H₂",col:"#c9ced4"},{html:"I<sub>2</sub>",txt:"I₂",col:"#b98cf0"},{html:"HI",txt:"HI",col:"#4fd1c5"}],
+  info:"Gleiche Stoffmengen Wasserstoff und Iod im beheizten, geschlossenen Gefäß. Die violette Farbe des Iods verblasst. Bei 25 °C ist Iod fest – die Reaktion läuft erst bei hohen Temperaturen messbar ab.",
+  vDef:'v = <span class="frac"><span>1</span><span>2</span></span> · <span class="frac"><span>Δc(HI)</span><span>Δt</span></span> = −<span class="frac"><span>Δc(I<sub>2</sub>)</span><span>Δt</span></span> = −<span class="frac"><span>Δc(H<sub>2</sub>)</span><span>Δt</span></span>',
+  vDef2:"Geschwindigkeitsgesetz der Hinreaktion: v = k · c(H<sub>2</sub>) · c(I<sub>2</sub>). Da c = p/(R·T), steigt v bei Verdopplung des Drucks auf das Vierfache."}
+];
+const RXI = Object.fromEntries(RX.map(r=>[r.id,r]));
+
+/* Diagrammgrößen je Reaktionstyp (alle affin in den Zustandsgrößen) */
+function qDefs(rx){
+  if(rx.type==="metal") return [
+    {key:"V", html:`V(${rx.gas.html})`, txt:`V(${rx.gas.txt})`, unit:"mL", f:(s,I)=>(I.ns0-s[0])*R*T_ROOM/(I.p*100)*1e6},
+    {key:"n", html:`n(${rx.gas.html})`, txt:`n(${rx.gas.txt})`, unit:"mmol", f:(s,I)=>(I.ns0-s[0])*1000},
+    {key:"c", html:"c(H<sub>3</sub>O<sup>+</sup>)", txt:"c(H₃O⁺)", unit:"mol/L", f:(s,I)=>s[1]/I.V}];
+  if(rx.type==="h2o2") return [
+    {key:"V", html:"V(O<sub>2</sub>)", txt:"V(O₂)", unit:"mL", f:(s,I)=>(I.n0-s[0])/2*R*T_ROOM/(I.p*100)*1e6},
+    {key:"c", html:"c(H<sub>2</sub>O<sub>2</sub>)", txt:"c(H₂O₂)", unit:"mol/L", f:(s,I)=>s[0]/I.V}];
+  if(rx.type==="thio") return [
+    {key:"S", html:"c(S)", txt:"c(S)", unit:"mmol/L", f:s=>s[1]*1000, thr:true},
+    {key:"T", html:"c(S<sub>2</sub>O<sub>3</sub><sup>2−</sup>)", txt:"c(S₂O₃²⁻)", unit:"mmol/L", f:s=>s[0]*1000}];
+  return [
+    {key:"c", html:"c(H<sub>2</sub>), c(I<sub>2</sub>), c(HI)", txt:"c(HI)", unit:"mmol/L", f:s=>s[2]*1000,
+     multi:[{html:"I<sub>2</sub>",txt:"c(I₂)",col:"#b98cf0",f:s=>s[1]*1000},{html:"H<sub>2</sub>",txt:"c(H₂)",col:"#c9ced4",f:s=>s[0]*1000,dash:[6,5]},{html:"HI",txt:"c(HI)",col:"#4fd1c5",f:s=>s[2]*1000}]},
+    {key:"hi", html:"c(HI)", txt:"c(HI)", unit:"mmol/L", f:s=>s[2]*1000}];
+}
+
+/* ============================================================
+   KINETIK
+   ============================================================ */
+function enzymeFactor(Tc){ return 1/(1+Math.exp((Tc-52)/3.5)); }
+function kOf(rx,cfg,Tc){
+  const T=Tc+273.15;
+  if(rx.type==="gas") return rx.A*Math.exp(-rx.Ea*1000/(R*T));
+  let k298=rx.k298, Ea=rx.Ea, f=1;
+  if(rx.cats){ const ct=rx.cats[cfg.cat]; k298=ct.k298; Ea=ct.Ea; if(ct.enzyme) f*=enzymeFactor(Tc); }
+  if(rx.sizes) f*=rx.sizes[cfg.size].f;
+  return k298*Math.exp(-Ea*1000/R*(1/T-1/298.15))*f;
+}
+function KHI(Tc){ const T=Tc+273.15, rx=RXI.hi; return rx.K700*Math.exp(-rx.dH*1000/R*(1/T-1/700)); }
+
+function initOf(rx,cfg){
+  const I={p:cfg.p, T:cfg.T};
+  if(rx.type==="metal"){
+    I.V=rx.V; I.ns0=rx.solid.m/rx.solid.M; I.nH0=cfg.c*rx.V; I.fin=Math.min(I.ns0, I.nH0/2);
+    I.s0=[I.ns0, I.nH0]; I.X=s=>(I.ns0-s[0])/I.fin;
+  } else if(rx.type==="thio"){
+    I.c0=cfg.c; I.s0=[cfg.c,0]; I.X=s=>s[1]/I.c0;
+  } else if(rx.type==="h2o2"){
+    I.V=rx.V; I.n0=cfg.c*rx.V; I.s0=[I.n0]; I.X=s=>(I.n0-s[0])/I.n0;
+  } else {
+    const a=cfg.p*100/(2*R*(cfg.T+273.15))/1000;   // mol/L je Edukt
+    const sK=Math.sqrt(KHI(cfg.T)), y=a*sK/(2+sK);
+    I.a=a; I.yEq=y; I.s0=[a,a,0]; I.X=s=>s[2]/(2*y);
+  }
+  return I;
+}
+function derivOf(rx,cfg,I,k){
+  if(rx.type==="metal") return s=>{ const x=Math.max(0,s[0])/I.ns0, cH=Math.max(0,s[1])/I.V; const r=k*Math.pow(x,2/3)*cH; return [-r,-2*r]; };
+  if(rx.type==="thio") return s=>{ const r=k*Math.max(0,s[0]); return [-r,r]; };
+  if(rx.type==="h2o2") return s=>{ const r=k*Math.max(0,s[0]); return [-r]; };
+  const kr=k/KHI(cfg.T);
+  return s=>{ const r=k*s[0]*s[1]-kr*s[2]*s[2]; return [-r,-r,2*r]; };
+}
+function simulate(rx,cfg){
+  const I=initOf(rx,cfg), k=kOf(rx,cfg,cfg.T), d=derivOf(rx,cfg,I,k);
+  const cap=rx.cap||10800;
+  let s=I.s0.slice(), t=0;
+  const d0=d(s); const h=1e-3;
+  const rate0=(I.X(s.map((v,i)=>v+d0[i]*h))-I.X(s))/h;
+  let tChar = rate0>0 ? 1/rate0 : Infinity;
+  let tStop=cap, dt;
+  if(rx.type==="thio"){
+    const tc = I.c0>rx.cStar ? -Math.log(1-rx.cStar/I.c0)/k : Infinity;
+    I.tCross=tc;
+    tStop = isFinite(tc) ? Math.min(cap, Math.max(20, tc*1.6)) : cap;
+    dt=tStop/1500;
+  } else {
+    dt=Math.min(tChar/400, cap/1500);
+    if(!(dt>0)) dt=cap/1500;
+  }
+  const ts=[0], ss=[s.slice()];
+  let steps=0;
+  while(true){
+    const k1=d(s), s2=s.map((v,i)=>v+k1[i]*dt/2), k2=d(s2), s3=s.map((v,i)=>v+k2[i]*dt/2), k3=d(s3), s4=s.map((v,i)=>v+k3[i]*dt), k4=d(s4);
+    s=s.map((v,i)=>Math.max(0, v+dt/6*(k1[i]+2*k2[i]+2*k3[i]+k4[i])));
+    t+=dt; steps++;
+    ts.push(t); ss.push(s.slice());
+    if(rx.type==="thio"){ if(t>=tStop-1e-9) break; }
+    else if(I.X(s)>=0.995 || t>=cap-1e-9) break;
+    if(steps>60000) break;
+  }
+  const data={t:ts, s:ss, n:ts.length, tEnd:t, I, k, d};
+  // Kenngrößen
+  const Xs=ss.map(I.X);
+  const tAt=(X)=>{ for(let i=1;i<Xs.length;i++){ if(Xs[i]>=X){ const f=(X-Xs[i-1])/((Xs[i]-Xs[i-1])||1); return ts[i-1]+f*(ts[i]-ts[i-1]); } } return null; };
+  data.tHalf = rx.type==="thio" ? null : tAt(0.5);
+  data.t99 = rx.type==="thio" ? null : tAt(0.99);
+  data.Xend = Xs[Xs.length-1];
+  data.capped = rx.type!=="thio" && data.Xend<0.99;
+  data.tCross = I.tCross;
+  data.rate0 = rate0;
+  return data;
+}
+function stateAt(data,t){
+  const ts=data.t; if(t<=0) return data.s[0].slice();
+  if(t>=data.tEnd) return data.s[data.n-1].slice();
+  let lo=0, hi=data.n-1;
+  while(hi-lo>1){ const m=(lo+hi)>>1; if(ts[m]<=t) lo=m; else hi=m; }
+  const f=(t-ts[lo])/((ts[hi]-ts[lo])||1);
+  return data.s[lo].map((v,i)=>v+f*(data.s[hi][i]-v));
+}
+function rateQ(qf,data,s){ const ds=data.d(s); return qf(s.map((v,i)=>v+ds[i]),data.I)-qf(s,data.I); }
+
+/* ============================================================
+   ZUSTAND
+   ============================================================ */
+const PALETTE=["#4fd1c5","#ffb454","#8fb4ff","#ff8a7a","#7fd68a","#c99cf0","#f0d36b","#e7e4dd"];
+const S = {
+  rx:RX[0], cfg:null, vary:false,
+  run:null,              // aktuelle Messung {no,color,rx,cfg,data}
+  t:0, running:false, started:false, finished:false,
+  speed:10, view:"setup", qIdx:0,
+  runs:[], runNo:0,
+  tool:{mode:"off", t1:null, t2:null, tt:null},
+};
+function stdCfg(rx){
+  return {T:rx.T.def, p:rx.p.def, c:rx.c?rx.c.def:null, size:rx.sizes?rx.sizeDef:null, cat:rx.cats?rx.catDef:null};
+}
+function isStd(){
+  const d=stdCfg(S.rx), c=S.cfg;
+  return c.T===d.T && c.p===d.p && c.c===d.c && c.size===d.size && c.cat===d.cat;
+}
+function newRun(){
+  const rx=S.rx, cfg=Object.assign({},S.cfg);
+  S.run={no:S.runNo+1, color:PALETTE[S.runNo%PALETTE.length], rx, cfg, data:simulate(rx,cfg)};
+  S.t=0; S.running=false; S.started=false; S.finished=false;
+  psReset(); bubbles.length=0;
+  const te=S.run.data.tEnd;
+  S.tool.t1=te*0.05; S.tool.t2=te*0.3; S.tool.tt=te*0.15;
+}
+
+/* ============================================================
+   OBERFLÄCHE: Reaktion & Bedingungen
+   ============================================================ */
+$("rxSelect").innerHTML = RX.map(r=>`<option value="${r.id}">${esc(r.name)}</option>`).join("");
+$("rxSelect").addEventListener("change", e=>loadReaction(e.target.value));
+
+const sT=$("sT"), sP=$("sP"), sC=$("sC");
+function loadReaction(id){
+  const rx=RXI[id]; S.rx=rx;
+  $("rxSelect").value=id;
+  S.cfg=stdCfg(rx);
+  S.qIdx=0;
+  S.speed=rx.speed;
+  sT.min=rx.T.min; sT.max=rx.T.max; sT.step=1;
+  sP.min=rx.p.min; sP.max=rx.p.max; sP.step=1;
+  if(rx.c){ sC.min=rx.c.min; sC.max=rx.c.max; sC.step=rx.c.step; $("lCname").innerHTML="Konzentration "+rx.c.html; }
+  $("cWrap").hidden=!rx.c;
+  $("sizeWrap").hidden=!rx.sizes;
+  $("catWrap").hidden=!rx.cats;
+  if(rx.sizes) $("sizeSeg").innerHTML=rx.sizes.map((z,i)=>`<button data-i="${i}">${esc(z.n)}</button>`).join("");
+  if(rx.cats) $("catSel").innerHTML=rx.cats.map((z,i)=>`<option value="${i}">${esc(z.n)}</option>`).join("");
+  $("rxEq").innerHTML=rx.eq;
+  $("rxInfo").textContent=rx.info;
+  $("eq").innerHTML=rx.eq;
+  $("eqIon").innerHTML=rx.ion||"";
+  $("vDef").innerHTML=rx.vDef;
+  $("vDef2").innerHTML=rx.vDef2;
+  $("condHint").innerHTML = rx.type==="gas"
+    ? "Bei Gasen bestimmt der Druck die Konzentration: c = p/(R·T). Standardbedingungen (25 °C) sind hier nicht sinnvoll, weil Iod fest ist und die Reaktion praktisch nicht abläuft – voreingestellt sind <b>450 °C und 1013 hPa</b>."
+    : "Standardbedingungen: <b>25 °C, 1013 hPa</b>"+(rx.c?`, ${rx.c.html} = ${fmt(rx.c.def,rx.c.dec)} mol/L`:"")+(rx.sizes?`, ${esc(rx.sizes[rx.sizeDef].n)}`:"")+(rx.cats?`, ${esc(rx.cats[rx.catDef].n)}`:"")+".";
+  if(!S.vary) applyStd(false);
+  syncControls();
+  renderQGrp(); renderSpeed();
+  newRun();
+  refreshAll();
+}
+function applyStd(rebuild){
+  S.cfg=stdCfg(S.rx);
+  if(rebuild!==false){ syncControls(); newRun(); refreshAll(); }
+}
+function syncControls(){
+  const rx=S.rx, c=S.cfg;
+  sT.value=c.T; sP.value=c.p; if(rx.c) sC.value=c.c;
+  $("lT").textContent=c.T+" °C";
+  $("lP").textContent=c.p+" hPa";
+  if(rx.c) $("lC").textContent=fmt(c.c,rx.c.dec)+" mol/L";
+  if(rx.sizes) [...$("sizeSeg").children].forEach((b,i)=>b.classList.toggle("active",i===c.size));
+  if(rx.cats) $("catSel").value=c.cat;
+  const lock = !S.vary || S.running;
+  [sT,sP,sC,$("catSel"),$("btnStd")].forEach(el=>el.disabled=lock);
+  [...$("sizeSeg").children].forEach(b=>b.disabled=lock);
+  $("condBox").classList.toggle("locked",lock);
+  $("varItem").classList.toggle("on",S.vary);
+  $("varChk").checked=S.vary; $("varChk").disabled=S.running;
+  $("explItem").hidden=!S.vary;
+  $("explItem").classList.toggle("on",$("explChk").checked);
+  $("explBox").hidden=!(S.vary && $("explChk").checked);
+  const std=isStd();
+  $("condChip").textContent = std ? (rx.type==="gas"?"Voreinstellung":"Standard") : "verändert";
+  $("condChip").className = "chip "+(std?"std":"var");
+}
+function condChanged(){
+  syncControls();
+  newRun();
+  refreshAll();
+}
+sT.addEventListener("input", ()=>{ S.cfg.T=+sT.value; condChanged(); });
+sP.addEventListener("input", ()=>{ S.cfg.p=+sP.value; condChanged(); });
+sC.addEventListener("input", ()=>{ S.cfg.c=Math.round(+sC.value*100)/100; condChanged(); });
+$("sizeSeg").addEventListener("click", e=>{ const b=e.target.closest("button"); if(!b||b.disabled) return; S.cfg.size=+b.dataset.i; condChanged(); });
+$("catSel").addEventListener("change", e=>{ S.cfg.cat=+e.target.value; condChanged(); });
+$("btnStd").addEventListener("click", ()=>applyStd());
+$("explChk").addEventListener("change", ()=>syncControls());
+$("varChk").addEventListener("change", e=>{
+  S.vary=e.target.checked;
+  if(!S.vary && !isStd()){ applyStd(); return; }
+  syncControls();
+});
+
+/* Diagrammgröße & Ansicht & Tempo */
+function renderQGrp(){
+  const qs=qDefs(S.rx);
+  $("qGrp").innerHTML=qs.map((q,i)=>`<button data-i="${i}" class="${i===S.qIdx?"active":""}">${q.html}</button>`).join("");
+}
+$("qGrp").addEventListener("click", e=>{ const b=e.target.closest("button"); if(!b) return; S.qIdx=+b.dataset.i; renderQGrp(); refreshAll(); });
+$("viewGrp").addEventListener("click", e=>{ const b=e.target.closest("button"); if(!b) return; S.view=b.dataset.view; [...$("viewGrp").children].forEach(x=>x.classList.toggle("active",x===b)); psReset(); });
+function renderSpeed(){ [...$("speedGrp").children].forEach(b=>b.classList.toggle("active", +b.dataset.speed===S.speed)); }
+$("speedGrp").addEventListener("click", e=>{ const b=e.target.closest("button"); if(!b) return; S.speed=+b.dataset.speed; renderSpeed(); });
+
+/* Steuerung */
+$("bStart").addEventListener("click", ()=>{
+  if(S.finished){ newRun(); }
+  if(!S.started){ S.started=true; S.runNo=S.run.no; }
+  S.running=!S.running;
+  syncControls(); refreshAll();
+});
+$("bEnd").addEventListener("click", ()=>{
+  if(!S.started){ S.started=true; S.runNo=S.run.no; }
+  S.t=S.run.data.tEnd; finish();
+});
+$("bReset").addEventListener("click", ()=>{
+  if(S.started && !S.finished) S.runNo=S.run.no-1;
+  newRun(); syncControls(); refreshAll();
+});
+function finish(){
+  S.running=false; S.finished=true;
+  if(!S.runs.includes(S.run)){ S.runs.push(S.run); if(S.runs.length>16) S.runs.shift(); }
+  syncControls(); refreshAll();
+}
+$("showRuns").addEventListener("change", ()=>refreshAll());
+$("btnClearRuns").addEventListener("click", ()=>{ S.runs=[]; refreshAll(); });
+
+/* ============================================================
+   ANZEIGEN
+   ============================================================ */
+function curQ(){ const qs=qDefs(S.rx); return qs[Math.min(S.qIdx,qs.length-1)]; }
+function curState(){ return stateAt(S.run.data, S.t); }
+function relToStd(){
+  // Anfangsgeschwindigkeit der aktuellen Bedingungen relativ zur Standardeinstellung (in mol/s bzw. mol/(L·s))
+  const rx=S.rx, a=S.run.data, b=simulateRate0(rx,stdCfg(rx));
+  return initialAbsRate(rx,a)/b;
+}
+function initialAbsRate(rx,data){
+  const s=data.s[0], ds=data.d(s);
+  if(rx.type==="gas") return ds[2];
+  if(rx.type==="thio") return ds[1];
+  return -ds[0];
+}
+const _r0cache={};
+function simulateRate0(rx,cfg){
+  const key=rx.id+JSON.stringify(cfg); if(_r0cache[key]) return _r0cache[key];
+  const I=initOf(rx,cfg), k=kOf(rx,cfg,cfg.T), d=derivOf(rx,cfg,I,k);
+  const v=initialAbsRate(rx,{s:[I.s0], d});
+  return (_r0cache[key]=v);
+}
+
+function setStatus(){
+  const b=$("statusBadge");
+  if(MODE==="none"){ b.className="status"; $("statusText").textContent="Aufgabenart wählen"; return; }
+  b.className="status"+(S.running?" running":S.finished?" done":"");
+  $("statusText").textContent = S.running?"Reaktion läuft":S.finished?(S.run.data.capped?"Messung abgebrochen":"Reaktion beendet"):S.started?"pausiert":"bereit";
+  $("bStart").textContent = S.finished?"Neue Messung":S.running?"Pause":S.started?"Fortsetzen":"Reaktion starten";
+  $("bEnd").disabled = S.finished;
+}
+function updateReadouts(){
+  const rx=S.rx, q=curQ(), d=S.run.data, s=curState();
+  $("roTime").textContent=fmtTime(S.t);
+  $("roQk").innerHTML = rx.type==="gas" ? "c(HI)" : q.html;
+  const qv = q.f(s,d.I);
+  $("roQ").textContent = fmtSig(qv,3)+" "+q.unit;
+  const rv = rateQ(q.f,d,s);
+  $("roV").textContent = (S.started||S.t>0) ? fmtSig(rv,3)+" "+q.unit+"/s" : fmtSig(rv,3)+" "+q.unit+"/s";
+  $("roX").textContent = fmt(clamp(d.I.X(s),0,1)*100,1)+" %";
+  if(rx.type==="thio"){
+    $("roHk").textContent="Kreuz verschwunden nach";
+    $("roH").textContent = (d.tCross!=null && S.t>=d.tCross) ? fmtTime(d.tCross) : "–";
+  } else {
+    $("roHk").innerHTML="Halbwertszeit t<sub>½</sub>";
+    $("roH").textContent = (d.tHalf!=null && S.t>=d.tHalf) ? fmtTime(d.tHalf) : "–";
+  }
+  $("roRel").textContent = "× "+fmtSig(relToStd(),3);
+}
+
+function refreshAll(){
+  setStatus(); updateReadouts(); renderExplain(); renderLegend(); renderRuns(); renderData(); renderAus(); drawK();
+  const nr=S.runs.length;
+  $("runsInfo").textContent = nr? `${nr} Messreihe${nr>1?"n":""} gespeichert (${S.runs.filter(r=>r.rx===S.rx).length} zur aktuellen Reaktion).` : "Noch keine Messreihe abgeschlossen.";
+}
+
+/* Erklärung zu den aktuellen Bedingungen */
+function renderExplain(){
+  const rx=S.rx, c=S.cfg, d0=stdCfg(rx), P=[];
+  const fT = kOf(rx,Object.assign({},c,{T:d0.T}),c.T)/kOf(rx,Object.assign({},c,{T:d0.T}),d0.T);
+  const T10 = kOf(rx,c,Math.min(c.T+10,rx.T.max+10))/kOf(rx,c,c.T);
+  const Tname = rx.type==="gas" ? "450 °C" : "25 °C";
+  if(c.T!==d0.T){
+    P.push(`<p><b>Temperatur ${c.T} °C:</b> Die Geschwindigkeitskonstante ist <span class="fac">${fmtSig(fT,3)}</span>-mal so groß wie bei ${Tname}. Bei höherer Temperatur haben viel mehr Teilchen die nötige Mindestenergie E<sub>A</sub>; zusätzlich stoßen sie etwas häufiger zusammen.${rx.cats&&rx.cats[c.cat].enzyme&&c.T>45?" <b>Achtung:</b> Oberhalb von etwa 45 °C wird das Enzym Katalase zunehmend denaturiert und verliert seine Wirkung.":""}</p>`);
+  } else {
+    P.push(`<p><b>Temperatur ${c.T} °C:</b> Eine Erhöhung um 10 K würde die Reaktion hier etwa <span class="fac">${fmtSig(T10,2)}</span>-mal so schnell machen (RGT-Regel: Faktor 2 bis 4).</p>`);
+  }
+  if(rx.type==="gas"){
+    const a=initOf(rx,c).a, a0=initOf(rx,d0).a;
+    P.push(`<p><b>Druck ${c.p} hPa:</b> Bei Gasen gilt c = p/(R·T). Die Anfangskonzentrationen betragen je <span class="fac">${fmtSig(a*1000,3)} mmol/L</span>${c.p!==d0.p||c.T!==d0.T?` (Voreinstellung: ${fmtSig(a0*1000,3)} mmol/L)`:""}. Da v = k · c(H<sub>2</sub>) · c(I<sub>2</sub>), wirkt sich eine Änderung der Konzentration quadratisch aus: doppelter Druck → vierfache Anfangsgeschwindigkeit, denn die Teilchen stoßen viermal so häufig zusammen.</p>`);
+    const K=KHI(c.T);
+    P.push(`<p><b>Gleichgewicht:</b> Die Rückreaktion 2 HI → H<sub>2</sub> + I<sub>2</sub> läuft ebenfalls ab; die Reaktion endet daher nicht vollständig, sondern im Gleichgewicht (K<sub>c</sub> = ${fmtSig(K,3)} bei ${c.T} °C).</p>`);
+  } else {
+    P.push(`<p><b>Druck ${c.p} hPa:</b> Auf die Geschwindigkeit einer Reaktion in Lösung hat der Druck praktisch <b>keinen Einfluss</b>, weil sich Flüssigkeiten kaum zusammendrücken lassen und sich die Konzentrationen nicht ändern.${rx.type==="thio"?"":c.p!==P_STD?` Das <b>gemessene Gasvolumen</b> hängt aber vom Druck ab (V = n · R · T / p): Bei ${c.p} hPa nimmt dieselbe Gasportion das <span class="fac">${fmtSig(P_STD/c.p,3)}</span>-Fache des Volumens bei 1013 hPa ein.`:" Ändert man den Druck, ändert sich nur das <b>gemessene Gasvolumen</b> (V = n · R · T / p), nicht die Reaktionsgeschwindigkeit."}</p>`);
+  }
+  if(rx.c){
+    const f=c.c/d0.c;
+    const nm=rx.c.html;
+    if(c.c!==d0.c) P.push(`<p><b>Konzentration ${nm} = ${fmt(c.c,rx.c.dec)} mol/L:</b> ${f>1?"Mehr":"Weniger"} Teilchen im gleichen Volumen – die Zahl der Zusammenstöße und damit die Anfangsgeschwindigkeit ist <span class="fac">${fmtSig(f,3)}</span>-mal so groß (Geschwindigkeitsgesetz 1. Ordnung bezüglich ${rx.type==="metal"?"H<sub>3</sub>O<sup>+</sup>":rx.type==="thio"?"S<sub>2</sub>O<sub>3</sub><sup>2−</sup>":"H<sub>2</sub>O<sub>2</sub>"}).${rx.type==="metal"&&c.c*rx.V<2*rx.solid.m/rx.solid.M?` Die Salzsäure reicht hier nicht für den gesamten Feststoff – die Salzsäure ist der <b>limitierende</b> Stoff, das Endvolumen ist kleiner.`:""}</p>`);
+    else P.push(`<p><b>Konzentration ${nm} = ${fmt(c.c,rx.c.dec)} mol/L</b> (Standardansatz). Eine Verdopplung würde die Anfangsgeschwindigkeit verdoppeln.</p>`);
+  }
+  if(rx.sizes){
+    const z=rx.sizes[c.size];
+    P.push(`<p><b>Zerteilungsgrad „${esc(z.n)}“:</b> ${c.size===0?"Grob zerteilter Feststoff – kleine Oberfläche.":`Die Oberfläche ist etwa <span class="fac">${z.f}</span>-mal so groß wie bei „${esc(rx.sizes[0].n)}“.`} Die Reaktion findet nur an der Oberfläche des Feststoffs statt; je größer sie ist, desto mehr Säureteilchen treffen pro Zeit auf.</p>`);
+  }
+  if(rx.cats){
+    const ct=rx.cats[c.cat], k0=rx.cats[0];
+    if(c.cat===0) P.push(`<p><b>Ohne Katalysator</b> ist die Aktivierungsenergie mit etwa ${k0.Ea} kJ/mol so hoch, dass die Zersetzung bei Raumtemperatur praktisch nicht messbar ist.</p>`);
+    else P.push(`<p><b>Katalysator ${esc(ct.n)}:</b> Er ermöglicht einen anderen Reaktionsweg mit niedrigerer Aktivierungsenergie (Modellwert ≈ ${ct.Ea} kJ/mol statt ${k0.Ea} kJ/mol) und wird dabei nicht verbraucht. Die Reaktion läuft bei 25 °C etwa <span class="fac">${fmtSig(ct.k298/k0.k298,2)}</span>-mal so schnell ab wie ohne Katalysator.</p>`);
+  }
+  $("explain").innerHTML=P.join("");
+}
+
+/* Legende */
+function renderLegend(){
+  const rx=S.rx, q=curQ(), L=[];
+  if(q.multi && (S.started||S.t>0)) q.multi.forEach(m=>L.push(`<span style="color:${m.col}"><i class="sw${m.dash?" dash":""}" style="${m.dash?"color":"background"}:${m.col}"></i>${m.html}</span>`));
+  else L.push(`<span style="color:${S.run.color}"><i class="sw" style="background:${S.run.color}"></i>${S.started?"aktuelle Messung "+S.run.no:"nächste Messung"}: ${esc(cfgLabel(rx,S.run.cfg))}</span>`);
+  if($("showRuns").checked) S.runs.filter(r=>r.rx===rx && r!==S.run).forEach(r=>L.push(`<span style="color:${r.color}"><i class="sw dash" style="color:${r.color}"></i>Messung ${r.no}: ${esc(cfgLabel(rx,r.cfg))}</span>`));
+  $("legend").innerHTML=L.join("");
+}
+function cfgLabel(rx,c){
+  const a=[c.T+" °C", c.p+" hPa"];
+  if(rx.c) a.push(fmt(c.c,rx.c.dec)+" mol/L");
+  if(rx.sizes) a.push(rx.sizes[c.size].n);
+  if(rx.cats) a.push(rx.cats[c.cat].n);
+  return a.join(", ");
+}
+
+/* ============================================================
+   ZEICHNEN
+   ============================================================ */
+const vc=$("vessel"), ch=$("chart"), kp=$("kplot");
+let dpr=1;
+function sizeCanvases(){
+  dpr=window.devicePixelRatio||1;
+  [vc,ch,kp].forEach(c=>{ if(c.clientWidth){ c.width=Math.round(c.clientWidth*dpr); c.height=Math.round(c.clientHeight*dpr); } });
+  drawK();
+}
+window.addEventListener("resize",sizeCanvases);
+const C={bg:"#0e1113", grid:"#233029", faint:"#5f6870", dim:"#9aa2a9", text:"#e7e4dd", glass:"#6b757e", inner:"#141a1e", piston:"#3a434b", teal:"#4fd1c5", amber:"#ffb454", danger:"#e4785b"};
+const MONO="ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace", SANS="system-ui,-apple-system,'Segoe UI',Roboto,sans-serif";
+
+/* deterministischer Zufall für Feststoffstücke */
+function rng(seed){ let x=seed>>>0||1; return ()=>{ x^=x<<13; x^=x>>>17; x^=x<<5; return ((x>>>0)%100000)/100000; }; }
+const pieceCache={};
+function pieces(rx,size){
+  const key=rx.id+size; if(pieceCache[key]) return pieceCache[key];
+  const r=rng(rx.id.length*977+size*131+7), n=rx.sizes?rx.sizes[size].count:12, a=[];
+  for(let i=0;i<n;i++) a.push({u:r(), v:r(), w:r()});
+  return (pieceCache[key]=a);
+}
+function tempColor(Tc,lo,hi,alpha){ const f=clamp((Tc-lo)/((hi-lo)||1),0,1); return `hsla(${210-200*f},70%,52%,${alpha})`; }
+
+const bubbles=[]; let bubAcc=0;
+function drawSetup(dt){
+  const c=vc.getContext("2d"), W=vc.clientWidth, H=vc.clientHeight; if(!W) return;
+  c.setTransform(dpr,0,0,dpr,0,0); c.fillStyle=C.bg; c.fillRect(0,0,W,H);
+  const rx=S.rx;
+  if(rx.type==="thio") return drawThio(c,W,H);
+  if(rx.type==="gas") return drawGasVessel(c,W,H);
+  const d=S.run.data, st=curState(), q0=qDefs(rx)[0];
+  const V=q0.f(st,d.I), Vmax=250;
+  // Kolbenprober
+  const bx0=46, bx1=W-38, by=48, bh=20, inner0=bx0+4, inner1=bx1-4;
+  const px=inner0+clamp(V/Vmax,0,1.02)*(inner1-inner0);
+  c.fillStyle="rgba(201,206,212,0.08)"; c.fillRect(inner0,by+1,px-inner0,bh-2);
+  c.fillStyle=C.piston; c.fillRect(px,by+2,6,bh-4);
+  c.fillRect(px+6,by+bh/2-2,W-px-6,4);
+  c.strokeStyle=C.glass; c.lineWidth=1.5; c.strokeRect(bx0,by,bx1-bx0,bh);
+  c.fillStyle=C.faint; c.font="9.5px "+MONO; c.textAlign="center"; c.textBaseline="bottom";
+  c.strokeStyle=C.faint; c.lineWidth=1;
+  for(let v=0; v<=Vmax; v+=25){
+    const x=inner0+v/Vmax*(inner1-inner0);
+    c.beginPath(); c.moveTo(x,by); c.lineTo(x,by-(v%50===0?6:3)); c.stroke();
+    if(v%50===0) c.fillText(String(v),x,by-7);
+  }
+  c.textAlign="left"; c.fillText("mL",bx1+12,by-7);
+  c.fillStyle=C.dim; c.font="10.5px "+SANS; c.textAlign="right"; c.textBaseline="top";
+  c.fillText("Kolbenprober",bx1,by+bh+4);
+  // Kolben (Erlenmeyer)
+  const cx=bx0+14, neckTop=150, neckBot=172, bot=292, hwB=58, hwN=9, liqTop=234;
+  const hw=y=>hwN+(y-neckBot)/(bot-neckBot)*(hwB-hwN);
+  // Schlauch
+  c.strokeStyle=C.glass; c.lineWidth=3; c.beginPath(); c.moveTo(cx,neckTop); c.lineTo(cx,by+bh); c.stroke();
+  // Wasserbad
+  c.fillStyle=tempColor(S.cfg.T,rx.T.min,rx.T.max,0.22); c.fillRect(4,244,cx+hwB+12,62);
+  c.strokeStyle="#3a434b"; c.lineWidth=1.5; c.beginPath(); c.moveTo(4,236); c.lineTo(4,306); c.lineTo(cx+hwB+16,306); c.lineTo(cx+hwB+16,236); c.stroke();
+  // Flüssigkeit
+  let tint="rgba(120,170,200,0.20)";
+  if(rx.type==="h2o2"){ const ct=rx.cats[S.cfg.cat]; if(ct.n.startsWith("Kalium")) tint=`rgba(200,170,90,${0.18+0.25*clamp(d.I.X(st),0,1)})`; else if(ct.enzyme) tint="rgba(205,185,140,0.32)"; }
+  c.fillStyle=tint;
+  c.beginPath(); c.moveTo(cx-hw(liqTop),liqTop); c.lineTo(cx+hw(liqTop),liqTop); c.lineTo(cx+hwB,bot); c.lineTo(cx-hwB,bot); c.closePath(); c.fill();
+  // Feststoff
+  if(rx.type==="metal"){
+    const x=clamp(st[0]/d.I.ns0,0,1), sc=Math.cbrt(x), sz=S.cfg.size, P=pieces(rx,sz);
+    c.fillStyle=rx.solid.col;
+    P.forEach((p,i)=>{
+      const px2=cx-hwB+10+p.u*(2*hwB-20), base=bot-3-p.v*4;
+      if(rx.id==="mg" && sz===0){ const L=26*sc; if(L<0.6) return; c.save(); c.translate(px2,base-2); c.rotate((p.w-.5)*0.6); c.fillRect(-L/2,-1.5,L,3); c.restore(); return; }
+      const r0 = sz===0?6.5:sz===1?2.6:1.1, r=r0*sc*(0.75+0.5*p.w);
+      if(r<0.35) return;
+      c.beginPath();
+      if(rx.id==="caco3" && sz===0){ c.moveTo(px2-r,base); c.lineTo(px2-r*0.6,base-r*1.3); c.lineTo(px2+r*0.7,base-r*1.1); c.lineTo(px2+r,base); c.closePath(); }
+      else c.ellipse(px2,base-r*0.7,r,r*0.75,0,0,Math.PI*2);
+      c.fill();
+    });
+  } else {
+    const ct=rx.cats[S.cfg.cat];
+    if(ct.n.startsWith("Braun")){ c.fillStyle="#2a2522"; c.beginPath(); c.ellipse(cx,bot-3,hwB*0.55,4,0,0,Math.PI*2); c.fill(); }
+  }
+  // Glas
+  c.strokeStyle=C.glass; c.lineWidth=2.5;
+  c.beginPath(); c.moveTo(cx-hwN,neckTop); c.lineTo(cx-hwN,neckBot); c.lineTo(cx-hwB,bot); c.lineTo(cx+hwB,bot); c.lineTo(cx+hwN,neckBot); c.lineTo(cx+hwN,neckTop); c.stroke();
+  c.fillStyle="#4a3a33"; c.fillRect(cx-hwN-2,neckTop-6,2*hwN+4,14);
+  // Blasen
+  const rateMl = rateQ(q0.f,d,st);           // mL pro s (Simulationszeit)
+  if(S.running){
+    bubAcc += clamp(rateMl*S.speed*4,0,70)*dt;
+    while(bubAcc>=1){ bubAcc-=1; bubbles.push({x:cx+(Math.random()*2-1)*(hwB-14), y:bot-6, r:1+Math.random()*1.8, v:30+Math.random()*30}); }
+  }
+  c.strokeStyle="rgba(230,235,240,0.75)"; c.lineWidth=1;
+  for(let i=bubbles.length-1;i>=0;i--){
+    const b=bubbles[i]; b.y-=b.v*dt; b.x+=(Math.random()-.5)*0.6;
+    const lim=hw(b.y)-3; b.x=clamp(b.x,cx-lim,cx+lim);
+    if(b.y<liqTop+2){ bubbles.splice(i,1); continue; }
+    c.beginPath(); c.arc(b.x,b.y,b.r,0,Math.PI*2); c.stroke();
+  }
+  // Beschriftung
+  c.fillStyle=C.dim; c.font="10.5px "+MONO; c.textAlign="center"; c.textBaseline="top";
+  c.fillText(`Wasserbad ϑ = ${S.cfg.T} °C`, (4+cx+hwB+16)/2, 312);
+  const rxX=cx+hwB+26;
+  c.textAlign="left"; c.textBaseline="alphabetic";
+  c.fillStyle=C.faint; c.font="10.5px "+SANS; c.fillText(`Gasvolumen ${rx.gas.txt}`, rxX, 140);
+  c.fillStyle=C.amber; c.font="17px "+MONO; c.fillText(fmt(V,1)+" mL", rxX, 160);
+  c.fillStyle=C.faint; c.font="10.5px "+SANS; c.fillText("Druck", rxX, 190);
+  c.fillStyle=C.dim; c.font="12.5px "+MONO; c.fillText(S.cfg.p+" hPa", rxX, 206);
+  c.fillStyle=C.faint; c.font="10.5px "+SANS; c.fillText("Zeit", rxX, 232);
+  c.fillStyle=C.dim; c.font="12.5px "+MONO; c.fillText(fmtTime(S.t), rxX, 248);
+  if(V>Vmax){ c.fillStyle=C.danger; c.font="10.5px "+SANS; c.fillText("Kolbenprober voll!", rxX, 274); }
+}
+
+function drawThio(c,W,H){
+  const d=S.run.data, st=curState(), cs=S.rx.cStar;
+  const cx=W/2, cy=168, Rr=Math.min(W/2-28,108);
+  c.fillStyle=C.dim; c.font="11px "+SANS; c.textAlign="center"; c.textBaseline="top";
+  c.fillText("Blick von oben durch das Becherglas", cx, 14);
+  // Papier mit Kreuz
+  c.fillStyle="#d8d4ca"; c.fillRect(cx-Rr-16,cy-Rr-16,2*Rr+32,2*Rr+32);
+  c.strokeStyle="#151515"; c.lineWidth=11; c.lineCap="round";
+  const a=Rr*0.55;
+  c.beginPath(); c.moveTo(cx-a,cy-a); c.lineTo(cx+a,cy+a); c.moveTo(cx+a,cy-a); c.lineTo(cx-a,cy+a); c.stroke();
+  c.lineCap="butt";
+  // Lösung mit Trübung
+  const tb = 1-Math.exp(-3.2*st[1]/cs);
+  c.beginPath(); c.arc(cx,cy,Rr,0,Math.PI*2);
+  c.fillStyle=`rgba(244,238,205,${clamp(tb*0.985,0,0.99)})`; c.fill();
+  c.fillStyle="rgba(150,190,210,0.06)"; c.fill();
+  c.strokeStyle=C.glass; c.lineWidth=4; c.stroke();
+  c.strokeStyle="rgba(255,255,255,0.12)"; c.lineWidth=1.5; c.beginPath(); c.arc(cx,cy,Rr-7,Math.PI*1.1,Math.PI*1.45); c.stroke();
+  // Status
+  const gone = d.tCross!=null && S.t>=d.tCross;
+  c.textAlign="center"; c.textBaseline="alphabetic";
+  c.font="12.5px "+SANS; c.fillStyle= gone?C.teal:C.dim;
+  c.fillText(gone?"Kreuz nicht mehr sichtbar":"Kreuz sichtbar", cx, cy+Rr+38);
+  c.font="15px "+MONO; c.fillStyle=C.amber;
+  c.fillText(gone?("t = "+fmtTime(d.tCross)):("t = "+fmtTime(S.t)), cx, cy+Rr+58);
+  c.font="10.5px "+MONO; c.fillStyle=C.faint;
+  c.fillText(`ϑ = ${S.cfg.T} °C · ${S.cfg.c.toFixed(2).replace(".",",")} mol/L`, cx, cy+Rr+76);
+  if(!isFinite(d.tCross||Infinity)) { c.fillStyle=C.danger; c.fillText("Zu verdünnt – keine sichtbare Trübung", cx, 34); }
+}
+
+function drawGasVessel(c,W,H){
+  const rx=S.rx, d=S.run.data, st=curState();
+  const x0=Math.max(30,W/2-80), x1=Math.min(W-30,W/2+80), bottom=H-58;
+  const f=Math.log(rx.p.max/S.cfg.p)/Math.log(rx.p.max/rx.p.min);
+  const innerH=(bottom-74)*(0.18+0.82*clamp(f,0,1)), top=bottom-innerH;
+  c.fillStyle=C.inner; c.fillRect(x0,top,x1-x0,innerH);
+  const vi=clamp(st[1]/0.009,0,1.4);
+  c.fillStyle=`rgba(150,70,200,${clamp(0.08+0.55*vi,0,0.8)})`; c.fillRect(x0,top,x1-x0,innerH);
+  c.fillStyle=C.piston; c.fillRect(x0-1,top-12,x1-x0+2,12); c.fillRect((x0+x1)/2-5,24,10,top-36);
+  c.strokeStyle=C.glass; c.lineWidth=3;
+  c.beginPath(); c.moveTo(x0-3,40); c.lineTo(x0-3,bottom+2); c.lineTo(x1+3,bottom+2); c.lineTo(x1+3,40); c.stroke();
+  // Ofen
+  const grad=c.createLinearGradient(x0,0,x1,0);
+  grad.addColorStop(0,tempColor(S.cfg.T,rx.T.min,rx.T.max,.9)); grad.addColorStop(1,tempColor(S.cfg.T+20,rx.T.min,rx.T.max,.9));
+  c.fillStyle=grad; c.fillRect(x0-3,bottom+10,x1-x0+6,7);
+  c.fillStyle=C.dim; c.font="10.5px "+MONO; c.textAlign="center"; c.textBaseline="top";
+  c.fillText(`ϑ = ${S.cfg.T} °C · p₀ = ${S.cfg.p} hPa`, (x0+x1)/2, bottom+24);
+  c.fillStyle=C.faint; c.font="10.5px "+SANS; c.textBaseline="alphabetic"; c.textAlign="left";
+  c.fillText("Farbe: Iod (violett)", 8, 16);
+}
+
+/* ---------- Teilchenebene ---------- */
+const PS={items:[], fx:[], prods:[], key:null, ev:null};
+function psReset(){ PS.items=[]; PS.fx=[]; PS.prods=[]; PS.key=null; PS.ev=null; }
+const PCOL={H:"#e4785b", T:"#f0d36b", P:"#8fb4ff", H2:"#c9ced4", I2:"#b98cf0", HI:"#4fd1c5", I:"#c99cf0", E:"#cdb98c"};
+function psTargets(){
+  const rx=S.rx, d=S.run.data, st=curState(), c=S.cfg;
+  if(rx.type==="metal") return {H: clamp(Math.round(24*st[1]/d.I.V),0,72)};
+  if(rx.type==="thio") return {T: clamp(Math.round(20*st[0]/0.1),0,60), H:14};
+  if(rx.type==="h2o2") return {P: clamp(Math.round(26*st[0]/d.I.V),0,40)};
+  const sc=14/0.0084;
+  return {H2:clamp(Math.round(st[0]*sc),0,60), I2:clamp(Math.round(st[1]*sc),0,60), HI:clamp(Math.round(st[2]*sc),0,120)};
+}
+function psBlocks(box){
+  const rx=S.rx, B=[];
+  if(rx.type==="metal"){
+    const x=clamp(curState()[0]/S.run.data.I.ns0,0,1), sc=Math.cbrt(x), n=[1,3,7][S.cfg.size];
+    const slot=(box.w-20)/n;
+    for(let i=0;i<n;i++){
+      const w=slot*(n===1?0.7:0.62)*sc, h=Math.max(0, (n===1?34:n===3?22:12)*sc);
+      if(w<1) continue;
+      B.push({x:box.x+10+slot*i+(slot-w)/2, y:box.y+box.h-h-2, w, h, col:rx.solid.col});
+    }
+  } else if(rx.type==="h2o2" && rx.cats[S.cfg.cat].n.startsWith("Braun")){
+    for(let i=0;i<4;i++){ const slot=(box.w-20)/4, w=slot*0.55; B.push({x:box.x+10+slot*i+(slot-w)/2, y:box.y+box.h-14, w, h:12, col:"#3a322d"}); }
+  }
+  return B;
+}
+function psSpeed(){ const T=S.cfg.T+273.15; return (S.rx.type==="gas"? 70*Math.sqrt(T/723):55*Math.sqrt(T/298)); }
+function psAdd(kind,box,x,y){
+  const a=Math.random()*Math.PI*2, v=psSpeed()*(0.6+Math.random()*0.8);
+  PS.items.push({k:kind, x:x!=null?x:box.x+8+Math.random()*(box.w-16), y:y!=null?y:box.y+8+Math.random()*(box.h*0.75), vx:Math.cos(a)*v, vy:Math.sin(a)*v});
+}
+function drawParticles(dt){
+  const c=vc.getContext("2d"), W=vc.clientWidth, H=vc.clientHeight; if(!W) return;
+  c.setTransform(dpr,0,0,dpr,0,0); c.fillStyle=C.bg; c.fillRect(0,0,W,H);
+  const rx=S.rx, box={x:10,y:42,w:W-20,h:H-78};
+  const key=rx.id+"|"+S.run.no+"|"+JSON.stringify(S.cfg)+"|"+W;
+  const tg=psTargets(), blocks=psBlocks(box);
+  const cat = rx.cats ? rx.cats[S.cfg.cat] : null;
+  if(PS.key!==key){
+    psReset(); PS.key=key;
+    Object.keys(tg).forEach(k=>{ for(let i=0;i<tg[k];i++) psAdd(k,box); });
+    if(cat && cat.n.startsWith("Kalium")) for(let i=0;i<7;i++) psAdd("I",box);
+    if(cat && cat.enzyme) for(let i=0;i<3;i++) psAdd("E",box);
+  }
+  const count=k=>PS.items.filter(p=>p.k===k).length;
+  const flash=(x,y)=>PS.fx.push({x,y,t:0});
+  const near=(list,fx,fy)=>{ let best=null,bd=Infinity; list.forEach(p=>{ const dd=(p.x-fx(p))**2+(p.y-fy(p))**2; if(dd<bd){bd=dd;best=p;} }); return best; };
+  // Synchronisation mit dem Modell: verschwindende Eduktteilchen = wirksame Stöße
+  if(rx.type!=="gas"){
+    const k = rx.type==="metal"?"H":rx.type==="thio"?"T":"P";
+    const st=curState(), dd=S.run.data;
+    const evT = Math.floor(rx.type==="thio" ? clamp(st[1]/rx.cStar,0,2)*18 : clamp(dd.I.X(st),0,1)*40);
+    if(PS.ev==null || evT<PS.ev) PS.ev=evT;
+    let guard=0;
+    while(PS.ev<evT && guard++<25){
+      PS.ev++;
+      const cand=PS.items.filter(p=>p.k===k); if(!cand.length) break;
+      let p, fxp, fyp;
+      if(blocks.length){
+        p=near(cand,q=>{ const b=nearestBlock(blocks,q); return clamp(q.x,b.x,b.x+b.w); },q=>nearestBlock(blocks,q).y);
+        const b=nearestBlock(blocks,p); fxp=clamp(p.x,b.x,b.x+b.w); fyp=b.y;
+      } else if(cat && (cat.n.startsWith("Kalium")||cat.enzyme)){
+        const helpers=PS.items.filter(q=>q.k===(cat.enzyme?"E":"I"));
+        p=near(cand,q=>near(helpers,()=>q.x,()=>q.y).x,q=>near(helpers,()=>q.x,()=>q.y).y);
+        fxp=p.x; fyp=p.y;
+      } else { p=cand[Math.floor(Math.random()*cand.length)]; fxp=p.x; fyp=p.y; }
+      flash(fxp,fyp);
+      if(rx.type==="thio") PS.prods.push({k:"S", x:fxp, y:fyp, vy:4+Math.random()*4});
+      else PS.prods.push({k:"gas", x:fxp, y:fyp-4, vy:-40-Math.random()*20});
+      if(count(k)>tg[k]) PS.items.splice(PS.items.indexOf(p),1);
+      else { p.x=box.x+8+Math.random()*(box.w-16); p.y=box.y+8+Math.random()*box.h*0.3; }   // Nachschub aus der Lösung (Überschuss)
+    }
+    while(count(k)>tg[k]){ const q=PS.items.find(x=>x.k===k); PS.items.splice(PS.items.indexOf(q),1); }
+    while(count(k)<tg[k]) psAdd(k,box);
+  } else if(rx.type==="gas"){
+    let guard=0;
+    while(count("H2")>tg.H2 && count("I2")>tg.I2 && guard++<20){
+      const h2s=PS.items.filter(p=>p.k==="H2"), i2s=PS.items.filter(p=>p.k==="I2");
+      const a=h2s[Math.floor(Math.random()*h2s.length)], b=near(i2s,()=>a.x,()=>a.y);
+      const mx=(a.x+b.x)/2, my=(a.y+b.y)/2;
+      PS.items.splice(PS.items.indexOf(a),1); PS.items.splice(PS.items.indexOf(b),1);
+      flash(mx,my); psAdd("HI",box,mx-5,my); psAdd("HI",box,mx+5,my);
+    }
+    while(count("H2")>tg.H2){ const h=PS.items.find(p=>p.k==="H2"); PS.items.splice(PS.items.indexOf(h),1); }
+    while(count("I2")>tg.I2){ const h=PS.items.find(p=>p.k==="I2"); PS.items.splice(PS.items.indexOf(h),1); }
+    while(count("HI")<tg.HI) psAdd("HI",box);
+    while(count("HI")>tg.HI){ const h=PS.items.find(p=>p.k==="HI"); PS.items.splice(PS.items.indexOf(h),1); }
+  }
+  // Box
+  c.strokeStyle="#31383e"; c.lineWidth=1; c.strokeRect(box.x,box.y,box.w,box.h);
+  blocks.forEach(b=>{ c.fillStyle=b.col; c.fillRect(b.x,b.y,b.w,b.h); c.strokeStyle="rgba(0,0,0,.35)"; c.strokeRect(b.x+.5,b.y+.5,b.w-1,b.h-1); });
+  // Bewegung
+  const vmax=psSpeed();
+  PS.items.forEach(p=>{
+    const slow = p.k==="E"?0.25:p.k==="I"?0.8:1;
+    p.vx+=(Math.random()-.5)*vmax*0.5*dt*6; p.vy+=(Math.random()-.5)*vmax*0.5*dt*6;
+    const sp=Math.hypot(p.vx,p.vy)||1, target=vmax*slow; p.vx*=target/sp*0.02+0.98; p.vy*=target/sp*0.02+0.98;
+    p.x+=p.vx*dt; p.y+=p.vy*dt;
+    const r=p.k==="E"?10:4;
+    if(p.x<box.x+r){p.x=box.x+r; p.vx=Math.abs(p.vx);} if(p.x>box.x+box.w-r){p.x=box.x+box.w-r; p.vx=-Math.abs(p.vx);}
+    if(p.y<box.y+r){p.y=box.y+r; p.vy=Math.abs(p.vy);} if(p.y>box.y+box.h-r){p.y=box.y+box.h-r; p.vy=-Math.abs(p.vy);}
+    blocks.forEach(b=>{ if(p.x>b.x-r && p.x<b.x+b.w+r && p.y>b.y-r){ p.y=b.y-r; p.vy=-Math.abs(p.vy); } });
+  });
+  // Produkte
+  for(let i=PS.prods.length-1;i>=0;i--){
+    const g=PS.prods[i];
+    if(g.k==="gas"){ g.y+=g.vy*dt; g.x+=(Math.random()-.5)*0.8; if(g.y<box.y+4){ PS.prods.splice(i,1); continue; }
+      c.strokeStyle=rx.gas?rx.gas.col:"#ccc"; c.lineWidth=1.3; c.beginPath(); c.arc(g.x,g.y,4.5,0,Math.PI*2); c.stroke(); }
+    else { g.y=Math.min(box.y+box.h-3, g.y+g.vy*dt); c.fillStyle="#f5e27a"; c.beginPath(); c.arc(g.x,g.y,2.2,0,Math.PI*2); c.fill(); }
+  }
+  if(PS.prods.length>260) PS.prods.splice(0,PS.prods.length-260);
+  PS.items.forEach(p=>{
+    c.fillStyle=PCOL[p.k];
+    if(p.k==="E"){ c.globalAlpha=.85; c.beginPath(); c.arc(p.x,p.y,10,0,Math.PI*2); c.fill(); c.globalAlpha=1; c.fillStyle=C.bg; c.beginPath(); c.arc(p.x+5,p.y-3,3.5,0,Math.PI*2); c.fill(); return; }
+    if(p.k==="H2"||p.k==="I2"||p.k==="HI"){
+      const r1=p.k==="H2"?3:p.k==="I2"?4.6:3.4, r2=p.k==="HI"?4.6:r1, c2=p.k==="HI"?PCOL.I2:PCOL[p.k], c1=p.k==="HI"?PCOL.H2:PCOL[p.k];
+      c.fillStyle=c1; c.beginPath(); c.arc(p.x-r1*0.7,p.y,r1,0,Math.PI*2); c.fill();
+      c.fillStyle=c2; c.beginPath(); c.arc(p.x+r2*0.7,p.y,r2,0,Math.PI*2); c.fill();
+      return;
+    }
+    c.beginPath(); c.arc(p.x,p.y,p.k==="I"?3:3.6,0,Math.PI*2); c.fill();
+  });
+  // Blitze (wirksame Stöße)
+  for(let i=PS.fx.length-1;i>=0;i--){
+    const f=PS.fx[i]; f.t+=dt; if(f.t>0.45){ PS.fx.splice(i,1); continue; }
+    const a=1-f.t/0.45;
+    c.strokeStyle=`rgba(255,180,84,${a})`; c.lineWidth=2; c.beginPath(); c.arc(f.x,f.y,4+f.t*28,0,Math.PI*2); c.stroke();
+    c.fillStyle=`rgba(255,230,160,${a})`; c.beginPath(); c.arc(f.x,f.y,3,0,Math.PI*2); c.fill();
+  }
+  // Legende
+  const LG = rx.type==="metal" ? [["H","H₃O⁺"],["gas",rx.gas.txt],["blk",rx.solid.name]]
+    : rx.type==="thio" ? [["T","S₂O₃²⁻"],["H","H₃O⁺"],["S","S"]]
+    : rx.type==="h2o2" ? [["P","H₂O₂"],["gas","O₂"]].concat(cat.n.startsWith("Kalium")?[["I","I⁻"]]:cat.enzyme?[["E","Katalase"]]:cat.n.startsWith("Braun")?[["blk","MnO₂"]]:[])
+    : [["H2","H₂"],["I2","I₂"],["HI","HI"]];
+  c.font="10.5px "+SANS; c.textBaseline="middle"; c.textAlign="left";
+  let lx=12; const ly=14;
+  LG.forEach(([k,n])=>{
+    if(k==="gas"){ c.strokeStyle=rx.gas.col; c.lineWidth=1.3; c.beginPath(); c.arc(lx+4,ly,4,0,Math.PI*2); c.stroke(); }
+    else if(k==="blk"){ c.fillStyle=rx.solid?rx.solid.col:"#3a322d"; if(rx.type==="h2o2") c.fillStyle="#5a504a"; c.fillRect(lx,ly-4,9,8); }
+    else if(k==="S"){ c.fillStyle="#f5e27a"; c.beginPath(); c.arc(lx+4,ly,2.4,0,Math.PI*2); c.fill(); }
+    else { c.fillStyle=PCOL[k]; c.beginPath(); c.arc(lx+4,ly,k==="E"?5:3.6,0,Math.PI*2); c.fill(); }
+    c.fillStyle=C.dim; c.fillText(n,lx+12,ly); lx+=c.measureText(n).width+26;
+  });
+  c.fillStyle=C.faint; c.font="10px "+SANS; c.textAlign="left"; c.textBaseline="alphabetic";
+  c.fillText("Wassermoleküle und Gegenionen nicht dargestellt", 12, H-22);
+  c.fillStyle="rgba(255,180,84,.9)"; c.fillText("○ Blitz = wirksamer Zusammenstoß", 12, H-8);
+}
+function nearestBlock(B,p){ let best=B[0], bd=Infinity; B.forEach(b=>{ const dx=p.x-clamp(p.x,b.x,b.x+b.w), dy=p.y-b.y, dd=dx*dx+dy*dy; if(dd<bd){bd=dd;best=b;} }); return best; }
+
+/* ---------- Diagramm ---------- */
+let chartGeo=null;
+function chartRuns(){
+  const L=[];
+  if($("showRuns").checked) S.runs.forEach(r=>{ if(r.rx===S.rx && r!==S.run) L.push(r); });
+  return L;
+}
+function qMax(run,q){
+  let m=0; const d=run.data, fs=q.multi?q.multi.map(x=>x.f):[q.f];
+  for(let i=0;i<d.n;i+=Math.max(1,Math.floor(d.n/300))) fs.forEach(f=>{ const v=f(d.s[i],d.I); if(v>m) m=v; });
+  fs.forEach(f=>{ const v=f(d.s[d.n-1],d.I); if(v>m) m=v; });
+  return m;
+}
+function drawChart(){
+  const c=ch.getContext("2d"), W=ch.clientWidth, H=ch.clientHeight; if(!W) return;
+  c.setTransform(dpr,0,0,dpr,0,0); c.fillStyle=C.bg; c.fillRect(0,0,W,H);
+  const Lm=60, Rm=14, T=22, B=36, pw=W-Lm-Rm, ph=H-T-B;
+  const rx=S.rx, q=curQ(), prev=chartRuns(), all=prev.concat([S.run]);
+  let tMax=0, yMax=0;
+  all.forEach(r=>{ tMax=Math.max(tMax,r.data.tEnd); yMax=Math.max(yMax,qMax(r,q)); });
+  if(q.thr) yMax=Math.max(yMax, rx.cStar*1000*1.15);
+  tMax=niceCeil(tMax); yMax=niceCeil(yMax*1.08);
+  const useMin = tMax>=1200, tu=useMin?60:1;
+  const X=t=>Lm+t/tMax*pw, Y=v=>T+ph-v/yMax*ph;
+  chartGeo={Lm,pw,tMax};
+  // Gitter
+  c.strokeStyle=C.grid; c.lineWidth=1; c.fillStyle=C.faint; c.font="10.5px "+MONO;
+  c.textAlign="right"; c.textBaseline="middle";
+  const ys=niceStep(yMax/5);
+  for(let v=0; v<=yMax+1e-12; v+=ys){ const y=Y(v); c.beginPath(); c.moveTo(Lm,y); c.lineTo(Lm+pw,y); c.stroke(); c.fillText(axl(v),Lm-6,y); }
+  c.textAlign="center"; c.textBaseline="top";
+  const xs=niceStep(tMax/tu/6)*tu;
+  for(let t=0; t<=tMax+1e-9; t+=xs){ const x=X(t); c.beginPath(); c.moveTo(x,T); c.lineTo(x,T+ph); c.stroke(); c.fillText(axl(t/tu),x,T+ph+6); }
+  c.fillStyle=C.dim; c.font="11px "+SANS;
+  c.fillText(useMin?"Zeit t (min)":"Zeit t (s)",Lm+pw/2,T+ph+20);
+  c.save(); c.translate(13,T+ph/2); c.rotate(-Math.PI/2); c.textBaseline="middle";
+  c.fillText((q.multi?"c":q.txt)+" ("+q.unit+")",0,0); c.restore();
+  // Schwelle (Kreuz)
+  if(q.thr){
+    const y=Y(rx.cStar*1000); c.setLineDash([4,4]); c.strokeStyle=C.dim; c.beginPath(); c.moveTo(Lm,y); c.lineTo(Lm+pw,y); c.stroke(); c.setLineDash([]);
+    c.fillStyle=C.dim; c.font="10.5px "+SANS; c.textAlign="left"; c.textBaseline="bottom"; c.fillText("Kreuz nicht mehr sichtbar",Lm+6,y-3);
+  }
+  c.save(); c.beginPath(); c.rect(Lm,T-2,pw,ph+4); c.clip();
+  c.lineJoin="round";
+  const curve=(run,f,tEnd,col,w,dash)=>{
+    const d=run.data; c.strokeStyle=col; c.lineWidth=w; c.setLineDash(dash||[]); c.beginPath();
+    const step=Math.max(1,Math.floor(d.n/900)); let first=true;
+    for(let i=0;i<d.n;i+=step){ if(d.t[i]>tEnd) break; const x=X(d.t[i]), y=Y(f(d.s[i],d.I)); if(first){c.moveTo(x,y);first=false;} else c.lineTo(x,y); }
+    const se=stateAt(d,Math.min(tEnd,d.tEnd)); c.lineTo(X(Math.min(tEnd,d.tEnd)),Y(f(se,d.I)));
+    c.stroke(); c.setLineDash([]);
+  };
+  prev.forEach(r=>curve(r, q.f, r.data.tEnd, r.color, 1.5, [5,4]));
+  if(S.started || S.t>0){
+    if(q.multi) q.multi.forEach(m=>curve(S.run,m.f,S.t,m.col,2,m.dash));
+    else curve(S.run,q.f,S.t,S.run.color,2.2);
+    // aktueller Punkt
+    const s=curState(); const v=q.f(s,S.run.data.I);
+    c.fillStyle=q.multi?q.multi[2].col:S.run.color; c.beginPath(); c.arc(X(S.t),Y(v),3.5,0,Math.PI*2); c.fill();
+  }
+  // Auswertung
+  drawTool(c,X,Y,q);
+  c.restore();
+  c.strokeStyle=C.grid; c.strokeRect(Lm,T,pw,ph);
+  if(!S.started && S.t===0){
+    c.fillStyle=C.faint; c.font="13px "+SANS; c.textAlign="left"; c.textBaseline="middle";
+    c.fillText(pw>520?"Bereit – Bedingungen wählen und „Reaktion starten“ klicken.":"Bereit – „Reaktion starten“ klicken.", Lm+14, T+ph/2);
+  }
+  if(S.finished && S.run.data.capped){
+    c.fillStyle=C.amber; c.font="11.5px "+SANS; c.textAlign="right"; c.textBaseline="top";
+    c.fillText(`Messung nach ${fmtTime(S.run.data.tEnd)} beendet – Reaktion sehr langsam (Umsatz ${fmt(S.run.data.Xend*100,1)} %)`, Lm+pw-6, T+6);
+  }
+}
+function toolQf(){ const q=curQ(); return q.multi? q.multi[2].f : q.f; }
+function drawTool(c,X,Y){
+  const tl=S.tool; if(tl.mode==="off" || !(S.started||S.t>0)) return;
+  const d=S.run.data, f=toolQf(), lim=S.t;
+  c.setLineDash([]); c.lineWidth=1.6;
+  if(tl.mode==="sec"){
+    const t1=Math.min(tl.t1,lim), t2=Math.min(tl.t2,lim); if(t2<=t1) return;
+    const y1=f(stateAt(d,t1),d.I), y2=f(stateAt(d,t2),d.I), m=(y2-y1)/(t2-t1);
+    const ta=Math.max(0,t1-(t2-t1)*0.4), tb=t2+(t2-t1)*0.4;
+    c.strokeStyle=C.amber; c.beginPath(); c.moveTo(X(ta),Y(y1+m*(ta-t1))); c.lineTo(X(tb),Y(y1+m*(tb-t1))); c.stroke();
+    c.setLineDash([3,3]); c.strokeStyle="rgba(255,180,84,.7)";
+    c.beginPath(); c.moveTo(X(t1),Y(y1)); c.lineTo(X(t2),Y(y1)); c.lineTo(X(t2),Y(y2)); c.stroke(); c.setLineDash([]);
+    c.fillStyle=C.amber; [[t1,y1],[t2,y2]].forEach(([t,y])=>{ c.beginPath(); c.arc(X(t),Y(y),4,0,Math.PI*2); c.fill(); });
+    c.font="10.5px "+MONO; c.textAlign="center"; c.textBaseline="top"; c.fillText("Δt",(X(t1)+X(t2))/2,Y(y1)+3);
+    c.textAlign="left"; c.textBaseline="middle"; c.fillText((m<0?"−":"")+"Δ",X(t2)+4,(Y(y1)+Y(y2))/2);
+  } else {
+    const t=Math.min(tl.tt,lim), s=stateAt(d,t), y=f(s,d.I), m=rateQ(f,d,s);
+    const span=chartGeo.tMax*0.18;
+    c.strokeStyle=C.teal; c.beginPath(); c.moveTo(X(t-span),Y(y-m*span)); c.lineTo(X(t+span),Y(y+m*span)); c.stroke();
+    c.fillStyle=C.teal; c.beginPath(); c.arc(X(t),Y(y),4,0,Math.PI*2); c.fill();
+  }
+}
+ch.addEventListener("pointerdown", e=>{
+  if(!chartGeo || !(S.started||S.t>0)) return;
+  const r=ch.getBoundingClientRect(), x=e.clientX-r.left;
+  const t=clamp((x-chartGeo.Lm)/chartGeo.pw*chartGeo.tMax, 0, S.t);
+  const tl=S.tool;
+  if(tl.mode==="off"){ setToolMode("tan"); }
+  if(tl.mode==="tan") tl.tt=t;
+  else { if(Math.abs(t-tl.t1)<Math.abs(t-tl.t2)) tl.t1=t; else tl.t2=t; if(tl.t1>tl.t2){ const z=tl.t1; tl.t1=tl.t2; tl.t2=z; } }
+  syncToolSliders(); renderAus();
+});
+
+/* ---------- Temperaturabhängigkeit ---------- */
+function drawK(){
+  const c=kp.getContext("2d"), W=kp.clientWidth, H=kp.clientHeight; if(!W) return;
+  c.setTransform(dpr,0,0,dpr,0,0); c.fillStyle=C.bg; c.fillRect(0,0,W,H);
+  const rx=S.rx, cfg=S.cfg, arr=$("arrChk").checked;
+  const L=56, Rm=14, T=16, B=38, pw=W-L-Rm, ph=H-T-B;
+  const Tref = rx.type==="gas" ? 450 : 25;
+  const kref=kOf(rx,cfg,Tref);
+  const pts=[]; for(let i=0;i<=120;i++){ const Tc=rx.T.min+(rx.T.max-rx.T.min)*i/120; pts.push([Tc, kOf(rx,cfg,Tc)/kref]); }
+  let xs, ys, xl, yl, log=false;
+  if(arr){
+    xs=pts.map(p=>1000/(p[0]+273.15)); ys=pts.map(p=>Math.log(p[1])); xl="1/T (10⁻³ K⁻¹)"; yl="ln (k/k_ref)";
+  } else {
+    const mx=Math.max(...pts.map(p=>p[1])), mn=Math.min(...pts.map(p=>p[1]));
+    log = mx/Math.max(mn,1e-300) > 60;
+    xs=pts.map(p=>p[0]); ys=pts.map(p=>log?Math.log10(Math.max(p[1],1e-300)):p[1]);
+    xl="Temperatur ϑ (°C)"; yl=log?"k / k(ϑ_ref) (log.)":"k / k(ϑ_ref)";
+  }
+  let x0=Math.min(...xs), x1=Math.max(...xs), y0=Math.min(...ys), y1=Math.max(...ys);
+  if(!arr && !log){ y0=0; y1=niceCeil(y1*1.05); }
+  else { const pad=(y1-y0)*0.06||1; y0-=pad; y1+=pad; if(log){ y0=Math.floor(y0); y1=Math.ceil(y1); } }
+  const X=v=>L+(v-x0)/(x1-x0)*pw, Y=v=>T+ph-(v-y0)/(y1-y0)*ph;
+  c.strokeStyle=C.grid; c.lineWidth=1; c.fillStyle=C.faint; c.font="10.5px "+MONO; c.textAlign="right"; c.textBaseline="middle";
+  if(log){ const stp=Math.max(1,Math.ceil((y1-y0)/6)); for(let e=y0;e<=y1;e+=stp){ const y=Y(e); c.beginPath(); c.moveTo(L,y); c.lineTo(L+pw,y); c.stroke(); c.fillText("10"+String(e).split("").map(ch=>SUPD[ch]).join(""),L-6,y);} }
+  else { const st=niceStep((y1-y0)/5); for(let v=Math.ceil(y0/st)*st; v<=y1+1e-9; v+=st){ const y=Y(v); c.beginPath(); c.moveTo(L,y); c.lineTo(L+pw,y); c.stroke(); c.fillText(axl(v),L-6,y);} }
+  c.textAlign="center"; c.textBaseline="top";
+  const sx=niceStep((x1-x0)/6); for(let v=Math.ceil(x0/sx)*sx; v<=x1+1e-9; v+=sx){ const x=X(v); c.beginPath(); c.moveTo(x,T); c.lineTo(x,T+ph); c.stroke(); c.fillText(axl(v),x,T+ph+6); }
+  c.fillStyle=C.dim; c.font="11px "+SANS; c.fillText(xl,L+pw/2,T+ph+22);
+  c.save(); c.translate(12,T+ph/2); c.rotate(-Math.PI/2); c.textBaseline="middle"; c.fillText(yl,0,0); c.restore();
+  c.strokeStyle=C.teal; c.lineWidth=2; c.beginPath(); xs.forEach((v,i)=>{ const x=X(v), y=Y(ys[i]); i?c.lineTo(x,y):c.moveTo(x,y); }); c.stroke();
+  const kc=kOf(rx,cfg,cfg.T)/kref, cxv=arr?1000/(cfg.T+273.15):cfg.T, cyv=arr?Math.log(kc):log?Math.log10(Math.max(kc,1e-300)):kc;
+  c.fillStyle=C.amber; c.beginPath(); c.arc(X(cxv),Y(cyv),5,0,Math.PI*2); c.fill();
+  c.strokeStyle=C.grid; c.strokeRect(L,T,pw,ph);
+  // Text
+  const f10=kOf(rx,cfg,cfg.T+10)/kOf(rx,cfg,cfg.T);
+  let Ea = rx.cats? rx.cats[cfg.cat].Ea : rx.Ea;
+  $("kinfo").innerHTML = `Bezugstemperatur ϑ<sub>ref</sub> = ${Tref} °C. Aktivierungsenergie (Modellwert): <b style="color:var(--text)">E<sub>A</sub> ≈ ${Ea} kJ/mol</b>. Bei ${cfg.T} °C ist k = <b style="color:var(--amber)">${fmtSig(kc,3)}</b> · k(ϑ<sub>ref</sub>). Eine Erhöhung von ${cfg.T} °C auf ${cfg.T+10} °C vergrößert k um den Faktor <b style="color:var(--amber)">${fmtSig(f10,3)}</b> (RGT-Regel: ca. 2–4).${rx.cats&&rx.cats[cfg.cat].enzyme?" Bei Katalase fällt die Kurve oberhalb von etwa 45 °C wieder ab, weil das Enzym denaturiert (Temperaturoptimum).":""}`;
+}
+$("arrChk").addEventListener("change", drawK);
+
+/* ---------- Tabs ---------- */
+document.querySelectorAll(".tabbtn").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll(".tabbtn").forEach(x=>x.classList.toggle("active",x===b));
+  document.querySelectorAll(".tabpanel").forEach(p=>p.classList.toggle("active",p.id==="tab-"+b.dataset.tab));
+  if(b.dataset.tab==="kt"){ sizeCanvases(); }
+}));
+
+/* ---------- Auswertung ---------- */
+function setToolMode(m){
+  S.tool.mode=m;
+  [...$("toolSeg").children].forEach(b=>b.classList.toggle("active",b.dataset.mode===m));
+  $("secCtl").hidden=m!=="sec"; $("tanCtl").hidden=m!=="tan";
+  syncToolSliders(); renderAus();
+}
+$("toolSeg").addEventListener("click", e=>{ const b=e.target.closest("button"); if(b) setToolMode(b.dataset.mode); });
+function syncToolSliders(){
+  const te=S.run.data.tEnd, tl=S.tool;
+  $("sT1").value=Math.round(tl.t1/te*1000); $("sT2").value=Math.round(tl.t2/te*1000); $("sTt").value=Math.round(tl.tt/te*1000);
+  $("lT1").textContent=fmtTime(tl.t1); $("lT2").textContent=fmtTime(tl.t2); $("lTt").textContent=fmtTime(tl.tt);
+}
+["sT1","sT2","sTt"].forEach(id=>$(id).addEventListener("input",()=>{
+  const te=S.run.data.tEnd, tl=S.tool;
+  tl.t1=+$("sT1").value/1000*te; tl.t2=+$("sT2").value/1000*te; tl.tt=+$("sTt").value/1000*te;
+  if(tl.t1>tl.t2){ if(id==="sT1") tl.t2=tl.t1; else tl.t1=tl.t2; }
+  syncToolSliders(); renderAus();
+}));
+function renderAus(){
+  const tl=S.tool, box=$("ausRes");
+  if(tl.mode==="off"){ box.innerHTML='<span class="empty-hint" style="padding:0">Wähle „Durchschnittsgeschwindigkeit“ oder „Momentangeschwindigkeit“. Die Auswertung ist möglich, sobald Messwerte vorliegen.</span>'; return; }
+  if(!(S.started||S.t>0)){ box.innerHTML='<span class="empty-hint" style="padding:0">Starte zuerst eine Messung.</span>'; return; }
+  const rx=S.rx, q=curQ(), d=S.run.data, f=toolQf();
+  const name = q.multi ? "c(HI)" : q.html, u=q.unit;
+  const lim=S.t, warn = (tl.mode==="sec"?tl.t2:tl.tt)>lim+1e-9 ? '<br><span style="color:var(--danger)">Der gewählte Zeitpunkt liegt nach dem aktuellen Messzeitpunkt – es wird der letzte Messwert verwendet.</span>' : "";
+  const molNote = (dv)=>{
+    if(rx.type==="metal"||rx.type==="h2o2"){ if(q.key==="V"){ const dn=dv*1e-6*S.cfg.p*100/(R*T_ROOM)*1000; return `<br>Das entspricht Δn(${rx.gas.html})/Δt = ${fmtSig(dn,3)} mmol/s.`; } }
+    return "";
+  };
+  if(tl.mode==="sec"){
+    const t1=Math.min(tl.t1,lim), t2=Math.min(tl.t2,lim);
+    if(t2<=t1){ box.innerHTML='<span class="empty-hint" style="padding:0">t<sub>2</sub> muss größer als t<sub>1</sub> sein (und im bereits gemessenen Bereich liegen).</span>'; return; }
+    const y1=f(stateAt(d,t1),d.I), y2=f(stateAt(d,t2),d.I), v=(y2-y1)/(t2-t1);
+    const sign = v<0 ? "−" : "";
+    box.innerHTML=`<b>Durchschnittsgeschwindigkeit</b><br>
+      t<sub>1</sub> = ${fmtTime(t1)}: ${name} = ${fmtSig(y1,4)} ${u}<br>
+      t<sub>2</sub> = ${fmtTime(t2)}: ${name} = ${fmtSig(y2,4)} ${u}<br>
+      Δ${name} = ${fmtSig(y2-y1,3)} ${u} &nbsp; Δt = ${fmtSig(t2-t1,3)} s<br>
+      <span class="big mono">v̄ = ${sign}Δ${name}/Δt = ${fmtSig(Math.abs(v),3)} ${u}/s</span>${molNote(Math.abs(v))}${warn}
+      <br><span style="color:var(--text-faint)">${v<0?"Die Größe nimmt ab (Edukt) – daher das Minuszeichen, v ist positiv.":"Sie gibt an, wie schnell die Reaktion im Mittel zwischen t₁ und t₂ abläuft."}</span>`;
+  } else {
+    const t=Math.min(tl.tt,lim), s=stateAt(d,t), y=f(s,d.I), m=rateQ(f,d,s), m0=rateQ(f,d,d.s[0]);
+    box.innerHTML=`<b>Momentangeschwindigkeit</b><br>
+      t = ${fmtTime(t)}: ${name} = ${fmtSig(y,4)} ${u}<br>
+      Änderung pro Zeit genau zum Zeitpunkt t: ${fmtSig(m,3)} ${u}/s<br>
+      <span class="big mono">v(t) = ${fmtSig(Math.abs(m),3)} ${u}/s</span>${molNote(Math.abs(m))}${warn}<br>
+      Anfangsgeschwindigkeit v<sub>0</sub> = ${fmtSig(Math.abs(m0),3)} ${u}/s<br>
+      <span style="color:var(--text-faint)">v(t) beträgt ${fmt(Math.abs(m)/Math.abs(m0||1)*100,0)} % von v<sub>0</sub> – die Geschwindigkeit nimmt ab, weil die Eduktkonzentration (bzw. die Oberfläche) abnimmt.</span>`;
+  }
+}
+
+/* ---------- Messreihen-Tabelle ---------- */
+function runRow(r){
+  const rx=r.rx, d=r.data, q0=qDefs(rx)[0], qf=q0.f;
+  const v0=Math.abs(rateQ(qf,d,d.s[0]));
+  const extra = rx.cats ? rx.cats[r.cfg.cat].n : rx.sizes ? rx.sizes[r.cfg.size].n : "–";
+  const conc = rx.c ? fmt(r.cfg.c,rx.c.dec)+" mol/L" : fmtSig(d.I.a*1000,3)+" mmol/L (je)";
+  let half, end;
+  if(rx.type==="thio"){ half = d.tCross!=null&&isFinite(d.tCross) ? fmtTime(d.tCross) : "–"; end = d.tCross&&isFinite(d.tCross) ? fmtSig(1/d.tCross,3)+" s⁻¹" : "–"; }
+  else { half = d.tHalf!=null ? fmtTime(d.tHalf) : "> "+fmtTime(d.tEnd); end = fmtSig(qf(d.s[d.n-1],d.I),3)+" "+q0.unit+(d.capped?" (abgebr.)":""); }
+  return {rx, cells:[`<span class="dotc" style="background:${r.color}"></span>${r.no}`, esc(rx.name), r.cfg.T+" °C", r.cfg.p+" hPa", conc, esc(extra), half, fmtSig(v0,3)+" "+q0.unit+"/s", end],
+    csv:[r.no, rx.name, r.cfg.T, r.cfg.p, rx.c?r.cfg.c:d.I.a, extra, rx.type==="thio"?(d.tCross||""):(d.tHalf||""), v0, rx.type==="thio"?(d.tCross?1/d.tCross:""):qf(d.s[d.n-1],d.I), q0.unit]};
+}
+function renderRuns(){
+  $("runsHead").innerHTML="<tr><th>#</th><th>Reaktion</th><th>ϑ</th><th>p</th><th>c</th><th>Zerteilung / Katalysator</th><th>t<sub>½</sub> bzw. t(Kreuz)</th><th>v<sub>0</sub></th><th>Endwert bzw. 1/t</th></tr>";
+  if(!S.runs.length){ $("runsBody").innerHTML='<tr><td colspan="9" class="empty-hint">Noch keine Messreihe abgeschlossen. Jede beendete Messung wird hier eingetragen.</td></tr>'; return; }
+  $("runsBody").innerHTML=S.runs.map(r=>"<tr>"+runRow(r).cells.map(x=>`<td>${x}</td>`).join("")+"</tr>").join("");
+}
+function download(name,text){
+  const blob=new Blob(["﻿"+text],{type:"text/csv;charset=utf-8"}), a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500);
+}
+const csvNum=v=>typeof v==="number"? String(+v.toPrecision(6)).replace(".",","):String(v).replace(/;/g,",");
+$("btnRunsCsv").addEventListener("click", ()=>{
+  if(!S.runs.length) return;
+  const lines=["Nr;Reaktion;Temperatur (°C);Druck (hPa);Konzentration (mol/L);Zerteilung/Katalysator;t_halb bzw. t_Kreuz (s);v0;Endwert bzw. 1/t;Einheit"];
+  S.runs.forEach(r=>lines.push(runRow(r).csv.map(csvNum).join(";")));
+  download("Messreihen_Reaktionsgeschwindigkeit.csv", lines.join("\r\n"));
+});
+
+/* ---------- Messwerte-Tabelle ---------- */
+function dataRows(){
+  const rx=S.rx, d=S.run.data, qs=qDefs(rx);
+  const cols=[]; qs.forEach(q=>{ if(q.multi) q.multi.slice().sort((a,b)=>["c(H₂)","c(I₂)","c(HI)"].indexOf(a.txt)-["c(H₂)","c(I₂)","c(HI)"].indexOf(b.txt)).forEach(m=>cols.push({html:"c("+m.html+")", txt:m.txt, unit:q.unit, f:m.f})); else if(!(rx.type==="gas")) cols.push({html:q.html, txt:q.txt, unit:q.unit, f:q.f}); });
+  const tEnd = S.started||S.t>0 ? S.t : 0;
+  const st=niceStep(Math.max(d.tEnd/20, 1e-3));
+  const rows=[];
+  for(let t=0; t<=tEnd+1e-9 && rows.length<400; t+=st){ const s=stateAt(d,t); rows.push([t].concat(cols.map(c=>c.f(s,d.I)))); }
+  return {cols, rows};
+}
+function renderData(){
+  const {cols,rows}=dataRows();
+  $("dataHead").innerHTML="<tr><th>t (s)</th>"+cols.map(c=>`<th>${c.html} (${c.unit})</th>`).join("")+"</tr>";
+  if(!rows.length || !(S.started||S.t>0)){ $("dataBody").innerHTML=`<tr><td colspan="${cols.length+1}" class="empty-hint">Die Messwerte der aktuellen Messung erscheinen hier, sobald die Reaktion gestartet wurde.</td></tr>`; return; }
+  $("dataBody").innerHTML=rows.map(r=>"<tr>"+r.map((v,i)=>`<td class="mono">${i?fmtSig(v,4):fmtSig(v,4)}</td>`).join("")+"</tr>").join("");
+}
+$("btnDataCsv").addEventListener("click", ()=>{
+  const {cols,rows}=dataRows(); if(!rows.length) return;
+  const lines=["t (s);"+cols.map(c=>`${c.txt} (${c.unit})`).join(";")];
+  rows.forEach(r=>lines.push(r.map(csvNum).join(";")));
+  download(`Messwerte_${S.rx.id}_Messung${S.run.no}.csv`, lines.join("\r\n"));
+});
+
+/* ---------- Animationsschleife ---------- */
+let last=0, slowAcc=0;
+function frame(ts){
+  const dt=Math.min(0.05,(ts-(last||ts))/1000); last=ts;
+  if(MODE==="ex"){ exFrame(dt); requestAnimationFrame(frame); return; }
+  if(S.running){
+    S.t+=dt*S.speed;
+    if(S.t>=S.run.data.tEnd){ S.t=S.run.data.tEnd; finish(); }
+  }
+  if(S.view==="setup") drawSetup(dt); else drawParticles(dt);
+  drawChart();
+  updateReadouts();
+  slowAcc+=dt;
+  if(S.running && slowAcc>0.4){ slowAcc=0; renderData(); renderAus(); }
+  requestAnimationFrame(frame);
+}
+
+/* ============================================================
+   GRUNDLAGEN – Grafiken
+   ============================================================ */
+const GC={teal:"#4fd1c5",amber:"#ffb454",red:"#e4785b",blue:"#8fb4ff",good:"#7fd68a",text:"#e7e4dd",dim:"#9aa2a9",faint:"#5f6870",grid:"#233029",glass:"#6b757e"};
+const fig=(svg,cap)=>`<div class="fig">${svg}<div class="cap">${cap}</div></div>`;
+const farr=s=>`<span class="fig-arrow">${s}</span>`;
+const svgO=(w,h)=>`<svg class="gfig" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">`;
+const pl=(pts,col,w,dash)=>`<polyline points="${pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ")}" fill="none" stroke="${col}" stroke-width="${w||2}" ${dash?`stroke-dasharray="${dash}"`:""} stroke-linejoin="round" stroke-linecap="round"/>`;
+const ln=(x1,y1,x2,y2,col,w,dash)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col}" stroke-width="${w||1.5}" ${dash?`stroke-dasharray="${dash}"`:""}/>`;
+const tx=(x,y,s,o)=>{ o=o||{}; return `<text x="${x}" y="${y}" ${o.a?`text-anchor="${o.a}"`:""} style="${o.c?`fill:${o.c};`:""}${o.s?`font-size:${o.s}px;`:""}" ${o.i?`font-style="italic"`:""}>${s}</text>`; };
+const arrowHead=(x,y,dir,col)=>{ const s=6; const pts = dir==="up"?[[x,y],[x-s/1.6,y+s],[x+s/1.6,y+s]] : dir==="right"?[[x,y],[x-s,y-s/1.6],[x-s,y+s/1.6]] : dir==="down"?[[x,y],[x-s/1.6,y-s],[x+s/1.6,y-s]] : [[x,y],[x+s,y-s/1.6],[x+s,y+s/1.6]]; return `<polygon points="${pts.map(p=>p.join(",")).join(" ")}" fill="${col}"/>`; };
+function axes(x0,y0,w,h,xl,yl){
+  return ln(x0,y0,x0+w,y0,GC.dim,1.3)+arrowHead(x0+w+4,y0,"right",GC.dim)+ln(x0,y0,x0,y0-h,GC.dim,1.3)+arrowHead(x0,y0-h-4,"up",GC.dim)
+    +tx(x0+w,y0+16,xl,{a:"end",i:true})+tx(x0-8,y0-h+4,yl,{a:"end",i:true});
+}
+function svgCT(){
+  const x0=44,y0=160,w=230,h=128, X=t=>x0+t*w, Y=c=>y0-c*h*0.85;
+  const ed=[],pr=[]; for(let i=0;i<=60;i++){ const t=i/60, c=Math.exp(-t/0.3); ed.push([X(t),Y(c)]); pr.push([X(t),Y(1-c)]); }
+  const ta=0.12,tb=0.32, ca=Math.exp(-ta/0.3), cb=Math.exp(-tb/0.3);
+  return svgO(300,185)+axes(x0,y0,w,h,"t","c")+pl(ed,GC.red,2.2)+pl(pr,GC.teal,2.2)
+    +ln(X(ta),Y(ca),X(tb),Y(ca),GC.amber,1.2,"3 3")+ln(X(tb),Y(ca),X(tb),Y(cb),GC.amber,1.2,"3 3")
+    +tx((X(ta)+X(tb))/2,Y(ca)-5,"Δt",{a:"middle",c:GC.amber})+tx(X(tb)+5,(Y(ca)+Y(cb))/2+4,"Δc",{c:GC.amber})
+    +tx(X(0.62),Y(Math.exp(-0.62/0.3))-8,"Edukt",{c:GC.red})+tx(X(0.62),Y(1-Math.exp(-0.62/0.3))+16,"Produkt",{c:GC.teal})+"</svg>";
+}
+function svgSecTan(){
+  const x0=44,y0=170,w=240,h=140, X=t=>x0+t*w, Yv=v=>y0-v*h*0.88, V=t=>1-Math.exp(-t/0.28), dV=t=>Math.exp(-t/0.28)/0.28;
+  const cur=[]; for(let i=0;i<=60;i++){ const t=i/60; cur.push([X(t),Yv(V(t))]); }
+  const t1=0.08,t2=0.45, m=(V(t2)-V(t1))/(t2-t1), tt=0.62, mt=dV(tt);
+  const sx=t=>[X(t),Yv(V(t1)+m*(t-t1))], tg=t=>[X(t),Yv(V(tt)+mt*(t-tt))];
+  return svgO(310,195)+axes(x0,y0,w,h,"t","V")+pl(cur,GC.text,2)
+    +pl([sx(0.0),sx(0.6)],GC.amber,1.8)+`<circle cx="${X(t1)}" cy="${Yv(V(t1))}" r="3.5" fill="${GC.amber}"/><circle cx="${X(t2)}" cy="${Yv(V(t2))}" r="3.5" fill="${GC.amber}"/>`
+    +ln(X(t1),y0,X(t1),Yv(V(t1)),GC.faint,1,"2 3")+ln(X(t2),y0,X(t2),Yv(V(t2)),GC.faint,1,"2 3")
+    +tx(X(t1),y0+14,"t₁",{a:"middle"})+tx(X(t2),y0+14,"t₂",{a:"middle"})
+    +pl([tg(0.42),tg(0.86)],GC.teal,1.8)+`<circle cx="${X(tt)}" cy="${Yv(V(tt))}" r="3.5" fill="${GC.teal}"/>`
+    +ln(X(tt),y0,X(tt),Yv(V(tt)),GC.faint,1,"2 3")+tx(X(tt),y0+14,"t",{a:"middle"})
+    +tx(X(0.18),Yv(0.98),"v̄ (Durchschnitt)",{c:GC.amber})+tx(X(0.70),Yv(0.70),"v(t) (Momentan)",{c:GC.teal})+"</svg>";
+}
+function svgKolben(){
+  return svgO(250,150)
+    +`<path d="M40 80 L40 92 L14 136 L86 136 L60 92 L60 80" fill="none" stroke="${GC.glass}" stroke-width="2"/>`
+    +`<path d="M27 114 L73 114 L86 136 L14 136 Z" fill="rgba(120,170,200,.25)"/>`
+    +`<ellipse cx="38" cy="132" rx="5" ry="3" fill="#a9b2ba"/><ellipse cx="55" cy="131" rx="6" ry="3.5" fill="#a9b2ba"/>`
+    +`<rect x="37" y="74" width="26" height="9" fill="#4a3a33"/>`+ln(50,74,50,32,GC.glass,2.5)
+    +`<rect x="44" y="22" width="170" height="16" fill="none" stroke="${GC.glass}" stroke-width="1.5"/><rect x="47" y="23" width="70" height="14" fill="rgba(201,206,212,.1)"/><rect x="117" y="24" width="5" height="12" fill="#3a434b"/><rect x="122" y="28" width="118" height="4" fill="#3a434b"/>`
+    +[0,1,2,3,4,5].map(i=>ln(48+i*32,22,48+i*32,17,GC.faint,1)).join("")
+    +tx(150,60,"Kolbenprober: V(Gas)",{a:"middle",c:GC.dim})+"</svg>";
+}
+function svgWaage(){
+  return svgO(170,150)
+    +`<path d="M70 40 L70 52 L46 96 L114 96 L90 52 L90 40" fill="none" stroke="${GC.glass}" stroke-width="2"/><path d="M56 78 L104 78 L114 96 L46 96 Z" fill="rgba(120,170,200,.25)"/>`
+    +`<rect x="68" y="32" width="24" height="9" rx="3" fill="#ddd6c6" opacity=".8"/>`
+    +`<rect x="22" y="100" width="126" height="10" fill="#3a434b"/><rect x="34" y="110" width="102" height="28" fill="#262c32" stroke="#31383e"/>`
+    +`<rect x="52" y="116" width="66" height="16" fill="#0e1113"/>`+tx(85,128,"152,37 g",{a:"middle",c:GC.amber,s:"11"})
+    +tx(85,20,"Watte: CO₂ entweicht",{a:"middle"})+"</svg>";
+}
+function svgKreuz(){
+  return svgO(170,150)+`<rect x="25" y="15" width="120" height="120" fill="#d8d4ca"/>`
+    +`<path d="M55 45 L115 105 M115 45 L55 105" stroke="#151515" stroke-width="10" stroke-linecap="round"/>`
+    +`<circle cx="85" cy="75" r="52" fill="rgba(244,238,205,.72)" stroke="${GC.glass}" stroke-width="3"/>`+"</svg>";
+}
+function svgColl(kind){
+  const P=(x,y,r,c)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${c}"/>`;
+  const arr=(x1,y,x2,c)=>ln(x1,y,x2,y,c,1.6)+arrowHead(x2,y,x2>x1?"right":"left",c);
+  let s=svgO(230,96)+ln(115,10,115,80,GC.grid,1,"3 3");
+  if(kind==="slow"){
+    s+=P(34,46,11,GC.red)+arr(48,46,58,GC.dim)+P(86,46,11,GC.blue)+arr(72,46,62,GC.dim);
+    s+=P(146,46,11,GC.red)+arr(132,46,124,GC.dim)+P(194,46,11,GC.blue)+arr(208,46,218,GC.dim);
+  } else if(kind==="orient"){
+    s+=P(24,46,10,GC.red)+P(40,46,10,GC.blue)+arr(54,46,74,GC.dim)+P(96,46,10,GC.red);
+    s+=P(146,46,10,GC.red)+P(162,46,10,GC.blue)+arr(134,38,122,GC.dim)+P(200,46,10,GC.red)+arr(212,46,222,GC.dim);
+  } else {
+    s+=P(20,46,10,GC.blue)+P(36,46,10,GC.red)+arr(50,46,80,GC.dim)+P(100,46,10,GC.red);
+    s+=`<circle cx="176" cy="46" r="24" fill="none" stroke="${GC.amber}" stroke-width="1.5" stroke-dasharray="3 3"/>`;
+    s+=P(142,46,10,GC.blue)+arr(130,36,120,GC.dim)+P(176,46,10,GC.red)+P(192,46,10,GC.red)+arr(206,36,222,GC.dim);
+  }
+  return s+tx(58,90,"vorher",{a:"middle",s:"10"})+tx(172,90,"nachher",{a:"middle",s:"10"})+"</svg>";
+}
+function svgCount(nA,nB,seed){
+  const r=rng(seed), w=150, h=110; let s=svgO(w,h)+`<rect x="2" y="2" width="${w-4}" height="${h-4}" fill="none" stroke="#31383e"/>`;
+  const put=(n,c)=>{ for(let i=0;i<n;i++) s+=`<circle cx="${12+r()*(w-24)}" cy="${12+r()*(h-24)}" r="6" fill="${c}"/>`; };
+  put(nA,GC.red); put(nB,GC.blue);
+  return s+"</svg>";
+}
+function svgMB(){
+  const x0=40,y0=160,w=250,h=130, EA=0.55, X=E=>x0+E*w;
+  const f=(E,kT)=>Math.sqrt(E)*Math.exp(-E/kT)/Math.pow(kT,1.5);
+  let mx=0; for(let i=1;i<=100;i++) mx=Math.max(mx,f(i/100,0.10));
+  const Y=v=>y0-v/mx*h*0.9;
+  const c1=[],c2=[],a1=[[X(EA),y0]],a2=[[X(EA),y0]];
+  for(let i=0;i<=120;i++){ const E=i/120; c1.push([X(E),Y(f(E,0.10))]); c2.push([X(E),Y(f(E,0.14))]); if(E>=EA){ a1.push([X(E),Y(f(E,0.10))]); a2.push([X(E),Y(f(E,0.14))]); } }
+  a1.push([X(1),y0]); a2.push([X(1),y0]);
+  const poly=(pts,col)=>`<polygon points="${pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ")}" fill="${col}"/>`;
+  return svgO(310,190)+poly(a2,"rgba(255,180,84,.30)")+poly(a1,"rgba(79,209,197,.45)")
+    +axes(x0,y0,w,h,"Energie E","Anteil der Teilchen")+pl(c1,GC.teal,2)+pl(c2,GC.amber,2)
+    +ln(X(EA),y0,X(EA),y0-h*0.9,GC.red,1.4,"4 3")+tx(X(EA)+4,y0-h*0.82,"E<tspan font-size='8' dy='3'>A</tspan>",{c:GC.red})
+    +tx(X(0.17),Y(f(0.05,0.10))-4,"T₁",{c:GC.teal})+tx(X(0.34),Y(f(0.3,0.14))-6,"T₂ > T₁",{c:GC.amber})+"</svg>";
+}
+function cube(x,y,s,col){
+  const d=s*0.45;
+  return `<polygon points="${x},${y} ${x+s},${y} ${x+s},${y+s} ${x},${y+s}" fill="${col}" stroke="#14171a" stroke-width="1"/>`
+   +`<polygon points="${x},${y} ${x+d},${y-d} ${x+s+d},${y-d} ${x+s},${y}" fill="#c4ccd3" stroke="#14171a" stroke-width="1"/>`
+   +`<polygon points="${x+s},${y} ${x+s+d},${y-d} ${x+s+d},${y+s-d} ${x+s},${y+s}" fill="#7d868e" stroke="#14171a" stroke-width="1"/>`;
+}
+function svgCubes(){
+  let s=svgO(320,140)+cube(20,50,64,"#a3acb4")+tx(52,130,"1 Würfel, a = 2 cm",{a:"middle"})+tx(52,145-2,"",{});
+  s+=`<text x="126" y="88" style="fill:${GC.teal};font-size:24px">→</text>`;
+  const o=[[0,1],[1,1],[0,0],[1,0]];
+  [[0],[1]].forEach((_,layer)=>{ o.forEach(([i,j])=>{ s+=cube(170+i*36+ (1-layer)*0 + j*14, 52+layer*34 - j*14 + 0, 30,"#a3acb4"); }); });
+  s+=tx(232,130,"8 Würfel, a = 1 cm",{a:"middle"});
+  return s+"</svg>";
+}
+function svgEnergy(){
+  const x0=40,y0=175,w=250,h=150;
+  const path=(peak)=>{ const pts=[]; for(let i=0;i<=80;i++){ const u=i/80, base=u<0.15?115:u>0.85?145:115+(145-115)*((u-0.15)/0.7); const bump=(base-peak)*Math.exp(-Math.pow((u-0.5)/0.13,2)); pts.push([x0+u*w, base-bump]); } return pts; };
+  return svgO(320,200)+axes(x0,y0,w,h,"Reaktionsverlauf","Energie")
+    +pl(path(35),GC.red,2)+pl(path(80),GC.teal,2,"5 4")
+    +tx(x0+10,108,"Edukte",{})+tx(x0+w-2,162,"Produkte",{a:"end"})
+    +ln(x0+w*0.5-60,115,x0+w*0.5-60,40,GC.red,1.2)+arrowHead(x0+w*0.5-60,37,"up",GC.red)+tx(x0+w*0.5-64,70,"E<tspan font-size='8' dy='3'>A</tspan>",{a:"end",c:GC.red})
+    +ln(x0+w*0.5+38,115,x0+w*0.5+38,84,GC.teal,1.2)+arrowHead(x0+w*0.5+38,81,"up",GC.teal)+tx(x0+w*0.5+42,104,"E<tspan font-size='8' dy='3'>A</tspan>(Kat.)",{c:GC.teal})
+    +ln(x0+w-14,115,x0+w-14,142,GC.amber,1.2)+arrowHead(x0+w-14,145,"down",GC.amber)+tx(x0+w-10,134,"Δ<tspan font-style='italic'>H</tspan>",{c:GC.amber})
+    +ln(x0,115,x0+w-8,115,GC.faint,1,"2 3")+"</svg>";
+}
+function svgHalf(){
+  const x0=44,y0=160,w=240,h=130, X=t=>x0+t*w, Y=c=>y0-c*h*0.9, th=0.22;
+  const cur=[]; for(let i=0;i<=80;i++){ const t=i/80; cur.push([X(t),Y(Math.pow(0.5,t/th))]); }
+  let s=svgO(310,190)+axes(x0,y0,w,h,"t","c")+pl(cur,GC.red,2.2);
+  [1,2,3].forEach(n=>{ const t=n*th, c=Math.pow(0.5,n); s+=ln(X(t),y0,X(t),Y(c),GC.faint,1,"2 3")+ln(x0,Y(c),X(t),Y(c),GC.faint,1,"2 3")+tx(X(t),y0+14,n+"·t½",{a:"middle"})+tx(x0-4,Y(c)+4,["","c₀/2","c₀/4","c₀/8"][n],{a:"end"}); });
+  return s+tx(x0-4,Y(1)+4,"c₀",{a:"end"})+"</svg>";
+}
+
+const BASICS=[
+  {t:"Was ist Reaktionsgeschwindigkeit?", html:()=>`
+    <p>Die <strong>Reaktionsgeschwindigkeit v</strong> gibt an, wie schnell sich die Konzentration eines Stoffes während einer Reaktion ändert. Sie ist der Quotient aus der Konzentrationsänderung Δc und der dafür benötigten Zeit Δt.</p>
+    <div class="fig-row">${fig(svgCT(),"Konzentrations-Zeit-Diagramm: Edukte werden verbraucht, Produkte entstehen. Die Kurven werden flacher – die Reaktion wird langsamer.")}</div>
+    <div class="formula-box">v = <span class="frac"><span>Δc(Produkt)</span><span>Δt</span></span> = −<span class="frac"><span>Δc(Edukt)</span><span>Δt</span></span> &nbsp;&nbsp; Einheit: <span class="frac"><span>mol</span><span>L · s</span></span></div>
+    <p>Weil die Konzentration der Edukte abnimmt (Δc &lt; 0), steht vor ihnen ein <strong>Minuszeichen</strong> – die Geschwindigkeit ist immer positiv. Bei unterschiedlichen Stoffmengenverhältnissen teilt man durch den stöchiometrischen Faktor, damit v für alle Stoffe gleich ist. Für Zink + Salzsäure gilt z. B.:</p>
+    <div class="formula-box">v = <span class="frac"><span>Δc(Zn<sup>2+</sup>)</span><span>Δt</span></span> = −<span class="frac"><span>1</span><span>2</span></span> · <span class="frac"><span>Δc(H<sub>3</sub>O<sup>+</sup>)</span><span>Δt</span></span></div>
+    <p>Statt der Konzentration kann man jede dazu <strong>proportionale Größe</strong> messen, etwa das Volumen eines entstehenden Gases, die Massenabnahme, die Farbintensität oder die Leitfähigkeit. Die Geschwindigkeit wird dann z. B. in mL/s angegeben.</p>`},
+  {t:"Durchschnitts- und Momentangeschwindigkeit", html:()=>`
+    <p>Da die Reaktion im Verlauf langsamer wird, hängt der Wert von v vom betrachteten Zeitraum ab. Man unterscheidet:</p>
+    <div class="fig-row">${fig(svgSecTan(),"Volumen-Zeit-Diagramm mit Sekante (orange) und Tangente (türkis)")}</div>
+    <ul>
+      <li><strong>Durchschnittsgeschwindigkeit v̄</strong> im Zeitintervall [t<sub>1</sub>; t<sub>2</sub>]: Steigung der <strong>Sekante</strong> durch die beiden Kurvenpunkte, v̄ = ΔV/Δt = (V<sub>2</sub> − V<sub>1</sub>)/(t<sub>2</sub> − t<sub>1</sub>).</li>
+      <li><strong>Momentangeschwindigkeit v(t)</strong> zu einem Zeitpunkt t: Steigung der <strong>Tangente</strong> an die Kurve in diesem Punkt (Grenzwert für Δt → 0).</li>
+      <li><strong>Anfangsgeschwindigkeit v<sub>0</sub></strong>: Steigung der Tangente bei t = 0. Hier sind die Bedingungen noch genau bekannt – deshalb vergleicht man Versuche am besten über v<sub>0</sub>.</li>
+    </ul>
+    <p>Zeichnerisch legt man ein <strong>Steigungsdreieck</strong> an die Gerade und liest Δt und ΔV ab. In der Simulation kannst du beides im Tab „Auswertung“ ausprobieren.</p>`},
+  {t:"Messmethoden", html:()=>`
+    <p>Gemessen wird immer eine Größe, die sich während der Reaktion proportional zur Konzentration eines Stoffes ändert:</p>
+    <div class="fig-row">${fig(svgKolben(),"<strong>Gasvolumen</strong> im Kolbenprober (Zn, Mg, Marmor, H<sub>2</sub>O<sub>2</sub>)")}${fig(svgWaage(),"<strong>Massenabnahme</strong> auf der Waage (Marmor + Salzsäure)")}${fig(svgKreuz(),"<strong>Trübung</strong>: Zeit, bis das Kreuz verschwindet (Thiosulfat)")}</div>
+    <ul>
+      <li><strong>Gasvolumen:</strong> Das Gas verdrängt den Kolben des Kolbenprobers. Nach V = n · R · T / p ist das Volumen bei konstanter Temperatur und konstantem Druck proportional zur Stoffmenge.</li>
+      <li><strong>Masse:</strong> Entweicht ein Gas aus dem offenen Gefäß, nimmt die Masse ab (Watte verhindert Spritzer).</li>
+      <li><strong>Trübung:</strong> Es wird die Zeit gemessen, bis eine feste Menge Schwefel entstanden ist. Je kürzer die Zeit, desto schneller die Reaktion – 1/t ist ein Maß für v.</li>
+      <li><strong>Farbe und Leitfähigkeit:</strong> Die Intensität einer Farbe (Fotometer) oder die Leitfähigkeit einer Lösung hängt von der Konzentration bestimmter Teilchen ab, z. B. beim Iod oder bei Ionen.</li>
+    </ul>`},
+  {t:"Stoßtheorie", html:()=>`
+    <p>Nach der <strong>Stoßtheorie</strong> können Teilchen nur miteinander reagieren, wenn sie <strong>zusammenstoßen</strong>. Aber nicht jeder Zusammenstoß führt zur Reaktion:</p>
+    <div class="fig-row">${fig(svgColl("slow"),"Zu wenig Energie: Die Teilchen prallen voneinander ab.")}${fig(svgColl("orient"),"Ungünstige Orientierung: Die reagierenden Atome treffen nicht aufeinander.")}${fig(svgColl("ok"),"<strong>Wirksamer Stoß</strong>: genug Energie und passende Orientierung – Bindungen werden gespalten und neu geknüpft.")}</div>
+    <p>Ein Stoß ist nur <strong>wirksam</strong>, wenn die Teilchen
+    <strong>mindestens die Aktivierungsenergie E<sub>A</sub></strong> mitbringen und <strong>geeignet zueinander ausgerichtet</strong> sind.</p>
+    <div class="formula-box">v ~ Zahl der wirksamen Zusammenstöße pro Zeiteinheit</div>
+    <p>Damit lassen sich alle Einflussfaktoren erklären: Konzentration, Druck und Zerteilungsgrad ändern die <strong>Zahl der Zusammenstöße</strong>, die Temperatur vor allem den <strong>Anteil wirksamer Stöße</strong>, ein Katalysator senkt die <strong>Aktivierungsenergie</strong>. In der Teilchenebene der Simulation zeigt jeder Lichtblitz einen wirksamen Stoß.</p>`},
+  {t:"Einfluss von Konzentration und Druck", html:()=>`
+    <p>Je mehr Teilchen sich in einem bestimmten Volumen befinden, desto häufiger stoßen sie zusammen. Die Zahl der möglichen Stoßpaare ist proportional zum Produkt der Konzentrationen:</p>
+    <div class="fig-row">${fig(svgCount(3,3,11),"3 A und 3 B: 3 · 3 = 9 mögliche Stoßpaare")}${fig(svgCount(6,3,23),"doppelte Konzentration von A: 6 · 3 = 18 Stoßpaare")}${fig(svgCount(6,6,37),"beide verdoppelt: 6 · 6 = 36 Stoßpaare")}</div>
+    <div class="formula-box">Zahl der Zusammenstöße ~ c(A) · c(B) &nbsp;⇒&nbsp; höhere Konzentration → größere Reaktionsgeschwindigkeit</div>
+    <p>Bei <strong>Gasen</strong> lässt sich die Konzentration über den <strong>Druck</strong> ändern, denn nach der Zustandsgleichung idealer Gase gilt c = n/V = p/(R · T). Wird ein Gasgemisch auf das halbe Volumen zusammengedrückt, verdoppeln sich Druck und Konzentrationen. Für H<sub>2</sub> + I<sub>2</sub> → 2 HI wird die Reaktion dann viermal so schnell.</p>
+    <p>Bei <strong>Reaktionen in Lösung</strong> hat der Druck praktisch keinen Einfluss: Flüssigkeiten lassen sich kaum zusammendrücken, die Konzentrationen bleiben gleich. Entsteht ein Gas, ändert sich durch den Druck nur dessen Volumen – nicht die Geschwindigkeit der Reaktion.</p>`},
+  {t:"Einfluss der Temperatur", html:()=>`
+    <p>Die Teilchen einer Stoffportion haben nicht alle dieselbe Energie. Ihre Verteilung beschreibt die <strong>Maxwell-Boltzmann-Verteilung</strong>. Nur Teilchen mit einer Energie von mindestens E<sub>A</sub> (Fläche rechts der gestrichelten Linie) können wirksam zusammenstoßen.</p>
+    <div class="fig-row">${fig(svgMB(),"Energieverteilung bei zwei Temperaturen: Bei T<sub>2</sub> ist der Anteil der Teilchen mit E ≥ E<sub>A</sub> (eingefärbte Fläche) deutlich größer.")}</div>
+    <p>Eine Temperaturerhöhung wirkt auf zwei Arten:</p>
+    <ul>
+      <li>Die Teilchen bewegen sich schneller und stoßen <strong>häufiger</strong> zusammen – das macht aber nur wenige Prozent aus.</li>
+      <li>Vor allem steigt der <strong>Anteil der Teilchen mit ausreichender Energie</strong> stark an. Das ist die Hauptursache für die Beschleunigung.</li>
+    </ul>
+    <div class="formula-box"><strong>RGT-Regel</strong> (Reaktionsgeschwindigkeit-Temperatur-Regel): Eine Temperaturerhöhung um 10 K steigert die Reaktionsgeschwindigkeit etwa auf das 2- bis 4-Fache.</div>
+    <p><strong>Vertiefung:</strong> Quantitativ beschreibt die <strong>Arrhenius-Gleichung</strong> k = A · e<sup>−E<sub>A</sub>/(R·T)</sup> die Temperaturabhängigkeit der Geschwindigkeitskonstante k. Trägt man ln k gegen 1/T auf, erhält man eine Gerade mit der Steigung −E<sub>A</sub>/R (Tab „Temperaturabhängigkeit“).</p>`},
+  {t:"Zerteilungsgrad", html:()=>`
+    <p>Bei <strong>heterogenen Reaktionen</strong> – z. B. zwischen einem Feststoff und einer Lösung – können die Teilchen nur an der <strong>Oberfläche</strong> des Feststoffs zusammenstoßen. Je feiner der Feststoff zerteilt ist, desto größer ist seine Oberfläche bei gleicher Masse.</p>
+    <div class="fig-row">${fig(svgCubes(),"Ein Würfel wird in acht kleinere zerlegt: Das Volumen bleibt gleich, die Oberfläche verdoppelt sich.")}</div>
+    <div class="table-wrap" style="margin:6px 0 12px"><table><thead><tr><th>Kantenlänge eines Würfels</th><th>Anzahl Würfel</th><th>Gesamtoberfläche</th></tr></thead><tbody>
+      <tr><td class="mono">2 cm</td><td>1</td><td>24 cm²</td></tr>
+      <tr><td class="mono">1 cm</td><td>8</td><td>48 cm²</td></tr>
+      <tr><td class="mono">1 mm</td><td>8000</td><td>480 cm²</td></tr>
+      <tr><td class="mono">0,01 mm</td><td>8 · 10<sup>9</sup></td><td>48 000 cm²</td></tr>
+    </tbody></table></div>
+    <p>Pulver reagiert deshalb viel schneller als Granalien oder Stücke. Im Extremfall – fein verteilter Mehl-, Holz- oder Metallstaub in Luft – kann die Reaktion explosionsartig verlaufen (<strong>Staubexplosion</strong>).</p>`},
+  {t:"Katalysator und Aktivierungsenergie", html:()=>`
+    <p>Ein <strong>Katalysator</strong> ist ein Stoff, der eine Reaktion beschleunigt, ohne dabei verbraucht zu werden. Er ermöglicht einen anderen <strong>Reaktionsweg mit niedrigerer Aktivierungsenergie</strong>.</p>
+    <div class="fig-row">${fig(svgEnergy(),"Energiediagramm ohne (rot) und mit Katalysator (türkis, gestrichelt). Die Reaktionsenthalpie ΔH bleibt gleich.")}</div>
+    <ul>
+      <li>Mit Katalysator haben bei gleicher Temperatur viel mehr Teilchen die nötige Energie – der Anteil wirksamer Stöße steigt.</li>
+      <li>Die <strong>Reaktionsenthalpie ΔH</strong> und die <strong>Lage eines Gleichgewichts</strong> ändern sich nicht; Hin- und Rückreaktion werden gleichermaßen beschleunigt.</li>
+      <li>Der Katalysator liegt nach der Reaktion unverändert vor.</li>
+    </ul>
+    <p><strong>Beispiele bei der Zersetzung von Wasserstoffperoxid:</strong> Kaliumiodid (homogene Katalyse, in Lösung), Braunstein MnO<sub>2</sub> (heterogene Katalyse an der Oberfläche) und das Enzym <strong>Katalase</strong> (Biokatalysator, z. B. in Hefe oder Kartoffeln). Enzyme sind besonders wirksam, werden aber oberhalb von etwa 45 °C <strong>denaturiert</strong> – sie haben ein Temperaturoptimum.</p>`},
+  {t:"Geschwindigkeitsgesetz und Halbwertszeit", html:()=>`
+    <p>Den Zusammenhang zwischen Reaktionsgeschwindigkeit und Konzentrationen beschreibt das <strong>Geschwindigkeitsgesetz</strong>. Für eine Reaktion A + B → Produkte gilt häufig:</p>
+    <div class="formula-box">v = k · c(A) · c(B)</div>
+    <p>Die <strong>Geschwindigkeitskonstante k</strong> hängt von der Reaktion, der Temperatur und einem Katalysator ab, nicht aber von den Konzentrationen. Die Exponenten (Reaktionsordnungen) werden experimentell bestimmt, z. B. durch Vergleich der Anfangsgeschwindigkeiten bei verschiedenen Konzentrationen.</p>
+    <ul>
+      <li><strong>1. Ordnung</strong> (v = k · c(A)), z. B. die Zersetzung von H<sub>2</sub>O<sub>2</sub>: Verdopplung von c(A) verdoppelt v.</li>
+      <li><strong>2. Ordnung</strong> (v = k · c(A) · c(B)), z. B. H<sub>2</sub> + I<sub>2</sub> → 2 HI: Verdopplung beider Konzentrationen vervierfacht v.</li>
+    </ul>
+    <div class="fig-row">${fig(svgHalf(),"Reaktion 1. Ordnung: Nach jeder Halbwertszeit hat sich die Konzentration halbiert.")}</div>
+    <p>Die <strong>Halbwertszeit t<sub>½</sub></strong> ist die Zeit, nach der die Hälfte des Edukts umgesetzt ist. Bei einer Reaktion 1. Ordnung ist sie unabhängig von der Anfangskonzentration (t<sub>½</sub> = ln 2 / k) – probiere es bei H<sub>2</sub>O<sub>2</sub> aus. Je kleiner t<sub>½</sub>, desto schneller die Reaktion.</p>`}
+];
+let bIdx=0;
+const bbd=$("basicsBackdrop");
+function showBasic(i){
+  bIdx=(i+BASICS.length)%BASICS.length;
+  const b=BASICS[bIdx];
+  $("basicsNum").textContent=(bIdx+1)+".";
+  $("basicsTitle").textContent=b.t;
+  $("basicsBody").innerHTML=b.html();
+  $("basicsPos").textContent=`Thema ${bIdx+1} von ${BASICS.length}`;
+  $("basicsPrev").disabled=bIdx===0;
+  $("basicsNext").disabled=bIdx===BASICS.length-1;
+  bbd.querySelector(".modal-box").scrollTop=0;
+  bbd.classList.add("open");
+}
+$("basicsCount").textContent=BASICS.length+" Themen";
+document.querySelectorAll(".basicsCountX").forEach(x=>x.textContent=BASICS.length+" Themen");
+[["basicsList","basicsToggle","basicsPanel"],["basicsList2","basicsToggle2","basicsPanel2"]].forEach(([L,T,P])=>{
+  $(L).innerHTML=BASICS.map((b,i)=>`<button type="button" class="basic-item" data-i="${i}"><span class="nr">${i+1}</span>${esc(b.t)}<span class="go">›</span></button>`).join("");
+  $(T).addEventListener("click", ()=>{
+    const open=$(T).getAttribute("aria-expanded")!=="true";
+    $(T).setAttribute("aria-expanded",String(open));
+    $(P).hidden=!open;
+  });
+  $(L).addEventListener("click", e=>{ const b=e.target.closest(".basic-item"); if(b) showBasic(+b.dataset.i); });
+});
+$("basicsPrev").addEventListener("click", ()=>showBasic(bIdx-1));
+$("basicsNext").addEventListener("click", ()=>showBasic(bIdx+1));
+$("closeBasics").addEventListener("click", ()=>bbd.classList.remove("open"));
+bbd.addEventListener("click", e=>{ if(e.target===bbd) bbd.classList.remove("open"); });
+document.addEventListener("keydown", e=>{
+  if(!bbd.classList.contains("open")) return;
+  if(e.key==="Escape") bbd.classList.remove("open");
+  if(e.key==="ArrowRight" && bIdx<BASICS.length-1) showBasic(bIdx+1);
+  if(e.key==="ArrowLeft" && bIdx>0) showBasic(bIdx-1);
+});
+
+/* Anleitung */
+const gbd=$("guideBackdrop");
+$("btnGuide").addEventListener("click", e=>{ e.preventDefault(); gbd.classList.add("open"); });
+$("closeGuide").addEventListener("click", ()=>gbd.classList.remove("open"));
+gbd.addEventListener("click", e=>{ if(e.target===gbd) gbd.classList.remove("open"); });
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") gbd.classList.remove("open"); });
+
+
+/* ============================================================
+   ÜBUNG: Zink + Salzsäure – Messprotokoll, Berechnungen,
+   c-t-Diagramm, Durchschnittsgeschwindigkeit
+   ============================================================ */
+const EXRX = Object.assign({}, RXI.zn, {solid:Object.assign({}, RXI.zn.solid, {m:0.20})});
+const EXD = simulate(EXRX, {T:25, p:1013, c:1, size:0, cat:null});
+const exQ = qDefs(EXRX)[0];
+const exVol = t => exQ.f(stateAt(EXD,t), EXD.I);          // mL bei 25 °C, 1013 hPa
+const EXT = [0,30,60,90,120,150,180,240,300,360];
+const VM=24.5, VSOL=0.050, N0=0.050, KMAX=100;
+const EXI = [[0,1],[1,2],[2,3],[4,6],[7,8]];               // Zeiträume (Indizes in EXT)
+let MODE="none";
+
+const SUPN={"⁰":"0","¹":"1","²":"2","³":"3","⁴":"4","⁵":"5","⁶":"6","⁷":"7","⁸":"8","⁹":"9","⁻":"-","⁺":"+"};
+function parseNum(s){
+  if(s==null) return NaN;
+  let x=String(s).trim().replace(/\s+/g,"").replace(/,/g,".").replace(/[−–]/g,"-");
+  x=x.replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺]/g, ch=>SUPN[ch]);
+  if(x==="") return NaN;
+  const m=x.match(/^([+-]?(?:\d+\.?\d*|\.\d+))(?:[·*x×⋅]10\^?\(?([+-]?\d+)\)?)?$/i);
+  if(m) return parseFloat(m[1])*(m[2]!=null?Math.pow(10,parseInt(m[2],10)):1);
+  if(/^[+-]?(?:\d+\.?\d*|\.\d+)e[+-]?\d+$/i.test(x)) return parseFloat(x);
+  return NaN;
+}
+const de = v => String(v).replace(".",",");
+function f3(v){ if(!isFinite(v)) return "–"; if(v===0) return "0"; const d=Math.max(0,2-Math.floor(Math.log10(Math.abs(v)))); return de(v.toFixed(d)); }
+function fV(v){ return de(String(+v.toPrecision(6))); }
+const relOk = r => (x,e) => e===0 ? Math.abs(x)<1e-12 : Math.abs(x-e)<=r*Math.abs(e)+1e-12;
+const vNum = (k,i) => parseNum(EX.val[k][i]);
+
+const COLS=[
+  {key:"V_ml", head:"V(H<sub>2</sub>)<br>[mL]", step:0},
+  {key:"V_L",  head:"V(H<sub>2</sub>)<br>[L]", step:1, exp:i=>vNum("V_ml",i)/1000, ok:(x,e)=>Math.abs(x-e)<=5e-5+1e-12, fmt:fV},
+  {key:"nH2",  head:"n(H<sub>2</sub>)<br>[mol]", step:2, exp:i=>vNum("V_L",i)/VM, ok:relOk(0.015), fmt:f3},
+  {key:"nZn",  head:"n(Zn<sup>2+</sup>)<br>[mol]", step:3, exp:i=>vNum("nH2",i), ok:relOk(0.015), fmt:f3},
+  {key:"cZn",  head:"c(Zn<sup>2+</sup>)<br>[mol/L]", step:4, exp:i=>vNum("nZn",i)/VSOL, ok:relOk(0.015), fmt:f3},
+  {key:"nH",   head:"n(H<sup>+</sup>)<br>[mol]", step:5, exp:i=>N0-2*vNum("nZn",i), ok:(x,e)=>Math.abs(x-e)<=1e-4+1e-12, fmt:f3},
+  {key:"cH",   head:"c(H<sup>+</sup>)<br>[mol/L]", step:6, exp:i=>vNum("nH",i)/VSOL, ok:(x,e)=>Math.abs(x-e)<=0.002+1e-12, fmt:f3}
+];
+const COLBY = Object.fromEntries(COLS.map(c=>[c.step,c]));
+const fr=(a,b)=>`<span class="frac"><span>${a}</span><span>${b}</span></span>`;
+
+const STEPS=[
+  {t:"Messwerte aufnehmen", html:()=>`
+    <p>Im Erlenmeyerkolben reagieren <strong>0,20 g Zink</strong> (Granalien) mit <strong>50 mL Salzsäure, c(HCl) = 1 mol/L</strong>, bei 25 °C und 1013 hPa. Der entstehende Wasserstoff schiebt den Stempel des Kolbenprobers nach rechts.</p>
+    <p>Starte die Messung. An jedem Messzeitpunkt hält die Stoppuhr an. Lies das Gasvolumen an der <strong>linken Kante des Stempels</strong> ab – die Lupe vergrößert die Skala – und trage den Wert in Millilitern ein. Ablesegenauigkeit: ±1 mL.</p>`},
+  {t:"Volumen in Liter umrechnen", html:()=>`
+    <p>Für die weiteren Rechnungen wird das Gasvolumen in <strong>Litern</strong> benötigt.</p>
+    <div class="formula-box">V [L] = V [mL] : 1000 &nbsp;&nbsp;&nbsp; Beispiel: 25 mL = 0,025 L</div>
+    <p>Trage die Werte in die markierte Spalte ein. Jeder Wert wird nach „Enter“ bzw. beim Wechsel in das nächste Feld geprüft.</p>`},
+  {t:"Stoffmenge n(H₂)", html:()=>`
+    <p>Ein Mol eines Gases nimmt bei 25 °C und 1013 hPa das <strong>molare Volumen V<sub>m</sub> = 24,5 L/mol</strong> ein. Daraus folgt die Stoffmenge des Wasserstoffs:</p>
+    <div class="formula-box">n(H<sub>2</sub>) = ${fr("V(H<sub>2</sub>)","V<sub>m</sub>")} = ${fr("V(H<sub>2</sub>)","24,5 L/mol")}</div>
+    <p>Runde auf <strong>drei gültige Ziffern</strong>. Kleine Zahlen kannst du auch als Zehnerpotenz eingeben, z. B. <span class="mono">7,14·10^-4</span>.</p>`},
+  {t:"Stoffmenge n(Zn²⁺)", html:()=>`
+    <p>Die Reaktionsgleichung liefert das Stoffmengenverhältnis:</p>
+    <div class="formula-box">Zn + 2 H<sup>+</sup> → Zn<sup>2+</sup> + H<sub>2</sub> &nbsp;&nbsp;⇒&nbsp;&nbsp; n(Zn<sup>2+</sup>) : n(H<sub>2</sub>) = 1 : 1 &nbsp;&nbsp;⇒&nbsp;&nbsp; n(Zn<sup>2+</sup>) = n(H<sub>2</sub>)</div>
+    <p>Für jedes entstandene H<sub>2</sub>-Molekül ist genau ein Zink-Atom als Zn<sup>2+</sup>-Ion in Lösung gegangen.</p>`},
+  {t:"Konzentration c(Zn²⁺)", html:()=>`
+    <p>Die Konzentration ist die Stoffmenge pro Volumen der Lösung. Das Volumen der Salzsäure beträgt 50 mL = <strong>0,050 L</strong>; es ändert sich während der Reaktion praktisch nicht.</p>
+    <div class="formula-box">c(Zn<sup>2+</sup>) = ${fr("n(Zn<sup>2+</sup>)","V(Lösung)")} = ${fr("n(Zn<sup>2+</sup>)","0,050 L")}</div>
+    <p>Runde auf drei gültige Ziffern.</p>`},
+  {t:"Stoffmenge n(H⁺)", html:()=>`
+    <p>Salzsäure ist vollständig protolysiert, zu Beginn gilt also c<sub>0</sub>(H<sup>+</sup>) = c<sub>0</sub>(HCl) = 1 mol/L (H<sup>+</sup> steht vereinfacht für H<sub>3</sub>O<sup>+</sup>). Berechne zuerst die <strong>Anfangsstoffmenge</strong>:</p>
+    <div class="ex-n0">n<sub>0</sub>(H<sup>+</sup>) = c<sub>0</sub>(HCl) · V(Lösung) = <input class="cell ${EX.n0ok?"ok":EX.n0st}" id="exN0" inputmode="decimal" autocomplete="off" value="${esc(EX.n0)}" ${EX.n0ok?"readonly":""}> mol ${EX.n0ok?"":'<button class="btn" id="exN0btn">Prüfen</button>'}</div>
+    <p>Pro Zn<sup>2+</sup>-Ion werden <strong>zwei</strong> H<sup>+</sup>-Ionen verbraucht. Die noch vorhandene Stoffmenge ist daher:</p>
+    <div class="formula-box">n(H<sup>+</sup>) = n<sub>0</sub>(H<sup>+</sup>) − 2 · n(Zn<sup>2+</sup>)</div>
+    <p>Runde auf drei gültige Ziffern (z. B. 0,0486).${EX.n0ok?"":" Die Spalte wird freigeschaltet, sobald n<sub>0</sub>(H<sup>+</sup>) stimmt."}</p>`},
+  {t:"Konzentration c(H⁺)", html:()=>`
+    <div class="formula-box">c(H<sup>+</sup>) = ${fr("n(H<sup>+</sup>)","V(Lösung)")} = ${fr("n(H<sup>+</sup>)","0,050 L")}</div>
+    <p>Runde auf drei gültige Ziffern (z. B. 0,972).</p>`},
+  {t:"c-t-Diagramm zeichnen", html:()=>`
+    <p>Trage die Konzentrationen von <strong style="color:#ffb454">Zn<sup>2+</sup></strong> und <strong style="color:#8fb4ff">H<sup>+</sup></strong> mit unterschiedlichen Farben gegen die Zeit ein. Weil sich die Werte stark unterscheiden, hat das Diagramm zwei y-Achsen: <strong style="color:#ffb454">links c(Zn<sup>2+</sup>)</strong> von 0 bis 0,07 mol/L, <strong style="color:#8fb4ff">rechts c(H<sup>+</sup>)</strong> von 0,86 bis 1,00 mol/L.</p>
+    <p>Wähle die Reihe (✕ c(Zn<sup>2+</sup>) oder + c(H<sup>+</sup>)), dann „Punkte setzen“, und tippe für jede Zeile des Protokolls an die passende Stelle – die Reihenfolge ist egal. Ein falsch gesetzter Punkt lässt sich im Modus <strong>„Punkte löschen“</strong> durch Antippen wieder entfernen. Prüfe danach die Punkte.</p>
+    <p>Zeichne zum Schluss mit „Kurve zeichnen“ und dem Stift für jede Reihe eine glatte <strong>Ausgleichskurve</strong> – keine Zickzacklinie von Punkt zu Punkt.</p>`},
+  {t:"Durchschnittsgeschwindigkeit", html:()=>`
+    <p>Die <strong>Durchschnittsgeschwindigkeit</strong> v̄ gibt an, wie stark sich eine Konzentration in einem Zeitraum im Mittel pro Sekunde ändert. Nimm die Konzentrationen aus dem Protokoll.</p>
+    <div class="formula-box">v̄(Zn<sup>2+</sup>) = ${fr("Δc(Zn<sup>2+</sup>)","Δt")} = ${fr("c<sub>2</sub>(Zn<sup>2+</sup>) − c<sub>1</sub>(Zn<sup>2+</sup>)","t<sub>2</sub> − t<sub>1</sub>")} &nbsp;&nbsp;&nbsp;&nbsp; v̄(H<sup>+</sup>) = −${fr("Δc(H<sup>+</sup>)","Δt")} = −${fr("c<sub>2</sub>(H<sup>+</sup>) − c<sub>1</sub>(H<sup>+</sup>)","t<sub>2</sub> − t<sub>1</sub>")}</div>
+    <p><strong>So gehst du vor:</strong> 1. Berechne die Konzentrationsänderung Δc = c<sub>2</sub> − c<sub>1</sub> im Zeitraum. 2. <strong>Teile das Ergebnis durch die Anzahl der Sekunden des Zeitraums</strong>, Δt = t<sub>2</sub> − t<sub>1</sub> (z. B. für 0 s – 30 s durch 30 s, für 120 s – 180 s durch 60 s). Erst dadurch erhältst du die Änderung <em>pro Sekunde</em>.</p>
+    <p>c(H<sup>+</sup>) nimmt ab, Δc(H<sup>+</sup>) ist also negativ – das Minuszeichen sorgt dafür, dass die Geschwindigkeit positiv ist. Einheit: mol/(L·s). Runde auf drei gültige Ziffern (z. B. <span class="mono">4,77·10^-4</span>).</p>`}
+];
+
+let EX;
+const exBubbles=[]; let exBubAcc=0;
+function exReset(){
+  EX={step:0, maxStep:0, done:{}, val:{}, st:{}, n0:"", n0st:"", n0ok:false,
+      m:{t:0, running:false, speed:1, next:1, waiting:false, tries:0, started:false},
+      pts:{zn:[],h:[]}, ptSt:{zn:[],h:[]}, series:"zn", strokes:[], drawing:null, plotMode:"pts",
+      rv:{zn:EXI.map(()=>""), h:EXI.map(()=>"")}, rs:{zn:EXI.map(()=>""), h:EXI.map(()=>"")},
+      fb:[]};
+  COLS.forEach(c=>{ EX.val[c.key]=EXT.map(()=> ""); EX.st[c.key]=EXT.map(()=> ""); });
+  EX.val.V_ml[0]="0"; EX.st.V_ml[0]="ok";
+  exBubbles.length=0;
+}
+function setFb(list){ EX.fb=list; renderFb(); }
+function renderFb(){ $("exFb").innerHTML=EX.fb.map(f=>`<div class="fb ${f.cls}">${f.html}</div>`).join(""); }
+function completeStep(s,msg){
+  EX.done[s]=true;
+  EX.maxStep=Math.max(EX.maxStep, Math.min(s+1, STEPS.length-1));
+  if(msg) EX.fb=[{cls:"good",html:msg}];
+}
+
+/* ---------- Rendering ---------- */
+function renderEx(){
+  const s=EX.step;
+  const b=$("statusBadge");
+  b.className="status"+(EX.done[STEPS.length-1]?" done":" running");
+  $("statusText").textContent=EX.done[STEPS.length-1]?"Übung abgeschlossen":`Übung: Schritt ${s+1} von ${STEPS.length}`;
+  $("exSteps").innerHTML=STEPS.map((st,i)=>`<button type="button" class="basic-item ex-st ${i===s?"cur":""} ${EX.done[i]?"done":""}" data-s="${i}" ${i>EX.maxStep?"disabled":""}><span class="nr">${i+1}</span>${esc(st.t)}<span class="go">${EX.done[i]?"✓":i>EX.maxStep?"🔒":"›"}</span></button>`).join("");
+  $("exNum").textContent=`Schritt ${s+1} von ${STEPS.length}`;
+  $("exTitle").textContent=STEPS[s].t;
+  $("exInstr").innerHTML=STEPS[s].html();
+  $("exMeasure").hidden = s!==0;
+  $("exPlot").hidden = s!==7;
+  $("exRates").hidden = s!==8;
+  $("exTableWrap").hidden = s>8;
+  renderExTable();
+  if(s===0){ renderPrompt(); renderExRun(); }
+  if(s===7) renderPlotInfo();
+  if(s===8) renderRates();
+  renderCtl();
+  const anchor = s===0?$("exMeasure"): s===7?$("exPlot"): s===8?$("exRates"): $("exTableWrap");
+  anchor.after($("exCtlWrap"));
+  renderFb();
+  $("exPrev").disabled = s===0;
+  $("exNext").disabled = !(EX.done[s] && s<STEPS.length-1);
+  $("exPos").textContent = EX.done[s] ? (s<STEPS.length-1?"Schritt erledigt – weiter geht’s.":"Alle Schritte erledigt.") : "Schritt noch offen";
+}
+function renderExTable(){
+  const s=EX.step;
+  let h='<thead><tr><th>t<br>[s]</th>'+COLS.map(c=>`<th class="${c.step===s?"cur":""}">${c.head}</th>`).join("")+'</tr></thead><tbody>';
+  EXT.forEach((t,i)=>{
+    const wait = s===0 && EX.m.waiting && EX.m.next===i;
+    h+=`<tr class="${wait?"wait":""}"><td class="mono tt">${t}</td>`;
+    COLS.forEach(c=>{
+      const v=EX.val[c.key][i], st=EX.st[c.key][i];
+      const editable = c.step===s && s>=1 && s<=6 && !EX.done[s] && (s!==5 || EX.n0ok);
+      if(editable) h+=`<td><input class="cell ${st}" data-k="${c.key}" data-i="${i}" value="${esc(v)}" inputmode="decimal" autocomplete="off" ${st==="ok"||st==="shown"?"readonly":""}></td>`;
+      else if(v!=="" && (c.step<s || EX.done[c.step] || c.step===0)) h+=`<td class="mono val st-${st}">${esc(v)}</td>`;
+      else h+=`<td class="${c.step>s?"lock":""}">${wait&&c.key==="V_ml"?'<span style="color:var(--amber)">?</span>':""}</td>`;
+    });
+    h+="</tr>";
+  });
+  $("exTable").innerHTML=h+"</tbody>";
+}
+
+/* ---------- Zelleneingabe ---------- */
+function cellHint(k,x,e,i){
+  if(!isFinite(x)) return "Bitte eine Zahl eingeben – mit Dezimalkomma, z. B. 0,0175 oder 7,14·10^-4.";
+  if(e!==0){ const r=x/e; if(Math.abs(r/1000-1)<0.05) return "Der Wert ist 1000-mal zu groß – prüfe die Einheit."; if(Math.abs(r*1000-1)<0.05) return "Der Wert ist 1000-mal zu klein – prüfe die Einheit."; }
+  const near=(a,b)=>b!==0 && Math.abs(a/b-1)<0.02;
+  if(k==="nH2"){ const V=vNum("V_L",i); if(near(x,V/24)||near(x,V/22.4)) return "Verwende das molare Volumen V<sub>m</sub> = 24,5 L/mol (25 °C, 1013 hPa)."; if(near(x,V*VM)) return "Teile das Volumen durch V<sub>m</sub> – nicht multiplizieren."; }
+  if(k==="nZn"){ const n=vNum("nH2",i); if(near(x,2*n)||near(x,n/2)) return "Laut Reaktionsgleichung entsteht pro Zn<sup>2+</sup>-Ion genau ein H<sub>2</sub>-Molekül – Verhältnis 1 : 1."; }
+  if(k==="cZn"||k==="cH"){ const n=vNum(k==="cZn"?"nZn":"nH",i); if(near(x,n*VSOL)) return "Teile die Stoffmenge durch das Volumen der Lösung (0,050 L) – nicht multiplizieren."; if(near(x,n)) return "Das ist noch die Stoffmenge – teile durch das Volumen der Lösung (0,050 L)."; }
+  if(k==="nH"){ const nz=vNum("nZn",i); if(near(x,N0-nz)) return "Pro Zn<sup>2+</sup>-Ion werden <b>zwei</b> H<sup>+</sup>-Ionen verbraucht – Faktor 2 beachten."; if(near(x,N0)&&nz>0) return "Ziehe die verbrauchten H<sup>+</sup>-Ionen von n<sub>0</sub>(H<sup>+</sup>) ab."; if(near(x,2*nz)) return "Das ist die verbrauchte Stoffmenge. Gesucht ist die noch vorhandene: n<sub>0</sub>(H<sup>+</sup>) − 2 · n(Zn<sup>2+</sup>)."; if(Math.abs(x-e)<0.0006) return "Fast – runde genauer: drei gültige Ziffern, z. B. 0,0486."; }
+  if(k==="cH" && Math.abs(x-e)<0.012) return "Fast – runde genauer: drei gültige Ziffern, z. B. 0,972.";
+  if(e!==0 && Math.abs(x/e-1)<0.06) return "Fast richtig – runde genauer (drei gültige Ziffern).";
+  return "Noch nicht richtig – schau dir den Tipp an.";
+}
+function exCellInput(inp){
+  const k=inp.dataset.k, i=+inp.dataset.i, col=COLS.find(c=>c.key===k);
+  if(EX.st[k][i]==="ok"||EX.st[k][i]==="shown") return;
+  EX.val[k][i]=inp.value.trim();
+  if(EX.val[k][i]===""){ EX.st[k][i]=""; inp.className="cell"; return; }
+  const x=parseNum(EX.val[k][i]), e=col.exp(i);
+  const ok=isFinite(x) && col.ok(x,e);
+  EX.st[k][i]=ok?"ok":"bad"; inp.className="cell "+EX.st[k][i];
+  if(ok){ inp.readOnly=true; setFb([{cls:"good",html:`t = ${EXT[i]} s: richtig.`}]); }
+  else setFb([{cls:"bad",html:`t = ${EXT[i]} s: `+cellHint(k,x,e,i)}]);
+  checkColDone();
+}
+function checkColDone(){
+  const s=EX.step, col=COLBY[s]; if(!col) return;
+  renderCtl();
+  if(EX.st[col.key].every(x=>x==="ok"||x==="shown")){
+    const next = STEPS[s+1] ? ` Weiter mit Schritt ${s+2}: ${STEPS[s+1].t}.` : "";
+    completeStep(s, "Die Spalte ist vollständig."+next);
+    renderEx();
+  }
+}
+$("exTable").addEventListener("change", e=>{ const inp=e.target.closest("input.cell"); if(inp) exCellInput(inp); });
+$("exTable").addEventListener("keydown", e=>{
+  if(e.key!=="Enter") return;
+  const inp=e.target.closest("input.cell"); if(!inp) return;
+  e.preventDefault(); exCellInput(inp);
+  const all=[...$("exTable").querySelectorAll("input.cell:not([readonly])")];
+  const nx=all.find(x=>+x.dataset.i>+inp.dataset.i) || all[0]; if(nx) nx.focus();
+});
+
+/* ---------- Tipp / Rest / Lösung ---------- */
+function exTip(){
+  const s=EX.step, i=1, t=EXT[i];
+  const g=k=>vNum(k,i);
+  switch(s){
+    case 1: return `Beispiel für t = ${t} s: V = ${fV(g("V_ml"))} mL : 1000 = <b>${fV(g("V_ml")/1000)} L</b>`;
+    case 2: return `Beispiel für t = ${t} s: n(H<sub>2</sub>) = ${fV(g("V_L"))} L : 24,5 L/mol = <b>${f3(g("V_L")/VM)} mol</b>`;
+    case 3: return `Beispiel für t = ${t} s: n(Zn<sup>2+</sup>) = n(H<sub>2</sub>) = <b>${f3(g("nH2"))} mol</b> – einfach übernehmen.`;
+    case 4: return `Beispiel für t = ${t} s: c(Zn<sup>2+</sup>) = ${f3(g("nZn"))} mol : 0,050 L = <b>${f3(g("nZn")/VSOL)} mol/L</b>`;
+    case 5: return EX.n0ok ? `Beispiel für t = ${t} s: n(H<sup>+</sup>) = 0,050 mol − 2 · ${f3(g("nZn"))} mol = <b>${f3(N0-2*g("nZn"))} mol</b>. Bei t = 0 s ist noch nichts verbraucht: n(H<sup>+</sup>) = n<sub>0</sub>(H<sup>+</sup>).` : `n<sub>0</sub>(H<sup>+</sup>) = 1 mol/L · 0,050 L – multipliziere Konzentration und Volumen (in Litern).`;
+    case 6: return `Beispiel für t = ${t} s: c(H<sup>+</sup>) = ${f3(g("nH"))} mol : 0,050 L = <b>${f3(g("nH")/VSOL)} mol/L</b>`;
+  }
+  return "";
+}
+function fillCol(all){
+  const col=COLBY[EX.step];
+  EXT.forEach((_,i)=>{ const st=EX.st[col.key][i]; if(st==="ok"||st==="shown") return; if(!all && i===0 && false) return; EX.val[col.key][i]=col.fmt(col.exp(i)); EX.st[col.key][i]="shown"; });
+  checkColDone(); renderEx();
+}
+function okCount(key){ return EXT.filter((_,i)=>i>0 && EX.st[key][i]==="ok").length; }
+function renderCtl(){
+  const s=EX.step, c=$("exCtl"); let h="";
+  if(s>=1 && s<=6){
+    const col=COLBY[s], locked = s===5 && !EX.n0ok, nok=okCount(col.key);
+    h=`<button class="btn ghost" data-a="tip">Tipp</button>
+       <button class="btn ghost" data-a="rest" ${(nok<2||EX.done[s]||locked)?"disabled":""}>Rest ausfüllen</button>
+       <button class="btn ghost" data-a="sol" ${(EX.done[s]||locked)?"disabled":""}>Lösung zeigen</button>
+       <span class="hint" style="margin:0">${EX.done[s]?"":`„Rest ausfüllen“ ist möglich, sobald zwei Werte ab t = 30 s richtig sind (${nok}/2).`}</span>`;
+  } else if(s===8){
+    h=`<button class="btn ghost" data-a="rtip">Tipp</button><button class="btn ghost" data-a="rsol" ${EX.done[8]?"disabled":""}>Lösung zeigen</button>`;
+  }
+  c.innerHTML=h; c.hidden=!h;
+}
+$("exCtl").addEventListener("click", e=>{
+  const b=e.target.closest("button"); if(!b||b.disabled) return;
+  const a=b.dataset.a;
+  if(a==="tip") setFb([{cls:"hint",html:exTip()}]);
+  else if(a==="rest"){ fillCol(false); if(!EX.fb.length||EX.fb[0].cls!=="good") setFb([{cls:"hint",html:"Die restlichen Werte wurden berechnet (orange)."}]); }
+  else if(a==="sol"){ fillCol(true); }
+  else if(a==="rtip") setFb([{cls:"hint",html:rateTip()}]);
+  else if(a==="rsol") rateSolve();
+});
+
+/* Anfangsstoffmenge n0(H+) */
+function checkN0(){
+  const inp=$("exN0"); if(!inp) return;
+  EX.n0=inp.value.trim(); const x=parseNum(EX.n0);
+  if(isFinite(x) && Math.abs(x-N0)<=1e-6){ EX.n0ok=true; EX.n0st="ok"; setFb([{cls:"good",html:"Richtig: n<sub>0</sub>(H<sup>+</sup>) = 0,050 mol. Jetzt kannst du die Spalte n(H<sup>+</sup>) ausfüllen."}]); renderEx(); return; }
+  EX.n0st="bad"; inp.className="cell bad";
+  setFb([{cls:"bad",html: isFinite(x)&&Math.abs(x-50)<1e-6 ? "Das Volumen muss in Litern eingesetzt werden: 50 mL = 0,050 L." : "Noch nicht richtig: n = c · V = 1 mol/L · 0,050 L."}]);
+}
+$("exInstr").addEventListener("click", e=>{ if(e.target.id==="exN0btn") checkN0(); });
+$("exInstr").addEventListener("keydown", e=>{ if(e.target.id==="exN0" && e.key==="Enter"){ e.preventDefault(); checkN0(); } });
+
+/* ---------- Schritt 1: Messung ---------- */
+const ec=$("exCanvas");
+function fitCanvas(c){ const d=window.devicePixelRatio||1; const w=Math.round(c.clientWidth*d), h=Math.round(c.clientHeight*d); if(w && (c.width!==w||c.height!==h)){ c.width=w; c.height=h; } return d; }
+function renderExRun(){
+  const m=EX.m, b=$("exRun");
+  b.textContent = m.running?"Pause":m.started?"Fortsetzen":"Messung starten";
+  b.disabled = !!EX.done[0] || m.waiting;
+  [...$("exSpeed").children].forEach(x=>x.classList.toggle("active", +x.dataset.speed===m.speed));
+}
+function renderPrompt(){
+  const m=EX.m, p=$("exPrompt");
+  if(EX.done[0]){ p.innerHTML='<span style="color:var(--good)">Alle Messwerte sind im Protokoll.</span>&nbsp;Weiter mit Schritt 2.'; return; }
+  if(m.waiting){
+    p.innerHTML=`<b style="color:var(--amber)">Messzeitpunkt t = ${EXT[m.next]} s</b> – abgelesenes Volumen: <input class="cell" id="exRead" inputmode="decimal" autocomplete="off"> mL <button class="btn primary" id="exReadBtn">Eintragen</button>${m.tries>=2?'<button class="btn ghost" id="exReadShow">Wert anzeigen</button>':""}`;
+  } else p.innerHTML = m.started ? `Messung läuft … nächster Messzeitpunkt: <b>t = ${EXT[m.next]} s</b>` : `Messzeitpunkte: ${EXT.slice(1).join(", ")} s. Starte die Messung.`;
+}
+function acceptReading(str,st){
+  const m=EX.m, i=m.next;
+  EX.val.V_ml[i]=str; EX.st.V_ml[i]=st;
+  m.waiting=false; m.tries=0; m.next++;
+  if(m.next>=EXT.length){ completeStep(0,"Alle Messwerte sind im Protokoll. Weiter mit Schritt 2: Volumen in Liter umrechnen."); }
+  else { m.running=true; EX.fb=[{cls:"good",html:`t = ${EXT[i]} s: ${str} mL eingetragen.`}]; }
+  renderEx();
+}
+function exRead(){
+  const m=EX.m, inp=$("exRead"); if(!inp) return;
+  const x=parseNum(inp.value), e=exVol(EXT[m.next]);
+  if(!isFinite(x)){ setFb([{cls:"bad",html:"Bitte eine Zahl eingeben, z. B. 17,5."}]); return; }
+  if(Math.abs(x-e)<=1.0){ acceptReading(de(String(+x.toFixed(2))),"ok"); return; }
+  m.tries++;
+  setFb([{cls:"bad",html:(x>e?"Der Wert ist zu groß.":"Der Wert ist zu klein.")+" Lies an der <b>linken Kante des Stempels</b> ab – in der Lupe ist die Skala vergrößert."+(m.tries>=2?" Du kannst dir den Wert auch anzeigen lassen.":"")}]);
+  renderPrompt();
+}
+$("exPrompt").addEventListener("click", e=>{
+  if(e.target.id==="exReadBtn") exRead();
+  if(e.target.id==="exReadShow"){ const v=Math.round(exVol(EXT[EX.m.next])*2)/2; acceptReading(de(String(v)),"shown"); }
+});
+$("exPrompt").addEventListener("keydown", e=>{ if(e.target.id==="exRead" && e.key==="Enter"){ e.preventDefault(); exRead(); } });
+$("exRun").addEventListener("click", ()=>{
+  const m=EX.m; if(EX.done[0]||m.waiting) return;
+  m.started=true; m.running=!m.running; renderPrompt(); renderExRun();
+});
+$("exSpeed").addEventListener("click", e=>{ const b=e.target.closest("button"); if(!b) return; EX.m.speed=+b.dataset.speed; renderExRun(); });
+function exTick(dt){
+  const m=EX.m; if(!m.running) return;
+  m.t+=dt*m.speed;
+  if(m.t>=EXT[m.next]){ m.t=EXT[m.next]; m.running=false; m.waiting=true; m.tries=0; EX.fb=[]; renderEx(); const r=$("exRead"); if(r) r.focus({preventScroll:true}); }
+}
+function exDraw(dt){
+  const d=fitCanvas(ec), c=ec.getContext("2d"), W=ec.clientWidth, H=ec.clientHeight; if(!W) return;
+  c.setTransform(d,0,0,d,0,0); c.fillStyle=C.bg; c.fillRect(0,0,W,H);
+  const m=EX.m, st=stateAt(EXD,m.t), V=exQ.f(st,EXD.I);
+  // Kolbenprober
+  const bx0=150, bx1=W-56, by=58, bh=30, in0=bx0+6, in1=bx1-8;
+  const X=v=>in0+v/KMAX*(in1-in0), px=X(V);
+  c.fillStyle="rgba(201,206,212,0.07)"; c.fillRect(in0,by+1,px-in0,bh-2);
+  c.fillStyle="#5d6873"; c.fillRect(px,by+3,9,bh-6);
+  c.fillStyle=C.piston; c.fillRect(px+9,by+bh/2-3,W-px-9,6);
+  c.strokeStyle=C.glass; c.lineWidth=1.6; c.strokeRect(bx0,by,bx1-bx0,bh);
+  for(let v=0; v<=KMAX; v++){ const x=X(v), L=v%10===0?11:v%5===0?7:4; c.strokeStyle=v%10===0?C.dim:C.faint; c.lineWidth=1; c.beginPath(); c.moveTo(x,by); c.lineTo(x,by-L); c.stroke(); }
+  c.fillStyle=C.dim; c.font="10.5px "+MONO; c.textAlign="center"; c.textBaseline="bottom";
+  for(let v=0; v<=KMAX; v+=10) c.fillText(String(v), X(v), by-13);
+  c.textAlign="left"; c.fillText("mL", X(KMAX)+14, by-13);
+  c.fillStyle=C.faint; c.font="10.5px "+SANS; c.textAlign="right"; c.textBaseline="top"; c.fillText("Kolbenprober (100 mL)", bx1, by+bh+5);
+  // Lupe
+  const lw=Math.min(300,W-bx0-20), lh=72, lx=clamp(px-lw/2, bx0, bx1-lw), ly=by+bh+40, span=10, v0=clamp(V-span/2,0,KMAX-span);
+  const LX=v=>lx+(v-v0)/span*lw, lpx=LX(V);
+  c.strokeStyle="rgba(79,209,197,.35)"; c.setLineDash([3,3]); c.beginPath(); c.moveTo(X(v0),by+bh); c.lineTo(lx,ly); c.moveTo(X(v0+span),by+bh); c.lineTo(lx+lw,ly); c.stroke(); c.setLineDash([]);
+  c.save(); c.beginPath(); c.rect(lx,ly,lw,lh); c.clip();
+  c.fillStyle="#11161a"; c.fillRect(lx,ly,lw,lh);
+  c.fillStyle="rgba(201,206,212,0.10)"; c.fillRect(lx,ly+28,Math.max(0,lpx-lx),lh-28);
+  c.fillStyle="#5d6873"; c.fillRect(lpx,ly+28,lw,lh-28);
+  for(let v=Math.ceil(v0*2)/2; v<=v0+span+1e-9; v+=0.5){
+    const x=LX(v), full=Math.abs(v-Math.round(v))<1e-9; c.strokeStyle=full?C.text:C.faint; c.lineWidth=full?1.3:1;
+    c.beginPath(); c.moveTo(x,ly+28); c.lineTo(x,ly+28-(full?(Math.round(v)%5===0?14:10):5)); c.stroke();
+    if(full){ c.fillStyle=Math.round(v)%5===0?C.text:C.dim; c.font=(Math.round(v)%5===0?"bold ":"")+"11px "+MONO; c.textAlign="center"; c.textBaseline="bottom"; c.fillText(String(Math.round(v)), x, ly+12); }
+  }
+  c.restore();
+  c.strokeStyle=C.teal; c.lineWidth=1.4; c.strokeRect(lx,ly,lw,lh);
+  c.fillStyle=C.teal; c.font="10.5px "+SANS; c.textAlign="left"; c.textBaseline="top"; c.fillText("Lupe", lx+4, ly+lh+4);
+  // Erlenmeyerkolben
+  const cx=72, neckTop=118, neckBot=140, bot=262, hwB=58, hwN=9, liqTop=206;
+  const hw=y=>hwN+(y-neckBot)/(bot-neckBot)*(hwB-hwN);
+  c.strokeStyle=C.glass; c.lineWidth=3; c.beginPath(); c.moveTo(cx,neckTop); c.lineTo(cx,by+bh/2); c.lineTo(bx0,by+bh/2); c.stroke();
+  c.fillStyle=tempColor(25,0,80,0.22); c.fillRect(4,214,cx+hwB+12,58);
+  c.strokeStyle="#3a434b"; c.lineWidth=1.5; c.beginPath(); c.moveTo(4,206); c.lineTo(4,274); c.lineTo(cx+hwB+16,274); c.lineTo(cx+hwB+16,206); c.stroke();
+  c.fillStyle="rgba(120,170,200,0.20)"; c.beginPath(); c.moveTo(cx-hw(liqTop),liqTop); c.lineTo(cx+hw(liqTop),liqTop); c.lineTo(cx+hwB,bot); c.lineTo(cx-hwB,bot); c.closePath(); c.fill();
+  const sc=Math.cbrt(clamp(st[0]/EXD.I.ns0,0,1));
+  c.fillStyle=EXRX.solid.col;
+  pieces(RXI.zn,0).slice(0,4).forEach(p=>{ const r=5.5*sc*(0.75+0.5*p.w); if(r<0.35) return; const x=cx-hwB+12+p.u*(2*hwB-24); c.beginPath(); c.ellipse(x,bot-3-r*0.7,r,r*0.75,0,0,Math.PI*2); c.fill(); });
+  c.strokeStyle=C.glass; c.lineWidth=2.5;
+  c.beginPath(); c.moveTo(cx-hwN,neckTop); c.lineTo(cx-hwN,neckBot); c.lineTo(cx-hwB,bot); c.lineTo(cx+hwB,bot); c.lineTo(cx+hwN,neckBot); c.lineTo(cx+hwN,neckTop); c.stroke();
+  c.fillStyle="#4a3a33"; c.fillRect(cx-hwN-2,neckTop-6,2*hwN+4,14);
+  const rate=rateQ(exQ.f,EXD,st);
+  if(m.running){ exBubAcc+=clamp(rate*m.speed*4,0,60)*dt; while(exBubAcc>=1){ exBubAcc-=1; exBubbles.push({x:cx+(Math.random()*2-1)*(hwB-16), y:bot-6, r:1+Math.random()*1.6, v:30+Math.random()*30}); } }
+  c.strokeStyle="rgba(230,235,240,0.75)"; c.lineWidth=1;
+  for(let i=exBubbles.length-1;i>=0;i--){ const b=exBubbles[i]; if(m.running) b.y-=b.v*dt; if(b.y<liqTop+2){ exBubbles.splice(i,1); continue; } b.x=clamp(b.x,cx-hw(b.y)+3,cx+hw(b.y)-3); c.beginPath(); c.arc(b.x,b.y,b.r,0,Math.PI*2); c.stroke(); }
+  // Stoppuhr
+  c.fillStyle=C.faint; c.font="10.5px "+SANS; c.textAlign="right"; c.textBaseline="alphabetic"; c.fillText("Stoppuhr", W-14, H-40);
+  c.fillStyle=m.waiting?C.amber:C.text; c.font="20px "+MONO; c.fillText(Math.floor(m.t)+" s", W-14, H-16);
+}
+
+/* ---------- Schritt 8: c-t-Diagramm (Zn²⁺ und H⁺) ---------- */
+const pc=$("exPlotCanvas"); const PX={xmax:390, L:66, R:66, T:18, B:48};
+const AX={
+  zn:{min:0,    max:0.07, step:0.01, minor:0.002, col:"#ffb454", lab:"c(Zn²⁺) in mol/L", html:"c(Zn<sup>2+</sup>)", side:"linke",  key:"cZn", tol:0.002},
+  h: {min:0.86, max:1.00, step:0.02, minor:0.004, col:"#8fb4ff", lab:"c(H⁺) in mol/L",   html:"c(H<sup>+</sup>)",   side:"rechte", key:"cH",  tol:0.004}
+};
+const SER=["zn","h"];
+function pgeo(){ const W=pc.clientWidth, H=pc.clientHeight; return {W,H,pw:W-PX.L-PX.R, ph:H-PX.T-PX.B}; }
+function toPx(t,c,k){ const g=pgeo(), a=AX[k]; return [PX.L+t/PX.xmax*g.pw, PX.T+g.ph-(c-a.min)/(a.max-a.min)*g.ph]; }
+function toData(x,y,k){ const g=pgeo(), a=AX[k]; return [(x-PX.L)/g.pw*PX.xmax, a.min+(PX.T+g.ph-y)/g.ph*(a.max-a.min)]; }
+const nearIdx = t => { let b=0; EXT.forEach((x,i)=>{ if(Math.abs(x-t)<Math.abs(EXT[b]-t)) b=i; }); return b; };
+/* Messzeitpunkte, für die in Reihe k noch kein Punkt in der Nähe liegt */
+function missing(k){ return EXT.map((t,i)=>i).filter(i=>!EX.pts[k].some(p=>Math.abs(p.t-EXT[i])<=5)); }
+function serDone(k){ return EX.pts[k].length===EXT.length && EX.ptSt[k].every(x=>x==="ok"); }
+function renderPlotInfo(){
+  [...$("plotModeGrp").children].forEach(b=>b.classList.toggle("active", b.dataset.pm===EX.plotMode));
+  [...$("plotSerGrp").children].forEach(b=>b.classList.toggle("active", b.dataset.ser===EX.series));
+  pc.style.cursor = EX.plotMode==="erase" ? "pointer" : "crosshair";
+  const k=EX.series, a=AX[k], miss=missing(k);
+  let info;
+  if(EX.plotMode==="erase") info=`<b style="color:var(--danger)">Punkte löschen:</b> Tippe auf einen Punkt, um ihn zu löschen (beide Reihen). Ein Tippen auf eine Kurve löscht diese Kurve.`;
+  else if(EX.plotMode==="draw") info=`Zeichne mit dem Stift die Ausgleichskurve für <b style="color:${a.col}">${a.html}</b>. Die Farbe richtet sich nach der gewählten Reihe.`;
+  else if(serDone(k)) info=`Alle Punkte für <b style="color:${a.col}">${a.html}</b> stimmen.${serDone(k==="zn"?"h":"zn")?" Zeichne jetzt die Ausgleichskurven.":` Wechsle zu ${AX[k==="zn"?"h":"zn"].html}.`}`;
+  else if(miss.length){ const i=miss[0]; info=`Reihe <b style="color:${a.col}">${a.html}</b> (${a.side} Achse) – noch ${miss.length} von ${EXT.length} Punkten offen, z. B. <b style="color:${a.col}">t = ${EXT[i]} s, c = ${esc(EX.val[a.key][i])} mol/L</b>`; }
+  else info=`Alle Punkte für <b style="color:${a.col}">${a.html}</b> gesetzt – tippe auf „Punkte prüfen“.`;
+  $("exPlotInfo").innerHTML=info;
+}
+function erasePoint(x,y){
+  let best=null, bd=16*16;
+  SER.forEach(k=>EX.pts[k].forEach((p,j)=>{ const [px,py]=toPx(p.t,p.c,k), d=(px-x)**2+(py-y)**2; if(d<bd){ bd=d; best={k,j}; } }));
+  if(best){ EX.pts[best.k].splice(best.j,1); EX.ptSt[best.k].splice(best.j,1); setFb([{cls:"hint",html:`Punkt gelöscht (${AX[best.k].html}).`}]); return; }
+  let sb=null, sd=12*12;
+  EX.strokes.forEach((s,si)=>s.p.forEach(([t,v])=>{ const [px,py]=toPx(t,v,s.k), d=(px-x)**2+(py-y)**2; if(d<sd){ sd=d; sb=si; } }));
+  if(sb!=null){ const k=EX.strokes[sb].k; EX.strokes.splice(sb,1); setFb([{cls:"hint",html:`Kurve gelöscht (${AX[k].html}).`}]); }
+}
+pc.addEventListener("pointerdown", e=>{
+  if(MODE!=="ex"||EX.step!==7) return;
+  const r=pc.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top;
+  const k=EX.series, a=AX[k], [t,c]=toData(x,y,k);
+  const pad=(a.max-a.min)*0.05;
+  if(EX.plotMode==="erase"){ erasePoint(x,y); renderPlotInfo(); }
+  else if(EX.plotMode==="pts"){
+    if(serDone(k)){ setFb([{cls:"hint",html:`Die Punkte für ${a.html} sind fertig. Wechsle die Reihe oder wähle „Kurve zeichnen“.`}]); return; }
+    if(t<-8||t>PX.xmax+5||c<a.min-pad||c>a.max+pad) return;
+    if(EX.pts[k].length>=EXT.length){ setFb([{cls:"hint",html:"Für diese Reihe sind schon alle 10 Punkte gesetzt. Prüfe sie oder lösche falsche Punkte mit „Punkte löschen“."}]); return; }
+    EX.pts[k].push({t:Math.max(0,t), c}); EX.ptSt[k].push("");
+    renderPlotInfo();
+  } else {
+    EX.drawing={k, p:[[t,c]]}; EX.strokes.push(EX.drawing);
+    try{ pc.setPointerCapture(e.pointerId); }catch(_){}
+  }
+  e.preventDefault();
+});
+pc.addEventListener("pointermove", e=>{ if(!EX.drawing) return; const r=pc.getBoundingClientRect(); EX.drawing.p.push(toData(e.clientX-r.left, e.clientY-r.top, EX.drawing.k)); });
+["pointerup","pointercancel","pointerleave"].forEach(ev=>pc.addEventListener(ev, ()=>{ EX.drawing=null; }));
+$("plotModeGrp").addEventListener("click", e=>{ const b=e.target.closest("button"); if(!b) return; EX.plotMode=b.dataset.pm; renderPlotInfo(); });
+$("plotSerGrp").addEventListener("click", e=>{ const b=e.target.closest("button"); if(!b) return; EX.series=b.dataset.ser; if(EX.plotMode==="erase") EX.plotMode="pts"; renderPlotInfo(); });
+$("strokeClear").addEventListener("click", ()=>{ EX.strokes=EX.strokes.filter(s=>s.k!==EX.series); });
+$("ptCheck").addEventListener("click", ()=>{
+  const k=EX.series, a=AX[k], P=EX.pts[k];
+  if(!P.length){ setFb([{cls:"hint",html:`Setze zuerst die Punkte für ${a.html}.`}]); return; }
+  const used=new Set(); let bad=0, firstMsg="";
+  P.forEach((p,j)=>{
+    const i=nearIdx(p.t), tOk=Math.abs(p.t-EXT[i])<=5, cOk=Math.abs(p.c-vNum(a.key,i))<=a.tol, dup=used.has(i);
+    const ok=tOk && cOk && !dup;
+    if(ok) used.add(i);
+    EX.ptSt[k][j]=ok?"ok":"bad";
+    if(!ok){ bad++; if(!firstMsg) firstMsg = !tOk ? `Ein Punkt liegt bei etwa ${Math.round(p.t)} s – dort gibt es keinen Messwert.` : dup ? `Für t = ${EXT[i]} s ist schon ein Punkt gesetzt – ein Punkt ist doppelt.` : `Bei t = ${EXT[i]} s stimmt die Konzentration nicht (getroffen etwa ${f3(p.c)} mol/L, richtig ${esc(EX.val[a.key][i])} mol/L). Achte auf die ${a.side} Achse.`; }
+  });
+  const miss=missing(k).length;
+  if(bad) setFb([{cls:"bad",html:`${a.html}: ${bad} Punkt${bad>1?"e sind":" ist"} falsch (rot). ${firstMsg} Lösche falsche Punkte mit „Punkte löschen“ und setze sie neu.`}]);
+  else if(miss) setFb([{cls:"good",html:`${a.html}: Die ${P.length} gesetzten Punkte stimmen. Es fehlen noch ${miss}.`}]);
+  else if(SER.every(serDone)){ completeStep(7,"Alle Punkte beider Reihen stimmen! Zeichne jetzt mit „Kurve zeichnen“ je eine Ausgleichskurve. Beachte: c(H<sup>+</sup>) nimmt doppelt so stark ab, wie c(Zn<sup>2+</sup>) zunimmt – deshalb verlaufen die Kurven spiegelbildlich."); EX.plotMode="draw"; renderEx(); return; }
+  else { const o=k==="zn"?"h":"zn"; EX.series=o; setFb([{cls:"good",html:`Alle Punkte für ${a.html} stimmen. Jetzt folgt ${AX[o].html} (${AX[o].side} Achse).`}]); }
+  renderPlotInfo();
+});
+function drawExPlot(){
+  const d=fitCanvas(pc), c=pc.getContext("2d"), {W,H,pw,ph}=pgeo(); if(!W) return;
+  c.setTransform(d,0,0,d,0,0); c.fillStyle=C.bg; c.fillRect(0,0,W,H);
+  c.lineWidth=1;
+  for(let t=0;t<=PX.xmax+1e-9;t+=10){ const [x]=toPx(t,0,"zn"); c.strokeStyle=t%30===0?"#2b3a33":"#18211d"; c.beginPath(); c.moveTo(x,PX.T); c.lineTo(x,PX.T+ph); c.stroke(); }
+  const nMin=Math.round((AX.zn.max-AX.zn.min)/AX.zn.minor);
+  for(let j=0;j<=nMin;j++){ const y=PX.T+ph-j/nMin*ph; c.strokeStyle=j%5===0?"#2b3a33":"#18211d"; c.beginPath(); c.moveTo(PX.L,y); c.lineTo(PX.L+pw,y); c.stroke(); }
+  c.font="10.5px "+MONO; c.textBaseline="top"; c.textAlign="center"; c.fillStyle=C.faint;
+  for(let t=0;t<=PX.xmax;t+=30){ const [x]=toPx(t,0,"zn"); c.fillText(String(t),x,PX.T+ph+6); }
+  c.textBaseline="middle";
+  SER.forEach(k=>{
+    const a=AX[k], n=Math.round((a.max-a.min)/a.step);
+    c.fillStyle=a.col; c.textAlign=k==="zn"?"right":"left";
+    for(let j=0;j<=n;j++){ const v=a.min+j*a.step, [,y]=toPx(0,v,k); c.fillText(de(v.toFixed(2)), k==="zn"?PX.L-7:PX.L+pw+7, y); }
+  });
+  c.lineWidth=1.4;
+  c.strokeStyle=AX.zn.col; c.beginPath(); c.moveTo(PX.L,PX.T); c.lineTo(PX.L,PX.T+ph); c.stroke();
+  c.strokeStyle=AX.h.col; c.beginPath(); c.moveTo(PX.L+pw,PX.T); c.lineTo(PX.L+pw,PX.T+ph); c.stroke();
+  c.strokeStyle=C.dim; c.beginPath(); c.moveTo(PX.L,PX.T+ph); c.lineTo(PX.L+pw,PX.T+ph); c.stroke();
+  c.fillStyle=C.dim; c.font="11.5px "+SANS; c.textAlign="center"; c.textBaseline="top"; c.fillText("Zeit t (s)",PX.L+pw/2,PX.T+ph+24);
+  c.save(); c.translate(14,PX.T+ph/2); c.rotate(-Math.PI/2); c.textBaseline="middle"; c.fillStyle=AX.zn.col; c.fillText(AX.zn.lab,0,0); c.restore();
+  c.save(); c.translate(W-12,PX.T+ph/2); c.rotate(Math.PI/2); c.textBaseline="middle"; c.fillStyle=AX.h.col; c.fillText(AX.h.lab,0,0); c.restore();
+  c.lineWidth=2.2; c.lineJoin="round"; c.lineCap="round";
+  EX.strokes.forEach(sk=>{ c.strokeStyle=AX[sk.k].col; c.beginPath(); sk.p.forEach(([t,v],j)=>{ const [x,y]=toPx(t,v,sk.k); j?c.lineTo(x,y):c.moveTo(x,y); }); c.stroke(); });
+  SER.forEach(k=>EX.pts[k].forEach((p,i)=>{
+    const [x,y]=toPx(p.t,p.c,k), st=EX.ptSt[k][i];
+    c.strokeStyle= st==="bad" ? C.danger : AX[k].col; c.lineWidth=2.2;
+    if(k==="zn"){ c.beginPath(); c.moveTo(x-5,y-5); c.lineTo(x+5,y+5); c.moveTo(x+5,y-5); c.lineTo(x-5,y+5); c.stroke(); }
+    else { c.beginPath(); c.moveTo(x-6,y); c.lineTo(x+6,y); c.moveTo(x,y-6); c.lineTo(x,y+6); c.stroke(); }
+    if(st==="ok"){ c.strokeStyle="#7fd68a"; c.lineWidth=1.2; c.beginPath(); c.arc(x,y,8,0,Math.PI*2); c.stroke(); }
+    if(EX.plotMode==="erase"){ c.strokeStyle="rgba(228,120,91,.55)"; c.lineWidth=1; c.setLineDash([2,2]); c.beginPath(); c.arc(x,y,11,0,Math.PI*2); c.stroke(); c.setLineDash([]); }
+  }));
+}
+
+/* ---------- Schritt 9: Durchschnittsgeschwindigkeit ---------- */
+function rateExp(k,j){ const [a,b]=EXI[j], dt=EXT[b]-EXT[a]; return k==="zn" ? (vNum("cZn",b)-vNum("cZn",a))/dt : -(vNum("cH",b)-vNum("cH",a))/dt; }
+function renderRates(){
+  let h='<thead><tr><th>Zeitraum</th>'+EXI.map(([a,b])=>`<th>${EXT[a]} s – ${EXT[b]} s<br><span style="font-weight:400;color:var(--text-faint)">Δt = ${EXT[b]-EXT[a]} s</span></th>`).join("")+'</tr></thead><tbody>';
+  [["zn","v̄(Zn<sup>2+</sup>)"],["h","v̄(H<sup>+</sup>)"]].forEach(([k,lab])=>{
+    h+=`<tr><td class="rl">${lab}<br><span class="u">[mol/(L·s)]</span></td>`+EXI.map((_,j)=>{ const st=EX.rs[k][j]; return `<td><input class="cell ${st}" data-rk="${k}" data-j="${j}" value="${esc(EX.rv[k][j])}" inputmode="decimal" autocomplete="off" ${st==="ok"||st==="shown"?"readonly":""}></td>`; }).join("")+"</tr>";
+  });
+  $("exRateTable").innerHTML=h+"</tbody>";
+}
+function rateHint(k,x,e,j){
+  if(!isFinite(x)) return "Bitte eine Zahl eingeben, z. B. 4,77·10^-4 oder 0,000477.";
+  const [a,b]=EXI[j], dt=EXT[b]-EXT[a], near=(p,q)=>q!==0&&Math.abs(p/q-1)<0.05;
+  if(near(x,-e)) return k==="zn" ? "Vorzeichen prüfen: c(Zn<sup>2+</sup>) nimmt zu, Δc ist positiv." : "c(H<sup>+</sup>) nimmt ab, Δc ist negativ – mit dem Minuszeichen in der Definition wird v̄ positiv.";
+  if(near(x,e*dt)||near(x,-e*dt)) return "Das ist erst Δc – teile das Ergebnis noch durch die Anzahl der Sekunden: Δt = "+dt+" s.";
+  if(k==="h" && (near(x,e/2))) return "Nimm die Werte aus der Spalte c(H<sup>+</sup>) – sie ändert sich doppelt so stark wie c(Zn<sup>2+</sup>).";
+  if(Math.abs(x/e-1)<0.12) return "Fast – rechne mit den Werten aus dem Protokoll und runde auf drei gültige Ziffern.";
+  return `Rechne Δc für den Zeitraum ${EXT[a]} s – ${EXT[b]} s und teile durch Δt = ${dt} s.`;
+}
+function rateInput(inp){
+  const k=inp.dataset.rk, j=+inp.dataset.j;
+  if(EX.rs[k][j]==="ok"||EX.rs[k][j]==="shown") return;
+  EX.rv[k][j]=inp.value.trim();
+  if(EX.rv[k][j]===""){ EX.rs[k][j]=""; inp.className="cell"; return; }
+  const x=parseNum(EX.rv[k][j]), e=rateExp(k,j);
+  const ok=isFinite(x) && Math.abs(x-e)<=0.05*Math.abs(e)+1e-9;
+  EX.rs[k][j]=ok?"ok":"bad"; inp.className="cell "+EX.rs[k][j];
+  const lab=`${k==="zn"?"v̄(Zn<sup>2+</sup>)":"v̄(H<sup>+</sup>)"}, ${EXT[EXI[j][0]]} s – ${EXT[EXI[j][1]]} s: `;
+  if(ok){ inp.readOnly=true; setFb([{cls:"good",html:lab+"richtig."}]); } else setFb([{cls:"bad",html:lab+rateHint(k,x,e,j)}]);
+  ratesDone();
+}
+function ratesDone(){
+  const all=["zn","h"].every(k=>EX.rs[k].every(s=>s==="ok"||s==="shown"));
+  if(all && !EX.done[8]){ completeStep(8,"Alle Durchschnittsgeschwindigkeiten stimmen. Vergleiche: v̄(H<sup>+</sup>) ist immer doppelt so groß wie v̄(Zn<sup>2+</sup>), und beide nehmen im Verlauf der Reaktion ab. Die Übung ist abgeschlossen!"); renderEx(); }
+}
+function rateTip(){
+  const [a,b]=EXI[0], dt=EXT[b]-EXT[a];
+  const z1=vNum("cZn",a), z2=vNum("cZn",b), h1=vNum("cH",a), h2=vNum("cH",b);
+  return `Beispiel für ${EXT[a]} s – ${EXT[b]} s:<br>v̄(Zn<sup>2+</sup>) = (${f3(z2)} − ${f3(z1)}) mol/L : (${EXT[b]} − ${EXT[a]}) s = <b>${f3((z2-z1)/dt)} mol/(L·s)</b><br>v̄(H<sup>+</sup>) = −(${f3(h2)} − ${f3(h1)}) mol/L : (${EXT[b]} − ${EXT[a]}) s = <b>${f3(-(h2-h1)/dt)} mol/(L·s)</b>`;
+}
+function rateSolve(){
+  ["zn","h"].forEach(k=>EXI.forEach((_,j)=>{ if(EX.rs[k][j]==="ok") return; EX.rv[k][j]=f3(rateExp(k,j)); EX.rs[k][j]="shown"; }));
+  renderRates(); ratesDone();
+}
+$("exRateTable").addEventListener("change", e=>{ const inp=e.target.closest("input.cell"); if(inp) rateInput(inp); });
+$("exRateTable").addEventListener("keydown", e=>{
+  if(e.key!=="Enter") return; const inp=e.target.closest("input.cell"); if(!inp) return;
+  e.preventDefault(); rateInput(inp);
+  const all=[...$("exRateTable").querySelectorAll("input.cell:not([readonly])")]; if(all.length) all[0].focus();
+});
+
+/* ---------- Navigation & Modus ---------- */
+function goStep(s){ if(s<0||s>EX.maxStep||s>=STEPS.length) return; EX.step=s; EX.fb=[]; renderEx(); window.scrollTo({top:0,behavior:"smooth"}); }
+$("exSteps").addEventListener("click", e=>{ const b=e.target.closest("button"); if(b&&!b.disabled) goStep(+b.dataset.s); });
+$("exPrev").addEventListener("click", ()=>goStep(EX.step-1));
+$("exNext").addEventListener("click", ()=>goStep(EX.step+1));
+$("exRestart").addEventListener("click", ()=>{ if(EX.maxStep>0 && !confirmRestart()) return; exReset(); renderEx(); });
+function confirmRestart(){ const b=$("exRestart"); if(b.dataset.arm==="1"){ b.dataset.arm=""; b.textContent="Übung neu beginnen"; return true; } b.dataset.arm="1"; b.textContent="Wirklich neu beginnen? Nochmal tippen"; setTimeout(()=>{ b.dataset.arm=""; b.textContent="Übung neu beginnen"; },3000); return false; }
+document.querySelectorAll(".mode-sel").forEach(g=>g.addEventListener("click", e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  MODE=b.dataset.mode;
+  document.querySelectorAll(".mode-sel button").forEach(x=>x.classList.toggle("active",x.dataset.mode===MODE));
+  $("simWrap").classList.remove("pick");
+  $("simWrap").hidden = MODE!=="sim"; $("exWrap").hidden = MODE!=="ex";
+  if(MODE==="ex"){ if(S.running){ S.running=false; } renderEx(); }
+  else { syncControls(); refreshAll(); sizeCanvases(); }
+}));
+function exFrame(dt){
+  if(EX.step===0){ exTick(dt); exDraw(dt); }
+  if(EX.step===7) drawExPlot();
+}
+exReset();
+
+/* Start */
+loadReaction("zn");
+sizeCanvases();
+requestAnimationFrame(frame);
+})();
+</script>
+
+<script>
+(function(){
+  const bd = document.getElementById("changelogBackdrop");
+  document.getElementById("btnChangelog").addEventListener("click", e=>{ e.preventDefault(); bd.classList.add("open"); });
+  document.getElementById("closeChangelog").addEventListener("click", ()=>bd.classList.remove("open"));
+  bd.addEventListener("click", e=>{ if(e.target===bd) bd.classList.remove("open"); });
+  document.addEventListener("keydown", e=>{ if(e.key==="Escape") bd.classList.remove("open"); });
+})();
+</script>
+<script>
+/* Höhe der Kopfzeile für die feststehende linke Spalte */
+(function(){
+  const hdr = document.querySelector("header");
+  if(!hdr) return;
+  const set = () => document.documentElement.style.setProperty("--hdr", Math.max(0, Math.round(hdr.getBoundingClientRect().bottom)) + "px");
+  addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
+})();
+</script>
+</body>
+</html>

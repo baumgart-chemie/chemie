@@ -181,6 +181,16 @@ svg.mol line.lp.ni{stroke:var(--nitro);}
 svg.mol line.lp.hal{stroke:var(--hal);}
 svg.mol circle.rd{fill:var(--amber); stroke:none;}
 svg.mol path.wv{stroke:var(--text-dim); stroke-width:1.4;}
+svg.mol .su{fill:#e8d36b;}
+svg.mol line.lp.su{stroke:#e8d36b;}
+svg.mol line.hb{stroke:var(--amber); stroke-width:1.6; stroke-dasharray:3 3.5;}
+svg.mol text.dl{fill:var(--amber); font-size:11.5px;}
+.gl-table td.f{vertical-align:middle; text-align:center;}
+.gl-table td.f svg.mol{display:inline-block; vertical-align:middle;}
+.gl-eqs{background:var(--screen); border:1px solid var(--line-soft); border-radius:4px; padding:6px 12px; margin:6px 0 12px; overflow-x:auto;}
+.gl-eqs .eqnum{gap:10px;}
+.gl-eqs .lbl{font-size:12px; color:var(--text-dim); margin:8px 0 0;}
+
 .eqs{display:flex; align-items:center; flex-wrap:wrap; gap:6px 12px; padding:8px 2px 12px;}
 .eqop{font-size:20px; color:var(--text-faint); line-height:1;}
 .eqop.arr{color:var(--teal); font-size:22px;}
@@ -302,6 +312,54 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
     overflow-y:auto; overscroll-behavior:contain; background:var(--bg);
   }
 }
+
+/* Rubrik Grundlagen */
+.gl-toggle{display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; cursor:pointer; text-align:left;
+  border:1px solid var(--teal-dim); border-radius:4px; background:var(--panel-alt); color:var(--text);
+  font-size:14px; font-weight:600; font-family:inherit; touch-action:manipulation;}
+.gl-toggle:hover{border-color:var(--teal);}
+.gl-toggle:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-toggle .gl-n{font-size:12px; font-weight:400; color:var(--text-faint);}
+.gl-toggle .gl-ch{margin-left:auto; color:var(--teal); font-size:13px;}
+.gl-toggle .gl-ch::after{content:"▸";}
+.gl-toggle[aria-expanded="true"] .gl-ch::after{content:"▾";}
+.gl-panel{margin-top:8px;}
+.gl-list{display:flex; flex-direction:column; gap:6px;}
+.gl-item{display:flex; gap:10px; align-items:center; width:100%; text-align:left; padding:8px 11px; cursor:pointer;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel); color:var(--text);
+  font-size:13px; font-family:inherit; font-weight:500; touch-action:manipulation;}
+.gl-item:hover{border-color:var(--text-faint); background:var(--panel-alt);}
+.gl-item:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-item .nr{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--amber); min-width:14px;}
+.gl-item .go{margin-left:auto; color:var(--text-faint); font-size:12px;}
+.gl-note{font-size:12px; color:var(--text-faint); line-height:1.5; margin:8px 0 0;}
+.modal-box.gl-wide{max-width:900px; width:100%; max-height:88vh; overflow-y:auto;}
+.gl-wide .gl-num{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--text-faint); margin-right:10px;}
+.gl-body p, .gl-body li{font-size:13.5px; line-height:1.6; color:var(--text-dim);}
+.gl-body p{margin:0 0 10px;}
+.gl-body ul, .gl-body ol{margin:0 0 12px; padding-left:22px;}
+.gl-body strong{color:var(--text); font-weight:600;}
+.gl-body sub, .gl-body sup{font-size:.72em;}
+.gl-row{display:flex; flex-wrap:wrap; gap:12px; align-items:stretch; margin:8px 0 14px;}
+.gl-fig{margin:0; flex:1 1 220px; background:var(--screen, #0e1113); border:1px solid var(--line-soft); border-radius:4px; padding:10px 12px 8px;
+  display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:6px; max-width:100%; overflow-x:auto;}
+.gl-fig figcaption{font-size:12px; color:var(--text-dim); text-align:center; line-height:1.45; max-width:420px;}
+.gl-tw{overflow-x:auto; margin:6px 0 12px; border:1px solid var(--line-soft); border-radius:4px;}
+.gl-table{width:100%; border-collapse:collapse; font-size:12.8px;}
+.gl-table th{text-align:left; font-weight:500; color:var(--text-faint); font-size:11.5px; padding:6px 9px; border-bottom:1px solid var(--line); background:var(--panel-alt);}
+.gl-table td{padding:6px 9px; border-bottom:1px solid var(--line-soft); color:var(--text-dim); vertical-align:top;}
+.gl-table tr:last-child td{border-bottom:none;}
+.gl-table td:first-child{color:var(--text);}
+.gl-steps{counter-reset:gls; list-style:none; padding-left:0 !important;}
+.gl-steps li{counter-increment:gls; position:relative; padding-left:30px; margin-bottom:6px;}
+.gl-steps li::before{content:counter(gls); position:absolute; left:0; top:1px; width:20px; height:20px; border-radius:50%; border:1px solid var(--teal-dim);
+  color:var(--teal); font-size:11.5px; display:flex; align-items:center; justify-content:center; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.gl-box{border:1px solid var(--line-soft); border-left:3px solid var(--teal); background:var(--panel-alt); border-radius:3px; padding:9px 12px; margin:8px 0 12px;
+  font-size:13.5px; line-height:1.65; color:var(--text);}
+.gl-box.gl-warn{border-left-color:var(--amber);}
+.gl-box small{color:var(--text-faint); font-size:12px;}
+.gl-nav{display:flex; align-items:center; gap:10px; border-top:1px solid var(--line-soft); padding-top:14px; margin-top:16px;}
+.gl-nav .sp{flex:1; text-align:center; font-size:12px; color:var(--text-faint);}
 </style>
 </head>
 <body>
@@ -356,6 +414,17 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
       <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.3</span><span class="d">02.11.2026</span></div>
+      <ul>
+        <li><strong>Grundlagen mit Strukturformeln:</strong> Alle Formeln in den Grundlagen sind jetzt Valenzstrichformeln mit freien Elektronenpaaren – Monomere und Wiederholungseinheiten, die Schritte der radikalischen Polymerisation, die Reaktionsgleichungen zu PET, PA 6.6 und PUR sowie Ester-, Amid- und Urethangruppe.</li>
+        <li><strong>Struktur und Eigenschaften:</strong> Erläuterungen zu Bindungen und Wechselwirkungen ergänzt – Atombindungen in der Kette und an den Vernetzungsstellen, Van-der-Waals-Kräfte, Dipol-Dipol-Kräfte und Wasserstoffbrücken mit Abbildungen, Übersichtstabelle und Vergleich der Bindungsstärken.</li>
+      </ul>
+      <div class="vh-ver"><span class="v">V1.2</span><span class="d">01.11.2026</span></div>
+      <ul>
+        <li><strong>Neue Rubrik „Grundlagen“:</strong> Der Knopf „Grundlagen“ oben in der linken Spalte klappt 5 Themen mit Erklärtext und Grafiken zu den fachlichen und methodischen Grundlagen auf. Mit den Knöpfen unten oder den Pfeiltasten blättert man zwischen den Themen.</li>
+        <li><strong>Linke Spalte:</strong> Sie bleibt beim Scrollen der Aufgabe stehen, füllt die Bildschirmhöhe und scrollt als Ganzes in einem einzigen Bereich.</li>
+        <li><strong>Lösungshistorie:</strong> neue Kategorie „mit Hilfen gelöst“ für Aufgaben, die nach einem Tipp richtig gelöst wurden.</li>
+      </ul>
       <div class="vh-ver"><span class="v">V1.1</span><span class="d">18.10.2026</span></div>
       <ul>
         <li><strong>Valenzstrichformeln:</strong> Alle Formeln, auch die Reaktionsgleichungen zur radikalischen Polymerisation, sind als Strukturformeln mit freien Elektronenpaaren dargestellt. Ungepaarte Elektronen erscheinen als orange Punkte.</li>
@@ -374,6 +443,17 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
 <div class="wrap">
   <!-- SIDEBAR -->
   <div class="sidebar">
+
+    <section class="block">
+      <button type="button" class="gl-toggle" id="glToggle" aria-expanded="false" aria-controls="glPanel">
+        <span>Grundlagen</span><span class="gl-n">5 Themen</span><span class="gl-ch" aria-hidden="true"></span>
+      </button>
+      <div class="gl-panel" id="glPanel" hidden>
+        <div class="gl-list" id="glList"></div>
+        <p class="gl-note">Erklärungen mit Grafiken zum Nachlesen – auch zur Besprechung im Unterricht.</p>
+      </div>
+    </section>
+
 
     <section class="block">
       <h2>Aufgabentypen</h2>
@@ -469,7 +549,7 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
 
 <footer>
   <p class="footer-note">Valenzstrichformeln mit freien Elektronenpaaren; lange CH₂-Ketten als eingeklammerte CH₂-Einheit mit Index, Benzolring in Kekulé-Schreibweise. Teilchenmodelle schematisch.</p>
-  <p class="footer-credit">Bastian Baumgart · Polymerisation &amp; Kunststoffe V1.1 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Polymerisation &amp; Kunststoffe V1.3 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <script>
@@ -505,10 +585,10 @@ function fm(s){
    dass sie möglichst weit von den Bindungen entfernt liegen.
    ============================================================ */
 const U = 32, STEP = 1.35;
-const VE = {H:1, C:4, N:5, O:6, F:7, Cl:7};
-const ELCLS = {O:"ox", N:"ni", F:"hal", Cl:"hal"};
+const VE = {H:1, C:4, N:5, O:6, F:7, Cl:7, S:6};
+const ELCLS = {O:"ox", N:"ni", F:"hal", Cl:"hal", S:"su"};
 
-function Mol(){ this.A=[]; this.B=[]; this.inner=[]; this.par=[]; this.brk=[]; }
+function Mol(){ this.A=[]; this.B=[]; this.inner=[]; this.par=[]; this.brk=[]; this.note=[]; }
 Mol.prototype.add = function(el,x,y,o){ o=o||{}; this.A.push({el, x, y, rad:o.rad?1:0, hide:!!o.hide}); return this.A.length-1; };
 Mol.prototype.bond = function(i,j,o){ this.B.push({i, j, o:o||1}); };
 
@@ -633,6 +713,7 @@ function render(m,opt){
     const s1=er(A,dx,dy), s2=er(B,dx,dy);
     x1+=dx*s1; y1+=dy*s1; x2-=dx*s2; y2-=dy*s2;
     const nx=-dy, ny=dx;
+    if(b.o==="hb"){ L(x1,y1,x2,y2,"hb"); return; }
     (b.o===2?[-2.8,2.8] : b.o===3?[-3.8,0,3.8] : [0]).forEach(o=>L(x1+nx*o, y1+ny*o, x2+nx*o, y2+ny*o));
   });
   m.inner.forEach(r=>{
@@ -654,10 +735,11 @@ function render(m,opt){
     out.push(`<text x="${f1(x)}" y="${f1(y)}" text-anchor="middle" dominant-baseline="central"${ELCLS[a.el]?` class="${ELCLS[a.el]}"`:""}>${esc(a.el)}</text>`);
     ext(x,y,hw(a),9);
     const ve=VE[a.el]; if(ve==null) return;
-    const bsum=nb[i].reduce((s,b)=>s+b.o,0);
+    const real=nb[i].filter(b=>b.o!=="hb");
+    const bsum=real.reduce((s,b)=>s+b.o,0);
     const np=Math.max(0, Math.floor((ve-bsum-a.rad)/2)), n=np+a.rad;
     if(!n) return;
-    const fixed=nb[i].map(b=>{ const o=other(b,i); return (Math.round(Math.atan2(o.y-a.y,o.x-a.x)*180/Math.PI)+360)%360; });
+    const fixed=real.map(b=>{ const o=other(b,i); return (Math.round(Math.atan2(o.y-a.y,o.x-a.x)*180/Math.PI)+360)%360; });
     let ang=chooseAngles(fixed,n), radA=null;
     if(a.rad){
       let bi=0, bd=-1;
@@ -674,6 +756,7 @@ function render(m,opt){
       out.push(`<circle class="rd" cx="${f1(px)}" cy="${f1(py)}" r="2.7"/>`); ext(px,py,3,3);
     }
   });
+  m.note.forEach(n=>{ const x=n.x*U, y=n.y*U; out.push(`<text class="dl" x="${f1(x)}" y="${f1(y)}" text-anchor="middle" dominant-baseline="central">${esc(n.t)}</text>`); ext(x,y,8,7); });
   m.par.forEach(p=>{
     const x=p.x*U, h=1.34*U, w=0.6*U;
     out.push(`<path class="br" d="M${f1(x-w+4)} ${f1(-h)} Q${f1(x-w-5)} 0 ${f1(x-w+4)} ${f1(h)}"/>`);
@@ -695,6 +778,61 @@ function render(m,opt){
   return `<svg class="mol" viewBox="${f1(bb.x0-P0)} ${f1(bb.y0-P0)} ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Strukturformel">${out.join("")}</svg>`;
 }
 function chainSVG(tokens, opt){ return render(chainMol(tokens), opt); }
+
+/* Mehrere Molekülausschnitte zu einer Abbildung zusammensetzen (für Wechselwirkungen) */
+function mergeMols(parts){
+  const m=new Mol();
+  parts.forEach(({mol,dx,dy})=>{
+    dx=dx||0; dy=dy||0; const base=m.A.length;
+    mol.A.forEach(a=>m.A.push(Object.assign({}, a, {x:a.x+dx, y:a.y+dy})));
+    mol.B.forEach(b=>m.B.push({i:b.i+base, j:b.j+base, o:b.o}));
+    mol.inner.forEach(r=>m.inner.push({cx:r.cx+dx, cy:r.cy+dy, a:r.a+base, b:r.b+base}));
+  });
+  return m;
+}
+function near(m,el,x,y){ let bi=-1, bd=1e9; m.A.forEach((a,i)=>{ if(a.el!==el) return; const d=Math.hypot(a.x-x,a.y-y); if(d<bd){ bd=d; bi=i; } }); return bi; }
+
+/* Van-der-Waals-Kräfte zwischen zwei PE-Ketten */
+function figVdW(){
+  const c=()=>chainMol(["~",CH2T,CH2T,CH2T,CH2T,"~"]);
+  const m=mergeMols([{mol:c()},{mol:c(),dy:3.3}]);
+  [1.35,2.7,4.05,5.4].forEach(x=>m.bond(near(m,"H",x,1), near(m,"H",x,2.3), "hb"));
+  return render(m);
+}
+/* Dipol-Dipol-Kräfte zwischen zwei PVC-Ketten */
+function figDipol(){
+  const CCl={l:"C", up:"H", down:"Cl"};
+  const c1=chainMol(["~",CCl,CH2T,CCl,CH2T,"~"]);
+  const c2=chainMol(["~",CCl,CH2T,CCl,CH2T,"~"]);
+  const D=1.55;  /* Versatz: die Anziehungslinie verläuft genau zwischen zwei H-Atomen */
+  const m=mergeMols([{mol:c1},{mol:c2,dy:3.3,dx:D}]);
+  [1.35,4.05].forEach(x=>{
+    m.note.push({x:x+0.42, y:-0.36, t:"δ+"}, {x:x+0.62, y:1.28, t:"δ−"});
+    m.note.push({x:x+D+0.42, y:2.94, t:"δ+"}, {x:x+D+0.62, y:4.58, t:"δ−"});
+    m.bond(near(m,"Cl",x,1), near(m,"C",x+D,3.3), "hb");
+  });
+  return render(m);
+}
+/* Wasserstoffbrücken zwischen zwei Polyamid-Ketten */
+function figHB(){
+  const c1=chainMol(["~",CH2T,"C=O","NH",CH2T,"~"]);
+  const c2=chainMol(["~",CH2T,{l:"N",down:"H"},{l:"C",down:"=O"},CH2T,"~"]);
+  const m=mergeMols([{mol:c2},{mol:c1,dy:3.3}]);
+  m.bond(near(m,"H",2.7,1), near(m,"O",2.7,2.3), "hb");
+  m.bond(near(m,"O",4.05,1), near(m,"H",4.05,2.3), "hb");
+  m.note.push({x:2.25, y:1.05, t:"δ+"}, {x:2.25, y:2.25, t:"δ−"}, {x:4.5, y:1.05, t:"δ−"}, {x:4.5, y:2.25, t:"δ+"});
+  return render(m);
+}
+/* Vernetzung durch Atombindungen: Schwefelbrücke zwischen zwei Ketten (vulkanisierter Kautschuk, vereinfacht) */
+function figSS(){
+  const c1=chainMol(["~",CH2T,{l:"C",up:"H"},CH2T,"~"]);
+  const c2=chainMol(["~",CH2T,{l:"C",down:"H"},CH2T,"~"]);
+  const m=mergeMols([{mol:c1},{mol:c2,dy:3}]);
+  const s1=m.add("S",2.7,1), s2=m.add("S",2.7,2);
+  m.bond(near(m,"C",2.7,0), s1); m.bond(s1,s2); m.bond(s2, near(m,"C",2.7,3));
+  return render(m);
+}
+
 
 /* Reaktionsgleichung aus Strukturformeln: Moleküle (Token-Arrays) und Zeichen "+", "→", Koeffizienten */
 function eqHTML(parts){
@@ -1295,6 +1433,7 @@ document.addEventListener("keydown", e=>{ if(e.key==="Escape") gbd.classList.rem
 
 renderTypes(); renderSelect(); renderOverview(); renderStats();
 $("guideEq").innerHTML = eqHTML(["n", monoT(addByK("PVC").s), "→", unitT(addByK("PVC").s)]);
+window.PF = {chainSVG, eqHTML, monoT, unitT, wrapU, addByK, COND, M, STEPS, RMON, figVdW, figDipol, figHB, figSS};
 loadTask(makeA1(addByK("PVC")));
 })();
 </script>
@@ -1315,6 +1454,137 @@ loadTask(makeA1(addByK("PVC")));
   if(!hdr) return;
   const set = () => document.documentElement.style.setProperty("--hdr", Math.max(0, Math.round(hdr.getBoundingClientRect().bottom)) + "px");
   addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
+})();
+</script>
+
+<div class="modal-backdrop" id="glBackdrop">
+  <div class="modal-box gl-wide" role="dialog" aria-modal="true" aria-labelledby="glTitle">
+    <div class="modal-head">
+      <h2><span class="gl-num" id="glNum"></span><span id="glTitle"></span></h2>
+      <button class="modal-close" id="glClose" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body gl-body" id="glBody"></div>
+    <div class="gl-nav">
+      <button class="btn ghost" id="glPrev">← Vorheriges Thema</button>
+      <span class="sp" id="glPos"></span>
+      <button class="btn" id="glNext">Nächstes Thema →</button>
+    </div>
+  </div>
+</div>
+<script>
+/* Rubrik Grundlagen */
+(function(){
+  const F = window.PF;
+  const CH2 = {l:"C", up:"H", down:"H"};
+  const H2O = ["H","O","H"];
+  const fig = (svg, cap) => `<figure class="gl-fig">${svg}<figcaption>${cap}</figcaption></figure>`;
+  const condUnit = k => F.wrapU(F.COND.find(c=>c.k===k).unit);
+  const netFig = (inner, cap) => `<figure class="gl-fig"><svg viewBox="0 0 220 140" width="220" style="max-width:220px;width:100%;height:auto" role="img">${inner}</svg><figcaption>${cap}</figcaption></figure>`;
+  const chains = [[25,31,33,28,21,17,19,25,31],[50,51,46,39,35,37,44,50,51],[68,63,56,53,56,63,68,68,63],[80,73,71,75,81,87,86,80,73],[91,89,93,100,105,103,97,91,89],[107,112,119,123,121,114,108,107,112]]
+    .map(ys => `<path d="M${ys.map((y,i)=>(20+i*22)+" "+y).join(" L")}" stroke="var(--teal)" stroke-width="2" fill="none"/>`).join("");
+  const duro = (()=>{ let h=""; [25,55,85,115].forEach((y,r)=>{ [30,70,110,150].forEach(x=>{ h+=`<line x1="${x}" y1="${y}" x2="${x+40}" y2="${y}" stroke="var(--teal)" stroke-width="2"/>`; }); if(r<3) [30,70,110,150,190].forEach(x=>{ h+=`<line x1="${x}" y1="${y}" x2="${x}" y2="${y+30}" stroke="var(--amber)" stroke-width="2"/>`; }); }); return h; })();
+
+  const GL = [
+  {t:"Monomer, Polymer, Wiederholungseinheit", h:()=>`
+    <p><strong>Polymere</strong> (Makromoleküle) sind aus sehr vielen kleinen Bausteinen, den <strong>Monomeren</strong>, aufgebaut. Kunststoffe bestehen aus Polymeren mit Tausenden von Monomereinheiten.</p>
+    <p>Das sich wiederholende Strukturstück heißt <strong>Wiederholungseinheit</strong>. Man schreibt es in eckige Klammern mit dem Index n:</p>
+    <div class="gl-eqs">${F.eqHTML(["n", F.monoT(F.addByK("PE").s), "→", F.unitT(F.addByK("PE").s)])}<p class="lbl">Ethen → Polyethen (PE)</p></div>
+    <p>In allen Formeln sind die <strong>freien Elektronenpaare</strong> als Striche am Atom eingezeichnet, ungepaarte Elektronen als orange Punkte.</p>
+    <p>Es gibt drei Bildungsreaktionen: <strong>Polymerisation</strong>, <strong>Polykondensation</strong> und <strong>Polyaddition</strong>. Welche abläuft, hängt von den funktionellen Gruppen der Monomere ab.</p>`},
+
+  {t:"Polymerisation", h:()=>`
+    <p>Monomere mit einer <strong>C=C-Doppelbindung</strong> verknüpfen sich, indem die Doppelbindungen „aufklappen“. Dabei wird nichts abgespalten.</p>
+    <div class="gl-tw"><table class="gl-table"><thead><tr><th>Monomer</th><th>Strukturformel</th><th>Wiederholungseinheit</th><th>Polymer</th></tr></thead><tbody>
+    ${["PE","PP","PVC","PS"].map(k=>{ const m=F.addByK(k); return `<tr><td>${m.mono}</td><td class="f">${F.chainSVG(F.monoT(m.s))}</td><td class="f">${F.chainSVG(F.unitT(m.s))}</td><td>${m.poly} (${m.k})</td></tr>`; }).join("")}
+    </tbody></table></div>
+    <div class="gl-box gl-info"><strong>Monomer → Wiederholungseinheit:</strong> Die Doppelbindung wird zur Einfachbindung, an beiden C-Atomen entsteht je eine Bindung nach außen. Die Substituenten (–CH<sub>3</sub>, –Cl, Phenyl) bleiben an ihrem C-Atom.<br><strong>Rückwärts:</strong> Aus der Wiederholungseinheit mit zwei C-Atomen in der Hauptkette erhält man das Monomer, indem man die C–C-Bindung zur Doppelbindung macht.</div>`},
+
+  {t:"Radikalische Polymerisation", h:()=>{ const r=F.RMON[0]; const row=(k,n,lbl)=>`<div class="eqnum"><span>${n}</span><div><p class="lbl">${lbl}</p>${F.eqHTML(F.STEPS[k].eq(r))}</div></div>`; return `
+    <p>Die Polymerisation läuft häufig als Kettenreaktion über <strong>Radikale</strong> – Teilchen mit einem ungepaarten Elektron (in den Formeln orange Punkte).</p>
+    <ol class="gl-steps"><li><strong>Zerfall des Initiators:</strong> Ein Starter (z. B. ein Peroxid R–O–O–R) zerfällt durch Wärme in zwei Radikale R–O•. Die O–O-Bindung wird homolytisch gespalten.</li><li><strong>Startreaktion:</strong> Das Starterradikal addiert an die C=C-Doppelbindung eines Monomers; es entsteht ein neues, größeres Radikal.</li><li><strong>Kettenwachstum:</strong> Das Radikal addiert immer weitere Monomere – die Kette wächst, das Radikal bleibt am Kettenende.</li><li><strong>Kettenabbruch:</strong> Zwei Radikale reagieren miteinander. Bei der <strong>Rekombination</strong> verbinden sich zwei Kettenenden; bei der <strong>Disproportionierung</strong> überträgt ein Radikal ein H-Atom auf das andere – es entstehen ein Alkan- und ein Alken-Kettenende.</li></ol>
+    <div class="gl-eqs">
+      ${row("init",1,"Zerfall des Initiators")}
+      ${row("start",2,"Startreaktion (Beispiel Ethen)")}
+      ${row("grow",3,"Kettenwachstum")}
+      ${row("rec",4,"Kettenabbruch durch Rekombination")}
+      ${row("disp",4,"Kettenabbruch durch Disproportionierung")}
+    </div>
+    <p>Bei jedem Schritt wird ein Elektronenpaar aus der π-Bindung gespalten: Ein Elektron bildet mit dem ungepaarten Elektron des Radikals eine neue Bindung, das andere wird zum neuen ungepaarten Elektron.</p>`; }},
+
+  {t:"Polykondensation und Polyaddition", h:()=>`
+    <p><strong>Polykondensation:</strong> Monomere mit <strong>zwei funktionellen Gruppen</strong> reagieren unter Abspaltung kleiner Moleküle (meist H<sub>2</sub>O, bei Säurechloriden HCl).</p>
+    <ul><li><strong>Polyester:</strong> Dicarbonsäure + Diol, Esterbindung –CO–O– (z. B. PET aus Terephthalsäure und Ethan-1,2-diol).</li>
+    <li><strong>Polyamide:</strong> Dicarbonsäure + Diamin oder Aminocarbonsäure, Amidbindung –CO–NH– (z. B. Nylon-6,6 aus Hexandisäure und Hexan-1,6-diamin).</li></ul>
+    <div class="gl-eqs">
+      <p class="lbl">Polyester PET</p>${F.eqHTML(["n", F.M.tere.t, "+", "n", F.M.glyk.t, "→", condUnit("PET"), "+", "2n", H2O])}
+      <p class="lbl">Polyamid PA 6.6</p>${F.eqHTML(["n", F.M.adip.t, "+", "n", F.M.hmda.t, "→", condUnit("PA 6.6"), "+", "2n", H2O])}
+    </div>
+    <p><strong>Polyaddition:</strong> Ein <strong>Diisocyanat</strong> (O=C=N–R–N=C=O) reagiert mit einem <strong>Diol</strong>. Das H-Atom der OH-Gruppe wandert zum N-Atom; es entsteht die Urethangruppe –NH–CO–O–. Dabei wird <strong>nichts abgespalten</strong>. Produkt: Polyurethane (PUR), z. B. Schaumstoffe.</p>
+    <div class="gl-eqs"><p class="lbl">Polyurethan PUR</p>${F.eqHTML(["n", F.M.hdi.t, "+", "n", F.M.butd.t, "→", condUnit("PUR")])}</div>
+    <div class="gl-row">
+      ${fig(F.chainSVG(["*","C=O","O","*"]), "<strong>Estergruppe</strong>")}
+      ${fig(F.chainSVG(["*","C=O","NH","*"]), "<strong>Amidgruppe</strong>")}
+      ${fig(F.chainSVG(["*","O","C=O","NH","*"]), "<strong>Urethangruppe</strong>")}
+    </div>
+    <div class="gl-tw"><table class="gl-table"><thead><tr><th>Reaktion</th><th>Monomere</th><th>Abspaltung</th></tr></thead><tbody><tr><td>Polymerisation</td><td>C=C</td><td>keine</td></tr><tr><td>Polykondensation</td><td>zwei funktionelle Gruppen (–COOH, –OH, –NH<sub>2</sub>)</td><td>H<sub>2</sub>O oder HCl</td></tr><tr><td>Polyaddition</td><td>Diisocyanat + Diol</td><td>keine</td></tr></tbody></table></div>`},
+
+  {t:"Struktur und Eigenschaften", h:()=>`
+    <div class="gl-row">
+      ${netFig(chains, "<strong>Thermoplast:</strong> lineare oder wenig verzweigte Ketten, nicht vernetzt. Zwischen den Ketten wirken nur zwischenmolekulare Wechselwirkungen.")}
+      ${netFig(chains+'<line x1="64" y1="33" x2="64" y2="51" stroke="var(--amber)" stroke-width="2.2"/><line x1="130" y1="69" x2="130" y2="87" stroke="var(--amber)" stroke-width="2.2"/><line x1="86" y1="105" x2="86" y2="123" stroke="var(--amber)" stroke-width="2.2"/>', "<strong>Elastomer:</strong> weitmaschig vernetzt. Wenige Atombindungen (orange) verbinden die Ketten.")}
+      ${netFig(duro, "<strong>Duroplast:</strong> engmaschig vernetzt. Sehr viele Atombindungen bilden ein starres, räumliches Netz.")}
+    </div>
+
+    <p><strong>Bindungen innerhalb der Kette:</strong> In allen Kunststoffen sind die Atome einer Kette durch <strong>Atombindungen</strong> (Elektronenpaarbindungen) verknüpft: C–C und C–H, je nach Kunststoff auch polare Bindungen wie C–Cl, C–O, C=O oder N–H. Atombindungen sind stark, die Bindungsenergie liegt in der Größenordnung von etwa 350 kJ/mol (C–C).</p>
+    <p><strong>Zwischen den Ketten</strong> wirken je nach Bau der Wiederholungseinheit verschiedene <strong>zwischenmolekulare Wechselwirkungen</strong> (gestrichelt):</p>
+    <div class="gl-row">
+      ${fig(F.figVdW(), "<strong>Van-der-Waals-Kräfte</strong> (PE): Anziehung durch kurzzeitige, spontan entstehende Dipole. Sie wirken zwischen allen Ketten und sind umso stärker, je länger die Ketten sind und je dichter sie aneinanderliegen.")}
+      ${fig(F.figDipol(), "<strong>Dipol-Dipol-Kräfte</strong> (PVC): Die polaren C–Cl-Bindungen (δ+/δ−) ziehen sich zwischen benachbarten Ketten an. Sie wirken zusätzlich zu den Van-der-Waals-Kräften.")}
+      ${fig(F.figHB(), "<strong>Wasserstoffbrücken</strong> (Polyamide): Das positiv polarisierte H-Atom der N–H-Gruppe wird vom freien Elektronenpaar des O-Atoms einer C=O-Gruppe der Nachbarkette angezogen.")}
+    </div>
+    <p><strong>Vernetzung:</strong> Bei Elastomeren und Duroplasten sind die Ketten zusätzlich durch <strong>Atombindungen</strong> miteinander verbunden. Beim Vulkanisieren von Kautschuk entstehen zum Beispiel Schwefelbrücken zwischen den Ketten.</p>
+    <div class="gl-row">${fig(F.figSS(), "<strong>Schwefelbrücke</strong> –S–S– zwischen zwei Ketten (vereinfacht): Die Ketten sind über Atombindungen fest verknüpft.")}</div>
+    <div class="gl-tw"><table class="gl-table"><thead><tr><th></th><th>innerhalb der Kette</th><th>zwischen den Ketten</th><th>beim Erwärmen</th></tr></thead><tbody>
+      <tr><td>Thermoplast</td><td>Atombindungen</td><td>nur zwischenmolekulare Wechselwirkungen: Van-der-Waals-Kräfte, Dipol-Dipol-Kräfte, Wasserstoffbrücken</td><td>Die Wechselwirkungen werden überwunden, die Ketten gleiten aneinander ab: weich, schmelzbar</td></tr>
+      <tr><td>Elastomer</td><td>Atombindungen</td><td>zwischenmolekulare Wechselwirkungen und <strong>wenige</strong> Atombindungen (Vernetzungsstellen)</td><td>Die Brücken bleiben erhalten: kein Schmelzen, bei hoher Temperatur Zersetzung</td></tr>
+      <tr><td>Duroplast</td><td>Atombindungen</td><td><strong>sehr viele</strong> Atombindungen (räumliches Netz)</td><td>formstabil, kein Erweichen, bei hoher Temperatur Zersetzung</td></tr>
+    </tbody></table></div>
+    <div class="gl-box gl-warn"><strong>Stärke im Vergleich (Größenordnung):</strong> Van-der-Waals-Kräfte &lt; Dipol-Dipol-Kräfte &lt; Wasserstoffbrücken ≪ Atombindungen.<br><small>Zwischenmolekulare Wechselwirkungen liegen bei wenigen bis etwa 40 kJ/mol, Atombindungen bei mehreren hundert kJ/mol. Deshalb lassen sich die Kräfte zwischen den Ketten eines Thermoplasten durch Erwärmen überwinden, die Atombindungen der Vernetzung dagegen nicht – sie brechen erst bei der Zersetzung.</small></div>
+    <ul><li><strong>Thermoplaste</strong> werden beim Erwärmen weich und formbar, weil die Ketten aneinander vorbeigleiten können; beim Abkühlen werden sie wieder fest. Sie sind schweißbar und recycelbar (PE, PP, PS, PVC, PET). Je stärker die Wechselwirkungen zwischen den Ketten, desto höher die Erweichungstemperatur und Festigkeit: Polyamide sind durch Wasserstoffbrücken besonders fest und eignen sich für reißfeste Fasern.</li>
+    <li><strong>Elastomere</strong> sind gummielastisch: Die wenigen Vernetzungen holen die Ketten nach dem Dehnen in die Ausgangslage zurück. Sie schmelzen nicht, quellen aber in Lösungsmitteln, weil Lösungsmittelmoleküle zwischen die Ketten eindringen können.</li>
+    <li><strong>Duroplaste</strong> sind hart und spröde; das dichte Netz aus Atombindungen verhindert Erweichen. Beim starken Erhitzen zersetzen sie sich.</li></ul>`}
+  ];
+  const g = id => document.getElementById(id);
+  const bd = g("glBackdrop"), box = bd.querySelector(".modal-box");
+  let idx = 0;
+  function show(i){
+    idx = Math.max(0, Math.min(GL.length - 1, i));
+    g("glNum").textContent = (idx + 1) + ".";
+    g("glTitle").innerHTML = GL[idx].t;
+    g("glBody").innerHTML = typeof GL[idx].h === "function" ? GL[idx].h() : GL[idx].h;
+    g("glPos").textContent = "Thema " + (idx + 1) + " von " + GL.length;
+    g("glPrev").disabled = idx === 0;
+    g("glNext").disabled = idx === GL.length - 1;
+    box.scrollTop = 0;
+    bd.classList.add("open");
+  }
+  g("glList").innerHTML = GL.map((b, i) => '<button type="button" class="gl-item" data-i="' + i + '"><span class="nr">' + (i + 1) + '</span>' + b.t + '<span class="go">›</span></button>').join("");
+  g("glToggle").addEventListener("click", () => {
+    const open = g("glToggle").getAttribute("aria-expanded") !== "true";
+    g("glToggle").setAttribute("aria-expanded", String(open));
+    g("glPanel").hidden = !open;
+  });
+  g("glList").addEventListener("click", e => { const b = e.target.closest(".gl-item"); if (b) show(+b.dataset.i); });
+  g("glPrev").addEventListener("click", () => show(idx - 1));
+  g("glNext").addEventListener("click", () => show(idx + 1));
+  g("glClose").addEventListener("click", () => bd.classList.remove("open"));
+  bd.addEventListener("click", e => { if (e.target === bd) bd.classList.remove("open"); });
+  document.addEventListener("keydown", e => {
+    if (!bd.classList.contains("open")) return;
+    if (e.key === "Escape") bd.classList.remove("open");
+    if (e.key === "ArrowRight" && idx < GL.length - 1) show(idx + 1);
+    if (e.key === "ArrowLeft" && idx > 0) show(idx - 1);
+  });
 })();
 </script>
 </body>

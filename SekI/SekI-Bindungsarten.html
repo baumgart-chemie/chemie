@@ -307,6 +307,54 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
     overflow-y:auto; overscroll-behavior:contain; background:var(--bg);
   }
 }
+
+/* Rubrik Grundlagen */
+.gl-toggle{display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; cursor:pointer; text-align:left;
+  border:1px solid var(--teal-dim); border-radius:4px; background:var(--panel-alt); color:var(--text);
+  font-size:14px; font-weight:600; font-family:inherit; touch-action:manipulation;}
+.gl-toggle:hover{border-color:var(--teal);}
+.gl-toggle:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-toggle .gl-n{font-size:12px; font-weight:400; color:var(--text-faint);}
+.gl-toggle .gl-ch{margin-left:auto; color:var(--teal); font-size:13px;}
+.gl-toggle .gl-ch::after{content:"▸";}
+.gl-toggle[aria-expanded="true"] .gl-ch::after{content:"▾";}
+.gl-panel{margin-top:8px;}
+.gl-list{display:flex; flex-direction:column; gap:6px;}
+.gl-item{display:flex; gap:10px; align-items:center; width:100%; text-align:left; padding:8px 11px; cursor:pointer;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel); color:var(--text);
+  font-size:13px; font-family:inherit; font-weight:500; touch-action:manipulation;}
+.gl-item:hover{border-color:var(--text-faint); background:var(--panel-alt);}
+.gl-item:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-item .nr{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--amber); min-width:14px;}
+.gl-item .go{margin-left:auto; color:var(--text-faint); font-size:12px;}
+.gl-note{font-size:12px; color:var(--text-faint); line-height:1.5; margin:8px 0 0;}
+.modal-box.gl-wide{max-width:900px; width:100%; max-height:88vh; overflow-y:auto;}
+.gl-wide .gl-num{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--text-faint); margin-right:10px;}
+.gl-body p, .gl-body li{font-size:13.5px; line-height:1.6; color:var(--text-dim);}
+.gl-body p{margin:0 0 10px;}
+.gl-body ul, .gl-body ol{margin:0 0 12px; padding-left:22px;}
+.gl-body strong{color:var(--text); font-weight:600;}
+.gl-body sub, .gl-body sup{font-size:.72em;}
+.gl-row{display:flex; flex-wrap:wrap; gap:12px; align-items:stretch; margin:8px 0 14px;}
+.gl-fig{margin:0; flex:1 1 220px; background:var(--screen, #0e1113); border:1px solid var(--line-soft); border-radius:4px; padding:10px 12px 8px;
+  display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:6px; max-width:100%; overflow-x:auto;}
+.gl-fig figcaption{font-size:12px; color:var(--text-dim); text-align:center; line-height:1.45; max-width:420px;}
+.gl-tw{overflow-x:auto; margin:6px 0 12px; border:1px solid var(--line-soft); border-radius:4px;}
+.gl-table{width:100%; border-collapse:collapse; font-size:12.8px;}
+.gl-table th{text-align:left; font-weight:500; color:var(--text-faint); font-size:11.5px; padding:6px 9px; border-bottom:1px solid var(--line); background:var(--panel-alt);}
+.gl-table td{padding:6px 9px; border-bottom:1px solid var(--line-soft); color:var(--text-dim); vertical-align:top;}
+.gl-table tr:last-child td{border-bottom:none;}
+.gl-table td:first-child{color:var(--text);}
+.gl-steps{counter-reset:gls; list-style:none; padding-left:0 !important;}
+.gl-steps li{counter-increment:gls; position:relative; padding-left:30px; margin-bottom:6px;}
+.gl-steps li::before{content:counter(gls); position:absolute; left:0; top:1px; width:20px; height:20px; border-radius:50%; border:1px solid var(--teal-dim);
+  color:var(--teal); font-size:11.5px; display:flex; align-items:center; justify-content:center; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.gl-box{border:1px solid var(--line-soft); border-left:3px solid var(--teal); background:var(--panel-alt); border-radius:3px; padding:9px 12px; margin:8px 0 12px;
+  font-size:13.5px; line-height:1.65; color:var(--text);}
+.gl-box.gl-warn{border-left-color:var(--amber);}
+.gl-box small{color:var(--text-faint); font-size:12px;}
+.gl-nav{display:flex; align-items:center; gap:10px; border-top:1px solid var(--line-soft); padding-top:14px; margin-top:16px;}
+.gl-nav .sp{flex:1; text-align:center; font-size:12px; color:var(--text-faint);}
 </style>
 </head>
 <body>
@@ -370,6 +418,12 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
       <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.2</span><span class="d">01.11.2026</span></div>
+      <ul>
+        <li><strong>Neue Rubrik „Grundlagen“:</strong> Der Knopf „Grundlagen“ oben in der linken Spalte klappt 5 Themen mit Erklärtext und Grafiken zu den fachlichen und methodischen Grundlagen auf. Mit den Knöpfen unten oder den Pfeiltasten blättert man zwischen den Themen.</li>
+        <li><strong>Linke Spalte:</strong> Sie bleibt beim Scrollen der Aufgabe stehen, füllt die Bildschirmhöhe und scrollt als Ganzes in einem einzigen Bereich.</li>
+        <li><strong>Lösungshistorie:</strong> neue Kategorie „mit Hilfen gelöst“ für Aufgaben, die nach einem Tipp richtig gelöst wurden.</li>
+      </ul>
       <div class="vh-ver"><span class="v">V1.1</span><span class="d">08.10.2026</span></div>
       <ul>
         <li><strong>Vollständige Strukturen:</strong> Verbindungen werden als Valenzstrichformel mit freien Elektronenpaaren gezeigt, Metallverbindungen zunächst als Atome einer Formeleinheit. Nach dem Lösen erscheinen Teilladungen (δ+/δ−) bzw. Ionenladungen.</li>
@@ -392,6 +446,17 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
 
 <div class="wrap">
   <div class="sidebar">
+
+    <section class="block">
+      <button type="button" class="gl-toggle" id="glToggle" aria-expanded="false" aria-controls="glPanel">
+        <span>Grundlagen</span><span class="gl-n">5 Themen</span><span class="gl-ch" aria-hidden="true"></span>
+      </button>
+      <div class="gl-panel" id="glPanel" hidden>
+        <div class="gl-list" id="glList"></div>
+        <p class="gl-note">Erklärungen mit Grafiken zum Nachlesen – auch zur Besprechung im Unterricht.</p>
+      </div>
+    </section>
+
     <section class="block">
       <h2>Aufgabe</h2>
       <p class="sub-label">Art der Aufgabe</p>
@@ -528,7 +593,7 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
 
 <footer>
   <p class="footer-note">Elektronegativitätswerte nach Pauling, auf eine Nachkommastelle gerundet (Schulbuchwerte). Einteilung nach ΔEN: unter 0,5 unpolare Atombindung, 0,5 bis 1,7 polare Atombindung, über 1,7 Ionenbindung; genau auf einer Grenze zählen beide Bindungsarten. EN-Werte werden mit ±0,1 Toleranz akzeptiert. Vereinfachtes Schulmodell: Die Grenzen sind Faustregeln, die Übergänge sind fließend.</p>
-  <p class="footer-credit">Bastian Baumgart · Bindungsart-Trainer V1.1 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Bindungsart-Trainer V1.2 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <script>
@@ -1302,6 +1367,58 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
   if(!hdr) return;
   const set = () => document.documentElement.style.setProperty("--hdr", Math.max(0, Math.round(hdr.getBoundingClientRect().bottom)) + "px");
   addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
+})();
+</script>
+
+<div class="modal-backdrop" id="glBackdrop">
+  <div class="modal-box gl-wide" role="dialog" aria-modal="true" aria-labelledby="glTitle">
+    <div class="modal-head">
+      <h2><span class="gl-num" id="glNum"></span><span id="glTitle"></span></h2>
+      <button class="modal-close" id="glClose" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body gl-body" id="glBody"></div>
+    <div class="gl-nav">
+      <button class="btn ghost" id="glPrev">← Vorheriges Thema</button>
+      <span class="sp" id="glPos"></span>
+      <button class="btn" id="glNext">Nächstes Thema →</button>
+    </div>
+  </div>
+</div>
+<script>
+/* Rubrik Grundlagen */
+(function(){
+  const GL = [{"t": "Elektronegativität", "h": "<p>Die <strong>Elektronegativität (EN)<\/strong> beschreibt, wie stark ein Atom die Elektronen einer Bindung zu sich zieht. Die übliche Skala nach Pauling reicht von etwa 0,7 (Caesium) bis 4,0 (Fluor).<\/p> <div class=\"gl-row\"><figure class=\"gl-fig\"><svg viewBox=\"0 0 300 150\" width=\"300\" style=\"max-width:300px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><defs><marker id=\"en\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--amber)\"/><\/marker><\/defs><rect x=\"40\" y=\"30\" width=\"220\" height=\"90\" rx=\"3\" fill=\"none\" stroke=\"var(--line)\" stroke-width=\"1.3\" /><line x1=\"50\" y1=\"128\" x2=\"250\" y2=\"128\" stroke=\"var(--amber)\" stroke-width=\"1.8\" marker-end=\"url(#en)\"/><text x=\"150\" y=\"145\" font-size=\"11\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"400\" >EN steigt nach rechts<\/text><line x1=\"270\" y1=\"112\" x2=\"270\" y2=\"40\" stroke=\"var(--amber)\" stroke-width=\"1.8\" marker-end=\"url(#en)\"/><text x=\"285\" y=\"76\" font-size=\"11\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"400\" transform=\"rotate(-90 285 76)\">EN steigt nach oben<\/text><text x=\"245\" y=\"48\" font-size=\"12\" fill=\"var(--text)\" text-anchor=\"end\" font-weight=\"600\" >F 4,0<\/text><text x=\"55\" y=\"112\" font-size=\"12\" fill=\"var(--text)\" text-anchor=\"start\" font-weight=\"600\" >Cs 0,8<\/text><text x=\"150\" y=\"80\" font-size=\"11\" fill=\"var(--text-faint)\" text-anchor=\"middle\" font-weight=\"400\" >Periodensystem<\/text><\/svg><figcaption>Tendenz im Periodensystem: Fluor ist das elektronegativste Element.<\/figcaption><\/figure><\/div> <p>Metalle haben kleine EN-Werte, Nichtmetalle große. Je nach verwendetem Periodensystem weichen die Werte um wenige Hundertstel ab.<\/p>"}, {"t": "ΔEN und die drei Bindungsarten", "h": "<p>Entscheidend für die Art der Bindung ist die <strong>Elektronegativitätsdifferenz<\/strong>: ΔEN = größere EN − kleinere EN.<\/p> <div class=\"gl-row\"><figure class=\"gl-fig\"><svg viewBox=\"0 0 560 120\" width=\"560\" style=\"max-width:560px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><rect x=\"30.0\" y=\"40\" width=\"75.75757575757576\" height=\"22\" rx=\"0\" fill=\"rgba(79,209,197,.18)\" stroke=\"var(--teal)\" stroke-width=\"1.3\" /><rect x=\"105.75757575757576\" y=\"40\" width=\"181.8181818181818\" height=\"22\" rx=\"0\" fill=\"rgba(255,180,84,.16)\" stroke=\"var(--amber)\" stroke-width=\"1.3\" /><rect x=\"287.57575757575756\" y=\"40\" width=\"242.42424242424244\" height=\"22\" rx=\"0\" fill=\"rgba(228,120,91,.15)\" stroke=\"var(--danger, #e4785b)\" stroke-width=\"1.3\" /><text x=\"67.87878787878788\" y=\"33\" font-size=\"11\" fill=\"var(--teal)\" text-anchor=\"middle\" font-weight=\"400\" >unpolar<\/text><text x=\"196.66666666666666\" y=\"33\" font-size=\"11\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"400\" >polare Atombindung<\/text><text x=\"408.78787878787875\" y=\"33\" font-size=\"11\" fill=\"var(--danger, #e4785b)\" text-anchor=\"middle\" font-weight=\"400\" >Ionenbindung<\/text><line x1=\"30.0\" y1=\"62\" x2=\"30.0\" y2=\"68\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"30.0\" y=\"82\" font-size=\"10.5\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >0<\/text><line x1=\"105.75757575757576\" y1=\"62\" x2=\"105.75757575757576\" y2=\"68\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"105.75757575757576\" y=\"82\" font-size=\"10.5\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >0,5<\/text><line x1=\"181.51515151515153\" y1=\"62\" x2=\"181.51515151515153\" y2=\"68\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"181.51515151515153\" y=\"82\" font-size=\"10.5\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >1<\/text><line x1=\"287.57575757575756\" y1=\"62\" x2=\"287.57575757575756\" y2=\"68\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"287.57575757575756\" y=\"82\" font-size=\"10.5\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >1,7<\/text><line x1=\"408.7878787878788\" y1=\"62\" x2=\"408.7878787878788\" y2=\"68\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"408.7878787878788\" y=\"82\" font-size=\"10.5\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >2,5<\/text><line x1=\"530.0\" y1=\"62\" x2=\"530.0\" y2=\"68\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"530.0\" y=\"82\" font-size=\"10.5\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >3,3<\/text><text x=\"280.0\" y=\"106\" font-size=\"11.5\" fill=\"var(--text)\" text-anchor=\"middle\" font-weight=\"600\" >ΔEN<\/text><circle cx=\"30.0\" cy=\"51\" r=\"3\" fill=\"var(--text)\"/><circle cx=\"90.6\" cy=\"51\" r=\"3\" fill=\"var(--text)\"/><circle cx=\"181.5\" cy=\"51\" r=\"3\" fill=\"var(--text)\"/><circle cx=\"211.8\" cy=\"51\" r=\"3\" fill=\"var(--text)\"/><circle cx=\"363.3\" cy=\"51\" r=\"3\" fill=\"var(--text)\"/><circle cx=\"499.7\" cy=\"51\" r=\"3\" fill=\"var(--text)\"/><\/svg><figcaption>Einteilung nach ΔEN mit Beispielen (Punkte von links: H–H, C–H, H–Cl, O–H, Na–Cl, Cs–F)<\/figcaption><\/figure><\/div> <div class=\"gl-tw\"><table class=\"gl-table\"><thead><tr><th>ΔEN<\/th><th>Bindungsart<\/th><th>Beispiel<\/th><\/tr><\/thead><tbody><tr><td>unter 0,5<\/td><td>unpolare Atombindung<\/td><td>H<sub>2<\/sub>, Cl<sub>2<\/sub>, C–H<\/td><\/tr><tr><td>0,5 bis 1,7<\/td><td>polare Atombindung<\/td><td>H–Cl, O–H in H<sub>2<\/sub>O<\/td><\/tr><tr><td>über 1,7<\/td><td>Ionenbindung<\/td><td>NaCl, MgO<\/td><\/tr><\/tbody><\/table><\/div> <div class=\"gl-box gl-warn\">Die Grenzen 0,5 und 1,7 sind <strong>Richtwerte<\/strong>, keine Naturgesetze: Die Übergänge sind fließend. Liegt ΔEN genau auf einer Grenze, kann man beide Bindungsarten begründen.<\/div>"}, {"t": "Unpolare und polare Atombindung", "h": "<p>Bei einer <strong>Atombindung<\/strong> (Elektronenpaarbindung) teilen sich zwei Atome ein oder mehrere Elektronenpaare.<\/p> <ul><li><strong>Unpolar:<\/strong> Beide Atome ziehen etwa gleich stark – das Elektronenpaar liegt in der Mitte (H–H, Cl–Cl).<\/li> <li><strong>Polar:<\/strong> Das elektronegativere Atom zieht das Elektronenpaar näher zu sich. Es erhält eine negative <strong>Teilladung δ−<\/strong>, der Partner eine positive Teilladung δ+.<\/li><\/ul> <div class=\"gl-row\"><figure class=\"gl-fig\"><svg viewBox=\"0 0 260 90\" width=\"260\" style=\"max-width:260px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><text x=\"70\" y=\"52\" font-size=\"26\" fill=\"var(--text)\" text-anchor=\"middle\" font-weight=\"600\" >H<\/text><line x1=\"90\" y1=\"44\" x2=\"160\" y2=\"44\" stroke=\"var(--text)\" stroke-width=\"2.2\"/><text x=\"185\" y=\"52\" font-size=\"26\" fill=\"var(--text)\" text-anchor=\"middle\" font-weight=\"600\" >Cl<\/text><text x=\"70\" y=\"20\" font-size=\"14\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"400\" >δ+<\/text><text x=\"185\" y=\"20\" font-size=\"14\" fill=\"var(--teal)\" text-anchor=\"middle\" font-weight=\"400\" >δ−<\/text><text x=\"70\" y=\"80\" font-size=\"10.5\" fill=\"var(--text-faint)\" text-anchor=\"middle\" font-weight=\"400\" >EN 2,2<\/text><text x=\"185\" y=\"80\" font-size=\"10.5\" fill=\"var(--text-faint)\" text-anchor=\"middle\" font-weight=\"400\" >EN 3,2<\/text><\/svg><figcaption>Chlorwasserstoff: ΔEN = 3,2 − 2,2 = 1,0 → polare Atombindung<\/figcaption><\/figure><\/div> <p>Ein Molekül mit polaren Bindungen kann ein <strong>Dipol<\/strong> sein, wenn die Teilladungen nicht symmetrisch verteilt sind (H<sub>2<\/sub>O ja, CO<sub>2<\/sub> nein).<\/p>"}, {"t": "Ionenbindung", "h": "<p>Ist die EN-Differenz sehr groß, wird das Elektron nicht mehr geteilt, sondern <strong>vollständig übertragen<\/strong>: Das Metallatom gibt Elektronen ab und wird zum positiv geladenen <strong>Kation<\/strong>, das Nichtmetallatom nimmt sie auf und wird zum negativ geladenen <strong>Anion<\/strong>.<\/p> <div class=\"gl-box gl-info\">Na → Na<sup>+<\/sup> + e<sup>−<\/sup> &nbsp;&nbsp;·&nbsp;&nbsp; Cl + e<sup>−<\/sup> → Cl<sup>−<\/sup><\/div> <p>Die Ionen ziehen sich elektrostatisch an und bilden ein regelmäßiges <strong>Ionengitter<\/strong>. Salze sind deshalb fest, haben hohe Schmelztemperaturen und leiten als Schmelze oder in Lösung den elektrischen Strom.<\/p> <div class=\"gl-row\"><figure class=\"gl-fig\"><svg viewBox=\"0 0 200 130\" width=\"200\" style=\"max-width:200px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><circle cx=\"40\" cy=\"25\" r=\"9\" fill=\"var(--teal)\" opacity=\".8\"/><circle cx=\"40\" cy=\"65\" r=\"13\" fill=\"var(--danger, #e4785b)\" opacity=\".8\"/><circle cx=\"40\" cy=\"105\" r=\"9\" fill=\"var(--teal)\" opacity=\".8\"/><circle cx=\"80\" cy=\"25\" r=\"13\" fill=\"var(--danger, #e4785b)\" opacity=\".8\"/><circle cx=\"80\" cy=\"65\" r=\"9\" fill=\"var(--teal)\" opacity=\".8\"/><circle cx=\"80\" cy=\"105\" r=\"13\" fill=\"var(--danger, #e4785b)\" opacity=\".8\"/><circle cx=\"120\" cy=\"25\" r=\"9\" fill=\"var(--teal)\" opacity=\".8\"/><circle cx=\"120\" cy=\"65\" r=\"13\" fill=\"var(--danger, #e4785b)\" opacity=\".8\"/><circle cx=\"120\" cy=\"105\" r=\"9\" fill=\"var(--teal)\" opacity=\".8\"/><circle cx=\"160\" cy=\"25\" r=\"13\" fill=\"var(--danger, #e4785b)\" opacity=\".8\"/><circle cx=\"160\" cy=\"65\" r=\"9\" fill=\"var(--teal)\" opacity=\".8\"/><circle cx=\"160\" cy=\"105\" r=\"13\" fill=\"var(--danger, #e4785b)\" opacity=\".8\"/><\/svg><figcaption>Ausschnitt aus einem Ionengitter: Kationen (klein) und Anionen (groß) wechseln sich ab.<\/figcaption><\/figure><\/div>"}, {"t": "Vorgehen", "h": "<ol class=\"gl-steps\"><li>Beide Elemente im Periodensystem suchen und ihre EN-Werte ablesen.<\/li><li>ΔEN berechnen: größerer Wert minus kleinerer Wert.<\/li><li>Mit den Grenzen vergleichen: unter 0,5 unpolar, 0,5 bis 1,7 polar, über 1,7 Ionenbindung.<\/li><li>Bei polaren Bindungen: Das Atom mit der größeren EN erhält δ−. Bei Ionenbindung: Das Atom mit der größeren EN wird zum Anion.<\/li><\/ol> <div class=\"gl-box gl-info\"><strong>Beispiel Magnesiumoxid:<\/strong> EN(O) = 3,4; EN(Mg) = 1,3; ΔEN = 2,1 &gt; 1,7 → Ionenbindung aus Mg<sup>2+<\/sup> und O<sup>2−<\/sup>.<\/div>"}];
+  const g = id => document.getElementById(id);
+  const bd = g("glBackdrop"), box = bd.querySelector(".modal-box");
+  let idx = 0;
+  function show(i){
+    idx = Math.max(0, Math.min(GL.length - 1, i));
+    g("glNum").textContent = (idx + 1) + ".";
+    g("glTitle").innerHTML = GL[idx].t;
+    g("glBody").innerHTML = GL[idx].h;
+    g("glPos").textContent = "Thema " + (idx + 1) + " von " + GL.length;
+    g("glPrev").disabled = idx === 0;
+    g("glNext").disabled = idx === GL.length - 1;
+    box.scrollTop = 0;
+    bd.classList.add("open");
+  }
+  g("glList").innerHTML = GL.map((b, i) => '<button type="button" class="gl-item" data-i="' + i + '"><span class="nr">' + (i + 1) + '</span>' + b.t + '<span class="go">›</span></button>').join("");
+  g("glToggle").addEventListener("click", () => {
+    const open = g("glToggle").getAttribute("aria-expanded") !== "true";
+    g("glToggle").setAttribute("aria-expanded", String(open));
+    g("glPanel").hidden = !open;
+  });
+  g("glList").addEventListener("click", e => { const b = e.target.closest(".gl-item"); if (b) show(+b.dataset.i); });
+  g("glPrev").addEventListener("click", () => show(idx - 1));
+  g("glNext").addEventListener("click", () => show(idx + 1));
+  g("glClose").addEventListener("click", () => bd.classList.remove("open"));
+  bd.addEventListener("click", e => { if (e.target === bd) bd.classList.remove("open"); });
+  document.addEventListener("keydown", e => {
+    if (!bd.classList.contains("open")) return;
+    if (e.key === "Escape") bd.classList.remove("open");
+    if (e.key === "ArrowRight" && idx < GL.length - 1) show(idx + 1);
+    if (e.key === "ArrowLeft" && idx > 0) show(idx - 1);
+  });
 })();
 </script>
 </body>

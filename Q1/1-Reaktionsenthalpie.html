@@ -292,6 +292,54 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
   .lib-block .lib-table thead th{top:calc(var(--lh, 90px) - 20px); z-index:2;}
 }
 .lib-wrap{overscroll-behavior:contain;}
+
+/* Rubrik Grundlagen */
+.gl-toggle{display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; cursor:pointer; text-align:left;
+  border:1px solid var(--teal-dim); border-radius:4px; background:var(--panel-alt); color:var(--text);
+  font-size:14px; font-weight:600; font-family:inherit; touch-action:manipulation;}
+.gl-toggle:hover{border-color:var(--teal);}
+.gl-toggle:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-toggle .gl-n{font-size:12px; font-weight:400; color:var(--text-faint);}
+.gl-toggle .gl-ch{margin-left:auto; color:var(--teal); font-size:13px;}
+.gl-toggle .gl-ch::after{content:"▸";}
+.gl-toggle[aria-expanded="true"] .gl-ch::after{content:"▾";}
+.gl-panel{margin-top:8px;}
+.gl-list{display:flex; flex-direction:column; gap:6px;}
+.gl-item{display:flex; gap:10px; align-items:center; width:100%; text-align:left; padding:8px 11px; cursor:pointer;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel); color:var(--text);
+  font-size:13px; font-family:inherit; font-weight:500; touch-action:manipulation;}
+.gl-item:hover{border-color:var(--text-faint); background:var(--panel-alt);}
+.gl-item:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-item .nr{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--amber); min-width:14px;}
+.gl-item .go{margin-left:auto; color:var(--text-faint); font-size:12px;}
+.gl-note{font-size:12px; color:var(--text-faint); line-height:1.5; margin:8px 0 0;}
+.modal-box.gl-wide{max-width:900px; width:100%; max-height:88vh; overflow-y:auto;}
+.gl-wide .gl-num{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--text-faint); margin-right:10px;}
+.gl-body p, .gl-body li{font-size:13.5px; line-height:1.6; color:var(--text-dim);}
+.gl-body p{margin:0 0 10px;}
+.gl-body ul, .gl-body ol{margin:0 0 12px; padding-left:22px;}
+.gl-body strong{color:var(--text); font-weight:600;}
+.gl-body sub, .gl-body sup{font-size:.72em;}
+.gl-row{display:flex; flex-wrap:wrap; gap:12px; align-items:stretch; margin:8px 0 14px;}
+.gl-fig{margin:0; flex:1 1 220px; background:var(--screen, #0e1113); border:1px solid var(--line-soft); border-radius:4px; padding:10px 12px 8px;
+  display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:6px; max-width:100%; overflow-x:auto;}
+.gl-fig figcaption{font-size:12px; color:var(--text-dim); text-align:center; line-height:1.45; max-width:420px;}
+.gl-tw{overflow-x:auto; margin:6px 0 12px; border:1px solid var(--line-soft); border-radius:4px;}
+.gl-table{width:100%; border-collapse:collapse; font-size:12.8px;}
+.gl-table th{text-align:left; font-weight:500; color:var(--text-faint); font-size:11.5px; padding:6px 9px; border-bottom:1px solid var(--line); background:var(--panel-alt);}
+.gl-table td{padding:6px 9px; border-bottom:1px solid var(--line-soft); color:var(--text-dim); vertical-align:top;}
+.gl-table tr:last-child td{border-bottom:none;}
+.gl-table td:first-child{color:var(--text);}
+.gl-steps{counter-reset:gls; list-style:none; padding-left:0 !important;}
+.gl-steps li{counter-increment:gls; position:relative; padding-left:30px; margin-bottom:6px;}
+.gl-steps li::before{content:counter(gls); position:absolute; left:0; top:1px; width:20px; height:20px; border-radius:50%; border:1px solid var(--teal-dim);
+  color:var(--teal); font-size:11.5px; display:flex; align-items:center; justify-content:center; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.gl-box{border:1px solid var(--line-soft); border-left:3px solid var(--teal); background:var(--panel-alt); border-radius:3px; padding:9px 12px; margin:8px 0 12px;
+  font-size:13.5px; line-height:1.65; color:var(--text);}
+.gl-box.gl-warn{border-left-color:var(--amber);}
+.gl-box small{color:var(--text-faint); font-size:12px;}
+.gl-nav{display:flex; align-items:center; gap:10px; border-top:1px solid var(--line-soft); padding-top:14px; margin-top:16px;}
+.gl-nav .sp{flex:1; text-align:center; font-size:12px; color:var(--text-faint);}
 </style>
 </head>
 <body>
@@ -348,6 +396,13 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
       <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.2</span><span class="d">01.11.2026</span></div>
+      <ul>
+        <li><strong>Neue Rubrik „Grundlagen“:</strong> Der Knopf „Grundlagen“ oben in der linken Spalte klappt 4 Themen mit Erklärtext und Grafiken zu den fachlichen und methodischen Grundlagen auf. Mit den Knöpfen unten oder den Pfeiltasten blättert man zwischen den Themen.</li>
+        <li><strong>Linke Spalte:</strong> Sie bleibt beim Scrollen der Aufgabe stehen, füllt die Bildschirmhöhe und scrollt als Ganzes in einem einzigen Bereich.</li>
+        <li><strong>Lösungshistorie:</strong> neue Kategorie „mit Hilfen gelöst“ für Aufgaben, die nach einem Tipp richtig gelöst wurden.</li>
+        <li><strong>Tabelle der Bildungsenthalpien:</strong> scrollt wie bei „Freie Enthalpie“ mit der linken Spalte; Überschrift, Suchfeld und Spaltenköpfe bleiben dabei stehen. Der Hinweis zur Übernahme der Werte steht über der Tabelle.</li>
+      </ul>
       <div class="vh-ver"><span class="v">V1.1</span><span class="d">02.10.2026</span></div>
       <ul>
         <li><strong>Gleichung prüfen:</strong> Beim Selbst-Ausgleichen hat die Reaktionsgleichung einen eigenen „Prüfen“-Button direkt darunter, mit eigener Rückmeldung.</li>
@@ -370,6 +425,17 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
 <div class="wrap">
   <!-- SIDEBAR -->
   <div class="sidebar">
+
+    <section class="block">
+      <button type="button" class="gl-toggle" id="glToggle" aria-expanded="false" aria-controls="glPanel">
+        <span>Grundlagen</span><span class="gl-n">4 Themen</span><span class="gl-ch" aria-hidden="true"></span>
+      </button>
+      <div class="gl-panel" id="glPanel" hidden>
+        <div class="gl-list" id="glList"></div>
+        <p class="gl-note">Erklärungen mit Grafiken zum Nachlesen – auch zur Besprechung im Unterricht.</p>
+      </div>
+    </section>
+
 
     <section class="block">
       <h2>Aufgabe</h2>
@@ -507,7 +573,7 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
 
 <footer>
   <p class="footer-note">Tabellenwerte für 25 °C und 1 bar nach gängigen Tabellenwerken (NIST, CRC Handbook), auf eine Nachkommastelle gerundet. Einzelne Schulbücher geben teilweise leicht abweichende Werte an.</p>
-  <p class="footer-credit">Bastian Baumgart · Berechnung der Reaktionsenthalpie V1.1 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Berechnung der Reaktionsenthalpie V1.2 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <script>
@@ -1275,6 +1341,58 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
     if(lh) document.documentElement.style.setProperty("--lh", lh.offsetHeight + "px");
   };
   addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
+})();
+</script>
+
+<div class="modal-backdrop" id="glBackdrop">
+  <div class="modal-box gl-wide" role="dialog" aria-modal="true" aria-labelledby="glTitle">
+    <div class="modal-head">
+      <h2><span class="gl-num" id="glNum"></span><span id="glTitle"></span></h2>
+      <button class="modal-close" id="glClose" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body gl-body" id="glBody"></div>
+    <div class="gl-nav">
+      <button class="btn ghost" id="glPrev">← Vorheriges Thema</button>
+      <span class="sp" id="glPos"></span>
+      <button class="btn" id="glNext">Nächstes Thema →</button>
+    </div>
+  </div>
+</div>
+<script>
+/* Rubrik Grundlagen */
+(function(){
+  const GL = [{"t": "Enthalpie, exotherm und endotherm", "h": "<p>Bei chemischen Reaktionen wird Energie umgesetzt. Läuft eine Reaktion bei konstantem Druck ab, nennt man die ausgetauschte Wärme <strong>Reaktionsenthalpie Δ<sub>r<\/sub>H<\/strong>. Sie wird in kJ/mol angegeben und bezieht sich auf die Formelumsätze der Reaktionsgleichung.<\/p> <div class=\"gl-row\"><figure class=\"gl-fig\"><svg viewBox=\"0 0 230 190\" width=\"230\" style=\"max-width:230px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><defs><marker id=\"ex1\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--text-dim)\"/><\/marker><marker id=\"ex1t\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--teal)\"/><\/marker><marker id=\"ex1a\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--amber)\"/><\/marker><\/defs><line x1=\"30\" y1=\"174\" x2=\"30\" y2=\"10\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" marker-end=\"url(#ex1)\"/><text x=\"16\" y=\"95.0\" font-size=\"11\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" transform=\"rotate(-90 16 95.0)\">Enthalpie H<\/text><line x1=\"45\" y1=\"50\" x2=\"115\" y2=\"50\" stroke=\"var(--teal)\" stroke-width=\"2.4\"/><text x=\"80.0\" y=\"43\" font-size=\"11.5\" fill=\"var(--teal)\" text-anchor=\"middle\" font-weight=\"400\" >Edukte<\/text><line x1=\"140\" y1=\"140\" x2=\"215\" y2=\"140\" stroke=\"var(--amber)\" stroke-width=\"2.4\"/><text x=\"177.5\" y=\"133\" font-size=\"11.5\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"400\" >Produkte<\/text><line x1=\"128\" y1=\"54\" x2=\"128\" y2=\"136\" stroke=\"var(--amber)\" stroke-width=\"1.6\" marker-end=\"url(#ex1a)\"/><text x=\"134\" y=\"99.0\" font-size=\"11.5\" fill=\"var(--amber)\" text-anchor=\"start\" font-weight=\"400\" >ΔrH &lt; 0<\/text><\/svg><figcaption><strong>exotherm:<\/strong> Energie wird an die Umgebung abgegeben<\/figcaption><\/figure><figure class=\"gl-fig\"><svg viewBox=\"0 0 230 190\" width=\"230\" style=\"max-width:230px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><defs><marker id=\"ex2\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--text-dim)\"/><\/marker><marker id=\"ex2t\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--teal)\"/><\/marker><marker id=\"ex2a\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--amber)\"/><\/marker><\/defs><line x1=\"30\" y1=\"174\" x2=\"30\" y2=\"10\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" marker-end=\"url(#ex2)\"/><text x=\"16\" y=\"95.0\" font-size=\"11\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" transform=\"rotate(-90 16 95.0)\">Enthalpie H<\/text><line x1=\"45\" y1=\"140\" x2=\"115\" y2=\"140\" stroke=\"var(--teal)\" stroke-width=\"2.4\"/><text x=\"80.0\" y=\"133\" font-size=\"11.5\" fill=\"var(--teal)\" text-anchor=\"middle\" font-weight=\"400\" >Edukte<\/text><line x1=\"140\" y1=\"50\" x2=\"215\" y2=\"50\" stroke=\"var(--amber)\" stroke-width=\"2.4\"/><text x=\"177.5\" y=\"43\" font-size=\"11.5\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"400\" >Produkte<\/text><line x1=\"128\" y1=\"136\" x2=\"128\" y2=\"54\" stroke=\"var(--amber)\" stroke-width=\"1.6\" marker-end=\"url(#ex2a)\"/><text x=\"134\" y=\"99.0\" font-size=\"11.5\" fill=\"var(--amber)\" text-anchor=\"start\" font-weight=\"400\" >ΔrH &gt; 0<\/text><\/svg><figcaption><strong>endotherm:<\/strong> Energie wird aus der Umgebung aufgenommen<\/figcaption><\/figure><\/div> <p>Das Vorzeichen wird aus Sicht des <strong>Systems<\/strong> angegeben: Gibt das System Energie ab, ist Δ<sub>r<\/sub>H negativ.<\/p>"}, {"t": "Standardbildungsenthalpie", "h": "<p>Die <strong>molare Standardbildungsenthalpie Δ<sub>f<\/sub>H°<\/strong> ist die Reaktionsenthalpie für die Bildung von 1 mol eines Stoffes aus den <strong>Elementen<\/strong> in ihrer stabilsten Form unter Standardbedingungen (25 °C, 1013 hPa).<\/p> <div class=\"gl-box gl-info\">C(Graphit) + O<sub>2<\/sub>(g) → CO<sub>2<\/sub>(g) &nbsp;&nbsp; Δ<sub>f<\/sub>H°(CO<sub>2<\/sub>) = −393,5 kJ/mol<\/div> <ul><li>Für <strong>Elemente<\/strong> in ihrer stabilsten Form ist Δ<sub>f<\/sub>H° = <strong>0<\/strong> (z. B. O<sub>2<\/sub>(g), H<sub>2<\/sub>(g), C(Graphit), Fe(s)).<\/li> <li>Der <strong>Aggregatzustand<\/strong> gehört zum Wert: Δ<sub>f<\/sub>H°(H<sub>2<\/sub>O, l) = −285,8 kJ/mol, Δ<sub>f<\/sub>H°(H<sub>2<\/sub>O, g) = −241,8 kJ/mol.<\/li><\/ul>"}, {"t": "Der Satz von Hess", "h": "<p>Die Reaktionsenthalpie hängt nur vom Anfangs- und Endzustand ab, nicht vom Weg (<strong>Satz von Hess<\/strong>). Man kann sich jede Reaktion deshalb so denken: Die Edukte werden in die Elemente zerlegt, und aus den Elementen werden die Produkte gebildet.<\/p> <div class=\"gl-row\"><figure class=\"gl-fig\"><svg viewBox=\"0 0 360 210\" width=\"360\" style=\"max-width:360px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><defs><marker id=\"hs\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--text-dim)\"/><\/marker><marker id=\"hst\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--teal)\"/><\/marker><marker id=\"hsa\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--amber)\"/><\/marker><\/defs><line x1=\"30\" y1=\"194\" x2=\"30\" y2=\"10\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" marker-end=\"url(#hs)\"/><text x=\"16\" y=\"105.0\" font-size=\"11\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" transform=\"rotate(-90 16 105.0)\">Enthalpie H<\/text><line x1=\"40\" y1=\"32\" x2=\"320\" y2=\"32\" stroke=\"var(--text-dim)\" stroke-width=\"2.4\"/><text x=\"180.0\" y=\"25\" font-size=\"11.5\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >Elemente (ΔfH° = 0)<\/text><line x1=\"40\" y1=\"100\" x2=\"150\" y2=\"100\" stroke=\"var(--teal)\" stroke-width=\"2.4\"/><text x=\"95.0\" y=\"93\" font-size=\"11.5\" fill=\"var(--teal)\" text-anchor=\"middle\" font-weight=\"400\" >Edukte<\/text><line x1=\"180\" y1=\"180\" x2=\"320\" y2=\"180\" stroke=\"var(--amber)\" stroke-width=\"2.4\"/><text x=\"250.0\" y=\"173\" font-size=\"11.5\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"400\" >Produkte<\/text><line x1=\"55\" y1=\"98\" x2=\"55\" y2=\"36\" stroke=\"var(--teal)\" stroke-width=\"1.6\" marker-end=\"url(#hst)\"/><text x=\"61\" y=\"71.0\" font-size=\"11.5\" fill=\"var(--teal)\" text-anchor=\"start\" font-weight=\"400\" >−ΣΔfH°(Edukte)<\/text><line x1=\"200\" y1=\"36\" x2=\"200\" y2=\"176\" stroke=\"var(--amber)\" stroke-width=\"1.6\" marker-end=\"url(#hsa)\"/><text x=\"206\" y=\"110.0\" font-size=\"11.5\" fill=\"var(--amber)\" text-anchor=\"start\" font-weight=\"400\" >ΣΔfH°(Produkte)<\/text><\/svg><figcaption>Gedachter Weg über die Elemente: Edukte zerlegen, dann Produkte bilden. Der Gesamtumsatz ist unabhängig vom Weg.<\/figcaption><\/figure><\/div> <div class=\"gl-box gl-info\">Δ<sub>r<\/sub>H° = Σ ν · Δ<sub>f<\/sub>H°(Produkte) − Σ ν · Δ<sub>f<\/sub>H°(Edukte)<br><small>ν = Koeffizient in der Reaktionsgleichung<\/small><\/div>"}, {"t": "Rechenweg mit Beispiel", "h": "<ol class=\"gl-steps\"><li>Reaktionsgleichung aufstellen und ausgleichen; Aggregatzustände angeben.<\/li><li>Δ<sub>f<\/sub>H°-Werte aller Stoffe aus der Tabelle heraussuchen (Elemente: 0).<\/li><li>Jeden Wert mit seinem Koeffizienten multiplizieren.<\/li><li>Summe der Produkte minus Summe der Edukte.<\/li><li>Vorzeichen deuten: negativ = exotherm, positiv = endotherm.<\/li><\/ol> <div class=\"gl-box gl-info\"><strong>Verbrennung von Methan<\/strong> (Wasser gasförmig):<br>CH<sub>4<\/sub>(g) + 2 O<sub>2<\/sub>(g) → CO<sub>2<\/sub>(g) + 2 H<sub>2<\/sub>O(g)<br>Δ<sub>r<\/sub>H° = [−393,5 + 2 · (−241,8)] − [−74,8 + 2 · 0] = −877,1 + 74,8 = <strong>−802,3 kJ/mol<\/strong><\/div> <div class=\"gl-box gl-warn\"><strong>Typische Fehler:<\/strong> Koeffizienten vergessen, Edukte minus Produkte gerechnet, Vorzeichen in der Klammer falsch aufgelöst, falscher Aggregatzustand (H<sub>2<\/sub>O l statt g).<\/div>"}];
+  const g = id => document.getElementById(id);
+  const bd = g("glBackdrop"), box = bd.querySelector(".modal-box");
+  let idx = 0;
+  function show(i){
+    idx = Math.max(0, Math.min(GL.length - 1, i));
+    g("glNum").textContent = (idx + 1) + ".";
+    g("glTitle").innerHTML = GL[idx].t;
+    g("glBody").innerHTML = GL[idx].h;
+    g("glPos").textContent = "Thema " + (idx + 1) + " von " + GL.length;
+    g("glPrev").disabled = idx === 0;
+    g("glNext").disabled = idx === GL.length - 1;
+    box.scrollTop = 0;
+    bd.classList.add("open");
+  }
+  g("glList").innerHTML = GL.map((b, i) => '<button type="button" class="gl-item" data-i="' + i + '"><span class="nr">' + (i + 1) + '</span>' + b.t + '<span class="go">›</span></button>').join("");
+  g("glToggle").addEventListener("click", () => {
+    const open = g("glToggle").getAttribute("aria-expanded") !== "true";
+    g("glToggle").setAttribute("aria-expanded", String(open));
+    g("glPanel").hidden = !open;
+  });
+  g("glList").addEventListener("click", e => { const b = e.target.closest(".gl-item"); if (b) show(+b.dataset.i); });
+  g("glPrev").addEventListener("click", () => show(idx - 1));
+  g("glNext").addEventListener("click", () => show(idx + 1));
+  g("glClose").addEventListener("click", () => bd.classList.remove("open"));
+  bd.addEventListener("click", e => { if (e.target === bd) bd.classList.remove("open"); });
+  document.addEventListener("keydown", e => {
+    if (!bd.classList.contains("open")) return;
+    if (e.key === "Escape") bd.classList.remove("open");
+    if (e.key === "ArrowRight" && idx < GL.length - 1) show(idx + 1);
+    if (e.key === "ArrowLeft" && idx > 0) show(idx - 1);
+  });
 })();
 </script>
 </body>
