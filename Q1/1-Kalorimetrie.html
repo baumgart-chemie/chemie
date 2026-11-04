@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulation „Kalorimetrie“</title>
+<style>
+:root{
+  --bg:#14171a;--panel:#1b1f23;--panel-alt:#20252a;--line:#31383e;
+  --text:#e7e4dd;--text-dim:#9aa2a9;--text-faint:#5f6870;
+  --amber:#ffb454;--teal:#4fd1c5;--good:#7fd68a;--danger:#e4785b;--screen:#0e1113;
+  --mono:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.45}
+a{color:var(--teal)}
+button{font:inherit;color:var(--text);background:var(--panel-alt);border:1px solid var(--line);border-radius:8px;min-height:44px;padding:8px 14px;cursor:pointer;touch-action:manipulation}
+button:active{transform:translateY(1px)}
+button:disabled{opacity:.38;cursor:default;transform:none}
+button.pri{border-color:var(--teal);color:var(--teal)}
+button.on{background:var(--teal);color:#0d1414;border-color:var(--teal)}
+button.small{min-height:36px;padding:5px 10px;font-size:13px}
+input[type=text]{font:inherit;font-family:var(--mono);background:var(--screen);color:var(--text);border:1px solid var(--line);border-radius:8px;min-height:44px;padding:6px 10px;width:100%}
+input[type=text]:focus{outline:2px solid var(--teal);outline-offset:0}
+input.ok{border-color:var(--good);color:var(--good)}
+input.bad{border-color:var(--danger);color:var(--danger)}
+input.auto{border-color:var(--amber);color:var(--amber)}
+input[type=range]{width:100%;accent-color:var(--teal);height:32px}
+input[type=checkbox]{width:22px;height:22px;accent-color:var(--teal);margin:0}
+.mono{font-family:var(--mono)}
+.dim{color:var(--text-dim)}
+.faint{color:var(--text-faint)}
+.amber{color:var(--amber)}
+.good{color:var(--good)}
+.bad-t{color:var(--danger)}
+/* Kopf */
+header.top{display:flex;align-items:center;gap:16px;padding:10px 18px;border-bottom:1px solid var(--line);background:var(--panel);flex-wrap:wrap}
+header.top .back{text-decoration:none;display:inline-flex;align-items:center;min-height:44px;padding:8px 14px;border:1px solid var(--line);border-radius:8px;color:var(--text);background:var(--panel-alt)}
+header.top h1{font-size:20px;margin:0}
+header.top .sub{color:var(--text-dim);font-size:13px}
+header.top .ttl{flex:1;min-width:220px}
+header.top .lnk{min-height:44px;display:inline-flex;align-items:center}
+.status{font-family:var(--mono);font-size:13px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--screen);color:var(--amber);min-width:180px;text-align:center}
+/* Layout */
+.layout{display:grid;grid-template-columns:330px minmax(0,1fr);gap:16px;padding:16px;max-width:1520px;margin:0 auto}
+aside{position:sticky;top:12px;align-self:start;max-height:calc(100vh - 24px);overflow:auto;display:flex;flex-direction:column;gap:12px;padding-right:2px}
+main{display:flex;flex-direction:column;gap:16px;min-width:0}
+.box,.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+.box h3,.card h2{margin:0 0 10px;font-size:15px;letter-spacing:.02em}
+.card h2{font-size:16px}
+.card h2 .tag{font-weight:400;color:var(--text-dim);font-size:13px;margin-left:6px}
+@media (max-width:920px){.layout{grid-template-columns:1fr}aside{position:static;max-height:none;overflow:visible}}
+/* Grundlagen */
+.gbtn{width:100%;display:flex;justify-content:space-between;align-items:center;font-weight:600}
+.glist[hidden]{display:none}
+.glist{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.glist button{text-align:left;font-size:14px}
+/* Auswahl */
+.choice{display:flex;flex-direction:column;gap:8px}
+.choice button{text-align:left;font-weight:600}
+.stoffList{display:flex;flex-wrap:wrap;gap:6px}
+.stoffList button{font-size:14px;flex:1 1 45%}
+.stoffInfo>span{white-space:normal!important}
+.stoffInfo{margin-top:10px;padding:10px;background:var(--screen);border-radius:8px;border:1px solid var(--line);font-size:13px;overflow-x:auto}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;cursor:pointer}
+.sl{margin:6px 0}
+.sl .lab{display:flex;justify-content:space-between;font-size:13px;color:var(--text-dim)}
+.sl .lab b{color:var(--amber);font-family:var(--mono);font-weight:500}
+.hint{font-size:12.5px;color:var(--text-dim);margin-top:6px}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btncol{display:flex;flex-direction:column;gap:8px}
+/* Schritte */
+ol.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+ol.steps li{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--panel-alt);cursor:pointer}
+ol.steps li.locked{opacity:.45;cursor:default}
+ol.steps li.cur{border-color:var(--teal)}
+ol.steps li.done{border-color:#3d5a41}
+ol.steps .sh{display:flex;gap:8px;align-items:center;font-weight:600;font-size:14px}
+ol.steps .num{width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;background:var(--line);flex:none}
+ol.steps li.cur .num{background:var(--teal);color:#0d1414}
+ol.steps li.done .num{background:var(--good);color:#0d1414}
+ol.steps .st{font-size:12.5px;color:var(--text-dim);margin-top:6px;display:none}
+ol.steps li.cur .st{display:block}
+/* Hauptbereich */
+.grid2{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px}
+@media (max-width:1180px){.grid2{grid-template-columns:1fr}}
+.appwrap{display:grid;grid-template-columns:minmax(0,1fr) 190px;gap:12px;align-items:start}
+@media (max-width:560px){.appwrap{grid-template-columns:1fr}}
+svg{display:block;max-width:100%;height:auto}
+.screen{background:var(--screen);border:1px solid var(--line);border-radius:10px}
+.lupe .cap{font-size:12px;color:var(--text-dim);text-align:center;margin-top:4px}
+.ctrl{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ctrl .sep{width:1px;height:30px;background:var(--line);margin:0 4px}
+.info{margin-top:10px;font-size:14px;padding:8px 12px;border-radius:8px;background:var(--panel-alt);border:1px solid var(--line)}
+.info.wait{border-color:var(--amber);color:var(--amber)}
+.explain{margin-top:10px;font-size:13.5px;padding:10px 12px;border-left:3px solid var(--teal);background:var(--panel-alt);border-radius:0 8px 8px 0}
+.locknote{color:var(--text-faint);font-size:14px;padding:6px 0}
+/* Felder */
+.field{display:grid;grid-template-columns:minmax(120px,190px) minmax(90px,170px) 52px;gap:8px;align-items:center;margin:8px 0}
+.field label{font-size:14px}
+.field .unit{font-family:var(--mono);color:var(--text-dim);font-size:13px}
+.fmsg{grid-column:1/-1;font-size:13px;margin-top:-4px}
+.fmsg.ok{color:var(--good)}.fmsg.bad{color:var(--danger)}.fmsg.auto{color:var(--amber)}
+@media (max-width:480px){.field{grid-template-columns:1fr 1fr 44px}}
+.calc{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--panel-alt);margin-top:12px}
+.calc.showF{grid-template-columns:minmax(0,1fr) minmax(220px,300px)}
+@media (max-width:760px){.calc.showF{grid-template-columns:1fr}}
+.calc.locked{opacity:.45}
+.calc h3{margin:0 0 4px;font-size:15px}
+.calc .given{font-size:13.5px;color:var(--text-dim)}
+.fbox{background:var(--screen);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:14px}
+.fbox h4{margin:0 0 8px;font-size:13px;color:var(--teal);text-transform:uppercase;letter-spacing:.06em}
+.fbox .fm{font-family:var(--mono);color:var(--amber);font-size:15px;margin:6px 0}
+.fbox p{margin:6px 0;color:var(--text-dim);font-size:13px}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 3px}
+.frac>span:first-child{border-bottom:1px solid currentColor;padding:0 3px}
+.frac>span{line-height:1.25}
+.helpbox{margin-top:10px;font-size:13.5px;padding:10px;border-radius:8px;background:var(--screen);border:1px dashed var(--line)}
+.passmsg{margin-top:8px;font-size:14px}
+/* Tabelle */
+.tabwrap{display:grid;grid-template-columns:minmax(260px,380px) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:860px){.tabwrap{grid-template-columns:1fr}}
+.tscroll{max-height:440px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+table.mt{border-collapse:collapse;width:100%;font-size:14px}
+table.mt th,table.mt td{padding:4px 8px;border-bottom:1px solid var(--line);text-align:left}
+table.mt th{position:sticky;top:0;background:var(--panel-alt);font-weight:600;font-size:13px}
+table.mt td.n{font-family:var(--mono);color:var(--text-dim)}
+table.mt tr.act{background:#2a2414}
+table.mt input{min-height:38px;padding:4px 8px;width:100px}
+table.mt .note{font-size:12px;color:var(--amber)}
+.res{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:8px}
+.res div{background:var(--screen);border:1px solid var(--line);border-radius:10px;padding:10px}
+.res b{display:block;font-family:var(--mono);font-size:18px;color:var(--amber);font-weight:500}
+.res span{font-size:12.5px;color:var(--text-dim)}
+/* Fuß */
+footer{border-top:1px solid var(--line);padding:14px 18px 22px;color:var(--text-dim);font-size:13px;text-align:center}
+footer p{margin:4px 0}
+/* Modal */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.62);display:none;align-items:flex-start;justify-content:center;padding:4vh 12px;z-index:50;overflow:auto}
+.ov.open{display:flex}
+.mbox{background:var(--panel);border:1px solid var(--line);border-radius:14px;max-width:720px;width:100%;padding:18px 20px}
+.mbox.wide{max-width:1040px}
+.mhead{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.mhead h2{flex:1;margin:0;font-size:18px}
+.mbody{font-size:15px}
+.mbody h3{font-size:15px;margin:16px 0 6px;color:var(--teal)}
+.mbody ul{padding-left:20px}
+.mbody li{margin:3px 0}
+.mfoot{display:flex;justify-content:space-between;gap:8px;margin-top:16px;flex-wrap:wrap}
+.gfig{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin:12px 0}
+.gfig .screen{padding:8px}
+.eq{font-family:var(--mono);color:var(--amber)}
+#print{display:none}
+/* Druck */
+@media print{
+  @page{size:A4;margin:14mm 14mm 20mm}
+  body{background:#fff;color:#000;font-size:11pt}
+  body>*:not(#print){display:none!important}
+  #print{display:block!important;color:#000;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+  #print h1{font-size:18pt;margin:0 0 4pt}
+  #print h2{font-size:12.5pt;margin:12pt 0 4pt;border-bottom:1px solid #999;padding-bottom:2pt}
+  #print table{border-collapse:collapse;font-size:10pt;margin:4pt 0}
+  #print td,#print th{border:1px solid #888;padding:2pt 6pt;text-align:left}
+  #print th{background:#eee}
+  #print .meta{display:flex;gap:24pt;margin:6pt 0 10pt;font-size:11pt}
+  #print .meta span{border-bottom:1px solid #000;min-width:120pt;display:inline-block}
+  #print .tabs{display:flex;gap:10pt;flex-wrap:wrap;align-items:flex-start}
+  #print .pfoot{position:fixed;bottom:-12mm;left:0;right:0;font-size:8.5pt;color:#444;text-align:center;border-top:1px solid #aaa;padding-top:2pt}
+  #print .avoid{break-inside:avoid}
+  #print .small{font-size:9.5pt;color:#333}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="back" href="../index.html">← Zurück</a>
+  <div class="ttl">
+    <h1>Simulation „Kalorimetrie“</h1>
+    <div class="sub">Verbrennungs- und Lösungskalorimetrie: Massen wiegen, Temperatur ablesen, Enthalpien berechnen</div>
+  </div>
+  <a href="#" class="lnk" id="lnkAnl">Anleitung</a>
+  <div class="status" id="status">Versuchsart wählen</div>
+</header>
+
+<div class="layout">
+  <aside id="aside">
+    <section class="box">
+      <button class="gbtn" id="gToggle"><span>Grundlagen · <span id="gCount">7</span> Themen</span><span id="gArrow">▾</span></button>
+      <div class="glist" id="gList" hidden></div>
+    </section>
+    <section class="box">
+      <h3>Versuchsart wählen</h3>
+      <div class="choice">
+        <button data-v="verbrennung" id="chV">Verbrennungskalorimetrie</button>
+        <button data-v="loesung" id="chL">Reaktion in wässriger Lösung</button>
+      </div>
+    </section>
+    <div id="asideRest" class="btncol" style="gap:12px"></div>
+  </aside>
+  <main id="main"></main>
+</div>
+
+<footer>
+  <p>Simulierte Daten zu Lehrzwecken. Modellannahmen: c(Wasser) = 4,18 J/(g·K); Wärmeverluste und Wärmekapazität des Kalorimeters werden vernachlässigt; verdünnte Lösungen werden wie Wasser behandelt (ρ = 1,00 g/mL); Literaturwerte gerundet (25 °C, 1013 hPa), für Holz und Kerzenwachs Richtwerte.</p>
+  <p>Bastian Baumgart · Kalorimetrie V1.0 · <a href="#" id="lnkVer">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+</footer>
+
+<div class="ov" id="ov">
+  <div class="mbox" id="mbox">
+    <div class="mhead"><h2 id="mTitle"></h2><button id="mClose" aria-label="Schließen">✕</button></div>
+    <div class="mbody" id="mBody"></div>
+    <div class="mfoot" id="mFoot"></div>
+  </div>
+</div>
+
+<div id="print"></div>
+<input type="file" id="fileIn" accept=".json,application/json" hidden>
+
+<script>
+'use strict';
+/* ================= Daten ================= */
+const C_W = 4.18;
+const VERSION = '1.0';
+const TITLE = 'Kalorimetrie';
+const STOFFE = {
+  verbrennung: [
+    {id:'methanol', name:'Methanol', nC:1, M:32.04, dH:-726},
+    {id:'ethanol',  name:'Ethanol',  nC:2, M:46.07, dH:-1367},
+    {id:'propanol', name:'Propan-1-ol', nC:3, M:60.10, dH:-2021},
+    {id:'butanol',  name:'Butan-1-ol',  nC:4, M:74.12, dH:-2676},
+    {id:'pentanol', name:'Pentan-1-ol', nC:5, M:88.15, dH:-3329},
+    {id:'holz', name:'Holz', solid:true, mix:true, dHg:-19.0, hold:'Schale mit Holz', holdAcc:'die Schale mit Holzspänen', holdType:'schale', fuelCol:'#a0723f', empty:[30,36], fuel:[5,7], rate:0.0050,
+      eqHTML:'Holz (Stoffgemisch, v. a. Cellulose und Lignin) + O₂ → CO₂ + H₂O (+ Asche)'},
+    {id:'paraffin', name:'Kerzenwachs', solid:true, mix:true, dHg:-46.0, hold:'Teelicht', holdAcc:'das Teelicht', holdType:'kerze', empty:[1.6,2.2], fuel:[12,14], rate:0.0020},
+    {id:'kohle', name:'Holzkohle', solid:true, M:12.01, dH:-393.5, short:'C', hold:'Schale mit Holzkohle', holdAcc:'die Schale mit Holzkohle', holdType:'schale', fuelCol:'#2b2b2b', empty:[30,36], fuel:[4,6], rate:0.0030,
+      eqHTML:'C(s) + O₂(g) → CO₂(g) <span class="dim">(Holzkohle ≈ Kohlenstoff)</span>'}
+  ],
+  loesung: [
+    {id:'naoh',  name:'Natriumhydroxid', short:'NaOH', formel:'NaOH', M:40.00, dH:-44.5, m0:4.00, tau:25, fluid:'Wasser', eq:'NaOH(s) → Na⁺(aq) + OH⁻(aq)', kind:'Lösungsenthalpie'},
+    {id:'cacl2', name:'Calciumchlorid', short:'CaCl₂', formel:'CaCl₂', M:110.98, dH:-81.3, m0:5.50, tau:35, fluid:'Wasser', eq:'CaCl₂(s) → Ca²⁺(aq) + 2 Cl⁻(aq)', kind:'Lösungsenthalpie'},
+    {id:'nh4no3',name:'Ammoniumnitrat', short:'NH₄NO₃', formel:'NH₄NO₃', M:80.04, dH:25.7, m0:8.00, tau:30, fluid:'Wasser', eq:'NH₄NO₃(s) → NH₄⁺(aq) + NO₃⁻(aq)', kind:'Lösungsenthalpie'},
+    {id:'kno3',  name:'Kaliumnitrat', short:'KNO₃', formel:'KNO₃', M:101.10, dH:34.9, m0:10.00, tau:40, fluid:'Wasser', eq:'KNO₃(s) → K⁺(aq) + NO₃⁻(aq)', kind:'Lösungsenthalpie'},
+    {id:'mg',    name:'Magnesium + Salzsäure', short:'Mg', formel:'Mg', M:24.31, dH:-466.9, m0:0.30, tau:45, fluid:'Salzsäure', fluidLong:'Salzsäure (c = 1 mol/L, im Überschuss)', eq:'Mg(s) + 2 H⁺(aq) → Mg²⁺(aq) + H₂(g)', kind:'Reaktionsenthalpie'},
+    {id:'hcl', name:'Salzsäure + Natronlauge', neutral:true, short:'Natronlauge', base:'Natronlauge', acid:'Salzsäure', conc:1.0, dH:-57.3, m0:50, tau:8, fluid:'Salzsäure', fluidLong:'Salzsäure (c = 1,0 mol/L)', eq:'H⁺(aq) + Cl⁻(aq) + Na⁺(aq) + OH⁻(aq) → Na⁺(aq) + Cl⁻(aq) + H₂O(l)', eqShort:'H⁺(aq) + OH⁻(aq) → H₂O(l)', kind:'Neutralisationsenthalpie'},
+    {id:'hno3', name:'Salpetersäure + Kalilauge', neutral:true, short:'Kalilauge', base:'Kalilauge', acid:'Salpetersäure', conc:1.0, dH:-57.3, m0:50, tau:8, fluid:'Salpetersäure', fluidLong:'Salpetersäure (c = 1,0 mol/L)', eq:'H⁺(aq) + NO₃⁻(aq) + K⁺(aq) + OH⁻(aq) → K⁺(aq) + NO₃⁻(aq) + H₂O(l)', eqShort:'H⁺(aq) + OH⁻(aq) → H₂O(l)', kind:'Neutralisationsenthalpie'},
+    {id:'zn',    name:'Zink + Kupfer(II)-sulfat', short:'Zn', formel:'Zn', M:65.38, dH:-217, m0:1.00, tau:50, fluid:'Lösung', fluidLong:'Kupfer(II)-sulfat-Lösung (c = 0,5 mol/L, im Überschuss)', eq:'Zn(s) + Cu²⁺(aq) → Zn²⁺(aq) + Cu(s)', kind:'Reaktionsenthalpie'}
+  ]
+};
+STOFFE.verbrennung.forEach(s=>{s.kind='Verbrennungsenthalpie';s.fluid='Wasser';if(!s.short)s.short=s.name;
+  if(!s.solid){s.hold='Brenner';s.holdAcc='den Brenner';s.holdType='brenner';s.empty=[118,132];s.fuel=[18,26];s.rate=0.0035;}});
+const kJproG=s=>s.mix?-s.dHg:-s.dH/s.M;  // freigesetzte Energie je g Brennstoff
+const isMix=()=>{const s=stoff();return !!(s&&s.mix);};
+const isNeu=()=>{const s=stoff();return !!(s&&s.neutral);};
+STOFFE.verbrennung.concat(STOFFE.loesung).forEach(x=>x.sym=x.mix?'Δ<sub>R</sub>h':'Δ<sub>R</sub>H<sub>m</sub>');
+const DEF = {
+  verbrennung:{mW:200, T0:25},
+  loesung:{mW:100, T0:25}
+};
+
+/* ================= Hilfsfunktionen ================= */
+const $ = s=>document.querySelector(s);
+const rnd = (a,b)=>a+Math.random()*(b-a);
+const r2 = x=>Math.round(x*100)/100;
+const r1 = x=>Math.round(x*10)/10;
+function fmt(x,d){ if(x==null||!isFinite(x)) return '–'; let s=(Math.abs(x)<0.5*Math.pow(10,-d)?0:x).toFixed(d); return s.replace('.',',').replace('-','−'); }
+function roundSig(x,s){ if(!isFinite(x)||x===0) return x; const e=Math.floor(Math.log10(Math.abs(x))); const p=Math.pow(10,e-s+1); return Math.round(x/p)*p; }
+function fmtSig(x,s=3){ if(x==null||!isFinite(x)) return '–'; if(x===0) return '0'; const e=Math.floor(Math.log10(Math.abs(x))); const d=Math.max(0,s-1-e); return fmt(roundSig(x,s),d); }
+function parseNum(str){
+  if(str==null) return NaN;
+  let s=String(str).trim().replace(/\s+/g,'').replace(/[−–]/g,'-').replace(/,/g,'.');
+  if(s==='') return NaN;
+  let m=s.match(/^([+-]?(?:\d+\.?\d*|\.\d+))(?:[·*x×]10\^?\(?([+-]?\d+)\)?)?$/i);
+  if(m) return parseFloat(m[1])*(m[2]!==undefined?Math.pow(10,+m[2]):1);
+  if(/^[+-]?(?:\d+\.?\d*|\.\d+)e[+-]?\d+$/i.test(s)) return parseFloat(s);
+  return NaN;
+}
+const near=(v,e,rel=0.0055,abs=1e-9)=>isFinite(v)&&isFinite(e)&&Math.abs(v-e)<=Math.max(Math.abs(e)*rel,abs);
+function mmss(t){ t=Math.round(t); const m=Math.floor(t/60), s=t%60; return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); }
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+/* Strukturformel n-Alkan-1-ol (Valenzstrichformel mit freien Elektronenpaaren) */
+function alcSVG(n, col){
+  col = col||'var(--text)';
+  const dx=40, y=48, x0=16, W=x0*2+dx*(n+2), Hh=96;
+  let g='';
+  const atom=(x,yy,t)=>`<text x="${x}" y="${yy+6}" text-anchor="middle" font-size="17" font-family="system-ui,sans-serif" fill="${col}">${t}</text>`;
+  const bond=(x1,y1,x2,y2)=>{const L=Math.hypot(x2-x1,y2-y1),ux=(x2-x1)/L,uy=(y2-y1)/L,a=10;return `<line x1="${x1+ux*a}" y1="${y1+uy*a}" x2="${x2-ux*a}" y2="${y2-uy*a}" stroke="${col}" stroke-width="1.6"/>`;};
+  const xs=i=>x0+dx*i;
+  g+=atom(xs(0),y,'H')+bond(xs(0),y,xs(1),y);
+  for(let i=1;i<=n;i++){
+    g+=atom(xs(i),y,'C');
+    g+=atom(xs(i),y-34,'H')+bond(xs(i),y,xs(i),y-34);
+    g+=atom(xs(i),y+34,'H')+bond(xs(i),y,xs(i),y+34);
+    g+=bond(xs(i),y,xs(i+1),y);
+  }
+  const xo=xs(n+1);
+  g+=atom(xo,y,'O');
+  g+=`<line x1="${xo-7}" y1="${y-13}" x2="${xo+7}" y2="${y-13}" stroke="${col}" stroke-width="1.6"/><line x1="${xo-7}" y1="${y+13}" x2="${xo+7}" y2="${y+13}" stroke="${col}" stroke-width="1.6"/>`;
+  g+=bond(xo,y,xs(n+2),y)+atom(xs(n+2),y,'H');
+  return `<svg viewBox="0 0 ${W} ${Hh}" width="${W*0.8}" height="${Hh*0.8}" style="display:inline-block;vertical-align:middle">${g}</svg>`;
+}
+function alkFragSVG(col){
+  col=col||'var(--text)';
+  const t=(x,y,c,fs)=>`<text x="${x}" y="${y+6}" text-anchor="middle" font-size="${fs||17}" font-family="system-ui,sans-serif" fill="${col}">${c}</text>`;
+  const l=(x1,y1,x2,y2)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col}" stroke-width="1.6"/>`;
+  let g=t(14,48,'H')+l(24,48,46,48)+`<path d="M38 18 q-6 30 0 60" fill="none" stroke="${col}" stroke-width="1.6"/>`+t(60,48,'C')+t(60,14,'H')+l(60,22,60,38)+t(60,82,'H')+l(60,58,60,74)+l(70,48,94,48)+`<path d="M84 18 q6 30 0 60" fill="none" stroke="${col}" stroke-width="1.6"/>`+t(94,84,'n',13)+t(108,48,'H');
+  return `<svg viewBox="0 0 122 96" width="98" height="77" style="display:inline-block;vertical-align:middle">${g}</svg>`;
+}
+function combEqHTML(s,col){
+  if(s.id==='paraffin') return `<span style="white-space:nowrap">${alkFragSVG(col)} <span>+ O₂ → CO₂ + H₂O</span></span><div style="font-size:12px;opacity:.75">Kerzenwachs (Paraffin): Gemisch langkettiger Alkane, n ≈ 20–30</div>`;
+  if(s.eqHTML) return `<span>${s.eqHTML}</span>`;
+  const n=s.nC, even=(3*n)%2===0;
+  const a=even?1:2, o2=even?3*n/2:3*n, co2=a*n, h2o=a*(n+1);
+  const k=x=>x===1?'':x+' ';
+  return `<span style="white-space:nowrap">${a===2?'2 ':''}${alcSVG(n,col)} <span>+ ${k(o2)}O₂ → ${k(co2)}CO₂ + ${k(h2o)}H₂O</span></span>`;
+}
+
+/* ================= Zustand ================= */
+function freshState(){
+  return {
+    versuch:null, stoffId:null, vary:false, explain:false, params:null, hidden:null,
+    waage:{item:null, water:0, solid:0, tare:0},
+    f:{}, rows:[],
+    sim:{t:0,T:25,pend:0,running:false,started:false,waiting:false,burning:false,burnStart:null,burnEnd:null,burned:0,added:false,addTime:null,frac:0,finished:false,speed:1,nextIdx:0},
+    passed:{Q:false,H:false,M:false}, inApp:false, showF:{}, help:{}
+  };
+}
+let S = freshState();
+const FIELD_IDS=['mW','m1','m2','dm','mS','T1','T2','dT','mG','Q','dH','n','dHm'];
+const CALC_IDS=['dm','T1','T2','dT','mG','Q','dH','n','dHm'];
+function initFields(){ S.f={}; FIELD_IDS.forEach(id=>S.f[id]={raw:'',val:null,ok:false,tries:0,auto:false,self:false,msg:''}); }
+initFields();
+
+const stoff=()=>S.versuch?STOFFE[S.versuch].find(s=>s.id===S.stoffId):null;
+const isComb=()=>S.versuch==='verbrennung';
+const isExo=()=>{const s=stoff();return !!s&&(s.mix?s.dHg:s.dH)<0;};
+function defaultsFor(){ const d=Object.assign({},DEF[S.versuch]); if(!isComb()) d.mS=stoff().m0; if(isNeu()) d.mW=50; return d; }
+function newHidden(){
+  const P=S.params;
+  const h={};
+  if(isComb()){
+    const s=stoff(); h.vessel=r2(rnd(98,112)); h.lampEmpty=rnd(s.empty[0],s.empty[1]); h.m1=r2(h.lampEmpty+rnd(s.fuel[0],s.fuel[1]));
+    h.rate=s.rate*rnd(0.9,1.1); h.m2=null;
+  } else {
+    h.vessel=r2(rnd(8.5,11.5)); h.dish=isNeu()?r2(rnd(46,56)):r2(rnd(2.6,3.9)); h.mS=r2(P.mS*rnd(0.985,1.015));
+  }
+  h.mW=r2(P.mW+rnd(-1.6,1.6));
+  S.hidden=h;
+}
+function resetMasses(){
+  S.waage={item:null,water:0,solid:0,tare:0};
+  ['mW','m1','m2','dm','mS'].forEach(id=>S.f[id]={raw:'',val:null,ok:false,tries:0,auto:false,self:false,msg:''});
+  S.inApp=false;
+}
+
+/* ================= Prüfungen ================= */
+const val=id=>S.f[id]&&S.f[id].ok?S.f[id].val:NaN;
+function ownRows(){ return S.rows.filter(r=>r.ok).map(r=>({t:r.t,v:parseNum(r.raw)})); }
+function startTime(){ return isComb()?S.sim.burnStart:S.sim.addTime; }
+function preVals(){ const st=startTime(); return ownRows().filter(r=>st!=null&&r.t<=st+1e-6); }
+function extVal(){ const o=ownRows(); if(!o.length) return NaN; const st=startTime(); const after=o.filter(r=>r.t>st); const src=after.length?after:o; return isExo()?Math.max(...src.map(r=>r.v)):Math.min(...src.map(r=>r.v)); }
+const mStoff=()=>isComb()?val('dm'):val('mS');
+const mHeat=()=>isNeu()?val('mG'):val('mW');
+
+const EXP={
+  mW:()=>S.hidden.mW, m1:()=>S.hidden.m1, m2:()=>S.hidden.m2, mS:()=>S.hidden.mS,
+  dm:()=>val('m1')-val('m2'),
+  T1:()=>{const p=preVals();return p.length?p[p.length-1].v:NaN;},
+  T2:()=>extVal(),
+  dT:()=>val('T2')-val('T1'),
+  mG:()=>val('mW')+val('mS'),
+  Q:()=>C_W*mHeat()*val('dT')/1000,
+  dH:()=>-val('Q'),
+  n:()=>isNeu()?stoff().conc*Math.min(val('mW'),val('mS'))/1000:mStoff()/stoff().M,
+  dHm:()=>isMix()?val('dH')/val('dm'):val('dH')/val('n')
+};
+const AUTOFMT={mW:x=>fmt(x,2),m1:x=>fmt(x,2),m2:x=>fmt(x,2),mS:x=>fmt(x,2),dm:x=>fmt(x,2),T1:x=>fmt(x,1),T2:x=>fmt(x,1),dT:x=>fmt(x,1),mG:x=>fmt(x,2),Q:x=>fmtSig(x,3),dH:x=>fmtSig(x,3),n:x=>fmtSig(x,3),dHm:x=>fmtSig(x,3)};
+
+function massCheck(v,e,kind){
+  if(Math.abs(v-e)<=0.006) return {ok:true};
+  const H=S.hidden;
+  if(kind==='mW'){
+    if(Math.abs(v-(e+H.vessel))<=0.02) return {ok:false,msg:'Du hast das Gefäß mitgewogen. Leeres Gefäß auf die Waage, „Tara“ drücken, dann erst das Wasser einfüllen.'};
+    if(Math.abs(v-H.vessel)<=0.02) return {ok:false,msg:'Das ist die Masse des leeren Gefäßes – gesucht ist die Masse des Wassers.'};
+    if(near(v,e/1000,0.01)) return {ok:false,msg:'Gib die Masse in Gramm an.'};
+  }
+  if(kind==='mS'){
+    if(Math.abs(v-(e+H.dish))<=0.02) return {ok:false,msg:isNeu()?'Das Becherglas wurde mitgewogen. Leeres Becherglas auflegen, „Tara“, dann die Lauge einfüllen.':'Das Wägeschälchen wurde mitgewogen. Schälchen auflegen, „Tara“, dann den Stoff einwiegen.'};
+    if(near(v,e*1000,0.01)) return {ok:false,msg:'Gib die Masse in Gramm an (nicht in mg).'};
+  }
+  if(kind==='m1'||kind==='m2'){
+    return {ok:false,msg:'Stell nur '+stoff().holdAcc+' auf die Waage. Steht ohne Gegenstand nicht 0,00 g in der Anzeige, vorher „Tara“ drücken.'};
+  }
+  return {ok:false,msg:'Lies den Wert genau an der Waagenanzeige ab (zwei Nachkommastellen).'};
+}
+const CHECK={
+  mW:v=>massCheck(v,EXP.mW(),'mW'),
+  m1:v=>massCheck(v,EXP.m1(),'m1'),
+  m2:v=>massCheck(v,EXP.m2(),'m2'),
+  mS:v=>massCheck(v,EXP.mS(),'mS'),
+  dm:v=>{const e=EXP.dm(); if(near(v,e,0.001,0.006)) return {ok:true};
+    if(near(v,-e,0.001,0.006)) return {ok:false,msg:'Vorzeichen: Δm = m₁ − m₂ (vorher minus nachher) ist positiv.'};
+    if(near(v,val('m1')+val('m2'),0.001,0.02)) return {ok:false,msg:'Die Massen werden subtrahiert, nicht addiert.'};
+    return {ok:false,msg:'Δm = m₁ − m₂ – rechne mit deinen eingetragenen Massen.'};},
+  T1:v=>{const p=preVals(); if(!p.length) return {ok:false,msg:'Kein Messwert bei t = 0 vorhanden.'};
+    if(p.some(r=>Math.abs(r.v-v)<=0.051)) return {ok:true};
+    const ex=extVal(); if(Math.abs(v-ex)<=0.051) return {ok:false,msg:'Das ist der Extremwert. T₁ ist die Anfangstemperatur bei t = 0.'};
+    return {ok:false,msg:'T₁ ist die Anfangstemperatur bei t = 0 (erste Zeile der Tabelle).'};},
+  T2:v=>{const e=EXP.T2(); if(Math.abs(v-e)<=0.051) return {ok:true};
+    const o=ownRows(); const last=o.length?o[o.length-1].v:NaN;
+    if(Math.abs(v-last)<=0.051) return {ok:false,msg:'Das ist der letzte Messwert. Gesucht ist der '+(isExo()?'höchste':'tiefste')+' Wert nach Reaktionsbeginn.'};
+    return {ok:false,msg:(isExo()?'Die Reaktion ist exotherm: Nimm den höchsten Temperaturwert aus deiner Tabelle.':'Die Reaktion ist endotherm: Nimm den tiefsten Temperaturwert aus deiner Tabelle.')};},
+  dT:v=>{const e=EXP.dT(); if(near(v,e,0.002,0.051)) return {ok:true};
+    if(near(v,-e,0.002,0.051)) return {ok:false,msg:'Vorzeichen: ΔT = T₂ − T₁ (Endwert minus Anfangswert).'+(isExo()?'':' Bei einer Abkühlung ist ΔT negativ.')};
+    if(near(v,e+273.15,0.002,0.2)||near(v,e-273.15,0.002,0.2)) return {ok:false,msg:'Eine Temperaturdifferenz ist in K und °C gleich groß – nicht 273 addieren.'};
+    return {ok:false,msg:'ΔT = T₂ − T₁ mit deinen Werten berechnen.'};},
+  mG:v=>{const e=EXP.mG(); if(near(v,e,0.001,0.006)) return {ok:true};
+    if(near(v,val('mW'),0.001,0.006)||near(v,val('mS'),0.001,0.006)) return {ok:false,msg:'Nach dem Mischen erwärmt sich die gesamte Lösung: Addiere die Massen beider Lösungen.'};
+    return {ok:false,msg:'m(gesamt) = m('+stoff().fluid+') + m('+stoff().short+').'};},
+  Q:v=>{const e=EXP.Q(), mW=mHeat(), dT=val('dT'); if(near(v,e,0.006,0.0015)) return {ok:true};
+    if(near(v,e*1000,0.006)) return {ok:false,msg:'Du hast Q in J angegeben – gefragt ist kJ (durch 1000 teilen).'};
+    if(near(v,-e,0.006)) return {ok:false,msg:'Vorzeichen: Q = c · m · ΔT. '+(isExo()?'Das Wasser nimmt Wärme auf, Q ist positiv.':'Das Wasser gibt Wärme ab (ΔT < 0), Q ist negativ.')};
+    if(isNeu()&&(near(v,C_W*val('mW')*dT/1000,0.006)||near(v,C_W*val('mS')*dT/1000,0.006))) return {ok:false,msg:'Setze die Gesamtmasse beider Lösungen ein.'};
+    if(!isNeu()&&near(v,C_W*mStoffRaw()*dT/1000,0.006)) return {ok:false,msg:'Du hast die Masse des Stoffs eingesetzt – in Q = c · m · ΔT steht die Masse des Wassers.'};
+    if(near(v,C_W*mW*val('T2')/1000,0.006)||near(v,C_W*mW*val('T2'),0.006)) return {ok:false,msg:'Setze die Temperaturdifferenz ΔT ein, nicht die Endtemperatur.'};
+    if(near(v,C_W*mW*(dT+273.15)/1000,0.006)) return {ok:false,msg:'ΔT in K ist genauso groß wie ΔT in °C – nicht 273 addieren.'};
+    if(near(v,mW*dT/1000,0.006)||near(v,mW*dT,0.006)) return {ok:false,msg:'Die spezifische Wärmekapazität c(Wasser) = 4,18 J/(g·K) fehlt.'};
+    if(near(v,e/1000,0.006)) return {ok:false,msg:'Setze die Masse in g ein – c ist in J/(g·K) angegeben. Danach J in kJ umrechnen.'};
+    return {ok:false,msg:'Q = c · m(Wasser) · ΔT, Ergebnis in kJ.'};},
+  dH:v=>{const e=EXP.dH(); if(near(v,e,0.006,0.0015)) return {ok:true};
+    if(near(v,-e,0.006)) return {ok:false,msg:'Vorzeichen: Die Wärme, die das Wasser aufnimmt, gibt das System ab. Also ΔH = −Q.'};
+    if(near(Math.abs(v),Math.abs(e)*1000,0.006)) return {ok:false,msg:'Einheit: ΔH in kJ angeben (nicht J).'};
+    return {ok:false,msg:'ΔH = −Q (Wert aus Schritt 1 mit umgekehrtem Vorzeichen).'};},
+  n:v=>{ if(isNeu()){ const e=EXP.n(), s=stoff(), big=s.conc*Math.max(val('mW'),val('mS'))/1000; if(near(v,e,0.006)) return {ok:true};
+      if(near(v,e*1000,0.006)) return {ok:false,msg:'Das Volumen muss in L eingesetzt werden (1 mL = 0,001 L).'};
+      if(Math.abs(big-e)>1e-9&&near(v,big,0.006)) return {ok:false,msg:'Es reagiert nur so viel, wie der Unterschuss-Partner zulässt: Nimm die kleinere Stoffmenge.'};
+      if(near(v,s.conc*(val('mW')+val('mS'))/1000,0.006)) return {ok:false,msg:'Nicht beide Volumina addieren: Es entsteht so viel Wasser, wie Säure bzw. Lauge (der kleinere Wert) vorliegt.'};
+      return {ok:false,msg:'n = c · V mit V = m / ρ (ρ = 1,00 g/mL), Volumen in L.'};}
+    const m=mStoff(), M=stoff().M, e=EXP.n(); if(near(v,e,0.006)) return {ok:true};
+    if(near(v,m*M,0.006)) return {ok:false,msg:'n = m / M – teilen, nicht multiplizieren.'};
+    if(near(v,M/m,0.006)) return {ok:false,msg:'Bruch vertauscht: n = m / M (Masse durch molare Masse).'};
+    if(near(v,e*1000,0.006)) return {ok:false,msg:'Das ist der Wert in mmol – gib n in mol an.'};
+    if(near(v,val('mW')/M,0.006)) return {ok:false,msg:'Du hast die Masse des Wassers eingesetzt. Gesucht ist die Stoffmenge des '+(isComb()?'verbrannten Brennstoffs (Δm).':'eingesetzten Stoffs.')};
+    if(isComb()&&near(v,val('m1')/M,0.006)) return {ok:false,msg:'Setze die verbrannte Masse Δm ein, nicht m₁.'};
+    return {ok:false,msg:'n = m / M mit '+(isComb()?'Δm':'m(Stoff)')+' aus deiner Messung.'};},
+  dHm:v=>{const e=EXP.dHm(), dH=val('dH'), n=val('n'); if(near(v,e,0.006)) return {ok:true};
+    if(near(v,-e,0.006)) return {ok:false,msg:'Vorzeichen prüfen: '+(isExo()?'exotherm → negativer Wert.':'endotherm → positiver Wert.')};
+    if(near(v,e*1000,0.006)) return {ok:false,msg:'Einheit: Ergebnis in kJ/mol angeben (nicht J/mol).'};
+    if(near(v,e/1000,0.006)) return {ok:false,msg:'Faktor 1000 zu klein – rechne mit ΔH in kJ und n in mol.'};
+    if(near(v,dH*n,0.006)) return {ok:false,msg:'Teile ΔH durch n – nicht multiplizieren.'};
+    if(!isMix()&&near(v,dH/mStoff(),0.006)) return {ok:false,msg:'Du hast durch die Masse geteilt. Für die molare Größe durch die Stoffmenge n teilen.'};
+    if(isMix()&&near(v,dH*val('dm'),0.006)) return {ok:false,msg:'Teile ΔH durch Δm – nicht multiplizieren.'};
+    return {ok:false,msg:'Δ<sub>r</sub>H = ΔH / n mit deinen Werten.'.replace('Δ<sub>r</sub>H','molare Enthalpie')};}
+};
+function mStoffRaw(){ return isComb()?val('dm'):val('mS'); }
+
+function evalField(id,user){
+  const F=S.f[id];
+  if(F.raw===''||F.raw==null){F.ok=false;F.msg='';F.val=null;return;}
+  const v=parseNum(F.raw); F.val=v;
+  if(isNaN(v)){F.ok=false;F.msg='Zahl nicht erkannt – Dezimalkomma verwenden, z. B. 12,5 oder 7,14·10^-4.'; if(user)F.tries++; return;}
+  const r=CHECK[id](v);
+  F.ok=r.ok;
+  F.msg=r.ok?(F.auto?'automatisch ergänzt *':'richtig'):r.msg;
+  if(user){ if(r.ok){F.self=!F.auto;} else {F.tries++;} }
+  if(!r.ok && user && ['mW','m1','m2','mS'].includes(id) && F.tries>=2){
+    F.auto=true; F.raw=AUTOFMT[id](EXP[id]()); F.val=parseNum(F.raw); F.ok=true;
+    F.msg='Nach zwei Fehlversuchen automatisch ergänzt * – vergleiche mit der Waagenanzeige.';
+  }
+}
+function evalAll(){ FIELD_IDS.forEach(id=>evalField(id,false)); }
+function autoFill(id){ const F=S.f[id]; const e=EXP[id](); if(!isFinite(e)) return; F.raw=AUTOFMT[id](e); F.auto=true; F.self=false; evalField(id,false); }
+function selfCount(){ return CALC_IDS.filter(id=>S.f[id].ok&&S.f[id].self).length; }
+
+function checkRow(i,user){
+  const r=S.rows[i]; if(!r) return;
+  if(r.raw===''){r.ok=false;r.msg='';return;}
+  const v=parseNum(r.raw);
+  if(isNaN(v)){r.ok=false;r.msg='Zahl nicht erkannt (z. B. 24,7).'; if(user)r.tries++;}
+  else if(Math.abs(v-r.trueT)<=0.12){r.ok=true;r.msg=r.auto?'automatisch ergänzt *':'';}
+  else{
+    r.ok=false;
+    if(Math.abs(v-(r.trueT+273.15))<=0.3) r.msg='Temperatur in °C angeben.';
+    else if(Math.abs(v-r.trueT)<=0.6) r.msg='Genauer ablesen: Ein kleiner Teilstrich entspricht 0,1 °C.';
+    else r.msg='Lies die Temperatur an der Thermometer-Lupe ab.';
+    if(user) r.tries++;
+  }
+  if(!r.ok && user && r.tries>=2){ r.raw=fmt(r1(r.trueT),1); r.auto=true; r.ok=true; r.msg='Nach zwei Fehlversuchen automatisch ergänzt *'; }
+}
+
+/* ================= Schritte ================= */
+function massDone(){ return S.f.mW.ok && (isComb()?S.f.m1.ok:S.f.mS.ok); }
+function stepsFor(){
+  if(!S.versuch) return [];
+  const s=stoff();
+  const L=[];
+  L.push({id:'massen',title:'Massen bestimmen',target:'cardWaage',done:massDone,
+    text:isComb()?'Leeres Becherglas auf die Waage, „Tara“, Wasser einfüllen und m(Wasser) ablesen. Danach die Waage leer tarieren und '+stoff().holdAcc+' wiegen (m₁).'
+      :(isNeu()?'Kalorimeterbecher auf die Waage, „Tara“, '+s.fluid+' einfüllen und ablesen. Dann ein leeres Becherglas auflegen, „Tara“, '+s.base+' einfüllen und ablesen.':'Kalorimeterbecher auf die Waage, „Tara“, '+s.fluid+' einfüllen und ablesen. Dann Wägeschälchen auflegen, „Tara“, Stoff einwiegen und m(Stoff) ablesen.')});
+  L.push({id:'messung',title:'Temperatur messen',target:'cardApp',done:()=>S.sim.finished,
+    text:'„Messung starten“: '+(isComb()?'Der Brennstoff wird entzündet.':(isNeu()?'Die '+s.base+' wird ins Kalorimeter gegossen.':'Der Stoff wird ins Kalorimeter gegeben.'))+' Der erste Wert (t = 0) ist die Anfangstemperatur. Alle 30 s hält die Messung an: Temperatur an der Lupe ablesen (auf 0,1 °C) und in die Tabelle eintragen.'+(isComb()?' Nach einiger Zeit die Flamme löschen.':'')+' Messen, bis sich die Temperatur nicht mehr ändert.'});
+  if(isComb()) L.push({id:'nach',title:s.hold+' zurückwiegen',target:'cardWaage',done:()=>S.f.m2.ok&&S.f.dm.ok,
+    text:'Nach dem Löschen '+s.holdAcc+' erneut wiegen (m₂) und die verbrannte Masse berechnen: Δm = m₁ − m₂.'+(s.solid?' (Asche und Ruß werden vernachlässigt.)':'')});
+  L.push({id:'Q',title:'Wärme Q berechnen',target:'calcQ',done:()=>S.passed.Q,
+    text:'Aus der Tabelle T₁ (bei t = 0) und T₂ ('+(isExo()?'Höchstwert':'Tiefstwert')+') ablesen. ΔT = T₂ − T₁ und Q = c · m · ΔT'+(isNeu()?' mit der Gesamtmasse beider Lösungen':'')+'. Danach Zwischenprüfung.'});
+  L.push({id:'H',title:s.kind+' ΔH',target:'calcH',done:()=>S.passed.H,
+    text:'Die Wärme, die das Wasser aufnimmt, gibt das System ab: ΔH = −Q.'});
+  L.push({id:'M',title:s.mix?'Enthalpie je Gramm':'molare Reaktionsenthalpie',target:'calcM',done:()=>S.passed.M,
+    text:s.mix?s.name+' ist ein Stoffgemisch ohne molare Masse. Deshalb wird ΔH auf 1 g bezogen: '+s.sym+' = ΔH / Δm.':(isNeu()?'Stoffmenge des gebildeten Wassers n = c · V berechnen (V = m / ρ) und ΔH auf 1 mol beziehen: ':'Stoffmenge n = m / M berechnen und ΔH auf 1 mol beziehen: ')+s.sym+' = ΔH / n.'});
+  L.push({id:'pdf',title:'Zusammenfassung als PDF',target:'cardPdf',done:()=>false,
+    text:'Name, Kurs und Datum eintragen und die Auswertung über die Druckfunktion als PDF speichern.'});
+  return L;
+}
+function curStepIdx(){ const L=stepsFor(); const i=L.findIndex(s=>!s.done()); return i<0?L.length-1:i; }
+
+/* ================= Grundlagen ================= */
+const svgCal=`<svg viewBox="0 0 300 230" width="300"><rect x="70" y="60" width="160" height="150" rx="10" fill="none" stroke="#9aa2a9" stroke-width="2" stroke-dasharray="6 4"/><text x="150" y="225" fill="#9aa2a9" font-size="11" text-anchor="middle">Isolierung</text><rect x="90" y="80" width="120" height="115" rx="4" fill="#173847" stroke="#4fd1c5"/><text x="150" y="182" text-anchor="middle" fill="#cfe" font-size="12">Wasser (Umgebung)</text><circle cx="150" cy="130" r="26" fill="#3a2a14" stroke="#ffb454"/><text x="150" y="126" text-anchor="middle" fill="#ffb454" font-size="11">Reaktions-</text><text x="150" y="140" text-anchor="middle" fill="#ffb454" font-size="11">system</text><path d="M180 122 l22 -8 M180 138 l22 8 M120 122 l-22 -8 M120 138 l-22 8" stroke="#ffb454" stroke-width="2"/><text x="214" y="112" fill="#ffb454" font-size="12">Q</text><rect x="196" y="20" width="7" height="150" rx="3" fill="none" stroke="#e7e4dd"/><circle cx="199.5" cy="172" r="7" fill="#e4785b"/><rect x="197.5" y="100" width="4" height="70" fill="#e4785b"/><text x="210" y="30" fill="#e7e4dd" font-size="11">Thermometer</text><line x1="110" y1="30" x2="110" y2="170" stroke="#e7e4dd" stroke-width="2"/><line x1="100" y1="170" x2="120" y2="170" stroke="#e7e4dd" stroke-width="2"/><text x="40" y="30" fill="#e7e4dd" font-size="11">Rührer</text></svg>`;
+function energySVG(exo){
+  const top=exo?50:120, bot=exo?120:50;
+  return `<svg viewBox="0 0 230 180" width="230"><line x1="30" y1="160" x2="30" y2="15" stroke="#9aa2a9"/><path d="M26 22 l4 -8 l4 8" fill="#9aa2a9"/><text x="10" y="12" fill="#9aa2a9" font-size="12">H</text><line x1="45" y1="${top}" x2="105" y2="${top}" stroke="#e7e4dd" stroke-width="3"/><text x="75" y="${top-8}" text-anchor="middle" fill="#e7e4dd" font-size="11">Edukte</text><line x1="140" y1="${bot}" x2="200" y2="${bot}" stroke="#e7e4dd" stroke-width="3"/><text x="170" y="${bot-8}" text-anchor="middle" fill="#e7e4dd" font-size="11">Produkte</text><line x1="120" y1="${top}" x2="120" y2="${bot}" stroke="${exo?'#e4785b':'#4fd1c5'}" stroke-width="2"/><path d="M115 ${exo?bot-8:bot+8} l5 ${exo?8:-8} l5 ${exo?-8:8}" fill="${exo?'#e4785b':'#4fd1c5'}"/><text x="124" y="${(top+bot)/2+4}" fill="${exo?'#e4785b':'#4fd1c5'}" font-size="12">ΔH ${exo?'< 0':'> 0'}</text><text x="115" y="176" text-anchor="middle" fill="#ffb454" font-size="13">${exo?'exotherm':'endotherm'}</text></svg>`;
+}
+const svgFlow=(()=>{const B=[['Messwerte','m, T₁, T₂'],['Q = c·m·ΔT','Wärme des Wassers'],['ΔH = −Q','für die Portion'],['n = m / M','Stoffmenge'],['Δ<tspan baseline-shift="sub" font-size="9">R</tspan>H<tspan baseline-shift="sub" font-size="9">m</tspan> = ΔH / n','pro mol']];let g='';B.forEach((b,i)=>{const x=10+i*150;g+=`<rect x="${x}" y="20" width="128" height="60" rx="8" fill="#20252a" stroke="${i===4?'#ffb454':'#4fd1c5'}"/><text x="${x+64}" y="46" text-anchor="middle" fill="#e7e4dd" font-size="13">${b[0]}</text><text x="${x+64}" y="66" text-anchor="middle" fill="#9aa2a9" font-size="11">${b[1]}</text>`;if(i<4)g+=`<path d="M${x+130} 50 h16 m-6 -5 l6 5 l-6 5" stroke="#9aa2a9" fill="none" stroke-width="1.6"/>`;});return `<svg viewBox="0 0 760 100" width="760">${g}</svg>`;})();
+const svgComb=`<svg viewBox="0 0 260 250" width="260"><rect x="20" y="232" width="220" height="10" fill="#31383e"/><rect x="36" y="30" width="6" height="204" fill="#5f6870"/><rect x="40" y="70" width="80" height="6" fill="#5f6870"/><path d="M90 60 v80 h90 v-80" fill="none" stroke="#9aa2a9" stroke-width="2"/><rect x="92" y="78" width="86" height="60" fill="#173847"/><rect x="160" y="20" width="6" height="110" rx="3" fill="none" stroke="#e7e4dd"/><circle cx="163" cy="130" r="5" fill="#e4785b"/><path d="M135 205 q-10 -20 0 -45 q10 25 0 45" fill="#ffb454" opacity=".9"/><rect x="110" y="205" width="50" height="27" rx="6" fill="#20252a" stroke="#9aa2a9"/><rect x="113" y="215" width="44" height="15" fill="#2a3a4a"/><text x="200" y="222" fill="#9aa2a9" font-size="11">Brenner</text><text x="190" y="100" fill="#9aa2a9" font-size="11">Wasser</text><text x="190" y="30" fill="#9aa2a9" font-size="11">Thermometer</text></svg>`;
+const svgLoes=`<svg viewBox="0 0 330 230" width="330"><line x1="30" y1="215" x2="30" y2="15" stroke="#9aa2a9"/><text x="12" y="14" fill="#9aa2a9" font-size="12">H</text><line x1="50" y1="40" x2="300" y2="40" stroke="#e7e4dd" stroke-width="2"/><text x="175" y="32" text-anchor="middle" fill="#e7e4dd" font-size="11">freie Ionen (Gasphase)</text><line x1="50" y1="140" x2="140" y2="140" stroke="#e7e4dd" stroke-width="2"/><text x="95" y="157" text-anchor="middle" fill="#e7e4dd" font-size="11">Ionengitter + Wasser</text><line x1="210" y1="165" x2="300" y2="165" stroke="#e7e4dd" stroke-width="2"/><text x="255" y="182" text-anchor="middle" fill="#e7e4dd" font-size="11">hydratisierte Ionen</text><line x1="110" y1="138" x2="110" y2="44" stroke="#4fd1c5" stroke-width="2"/><path d="M105 52 l5 -8 l5 8" fill="#4fd1c5"/><text x="60" y="95" fill="#4fd1c5" font-size="11">Gitter-</text><text x="60" y="108" fill="#4fd1c5" font-size="11">energie</text><line x1="240" y1="42" x2="240" y2="161" stroke="#e4785b" stroke-width="2"/><path d="M235 153 l5 8 l5 -8" fill="#e4785b"/><text x="246" y="100" fill="#e4785b" font-size="11">Hydratations-</text><text x="246" y="113" fill="#e4785b" font-size="11">enthalpie</text><line x1="160" y1="140" x2="160" y2="163" stroke="#ffb454" stroke-width="2"/><path d="M155 157 l5 6 l5 -6" fill="#ffb454"/><text x="166" y="210" fill="#ffb454" font-size="12">ΔH (Lösen, hier exotherm)</text></svg>`;
+const svgErr=`<svg viewBox="0 0 340 200" width="340"><line x1="40" y1="170" x2="320" y2="170" stroke="#9aa2a9"/><line x1="40" y1="170" x2="40" y2="15" stroke="#9aa2a9"/><text x="300" y="188" fill="#9aa2a9" font-size="11">Zeit</text><text x="6" y="14" fill="#9aa2a9" font-size="11">T</text><path d="M40 140 H100 L150 50 H320" fill="none" stroke="#7fd68a" stroke-width="2" stroke-dasharray="5 4"/><path d="M40 140 H100 C120 120 135 85 160 78 C200 70 250 82 320 96" fill="none" stroke="#ffb454" stroke-width="2.5"/><text x="210" y="45" fill="#7fd68a" font-size="11">ohne Wärmeverlust</text><text x="215" y="115" fill="#ffb454" font-size="11">reale Messung</text><line x1="100" y1="175" x2="100" y2="165" stroke="#9aa2a9"/><text x="70" y="196" fill="#9aa2a9" font-size="10">Reaktionsbeginn</text></svg>`;
+
+const GRUND=[
+  {t:'Prinzip der Kalorimetrie',h:()=>`<p>Ein <b>Kalorimeter</b> ist ein gut isoliertes Gefäß, in dem eine bekannte Wassermenge die bei einer Reaktion abgegebene (oder aufgenommene) Wärme aufnimmt (bzw. abgibt). Aus der <b>Temperaturänderung des Wassers</b> lässt sich die übertragene Wärme Q berechnen.</p><div class="gfig"><div class="screen">${svgCal}</div></div><p>Man unterscheidet das <b>System</b> (die reagierenden Stoffe) und die <b>Umgebung</b> (hier vor allem das Wasser). Idealerweise geht keine Wärme nach außen verloren – das Kalorimeter ist dann ein abgeschlossenes System. Der Rührer sorgt für eine gleichmäßige Temperatur, das Thermometer misst die Temperatur des Wassers.</p>`},
+  {t:'Wärme Q = c · m · ΔT',h:()=>`<p>Die Wärme, die eine Wasserportion aufnimmt, ist proportional zu ihrer <b>Masse m</b> und zur <b>Temperaturänderung ΔT</b>:</p><p class="eq" style="font-size:20px;text-align:center">Q = c(Wasser) · m(Wasser) · ΔT</p><ul><li><b>c(Wasser) = 4,18 J/(g·K)</b>: spezifische Wärmekapazität. Um 1 g Wasser um 1 K zu erwärmen, braucht man 4,18 J.</li><li><b>ΔT = T₂ − T₁</b> (Endtemperatur minus Anfangstemperatur). Eine Temperaturdifferenz ist in K und °C gleich groß: ΔT = 5 °C entspricht ΔT = 5 K.</li><li>Die Masse wird in g eingesetzt; Q ergibt sich in J. Umrechnung: 1 kJ = 1000 J.</li></ul><p><b>Beispiel:</b> 200 g Wasser erwärmen sich von 25,0 °C auf 37,5 °C.<br>Q = 4,18 J/(g·K) · 200 g · 12,5 K = 10 450 J = 10,5 kJ.</p><p>Je mehr Wasser, desto kleiner ist die Temperaturänderung bei gleicher Wärme.</p>`},
+  {t:'Exotherm und endotherm',h:()=>`<div class="gfig"><div class="screen">${energySVG(true)}</div><div class="screen">${energySVG(false)}</div></div><ul><li><b>Exotherme Reaktion:</b> Das System gibt Wärme an die Umgebung ab. Das Wasser erwärmt sich (ΔT &gt; 0, Q &gt; 0). Die Enthalpie des Systems nimmt ab: <b>ΔH &lt; 0</b>.</li><li><b>Endotherme Reaktion:</b> Das System nimmt Wärme aus der Umgebung auf. Das Wasser kühlt ab (ΔT &lt; 0, Q &lt; 0): <b>ΔH &gt; 0</b>.</li></ul><p>Die Wärme, die das Wasser aufnimmt, hat das System abgegeben – deshalb gilt bei konstantem Druck:</p><p class="eq" style="font-size:20px;text-align:center">ΔH = −Q</p>`},
+  {t:'Von Q zur molaren Reaktionsenthalpie',h:()=>`<div class="gfig"><div class="screen" style="overflow-x:auto;max-width:100%">${svgFlow}</div></div><p>ΔH gilt nur für die im Versuch umgesetzte Portion. Um Reaktionen vergleichen zu können, bezieht man die Enthalpie auf <b>1 mol</b> des Stoffs:</p><ul><li>Stoffmenge: <span class="eq">n = m / M</span> (m in g, M in g/mol)</li><li>Molare Reaktionsenthalpie: <span class="eq">Δ<sub>R</sub>H<sub>m</sub> = ΔH / n</span> in kJ/mol</li></ul><p>Die molare Reaktionsenthalpie Δ<sub>R</sub>H<sub>m</sub> heißt bei einer Verbrennung auch <b>molare Verbrennungsenthalpie</b>, beim Lösen eines Salzes <b>molare Lösungsenthalpie</b>. Tabellenwerte beziehen sich auf Standardbedingungen (25 °C, 1013 hPa).</p><p><b>Beispiel:</b> Bei der Verbrennung von 0,500 g Ethanol (M = 46,07 g/mol) wird ΔH = −11,2 kJ bestimmt.<br>n = 0,500 g / 46,07 g/mol = 0,0109 mol → Δ<sub>R</sub>H<sub>m</sub> = −11,2 kJ / 0,0109 mol ≈ −1030 kJ/mol.</p>`},
+  {t:'Verbrennungskalorimetrie',h:()=>`<div class="gfig"><div class="screen">${svgComb}</div></div><p>Ein Brennstoff (z. B. ein Alkohol in einem kleinen Brenner, ein Teelicht oder Holz in einer Porzellanschale) erhitzt eine Wasserportion. Die verbrannte Masse bestimmt man durch <b>Wiegen des Brenners vorher (m₁) und nachher (m₂)</b>: Δm = m₁ − m₂.</p><p>Verbrennung von Ethanol:</p><div class="stoffInfo" style="text-align:center">${combEqHTML(STOFFE.verbrennung[1])}</div><p>Bei einfachen Aufbauten gehen viele Wärmeanteile verloren (heiße Abgase, Erwärmung von Gefäß, Stativ und Luft, unvollständige Verbrennung mit Rußbildung). Die gemessenen Beträge der Verbrennungsenthalpie sind deshalb in realen Versuchen meist deutlich kleiner als die Literaturwerte. <i>In dieser Simulation werden diese Verluste vernachlässigt.</i></p><p>In der homologen Reihe der Alkanole nimmt der Betrag der molaren Verbrennungsenthalpie je CH₂-Gruppe um etwa 650 kJ/mol zu.</p><p><b>Feste Brennstoffe:</b> Holz und Kerzenwachs sind <b>Stoffgemische</b> – sie haben keine einheitliche molare Masse. Man bezieht die Verbrennungsenthalpie deshalb auf 1 g: <span class="eq">Δ<sub>R</sub>h = ΔH / Δm</span> in kJ/g (Richtwerte: Holz ca. −19 kJ/g, Kerzenwachs ca. −46 kJ/g). Holzkohle besteht fast nur aus Kohlenstoff; hier ist eine molare Angabe möglich (C + O₂ → CO₂, Δ<sub>R</sub>H<sub>m</sub> = −393,5 kJ/mol). Asche und Ruß werden beim Zurückwiegen vernachlässigt.</p>`},
+  {t:'Reaktionen in wässriger Lösung',h:()=>`<p>Bei Reaktionen in Lösung (z. B. Lösen von Salzen, Metall + Säure) befindet sich das System direkt im Wasser des Kalorimeters, z. B. in einem Styroporbecher mit Deckel. Die Wärmeverluste sind gering.</p><div class="gfig"><div class="screen">${svgLoes}</div></div><p><b>Lösungsenthalpie:</b> Beim Lösen eines Salzes muss das Ionengitter aufgebrochen werden (Gitterenergie, endotherm). Die Ionen werden von Wassermolekülen umhüllt (Hydratation, exotherm). Überwiegt die Hydratationsenthalpie, erwärmt sich die Lösung (z. B. NaOH, CaCl₂), sonst kühlt sie ab (z. B. NH₄NO₃, KNO₃).</p><p><b>Neutralisation:</b> Beim Mischen einer starken Säure mit einer starken Lauge reagieren nur die Oxonium- und Hydroxid-Ionen: H⁺(aq) + OH⁻(aq) → H₂O(l). Die übrigen Ionen bleiben unverändert. Deshalb ist die molare Neutralisationsenthalpie für alle starken Säuren und Laugen etwa gleich: Δ<sub>R</sub>H<sub>m</sub> ≈ −57 kJ/mol (je mol gebildetes Wasser). Die Stoffmenge folgt aus n = c · V; das Volumen erhält man aus der gewogenen Masse mit V = m / ρ (ρ ≈ 1,00 g/mL). Für Q zählt die Masse beider Lösungen zusammen.</p><p><b>Reaktionen:</b> Mg(s) + 2 H⁺(aq) → Mg²⁺(aq) + H₂(g) bzw. Zn(s) + Cu²⁺(aq) → Zn²⁺(aq) + Cu(s). H⁺ steht vereinfacht für H₃O⁺. Die zweite Lösung liegt im Überschuss vor, sodass das eingewogene Metall vollständig reagiert.</p><p>Vereinfachung: Die Masse der Lösung wird gleich der Masse des Wassers gesetzt, c = 4,18 J/(g·K).</p>`},
+  {t:'Fehlerquellen',h:()=>`<div class="gfig"><div class="screen">${svgErr}</div></div><ul><li><b>Wärmeverluste</b> an Luft, Gefäß, Thermometer, Stativ – das Wasser erwärmt sich weniger als bei idealer Isolierung.</li><li><b>Wärmekapazität des Kalorimeters</b> wird vernachlässigt (auch Gefäß und Thermometer werden erwärmt).</li><li><b>Unvollständige Verbrennung</b> (Ruß, CO), Verdunsten des Brennstoffs.</li><li><b>Abkühlung während der Messung:</b> Der Höchstwert wird erst nach dem Reaktionsende erreicht, und das Wasser kühlt bereits ab.</li><li><b>Ablesegenauigkeit</b> an Thermometer und Waage.</li></ul><p><i>In dieser Simulation werden Wärmeverluste und die Wärmekapazität des Kalorimeters vernachlässigt (idealisiertes Kalorimeter). Abweichungen vom Literaturwert entstehen nur durch Ablesen und Runden.</i></p><p>Die prozentuale Abweichung vom Literaturwert berechnet man mit: Abweichung = (Messwert − Literaturwert) / Literaturwert · 100 %.</p>`}
+];
+
+/* ================= Modal ================= */
+let gIdx=-1;
+function openModal(title,body,foot,wide){
+  $('#mTitle').innerHTML=title; $('#mBody').innerHTML=body; $('#mFoot').innerHTML=foot||'';
+  $('#mbox').classList.toggle('wide',!!wide); $('#ov').classList.add('open');
+}
+function closeModal(){ $('#ov').classList.remove('open'); gIdx=-1; }
+function openGrund(i){
+  gIdx=(i+GRUND.length)%GRUND.length; const g=GRUND[gIdx];
+  openModal(`Grundlagen ${gIdx+1}/${GRUND.length}: ${g.t}`,g.h(),
+    `<button id="gPrev">← Vorheriges Thema</button><button id="gNext">Nächstes Thema →</button>`,true);
+  $('#gPrev').onclick=()=>openGrund(gIdx-1); $('#gNext').onclick=()=>openGrund(gIdx+1);
+}
+$('#mClose').onclick=closeModal;
+$('#ov').addEventListener('click',e=>{if(e.target.id==='ov')closeModal();});
+document.addEventListener('keydown',e=>{
+  if(!$('#ov').classList.contains('open')) return;
+  if(e.key==='Escape') closeModal();
+  if(gIdx>=0 && e.target.tagName!=='INPUT'){ if(e.key==='ArrowRight') openGrund(gIdx+1); if(e.key==='ArrowLeft') openGrund(gIdx-1); }
+});
+$('#gCount').textContent=GRUND.length;
+$('#gList').innerHTML=GRUND.map((g,i)=>`<button data-g="${i}">${i+1}. ${g.t}</button>`).join('');
+$('#gList').addEventListener('click',e=>{const b=e.target.closest('button');if(b)openGrund(+b.dataset.g);});
+$('#gToggle').onclick=()=>{const l=$('#gList'); l.hidden=!l.hidden; $('#gArrow').textContent=l.hidden?'▾':'▴';};
+
+$('#lnkAnl').onclick=e=>{e.preventDefault();openModal('Anleitung',`
+<p>Mit dieser Simulation bestimmst du die molare Enthalpie einer Reaktion mit einem Kalorimeter – von der Wägung über das Ablesen der Temperatur bis zur Berechnung.</p>
+<h3>1. Versuch wählen</h3><ul><li><b>Verbrennungskalorimetrie:</b> Ein flüssiger Brennstoff (Alkohol im Brenner) oder ein fester Brennstoff (Holz, Kerzenwachs, Holzkohle) verbrennt und erwärmt Wasser in einem Becherglas. Bei den Stoffgemischen Holz und Kerzenwachs wird die Enthalpie je Gramm berechnet.</li><li><b>Reaktion in wässriger Lösung:</b> Ein Salz wird gelöst, eine Säure mit einer Lauge neutralisiert oder ein Metall reagiert in einer Lösung im isolierten Kalorimeterbecher.</li><li>Danach den Stoff auswählen. Strukturformel bzw. Reaktionsgleichung werden angezeigt.</li></ul>
+<h3>2. Massen bestimmen</h3><ul><li>Gegenstände mit den Knöpfen auf die Waage stellen, mit „Tara“ auf 0,00 g setzen, Wasser bzw. Stoff einfüllen.</li><li>Die Anzeige ablesen und in die Felder eintragen. Jeder Wert wird sofort geprüft (grün = richtig, rot = falsch).</li></ul>
+<h3>3. Temperatur messen</h3><ul><li>„Messung starten“: Alle 30 s hält die Simulation an. Lies die Temperatur an der <b>Thermometer-Lupe</b> auf 0,1 °C ab und trage sie in die Tabelle ein. Danach läuft die Messung weiter.</li><li>Mit dem Start der Messung wird der Brenner entzündet bzw. der Stoff zugegeben; der Wert bei t = 0 ist die Anfangstemperatur. Bei der Verbrennung löschst du die Flamme nach einiger Zeit selbst. Mit ×1, ×2, ×5 läuft die Zeit schneller.</li><li>Nach zwei Fehlversuchen wird ein Messwert automatisch ergänzt und mit * markiert.</li></ul>
+<h3>4. Auswerten</h3><ul><li>Erst Q, nach der Zwischenprüfung ΔH, danach die molare Enthalpie. Mit „Formel“ blendest du neben jeder Aufgabe die passenden Formeln ein.</li><li>„Tipp“ zeigt den Rechenweg mit deinen Werten, „Rest ausfüllen“ gibt es nach zwei selbst richtig berechneten Werten, „Lösung zeigen“ füllt die Werte aus (Markierung *).</li><li>Geprüft wird immer mit deinen eigenen vorherigen Werten – Rundungen zählen nicht als Fehler.</li><li>Eingaben mit Dezimalkomma; Punkt und Zehnerpotenzen wie 7,14·10^-4 werden auch erkannt. Ergebnisse auf drei gültige Ziffern runden.</li></ul>
+<h3>5. Zusammenfassung</h3><ul><li>Im letzten Schritt erstellst du über die Druckfunktion ein PDF mit allen Messwerten und Ergebnissen.</li><li>„Zwischenstand speichern“ lädt eine Datei herunter (auf dem iPad unter „Dateien → Downloads“), die du mit „Zwischenstand laden“ wieder öffnest. Es werden keine Daten übertragen oder im Browser gespeichert.</li></ul>
+<h3>Bedingungen variieren</h3><p>Nach Anhaken von „Bedingungen variieren“ lassen sich Wassermasse, Anfangstemperatur und Stoffportion ändern (nur vor Messbeginn). „Erklärungen anzeigen“ blendet Hintergründe zu den gewählten Bedingungen ein.</p>`);};
+$('#lnkVer').onclick=e=>{e.preventDefault();openModal('Versionshinweise',`
+<h3>Version 1.0 – 04.11.2026</h3><ul>
+<li>Verbrennungskalorimetrie mit fünf Alkanolen (Methanol bis Pentan-1-ol) und den festen Brennstoffen Holz, Kerzenwachs und Holzkohle; Strukturformeln und Verbrennungsgleichungen; Enthalpie je Gramm für Stoffgemische</li>
+<li>Kalorimetrie in wässriger Lösung: Lösungsenthalpien von NaOH, CaCl₂, NH₄NO₃, KNO₃ sowie die Neutralisationen Salzsäure + Natronlauge und Salpetersäure + Kalilauge und die Reaktionen Mg + Salzsäure und Zn + Kupfer(II)-sulfat-Lösung</li>
+<li>Digitale Waage mit Tara-Funktion, Thermometer mit Lupe zum Ablesen auf 0,1 °C</li>
+<li>Messwerttabelle mit automatischem Halt alle 30 s, Diagramm der eigenen Messwerte, CSV-Export</li>
+<li>Schrittweise Auswertung: Q → Zwischenprüfung → ΔH → molare Enthalpie, zuschaltbare Formeln, Tipp, „Rest ausfüllen“, „Lösung zeigen“, Rückmeldungen zu typischen Fehlern</li>
+<li>Vergleich mit Literaturwerten und prozentuale Abweichung</li>
+<li>Idealisiertes Kalorimeter: Wärmeverluste und Wärmekapazität des Kalorimeters werden vernachlässigt</li>
+<li>„Bedingungen variieren“ mit Erklärungen, Zwischenstand als Datei, Zusammenfassung als PDF</li>
+<li>7 Grundlagen-Themen</li></ul>`);};
+
+/* ================= Aside ================= */
+document.querySelectorAll('.choice button').forEach(b=>b.onclick=()=>chooseVersuch(b.dataset.v));
+function chooseVersuch(v){
+  if(S.sim.started && S.versuch!==v){ if(!confirmNew()) return; }
+  if(S.versuch===v) return;
+  const keepG=S.showF;
+  S=freshState(); S.showF=keepG; initFields();
+  S.versuch=v; S.stoffId=v==='verbrennung'?'ethanol':'naoh';
+  S.params=defaultsFor(); newHidden(); S.sim.T=S.params.T0;
+  renderAll();
+}
+function confirmNew(){ return window.confirm('Den laufenden Versuch verwerfen und neu beginnen?'); }
+function chooseStoff(id){
+  if(S.sim.started) return;
+  S.stoffId=id;
+  if(!S.vary) S.params=defaultsFor(); else if(!isComb()) S.params.mS=stoff().m0;
+  newHidden(); resetMasses(); S.sim.T=S.params.T0; renderAll();
+}
+function sliderDefs(){
+  const L=[{k:'mW',lab:'Masse '+(isComb()?'Wasser':stoff().fluid),min:isComb()?100:50,max:isComb()?300:200,step:10,u:'g',d:0},
+           {k:'T0',lab:'Anfangstemperatur (Raum und Wasser)',min:15,max:30,step:1,u:'°C',d:0}];
+  if(isNeu()){L[0].min=25;L[0].max=100;L[0].step=5; L.push({k:'mS',lab:'Masse '+stoff().base,min:25,max:100,step:5,u:'g',d:0});}
+  else if(!isComb()){const m0=stoff().m0; L.push({k:'mS',lab:'Portion '+stoff().short,min:r2(m0*0.5),max:r2(m0*2),step:m0<1?0.05:0.5,u:'g',d:2});}
+  return L;
+}
+function renderAside(){
+  $('#chV').classList.toggle('on',S.versuch==='verbrennung');
+  $('#chL').classList.toggle('on',S.versuch==='loesung');
+  const R=$('#asideRest');
+  if(!S.versuch){ R.innerHTML=''; return; }
+  const s=stoff(), lock=S.sim.started;
+  let h=`<section class="box"><h3>Stoff wählen</h3><div class="stoffList">`+
+    (()=>{const groups=isComb()?[['flüssige Brennstoffe',x=>!x.solid],['feste Brennstoffe',x=>x.solid]]:[['Lösen von Salzen',x=>x.kind==='Lösungsenthalpie'],['Neutralisationen',x=>x.neutral],['Redoxreaktionen',x=>x.kind==='Reaktionsenthalpie']];
+      return groups.map(g=>`<div class="dim" style="width:100%;font-size:12px;margin-top:4px">${g[0]}</div>`+STOFFE[S.versuch].filter(g[1]).map(x=>`<button class="small ${x.id===S.stoffId?'on':''}" data-s="${x.id}" ${lock?'disabled':''}>${x.name}</button>`).join('')).join('');})()+`</div>`+
+    `<div class="stoffInfo">${isComb()?`<div class="dim" style="margin-bottom:4px">Verbrennung von ${s.name}:</div>${combEqHTML(s)}`:`<div class="dim" style="margin-bottom:4px">${s.kind}:</div><span class="eq">${s.eq}</span>${s.fluidLong?`<div class="dim" style="margin-top:4px">im Kalorimeter: ${s.fluidLong}</div>`:''}`}<div class="dim" style="margin-top:6px">${s.mix?`Stoffgemisch – Richtwert ${fmt(-s.dHg,1)} kJ je g`:(s.neutral?`c(${s.acid}) = c(${s.base}) = ${fmt(s.conc,1)} mol/L · ρ ≈ 1,00 g/mL`:`M(${s.short}) = ${fmt(s.M,2)} g/mol`)}</div>${s.neutral?`<div class="dim">Ionengleichung: <span class="eq">${s.eqShort}</span></div>`:''}</div>`+
+    (lock?`<div class="hint">Nach Messbeginn gesperrt – „Neuer Versuch“ zum Ändern.</div>`:'')+`</section>`;
+  h+=`<section class="box"><label class="chk"><input type="checkbox" id="cVary" ${S.vary?'checked':''} ${lock?'disabled':''}> Bedingungen variieren</label>`;
+  sliderDefs().forEach(d=>{const v=S.params[d.k];h+=`<div class="sl"><div class="lab"><span>${d.lab}</span><b id="sv_${d.k}">${fmt(v,d.d)} ${d.u}</b></div><input type="range" data-k="${d.k}" min="${d.min}" max="${d.max}" step="${d.step}" value="${v}" ${(!S.vary||lock)?'disabled':''}></div>`;});
+  h+=`<div class="btnrow"><button class="small" id="bStd" ${(!S.vary||lock)?'disabled':''}>Standardbedingungen</button></div>`+
+     `<label class="chk"><input type="checkbox" id="cExp" ${S.explain?'checked':''} ${!S.vary?'disabled':''}> Erklärungen anzeigen</label></section>`;
+  const L=stepsFor(), ci=curStepIdx();
+  h+=`<section class="box"><h3>Arbeitsschritte</h3><ol class="steps">`+L.map((st,i)=>{
+    const cls=st.done()?'done':(i===ci?'cur':(i>ci?'locked':''));
+    return `<li class="${cls}" data-t="${st.target}" data-i="${i}"><div class="sh"><span class="num">${st.done()?'✓':i+1}</span>${st.title}</div><div class="st">${st.text}</div></li>`;}).join('')+`</ol></section>`;
+  h+=`<section class="box btncol"><button id="bSave">Zwischenstand speichern</button><button id="bLoad">Zwischenstand laden</button><button id="bNew">Neuer Versuch</button></section>`;
+  R.innerHTML=h;
+  R.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>chooseStoff(b.dataset.s));
+  const cv=$('#cVary'); cv.onchange=()=>{S.vary=cv.checked; if(!S.vary){S.explain=false; S.params=defaultsFor(); newHidden(); resetMasses(); S.sim.T=S.params.T0;} renderAll();};
+  R.querySelectorAll('input[type=range]').forEach(sl=>{
+    const d=sliderDefs().find(x=>x.k===sl.dataset.k);
+    sl.oninput=()=>{$('#sv_'+d.k).textContent=fmt(+sl.value,d.d)+' '+d.u;};
+    sl.onchange=()=>{S.params[d.k]=+sl.value; newHidden(); resetMasses(); S.sim.T=S.params.T0; renderAll();};
+  });
+  $('#bStd').onclick=()=>{S.params=defaultsFor(); newHidden(); resetMasses(); S.sim.T=S.params.T0; renderAll();};
+  $('#cExp').onchange=e=>{S.explain=e.target.checked; renderAll();};
+  R.querySelectorAll('ol.steps li').forEach(li=>li.onclick=()=>{ if(li.classList.contains('locked')) return; const el=document.getElementById(li.dataset.t); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); });
+  $('#bSave').onclick=saveState; $('#bLoad').onclick=()=>$('#fileIn').click();
+  $('#bNew').onclick=()=>{ if(S.sim.started&&!confirmNew()) return; const v=S.versuch,st=S.stoffId,vary=S.vary,p=S.params,ex=S.explain; S=freshState(); initFields(); S.versuch=v;S.stoffId=st;S.vary=vary;S.explain=ex;S.params=vary?p:defaultsFor(); newHidden(); S.sim.T=S.params.T0; renderAll(); };
+}
+
+/* ================= Hauptbereich ================= */
+function fieldHTML(id,label,unit,dis){
+  const F=S.f[id]; const cls=F.raw===''?'':(F.ok?(F.auto?'auto':'ok'):'bad');
+  const mcls=F.ok?(F.auto?'auto':'ok'):'bad';
+  return `<div class="field"><label for="in_${id}">${label}</label><input type="text" inputmode="decimal" autocomplete="off" id="in_${id}" data-f="${id}" class="${cls}" value="${esc(F.raw)}" ${dis||(F.ok&&F.auto)?'disabled':''}><span class="unit">${unit}</span>${F.msg?`<div class="fmsg ${mcls}">${F.ok?'✓ ':'✗ '}${F.msg}</div>`:''}</div>`;
+}
+function renderMain(){
+  const M=$('#main');
+  if(!S.versuch){ M.innerHTML=`<div class="card"><h2>Kalorimetrie</h2><p class="dim">Wähle links unter „Versuchsart wählen“ eine Verbrennungskalorimetrie oder eine Reaktion in wässriger Lösung. Danach erscheinen Versuchsaufbau, Waage, Messwerttabelle und Auswertung.</p><p class="dim">Die Grundlagen (oben links) erklären Kalorimeter, die Formel Q = c · m · ΔT und den Weg zur molaren Reaktionsenthalpie.</p></div>`; return; }
+  const s=stoff();
+  let h=`<div class="grid2">
+    <div class="card" id="cardApp"><h2>Versuchsaufbau<span class="tag">${isComb()?'Verbrennung von '+s.name:s.name}</span></h2>
+      <div class="appwrap"><div class="screen" id="appSvg"></div><div class="lupe"><div class="screen" id="lupeSvg"></div><div class="cap">Thermometer-Lupe (Teilung 0,1 °C)</div></div></div>
+      <div class="ctrl" id="ctrl"></div><div id="simInfo" class="info"></div>
+      ${S.vary&&S.explain?`<div class="explain">${explainHTML()}</div>`:''}
+    </div>
+    <div class="card" id="cardWaage"><h2>Waage</h2><div class="screen" id="waageSvg"></div><div class="btnrow" style="margin-top:10px" id="waageBtns"></div><div id="massFields"></div></div>
+  </div>`;
+  h+=`<div class="card" id="cardTab"><h2>Messwerttabelle<span class="tag">Temperatur des ${isComb()?'Wassers':(s.fluid==='Wasser'?'Wassers':'Kalorimeterinhalts')}</span></h2><div class="tabwrap"><div><div class="tscroll" id="tabBox"></div><div class="btnrow" style="margin-top:8px"><button class="small" id="bCsv">CSV-Export</button></div></div><div><div class="screen" id="diagSvg"></div><div class="hint">Diagramm deiner eingetragenen Messwerte.</div></div></div></div>`;
+  h+=`<div class="card" id="cardAusw"><h2>Auswertung</h2><div id="calcs"></div></div>`;
+  h+=`<div class="card" id="cardPdf"><h2>Zusammenfassung als PDF</h2><div id="pdfBox"></div></div>`;
+  M.innerHTML=h;
+  renderWaage(); renderTable(); renderCalcs(); renderPdf(); renderControls(); updateLive(true);
+  $('#bCsv').onclick=exportCSV;
+}
+function explainHTML(){
+  const P=S.params, D=defaultsFor(), s=stoff();
+  let t=`<b>Zu den gewählten Bedingungen:</b><ul style="margin:6px 0;padding-left:18px">`;
+  t+=`<li>Wassermasse ${fmt(P.mW,0)} g: Je größer die Wassermasse, desto kleiner die Temperaturänderung bei gleicher Wärme (Q = c · m · ΔT). Kleine ΔT sind ungenauer abzulesen.</li>`;
+  t+=`<li>Anfangstemperatur ${fmt(P.T0,0)} °C: Sie entspricht der Raumtemperatur. Je weiter sich das Wasser von der Raumtemperatur entfernt, desto mehr Wärme tauscht es mit der Umgebung aus.</li>`;
+  if(isNeu()) t+=`<li>${fmt(P.mW,0)} g ${s.acid} und ${fmt(P.mS,0)} g ${s.base}: Es entsteht so viel Wasser, wie der Partner im Unterschuss zulässt. Die molare Reaktionsenthalpie bleibt gleich, weil durch n geteilt wird.</li>`;
+  else if(!isComb()) t+=`<li>Portion ${fmt(P.mS,2)} g ${s.short}: Die doppelte Stoffmenge setzt die doppelte Wärme um. Die molare Reaktionsenthalpie bleibt gleich, weil durch n geteilt wird.</li>`;
+  t+=`<li>Idealisiertes Kalorimeter: Die gesamte Reaktionswärme wird vom Wasser aufgenommen bzw. abgegeben. Wärmeverluste an die Umgebung und die Wärmekapazität des Kalorimeters werden vernachlässigt. Deshalb stimmt das Ergebnis bis auf Ablese- und Rundungsfehler mit dem Literaturwert (${s.mix?fmt(s.dHg,1)+' kJ/g':fmt(s.dH,1)+' kJ/mol'}) überein. In realen Versuchen ist der Betrag meist kleiner.</li>`;
+  t+=`<li>Die Temperatur steigt bzw. fällt nicht sofort: Die Wärme verteilt sich erst nach und nach im Wasser. Nach Reaktionsende bleibt die Temperatur konstant.</li></ul>`;
+  return t;
+}
+
+/* ---- Waage ---- */
+function waageTotal(){
+  const W=S.waage,H=S.hidden;
+  if(W.item==='vessel') return H.vessel+W.water;
+  if(W.item==='lamp') return H.m1-S.sim.burned;
+  if(W.item==='dish') return H.dish+W.solid;
+  return 0;
+}
+function waagePhase(){ if(!massDone()&&!S.sim.started) return 'massen'; if(isComb()&&S.sim.finished&&!(S.f.m2.ok)) return 'nach'; return 'aus'; }
+function renderWaage(){
+  const ph=waagePhase(), W=S.waage, s=stoff(), B=$('#waageBtns'); if(!B) return;
+  let b='';
+  const vName=isComb()?'Becherglas':'Kalorimeterbecher';
+  if(ph==='massen'){
+    b+=`<button class="small ${W.item==='vessel'?'on':''}" data-w="vessel">${W.item==='vessel'?vName+' abnehmen':vName+' auflegen'}</button>`;
+    b+=`<button class="small" data-w="water" ${W.item==='vessel'&&W.water===0?'':'disabled'}>${s.fluid} einfüllen</button>`;
+    if(W.water>0&&!S.f.mW.ok) b+=`<button class="small" data-w="empty" ${W.item==='vessel'?'':'disabled'}>Gefäß leeren</button>`;
+    if(isComb()) b+=`<button class="small ${W.item==='lamp'?'on':''}" data-w="lamp">${s.hold} ${W.item==='lamp'?'abnehmen':'auflegen'}</button>`;
+    else{
+      const dn=isNeu()?'Becherglas':'Wägeschälchen';
+      b+=`<button class="small ${W.item==='dish'?'on':''}" data-w="dish">${dn} ${W.item==='dish'?'abnehmen':'auflegen'}</button>`;
+      b+=`<button class="small" data-w="solid" ${W.item==='dish'&&W.solid===0?'':'disabled'}>${s.short} ${isNeu()?'einfüllen':'einwiegen'}</button>`;
+      if(W.solid>0&&!S.f.mS.ok) b+=`<button class="small" data-w="emptyS" ${W.item==='dish'?'':'disabled'}>${isNeu()?'Becherglas':'Schälchen'} leeren</button>`;
+    }
+    b+=`<button class="small pri" data-w="tare">Tara</button>`;
+  } else if(ph==='nach'){
+    b+=`<button class="small ${W.item==='lamp'?'on':''}" data-w="lamp">${s.hold} ${W.item==='lamp'?'abnehmen':'auflegen'}</button><button class="small pri" data-w="tare">Tara</button>`;
+  } else b=`<span class="dim" style="font-size:13px">${S.sim.started&&!S.sim.finished?'Während der Messung wird nicht gewogen.':(massDone()?'Wägungen abgeschlossen.':'')}</span>`;
+  B.innerHTML=b;
+  B.querySelectorAll('[data-w]').forEach(x=>x.onclick=()=>waageAction(x.dataset.w));
+  let f='';
+  if(isComb()){
+    f+=fieldHTML('mW','m(Wasser)','g',ph!=='massen');
+    f+=fieldHTML('m1','m₁ ('+s.hold+' vorher)','g',ph!=='massen');
+    if(S.sim.finished){
+      f+=`<div style="border-top:1px solid var(--line);margin-top:10px;padding-top:6px" class="dim">Nach der Verbrennung:</div>`;
+      f+=fieldHTML('m2','m₂ ('+s.hold+' nachher)','g',S.f.m2.ok);
+      f+=`<div class="calc ${S.showF.dm?'showF':''}" style="margin-top:6px"><div>${fieldHTML('dm','Δm (verbrannt)','g',!S.f.m2.ok)}<button class="small" data-ft="dm">${S.showF.dm?'Formel ausblenden':'Formel'}</button></div>${S.showF.dm?`<div class="fbox"><h4>Formel</h4><div class="fm">Δm = m₁ − m₂</div><p>Masse vorher minus nachher = Masse des verbrannten Brennstoffs.${s.solid?' Asche und Ruß werden vernachlässigt.':''}</p></div>`:''}</div>`;
+    }
+  } else {
+    f+=fieldHTML('mW','m('+s.fluid+')','g',ph!=='massen');
+    f+=fieldHTML('mS','m('+s.short+')','g',ph!=='massen');
+  }
+  if(ph==='massen') f+=`<div class="hint">Wert in der Waagenanzeige ablesen und eintragen (Enter oder Feld verlassen).</div>`;
+  $('#massFields').innerHTML=f;
+  bindFields($('#massFields'));
+  $('#massFields').querySelectorAll('[data-ft]').forEach(x=>x.onclick=()=>{S.showF[x.dataset.ft]=!S.showF[x.dataset.ft]; renderWaage();});
+  drawWaage();
+}
+function waageAction(a){
+  const W=S.waage,H=S.hidden;
+  if(a==='vessel') W.item=W.item==='vessel'?null:'vessel';
+  if(a==='lamp') W.item=W.item==='lamp'?null:'lamp';
+  if(a==='dish') W.item=W.item==='dish'?null:'dish';
+  if(a==='water') W.water=H.mW;
+  if(a==='empty') W.water=0;
+  if(a==='solid') W.solid=H.mS;
+  if(a==='emptyS') W.solid=0;
+  if(a==='tare') W.tare=r2(waageTotal());
+  renderWaage();
+}
+function holderSVG(cx,by,fuelFrac,burning){
+  const s=stoff(), f=Math.max(0,Math.min(1,fuelFrac==null?1:fuelFrac)); let g='';
+  const fl=(x,y,h,w)=>{const k=1+0.12*Math.sin(performance.now()/90);return `<path d="M${x} ${y} q${-w} ${-h*0.36*k} 0 ${-h*k} q${w} ${h*0.64*k} 0 ${h*k}" fill="#ffb454" opacity=".9"/><path d="M${x} ${y} q${-w*0.45} ${-h*0.2} 0 ${-h*0.55*k} q${w*0.45} ${h*0.32} 0 ${h*0.55*k}" fill="#4fd1c5" opacity=".65"/>`;};
+  if(s.holdType==='brenner'){
+    const fh=Math.max(4,22*f);
+    g=`<rect x="${cx-35}" y="${by-48}" width="70" height="48" rx="10" fill="#20252a" stroke="#9aa2a9" stroke-width="2"/><rect x="${cx-32}" y="${by-4-fh}" width="64" height="${fh}" fill="#2a4560"/><rect x="${cx-8}" y="${by-64}" width="16" height="17" fill="#5f6870"/><rect x="${cx-3}" y="${by-74}" width="6" height="11" fill="#e7e4dd"/>`;
+    if(burning) g+=fl(cx,by-74,56,16);
+  } else if(s.holdType==='kerze'){
+    const wh=4+12*f;
+    g=`<path d="M${cx-30} ${by} v-20 h60 v20 z" fill="#c9ccd0" stroke="#9aa2a9"/><rect x="${cx-27}" y="${by-3-wh}" width="54" height="${wh}" fill="#efe9da"/><line x1="${cx}" y1="${by-3-wh}" x2="${cx}" y2="${by-11-wh}" stroke="#333" stroke-width="2"/>`;
+    if(burning) g+=fl(cx,by-11-wh,34,9);
+  } else {
+    g=`<path d="M${cx-42} ${by-22} q42 30 84 0 z" fill="#e9e6df" stroke="#9aa2a9"/>`;
+    const n=Math.round(3+7*f);
+    for(let i=0;i<n;i++){ const x=cx-26+((i*17)%52), y=by-22-((i*7)%10); g+= s.id==='holz'?`<rect x="${x}" y="${y-4}" width="16" height="5" rx="1.5" fill="${s.fuelCol}" transform="rotate(${(i*37)%50-25} ${x+8} ${y})"/>`:`<ellipse cx="${x+6}" cy="${y-2}" rx="8" ry="5" fill="${s.fuelCol}" stroke="#555"/>`; }
+    if(burning){ if(s.id==='kohle'){ g+=`<ellipse cx="${cx}" cy="${by-26}" rx="28" ry="8" fill="#e4785b" opacity="${0.45+0.2*Math.sin(performance.now()/200)}"/>`+fl(cx,by-28,26,10); } else g+=fl(cx-10,by-26,62,18)+fl(cx+12,by-26,50,14); }
+  }
+  return g;
+}
+function drawWaage(){
+  const W=S.waage, H=S.hidden, s=stoff();
+  const disp=r2(waageTotal()-W.tare);
+  let item='';
+  const px=150, py=96;
+  if(W.item==='vessel'){
+    if(isComb()){ item=`<path d="M112 ${py} v-62 h76 v62 z" fill="none" stroke="#9aa2a9" stroke-width="2"/>${W.water>0?`<rect x="114" y="${py-46}" width="72" height="44" fill="#1d4a5c" opacity=".9"/>`:''}`; }
+    else { item=`<path d="M118 ${py} l-6 -64 h76 l-6 64 z" fill="#e9e6df" opacity=".85" stroke="#9aa2a9"/>${W.water>0?`<path d="M121 ${py-3} l-4 -42 h66 l-4 42 z" fill="${s.id==='zn'?'#2d6fb3':'#1d4a5c'}" opacity=".9"/>`:''}`; }
+  }
+  if(W.item==='lamp'){ item=holderSVG(150,py,1-S.sim.burned/(H.m1-H.lampEmpty),false); }
+  if(W.item==='dish'&&isNeu()){ item=`<path d="M126 ${py} v-50 h48 v50 z" fill="none" stroke="#9aa2a9" stroke-width="2"/>${W.solid>0?`<rect x="128" y="${py-36}" width="44" height="34" fill="#3b5a6e" opacity=".9"/>`:''}`; }
+  else if(W.item==='dish'){ item=`<path d="M118 ${py} q32 10 64 0 l-4 -10 h-56 z" fill="#b8b4ab" stroke="#9aa2a9"/>${W.solid>0?`<ellipse cx="150" cy="${py-10}" rx="18" ry="5" fill="${s.id==='mg'?'#bfc4c8':s.id==='zn'?'#8e9499':'#f2f0ea'}"/>`:''}`; }
+  $('#waageSvg').innerHTML=`<svg viewBox="0 0 300 175"><rect x="40" y="104" width="220" height="56" rx="10" fill="#2a3036" stroke="#31383e"/><rect x="95" y="98" width="110" height="8" rx="3" fill="#5f6870"/>${item}<rect x="80" y="118" width="140" height="32" rx="5" fill="#0b0f0d" stroke="#31383e"/><text x="210" y="142" text-anchor="end" font-family="ui-monospace,Consolas,monospace" font-size="20" fill="#4fd1c5">${fmt(disp,2)} g</text><text x="52" y="168" fill="#5f6870" font-size="10">max 600 g · d = 0,01 g</text></svg>`;
+}
+
+/* ---- Felder binden ---- */
+function bindFields(root){
+  root.querySelectorAll('input[data-f]').forEach(inp=>{
+    const go=()=>{const id=inp.dataset.f; const F=S.f[id]; if(inp.value===F.raw) return; F.raw=inp.value.trim(); F.auto=false; evalField(id,true); evalAll(); afterChange();};
+    inp.addEventListener('change',go);
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();go();}});
+  });
+}
+function afterChange(){
+  if(massDone()&&!S.inApp){ S.inApp=true; S.waage.item=null; S.waage.tare=0; }
+  if(isComb()&&S.f.m2.ok&&S.waage.item==='lamp'){}
+  renderAll();
+}
+
+/* ---- Steuerung & Simulation ---- */
+function canEnd(){
+  const sim=S.sim; if(!sim.started||sim.finished||sim.waiting) return false;
+  if(isComb()) return sim.burnEnd!=null && sim.t>=sim.burnEnd+120;
+  return sim.added && sim.t>=sim.addTime+Math.max(180,stoff().tau*5);
+}
+function renderControls(){
+  const C=$('#ctrl'); if(!C) return;
+  const sim=S.sim; let h='';
+  if(!sim.started){ h+=`<button class="pri" id="bStart" ${massDone()?'':'disabled'}>Messung starten</button>${massDone()?'':'<span class="dim" style="font-size:13px">Zuerst die Massen bestimmen.</span>'}`; }
+  else if(!sim.finished){
+    h+=`<button id="bPause" ${sim.waiting?'disabled':''}>${sim.running?'Pause':'Weiter'}</button>`;
+    h+=[1,2,5].map(v=>`<button class="small ${sim.speed===v?'on':''}" data-sp="${v}">×${v}</button>`).join('');
+    h+=`<span class="sep"></span>`;
+    if(isComb()){
+      if(sim.burning) h+=`<button class="pri" id="bOff">Flamme löschen</button>`;
+    } else if(!sim.added) h+=`<button class="pri" id="bAdd" ${sim.t>=60?'':'disabled'}>${stoff().short} zugeben</button>`;
+    h+=`<button id="bEnd" ${canEnd()?'':'disabled'}>Messung beenden</button>`;
+  } else h+=`<span class="good">Messung beendet.</span>`;
+  C.innerHTML=h;
+  const on=(id,f)=>{const e=document.getElementById(id); if(e) e.onclick=f;};
+  on('bStart',()=>{sim.started=true;sim.running=true;sim.t=0;sim.T=S.params.T0;sim.nextIdx=0;lastTs=null;
+    if(isComb()){sim.burning=true;sim.burnStart=0;} else {sim.added=true;sim.addTime=0;sim.frac=0;} // Reaktion beginnt mit dem Start
+    renderAll();});
+  on('bPause',()=>{sim.running=!sim.running;lastTs=null;renderControls();updateLive(true);});
+  C.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{sim.speed=+b.dataset.sp;renderControls();});
+  on('bIgn',()=>{sim.burning=true;sim.burnStart=sim.t;renderAll();});
+  on('bOff',()=>{extinguish();});
+  on('bAdd',()=>{sim.added=true;sim.addTime=sim.t;sim.frac=0;renderAll();});
+  on('bEnd',()=>finishMeasurement());
+}
+function extinguish(auto){
+  const sim=S.sim; if(!sim.burning) return; sim.burning=false; sim.burnEnd=sim.t;
+  if(auto) autoNote=sim.T>=75?'Die Flamme wurde bei 75 °C automatisch gelöscht.':'Die Flamme wurde nach 10 min automatisch gelöscht.';
+  needRender=true;
+}
+let autoNote='';
+function finishMeasurement(){
+  const sim=S.sim; sim.finished=true; sim.running=false; sim.waiting=false;
+  if(isComb()){ S.hidden.m2=r2(S.hidden.m1-sim.burned); }
+  renderAll();
+}
+function physics(dt){
+  const s=stoff(), sim=S.sim, P=S.params, H=S.hidden, loss=0; // Wärmeverluste vernachlässigt
+  let tau, kc;
+  if(isComb()){
+    if(sim.burning){ const dm=H.rate*dt; sim.burned+=dm; sim.pend+=dm*kJproG(s)*1000*(1-loss);
+      if(sim.t-sim.burnStart>=600||sim.T>=75) extinguish(true); }
+    tau=20; kc=0;
+  } else {
+    if(sim.added){ const f=1-Math.exp(-(sim.t+dt-sim.addTime)/s.tau); const df=f-sim.frac; sim.frac=f; const n=s.neutral?s.conc*Math.min(H.mW,H.mS)/1000:H.mS/s.M; sim.pend+=-n*s.dH*1000*(1-loss)*df; }
+    tau=6; kc=0;
+  }
+  const tr=sim.pend*Math.min(1,dt/tau); sim.pend-=tr; sim.T+=tr/(C_W*(s.neutral?H.mW+H.mS:H.mW));
+  sim.T-=kc*(sim.T-P.T0)*dt;
+}
+function takeReading(){
+  const sim=S.sim; sim.t=sim.nextIdx*30;
+  let note='';
+  S.rows.push({t:sim.t,trueT:sim.T,raw:'',ok:false,tries:0,auto:false,msg:'',note});
+  sim.nextIdx++; sim.waiting=true;
+  renderTable(); renderControls(); updateLive(true);
+  setTimeout(()=>{const e=document.getElementById('row_'+(S.rows.length-1)); if(e){ e.focus({preventScroll:true}); const tb=$('#tabBox'); if(tb) tb.scrollTop=tb.scrollHeight; }},30);
+}
+function rowAnswered(){
+  const sim=S.sim;
+  if(sim.waiting && S.rows.length && S.rows[S.rows.length-1].ok){
+    sim.waiting=false; lastTs=null;
+    if(S.rows.length>=41){ finishMeasurement(); return; }
+  }
+}
+let lastTs=null, needRender=false, lastDraw=0;
+function loop(ts){
+  const sim=S.sim;
+  if(S.versuch && sim.started && sim.running && !sim.waiting && !sim.finished){
+    if(lastTs==null) lastTs=ts;
+    let adv=Math.min(0.2,(ts-lastTs)/1000)*sim.speed; lastTs=ts;
+    while(adv>1e-9 && !sim.waiting){
+      const nextT=sim.nextIdx*30;
+      if(nextT-sim.t<=1e-9){ takeReading(); break; }
+      const st=Math.min(0.25,adv,nextT-sim.t);
+      physics(st); sim.t+=st; adv-=st;
+      if(nextT-sim.t<=1e-6){ sim.t=nextT; takeReading(); break; }
+    }
+    if(needRender){ needRender=false; renderAll(); }
+    if(ts-lastDraw>50){ lastDraw=ts; updateLive(); }
+  } else {
+    lastTs=null;
+    if(sim.burning && ts-lastDraw>80){ lastDraw=ts; updateLive(); }
+  }
+  requestAnimationFrame(loop);
+}
+
+/* ---- Live-Zeichnungen ---- */
+function updateLive(force){
+  if(!S.versuch||!$('#appSvg')) { updateStatus(); return; }
+  drawApparatus(); drawLupe(); updateInfo(); updateStatus();
+  const sim=S.sim;
+  if(sim.started&&!sim.finished){ const b=$('#bEnd'); if(b) b.disabled=!canEnd(); const i=$('#bIgn'); if(i) i.disabled=sim.t<60; const a=$('#bAdd'); if(a) a.disabled=sim.t<60; }
+  if(S.waage.item==='lamp') drawWaage();
+}
+function tempColor(T){ const k=Math.max(0,Math.min(1,(T-10)/60)); const r=Math.round(30+k*110), g=Math.round(86-k*30), b=Math.round(120-k*60); return `rgb(${r},${g},${b})`; }
+function drawApparatus(){
+  const sim=S.sim, s=stoff(), T=sim.T;
+  const thermoY=v=>186-Math.max(0,Math.min(100,v))*1.5; // 0..100 °C über 150 px
+  let g='';
+  const thermo=(x,top)=>`<rect x="${x}" y="${top}" width="9" height="${196-top}" rx="4" fill="#0e1113" stroke="#e7e4dd" stroke-width="1.2"/><circle cx="${x+4.5}" cy="199" r="7" fill="#e4785b"/><rect x="${x+2.5}" y="${thermoY(T)}" width="4" height="${199-thermoY(T)}" fill="#e4785b"/>`+[0,20,40,60,80,100].map(v=>`<line x1="${x+9}" y1="${thermoY(v)}" x2="${x+14}" y2="${thermoY(v)}" stroke="#9aa2a9"/><text x="${x+16}" y="${thermoY(v)+3}" font-size="8" fill="#9aa2a9">${v}</text>`).join('');
+  if(isComb()){
+    g+=`<rect x="20" y="330" width="380" height="12" fill="#31383e"/><rect x="58" y="40" width="7" height="292" fill="#5f6870"/><rect x="62" y="120" width="98" height="7" fill="#5f6870"/><rect x="152" y="112" width="12" height="22" fill="#9aa2a9"/>`;
+    if(S.inApp){
+      g+=`<path d="M160 96 v120 q0 6 6 6 h108 q6 0 6 -6 v-120" fill="none" stroke="#c9d1d6" stroke-width="2.4"/><rect x="162" y="120" width="116" height="100" rx="4" fill="${tempColor(T)}" opacity=".95"/>`;
+      g+=`<line x1="190" y1="70" x2="190" y2="212" stroke="#c9d1d6" stroke-width="2.5"/><line x1="178" y1="212" x2="202" y2="212" stroke="#c9d1d6" stroke-width="3"/>`;
+      g+=thermo(244,30);
+      g+=holderSVG(220,330,1-sim.burned/(S.hidden.m1-S.hidden.lampEmpty),sim.burning);
+      g+=`<text x="290" y="170" font-size="12" fill="#9aa2a9">Wasser</text><text x="272" y="318" font-size="12" fill="#9aa2a9">${s.hold}</text>`;
+    } else g+=`<text x="210" y="200" text-anchor="middle" font-size="14" fill="#5f6870">Becherglas und Brennstoff werden</text><text x="210" y="220" text-anchor="middle" font-size="14" fill="#5f6870">zuerst gewogen (Waage).</text>`;
+  } else {
+    g+=`<rect x="20" y="330" width="380" height="12" fill="#31383e"/>`;
+    if(S.inApp){
+      const liq = s.id==='zn' ? (()=>{const k=sim.frac*0.25;return `rgb(${Math.round(45+k*80)},${Math.round(111+k*40)},${Math.round(179-k*60)})`;})() : tempColor(T);
+      g+=`<path d="M140 120 l14 208 h112 l14 -208 z" fill="#e9e6df" stroke="#9aa2a9"/><path d="M152 132 l12 186 h92 l12 -186 z" fill="#d7d3cb"/>`;
+      g+=`<path d="M156 160 l10 154 h88 l10 -154 z" fill="${liq}" opacity=".95"/>`;
+      g+=`<rect x="132" y="108" width="156" height="14" rx="4" fill="#c8c4bb" stroke="#9aa2a9"/>`;
+      g+=`<line x1="182" y1="60" x2="182" y2="305" stroke="#c9d1d6" stroke-width="2.5"/><line x1="170" y1="305" x2="194" y2="305" stroke="#c9d1d6" stroke-width="3"/>`;
+      g+=thermo(228,26);
+      if(sim.added){
+        const vis=Math.max(0,1-sim.frac*1.05);
+        if(isNeu()) g+=`<path d="M306 326 v-46 h44 v46 z" fill="none" stroke="#9aa2a9" stroke-width="2"/><text x="328" y="272" text-anchor="middle" font-size="11" fill="#9aa2a9">${s.short} (leer)</text>`;
+        else for(let i=0;i<14;i++){ const x=172+((i*37)%76), y=300-((i*23)%40); if(vis>0.02) g+=`<circle cx="${x}" cy="${y}" r="${2.5*vis+0.5}" fill="${s.id==='mg'?'#cfd4d8':s.id==='zn'?'#8e9499':'#f4f2ec'}" opacity="${vis}"/>`; }
+        if(s.id==='mg'&&sim.frac<0.985){ const tt=performance.now()/600; for(let i=0;i<10;i++){ const x=170+((i*29)%80), y=300-(((tt*40)+i*27)%130); g+=`<circle cx="${x}" cy="${y}" r="2.6" fill="none" stroke="#e7e4dd" opacity=".75"/>`; } }
+        if(s.id==='zn'&&sim.frac>0.05){ for(let i=0;i<9;i++){ g+=`<circle cx="${174+((i*41)%74)}" cy="${306-((i*7)%10)}" r="${2.5*sim.frac+0.5}" fill="#b5652d"/>`; } }
+      } else {
+        if(isNeu()) g+=`<path d="M306 326 v-46 h44 v46 z" fill="none" stroke="#9aa2a9" stroke-width="2"/><rect x="308" y="290" width="40" height="34" fill="#3b5a6e"/><text x="328" y="272" text-anchor="middle" font-size="11" fill="#9aa2a9">${s.short}</text>`; else
+        g+=`<path d="M300 322 q30 8 60 0 l-4 -9 h-52 z" fill="#b8b4ab"/><ellipse cx="330" cy="314" rx="16" ry="4" fill="${s.id==='mg'?'#bfc4c8':s.id==='zn'?'#8e9499':'#f2f0ea'}"/><text x="330" y="300" text-anchor="middle" font-size="11" fill="#9aa2a9">${s.short}</text>`;
+      }
+      g+=`<text x="292" y="200" font-size="12" fill="#9aa2a9">${s.fluid==='Wasser'?'Wasser':s.fluid}</text><text x="292" y="130" font-size="12" fill="#9aa2a9">Styroporbecher</text><text x="292" y="144" font-size="12" fill="#9aa2a9">mit Deckel</text>`;
+    } else g+=`<text x="210" y="200" text-anchor="middle" font-size="14" fill="#5f6870">Kalorimeterbecher und Stoff werden</text><text x="210" y="220" text-anchor="middle" font-size="14" fill="#5f6870">zuerst gewogen (Waage).</text>`;
+  }
+  g+=`<text x="16" y="22" font-family="ui-monospace,Consolas,monospace" font-size="15" fill="#ffb454">t = ${mmss(sim.t)}</text>`;
+  $('#appSvg').innerHTML=`<svg viewBox="0 0 420 350">${g}</svg>`;
+}
+function drawLupe(){
+  const T=S.sim.T, c=Math.round(T*2)/2, lo=c-1.5, hi=c+1.5, pp=88, top=18;
+  const y=v=>top+(hi-v)*pp;
+  let g=`<rect x="78" y="6" width="26" height="296" rx="6" fill="#e9eef0" opacity=".12"/>`;
+  g+=`<rect x="86" y="${Math.max(6,y(T))}" width="10" height="${302-Math.max(6,y(T))}" fill="#e4785b"/>`;
+  for(let k=Math.ceil(lo*10);k<=Math.floor(hi*10);k++){
+    const v=k/10, yy=y(v); const major=k%10===0, mid=k%5===0;
+    const L=major?30:(mid?22:13);
+    g+=`<line x1="${104}" y1="${yy}" x2="${104+L}" y2="${yy}" stroke="#e7e4dd" stroke-width="${major?1.6:1}"/>`;
+    if(major) g+=`<text x="${140}" y="${yy+5}" font-family="ui-monospace,Consolas,monospace" font-size="15" fill="#e7e4dd">${k/10}</text>`;
+  }
+  g+=`<text x="10" y="22" font-size="12" fill="#9aa2a9">°C</text>`;
+  $('#lupeSvg').innerHTML=`<svg viewBox="0 0 180 300">${g}</svg>`;
+}
+function updateInfo(){
+  const I=$('#simInfo'); if(!I) return; const sim=S.sim;
+  let t='', w=false;
+  if(!sim.started) t=massDone()?(isComb()?'Bereit. Mit „Messung starten“ wird der Brennstoff entzündet – die erste Temperatur (t = 00:00) ist die Anfangstemperatur.':'Bereit. Mit „Messung starten“ wird der Stoff zugegeben – die erste Temperatur (t = 00:00) ist die Anfangstemperatur.'):'Bestimme zuerst die Massen mit der Waage.';
+  else if(sim.finished) t='Messung beendet. '+(isComb()?'Wiege jetzt '+stoff().holdAcc+' zurück (Waage).':'Weiter mit der Auswertung.');
+  else if(sim.waiting){ t=`Messzeitpunkt t = ${mmss(sim.t)}: Temperatur an der Lupe ablesen und in die Tabelle eintragen.`; w=true; }
+  else {
+    t=`t = ${mmss(sim.t)} · nächster Messwert bei ${mmss(sim.nextIdx*30)}`;
+    if(isComb()){ if(sim.burning) t+=' · Brennstoff brennt.'; if(sim.burnEnd!=null&&!canEnd()) t+=' · Weiter messen (mind. 2 min nach dem Löschen).'; }
+    else { if(!sim.added&&sim.t>=60) t+=' · Stoff kann zugegeben werden.'; if(sim.added&&!canEnd()) t+=' · Weiter messen, bis sich die Temperatur kaum noch ändert.'; }
+    if(canEnd()) t+=' · Messung kann beendet werden.';
+    if(!sim.running) t+=' (pausiert)';
+  }
+  if(autoNote&&sim.started&&!sim.finished) t+=' '+autoNote;
+  I.textContent=t; I.classList.toggle('wait',w);
+}
+function updateStatus(){
+  const st=$('#status'); if(!S.versuch){st.textContent='Versuchsart wählen';return;}
+  const sim=S.sim;
+  if(sim.started&&!sim.finished){ st.textContent=(sim.waiting?'Ablesen · ':(sim.running?'Messung · ':'Pause · '))+mmss(sim.t); return; }
+  const L=stepsFor(); const i=curStepIdx();
+  st.textContent=`Schritt ${i+1}/${L.length} · ${L[i].title}`;
+}
+
+/* ---- Tabelle & Diagramm ---- */
+function renderTable(){
+  const B=$('#tabBox'); if(!B) return;
+  const sim=S.sim, st=startTime();
+  if(!S.rows.length){ B.innerHTML=`<div class="locknote" style="padding:12px">Noch keine Messwerte. Die Tabelle füllt sich während der Messung alle 30 s.</div>`; drawDiag(); return; }
+  let lastPre=-1; if(st!=null) S.rows.forEach((r,i)=>{if(r.t<=st+1e-6) lastPre=i;});
+  let h=`<table class="mt"><thead><tr><th>Nr.</th><th>t in min</th><th>t in s</th><th>T in °C</th></tr></thead><tbody>`;
+  S.rows.forEach((r,i)=>{
+    const act=sim.waiting&&i===S.rows.length-1;
+    const cls=r.raw===''?'':(r.ok?(r.auto?'auto':'ok'):'bad');
+    let note='';
+    if(i===lastPre) note=isComb()?'↓ entzündet':(isNeu()?'↓ Lauge zugegeben':'↓ Stoff zugegeben');
+    if(isComb()&&sim.burnEnd!=null){ const pe=S.rows.findIndex(x=>x.t>=sim.burnEnd-1e-6); if(pe>0&&i===pe-1&&note==='') note='↓ Flamme gelöscht'; else if(pe>0&&i===pe-1) note+=' · Flamme gelöscht'; }
+    h+=`<tr class="${act?'act':''}"><td class="n">${i+1}</td><td class="n">${mmss(r.t)}</td><td class="n">${r.t}</td><td><input type="text" inputmode="decimal" autocomplete="off" id="row_${i}" data-r="${i}" class="${cls}" value="${esc(r.raw)}" ${(r.ok||(!act&&r.raw===''&&!sim.finished&&i===S.rows.length-1))?'disabled':''}>${r.auto?' <span class="amber">*</span>':''}${r.msg&&!r.ok?`<div class="note" style="color:var(--danger)">${r.msg}</div>`:''}${note?`<div class="note">${note}</div>`:''}</td></tr>`;
+  });
+  h+=`</tbody></table>`;
+  B.innerHTML=h;
+  B.querySelectorAll('input[data-r]').forEach(inp=>{
+    const go=()=>{const i=+inp.dataset.r,r=S.rows[i]; if(inp.value.trim()===r.raw) return; r.raw=inp.value.trim(); r.auto=false; checkRow(i,true);
+      const wasWaiting=S.sim.waiting; renderTable(); drawDiag();
+      if(r.ok&&wasWaiting&&i===S.rows.length-1){ setTimeout(()=>{rowAnswered(); renderAll();},450); }
+      else if(!r.ok){ const e=document.getElementById('row_'+i); if(e){e.focus({preventScroll:true}); e.select();} }
+    };
+    inp.addEventListener('change',go);
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();go();}});
+  });
+  drawDiag();
+}
+function diagSVG(print){
+  const pts=ownRows(); const W=520,H=270,ml=48,mr=14,mt=14,mb=40;
+  const fg=print?'#000':'#9aa2a9', grid=print?'#ccc':'#262c31', pc=print?'#c05000':'#ffb454';
+  const tmax=Math.max(300,pts.length?pts[pts.length-1].t:0);
+  let vmin=S.params.T0-1, vmax=S.params.T0+1;
+  pts.forEach(p=>{vmin=Math.min(vmin,p.v);vmax=Math.max(vmax,p.v);});
+  vmin=Math.floor(vmin-0.5); vmax=Math.ceil(vmax+0.5);
+  const X=t=>ml+(t/tmax)*(W-ml-mr), Y=v=>mt+(vmax-v)/(vmax-vmin)*(H-mt-mb);
+  let g='';
+  const span=vmax-vmin, stepV=span>20?5:span>8?2:span>4?1:0.5;
+  for(let v=Math.ceil(vmin/stepV)*stepV;v<=vmax+1e-9;v+=stepV){ g+=`<line x1="${ml}" x2="${W-mr}" y1="${Y(v)}" y2="${Y(v)}" stroke="${grid}"/><text x="${ml-6}" y="${Y(v)+4}" text-anchor="end" font-size="11" fill="${fg}">${fmt(v,stepV<1?1:0)}</text>`; }
+  const stepT=tmax>900?120:60;
+  for(let t=0;t<=tmax+1e-9;t+=stepT){ g+=`<line y1="${mt}" y2="${H-mb}" x1="${X(t)}" x2="${X(t)}" stroke="${grid}"/><text x="${X(t)}" y="${H-mb+16}" text-anchor="middle" font-size="11" fill="${fg}">${t/60}</text>`; }
+  g+=`<line x1="${ml}" y1="${H-mb}" x2="${W-mr}" y2="${H-mb}" stroke="${fg}"/><line x1="${ml}" y1="${mt}" x2="${ml}" y2="${H-mb}" stroke="${fg}"/>`;
+  g+=`<text x="${(W+ml)/2}" y="${H-6}" text-anchor="middle" font-size="12" fill="${fg}">t in min</text><text x="14" y="${(H-mb+mt)/2}" font-size="12" fill="${fg}" transform="rotate(-90 14 ${(H-mb+mt)/2})" text-anchor="middle">T in °C</text>`;
+  const st=startTime(); if(st!=null&&st<=tmax) g+=`<line x1="${X(st)}" x2="${X(st)}" y1="${mt}" y2="${H-mb}" stroke="${print?'#888':'#4fd1c5'}" stroke-dasharray="4 4"/><text x="${X(st)+4}" y="${mt+12}" font-size="10" fill="${print?'#555':'#4fd1c5'}">${isComb()?'entzündet':'Zugabe'}</text>`;
+  if(isComb()&&S.sim.burnEnd!=null) g+=`<line x1="${X(S.sim.burnEnd)}" x2="${X(S.sim.burnEnd)}" y1="${mt}" y2="${H-mb}" stroke="${print?'#888':'#e4785b'}" stroke-dasharray="4 4"/><text x="${X(S.sim.burnEnd)+4}" y="${mt+26}" font-size="10" fill="${print?'#555':'#e4785b'}">gelöscht</text>`;
+  if(pts.length>1) g+=`<polyline points="${pts.map(p=>X(p.t)+','+Y(p.v)).join(' ')}" fill="none" stroke="${pc}" stroke-width="1.2" opacity=".55"/>`;
+  pts.forEach(p=>{g+=`<circle cx="${X(p.t)}" cy="${Y(p.v)}" r="3.6" fill="${pc}"/>`;});
+  return `<svg viewBox="0 0 ${W} ${H}" ${print?'width="460"':''}>${g}</svg>`;
+}
+function drawDiag(){ const D=$('#diagSvg'); if(D) D.innerHTML=diagSVG(false); }
+
+/* ---- Auswertung ---- */
+function cardDefs(){
+  const s=stoff();
+  return [
+    {id:'Q',el:'calcQ',title:'1. Wärme Q, die '+(s.fluid==='Wasser'?'das Wasser':'der Kalorimeterinhalt')+' aufgenommen hat',fields:[['T1','T₁ (Anfangstemperatur)','°C'],['T2','T₂ ('+(isExo()?'höchste':'tiefste')+' Temperatur)','°C'],['dT','ΔT','K']].concat(isNeu()?[['mG','m(gesamt)','g']]:[]).concat([['Q','Q','kJ']]),
+      given:`c(Wasser) = 4,18 J/(g·K) · m(${s.fluid}) = ${S.f.mW.ok?S.f.mW.raw:'…'} g`+(isNeu()?` · m(${s.short}) = ${S.f.mS.ok?S.f.mS.raw:'…'} g`:''),
+      formula:`<h4>Formeln</h4><div class="fm">ΔT = T₂ − T₁</div><div class="fm">Q = c · m · ΔT</div>${isNeu()?'<div class="fm">m(gesamt) = m(Säure) + m(Lauge)</div>':''}<p>c(Wasser) = 4,18 J/(g·K); m = Masse des ${isNeu()?'gesamten Gemischs (wie Wasser)':(s.fluid==='Wasser'?'Wassers':'Kalorimeterinhalts (wie Wasser)')} in g.</p><p>Eine Temperaturdifferenz ist in K und °C gleich groß.</p><p>Q ergibt sich in J: 1 kJ = 1000 J.</p>${isExo()?'':'<p>Bei Abkühlung sind ΔT und Q negativ.</p>'}`,
+      tip:()=>`T₁ ist der Wert bei t = 0 (Anfangstemperatur)${preVals().length?` (bei dir: ${fmt(EXP.T1(),1)} °C)`:''}, T₂ der ${isExo()?'höchste':'tiefste'} Wert danach${isFinite(EXP.T2())?` (bei dir: ${fmt(EXP.T2(),1)} °C)`:''}.<br>ΔT = T₂ − T₁${S.f.T1.ok&&S.f.T2.ok?` = ${S.f.T2.raw} °C − ${S.f.T1.raw} °C`:''}.<br>${isNeu()?`m(gesamt) = ${S.f.mW.raw} g + ${S.f.mS.raw} g.<br>`:''}Q = 4,18 J/(g·K) · ${isNeu()?(S.f.mG.ok?S.f.mG.raw:'m(gesamt)'):S.f.mW.raw} g · ${S.f.dT.ok?S.f.dT.raw:'ΔT'} K${S.f.dT.ok&&isFinite(mHeat())?` = ${fmt(C_W*mHeat()*val('dT'),0)} J`:''} → in kJ umrechnen (÷ 1000).`},
+    {id:'H',el:'calcH',title:'2. '+s.kind+' ΔH für die eingesetzte Portion',fields:[['dH','ΔH','kJ']],
+      given:`Q = ${S.f.Q.ok?S.f.Q.raw:'…'} kJ`,
+      formula:`<h4>Formel</h4><div class="fm">ΔH = −Q</div><p>Die Wärme, die das Wasser aufnimmt (Q), gibt das System ab. Die Enthalpie des Systems ändert sich deshalb um −Q.</p><p>exotherm: Q &gt; 0 → ΔH &lt; 0<br>endotherm: Q &lt; 0 → ΔH &gt; 0</p>`,
+      tip:()=>`Das Wasser hat Q = ${S.f.Q.raw} kJ ${val('Q')>=0?'aufgenommen':'(abgegeben)'}. Das System hat diese Wärme ${val('Q')>=0?'abgegeben':'aufgenommen'} → ΔH = −(${S.f.Q.raw} kJ).`},
+    s.mix?{id:'M',el:'calcM',title:'3. Verbrennungsenthalpie je Gramm '+s.sym,fields:[['dHm',s.sym,'kJ/g']],
+      given:`Δm = ${S.f.dm.raw||'…'} g · ΔH = ${S.f.dH.ok?S.f.dH.raw:'…'} kJ · ${s.name} ist ein Stoffgemisch – es gibt keine molare Masse.`,
+      formula:`<h4>Formel</h4><div class="fm">${s.sym} = <span class="frac"><span>ΔH</span><span>Δm</span></span></div><p>Für Stoffgemische (Holz, Wachs) bezieht man die Enthalpie auf 1 g statt auf 1 mol.</p><p>ΔH in kJ, Δm in g → Ergebnis in kJ/g.</p>`,
+      tip:()=>`${s.sym} = ${S.f.dH.raw} kJ / ${S.f.dm.raw} g.`}
+    :isNeu()?{id:'M',el:'calcM',title:'3. molare Reaktionsenthalpie '+s.sym+' (Neutralisation)',fields:[['n','n(H₂O)','mol'],['dHm',s.sym,'kJ/mol']],
+      given:`c(${s.acid}) = c(${s.base}) = ${fmt(s.conc,1)} mol/L · ρ = 1,00 g/mL · m(${s.fluid}) = ${S.f.mW.raw} g · m(${s.short}) = ${S.f.mS.raw} g · ΔH = ${S.f.dH.ok?S.f.dH.raw:'…'} kJ`,
+      formula:`<h4>Formeln</h4><div class="fm">V = <span class="frac"><span>m</span><span>ρ</span></span></div><div class="fm">n = c · V</div><div class="fm">${s.sym} = <span class="frac"><span>ΔH</span><span>n</span></span></div><p>H⁺ + OH⁻ → H₂O: Es entstehen so viele mol Wasser, wie Säure bzw. Lauge im Unterschuss vorliegt (bei gleichen Mengen: n(H⁺) = n(OH⁻)).</p><p>V in L einsetzen (1 mL = 0,001 L). Ergebnis in kJ/mol (je mol gebildetes Wasser).</p>`,
+      tip:()=>`V = m / ρ: ${S.f.mS.raw} g / 1,00 g/mL = ${fmt(val('mS'),1)} mL = ${fmt(val('mS')/1000,4)} L (entsprechend für die Säure).<br>n = ${fmt(s.conc,1)} mol/L · V (kleineres Volumen)${S.f.n.ok?` = ${S.f.n.raw} mol`:''}.<br>${s.sym} = ${S.f.dH.raw} kJ / ${S.f.n.ok?S.f.n.raw:'n'} mol.`}
+    :{id:'M',el:'calcM',title:'3. molare Reaktionsenthalpie '+s.sym,fields:[['n','n('+s.short+')','mol'],['dHm',s.sym,'kJ/mol']],
+      given:`${isComb()?'Δm':'m('+s.short+')'} = ${(isComb()?S.f.dm:S.f.mS).raw||'…'} g · M(${s.short}) = ${fmt(s.M,2)} g/mol · ΔH = ${S.f.dH.ok?S.f.dH.raw:'…'} kJ`,
+      formula:`<h4>Formeln</h4><div class="fm">n = <span class="frac"><span>m</span><span>M</span></span></div><div class="fm">${s.sym} = <span class="frac"><span>ΔH</span><span>n</span></span></div><p>m in g (${isComb()?'verbrannte Masse Δm':'eingewogene Masse'}), M in g/mol → n in mol.</p><p>ΔH in kJ, n in mol → Ergebnis in kJ/mol.</p>`,
+      tip:()=>`n = ${(isComb()?S.f.dm:S.f.mS).raw} g / ${fmt(s.M,2)} g/mol${S.f.n.ok?` = ${S.f.n.raw} mol`:''}.<br>${s.sym} = ${S.f.dH.raw} kJ / ${S.f.n.ok?S.f.n.raw:'n'} mol.`}
+  ];
+}
+function cardUnlocked(i){
+  const pre=isComb()?(S.sim.finished&&S.f.m2.ok&&S.f.dm.ok):S.sim.finished;
+  if(i===0) return pre; if(i===1) return S.passed.Q; return S.passed.H;
+}
+function renderCalcs(){
+  const box=$('#calcs'); if(!box) return;
+  const defs=cardDefs(); let h='';
+  if(!cardUnlocked(0)) h+=`<div class="locknote">Die Auswertung wird nach der Messung${isComb()?' und dem Zurückwiegen':''} freigeschaltet.</div>`;
+  defs.forEach((d,i)=>{
+    const un=cardUnlocked(i), passed=S.passed[d.id], showF=S.showF[d.id];
+    const allOk=d.fields.every(f=>S.f[f[0]].ok);
+    h+=`<div class="calc ${showF?'showF':''} ${un?'':'locked'}" id="${d.el}"><div><h3>${d.title}</h3>`;
+    if(un){
+      h+=`<div class="given">Gegeben: ${d.given}</div>`;
+      d.fields.forEach(f=>{h+=fieldHTML(f[0],f[1],f[2],passed);});
+      h+=`<div class="btnrow" style="margin-top:6px"><button class="small" data-fx="${d.id}">${showF?'Formel ausblenden':'Formel'}</button>`;
+      if(!passed){
+        h+=`<button class="small" data-tip="${d.id}">Tipp</button><button class="small" data-rest="${d.id}" ${selfCount()>=2&&!allOk?'':'disabled'} title="nach zwei selbst richtig berechneten Werten">Rest ausfüllen</button><button class="small" data-sol="${d.id}">Lösung zeigen</button><button class="small pri" data-pass="${d.id}">${i===2?'Ergebnis prüfen':'Zwischenprüfung'}</button>`;
+      }
+      h+=`</div>`;
+      if(S.help[d.id]==='tip'&&!passed) h+=`<div class="helpbox"><b>Tipp:</b> ${d.tip()}</div>`;
+      if(S.help[d.id]==='sol') h+=`<div class="helpbox"><b>Lösung:</b> ${solText(d.id)}</div>`;
+      if(S.help['pass_'+d.id]) h+=`<div class="passmsg">${S.help['pass_'+d.id]}</div>`;
+    } else h+=`<div class="locknote">${i===0?'Noch gesperrt.':'Wird nach bestandener Zwischenprüfung freigeschaltet.'}</div>`;
+    h+=`</div>${showF&&un?`<div class="fbox">${d.formula}</div>`:''}</div>`;
+  });
+  if(S.passed.M) h+=resultHTML();
+  box.innerHTML=h;
+  bindFields(box);
+  box.querySelectorAll('[data-fx]').forEach(b=>b.onclick=()=>{S.showF[b.dataset.fx]=!S.showF[b.dataset.fx];renderCalcs();});
+  box.querySelectorAll('[data-tip]').forEach(b=>b.onclick=()=>{S.help[b.dataset.tip]=S.help[b.dataset.tip]==='tip'?null:'tip';renderCalcs();});
+  box.querySelectorAll('[data-sol]').forEach(b=>b.onclick=()=>{fillCard(b.dataset.sol);S.help[b.dataset.sol]='sol';renderAll();});
+  box.querySelectorAll('[data-rest]').forEach(b=>b.onclick=()=>{fillCard(b.dataset.rest);renderAll();});
+  box.querySelectorAll('[data-pass]').forEach(b=>b.onclick=()=>passCard(b.dataset.pass));
+}
+function fillCard(id){
+  const d=cardDefs().find(x=>x.id===id);
+  d.fields.forEach(f=>{ if(!S.f[f[0]].ok){ autoFill(f[0]); evalAll(); } });
+}
+function solText(id){
+  const s=stoff();
+  if(id==='Q') return `T₁ = ${S.f.T1.raw} °C, T₂ = ${S.f.T2.raw} °C → ΔT = ${S.f.dT.raw} K;<br>${isNeu()?`m(gesamt) = ${S.f.mW.raw} g + ${S.f.mS.raw} g = ${S.f.mG.raw} g;<br>`:''}Q = 4,18 J/(g·K) · ${isNeu()?S.f.mG.raw:S.f.mW.raw} g · ${S.f.dT.raw} K = ${fmt(C_W*mHeat()*val('dT'),0)} J = ${S.f.Q.raw} kJ`;
+  if(id==='H') return `ΔH = −Q = −(${S.f.Q.raw} kJ) = ${S.f.dH.raw} kJ`;
+  if(s.mix) return `${s.sym} = ${S.f.dH.raw} kJ / ${S.f.dm.raw} g = ${S.f.dHm.raw} kJ/g`;
+  if(isNeu()) return `V = ${fmt(Math.min(val('mW'),val('mS')),2)} g / 1,00 g/mL = ${fmt(Math.min(val('mW'),val('mS'))/1000,5)} L; n = ${fmt(s.conc,1)} mol/L · V = ${S.f.n.raw} mol;<br>${s.sym} = ${S.f.dH.raw} kJ / ${S.f.n.raw} mol = ${S.f.dHm.raw} kJ/mol`;
+  return `n = ${(isComb()?S.f.dm:S.f.mS).raw} g / ${fmt(s.M,2)} g/mol = ${S.f.n.raw} mol;<br>${s.sym} = ${S.f.dH.raw} kJ / ${S.f.n.raw} mol = ${S.f.dHm.raw} kJ/mol`;
+}
+function passCard(id){
+  const d=cardDefs().find(x=>x.id===id);
+  const missing=d.fields.filter(f=>S.f[f[0]].raw===''), wrong=d.fields.filter(f=>S.f[f[0]].raw!==''&&!S.f[f[0]].ok);
+  if(!missing.length&&!wrong.length){
+    S.passed[id]=true;
+    S.help['pass_'+id]=`<span class="good">✓ ${id==='M'?'Ergebnis richtig berechnet.':'Zwischenprüfung bestanden – der nächste Schritt ist freigeschaltet.'}</span>`;
+  } else {
+    S.help['pass_'+id]=`<span class="bad-t">✗ Noch nicht bestanden: ${[...missing.map(f=>f[1]+' fehlt'),...wrong.map(f=>f[1]+' ist falsch')].join(', ')}.</span>`;
+  }
+  renderAll();
+  if(S.passed[id]){ const nx={Q:'calcH',H:'calcM',M:'cardPdf'}[id]; setTimeout(()=>{const e=document.getElementById(nx); if(e) e.scrollIntoView({behavior:'smooth',block:'center'});},60); }
+}
+function resultHTML(){
+  const s=stoff(), v=val('dHm'), lit=s.mix?s.dHg:s.dH, dev=(v-lit)/lit*100, U=s.mix?'kJ/g':'kJ/mol';
+  return `<div class="calc"><div><h3>Vergleich mit dem Literaturwert</h3><div class="res">
+    <div><span>dein Ergebnis</span><b>${S.f.dHm.raw} ${U}</b></div>
+    <div><span>${s.mix?'Richtwert (Stoffgemisch)':(s.neutral?'Literaturwert (verdünnte Lösungen)':'Literaturwert (25 °C, 1013 hPa)')}</span><b>${fmt(lit,lit%1?1:0)} ${U}</b></div>
+    <div><span>Abweichung</span><b>${fmt(dev,1)} %</b></div></div>
+    <p class="dim" style="font-size:14px">${Math.abs(dev)<3?'Gute Übereinstimmung. Die kleine Abweichung entsteht durch Ablesegenauigkeit (0,1 °C) und Rundung. In der Simulation werden Wärmeverluste und die Wärmekapazität des Kalorimeters vernachlässigt; in realen Versuchen ist der Betrag meist deutlich kleiner als der Literaturwert.':'Die Abweichung ist größer als durch Ablesen und Runden zu erwarten. Prüfe T₁ und T₂: Wurde der richtige Wert vor Reaktionsbeginn und der Extremwert gewählt?'}</p>
+  </div></div>`;
+}
+function renderPdf(){
+  const B=$('#pdfBox'); if(!B) return;
+  const ready=S.passed.M;
+  B.innerHTML=`<p class="dim" style="margin-top:0">Die Zusammenfassung enthält Versuch, Massen, Messwerttabelle, Diagramm, alle Rechenschritte, das Ergebnis mit Literaturvergleich und den Bearbeitungsstand. Automatisch ergänzte Werte sind mit * gekennzeichnet.</p>
+  <div class="btnrow"><button class="pri" id="bPdf" ${ready?'':'disabled'}>Zusammenfassung als PDF</button>${ready?'':'<span class="dim" style="font-size:13px">Verfügbar nach Abschluss der Auswertung.</span>'}</div>`;
+  const b=$('#bPdf'); if(b) b.onclick=openPdfDialog;
+}
+
+/* ================= PDF ================= */
+function openPdfDialog(){
+  const d=new Date(); const ds=String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();
+  openModal('Zusammenfassung als PDF',`<p class="dim">Name und Kurs werden nur für den Ausdruck verwendet und nicht gespeichert.</p>
+  <div class="field"><label for="pName">Name</label><input type="text" id="pName" autocomplete="off" style="font-family:inherit"><span></span></div>
+  <div class="field"><label for="pKurs">Kurs</label><input type="text" id="pKurs" autocomplete="off" style="font-family:inherit"><span></span></div>
+  <div class="field"><label for="pDat">Datum</label><input type="text" id="pDat" value="${ds}" autocomplete="off" style="font-family:inherit"><span></span></div>
+  <p class="dim" style="font-size:13px">Im Druckdialog „Als PDF speichern“ wählen. Auf dem iPad: Teilen → Drucken → mit zwei Fingern in die Vorschau ziehen → Teilen → „In Dateien sichern“.</p>`,
+  `<span></span><button class="pri" id="bDoPrint">Drucken / als PDF speichern</button>`);
+  $('#bDoPrint').onclick=()=>{ buildPrint($('#pName').value,$('#pKurs').value,$('#pDat').value); closeModal(); setTimeout(()=>window.print(),80); };
+}
+function pv(id,unit){ const F=S.f[id]; if(!F.raw) return '—'; return `${esc(F.raw)} ${unit}${F.auto?' *':''}`; }
+function buildPrint(name,kurs,dat){
+  const s=stoff(), P=S.params;
+  let h=`<h1>Kalorimetrie – Auswertung</h1><div class="meta"><div>Name: <span>${esc(name)}</span></div><div>Kurs: <span>${esc(kurs)}</span></div><div>Datum: <span>${esc(dat)}</span></div></div>`;
+  h+=`<h2>Versuch</h2><table><tr><th>Versuchsart</th><td>${isComb()?'Verbrennungskalorimetrie':'Reaktion in wässriger Lösung'}</td></tr><tr><th>Stoff</th><td>${s.name}${s.M?` (M = ${fmt(s.M,2)} g/mol)`:''}${s.neutral?` (c = ${fmt(s.conc,1)} mol/L)`:''}</td></tr><tr><th>${isComb()?'Reaktionsgleichung':'Gleichung'}</th><td>${isComb()?combEqHTML(s,'#000'):s.eq}${s.neutral?'<br>Ionengleichung: '+s.eqShort:''}</td></tr>${s.fluidLong?`<tr><th>Kalorimeterinhalt</th><td>${s.fluidLong}</td></tr>`:''}<tr><th>Bedingungen</th><td>Anfangstemperatur ${fmt(P.T0,0)} °C, 1013 hPa; Wärmeverluste und Wärmekapazität des Kalorimeters vernachlässigt</td></tr></table>`;
+  h+=`<h2>Massen</h2><table><tr><th>m(${s.fluid})</th><td>${pv('mW','g')}</td></tr>`+(isComb()?`<tr><th>m₁ (${s.hold} vorher)</th><td>${pv('m1','g')}</td></tr><tr><th>m₂ (${s.hold} nachher)</th><td>${pv('m2','g')}</td></tr><tr><th>Δm = m₁ − m₂</th><td>${pv('dm','g')}</td></tr>`:`<tr><th>m(${s.short})</th><td>${pv('mS','g')}</td></tr>`)+`</table>`;
+  const st=startTime(); const rows=S.rows;
+  const per=Math.ceil(rows.length/3)||1; let tabs='';
+  for(let c=0;c<3;c++){ const part=rows.slice(c*per,(c+1)*per); if(!part.length) continue;
+    tabs+=`<table><tr><th>t in s</th><th>T in °C</th></tr>`+part.map(r=>`<tr><td>${r.t}${st!=null&&Math.abs(r.t-rows.filter(x=>x.t<=st+1e-6).slice(-1)[0]?.t)<1e-6?' (Beginn)':''}</td><td>${r.raw?esc(r.raw):'—'}${r.auto?' *':''}</td></tr>`).join('')+`</table>`; }
+  h+=`<div class="avoid"><h2>Messwerte</h2><div class="tabs">${tabs}</div></div>`;
+  h+=`<div class="avoid"><h2>Temperatur-Zeit-Diagramm</h2>${diagSVG(true)}</div>`;
+  h+=`<div class="avoid"><h2>Auswertung</h2><table>
+    <tr><th>T₁ (Anfangstemperatur)</th><td>${pv('T1','°C')}</td></tr>
+    <tr><th>T₂ (${isExo()?'Höchstwert':'Tiefstwert'})</th><td>${pv('T2','°C')}</td></tr>
+    <tr><th>ΔT = T₂ − T₁</th><td>${pv('dT','K')}</td></tr>
+    ${isNeu()?`<tr><th>m(gesamt)</th><td>${pv('mG','g')}</td></tr>`:''}
+    <tr><th>Q = c · m · ΔT (c = 4,18 J/(g·K))</th><td>${pv('Q','kJ')}</td></tr>
+    <tr><th>ΔH = −Q</th><td>${pv('dH','kJ')}</td></tr>
+    ${s.mix?`<tr><th>${s.sym} = ΔH / Δm</th><td>${pv('dHm','kJ/g')}</td></tr>`:`<tr><th>${isNeu()?'n(H₂O) = c · V':'n = m / M'}</th><td>${pv('n','mol')}</td></tr><tr><th>${s.sym} = ΔH / n</th><td>${pv('dHm','kJ/mol')}</td></tr>`}</table></div>`;
+  if(S.passed.M){ const v=val('dHm'),lit=s.mix?s.dHg:s.dH,U=s.mix?'kJ/g':'kJ/mol',dev=(v-lit)/lit*100; h+=`<h2>Ergebnis</h2><p>${s.mix?'Verbrennungsenthalpie je Gramm':'Molare Reaktionsenthalpie'} ${s.sym}: <b>${esc(S.f.dHm.raw)} ${U}</b> · ${s.mix?'Richtwert':'Literaturwert'}: ${fmt(lit,lit%1?1:0)} ${U} · Abweichung: ${fmt(dev,1)} %</p>`; }
+  const L=stepsFor();
+  h+=`<h2>Bearbeitungsstand</h2><p class="small">${L.slice(0,-1).map(x=>(x.done()?'✓ ':'○ ')+x.title).join(' · ')}</p>`;
+  const anyAuto=FIELD_IDS.some(id=>S.f[id].auto)||rows.some(r=>r.auto);
+  h+=`<p class="small">${anyAuto?'* automatisch ergänzter Wert. ':''}Simulierte Daten zu Lehrzwecken; Modellannahmen: Wärmeverluste und Wärmekapazität des Kalorimeters vernachlässigt, Lösungen wie Wasser behandelt.</p>`;
+  h+=`<div class="pfoot">Simulation „Kalorimetrie“ V${VERSION} · Bastian Baumgart · Dammweg 7, 31241 Ilsede · Lizenz CC BY-NC-SA 4.0</div>`;
+  $('#print').innerHTML=h;
+}
+
+/* ================= CSV, Speichern, Laden ================= */
+function download(name,text,type){
+  const b=new Blob([text],{type}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=name; document.body.appendChild(a); a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+}
+function exportCSV(){
+  if(!S.rows.length) return;
+  let t='t in s;T in °C\n'+S.rows.map(r=>`${r.t};${r.raw||''}${r.auto?' *':''}`).join('\n');
+  download('Kalorimetrie_Messwerte.csv','﻿'+t,'text/csv;charset=utf-8');
+}
+function saveState(){
+  const copy=JSON.parse(JSON.stringify(S));
+  copy.sim.running=false;
+  FIELD_IDS.forEach(id=>{delete copy.f[id].ok;delete copy.f[id].msg;});
+  copy.rows.forEach(r=>{delete r.ok;delete r.msg;});
+  copy.passed={Q:false,H:false,M:false}; copy.help={};
+  download('Kalorimetrie_Zwischenstand.json',JSON.stringify({app:'Kalorimetrie',version:VERSION,state:copy},null,1),'application/json');
+}
+$('#fileIn').onchange=e=>{
+  const file=e.target.files[0]; if(!file) return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    try{
+      const d=JSON.parse(rd.result); if(d.app!=='Kalorimetrie'||!d.state) throw new Error('x');
+      const st=Object.assign(freshState(),d.state);
+      st.sim=Object.assign(freshState().sim,d.state.sim); st.sim.running=false;
+      if(!STOFFE[st.versuch]||!STOFFE[st.versuch].find(x=>x.id===st.stoffId)) throw new Error('x');
+      S=st;
+      FIELD_IDS.forEach(id=>{S.f[id]=Object.assign({raw:'',val:null,ok:false,tries:0,auto:false,self:false,msg:''},S.f[id]||{});S.f[id].ok=false;});
+      evalAll(); evalAll();
+      S.rows.forEach((r,i)=>{r.ok=false;checkRow(i,false);});
+      S.passed={Q:cardOk('Q'),H:false,M:false}; S.passed.H=S.passed.Q&&cardOk('H'); S.passed.M=S.passed.H&&cardOk('M');
+      S.help={};
+      if(S.sim.waiting&&S.rows.length&&S.rows[S.rows.length-1].ok) S.sim.waiting=false;
+      autoNote='';
+      renderAll();
+      openModal('Zwischenstand geladen','<p>Der Zwischenstand wurde geladen und alle Werte wurden neu geprüft.'+(S.sim.started&&!S.sim.finished?' Die Messung ist pausiert – mit „Weiter“ fortsetzen.':'')+'</p>');
+    }catch(err){ openModal('Laden nicht möglich','<p>Die Datei ist kein gültiger Zwischenstand dieser Simulation.</p>'); }
+    e.target.value='';
+  };
+  rd.readAsText(file);
+};
+function cardOk(id){ const d=cardDefs().find(x=>x.id===id); return d.fields.every(f=>S.f[f[0]].ok); }
+
+/* ================= Rendern ================= */
+function renderAll(){ renderAside(); renderMain(); updateStatus(); }
+renderAll();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
