@@ -748,7 +748,7 @@ input.cell.shown{border-color:var(--amber-dim); color:var(--amber);}
         <div><span>Zink (Granalien)</span><b class="mono">m = 0,20 g</b></div>
         <div><span>Salzsäure</span><b class="mono">50 mL, c = 1 mol/L</b></div>
         <div><span>Bedingungen</span><b class="mono">25 °C, 1013 hPa</b></div>
-        <div><span>molares Volumen</span><b class="mono">V<sub>m</sub> = 24,5 L/mol</b></div>
+        <div><span>molares Volumen</span><b class="mono">V<sub>m</sub> = 24 L/mol</b></div>
         <div><span>Kolbenprober</span><b class="mono">0 – 100 mL</b></div>
       </div>
     </section>
@@ -832,7 +832,7 @@ input.cell.shown{border-color:var(--amber-dim); color:var(--amber);}
 
 <footer>
   <p class="footer-note">Simulierte Daten zu Lehrzwecken · Geschwindigkeitsgesetze vereinfacht (Feststoffe: Oberfläche schrumpft mit dem Umsatz; Thiosulfat und H<sub>2</sub>O<sub>2</sub> 1. Ordnung; HI-Bildung 2. Ordnung mit Rückreaktion). Aktivierungsenergien und Geschwindigkeitskonstanten gerundet bzw. Modellwerte. Gasvolumen im Kolbenprober bei 25 °C und dem eingestellten Druck, ideales Gas; Löslichkeit der Gase vernachlässigt.</p>
-  <p class="footer-credit">Bastian Baumgart · Simulation „Reaktionsgeschwindigkeit“ V1.0 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Simulation „Reaktionsgeschwindigkeit“ V1.0 · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <script>
@@ -2159,10 +2159,10 @@ document.addEventListener("keydown", e=>{ if(e.key==="Escape") gbd.classList.rem
    ============================================================ */
 const EXRX = Object.assign({}, RXI.zn, {solid:Object.assign({}, RXI.zn.solid, {m:0.20})});
 const EXD = simulate(EXRX, {T:25, p:1013, c:1, size:0, cat:null});
-const exQ = qDefs(EXRX)[0];
-const exVol = t => exQ.f(stateAt(EXD,t), EXD.I);          // mL bei 25 °C, 1013 hPa
+const exQ = Object.assign({}, qDefs(EXRX)[0], {f:(s,I)=>(I.ns0-s[0])*VM*1000});   // Übung: V = n·V_m mit V_m = 24 L/mol
+const exVol = t => exQ.f(stateAt(EXD,t), EXD.I);          // mL, V_m = 24 L/mol
 const EXT = [0,30,60,90,120,150,180,240,300,360];
-const VM=24.5, VSOL=0.050, N0=0.050, KMAX=100;
+const VM=24, VSOL=0.050, N0=0.050, KMAX=100;
 const EXI = [[0,1],[1,2],[2,3],[4,6],[7,8]];               // Zeiträume (Indizes in EXT)
 let MODE="none";
 
@@ -2204,8 +2204,8 @@ const STEPS=[
     <div class="formula-box">V [L] = V [mL] : 1000 &nbsp;&nbsp;&nbsp; Beispiel: 25 mL = 0,025 L</div>
     <p>Trage die Werte in die markierte Spalte ein. Jeder Wert wird nach „Enter“ bzw. beim Wechsel in das nächste Feld geprüft.</p>`},
   {t:"Stoffmenge n(H₂)", html:()=>`
-    <p>Ein Mol eines Gases nimmt bei 25 °C und 1013 hPa das <strong>molare Volumen V<sub>m</sub> = 24,5 L/mol</strong> ein. Daraus folgt die Stoffmenge des Wasserstoffs:</p>
-    <div class="formula-box">n(H<sub>2</sub>) = ${fr("V(H<sub>2</sub>)","V<sub>m</sub>")} = ${fr("V(H<sub>2</sub>)","24,5 L/mol")}</div>
+    <p>Ein Mol eines Gases nimmt bei 25 °C und 1013 hPa das <strong>molare Volumen V<sub>m</sub> = 24 L/mol</strong> ein. Daraus folgt die Stoffmenge des Wasserstoffs:</p>
+    <div class="formula-box">n(H<sub>2</sub>) = ${fr("V(H<sub>2</sub>)","V<sub>m</sub>")} = ${fr("V(H<sub>2</sub>)","24 L/mol")}</div>
     <p>Runde auf <strong>drei gültige Ziffern</strong>. Kleine Zahlen kannst du auch als Zehnerpotenz eingeben, z. B. <span class="mono">7,14·10^-4</span>.</p>`},
   {t:"Stoffmenge n(Zn²⁺)", html:()=>`
     <p>Die Reaktionsgleichung liefert das Stoffmengenverhältnis:</p>
@@ -2310,7 +2310,7 @@ function cellHint(k,x,e,i){
   if(!isFinite(x)) return "Bitte eine Zahl eingeben – mit Dezimalkomma, z. B. 0,0175 oder 7,14·10^-4.";
   if(e!==0){ const r=x/e; if(Math.abs(r/1000-1)<0.05) return "Der Wert ist 1000-mal zu groß – prüfe die Einheit."; if(Math.abs(r*1000-1)<0.05) return "Der Wert ist 1000-mal zu klein – prüfe die Einheit."; }
   const near=(a,b)=>b!==0 && Math.abs(a/b-1)<0.02;
-  if(k==="nH2"){ const V=vNum("V_L",i); if(near(x,V/24)||near(x,V/22.4)) return "Verwende das molare Volumen V<sub>m</sub> = 24,5 L/mol (25 °C, 1013 hPa)."; if(near(x,V*VM)) return "Teile das Volumen durch V<sub>m</sub> – nicht multiplizieren."; }
+  if(k==="nH2"){ const V=vNum("V_L",i); if(near(x,V/24.5)||near(x,V/22.4)) return "Verwende das molare Volumen V<sub>m</sub> = 24 L/mol (25 °C, 1013 hPa)."; if(near(x,V*VM)) return "Teile das Volumen durch V<sub>m</sub> – nicht multiplizieren."; }
   if(k==="nZn"){ const n=vNum("nH2",i); if(near(x,2*n)||near(x,n/2)) return "Laut Reaktionsgleichung entsteht pro Zn<sup>2+</sup>-Ion genau ein H<sub>2</sub>-Molekül – Verhältnis 1 : 1."; }
   if(k==="cZn"||k==="cH"){ const n=vNum(k==="cZn"?"nZn":"nH",i); if(near(x,n*VSOL)) return "Teile die Stoffmenge durch das Volumen der Lösung (0,050 L) – nicht multiplizieren."; if(near(x,n)) return "Das ist noch die Stoffmenge – teile durch das Volumen der Lösung (0,050 L)."; }
   if(k==="nH"){ const nz=vNum("nZn",i); if(near(x,N0-nz)) return "Pro Zn<sup>2+</sup>-Ion werden <b>zwei</b> H<sup>+</sup>-Ionen verbraucht – Faktor 2 beachten."; if(near(x,N0)&&nz>0) return "Ziehe die verbrauchten H<sup>+</sup>-Ionen von n<sub>0</sub>(H<sup>+</sup>) ab."; if(near(x,2*nz)) return "Das ist die verbrauchte Stoffmenge. Gesucht ist die noch vorhandene: n<sub>0</sub>(H<sup>+</sup>) − 2 · n(Zn<sup>2+</sup>)."; if(Math.abs(x-e)<0.0006) return "Fast – runde genauer: drei gültige Ziffern, z. B. 0,0486."; }
@@ -2354,7 +2354,7 @@ function exTip(){
   const g=k=>vNum(k,i);
   switch(s){
     case 1: return `Beispiel für t = ${t} s: V = ${fV(g("V_ml"))} mL : 1000 = <b>${fV(g("V_ml")/1000)} L</b>`;
-    case 2: return `Beispiel für t = ${t} s: n(H<sub>2</sub>) = ${fV(g("V_L"))} L : 24,5 L/mol = <b>${f3(g("V_L")/VM)} mol</b>`;
+    case 2: return `Beispiel für t = ${t} s: n(H<sub>2</sub>) = ${fV(g("V_L"))} L : 24 L/mol = <b>${f3(g("V_L")/VM)} mol</b>`;
     case 3: return `Beispiel für t = ${t} s: n(Zn<sup>2+</sup>) = n(H<sub>2</sub>) = <b>${f3(g("nH2"))} mol</b> – einfach übernehmen.`;
     case 4: return `Beispiel für t = ${t} s: c(Zn<sup>2+</sup>) = ${f3(g("nZn"))} mol : 0,050 L = <b>${f3(g("nZn")/VSOL)} mol/L</b>`;
     case 5: return EX.n0ok ? `Beispiel für t = ${t} s: n(H<sup>+</sup>) = 0,050 mol − 2 · ${f3(g("nZn"))} mol = <b>${f3(N0-2*g("nZn"))} mol</b>. Bei t = 0 s ist noch nichts verbraucht: n(H<sup>+</sup>) = n<sub>0</sub>(H<sup>+</sup>).` : `n<sub>0</sub>(H<sup>+</sup>) = 1 mol/L · 0,050 L – multipliziere Konzentration und Volumen (in Litern).`;
@@ -2728,7 +2728,7 @@ function sumHTML(){
 
   <div class="s-sec">
     <h2>2 Messwerte und Berechnungen</h2>
-    <p class="s-small">V [L] = V [mL] : 1000 &nbsp;·&nbsp; n(H<sub>2</sub>) = V(H<sub>2</sub>) : V<sub>m</sub> mit V<sub>m</sub> = 24,5 L/mol &nbsp;·&nbsp; n(Zn<sup>2+</sup>) = n(H<sub>2</sub>) &nbsp;·&nbsp; c = n : V(Lösung) mit V(Lösung) = 0,050 L &nbsp;·&nbsp; n(H<sup>+</sup>) = n<sub>0</sub>(H<sup>+</sup>) − 2 · n(Zn<sup>2+</sup>) mit n<sub>0</sub>(H<sup>+</sup>) = ${EX.n0?esc(EX.n0):"–"} mol</p>
+    <p class="s-small">V [L] = V [mL] : 1000 &nbsp;·&nbsp; n(H<sub>2</sub>) = V(H<sub>2</sub>) : V<sub>m</sub> mit V<sub>m</sub> = 24 L/mol &nbsp;·&nbsp; n(Zn<sup>2+</sup>) = n(H<sub>2</sub>) &nbsp;·&nbsp; c = n : V(Lösung) mit V(Lösung) = 0,050 L &nbsp;·&nbsp; n(H<sup>+</sup>) = n<sub>0</sub>(H<sup>+</sup>) − 2 · n(Zn<sup>2+</sup>) mit n<sub>0</sub>(H<sup>+</sup>) = ${EX.n0?esc(EX.n0):"–"} mol</p>
     <table class="s-tab">
       <thead><tr><th>t<br>[s]</th>${COLS.map(c=>`<th>${c.head}</th>`).join("")}</tr></thead>
       <tbody>${rows}</tbody>

@@ -77,6 +77,13 @@ header .status.running{color:var(--amber); border-color:var(--amber-dim);}
 .modal-body h3:first-child{margin-top:0;}
 .modal-body p{font-size:13.5px; line-height:1.6; color:var(--text-dim); margin:0 0 4px;}
 .modal-body strong{color:var(--text); font-weight:600;}
+.pdf-runs{display:flex; flex-direction:column; gap:4px; margin-bottom:4px;}
+.pdf-runs label{display:flex; align-items:center; gap:10px; padding:9px 10px; border:1px solid var(--line); border-radius:4px; font-size:13px; color:var(--text); cursor:pointer; touch-action:manipulation;}
+.pdf-runs label.off{opacity:.55; cursor:default;}
+.pdf-runs input{width:20px; height:20px; flex:none; accent-color:var(--teal);}
+.pdf-runs i{display:inline-block; width:14px; height:4px; flex:none; border-radius:2px;}
+.pdf-fields{display:flex; gap:8px; margin-bottom:10px;}
+.pdf-fields input{flex:1; min-width:0; padding:9px 10px; font-family:inherit; font-size:14px; background:var(--panel-alt); color:var(--text); border:1px solid var(--line); border-radius:4px;}
 .changelog-box{max-width:560px;}
 .cl-version + .cl-version{margin-top:20px; padding-top:16px; border-top:1px solid var(--line-soft);}
 .cl-head{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:6px;}
@@ -199,9 +206,6 @@ tbody tr:hover{background:var(--panel-alt);}
 .table-wrap{overflow-x:auto; border:1px solid var(--line-soft); border-radius:4px;}
 .empty-hint{color:var(--text-faint); font-size:13px; padding:22px 4px;}
 
-.calib-grid{display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start;}
-@media (max-width:700px){ .calib-grid{grid-template-columns:1fr;} }
-.calib-form .field-full{max-width:320px;}
 .note{font-size:12px; color:var(--text-faint); line-height:1.5; margin-top:10px; max-width:60ch;}
 
 .res-list{display:flex; flex-direction:column; gap:8px;}
@@ -251,9 +255,115 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
 @media (min-width:921px){
   .sidebar{
     position:sticky; top:0; align-self:start;
-    height:calc(100vh - var(--hdr, 70px)); height:calc(100dvh - var(--hdr, 70px)); max-height:none;
+    height:calc(100vh - max(var(--hdr, 70px), var(--ftr, 0px))); height:calc(100dvh - max(var(--hdr, 70px), var(--ftr, 0px))); max-height:none;
     overflow-y:auto; overscroll-behavior:contain; background:var(--bg);
   }
+}
+
+/* Aufgabenart Simulation / Analyse */
+.mode-sel{display:flex; flex-direction:column; gap:8px;}
+.mode-sel button{display:flex; flex-direction:column; align-items:flex-start; gap:3px; width:100%; text-align:left; padding:10px 12px; cursor:pointer;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel); color:var(--text); font-family:inherit; touch-action:manipulation;}
+.mode-sel button:hover{border-color:var(--text-faint);}
+.mode-sel button:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.mode-sel button.active{border-color:var(--teal); background:var(--teal-dim);}
+.mode-sel .ms-t{font-size:13.5px; font-weight:600;}
+.mode-sel .ms-d{font-size:12px; color:var(--text-faint); line-height:1.4;}
+.mode-sel button.active .ms-d{color:var(--text-dim);}
+.wrap.ana .sim-only{display:none !important;}
+.wrap:not(.ana) .ana-only{display:none !important;}
+.cond{margin:0; display:grid; grid-template-columns:auto 1fr; gap:5px 12px; font-size:12.8px;}
+.cond dt{color:var(--text-faint);}
+.cond dd{margin:0; color:var(--amber); font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:12.3px; text-align:right;}
+.steps{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px;}
+.stp{border:1px solid var(--line); border-radius:4px; background:var(--panel); padding:10px 12px;}
+.stp.cur{border-color:var(--teal);}
+.stp.lock{opacity:.5;}
+.stp-h{display:flex; align-items:center; gap:9px; font-size:13.5px; font-weight:600;}
+.stp-n{width:22px; height:22px; border-radius:50%; border:1px solid var(--teal-dim); color:var(--teal); display:flex; align-items:center; justify-content:center;
+  font-size:12px; flex:none; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.stp.done .stp-n{background:var(--teal-dim); color:var(--text); border-color:var(--teal);}
+.stp-s{margin-left:auto; font-size:11.5px; font-weight:400; color:var(--text-faint); text-align:right;}
+.stp.done .stp-s{color:#7fd68a;}
+.stp-b{margin-top:9px; font-size:12.8px; line-height:1.55; color:var(--text-dim);}
+.stp-b p{margin:0 0 8px;}
+.stp-b strong{color:var(--text); font-weight:600;}
+.stp-b .btn{padding:9px 14px;}
+.stp-b .fml{display:block; margin:4px 0 8px; padding:7px 10px; border-left:3px solid var(--teal); background:var(--panel-alt); color:var(--text); border-radius:3px;}
+.ref-done{margin:8px 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:3px; font-size:12.3px;}
+.ref-done li{display:flex; gap:8px; align-items:center;}
+.ref-done i{display:inline-block; width:14px; height:3px; border-radius:2px; flex:none;}
+.ref-done .mono{color:var(--amber); margin-left:auto;}
+.chk-list{display:flex; flex-direction:column; gap:5px; margin:6px 0 10px;}
+.chk-list label{display:flex; align-items:center; gap:10px; padding:8px 10px; border:1px solid var(--line-soft); border-radius:3px; background:var(--panel-alt);
+  cursor:pointer; font-size:13px; color:var(--text); touch-action:manipulation;}
+.chk-list input{width:20px; height:20px; margin:0; accent-color:var(--teal); flex:none;}
+.chk-list .mono{margin-left:auto; color:var(--text-faint); font-size:11.5px;}
+.fb{border-radius:3px; padding:8px 10px; font-size:12.8px; line-height:1.5; margin-top:8px;}
+.fb.good{border:1px solid #3c6b44; background:rgba(127,214,138,.08); color:#7fd68a;}
+.fb.bad{border:1px solid #7a3f30; background:rgba(228,120,91,.08); color:var(--danger);}
+.fb.info{border:1px solid var(--line); background:var(--panel-alt); color:var(--text-dim);}
+.ana-confirm{border:1px solid var(--amber-dim); background:rgba(255,180,84,.07); border-radius:3px; padding:9px 10px; font-size:12.8px; color:var(--text-dim); line-height:1.5;}
+.ana-confirm .btn-row{margin-top:8px;}
+.run-item{display:inline-flex; align-items:center;}
+.run-del{background:none; border:1px solid transparent; color:var(--text-faint); font-size:19px; line-height:1; padding:8px 12px; min-width:40px; min-height:38px; cursor:pointer; border-radius:3px; font-family:inherit; touch-action:manipulation;}
+.run-del:hover{color:var(--danger); border-color:var(--line);}
+.run-del:disabled{opacity:.25; cursor:not-allowed;}
+/* Tab Konzentrationen */
+.conc-tab td{vertical-align:top;}
+.conc-tab td.nm{color:var(--text); font-weight:500; padding-top:13px;}
+.conc-tab input{width:96px; text-align:right; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; padding:8px 8px;}
+.conc-tab input.ok{border-color:#3c6b44; background:rgba(127,214,138,.08); color:#7fd68a;}
+.conc-tab input.bad{border-color:#7a3f30; background:rgba(228,120,91,.08); color:var(--danger);}
+.conc-tab input.shown{border-color:var(--amber-dim); background:rgba(255,180,84,.07); color:var(--amber);}
+.conc-tab input:disabled{opacity:.45;}
+.conc-tab .cref{padding-top:13px; color:var(--text-dim);}
+.conc-tab .rowctl{display:flex; gap:6px; flex-wrap:wrap;}
+.conc-tab .rowctl .btn{padding:6px 10px; font-size:12px;}
+.conc-tab tr.msg td{border-bottom:1px solid var(--line-soft); padding-top:0; white-space:normal;}
+.conc-tab tr.has-msg td{border-bottom:none;}
+.conc-tab tbody tr:hover{background:transparent;}
+.cmsg{font-size:12.5px; line-height:1.5; color:var(--text-dim);}
+.cmsg.bad{color:var(--danger);} .cmsg.good{color:#7fd68a;} .cmsg.tip{color:var(--text-dim);}
+.ast{color:var(--amber); font-weight:700; margin-left:2px;}
+/* Zusammenfassung / Druck */
+.ex-sum-ctl{display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center; margin-bottom:14px;}
+.ex-sum-ctl label{display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text-dim);}
+.ex-sum-ctl input.sumf{width:220px; min-width:0; font-family:inherit;}
+.paper-wrap{overflow-x:auto; padding:4px 0 8px;}
+.paper{background:#fff; color:#111; width:794px; max-width:100%; min-width:640px; padding:40px 46px; border-radius:3px; box-shadow:0 2px 14px rgba(0,0,0,.45);}
+#printRoot{display:none;}
+.sheet{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; font-size:12.5px; line-height:1.45; color:#111; -webkit-print-color-adjust:exact; print-color-adjust:exact;}
+.sheet h1{font-size:19px; margin:0; color:#111;}
+.sheet h2{font-size:13.5px; margin:0 0 6px; color:#111; border-bottom:1.5px solid #222; padding-bottom:2px;}
+.sheet p{margin:0 0 6px;}
+.sheet sub,.sheet sup{font-size:.72em;}
+.sheet .s-kick{font-size:11px; letter-spacing:.8px; text-transform:uppercase; color:#555;}
+.sheet .s-fields{display:flex; gap:22px; margin:14px 0 6px;}
+.sheet .sf{flex:1; display:flex; gap:8px; align-items:flex-end; border-bottom:1px solid #333; padding-bottom:2px;}
+.sheet .sf:last-child{flex:0 0 150px;}
+.sheet .sl{font-size:11px; color:#555;}
+.sheet .sv{font-size:13px; font-weight:600;}
+.sheet .s-sec{margin-top:16px;}
+.sheet .s-keep{break-inside:avoid; page-break-inside:avoid;}
+.sheet .s-small{font-size:11px; color:#333;}
+.sheet table.s-tab{width:100%; border-collapse:collapse; font-size:11px; margin:4px 0 6px;}
+.sheet table.s-tab th,.sheet table.s-tab td{border:1px solid #888; padding:3px 5px; text-align:center; white-space:nowrap;}
+.sheet table.s-tab td.l{text-align:left;}
+.sheet table.s-tab th{background:#eef0f2; font-weight:600;}
+.sheet table.s-tab tr{break-inside:avoid;}
+.sheet .ast{color:#b45309; font-weight:700; margin-left:1px;}
+.sheet .s-img{display:block; width:100%; height:auto; border:1px solid #bbb;}
+.sheet .s-leg{display:flex; flex-wrap:wrap; gap:3px 16px; font-size:10.5px; margin-top:4px;}
+.sheet .s-leg i{display:inline-block; width:16px; height:3px; margin-right:5px; vertical-align:middle;}
+.sheet .s-status{border:1px solid #bbb; background:#f6f7f8; padding:8px 10px 4px; border-radius:3px;}
+.sheet .s-status h2{border:none; padding:0; margin-bottom:4px;}
+.sheet .s-foot{margin-top:16px; padding-top:6px; border-top:1px solid #aaa; font-size:10px; color:#555;}
+@media print{
+  @page{size:A4; margin:14mm 14mm 14mm 14mm;}
+  :root, html, body.pr{background:#fff !important; color:#111; color-scheme:light !important;}
+  body.pr > *:not(#printRoot){display:none !important;}
+  body.pr #printRoot{display:block;}
 }
 
 /* Rubrik Grundlagen */
@@ -315,6 +425,44 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
   <span class="status" id="statusBadge"><span class="dot"></span><span id="statusText">bereit</span></span>
 </header>
 
+<div class="modal-backdrop" id="sumDlgBackdrop">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2>Protokoll als PDF</h2>
+      <button class="modal-close" id="closeSumDlg" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body">
+      <p>Das Analyseprotokoll enthält Messbedingungen, Chromatogramme, Zuordnung, Konzentrationen und deinen Bearbeitungsstand.</p>
+      <p><strong>So speicherst du das PDF:</strong> Nach „PDF erstellen“ öffnet sich der Druckdialog des Browsers. Dort als Drucker bzw. Ziel <strong>„Als PDF speichern“</strong> wählen und auf „Speichern“ tippen (am iPad: Teilen → „In Dateien sichern“). Es wird nichts gedruckt oder übertragen.</p>
+      <div class="btn-row" style="margin-top:14px;">
+        <button class="btn primary" id="sumDlgGo">PDF erstellen</button>
+        <button class="btn ghost" id="sumDlgCancel">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="pdfBackdrop">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2>Auswertung als PDF</h2>
+      <button class="modal-close" id="closePdf" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body">
+      <h3>Welche Läufe sollen ins PDF?</h3>
+      <div id="pdfRuns" class="pdf-runs"></div>
+      <h3>Angaben (optional)</h3>
+      <div class="pdf-fields"><input type="text" id="pdfName" placeholder="Name" maxlength="60" aria-label="Name"><input type="text" id="pdfKurs" placeholder="Kurs" maxlength="40" aria-label="Kurs"></div>
+      <p>Die Auswertung enthält das Chromatogramm der gewählten Läufe, je Lauf die Peaktabelle (in der Simulation auch die Auflösung) und bei mindestens zwei Läufen einen Vergleich der Retentionszeiten.</p>
+      <p><strong>So speicherst du das PDF:</strong> Nach „PDF erstellen“ öffnet sich der Druckdialog des Browsers. Dort als Drucker bzw. Ziel <strong>„Als PDF speichern“</strong> wählen und auf „Speichern“ tippen (am iPad: Teilen → „In Dateien sichern“). Es wird nichts gedruckt oder übertragen.</p>
+      <div class="btn-row" style="margin-top:14px;">
+        <button class="btn primary" id="pdfGo">PDF erstellen</button>
+        <button class="btn ghost" id="pdfCancel">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-backdrop" id="guideBackdrop">
   <div class="modal-box">
     <div class="modal-head">
@@ -322,6 +470,9 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
       <button class="modal-close" id="closeGuide" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
+      <h3>Aufgabenart</h3>
+      <p>In der linken Spalte wählst du direkt unter „Grundlagen“ die Aufgabenart. Beim Öffnen ist die <strong>Simulation</strong> eingestellt: Hier stellst du die Methode frei ein und trennst eigene Proben und Stoffgemische (alle Abschnitte bis „Auflösung“). In der <strong>Analyse</strong> untersuchst du eine unbekannte Probe (Abschnitt „Analyse einer unbekannten Probe“ am Ende). Beim Wechsel bleiben die Läufe der anderen Aufgabenart erhalten.</p>
+
       <h3>Ofentemperatur</h3>
       <p><strong>Isotherm:</strong> Die Säule hat während des gesamten Laufs eine konstante Temperatur. Substanzen mit niedrigem Siedepunkt eluieren schnell, hochsiedende Substanzen erst spät oder gar nicht.</p>
       <p><strong>Temperaturprogramm:</strong> Die Säule startet bei einer Starttemperatur, hält diese für die eingestellte Haltezeit und wird danach mit der Heizrate bis zur Endtemperatur aufgeheizt. Das sorgt für gleichmäßiger verteilte Peaks über einen weiten Siedebereich.</p>
@@ -350,7 +501,7 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
       <h3>Lauf starten</h3>
       <p>Mit <strong>„Injektion starten"</strong> beginnt die Aufzeichnung des Chromatogramms in Echtzeit. Über die Geschwindigkeitsstufen (×1/×4/×15) lässt sich der Lauf beschleunigen. „Stopp" hält den Lauf an.</p>
       <p><strong>Mehrere Läufe vergleichen:</strong> Jeder neue Lauf wird über die bisherigen gelegt, jeweils in einer eigenen Farbe. So lassen sich zum Beispiel verschiedene Temperaturen, Flüsse oder Proben direkt vergleichen. Die Legende unter dem Chromatogramm zeigt Probe und Methode jedes Laufs; der aktuelle Lauf ist kräftiger gezeichnet. Es werden bis zu 8 Läufe angezeigt, danach verschwindet jeweils der älteste. <strong>„Zurücksetzen"</strong> löscht alle Läufe.</p>
-      <p><strong>Auswertung älterer Läufe:</strong> Nach jedem Lauf zeigen Peaktabelle, Quantifizierung und Auflösung zunächst den neuesten Lauf. Ein Klick auf einen Eintrag in der Legende zeigt stattdessen die Auswertung dieses Laufs; er wird dann im Chromatogramm hervorgehoben und mit Peaknummern versehen. Über den Reitern steht jeweils, welcher Lauf gerade ausgewertet angezeigt wird. Ein Lauf, der mit „Stopp" abgebrochen wurde, wird nicht ausgewertet. Der Schwellenwert und der CSV-Export beziehen sich immer auf den angezeigten Lauf.</p>
+      <p><strong>Auswertung älterer Läufe:</strong> Nach jedem Lauf zeigen Peaktabelle und Auflösung zunächst den neuesten Lauf. Ein Klick auf einen Eintrag in der Legende zeigt stattdessen die Auswertung dieses Laufs; er wird dann im Chromatogramm hervorgehoben und mit Peaknummern versehen. Über den Reitern steht jeweils, welcher Lauf gerade ausgewertet angezeigt wird. Ein Lauf, der mit „Stopp" abgebrochen wurde, wird nicht ausgewertet. Der Schwellenwert und der CSV-Export beziehen sich immer auf den angezeigten Lauf.</p>
 
       <h3>Luftpeak (Totzeit)</h3>
       <p>Bei jeder Injektion gelangt mit der Spritze etwas Luft in die Säule. Luft wird von der Trennsäule nicht zurückgehalten und erscheint deshalb als erster Peak – beim Standardfluss von 1,5 mL/min nach <strong>10 Sekunden</strong>. Diese Zeit ist die <strong>Totzeit t₀</strong>: So lange braucht das Trägergas durch die Säule, und keine Substanz kann früher eluieren. Bei höherem Fluss erscheint der Luftpeak früher, bei geringerem später.</p>
@@ -359,11 +510,24 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
       <h3>Peaktabelle</h3>
       <p>Nach Abschluss des Laufs werden Peaks automatisch erkannt und integriert: Retentionszeit, Höhe, Fläche, Flächenanteil und Bodenzahl. Der <strong>Schwellenwert</strong> legt fest, ab welcher relativen Signalhöhe ein Peak erkannt wird – bei verrauschten Signalen höher stellen, um Fehlerkennungen zu vermeiden.</p>
 
-      <h3>Quantifizierung</h3>
-      <p>Über eine <strong>Einpunkt-Kalibrierung</strong> lässt sich aus einem Peak mit bekannter Konzentration die Konzentration aller anderen Peaks berechnen. Der Vergleich mit der tatsächlich eingestellten Konzentration zeigt, welchen Fehler unterschiedliche Responsefaktoren verursachen können.</p>
-
       <h3>Auflösung</h3>
-      <p>Für jedes benachbarte Peakpaar wird die <strong>Auflösung R<sub>s</sub></strong> berechnet. Ab R<sub>s</sub> ≈ 1,5 gelten zwei Peaks als vollständig getrennt (Basislinientrennung).</p>
+      <p>Für jedes benachbarte Peakpaar wird die <strong>Auflösung R<sub>s</sub></strong> berechnet und mit Peaknummer und Stoffname angezeigt. Ab R<sub>s</sub> ≈ 1,5 gelten zwei Peaks als vollständig getrennt (Basislinientrennung). Der Luftpeak wird nicht mitgerechnet. Erscheinen zwei Stoffe als ein gemeinsamer Peak, meldet der Tab sie als „nicht getrennt“.</p>
+      <p><strong>Ideen zum Ausprobieren:</strong> Stoffpaare mit fast gleichem Siedepunkt wie Benzol/Cyclohexan, Diethylether/n-Pentan oder Ethanol/Ethylacetat. Welche Einstellung bringt sie am schnellsten auf R<sub>s</sub> ≥ 1,5 – Temperatur, Trennstufen oder Trägergasfluss?</p>
+
+      <h3>Läufe löschen</h3>
+      <p>Das <strong>×</strong> hinter einem Lauf in der Legende löscht genau diesen Lauf, „Zurücksetzen“ löscht alle Läufe. Der gerade laufende Lauf lässt sich erst nach dem Ende oder nach „Stopp“ löschen.</p>
+
+      <h3>Analyse einer unbekannten Probe</h3>
+      <p>Wähle das <strong>Niveau</strong> und die <strong>Probennummer</strong>: „leicht“ sind die Proben 1–10 mit 1–2 Stoffen, „schwer“ die Proben 11–20 mit 4–5 Stoffen. Jede Nummer steht immer für dieselbe Zusammensetzung, so lässt sich eine Probe gezielt vergeben und wiederholen. Die Messbedingungen sind fest eingestellt und in der linken Spalte angegeben; alle Stoffe der Proben und Referenzen werden darunter getrennt und erscheinen innerhalb der Laufzeit.</p>
+      <p>Die Arbeitsschritte in der linken Spalte werden nacheinander freigeschaltet:</p>
+      <ul>
+        <li><strong>1 Probe messen:</strong> Die Probe wird injiziert und aufgezeichnet.</li>
+        <li><strong>2 Referenzstoffe messen:</strong> Aus einer Auswahl von 13 Stoffen werden Referenzlösungen (je 10,0 g/L) einzeln gemessen. Alle Läufe liegen übereinander im Chromatogramm; die Legende schaltet die Peaktabelle zwischen den Läufen um, × löscht einzelne Läufe.</li>
+        <li><strong>3 Bestandteile bestimmen:</strong> Stimmt die Retentionszeit einer Referenz mit einem Peak der Probe überein, ist der Stoff enthalten. Die gemessenen Referenzen werden angekreuzt, „Prüfen“ bestätigt die Auswahl. Nach zwei Prüfversuchen ist „Lösung zeigen“ möglich. In der Peaktabelle der Probe stehen die Stoffnamen erst nach der richtigen Bestimmung.</li>
+        <li><strong>4 Konzentrationen berechnen:</strong> Im Tab „Konzentrationen“ werden für jeden Bestandteil die Peakflächen von Probe und Referenz eingetragen und c(Probe) = A(Probe) : A(Referenz) · c(Referenz) berechnet. Jeder Wert wird sofort geprüft, typische Fehler (vertauschtes Verhältnis, Peakhöhe statt Fläche, Luftpeak, falscher Peak) bekommen eine eigene Rückmeldung. Danach erscheint der tatsächliche Gehalt mit der Abweichung.</li>
+        <li><strong>5 Zusammenfassung als PDF:</strong> Im Tab „Zusammenfassung“ entsteht ein druckfertiges Protokoll mit Name, Kurs und Datum (werden nicht gespeichert), allen Chromatogrammen, der Zuordnung und den Konzentrationen. „Als PDF speichern“ öffnet die Druckfunktion des Browsers.</li>
+      </ul>
+      <p>Hilfen: „Tipp“ gibt einen Hinweis mit den eigenen Werten, „Lösung zeigen“ trägt die Werte einer Zeile ein, „Rest ausfüllen“ ergänzt bei mehr als zwei Bestandteilen die übrigen Zeilen, sobald zwei Zeilen selbst richtig berechnet sind. Automatisch ergänzte Werte sind mit * gekennzeichnet.</p>
     </div>
   </div>
 </div>
@@ -375,6 +539,16 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
       <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
+      <div class="vh-ver"><span class="v">V2.0</span><span class="d">04.11.2026</span></div>
+      <ul>
+        <li><strong>Aufgabenart wählen:</strong> Unter „Grundlagen“ wählt man zwischen „Simulation“ (der bisherige Funktionsumfang, beim Öffnen eingestellt) und der neuen „Analyse“.</li>
+        <li><strong>Analyse einer unbekannten Probe:</strong> Niveau „leicht“ (Proben 1–10, 1–2 Stoffe) oder „schwer“ (Proben 11–20, 4–5 Stoffe) bei festen Messbedingungen. Referenzstoffe aus einer Auswahl von 13 Stoffen messen, Bestandteile über die Retentionszeiten bestimmen und prüfen, Konzentrationen über den Vergleich der Peakflächen berechnen (mit sofortiger Prüfung, Tipp und Lösung) und das Protokoll als PDF speichern.</li>
+        <li><strong>Läufe einzeln löschen:</strong> × hinter jedem Lauf in der Legende.</li>
+        <li><strong>Quantifizierung entfernt:</strong> Die bisherige Einpunkt-Kalibrierung verglich verschiedene Stoffe miteinander und lieferte wegen unterschiedlicher Responsefaktoren irreführende Werte. Die Mengenbestimmung erfolgt jetzt in der Analyse über Referenzen desselben Stoffes.</li>
+        <li><strong>Auflösung überarbeitet:</strong> ohne Luftpeak, mit Stoffnamen; Stoffe, die als ein gemeinsamer Peak erscheinen, werden als „nicht getrennt“ gemeldet.</li>
+        <li><strong>Grundlagen:</strong> neues Thema 6 „Analyse einer unbekannten Probe“.</li>
+        <li><strong>Auswertung als PDF</strong> statt CSV-Export: wählbare Läufe in einem Chromatogramm, je Lauf Peaktabelle und (Simulation) Auflösung, bei mehreren Läufen ein Vergleich der Retentionszeiten. Das PDF entsteht über den Druckdialog („Als PDF speichern“).</li>
+      </ul>
       <div class="vh-ver"><span class="v">V1.2</span><span class="d">01.11.2026</span></div>
       <ul>
         <li><strong>Neue Rubrik „Grundlagen“:</strong> Der Knopf „Grundlagen“ oben in der linken Spalte klappt 5 Themen mit Erklärtext und Grafiken zu den fachlichen und methodischen Grundlagen auf. Mit den Knöpfen unten oder den Pfeiltasten blättert man zwischen den Themen.</li>
@@ -406,7 +580,7 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
 
     <section class="block">
       <button type="button" class="gl-toggle" id="glToggle" aria-expanded="false" aria-controls="glPanel">
-        <span>Grundlagen</span><span class="gl-n">5 Themen</span><span class="gl-ch" aria-hidden="true"></span>
+        <span>Grundlagen</span><span class="gl-n">6 Themen</span><span class="gl-ch" aria-hidden="true"></span>
       </button>
       <div class="gl-panel" id="glPanel" hidden>
         <div class="gl-list" id="glList"></div>
@@ -414,8 +588,48 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
       </div>
     </section>
 
-
     <section class="block">
+      <h2>Aufgabenart wählen</h2>
+      <div class="mode-sel" id="taskSel">
+        <button type="button" data-task="sim" class="active"><span class="ms-t">Simulation</span><span class="ms-d">Methode frei einstellen, Substanzen und Stoffgemische trennen und auswerten</span></button>
+        <button type="button" data-task="ana"><span class="ms-t">Analyse</span><span class="ms-d">Unbekannte Probe mit Referenzstoffen untersuchen und Konzentrationen bestimmen</span></button>
+      </div>
+    </section>
+
+    <section class="block ana-only">
+      <h2>Unbekannte Probe</h2>
+      <div class="mode-toggle" id="lvlSel">
+        <button type="button" data-lvl="leicht" class="active">Leicht · 1–2 Stoffe</button>
+        <button type="button" data-lvl="schwer">Schwer · 4–5 Stoffe</button>
+      </div>
+      <div class="field-full" style="margin-bottom:0;">
+        <label for="sampleSel">Probennummer</label>
+        <select id="sampleSel"></select>
+      </div>
+      <div class="ana-confirm" id="anaConfirm" hidden></div>
+    </section>
+
+    <section class="block ana-only">
+      <h2>Messbedingungen (fest eingestellt)</h2>
+      <dl class="cond">
+        <dt>Starttemperatur</dt><dd>40 °C</dd>
+        <dt>Haltezeit</dt><dd>1,0 min</dd>
+        <dt>Heizrate</dt><dd>10 °C/min</dd>
+        <dt>Trägergasfluss</dt><dd>1,5 mL/min</dd>
+        <dt>Trennstufen N</dt><dd>15 000</dd>
+        <dt>Laufzeit</dt><dd>10 min</dd>
+        <dt>Probenmenge</dt><dd>1,0 µL</dd>
+        <dt>Detektorrauschen</dt><dd>gering</dd>
+        <dt>Referenzlösungen</dt><dd>je 10,0 g/L</dd>
+      </dl>
+    </section>
+
+    <section class="block ana-only">
+      <h2>Arbeitsschritte</h2>
+      <ol class="steps" id="anaSteps"></ol>
+    </section>
+
+    <section class="block sim-only">
       <h2>Ofentemperatur</h2>
       <div class="mode-toggle">
         <button id="modeIso" class="active">Isotherm</button>
@@ -439,7 +653,7 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
       </div>
     </section>
 
-    <section class="block">
+    <section class="block sim-only">
       <h2>Trennsäule & Fluss</h2>
       <div class="row"><label>Trägergasfluss</label><span class="val mono" id="vFlow">1.5 mL/min</span></div>
       <input type="range" id="rFlow" min="0.5" max="4" value="1.5" step="0.1">
@@ -449,7 +663,7 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
       <input type="range" id="rRuntime" min="8" max="40" value="20" step="1">
     </section>
 
-    <section class="block">
+    <section class="block sim-only">
       <h2>Probenaufgabe & Detektor</h2>
       <div class="row"><label>Probenmenge</label><span class="val mono" id="vAmt">1.0×</span></div>
       <input type="range" id="rAmt" min="0.2" max="3" value="1" step="0.1">
@@ -457,7 +671,7 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
       <input type="range" id="rNoise" min="0" max="10" value="2" step="1">
     </section>
 
-    <section class="block">
+    <section class="block sim-only">
       <h2>Probengemisch</h2>
       <div class="compound-hint">
         <span>Substanz</span><span>Siedepunkt °C</span><span>Konz.</span><span></span>
@@ -487,7 +701,7 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
 
     <div class="screen-card">
       <div class="screen-top">
-        <button class="btn primary" id="btnRun">Injektion starten</button>
+        <button class="btn primary sim-only" id="btnRun">Injektion starten</button>
         <button class="btn" id="btnStop" disabled>Stopp</button>
         <button class="btn ghost" id="btnReset">Zurücksetzen</button>
         <div class="speed-group">
@@ -510,8 +724,9 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
     <div class="eval-run" id="evalRun" style="display:none;"></div>
     <div class="tabs">
       <button class="tabbtn active" data-tab="peaks">Peaktabelle</button>
-      <button class="tabbtn" data-tab="quant">Quantifizierung</button>
-      <button class="tabbtn" data-tab="res">Auflösung</button>
+      <button class="tabbtn sim-only" data-tab="res">Auflösung</button>
+      <button class="tabbtn ana-only" data-tab="conc">Konzentrationen</button>
+      <button class="tabbtn ana-only" data-tab="sum">Zusammenfassung</button>
     </div>
 
     <div class="tabpanel active" id="tab-peaks">
@@ -529,37 +744,29 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
         </table>
       </div>
       <div class="btn-row" style="margin-top:12px;">
-        <button class="btn ghost" id="btnExport">Peaktabelle als CSV exportieren</button>
+        <button class="btn ghost" id="btnExport" disabled>Auswertung als PDF</button>
       </div>
     </div>
 
-    <div class="tabpanel" id="tab-quant">
-      <div class="calib-grid">
-        <div class="calib-form">
-          <div class="field-full">
-            <label>Standardpeak (bekannte Konzentration)</label>
-            <select id="stdPeakSelect"><option value="">– Peaktabelle zuerst füllen –</option></select>
-          </div>
-          <div class="field-full">
-            <label>Bekannte Konzentration des Standards</label>
-            <input type="number" id="stdConc" value="50" step="1" min="0.01">
-          </div>
-          <button class="btn primary" id="btnCalibrate">Kalibrieren & quantifizieren</button>
-          <p class="note">Einpunkt-Außenstandard-Kalibrierung: c<sub>i</sub> = Fläche<sub>i</sub> / Fläche<sub>Standard</sub> × c<sub>Standard</sub>. Der Vergleich mit der „wahren" Konzentration zeigt, wie stark unterschiedliche Responsefaktoren das Ergebnis verfälschen.</p>
+    <div class="tabpanel" id="tab-conc">
+      <div id="concBox"></div>
+    </div>
+
+    <div class="tabpanel" id="tab-sum">
+      <div id="sumLocked" class="empty-hint">Die Zusammenfassung ist verfügbar, sobald die Bestandteile der Probe bestimmt sind (Schritt 3).</div>
+      <div id="sumOpen" hidden>
+        <div class="ex-sum-ctl">
+          <label>Name <input type="text" class="sumf" id="sumName" maxlength="60" autocomplete="off"></label>
+          <label>Kurs <input type="text" class="sumf" id="sumKurs" maxlength="40" autocomplete="off" style="width:140px;"></label>
+          <button class="btn primary" id="sumPrint">Als PDF speichern</button>
         </div>
-        <div>
-          <div class="table-wrap">
-            <table id="quantTable">
-              <thead><tr><th>#</th><th>tR</th><th>Fläche</th><th>c berechnet</th><th>c tatsächlich</th><th>Fehler %</th></tr></thead>
-              <tbody id="quantBody"><tr><td colspan="6" class="empty-hint">Noch keine Kalibrierung durchgeführt.</td></tr></tbody>
-            </table>
-          </div>
-        </div>
+        <p class="note" style="margin:0 0 12px; max-width:none;">„Als PDF speichern“ öffnet die Druckfunktion des Browsers: dort „Als PDF sichern“ bzw. „Microsoft Print to PDF“ wählen, auf dem iPad „Drucken → Teilen → In Dateien sichern“. Name und Kurs werden nicht gespeichert.</p>
+        <div class="paper-wrap"><div class="paper" id="sumPaper"></div></div>
       </div>
     </div>
 
     <div class="tabpanel" id="tab-res">
-      <p class="note" style="margin-top:0 0 14px;">Auflösung R<sub>s</sub> zwischen benachbarten Peaks: R<sub>s</sub> = 2×(t<sub>R2</sub>−t<sub>R1</sub>) / (w<sub>1</sub>+w<sub>2</sub>). Ab R<sub>s</sub> ≈ 1.5 gilt die Trennung als vollständig (Basislinientrennung).</p>
+      <p class="note" style="margin:0 0 14px; max-width:none;">Auflösung R<sub>s</sub> zwischen benachbarten Peaks: R<sub>s</sub> = 2×(t<sub>R2</sub>−t<sub>R1</sub>) / (w<sub>1</sub>+w<sub>2</sub>). Ab R<sub>s</sub> ≈ 1,5 gilt die Trennung als vollständig (Basislinientrennung). Der Luftpeak wird nicht mitgerechnet; Stoffe, die als ein gemeinsamer Peak erscheinen, werden eigens gemeldet.</p>
       <div class="res-list" id="resList"><div class="empty-hint">Noch keine Peaks zum Vergleichen.</div></div>
     </div>
 
@@ -568,7 +775,7 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
 
 <footer>
   <p class="footer-note">Simulierte Daten zu Lehrzwecken · Retentionszeiten, Peakformen und Rauschen werden aus vereinfachten physikalischen Modellen berechnet und bilden kein reales Säulen-/Detektorverhalten exakt ab.</p>
-  <p class="footer-credit">Bastian Baumgart · Simulation „Gaschromatograph“ V1.2 (erstellt mit Claude Pro) · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Simulation „Gaschromatograph“ V2.0 · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <script>
@@ -619,8 +826,12 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
   let activeRuntime = params.runtime; // Zeitachsen-Ende des aktuellen Laufs
 
   // Lauf-Historie: ältere Läufe bleiben bis "Zurücksetzen" im Chromatogramm sichtbar
-  const RUN_COLORS = ["#ffb454","#4fd1c5","#9d8cf1","#f18cae","#7fd68a","#6fb7ff","#e4a85b","#e07a7a"];
-  const MAX_RUNS = 8;            // inkl. aktuellem Lauf
+  const RUN_COLORS = ["#ffb454","#4fd1c5","#9d8cf1","#f18cae","#7fd68a","#6fb7ff","#e4a85b","#e07a7a","#c9d46b","#5fd1a0","#d98cf1","#9fb3c8"];
+  const PRINT_COLORS = ["#c2410c","#0f766e","#6d28d9","#be185d","#15803d","#1d4ed8","#a16207","#b91c1c","#65730f","#047857","#9333ea","#475569"];
+  const MAX_RUNS = 8;            // inkl. aktuellem Lauf (Simulation)
+  const MAX_RUNS_ANA = 16;       // Analyse: Probe und viele Referenzen
+  let taskMode = "sim";          // "sim" | "ana"
+  const maxRuns = () => taskMode==="ana" ? MAX_RUNS_ANA : MAX_RUNS;
   let runHistory = [];           // {t, sig, end, color, label, num}
   let runCounter = 0;
   let currentRun = null;         // {num, color, label, end, finished, t, sig, truePeaks, runtime, peaks, hint}
@@ -804,21 +1015,21 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
     $("progControls").style.display = m==="prog" ? "" : "none";
   }
 
+  function setSpeed(v){
+    speed = v;
+    document.querySelectorAll(".speed-group button").forEach(x=>x.classList.toggle("active", +x.dataset.speed===v));
+  }
   document.querySelectorAll(".speed-group button").forEach(b=>{
-    b.addEventListener("click", ()=>{
-      document.querySelectorAll(".speed-group button").forEach(x=>x.classList.remove("active"));
-      b.classList.add("active");
-      speed = +b.dataset.speed;
-    });
+    b.addEventListener("click", ()=> setSpeed(+b.dataset.speed));
   });
 
+  function switchTab(name){
+    document.querySelectorAll(".tabbtn").forEach(x=>x.classList.toggle("active", x.dataset.tab===name));
+    document.querySelectorAll(".tabpanel").forEach(x=>x.classList.toggle("active", x.id==="tab-"+name));
+    if(name==="conc" || name==="sum") renderAna();
+  }
   document.querySelectorAll(".tabbtn").forEach(b=>{
-    b.addEventListener("click", ()=>{
-      document.querySelectorAll(".tabbtn").forEach(x=>x.classList.remove("active"));
-      document.querySelectorAll(".tabpanel").forEach(x=>x.classList.remove("active"));
-      b.classList.add("active");
-      $("tab-"+b.dataset.tab).classList.add("active");
-    });
+    b.addEventListener("click", ()=> switchTab(b.dataset.tab));
   });
 
   // ---------- Ofentemperatur zu Zeit t ----------
@@ -861,20 +1072,20 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
   }
 
   // ---------- Simulation erzeugen ----------
-  function buildRun(){
+  function buildRun(list){
     const rt = params.runtime;
     const t = new Float64Array(N_SAMPLES);
     const sig = new Float64Array(N_SAMPLES);
     for(let i=0;i<N_SAMPLES;i++) t[i] = rt*i/(N_SAMPLES-1);
 
     const minSigma = 2.5*rt/(N_SAMPLES-1);   // mind. ~2,5 Messpunkte pro Sigma
-    truePeaks = expandCompounds().map(c=>{
+    truePeaks = (list || expandCompounds()).map(c=>{
       const ret = computeRetention(c, true);
       const tR = ret.tR;
       const sigma = Math.max(ret.sigma, minSigma);
       const trueArea = c.conc * c.rf;               // Fläche ∝ Menge × Responsefaktor
       const amp = (trueArea/(sigma*Math.sqrt(2*Math.PI))) * (params.amount) * 0.9;
-      return {name:c.name, bp:c.bp, tR, sigma, amp, trueConc:c.conc};
+      return {name:c.name, bp:c.bp, tR, sigma, amp, trueConc: c.trueConc!=null ? c.trueConc : c.conc};
     });
     // Luftpeak: mit der Spritze injizierte Luft, wird nicht zurückgehalten -> erscheint bei t0
     {
@@ -1002,10 +1213,12 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
     const items = allRuns();
     if(!items.length){ el.innerHTML = ""; el.style.display = "none"; return; }
     el.style.display = "flex";
-    const title = items.length > 1 ? `<span class="legend-title">Zum Anzeigen der Auswertung anklicken:</span>` : "";
+    const title = items.length > 1 ? `<span class="legend-title">Lauf anklicken zeigt seine Auswertung · × löscht ihn:</span>` : "";
     el.innerHTML = title + items.map(r=>{
       const cls = "run-chip" + (r===currentRun ? " current" : "") + (r===selectedRun ? " selected" : "");
-      return `<button type="button" class="${cls}" data-num="${r.num}" title="Auswertung dieses Laufs anzeigen"><i style="background:${r.color}"></i>${r.label}${r===currentRun?' (aktuell)':''}</button>`;
+      const busy = running && r===currentRun;
+      return `<span class="run-item"><button type="button" class="${cls}" data-num="${r.num}" title="Auswertung dieses Laufs anzeigen"><i style="background:${r.color}"></i>${r.label}${r===currentRun?' (aktuell)':''}</button>`+
+             `<button type="button" class="run-del" data-del="${r.num}" title="Diesen Lauf löschen" aria-label="Lauf ${r.num} löschen"${busy?' disabled':''}>×</button></span>`;
     }).join("");
     el.querySelectorAll(".run-chip").forEach(btn=>{
       btn.addEventListener("click", ()=>{
@@ -1013,24 +1226,33 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
         if(run) showRun(run);
       });
     });
+    el.querySelectorAll(".run-del").forEach(btn=>{
+      btn.addEventListener("click", ()=> deleteRun(+btn.dataset.del));
+    });
   }
 
-  function startRun(){
+  function startRun(opts){
+    opts = opts || {};
+    if(running) return;
     // bisherigen Lauf mitsamt seiner Auswertung in die Historie übernehmen
     if(currentRun){
       runHistory.push(currentRun);
-      while(runHistory.length > MAX_RUNS-1) runHistory.shift();
+      while(runHistory.length > maxRuns()-1) runHistory.shift();
     }
     runCounter++;
-    currentRun = {num:runCounter, color:RUN_COLORS[(runCounter-1)%RUN_COLORS.length], label:runLabel(runCounter),
+    const ci = opts.ci!=null ? opts.ci : (runCounter-1)%RUN_COLORS.length;
+    currentRun = {num:runCounter, ci, color:RUN_COLORS[ci],
+                  label: opts.label ? `Lauf ${runCounter}: ${opts.label}` : runLabel(runCounter),
+                  kind: opts.kind || "sim", refName: opts.refName || null,
                   end:0, finished:false, peaks:[], hint:""};
-    buildRun();
+    buildRun(opts.list);
     currentRun.t = simData.t; currentRun.sig = simData.sig;
     currentRun.truePeaks = truePeaks; currentRun.runtime = activeRuntime;
     simTime = 0; running = true; startPerf = performance.now();
     showRun(currentRun);
     $("btnRun").disabled = true; $("btnStop").disabled=false;
     $("statusBadge").classList.add("running"); $("statusText").textContent="Lauf aktiv";
+    afterRunsChanged();
     cancelAnimationFrame(animId); tick();
   }
   function stopRun(finished){
@@ -1047,6 +1269,20 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
       if(finished){ evaluateRun(currentRun); showRun(currentRun); }   // neues Ergebnis anzeigen
       else showRun(selectedRun);
     } else draw();
+    afterRunsChanged();
+  }
+
+  // Einzelnen Lauf löschen (nicht den gerade laufenden)
+  function deleteRun(num){
+    if(running && currentRun && currentRun.num===num) return;
+    const wasSelected = selectedRun && selectedRun.num===num;
+    if(currentRun && currentRun.num===num) currentRun = runHistory.pop() || null;
+    else runHistory = runHistory.filter(r=>r.num!==num);
+    if(currentRun){ simData = {t:currentRun.t, sig:currentRun.sig}; activeRuntime = currentRun.runtime; }
+    else { simData = null; activeRuntime = params.runtime; }
+    if(!allRuns().length){ $("statusText").textContent="bereit"; $("roTime").textContent="0.00 min"; $("roSignal").textContent="0.0 pA"; }
+    showRun(wasSelected ? currentRun : selectedRun);
+    afterRunsChanged();
   }
   function tick(){
     const now = performance.now();
@@ -1062,14 +1298,15 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
     animId = requestAnimationFrame(tick);
   }
 
-  $("btnRun").addEventListener("click", startRun);
+  $("btnRun").addEventListener("click", ()=> startRun());
   $("btnStop").addEventListener("click", ()=>stopRun(false));
   $("btnReset").addEventListener("click", ()=>{
     stopRun(false); simData=null; activeRuntime=params.runtime;
     runHistory = []; runCounter = 0; currentRun = null;
     $("statusText").textContent="bereit";
-    $("roTime").textContent="0.00 min"; $("roSignal").textContent="0.0 pA"; $("roTemp").textContent=params.temp+" °C";
+    $("roTime").textContent="0.00 min"; $("roSignal").textContent="0.0 pA"; $("roTemp").textContent=ovenTemp(0)+" °C";
     showRun(null);
+    afterRunsChanged();
   });
 
   // ---------- Peak-Erkennung & Integration ----------
@@ -1179,14 +1416,14 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
     run.hint = msgs.join(" ");
   }
 
-  // Zeigt die Auswertung eines Laufs in Peaktabelle, Quantifizierung und Auflösung an
+  // Zeigt die Auswertung eines Laufs in Peaktabelle und Auflösung an
   function showRun(run){
     selectedRun = run || null;
     const done = !!(run && run.finished);
     detectedPeaks = done ? run.peaks : [];
     const hint = $("peakHint");
     hint.textContent = done ? run.hint : "";
-    hint.style.display = (done && run.hint) ? "block" : "none";
+    hint.style.display = (done && run.hint && (run.kind||"sim")==="sim") ? "block" : "none";
     $("roPeaks").textContent = done ? detectedPeaks.length : "–";
     const lbl = $("evalRun");
     if(run){
@@ -1196,11 +1433,17 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
       lbl.style.display = "none"; lbl.innerHTML = "";
     }
     renderPeakTable();
-    renderQuantOptions();
-    $("quantBody").innerHTML = `<tr><td colspan="6" class="empty-hint">Noch keine Kalibrierung durchgeführt.</td></tr>`;
     renderRes();
+    $("btnExport").disabled = !detectedPeaks.length;
     renderLegend();
     draw();
+  }
+
+  // Anzeigename eines Peaks: bei der unbekannten Probe erst nach richtiger Bestimmung (Schritt 3)
+  function peakName(p){
+    if(p.isAir) return "Luft (Totzeit)";
+    if(selectedRun && selectedRun.kind==="probe") return (ANA.idDone && p.match) ? p.match : "–";
+    return p.match || "unbekannt";
   }
 
   function renderPeakTable(){
@@ -1223,67 +1466,48 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
         <td class="mono">${p.area.toFixed(1)}</td>
         <td class="mono">${p.isAir ? '—' : p.areaPct.toFixed(1)+'%'}</td>
         <td class="mono">${Math.round(p.N).toLocaleString('de-DE')}</td>
-        <td class="${p.match?'id-match':'id-unknown'}">${p.isAir ? 'Luft (Totzeit)' : (p.match||'unbekannt')}</td>
+        <td class="${peakName(p)!=='–'&&peakName(p)!=='unbekannt'?'id-match':'id-unknown'}">${peakName(p)}</td>
       </tr>`).join("");
   }
 
-  // ---------- Quantifizierung ----------
-  function renderQuantOptions(){
-    const sel = $("stdPeakSelect");
-    if(!detectedPeaks.length){ sel.innerHTML=`<option value="">– Peaktabelle zuerst füllen –</option>`; return; }
-    sel.innerHTML = detectedPeaks.filter(p=>!p.isAir).map(p=>`<option value="${p.num}">Peak ${p.num} — tR ${p.tR.toFixed(2)} min ${p.match? '('+p.match+')':''}</option>`).join("");
-  }
-  $("btnCalibrate").addEventListener("click", renderQuant);
-  function renderQuant(){
-    const body = $("quantBody");
-    if(!detectedPeaks.length){ body.innerHTML=`<tr><td colspan="6" class="empty-hint">Noch keine Kalibrierung durchgeführt.</td></tr>`; return; }
-    const stdNum = +$("stdPeakSelect").value;
-    const std = detectedPeaks.find(p=>p.num===stdNum);
-    if(!std){ body.innerHTML=`<tr><td colspan="6" class="empty-hint">Bitte einen Standardpeak auswählen.</td></tr>`; return; }
-    const cStd = +$("stdConc").value || 1;
-    body.innerHTML = detectedPeaks.filter(p=>!p.isAir).map(p=>{
-      const cCalc = (p.area/std.area)*cStd;
-      const err = (p.trueConc!=null) ? ((cCalc-p.trueConc)/p.trueConc*100) : null;
-      return `<tr>
-        <td class="mono">${p.num}</td>
-        <td class="mono">${p.tR.toFixed(2)}</td>
-        <td class="mono">${p.area.toFixed(1)}</td>
-        <td class="mono">${cCalc.toFixed(2)}</td>
-        <td class="mono">${p.trueConc!=null? p.trueConc.toFixed(2) : '—'}</td>
-        <td class="mono" style="color:${err==null?'inherit': (Math.abs(err)<8?'#7fd68a': Math.abs(err)<20?'#ffb454':'#e4785b')}">${err==null?'—': (err>0?'+':'')+err.toFixed(1)+'%'}</td>
-      </tr>`;
-    }).join("");
-  }
-
   // ---------- Auflösung ----------
+  // Jeder erkannte Peak bekommt alle Stoffe (auch Luft) zugeordnet, die in ihm stecken.
+  // Paare ohne Luftpeak, mit Stoffnamen; gemeinsam eluierende Stoffe werden eigens gemeldet.
   function renderRes(){
     const list = $("resList");
-    if(detectedPeaks.length<2){ list.innerHTML = `<div class="empty-hint">Mindestens zwei Peaks nötig.</div>`; return; }
-    let html="";
-    for(let i=1;i<detectedPeaks.length;i++){
-      const a=detectedPeaks[i-1], b=detectedPeaks[i];
-      const wA = a.wHalf*1.7, wB = b.wHalf*1.7; // Basisbreite ≈ 1.7 × Halbwertsbreite
+    const run = selectedRun;
+    if(!run || !run.finished){ list.innerHTML = `<div class="empty-hint">${run && running && run===currentRun ? "Lauf läuft – die Auflösung erscheint nach Ende des Laufs." : run ? "Dieser Lauf wurde vor dem Ende gestoppt und daher nicht ausgewertet." : "Noch keine Peaks – Injektion starten und Lauf abwarten."}</div>`; return; }
+    const showNames = !(run.kind==="probe" && !ANA.idDone);
+    const groups = detectedPeaks.map(p=>({p, items:[]}));
+    (run.truePeaks||[]).filter(tp=>tp.tR <= run.runtime).forEach(tp=>{
+      let g = null, bd = Infinity;
+      groups.forEach(x=>{ const d = Math.abs(x.p.tR-tp.tR); if(d<bd){ bd=d; g=x; } });
+      if(g && bd <= Math.max(0.05*tp.tR, 4*tp.sigma)) g.items.push(tp);
+    });
+    const subsOf = g => g.items.filter(tp=>!tp.air).map(tp=>tp.name);
+    const hasAir = g => g.p.isAir || g.items.some(tp=>tp.air);
+    const lbl = g => { const n = subsOf(g); return `Peak ${g.p.num}` + (showNames && n.length ? " " + n.join(" + ") : ""); };
+    const tr = g => de(g.p.tR.toFixed(2));
+    let html = "";
+    groups.forEach(g=>{
+      const n = subsOf(g);
+      if(hasAir(g) && n.length)
+        html += `<div class="res-item"><span>${showNames ? n.join(" und ") : n.length+" Stoff(e)"} im Luftpeak</span><span class="mono rs-val res-bad">nicht getrennt · eluiert mit der Luft bei t<sub>R</sub> ≈ ${tr(g)} min (kaum zurückgehalten)</span></div>`;
+      else if(n.length > 1)
+        html += `<div class="res-item"><span>${showNames ? n.join(" und ") : n.length+" Stoffe"}</span><span class="mono rs-val res-bad">nicht getrennt · ein gemeinsamer Peak bei t<sub>R</sub> ≈ ${tr(g)} min, R<sub>s</sub> deutlich unter 1</span></div>`;
+    });
+    const pk = groups.filter(g=>!hasAir(g));
+    if(pk.length<2 && !html){ list.innerHTML = `<div class="empty-hint">Für die Auflösung sind mindestens zwei Peaks von Probenbestandteilen nötig (der Luftpeak zählt nicht).</div>`; return; }
+    for(let i=1;i<pk.length;i++){
+      const a=pk[i-1].p, b=pk[i].p;
+      const wA = a.wHalf*1.7, wB = b.wHalf*1.7; // Basisbreite ≈ 1,7 × Halbwertsbreite
       const rs = 2*(b.tR-a.tR)/(wA+wB);
       const cls = rs>=1.5?'res-good': rs>=1.0?'res-mid':'res-bad';
       const verdict = rs>=1.5?'Basislinientrennung':rs>=1.0?'teilweise getrennt':'nicht aufgelöst';
-      html += `<div class="res-item"><span>Peak ${a.num} → Peak ${b.num}</span><span class="mono rs-val ${cls}">Rs = ${rs.toFixed(2)} · ${verdict}</span></div>`;
+      html += `<div class="res-item"><span>${lbl(pk[i-1])} → ${lbl(pk[i])}</span><span class="mono rs-val ${cls}">R<sub>s</sub> = ${de(rs.toFixed(2))} · ${verdict}</span></div>`;
     }
     list.innerHTML = html;
   }
-
-  // ---------- CSV Export ----------
-  $("btnExport").addEventListener("click", ()=>{
-    if(!detectedPeaks.length) return;
-    let csv = "Peak;tR_min;Hoehe;Flaeche;Flaeche_pct;Bodenzahl_N;Substanz\n";
-    detectedPeaks.forEach(p=>{
-      csv += `${p.num};${p.tR.toFixed(3)};${p.height.toFixed(2)};${p.area.toFixed(2)};${p.isAir ? '' : p.areaPct.toFixed(2)};${Math.round(p.N)};${p.isAir ? 'Luft (Totzeit)' : (p.match||'unbekannt')}\n`;
-    });
-    const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href=url; a.download = selectedRun ? `gc_peaktabelle_lauf${selectedRun.num}.csv` : "gc_peaktabelle.csv"; a.click();
-    URL.revokeObjectURL(url);
-  });
 
   // ---------- Anleitung ----------
   const guideBackdrop = $("guideBackdrop");
@@ -1300,10 +1524,559 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
     if(e.key==="Escape"){ guideBackdrop.classList.remove("open"); changelogBackdrop.classList.remove("open"); }
   });
 
+  // =====================================================================
+  // ---------- Aufgabenart „Analyse“: unbekannte Probe ----------
+  // =====================================================================
+  const SIGNAL_K = 4;      // Detektorsignal je g/L (gleich für Probe und Referenz, kürzt sich heraus)
+  const C_REF = 10;        // Konzentration jeder Referenzlösung in g/L
+  const ANA_PARAMS = {temp:40, tStart:40, hold:1, ramp:10, tEnd:220, flow:1.5, plates:15000, runtime:10, amount:1, noise:2};
+  // Referenzstoffe: unter den festen Bedingungen alle getrennt (Rs ≥ 1,6 zum Nachbarn) und im Messfenster
+  const PORTFOLIO = ["n-Pentan","Dichlormethan","Aceton","Chloroform","Methanol","n-Hexan","Ethanol",
+                     "2-Propanol","n-Heptan","Toluol","Pyridin","Essigsäure","n-Octan"];
+  // Proben: Konzentrationen in g/L; 1–10 leicht (1–2 Stoffe), 11–20 schwer (4–5 Stoffe)
+  const SAMPLES = {
+    1:[["Ethanol",15.0]],
+    2:[["Toluol",8.0]],
+    3:[["Aceton",12.5]],
+    4:[["n-Hexan",6.0],["n-Heptan",9.0]],
+    5:[["Methanol",8.0],["Ethanol",20.0]],
+    6:[["Dichlormethan",15.0],["Chloroform",7.5]],
+    7:[["Ethanol",18.0],["2-Propanol",6.0]],
+    8:[["n-Pentan",5.0],["Toluol",12.0]],
+    9:[["Aceton",9.0],["Essigsäure",14.0]],
+    10:[["Pyridin",7.0],["n-Octan",4.5]],
+    11:[["n-Pentan",4.0],["Aceton",11.5],["n-Hexan",6.5],["Toluol",8.0]],
+    12:[["Methanol",6.0],["Ethanol",22.0],["2-Propanol",9.0],["Essigsäure",5.0]],
+    13:[["Dichlormethan",12.0],["Chloroform",8.0],["Toluol",5.5],["Pyridin",3.5],["n-Octan",4.0]],
+    14:[["n-Hexan",9.0],["n-Heptan",7.5],["Toluol",11.0],["n-Octan",5.0]],
+    15:[["Aceton",7.0],["Methanol",8.0],["Ethanol",14.0],["2-Propanol",4.5],["Essigsäure",6.0]],
+    16:[["n-Pentan",6.0],["Dichlormethan",9.5],["Chloroform",5.0],["n-Hexan",3.5]],
+    17:[["Aceton",15.0],["Ethanol",13.0],["n-Heptan",6.0],["Toluol",7.5],["Pyridin",4.0]],
+    18:[["Methanol",12.0],["n-Hexan",5.5],["2-Propanol",7.0],["n-Heptan",8.0]],
+    19:[["n-Pentan",3.0],["Chloroform",6.5],["Ethanol",16.0],["Toluol",9.0],["n-Octan",7.0]],
+    20:[["Dichlormethan",7.0],["Aceton",5.5],["Methanol",9.0],["Essigsäure",8.5],["n-Octan",3.5]]
+  };
+  const libOf = n => compoundLibrary.find(c=>c.name===n);
+  const bpOf = n => libOf(n).bp;
+
+  const ANA = {level:"leicht", sample:1, idSel:new Set(), idDone:false, idTries:0, idShown:false, idFb:null,
+               rows:{}, refFb:null, name:"", kurs:"", printed:false, pending:null};
+  let simSnap = null, anaSnap = null;
+
+  // ---------- Zahlen ----------
+  const SUPN={"⁰":"0","¹":"1","²":"2","³":"3","⁴":"4","⁵":"5","⁶":"6","⁷":"7","⁸":"8","⁹":"9","⁻":"-","⁺":"+"};
+  function parseNum(v){
+    if(v==null) return NaN;
+    let x=String(v).trim().replace(/\s+/g,"").replace(/,/g,".").replace(/[−–]/g,"-");
+    x=x.replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺]/g, ch=>SUPN[ch]);
+    if(x==="") return NaN;
+    const m=x.match(/^([+-]?(?:\d+\.?\d*|\.\d+))(?:[·*x×⋅]10\^?\(?([+-]?\d+)\)?)?$/i);
+    if(m) return parseFloat(m[1])*(m[2]!=null?Math.pow(10,parseInt(m[2],10)):1);
+    if(/^[+-]?(?:\d+\.?\d*|\.\d+)e[+-]?\d+$/i.test(x)) return parseFloat(x);
+    return NaN;
+  }
+  const de = v => String(v).replace(".",",");
+  function f3(v){ if(!isFinite(v)) return "–"; if(v===0) return "0"; const d=Math.max(0,2-Math.floor(Math.log10(Math.abs(v)))); return de(v.toFixed(d)); }
+  const f1 = v => de(v.toFixed(1));
+  const esc = t => String(t).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+  // ---------- Läufe der Analyse ----------
+  const sampleComps = () => SAMPLES[ANA.sample].slice().sort((a,b)=>bpOf(a[0])-bpOf(b[0]));
+  const sampleNames = () => sampleComps().map(c=>c[0]);
+  function finishedRuns(kind, ref){ return allRuns().filter(r=>r.finished && r.kind===kind && (!ref || r.refName===ref)); }
+  function peaksNamed(runs, name){ const a=[]; runs.forEach(r=>r.peaks.forEach(p=>{ if(!p.isAir && p.match===name) a.push(p); })); return a; }
+  const probeDone = () => finishedRuns("probe").length > 0;
+  const measuredRefs = () => PORTFOLIO.filter(n=>finishedRuns("ref", n).length);
+  function refTR(name){ const p=peaksNamed(finishedRuns("ref",name), name); return p.length ? p[p.length-1].tR : null; }
+
+  function injectProbe(){
+    if(running) return;
+    if(allRuns().length >= MAX_RUNS_ANA){ ANA.refFb={cls:"bad", html:`Es sind schon ${MAX_RUNS_ANA} Läufe gespeichert. Lösche zuerst einzelne Läufe mit × in der Legende.`}; renderAna(); return; }
+    const list = SAMPLES[ANA.sample].map(([n,c])=>{ const L=libOf(n); return {name:n, bp:L.bp, rf:L.rf, conc:c*SIGNAL_K, trueConc:c}; });
+    ANA.refFb = null;
+    startRun({list, label:`Probe ${ANA.sample}`, kind:"probe", ci:0});
+  }
+  function injectRef(){
+    if(running) return;
+    if(allRuns().length >= MAX_RUNS_ANA){ ANA.refFb={cls:"bad", html:`Es sind schon ${MAX_RUNS_ANA} Läufe gespeichert. Lösche zuerst einzelne Läufe mit × in der Legende.`}; renderAna(); return; }
+    const sel = $("refSel"); if(!sel) return;
+    const n = sel.value, L = libOf(n);
+    const used = allRuns().filter(r=>r.kind==="ref").length;
+    ANA.refFb = null;
+    const REF_CI = [1,2,3,4,5,7,8,9,10,11];   // ohne die Orangetöne der Probe (0 und 6)
+    startRun({list:[{name:n, bp:L.bp, rf:L.rf, conc:C_REF*SIGNAL_K, trueConc:C_REF}], label:`Referenz ${n}`, kind:"ref", refName:n, ci:REF_CI[used%REF_CI.length]});
+  }
+
+  // ---------- Aufgabenart wechseln ----------
+  function snapRuns(){ return {runHistory, runCounter, currentRun, selectedRun, params:{...params}, mode, speed}; }
+  function restoreRuns(sn){
+    runHistory = sn.runHistory; runCounter = sn.runCounter; currentRun = sn.currentRun; selectedRun = sn.selectedRun;
+    Object.assign(params, sn.params); setMode(sn.mode); setSpeed(sn.speed);
+    simData = currentRun ? {t:currentRun.t, sig:currentRun.sig} : null;
+    activeRuntime = currentRun ? currentRun.runtime : params.runtime;
+  }
+  function freshAnaSnap(){ return {runHistory:[], runCounter:0, currentRun:null, selectedRun:null, params:{...ANA_PARAMS}, mode:"prog", speed:1}; }
+  function setTask(m){
+    if(m===taskMode) return;
+    if(running) stopRun(false);
+    if(m==="ana"){ simSnap = snapRuns(); restoreRuns(anaSnap || freshAnaSnap()); }
+    else { anaSnap = snapRuns(); restoreRuns(simSnap); }
+    taskMode = m;
+    document.querySelector(".wrap").classList.toggle("ana", m==="ana");
+    document.querySelectorAll("#taskSel button").forEach(b=>b.classList.toggle("active", b.dataset.task===m));
+    const act = document.querySelector(".tabbtn.active");
+    if(!act || act.classList.contains(m==="ana" ? "sim-only" : "ana-only")) switchTab("peaks");
+    $("statusText").textContent = allRuns().length ? ($("statusText").textContent) : "bereit";
+    $("roTemp").textContent = ovenTemp(0) + " °C";
+    $("roTime").textContent = "0.00 min"; $("roSignal").textContent = "0.0 pA";
+    showRun(selectedRun || currentRun);
+    renderAna();
+  }
+  document.querySelectorAll("#taskSel button").forEach(b=> b.addEventListener("click", ()=> setTask(b.dataset.task)));
+
+  // ---------- Probe wählen ----------
+  function resetAnalysis(){
+    if(running) stopRun(false);
+    runHistory = []; runCounter = 0; currentRun = null; selectedRun = null; simData = null; activeRuntime = params.runtime;
+    Object.assign(ANA, {idSel:new Set(), idDone:false, idTries:0, idShown:false, idFb:null, rows:{}, refFb:null, printed:false, pending:null});
+    $("statusText").textContent = "bereit"; $("roTime").textContent = "0.00 min"; $("roSignal").textContent = "0.0 pA";
+    showRun(null);
+    renderAna();
+  }
+  const hasProgress = () => allRuns().length > 0 || ANA.idTries > 0;
+  function fillSampleSel(){
+    const a = ANA.level==="leicht" ? 1 : 11;
+    $("sampleSel").innerHTML = Array.from({length:10}, (_,i)=>`<option value="${a+i}">Probe ${a+i}</option>`).join("");
+    $("sampleSel").value = String(ANA.sample);
+    document.querySelectorAll("#lvlSel button").forEach(b=>b.classList.toggle("active", b.dataset.lvl===ANA.level));
+  }
+  function requestSample(level, sample){
+    if(level===ANA.level && sample===ANA.sample){ ANA.pending=null; renderConfirm(); return; }
+    if(hasProgress()){ ANA.pending = {level, sample}; fillSampleSel(); renderConfirm(); return; }
+    ANA.level = level; ANA.sample = sample; ANA.pending = null; fillSampleSel(); resetAnalysis();
+  }
+  function renderConfirm(){
+    const box = $("anaConfirm");
+    if(!ANA.pending){ box.hidden = true; box.innerHTML = ""; return; }
+    box.hidden = false;
+    box.innerHTML = `Zu <strong>Probe ${ANA.pending.sample}</strong> wechseln? Alle Läufe und Eingaben zu Probe ${ANA.sample} werden gelöscht.
+      <div class="btn-row"><button type="button" class="btn primary" id="cfYes">Ja, Probe ${ANA.pending.sample}</button><button type="button" class="btn ghost" id="cfNo">Abbrechen</button></div>`;
+    $("cfYes").addEventListener("click", ()=>{ const p=ANA.pending; ANA.level=p.level; ANA.sample=p.sample; ANA.pending=null; fillSampleSel(); renderConfirm(); resetAnalysis(); });
+    $("cfNo").addEventListener("click", ()=>{ ANA.pending=null; fillSampleSel(); renderConfirm(); });
+  }
+  document.querySelectorAll("#lvlSel button").forEach(b=> b.addEventListener("click", ()=>{
+    const lvl = b.dataset.lvl; if(lvl===ANA.level && !ANA.pending) return;
+    requestSample(lvl, lvl==="leicht" ? 1 : 11);
+  }));
+  $("sampleSel").addEventListener("change", e=> requestSample(ANA.level, +e.target.value));
+
+  // ---------- Schritt 3: Bestandteile bestimmen ----------
+  function idCheck(){
+    const sol = new Set(sampleNames());
+    if(!ANA.idSel.size){ ANA.idFb = {cls:"bad", html:"Kreuze zuerst die Referenzstoffe an, die deiner Meinung nach in der Probe enthalten sind."}; renderAna(); return; }
+    let right=0, wrong=0; ANA.idSel.forEach(n=> sol.has(n) ? right++ : wrong++);
+    const missing = sol.size - right;
+    ANA.idTries++;
+    if(!wrong && !missing){
+      ANA.idDone = true;
+      ANA.idFb = {cls:"good", html:`Richtig! Die Probe enthält ${listNames(sampleNames())}. Weiter mit Schritt 4: Konzentrationen berechnen.`};
+      initRows();
+    } else {
+      const parts = [`${right} richtig angekreuzt`];
+      if(wrong) parts.push(`${wrong} angekreuzt, aber nicht in der Probe`);
+      if(missing) parts.push(`${missing} Bestandteil${missing>1?"e":""} fehl${missing>1?"en":"t"} noch`);
+      let extra = "";
+      if(missing && measuredRefs().length < PORTFOLIO.length) extra = " Miss gegebenenfalls weitere Referenzstoffe.";
+      ANA.idFb = {cls:"bad", html:`Noch nicht richtig: ${parts.join(", ")}.${extra}`};
+    }
+    renderAna();
+  }
+  function idSolution(){
+    ANA.idSel = new Set(sampleNames()); ANA.idDone = true; ANA.idShown = true;
+    ANA.idFb = {cls:"info", html:`Lösung: Die Probe enthält ${listNames(sampleNames())}.<span class="ast">*</span>`};
+    initRows(); renderAna();
+  }
+  const listNames = a => a.length===1 ? `<strong>${a[0]}</strong>` : a.slice(0,-1).map(n=>`<strong>${n}</strong>`).join(", ") + ` und <strong>${a[a.length-1]}</strong>`;
+  function initRows(){ sampleNames().forEach(n=>{ if(!ANA.rows[n]) ANA.rows[n] = {aP:"", aR:"", c:"", st:{aP:"",aR:"",c:""}, msg:null}; }); }
+
+  // ---------- Schritt 4: Konzentrationen ----------
+  const near = (x,e) => Math.abs(x-e) <= Math.max(0.06, 0.01*Math.abs(e));
+  function checkArea(name, which, x){
+    if(!isFinite(x)) return {st:"bad", msg:"Bitte eine Zahl eingeben (Komma oder Punkt sind erlaubt)."};
+    const P = peaksNamed(finishedRuns("probe"), name), R = peaksNamed(finishedRuns("ref", name), name);
+    const own = which==="aP" ? P : R, other = which==="aP" ? R : P;
+    if(own.some(p=>near(x,p.area))) return {st:"ok"};
+    const runsOwn = which==="aP" ? finishedRuns("probe") : finishedRuns("ref", name);
+    const all = []; runsOwn.forEach(r=>r.peaks.forEach(p=>all.push(p)));
+    if(all.some(p=>p.isAir && near(x,p.area))) return {st:"bad", msg:"Das ist die Fläche des Luftpeaks. Er gehört weder zur Probe noch zur Referenz."};
+    if(other.some(p=>near(x,p.area))) return {st:"bad", msg: which==="aP"
+      ? "Das ist die Fläche aus der Referenzmessung. Hier gehört die Fläche des passenden Peaks in der Probe hin."
+      : "Das ist die Fläche aus der Probe. Hier gehört die Fläche aus der Referenzmessung hin."};
+    if(all.some(p=>near(x,p.height))) return {st:"bad", msg:"Das ist die Peakhöhe. Gesucht ist die Peakfläche (Spalte „Fläche“)."};
+    if(which==="aP" && all.some(p=>near(x,p.area))) return {st:"bad", msg:`Diese Fläche gehört zu einem anderen Peak der Probe. Nimm den Peak, dessen Retentionszeit zur Referenz ${name} passt.`};
+    return {st:"bad", msg: which==="aP"
+      ? `Diese Fläche passt zu keinem Peak der Probe. Lies in der Peaktabelle der Probe die Fläche des Peaks mit der Retentionszeit von ${name} ab.`
+      : `Lies in der Peaktabelle der Referenzmessung von ${name} die Fläche des ${name}-Peaks ab.`};
+  }
+  function checkConc(row, x){
+    if(!isFinite(x)) return {st:"bad", msg:"Bitte eine Zahl eingeben (Komma oder Punkt sind erlaubt)."};
+    const aP = parseNum(row.aP), aR = parseNum(row.aR);
+    const e = aP/aR*C_REF;
+    if(Math.abs(x-e) <= 0.01*e) return {st:"ok"};
+    if(Math.abs(x - aR/aP*C_REF) <= 0.01*aR/aP*C_REF) return {st:"bad", msg:"Das Verhältnis ist vertauscht: Die Fläche der Probe steht im Zähler, die Fläche der Referenz im Nenner."};
+    if(Math.abs(x - aP/aR) <= 0.01*aP/aR) return {st:"bad", msg:`Fast: Das Flächenverhältnis muss noch mit der Konzentration der Referenzlösung (${f1(C_REF)} g/L) multipliziert werden.`};
+    if(Math.abs(x - aR/aP) <= 0.01*aR/aP) return {st:"bad", msg:"Das Verhältnis ist vertauscht und die Konzentration der Referenz fehlt noch."};
+    return {st:"bad", msg:"Noch nicht richtig – schau dir den Tipp an."};
+  }
+  const rowAreasOk = r => (r.st.aP==="ok"||r.st.aP==="shown") && (r.st.aR==="ok"||r.st.aR==="shown");
+  const rowDone = r => r.st.c==="ok" || r.st.c==="shown";
+  const rowOwn = r => r.st.aP==="ok" && r.st.aR==="ok" && r.st.c==="ok";
+  function trueOf(name){ const c = SAMPLES[ANA.sample].find(x=>x[0]===name); return c ? c[1] : NaN; }
+
+  function enterValue(name, key, val){
+    const row = ANA.rows[name]; if(!row || rowDone(row)) return;
+    row[key] = val.trim();
+    if(row[key]===""){ row.st[key]=""; row.msg=null; renderAna(); return; }
+    const x = parseNum(row[key]);
+    const res = key==="c" ? checkConc(row, x) : checkArea(name, key, x);
+    row.st[key] = res.st;
+    if(res.st==="ok" && key==="c"){
+      const t = trueOf(name), dev = (x-t)/t*100;
+      row.msg = {cls:"good", html:`Richtig berechnet. Tatsächlich enthält die Probe ${f3(t)} g/L ${name} – Abweichung ${dev>=0?"+":"−"}${de(Math.abs(dev).toFixed(1))} % (Messunsicherheit durch Rauschen und Integration).`};
+    } else row.msg = res.st==="ok" ? null : {cls:"bad", html:res.msg};
+    renderAna();
+  }
+  function rowTip(name){
+    const row = ANA.rows[name], tr = refTR(name);
+    let h;
+    if(!finishedRuns("ref", name).length) h = `Miss zuerst die Referenz ${name} (Schritt 2).`;
+    else if(!rowAreasOk(row)) h = `Klicke in der Legende auf die Probe und suche in ihrer Peaktabelle den Peak mit t<sub>R</sub> ≈ ${de(tr.toFixed(2))} min (wie die Referenz ${name}). Seine Fläche ist A(Probe). A(Referenz) ist die Fläche des ${name}-Peaks in der Peaktabelle der Referenzmessung.`;
+    else h = `Mit deinen Werten: c(Probe) = A(Probe) : A(Referenz) · c(Referenz) = ${esc(row.aP)} : ${esc(row.aR)} · ${f1(C_REF)} g/L. Auf drei gültige Ziffern runden.`;
+    row.msg = {cls:"tip", html:"Tipp: "+h}; renderAna();
+  }
+  function rowSolve(name, fromRest){
+    const row = ANA.rows[name];
+    const P = peaksNamed(finishedRuns("probe"), name), R = peaksNamed(finishedRuns("ref", name), name);
+    if(!P.length || !R.length){ row.msg = {cls:"bad", html: !P.length ? "Für die Lösung muss die Probe gemessen sein." : `Für die Lösung muss die Referenz ${name} gemessen sein (Schritt 2).`}; if(!fromRest) renderAna(); return false; }
+    if(row.st.aP!=="ok"){ row.aP = f1(P[P.length-1].area); row.st.aP = "shown"; }
+    if(row.st.aR!=="ok"){ row.aR = f1(R[R.length-1].area); row.st.aR = "shown"; }
+    const c = parseNum(row.aP)/parseNum(row.aR)*C_REF;
+    row.c = f3(c); row.st.c = "shown";
+    const t = trueOf(name), dev = (c-t)/t*100;
+    row.msg = {cls:"tip", html:`Lösung eingetragen<span class="ast">*</span>. Tatsächlich enthält die Probe ${f3(t)} g/L ${name} – Abweichung ${dev>=0?"+":"−"}${de(Math.abs(dev).toFixed(1))} %.`};
+    if(!fromRest) renderAna();
+    return true;
+  }
+  function restFill(){ sampleNames().forEach(n=>{ if(!rowDone(ANA.rows[n])) rowSolve(n, true); }); renderAna(); }
+
+  // ---------- Darstellung ----------
+  function stepState(){
+    const p = probeDone(), idd = ANA.idDone;
+    const rows = sampleNames().map(n=>ANA.rows[n]).filter(Boolean);
+    const cDone = idd && rows.length && rows.every(rowDone);
+    return {s1:p||idd, s2:idd, s3:idd, s4:!!cDone, s5:ANA.printed, cnt:rows.filter(rowDone).length, tot:sampleNames().length};
+  }
+  function renderAna(){
+    if(taskMode!=="ana") return;
+    renderSteps(); renderConc(); renderSummaryTab();
+  }
+  function renderSteps(){
+    const st = stepState(), busy = running;
+    const refs = measuredRefs();
+    const cur = !st.s1 ? 1 : !st.s3 ? (refs.length ? 3 : 2) : !st.s4 ? 4 : 5;
+    const fb = f => f ? `<div class="fb ${f.cls==="tip"?"info":f.cls}">${f.html}</div>` : "";
+    const li = (n, title, status, done, locked, body) =>
+      `<li class="stp${done?" done":""}${n===cur?" cur":""}${locked?" lock":""}"><div class="stp-h"><span class="stp-n">${done?"✓":n}</span><span>${title}</span><span class="stp-s">${status}</span></div>${locked?"":`<div class="stp-b">${body}</div>`}</li>`;
+    let h = "";
+    h += li(1, "Probe messen", st.s1 ? "erledigt" : "", st.s1, false,
+      `<p>Spritze die unbekannte <strong>Probe ${ANA.sample}</strong> ein. Der erste Peak ist der Luftpeak (Totzeit), jeder weitere Peak gehört zu einem Bestandteil der Probe.</p>
+       <button type="button" class="btn primary" id="anaProbe"${busy?" disabled":""}>Probe ${ANA.sample} injizieren</button>`);
+    const opts = PORTFOLIO.map(n=>`<option value="${n}">${n}</option>`).join("");
+    h += li(2, "Referenzstoffe messen", refs.length ? `${refs.length} gemessen` : "", st.s2, !st.s1,
+      `<p>Miss mögliche Bestandteile einzeln als Referenz (je ${f1(C_REF)} g/L) unter denselben Bedingungen. Stimmt die Retentionszeit einer Referenz mit einem Peak der Probe überein (± 0,05 min), ist dieser Stoff vermutlich enthalten.</p>
+       <div style="display:flex; gap:6px;"><select id="refSel" style="flex:1; min-width:0;" aria-label="Referenzstoff auswählen">${opts}</select><button type="button" class="btn primary" id="anaRef" style="flex:none;"${busy?" disabled":""}>Injizieren</button></div>
+       ${refs.length ? `<ul class="ref-done">${refs.map(n=>{ const r=finishedRuns("ref",n).slice(-1)[0], t=refTR(n); return `<li><i style="background:${r.color}"></i>${n}<span class="mono">${t!=null?"t<sub>R</sub> "+de(t.toFixed(2))+" min":"kein Peak"}</span></li>`; }).join("")}</ul>` : ""}
+       ${fb(ANA.refFb)}`);
+    const chk = refs.length
+      ? `<div class="chk-list">${refs.map(n=>`<label><input type="checkbox" data-id="${n}"${ANA.idSel.has(n)?" checked":""}${ANA.idDone?" disabled":""}>${n}</label>`).join("")}</div>`
+      : `<p><em>Hier erscheinen die gemessenen Referenzstoffe zum Ankreuzen.</em></p>`;
+    const solOk = ANA.idTries >= 2;
+    h += li(3, "Bestandteile bestimmen", st.s3 ? (ANA.idShown ? "Lösung angezeigt" : `richtig (${ANA.idTries}. Versuch)`) : (ANA.idTries ? `${ANA.idTries} Versuch${ANA.idTries>1?"e":""}` : ""), st.s3, !st.s1,
+      `<p>Kreuze alle Referenzstoffe an, die in der Probe enthalten sind, und prüfe deine Auswahl. Jeder Peak der Probe (außer Luft) muss einem Stoff zugeordnet sein.</p>
+       ${chk}
+       ${ANA.idDone ? "" : `<div class="btn-row"><button type="button" class="btn primary" id="idCheck"${refs.length?"":" disabled"}>Prüfen</button><button type="button" class="btn ghost" id="idTip">Tipp</button><button type="button" class="btn ghost" id="idSol"${solOk?"":" disabled"} title="${solOk?"":"Möglich nach zwei Prüfversuchen"}">Lösung zeigen</button></div>${solOk?"":`<p class="note" style="margin:8px 0 0; max-width:none;">„Lösung zeigen“ wird nach zwei Prüfversuchen freigeschaltet (bisher ${ANA.idTries}).</p>`}`}
+       ${fb(ANA.idFb)}`);
+    h += li(4, "Konzentrationen berechnen", st.s3 ? `${st.cnt} von ${st.tot}` : "", st.s4, !st.s3,
+      `<p>Die Peakfläche ist proportional zur Konzentration. Probe und Referenz enthalten denselben Stoff, deshalb gilt:</p>
+       <span class="fml">c(Probe) = A(Probe) : A(Referenz) · c(Referenz)</span>
+       <p>Lies für jeden Bestandteil die Flächen in den Peaktabellen von Probe und Referenz ab (in der Legende umschalten) und berechne c(Probe) auf drei gültige Ziffern.</p>
+       <button type="button" class="btn${st.s4?" ghost":" primary"}" id="goConc">Zur Tabelle „Konzentrationen“</button>`);
+    h += li(5, "Zusammenfassung als PDF", st.s5 ? "erstellt" : "", st.s5, !st.s3,
+      `<p>Trage Name und Kurs ein und speichere das Analyseprotokoll mit Chromatogramm, Zuordnung und Konzentrationen als PDF.</p>
+       <button type="button" class="btn${st.s4?" primary":" ghost"}" id="goSum">Zur Zusammenfassung</button>`);
+    $("anaSteps").innerHTML = h;
+    const on = (id, fn) => { const el=$(id); if(el) el.addEventListener("click", fn); };
+    on("anaProbe", injectProbe); on("anaRef", injectRef);
+    if($("refSel")){ const keep = renderSteps.lastRef; if(keep && PORTFOLIO.includes(keep)) $("refSel").value = keep; $("refSel").addEventListener("change", e=>{ renderSteps.lastRef = e.target.value; }); }
+    on("idCheck", idCheck); on("idSol", ()=>{ if(ANA.idTries>=2) idSolution(); });
+    on("idTip", ()=>{ ANA.idFb = {cls:"tip", html:`Tipp: Klicke in der Legende auf die Probe und notiere die Retentionszeiten ihrer Peaks. Vergleiche sie mit den Retentionszeiten der Referenzen in der Liste oben – gleiche Retentionszeit (± 0,05 min) bedeutet gleicher Stoff. Proben im Niveau „leicht“ enthalten 1–2, im Niveau „schwer“ 4–5 Stoffe.`}; renderAna(); });
+    document.querySelectorAll("#anaSteps input[data-id]").forEach(c=> c.addEventListener("change", ()=>{ c.checked ? ANA.idSel.add(c.dataset.id) : ANA.idSel.delete(c.dataset.id); }));
+    on("goConc", ()=>{ switchTab("conc"); $("tab-conc").scrollIntoView({behavior:"smooth", block:"start"}); });
+    on("goSum", ()=>{ switchTab("sum"); $("tab-sum").scrollIntoView({behavior:"smooth", block:"start"}); });
+  }
+
+  function renderConc(){
+    const box = $("concBox");
+    if(!ANA.idDone){ box.innerHTML = `<div class="empty-hint">Die Tabelle erscheint, sobald die Bestandteile der Probe bestimmt sind (Schritt 3).</div>`; return; }
+    const names = sampleNames();
+    const own = names.filter(n=>rowOwn(ANA.rows[n])).length;
+    const allDone = names.every(n=>rowDone(ANA.rows[n]));
+    const cls = s => s ? ` class="${s}"` : "";
+    const rows = names.map((n,i)=>{
+      const r = ANA.rows[n], done = rowDone(r);
+      const refOk = finishedRuns("ref", n).length > 0;
+      const dis = k => (done || r.st[k]==="ok" || r.st[k]==="shown" || (k==="aR" && !refOk) || (k==="c" && !rowAreasOk(r))) ? " disabled" : "";
+      const inp = k => `<input type="text" inputmode="decimal" autocomplete="off" id="cin-${i}-${k}" data-n="${esc(n)}" data-k="${k}" value="${esc(r[k])}"${cls(r.st[k])}${dis(k)} aria-label="${k==="aP"?"Fläche Probe":k==="aR"?"Fläche Referenz":"Konzentration Probe"} ${esc(n)}">${r.st[k]==="shown"?'<span class="ast">*</span>':""}`;
+      const msg = r.msg ? r.msg : (!refOk ? {cls:"bad", html:`Referenz ${n} ist noch nicht gemessen – miss sie in Schritt 2.`} : null);
+      return `<tr class="${msg?"has-msg":""}"><td class="nm">${n}</td><td>${inp("aP")}</td><td>${inp("aR")}</td><td class="cref mono">${f1(C_REF)}</td><td>${inp("c")}</td>
+        <td><div class="rowctl"><button type="button" class="btn ghost" data-tip="${esc(n)}"${done?" disabled":""}>Tipp</button><button type="button" class="btn ghost" data-sol="${esc(n)}"${done?" disabled":""}>Lösung zeigen</button></div></td></tr>`+
+        (msg ? `<tr class="msg"><td></td><td colspan="5"><div class="cmsg ${msg.cls}">${msg.html}</div></td></tr>` : "");
+    }).join("");
+    box.innerHTML = `<p class="note" style="margin:0 0 12px; max-width:none;">c(Probe) = A(Probe) : A(Referenz) · c(Referenz) &nbsp;·&nbsp; Flächen aus der Spalte „Fläche“ der Peaktabellen (Legende anklicken, um zwischen Probe und Referenz zu wechseln). Jeder Wert wird nach der Eingabe sofort geprüft.</p>
+      <div class="table-wrap"><table class="conc-tab">
+        <thead><tr><th>Bestandteil</th><th>A(Probe)</th><th>A(Referenz)</th><th>c(Referenz) in g/L</th><th>c(Probe) in g/L</th><th>Hilfe</th></tr></thead>
+        <tbody>${rows}</tbody></table></div>
+      <div class="btn-row" style="margin-top:12px; align-items:center;">
+        ${names.length > 2 ? `<button type="button" class="btn ghost" id="restFill"${own>=2&&!allDone?"":" disabled"}>Rest ausfüllen</button><span class="note" style="margin:0;">${allDone?"Alle Konzentrationen sind bestimmt.":`„Rest ausfüllen“ ist möglich, sobald zwei Zeilen selbst richtig berechnet sind (${own}/2).`}</span>`
+          : `<span class="note" style="margin:0;">${allDone?"Alle Konzentrationen sind bestimmt – weiter mit Schritt 5.":""}</span>`}
+      </div>
+      <p class="note"><span class="ast">*</span> automatisch ergänzt („Lösung zeigen“ oder „Rest ausfüllen“).</p>`;
+    box.querySelectorAll("input[data-k]").forEach(inp=>{
+      const go = ()=>{ if(inp.value.trim()!==ANA.rows[inp.dataset.n][inp.dataset.k] || ANA.rows[inp.dataset.n].st[inp.dataset.k]===""){ const id=inp.id; enterValue(inp.dataset.n, inp.dataset.k, inp.value); focusNext(id); } };
+      inp.addEventListener("change", go);
+      inp.addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); go(); } });
+    });
+    box.querySelectorAll("[data-tip]").forEach(b=>b.addEventListener("click", ()=>rowTip(b.dataset.tip)));
+    box.querySelectorAll("[data-sol]").forEach(b=>b.addEventListener("click", ()=>rowSolve(b.dataset.sol)));
+    const rf = $("restFill"); if(rf) rf.addEventListener("click", restFill);
+  }
+  function focusNext(id){
+    const order = Array.from(document.querySelectorAll("#concBox input[data-k]"));
+    const i = order.findIndex(x=>x.id===id);
+    const me = $(id);
+    if(me && !me.disabled && me.classList.contains("bad")){ me.focus(); me.select(); return; }
+    const nx = order.slice(i+1).find(x=>!x.disabled); if(nx) nx.focus();
+  }
+
+  // ---------- Schritt 5: Zusammenfassung ----------
+  function chromImage(only){
+    if(only && !Array.isArray(only)) only = [only];
+    const runs = (only || allRuns()).filter(r=>r.end>0);
+    const W=1400, H=540, L=84, R=26, T=22, B=72, pw=W-L-R, ph=H-T-B;
+    const cv = document.createElement("canvas"); cv.width=W; cv.height=H;
+    const g = cv.getContext("2d");
+    g.fillStyle="#fff"; g.fillRect(0,0,W,H);
+    let rt = 0.5, mx = 2;
+    runs.forEach(r=>{ if(r.end>rt) rt=r.end; for(let i=0;i<r.t.length && r.t[i]<=r.end;i++) if(r.sig[i]>mx) mx=r.sig[i]; });
+    const X = t => L + pw*t/rt, Y = v => T + ph - v/mx*ph*0.92;
+    g.strokeStyle="#e2e4e7"; g.lineWidth=1;
+    g.font='20px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif'; g.fillStyle="#333"; g.textAlign="center";
+    for(let i=0;i<=10;i++){ const x=X(rt*i/10); g.beginPath(); g.moveTo(x,T); g.lineTo(x,T+ph); g.stroke(); g.fillText(de((rt*i/10).toFixed(1)), x, T+ph+28); }
+    for(let j=0;j<=4;j++){ const y=T+ph*j/4; g.beginPath(); g.moveTo(L,y); g.lineTo(L+pw,y); g.stroke(); }
+    g.strokeStyle="#333"; g.lineWidth=1.5; g.beginPath(); g.moveTo(L,T); g.lineTo(L,T+ph); g.lineTo(L+pw,T+ph); g.stroke();
+    g.fillText("Zeit in min", L+pw/2, H-10);
+    g.save(); g.translate(28, T+ph/2); g.rotate(-Math.PI/2); g.fillText("Signal in pA", 0, 0); g.restore();
+    g.lineJoin="round";
+    runs.slice().sort((a,b)=>(a.kind==="probe")-(b.kind==="probe")).forEach(r=>{   // Probe zuletzt, damit sie oben liegt
+      g.beginPath(); g.strokeStyle = PRINT_COLORS[(r.ci||0)%PRINT_COLORS.length]; g.lineWidth = r.kind==="probe" ? 2.8 : 2;
+      for(let i=0;i<r.t.length && r.t[i]<=r.end;i++){ const x=X(r.t[i]), y=Y(r.sig[i]); i ? g.lineTo(x,y) : g.moveTo(x,y); }
+      g.stroke();
+    });
+    if(only && only.length===1 && only[0].peaks){ const o1 = only[0];   // Peaknummern über den Peaks
+      g.fillStyle="#111"; g.font='bold 20px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif'; g.textAlign="center";
+      o1.peaks.forEach(p=>{ let k=0; while(k<o1.t.length-1 && o1.t[k]<p.tR) k++; g.fillText(String(p.num), X(p.tR), Math.max(T+14, Y(o1.sig[k])-8)); });
+    }
+    return cv.toDataURL("image/png");
+  }
+  const pad2 = n => String(n).padStart(2,"0");
+  function sumHTML(){
+    const d = new Date(), date = `${pad2(d.getDate())}.${pad2(d.getMonth()+1)}.${d.getFullYear()}`;
+    const fld = (lab,v) => `<div class="sf"><span class="sl">${lab}</span><span class="sv">${v?esc(v):"&nbsp;"}</span></div>`;
+    const ast = '<span class="ast">*</span>';
+    const runs = allRuns().filter(r=>r.end>0);
+    const probeRun = finishedRuns("probe").slice(-1)[0];
+    const names = sampleNames();
+    const probeRows = probeRun ? probeRun.peaks.map(p=>`<tr><td>${p.num}</td><td>${de(p.tR.toFixed(2))}</td><td>${f1(p.area)}</td><td class="l">${p.isAir?"Luft (Totzeit)":(ANA.idDone&&p.match?p.match:"–")}</td></tr>`).join("") : `<tr><td colspan="4">Probe nicht gemessen</td></tr>`;
+    const refRows = measuredRefs().map(n=>{ const t=refTR(n); const p=peaksNamed(finishedRuns("ref",n), n).slice(-1)[0];
+      return `<tr><td class="l">${n}</td><td>${t!=null?de(t.toFixed(2)):"–"}</td><td>${p?f1(p.area):"–"}</td><td>${names.includes(n)&&ANA.idDone?"ja":"nein"}</td></tr>`; }).join("") || `<tr><td colspan="4">keine Referenz gemessen</td></tr>`;
+    const cell = (r,k) => r[k]==="" ? "–" : esc(r[k]) + (r.st[k]==="shown" ? ast : "");
+    const concRows = names.map(n=>{ const r=ANA.rows[n]||{aP:"",aR:"",c:"",st:{}}; const t=trueOf(n), c=parseNum(r.c), done=rowDone(r);
+      const dev = done ? (c-t)/t*100 : NaN;
+      return `<tr><td class="l">${n}</td><td>${cell(r,"aP")}</td><td>${cell(r,"aR")}</td><td>${f1(C_REF)}</td><td><b>${cell(r,"c")}</b></td><td>${done?f3(t):"–"}</td><td>${done?(dev>=0?"+":"−")+de(Math.abs(dev).toFixed(1))+" %":"–"}</td></tr>`; }).join("");
+    let own=0, auto=0; names.forEach(n=>{ const r=ANA.rows[n]; if(!r) return; ["aP","aR","c"].forEach(k=>{ if(r.st[k]==="ok") own++; else if(r.st[k]==="shown") auto++; }); });
+    const st = stepState(); const nDone = [st.s1,st.s3,st.s4].filter(Boolean).length + (measuredRefs().length?1:0);
+    const url = /^https?:/.test(location.protocol) ? location.host + location.pathname.replace(/\/[^/]*$/,"/") : "chemie.mail-baumgart.de";
+    return `<div class="sheet">
+  <div class="s-kick">Analyseprotokoll Gaschromatographie</div>
+  <h1>Unbekannte Probe ${ANA.sample} (Niveau ${ANA.level})</h1>
+  <div class="s-fields">${fld("Name",ANA.name)}${fld("Kurs",ANA.kurs)}${fld("Datum",date)}</div>
+
+  <div class="s-sec">
+    <h2>1 Messbedingungen</h2>
+    <p>Temperaturprogramm: 40 °C, 1,0 min halten, dann 10 °C/min &nbsp;·&nbsp; Trägergasfluss 1,5 mL/min &nbsp;·&nbsp; Trennstufen N = 15 000 &nbsp;·&nbsp; Laufzeit 10 min &nbsp;·&nbsp; Probenmenge 1,0 µL &nbsp;·&nbsp; Referenzlösungen je ${f1(C_REF)} g/L</p>
+  </div>
+
+  <div class="s-sec s-keep">
+    <h2>2 Chromatogramme</h2>
+    <img class="s-img" src="${chromImage()}" alt="Chromatogramme der Probe und der Referenzen">
+    <div class="s-leg">${runs.map(r=>`<span><i style="background:${PRINT_COLORS[(r.ci||0)%PRINT_COLORS.length]}"></i>${esc(r.label)}</span>`).join("")}</div>
+  </div>
+
+  <div class="s-sec s-keep">
+    <h2>3 Zuordnung über die Retentionszeiten</h2>
+    <div style="display:flex; gap:14px; align-items:flex-start;">
+      <div style="flex:1;"><p class="s-small"><b>Peaks der Probe</b></p>
+        <table class="s-tab"><thead><tr><th>Peak</th><th>t<sub>R</sub> in min</th><th>Fläche</th><th>Stoff</th></tr></thead><tbody>${probeRows}</tbody></table></div>
+      <div style="flex:1;"><p class="s-small"><b>Gemessene Referenzen</b></p>
+        <table class="s-tab"><thead><tr><th>Referenz</th><th>t<sub>R</sub> in min</th><th>Fläche</th><th>in der Probe</th></tr></thead><tbody>${refRows}</tbody></table></div>
+    </div>
+    <p>Bestandteile der Probe: <b>${ANA.idDone ? names.join(", ") : "noch nicht bestimmt"}</b>${ANA.idShown?ast:""} &nbsp;·&nbsp; ${ANA.idDone ? (ANA.idShown ? `Lösung nach ${ANA.idTries} Prüfversuchen angezeigt` : `im ${ANA.idTries}. Versuch richtig bestimmt`) : `${ANA.idTries} Prüfversuch(e)`}</p>
+  </div>
+
+  <div class="s-sec s-keep">
+    <h2>4 Konzentrationen</h2>
+    <p class="s-small">c(Probe) = A(Probe) : A(Referenz) · c(Referenz). Der Responsefaktor kürzt sich heraus, weil Probe und Referenz denselben Stoff enthalten und unter gleichen Bedingungen gemessen wurden.</p>
+    <table class="s-tab"><thead><tr><th>Bestandteil</th><th>A(Probe)</th><th>A(Referenz)</th><th>c(Referenz) in g/L</th><th>c(Probe) in g/L</th><th>tatsächlich in g/L</th><th>Abweichung</th></tr></thead><tbody>${concRows}</tbody></table>
+  </div>
+
+  <div class="s-sec s-keep s-status">
+    <h2>Bearbeitungsstand</h2>
+    <p>Abgeschlossene Arbeitsschritte: <b>${nDone} von 4</b> (ohne Zusammenfassung) &nbsp;·&nbsp; selbst ermittelte Werte: <b>${own}</b> &nbsp;·&nbsp; automatisch ergänzte Werte: <b>${auto}</b> &nbsp;·&nbsp; Läufe: <b>${runs.length}</b> (davon ${runs.filter(r=>r.kind==="ref").length} Referenzen)</p>
+    <p class="s-small"><span class="ast">*</span> automatisch ergänzt („Lösung zeigen“ oder „Rest ausfüllen“). Alle anderen Werte wurden selbst eingegeben und von der Simulation als richtig geprüft.</p>
+  </div>
+
+  <div class="s-foot">Erstellt mit der Simulation „Gaschromatograph“ (Aufgabenart Analyse) von Bastian Baumgart · ${esc(url)} · Simulierte Messdaten · Lizenz: CC BY-NC-SA 4.0</div>
+</div>`;
+  }
+  let sumTimer = null;
+  function renderSummaryTab(){
+    const open = ANA.idDone;
+    $("sumLocked").hidden = open; $("sumOpen").hidden = !open;
+    if(!open || !$("tab-sum").classList.contains("active")) return;
+    if(document.activeElement!==$("sumName")) $("sumName").value = ANA.name;
+    if(document.activeElement!==$("sumKurs")) $("sumKurs").value = ANA.kurs;
+    $("sumPaper").innerHTML = sumHTML();
+  }
+  ["sumName","sumKurs"].forEach(id=> $(id).addEventListener("input", ()=>{
+    ANA.name = $("sumName").value.slice(0,60); ANA.kurs = $("sumKurs").value.slice(0,40);
+    clearTimeout(sumTimer); sumTimer = setTimeout(renderSummaryTab, 300);
+  }));
+  const sumDlg = $("sumDlgBackdrop");
+  $("sumPrint").addEventListener("click", ()=>{
+    ANA.name = $("sumName").value.slice(0,60); ANA.kurs = $("sumKurs").value.slice(0,40);
+    sumDlg.classList.add("open");
+  });
+  const closeSumDlg = () => sumDlg.classList.remove("open");
+  $("closeSumDlg").addEventListener("click", closeSumDlg);
+  $("sumDlgCancel").addEventListener("click", closeSumDlg);
+  sumDlg.addEventListener("click", e=>{ if(e.target===sumDlg) closeSumDlg(); });
+  $("sumDlgGo").addEventListener("click", ()=>{
+    closeSumDlg();
+    $("printRoot").innerHTML = sumHTML();
+    document.body.classList.add("pr");
+    setTimeout(()=>window.print(), 80);
+  });
+
+  // ---------- Auswertung (Peaktabelle, Auflösung) als PDF ----------
+  let evalPrint = false;
+  function evalRunBlock(run, nr){
+    // Peaktabelle und Auflösung des Laufs: dazu den Lauf kurz als ausgewählt setzen
+    selectedRun = run; detectedPeaks = run.peaks || [];
+    const rows = detectedPeaks.map(p=>`<tr><td>${p.num}</td><td>${de(p.tR.toFixed(2))}</td><td>${de(p.height.toFixed(1))}</td><td>${de(p.area.toFixed(1))}</td><td>${p.isAir?"—":de(p.areaPct.toFixed(1))+" %"}</td><td>${Math.round(p.N).toLocaleString("de-DE")}</td><td class="l">${esc(peakName(p))}</td></tr>`).join("");
+    let res = "";
+    if(taskMode==="sim"){
+      renderRes();
+      const items = [...$("resList").querySelectorAll(".res-item")].map(el=>{ const sp = el.querySelectorAll("span"); return `<tr><td class="l">${sp[0]?sp[0].innerHTML:""}</td><td class="l">${sp[1]?sp[1].innerHTML:""}</td></tr>`; }).join("");
+      res = items ? `<p class="s-small"><b>Auflösung</b> · R<sub>s</sub> = 2·(t<sub>R2</sub> − t<sub>R1</sub>) : (w<sub>1</sub> + w<sub>2</sub>); ab R<sub>s</sub> ≥ 1,5 Basislinientrennung</p><table class="s-tab"><thead><tr><th>Peakpaar / Stoffe</th><th>Ergebnis</th></tr></thead><tbody>${items}</tbody></table>` : `<p class="s-small">Auflösung: mindestens zwei Peaks von Probenbestandteilen nötig.</p>`;
+    }
+    return `<div class="s-sec s-keep"><h2>${nr} ${esc(run.label)}</h2>
+    <table class="s-tab"><thead><tr><th>Peak</th><th>t<sub>R</sub> in min</th><th>Höhe</th><th>Fläche</th><th>Fläche in %</th><th>Bodenzahl N</th><th>Stoff</th></tr></thead><tbody>${rows}</tbody></table>${res}</div>`;
+  }
+  function evalHTML(runs){
+    const d = new Date(), date = `${pad2(d.getDate())}.${pad2(d.getMonth()+1)}.${d.getFullYear()}`;
+    const fld = (lab,v) => `<div class="sf"><span class="sl">${lab}</span><span class="sv">${v?esc(v):"&nbsp;"}</span></div>`;
+    const prevSel = selectedRun, prevDet = detectedPeaks;
+    const blocks = runs.map((r,i)=>evalRunBlock(r, "2." + (i+1))).join("");
+    // Vergleich der Retentionszeiten
+    let cmp = "";
+    if(runs.length>1){
+      const nm = (r,p)=>{ selectedRun = r; return peakName(p); };
+      const names = [];
+      runs.forEach(r=>(r.peaks||[]).forEach(p=>{ const n = nm(r,p); if(!p.isAir && n!=="–" && n!=="unbekannt" && !names.includes(n)) names.push(n); }));
+      const cell = (r,n)=>{ const p=(r.peaks||[]).find(q=>nm(r,q)===n); return p ? de(p.tR.toFixed(2)) : "–"; };
+      const head = runs.map(r=>`<th>Lauf ${r.num}</th>`).join("");
+      const body = names.map(n=>`<tr><td class="l">${esc(n)}</td>${runs.map(r=>`<td>${cell(r,n)}</td>`).join("")}</tr>`).join("")
+        + `<tr><td class="l">Anzahl erkannter Peaks</td>${runs.map(r=>`<td>${(r.peaks||[]).length}</td>`).join("")}</tr>`;
+      cmp = `<div class="s-sec s-keep"><h2>3 Vergleich der Läufe</h2><p class="s-small">Retentionszeiten t<sub>R</sub> in min; „–“: Stoff in diesem Lauf nicht als eigener Peak erkannt.</p>
+      <table class="s-tab"><thead><tr><th>Stoff</th>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
+    }
+    selectedRun = prevSel; detectedPeaks = prevDet; renderRes();
+    const url = /^https?:/.test(location.protocol) ? location.host + location.pathname.replace(/\/[^/]*$/,"/") : "chemie.mail-baumgart.de";
+    return `<div class="sheet">
+  <div class="s-kick">Auswertung Gaschromatographie</div>
+  <h1>${runs.length>1 ? runs.length+" Läufe im Vergleich" : esc(runs[0].label)}</h1>
+  <div class="s-fields">${fld("Name",ANA.name)}${fld("Kurs",ANA.kurs)}${fld("Datum",date)}</div>
+  <div class="s-sec s-keep"><h2>1 Chromatogramm</h2>
+    <img class="s-img" src="${chromImage(runs)}" alt="Chromatogramm">
+    <div class="s-leg">${runs.map(r=>`<span><i style="background:${PRINT_COLORS[(r.ci||0)%PRINT_COLORS.length]}"></i>${esc(r.label)}</span>`).join("")}</div></div>
+  ${blocks}
+  ${cmp}
+  <p class="s-small">Der Luftpeak (Totzeit) zählt nicht zu den Flächenprozenten.</p>
+  <div class="s-foot">Erstellt mit der Simulation „Gaschromatograph“ von Bastian Baumgart · ${esc(url)} · Simulierte Messdaten · Lizenz: CC BY-NC-SA 4.0</div>
+</div>`;
+  }
+  const pdfBackdrop = $("pdfBackdrop");
+  const pdfRunsOk = () => allRuns().filter(r=>r.finished && (r.peaks||[]).length);
+  function openPdfDialog(){
+    const list = pdfRunsOk();
+    if(!list.length) return;
+    $("pdfRuns").innerHTML = list.map(r=>`<label><input type="checkbox" value="${r.num}" checked><i style="background:${r.color}"></i><span>${esc(r.label)}</span></label>`).join("");
+    $("pdfName").value = ANA.name || ""; $("pdfKurs").value = ANA.kurs || "";
+    $("pdfGo").disabled = false;
+    pdfBackdrop.classList.add("open");
+  }
+  $("pdfRuns").addEventListener("change", ()=>{ $("pdfGo").disabled = !$("pdfRuns").querySelector("input:checked"); });
+  const closePdf = () => pdfBackdrop.classList.remove("open");
+  $("btnExport").addEventListener("click", openPdfDialog);
+  $("closePdf").addEventListener("click", closePdf);
+  $("pdfCancel").addEventListener("click", closePdf);
+  pdfBackdrop.addEventListener("click", e=>{ if(e.target===pdfBackdrop) closePdf(); });
+  $("pdfGo").addEventListener("click", ()=>{
+    const nums = [...$("pdfRuns").querySelectorAll("input:checked")].map(i=>+i.value);
+    const runs = pdfRunsOk().filter(r=>nums.includes(r.num));
+    if(!runs.length) return;
+    ANA.name = $("pdfName").value.slice(0,60); ANA.kurs = $("pdfKurs").value.slice(0,40);
+    closePdf();
+    $("printRoot").innerHTML = evalHTML(runs);
+    evalPrint = true;
+    document.body.classList.add("pr");
+    setTimeout(()=>window.print(), 80);
+  });
+
+  window.addEventListener("afterprint", ()=>{
+    if(!document.body.classList.contains("pr")) return;
+    document.body.classList.remove("pr");
+    if(evalPrint){ evalPrint = false; return; }
+    if(taskMode==="ana" && ANA.idDone){ ANA.printed = true; renderAna(); }
+  });
+
+  function afterRunsChanged(){ if(taskMode==="ana") renderAna(); }
+
   // ---------- Init ----------
   renderCompounds();
   renderLibrarySelect();
   renderMixtureSelect();
+  fillSampleSel();
   fitCanvas();
   draw();
 })();
@@ -1314,9 +2087,15 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
   const hdr = document.querySelector("header");
   if(!hdr) return;
   const set = () => document.documentElement.style.setProperty("--hdr", Math.max(0, Math.round(hdr.getBoundingClientRect().bottom)) + "px");
+  /* Platz unter dem Inhaltsbereich (Fuß): die Spalte darf am Seitenende nicht oben aus dem Bild geschoben werden */
+  const wrap = document.querySelector(".wrap");
+  const setF = () => { if(!wrap) return; const d = document.documentElement.scrollHeight - (wrap.getBoundingClientRect().bottom + scrollY); document.documentElement.style.setProperty("--ftr", Math.max(0, Math.round(d)) + "px"); };
+  addEventListener("resize", setF); addEventListener("load", setF); setF(); if(window.ResizeObserver) new ResizeObserver(setF).observe(document.body);
   addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
 })();
 </script>
+
+<div id="printRoot"></div>
 
 <div class="modal-backdrop" id="glBackdrop">
   <div class="modal-box gl-wide" role="dialog" aria-modal="true" aria-labelledby="glTitle">
@@ -1335,7 +2114,7 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
 <script>
 /* Rubrik Grundlagen */
 (function(){
-  const GL = [{"t": "Prinzip der Chromatographie", "h": "<p>Chromatographie trennt Stoffgemische durch die unterschiedliche Verteilung der Stoffe zwischen einer <strong>mobilen Phase<\/strong>, die sich bewegt, und einer <strong>stationären Phase<\/strong>, die festsitzt.<\/p> <p>Ein Stoff, der stark mit der stationären Phase wechselwirkt oder sich gut darin löst, hält sich länger dort auf und wandert langsamer. Ein Stoff, der sich vor allem in der mobilen Phase aufhält, wird schnell transportiert. So kommen die Bestandteile nacheinander am Ende der Trennstrecke an.<\/p> <p>Bei der <strong>Gaschromatographie (GC)<\/strong> ist die mobile Phase ein inertes <strong>Trägergas<\/strong> (z. B. Helium, Stickstoff, Wasserstoff), die stationäre Phase ein dünner Flüssigkeitsfilm auf der Innenwand einer langen, dünnen <strong>Kapillarsäule<\/strong>.<\/p>"}, {"t": "Aufbau eines Gaschromatographen", "h": "<div class=\"gl-row\"><figure class=\"gl-fig\"><svg viewBox=\"0 0 440 170\" width=\"440\" style=\"max-width:440px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><defs><marker id=\"gs\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--teal)\"/><\/marker><\/defs><rect x=\"10\" y=\"60\" width=\"62\" height=\"40\" rx=\"3\" fill=\"var(--panel-alt)\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" /><text x=\"41\" y=\"84\" font-size=\"10.5\" fill=\"var(--text)\" text-anchor=\"middle\" font-weight=\"400\" >Trägergas<\/text><line x1=\"72\" y1=\"80\" x2=\"108\" y2=\"80\" stroke=\"var(--teal)\" stroke-width=\"1.8\" marker-end=\"url(#gs)\"/><rect x=\"108\" y=\"55\" width=\"50\" height=\"50\" rx=\"3\" fill=\"var(--panel-alt)\" stroke=\"var(--amber)\" stroke-width=\"1.3\" /><text x=\"133\" y=\"76\" font-size=\"10\" fill=\"var(--text)\" text-anchor=\"middle\" font-weight=\"400\" >Injektor<\/text><text x=\"133\" y=\"90\" font-size=\"9.5\" fill=\"var(--text-faint)\" text-anchor=\"middle\" font-weight=\"400\" >(Probe)<\/text><rect x=\"175\" y=\"25\" width=\"140\" height=\"115\" rx=\"6\" fill=\"rgba(255,180,84,.06)\" stroke=\"var(--amber)\" stroke-width=\"1.3\" /><text x=\"245\" y=\"18\" font-size=\"10.5\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"400\" >Säulenofen<\/text><circle cx=\"245\" cy=\"82\" r=\"38\" fill=\"none\" stroke=\"var(--teal)\" stroke-width=\"2.4\"/><circle cx=\"245\" cy=\"82\" r=\"30\" fill=\"none\" stroke=\"var(--teal)\" stroke-width=\"2.4\"/><circle cx=\"245\" cy=\"82\" r=\"22\" fill=\"none\" stroke=\"var(--teal)\" stroke-width=\"2.4\"/><text x=\"245\" y=\"132\" font-size=\"10\" fill=\"var(--text)\" text-anchor=\"middle\" font-weight=\"400\" >Trennsäule<\/text><line x1=\"158\" y1=\"80\" x2=\"207\" y2=\"82\" stroke=\"var(--teal)\" stroke-width=\"1.8\"/><line x1=\"283\" y1=\"82\" x2=\"330\" y2=\"82\" stroke=\"var(--teal)\" stroke-width=\"1.8\" marker-end=\"url(#gs)\"/><rect x=\"330\" y=\"60\" width=\"52\" height=\"44\" rx=\"3\" fill=\"var(--panel-alt)\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" /><text x=\"356\" y=\"86\" font-size=\"10\" fill=\"var(--text)\" text-anchor=\"middle\" font-weight=\"400\" >Detektor<\/text><line x1=\"382\" y1=\"82\" x2=\"400\" y2=\"82\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><rect x=\"400\" y=\"52\" width=\"34\" height=\"60\" rx=\"3\" fill=\"none\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" /><path d=\"M404 105 L410 105 L413 70 L416 105 L421 105 L424 88 L427 105 L431 105\" stroke=\"var(--teal)\" stroke-width=\"1.4\" fill=\"none\" /><text x=\"417\" y=\"128\" font-size=\"9.5\" fill=\"var(--text-faint)\" text-anchor=\"middle\" font-weight=\"400\" >Signal<\/text><\/svg><figcaption>Schema eines Gaschromatographen<\/figcaption><\/figure><\/div> <ul><li><strong>Injektor:<\/strong> Die flüssige Probe wird mit einer Spritze eingespritzt und sofort verdampft.<\/li> <li><strong>Trennsäule im Ofen:<\/strong> Hier findet die Trennung statt. Die Ofentemperatur bestimmt, wie schnell die Stoffe wandern.<\/li> <li><strong>Detektor:<\/strong> registriert die austretenden Stoffe und erzeugt ein elektrisches Signal, das gegen die Zeit aufgezeichnet wird – das <strong>Chromatogramm<\/strong>.<\/li><\/ul>"}, {"t": "Retentionszeit", "h": "<div class=\"gl-row\"><figure class=\"gl-fig\"><svg viewBox=\"0 0 360 200\" width=\"360\" style=\"max-width:360px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><defs><marker id=\"ax60250\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--text-dim)\"/><\/marker><\/defs><line x1=\"69.07692307692308\" y1=\"14\" x2=\"69.07692307692308\" y2=\"164\" stroke=\"var(--text-faint)\" stroke-width=\"1\" stroke-dasharray=\"4 3\"/><text x=\"72.07692307692308\" y=\"24\" font-size=\"10.5\" fill=\"var(--text-faint)\" text-anchor=\"start\" font-weight=\"400\" >t₀<\/text><path d=\"M46.0 161.1 L47.0 161.1 L48.0 161.1 L49.0 161.1 L50.0 161.1 L51.0 161.1 L52.0 161.1 L53.0 161.1 L54.0 161.1 L55.0 161.1 L56.0 161.1 L57.0 161.1 L58.0 161.1 L59.0 161.1 L60.0 161.1 L61.0 161.1 L62.0 160.8 L63.0 160.0 L64.0 158.0 L65.0 153.6 L66.0 146.5 L67.0 137.3 L68.0 129.1 L69.0 125.4 L70.0 128.2 L71.0 135.9 L72.0 145.1 L73.0 152.7 L74.0 157.5 L75.0 159.8 L76.0 160.7 L77.0 161.0 L78.0 161.1 L79.0 161.1 L80.0 161.1 L81.0 161.1 L82.0 161.1 L83.0 161.1 L84.0 161.1 L85.0 161.1 L86.0 161.1 L87.0 161.1 L88.0 161.1 L89.0 161.1 L90.0 161.1 L91.0 161.1 L92.0 161.1 L93.0 161.1 L94.0 161.1 L95.0 161.1 L96.0 161.1 L97.0 161.1 L98.0 161.1 L99.0 161.1 L100.0 161.1 L101.0 161.1 L102.0 161.1 L103.0 161.1 L104.0 161.1 L105.0 161.1 L106.0 161.1 L107.0 161.1 L108.0 161.1 L109.0 161.1 L110.0 161.1 L111.0 161.1 L112.0 161.1 L113.0 161.1 L114.0 161.1 L115.0 161.1 L116.0 161.1 L117.0 161.1 L118.0 161.1 L119.0 161.1 L120.0 161.1 L121.0 161.1 L122.0 161.1 L123.0 161.1 L124.0 161.1 L125.0 161.1 L126.0 161.1 L127.0 161.0 L128.0 160.9 L129.0 160.7 L130.0 160.3 L131.0 159.7 L132.0 158.6 L133.0 157.0 L134.0 154.7 L135.0 151.2 L136.0 146.5 L137.0 140.1 L138.0 132.0 L139.0 122.0 L140.0 110.2 L141.0 97.1 L142.0 83.2 L143.0 69.2 L144.0 56.3 L145.0 45.4 L146.0 37.4 L147.0 33.2 L148.0 33.0 L149.0 37.0 L150.0 44.7 L151.0 55.4 L152.0 68.2 L153.0 82.1 L154.0 96.0 L155.0 109.3 L156.0 121.1 L157.0 131.3 L158.0 139.5 L159.0 146.0 L160.0 150.9 L161.0 154.4 L162.0 156.9 L163.0 158.5 L164.0 159.6 L165.0 160.3 L166.0 160.6 L167.0 160.9 L168.0 161.0 L169.0 161.1 L170.0 161.1 L171.0 161.1 L172.0 161.1 L173.0 161.1 L174.0 161.1 L175.0 161.1 L176.0 161.1 L177.0 161.1 L178.0 161.0 L179.0 160.9 L180.0 160.8 L181.0 160.6 L182.0 160.3 L183.0 159.9 L184.0 159.3 L185.0 158.4 L186.0 157.2 L187.0 155.6 L188.0 153.4 L189.0 150.7 L190.0 147.4 L191.0 143.3 L192.0 138.5 L193.0 133.0 L194.0 126.9 L195.0 120.3 L196.0 113.5 L197.0 106.7 L198.0 100.1 L199.0 94.2 L200.0 89.3 L201.0 85.5 L202.0 83.3 L203.0 82.6 L204.0 83.5 L205.0 86.0 L206.0 90.0 L207.0 95.1 L208.0 101.1 L209.0 107.7 L210.0 114.5 L211.0 121.4 L212.0 127.9 L213.0 133.9 L214.0 139.3 L215.0 144.0 L216.0 147.9 L217.0 151.2 L218.0 153.8 L219.0 155.8 L220.0 157.4 L221.0 158.5 L222.0 159.4 L223.0 160.0 L224.0 160.4 L225.0 160.7 L226.0 160.8 L227.0 161.0 L228.0 161.0 L229.0 161.1 L230.0 161.1 L231.0 161.1 L232.0 161.1 L233.0 161.1 L234.0 161.1 L235.0 161.1 L236.0 161.1 L237.0 161.1 L238.0 161.1 L239.0 161.1 L240.0 161.1 L241.0 161.1 L242.0 161.1 L243.0 161.1 L244.0 161.1 L245.0 161.1 L246.0 161.1 L247.0 161.0 L248.0 161.0 L249.0 160.9 L250.0 160.8 L251.0 160.7 L252.0 160.5 L253.0 160.2 L254.0 159.8 L255.0 159.3 L256.0 158.7 L257.0 157.9 L258.0 156.8 L259.0 155.5 L260.0 153.8 L261.0 151.8 L262.0 149.3 L263.0 146.4 L264.0 143.0 L265.0 139.0 L266.0 134.4 L267.0 129.3 L268.0 123.7 L269.0 117.6 L270.0 111.1 L271.0 104.2 L272.0 97.2 L273.0 90.2 L274.0 83.3 L275.0 76.8 L276.0 70.8 L277.0 65.4 L278.0 61.0 L279.0 57.5 L280.0 55.2 L281.0 54.1 L282.0 54.2 L283.0 55.6 L284.0 58.2 L285.0 61.9 L286.0 66.6 L287.0 72.1 L288.0 78.3 L289.0 84.9 L290.0 91.8 L291.0 98.9 L292.0 105.8 L293.0 112.6 L294.0 119.0 L295.0 125.0 L296.0 130.6 L297.0 135.5 L298.0 139.9 L299.0 143.8 L300.0 147.1 L301.0 149.9 L302.0 152.3 L303.0 154.2 L304.0 155.8 L305.0 157.1 L306.0 158.1 L307.0 158.9 L308.0 159.5 L309.0 159.9 L310.0 160.3 L311.0 160.5 L312.0 160.7 L313.0 160.8 L314.0 160.9 L315.0 161.0 L316.0 161.0 L317.0 161.1 L318.0 161.1 L319.0 161.1 L320.0 161.1 L321.0 161.1 L322.0 161.1 L323.0 161.1 L324.0 161.1 L325.0 161.1 L326.0 161.1 L327.0 161.1 L328.0 161.1 L329.0 161.1 L330.0 161.1 L331.0 161.1 L332.0 161.1 L333.0 161.1 L334.0 161.1 L335.0 161.1 L336.0 161.1 L337.0 161.1 L338.0 161.1 L339.0 161.1 L340.0 161.1 L341.0 161.1 L342.0 161.1 L343.0 161.1 L344.0 161.1 L345.0 161.1 L346.0 161.1\" stroke=\"var(--teal)\" stroke-width=\"2\" fill=\"none\" /><circle cx=\"147.5\" cy=\"32.6\" r=\"3.6\" fill=\"var(--amber)\"/><text x=\"153.53846153846155\" y=\"30.571428571428584\" font-size=\"10.5\" fill=\"var(--amber)\" text-anchor=\"start\" font-weight=\"400\" >tR<\/text><line x1=\"46\" y1=\"164\" x2=\"352\" y2=\"164\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" marker-end=\"url(#ax60250)\"/><line x1=\"46\" y1=\"164\" x2=\"46\" y2=\"8\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" marker-end=\"url(#ax60250)\"/><line x1=\"46.0\" y1=\"164\" x2=\"46.0\" y2=\"168\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"46.0\" y=\"179\" font-size=\"10\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >0<\/text><line x1=\"138.30769230769232\" y1=\"164\" x2=\"138.30769230769232\" y2=\"168\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"138.30769230769232\" y=\"179\" font-size=\"10\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >2<\/text><line x1=\"230.6153846153846\" y1=\"164\" x2=\"230.6153846153846\" y2=\"168\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"230.6153846153846\" y=\"179\" font-size=\"10\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >4<\/text><line x1=\"322.92307692307696\" y1=\"164\" x2=\"322.92307692307696\" y2=\"168\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"322.92307692307696\" y=\"179\" font-size=\"10\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >6<\/text><text x=\"196.0\" y=\"196\" font-size=\"11\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >Zeit in min<\/text><text x=\"13\" y=\"89.0\" font-size=\"11\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" transform=\"rotate(-90 13 89.0)\">Signal<\/text><\/svg><figcaption>Chromatogramm: Luftpeak bei der Totzeit t₀, danach die Peaks der Probenbestandteile<\/figcaption><\/figure><\/div> <p>Die <strong>Retentionszeit t<sub>R<\/sub><\/strong> ist die Zeit von der Injektion bis zum Maximum eines Peaks. Unter gleichen Bedingungen ist sie für jeden Stoff charakteristisch. Die <strong>Totzeit t<sub>0<\/sub><\/strong> braucht ein Stoff, der gar nicht mit der stationären Phase wechselwirkt, z. B. die mit eingespritzte Luft.<\/p> <p>Die Retentionszeit wird größer bei<\/p> <ul><li>höherer Siedetemperatur des Stoffes (stärkere zwischenmolekulare Kräfte),<\/li><li>ähnlicher Polarität von Stoff und stationärer Phase,<\/li><li>niedrigerer Ofentemperatur, kleinerem Gasfluss und längerer Säule.<\/li><\/ul>"}, {"t": "Temperaturprogramm und Auflösung", "h": "<p>Bei <strong>isothermer<\/strong> Arbeitsweise bleibt die Ofentemperatur konstant. Ist sie niedrig, werden leichtflüchtige Stoffe gut getrennt, schwerflüchtige brauchen aber sehr lange und geben breite, flache Peaks. Ist sie hoch, laufen die Peaks früh und eng zusammen.<\/p> <p>Ein <strong>Temperaturprogramm<\/strong> löst das Problem: Man beginnt bei niedriger Temperatur und heizt dann mit einer festen Rate auf. So werden alle Bestandteile in vertretbarer Zeit mit schmalen Peaks getrennt.<\/p> <div class=\"gl-box gl-info\">Die <strong>Auflösung R<\/strong> beschreibt, wie gut zwei benachbarte Peaks getrennt sind: R = 2 · (t<sub>R2<\/sub> − t<sub>R1<\/sub>) / (w<sub>1<\/sub> + w<sub>2<\/sub>), w = Peakbreite an der Basis. Ab R ≈ 1,5 gelten zwei Peaks als vollständig getrennt.<\/div>"}, {"t": "Qualitative und quantitative Auswertung", "h": "<p><strong>Qualitativ – welcher Stoff?<\/strong> Man vergleicht die Retentionszeiten mit denen von Vergleichssubstanzen, die unter genau denselben Bedingungen gemessen wurden. Stimmt die Retentionszeit überein, ist der Stoff wahrscheinlich gleich; sicher ist es erst, wenn er auch unter anderen Bedingungen übereinstimmt.<\/p> <p><strong>Quantitativ – wie viel?<\/strong> Die <strong>Peakfläche<\/strong> ist proportional zur Stoffmenge des Stoffes. Bei der Flächenprozent-Methode teilt man jede Peakfläche durch die Summe aller Flächen:<\/p> <div class=\"gl-box gl-info\">Anteil (Flächen-%) = A<sub>i<\/sub> / ΣA · 100 %<\/div> <p>Weil der Detektor nicht auf jeden Stoff gleich stark anspricht, korrigiert man für genaue Ergebnisse mit <strong>Responsefaktoren<\/strong>, die mit bekannten Mischungen bestimmt werden. Der Luftpeak wird bei der Auswertung nicht mitgerechnet.<\/p>"}];
+  const GL = [{"t": "Prinzip der Chromatographie", "h": "<p>Chromatographie trennt Stoffgemische durch die unterschiedliche Verteilung der Stoffe zwischen einer <strong>mobilen Phase<\/strong>, die sich bewegt, und einer <strong>stationären Phase<\/strong>, die festsitzt.<\/p> <p>Ein Stoff, der stark mit der stationären Phase wechselwirkt oder sich gut darin löst, hält sich länger dort auf und wandert langsamer. Ein Stoff, der sich vor allem in der mobilen Phase aufhält, wird schnell transportiert. So kommen die Bestandteile nacheinander am Ende der Trennstrecke an.<\/p> <p>Bei der <strong>Gaschromatographie (GC)<\/strong> ist die mobile Phase ein inertes <strong>Trägergas<\/strong> (z. B. Helium, Stickstoff, Wasserstoff), die stationäre Phase ein dünner Flüssigkeitsfilm auf der Innenwand einer langen, dünnen <strong>Kapillarsäule<\/strong>.<\/p>"}, {"t": "Aufbau eines Gaschromatographen", "h": "<div class=\"gl-row\"><figure class=\"gl-fig\"><svg viewBox=\"0 0 440 170\" width=\"440\" style=\"max-width:440px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><defs><marker id=\"gs\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--teal)\"/><\/marker><\/defs><rect x=\"10\" y=\"60\" width=\"62\" height=\"40\" rx=\"3\" fill=\"var(--panel-alt)\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" /><text x=\"41\" y=\"84\" font-size=\"10.5\" fill=\"var(--text)\" text-anchor=\"middle\" font-weight=\"400\" >Trägergas<\/text><line x1=\"72\" y1=\"80\" x2=\"108\" y2=\"80\" stroke=\"var(--teal)\" stroke-width=\"1.8\" marker-end=\"url(#gs)\"/><rect x=\"108\" y=\"55\" width=\"50\" height=\"50\" rx=\"3\" fill=\"var(--panel-alt)\" stroke=\"var(--amber)\" stroke-width=\"1.3\" /><text x=\"133\" y=\"76\" font-size=\"10\" fill=\"var(--text)\" text-anchor=\"middle\" font-weight=\"400\" >Injektor<\/text><text x=\"133\" y=\"90\" font-size=\"9.5\" fill=\"var(--text-faint)\" text-anchor=\"middle\" font-weight=\"400\" >(Probe)<\/text><rect x=\"175\" y=\"25\" width=\"140\" height=\"115\" rx=\"6\" fill=\"rgba(255,180,84,.06)\" stroke=\"var(--amber)\" stroke-width=\"1.3\" /><text x=\"245\" y=\"18\" font-size=\"10.5\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"400\" >Säulenofen<\/text><circle cx=\"245\" cy=\"82\" r=\"38\" fill=\"none\" stroke=\"var(--teal)\" stroke-width=\"2.4\"/><circle cx=\"245\" cy=\"82\" r=\"30\" fill=\"none\" stroke=\"var(--teal)\" stroke-width=\"2.4\"/><circle cx=\"245\" cy=\"82\" r=\"22\" fill=\"none\" stroke=\"var(--teal)\" stroke-width=\"2.4\"/><text x=\"245\" y=\"132\" font-size=\"10\" fill=\"var(--text)\" text-anchor=\"middle\" font-weight=\"400\" >Trennsäule<\/text><line x1=\"158\" y1=\"80\" x2=\"207\" y2=\"82\" stroke=\"var(--teal)\" stroke-width=\"1.8\"/><line x1=\"283\" y1=\"82\" x2=\"330\" y2=\"82\" stroke=\"var(--teal)\" stroke-width=\"1.8\" marker-end=\"url(#gs)\"/><rect x=\"330\" y=\"60\" width=\"52\" height=\"44\" rx=\"3\" fill=\"var(--panel-alt)\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" /><text x=\"356\" y=\"86\" font-size=\"10\" fill=\"var(--text)\" text-anchor=\"middle\" font-weight=\"400\" >Detektor<\/text><line x1=\"382\" y1=\"82\" x2=\"400\" y2=\"82\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><rect x=\"400\" y=\"52\" width=\"34\" height=\"60\" rx=\"3\" fill=\"none\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" /><path d=\"M404 105 L410 105 L413 70 L416 105 L421 105 L424 88 L427 105 L431 105\" stroke=\"var(--teal)\" stroke-width=\"1.4\" fill=\"none\" /><text x=\"417\" y=\"128\" font-size=\"9.5\" fill=\"var(--text-faint)\" text-anchor=\"middle\" font-weight=\"400\" >Signal<\/text><\/svg><figcaption>Schema eines Gaschromatographen<\/figcaption><\/figure><\/div> <ul><li><strong>Injektor:<\/strong> Die flüssige Probe wird mit einer Spritze eingespritzt und sofort verdampft.<\/li> <li><strong>Trennsäule im Ofen:<\/strong> Hier findet die Trennung statt. Die Ofentemperatur bestimmt, wie schnell die Stoffe wandern.<\/li> <li><strong>Detektor:<\/strong> registriert die austretenden Stoffe und erzeugt ein elektrisches Signal, das gegen die Zeit aufgezeichnet wird – das <strong>Chromatogramm<\/strong>.<\/li><\/ul>"}, {"t": "Retentionszeit", "h": "<div class=\"gl-row\"><figure class=\"gl-fig\"><svg viewBox=\"0 0 360 200\" width=\"360\" style=\"max-width:360px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><defs><marker id=\"ax60250\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--text-dim)\"/><\/marker><\/defs><line x1=\"69.07692307692308\" y1=\"14\" x2=\"69.07692307692308\" y2=\"164\" stroke=\"var(--text-faint)\" stroke-width=\"1\" stroke-dasharray=\"4 3\"/><text x=\"72.07692307692308\" y=\"24\" font-size=\"10.5\" fill=\"var(--text-faint)\" text-anchor=\"start\" font-weight=\"400\" >t₀<\/text><path d=\"M46.0 161.1 L47.0 161.1 L48.0 161.1 L49.0 161.1 L50.0 161.1 L51.0 161.1 L52.0 161.1 L53.0 161.1 L54.0 161.1 L55.0 161.1 L56.0 161.1 L57.0 161.1 L58.0 161.1 L59.0 161.1 L60.0 161.1 L61.0 161.1 L62.0 160.8 L63.0 160.0 L64.0 158.0 L65.0 153.6 L66.0 146.5 L67.0 137.3 L68.0 129.1 L69.0 125.4 L70.0 128.2 L71.0 135.9 L72.0 145.1 L73.0 152.7 L74.0 157.5 L75.0 159.8 L76.0 160.7 L77.0 161.0 L78.0 161.1 L79.0 161.1 L80.0 161.1 L81.0 161.1 L82.0 161.1 L83.0 161.1 L84.0 161.1 L85.0 161.1 L86.0 161.1 L87.0 161.1 L88.0 161.1 L89.0 161.1 L90.0 161.1 L91.0 161.1 L92.0 161.1 L93.0 161.1 L94.0 161.1 L95.0 161.1 L96.0 161.1 L97.0 161.1 L98.0 161.1 L99.0 161.1 L100.0 161.1 L101.0 161.1 L102.0 161.1 L103.0 161.1 L104.0 161.1 L105.0 161.1 L106.0 161.1 L107.0 161.1 L108.0 161.1 L109.0 161.1 L110.0 161.1 L111.0 161.1 L112.0 161.1 L113.0 161.1 L114.0 161.1 L115.0 161.1 L116.0 161.1 L117.0 161.1 L118.0 161.1 L119.0 161.1 L120.0 161.1 L121.0 161.1 L122.0 161.1 L123.0 161.1 L124.0 161.1 L125.0 161.1 L126.0 161.1 L127.0 161.0 L128.0 160.9 L129.0 160.7 L130.0 160.3 L131.0 159.7 L132.0 158.6 L133.0 157.0 L134.0 154.7 L135.0 151.2 L136.0 146.5 L137.0 140.1 L138.0 132.0 L139.0 122.0 L140.0 110.2 L141.0 97.1 L142.0 83.2 L143.0 69.2 L144.0 56.3 L145.0 45.4 L146.0 37.4 L147.0 33.2 L148.0 33.0 L149.0 37.0 L150.0 44.7 L151.0 55.4 L152.0 68.2 L153.0 82.1 L154.0 96.0 L155.0 109.3 L156.0 121.1 L157.0 131.3 L158.0 139.5 L159.0 146.0 L160.0 150.9 L161.0 154.4 L162.0 156.9 L163.0 158.5 L164.0 159.6 L165.0 160.3 L166.0 160.6 L167.0 160.9 L168.0 161.0 L169.0 161.1 L170.0 161.1 L171.0 161.1 L172.0 161.1 L173.0 161.1 L174.0 161.1 L175.0 161.1 L176.0 161.1 L177.0 161.1 L178.0 161.0 L179.0 160.9 L180.0 160.8 L181.0 160.6 L182.0 160.3 L183.0 159.9 L184.0 159.3 L185.0 158.4 L186.0 157.2 L187.0 155.6 L188.0 153.4 L189.0 150.7 L190.0 147.4 L191.0 143.3 L192.0 138.5 L193.0 133.0 L194.0 126.9 L195.0 120.3 L196.0 113.5 L197.0 106.7 L198.0 100.1 L199.0 94.2 L200.0 89.3 L201.0 85.5 L202.0 83.3 L203.0 82.6 L204.0 83.5 L205.0 86.0 L206.0 90.0 L207.0 95.1 L208.0 101.1 L209.0 107.7 L210.0 114.5 L211.0 121.4 L212.0 127.9 L213.0 133.9 L214.0 139.3 L215.0 144.0 L216.0 147.9 L217.0 151.2 L218.0 153.8 L219.0 155.8 L220.0 157.4 L221.0 158.5 L222.0 159.4 L223.0 160.0 L224.0 160.4 L225.0 160.7 L226.0 160.8 L227.0 161.0 L228.0 161.0 L229.0 161.1 L230.0 161.1 L231.0 161.1 L232.0 161.1 L233.0 161.1 L234.0 161.1 L235.0 161.1 L236.0 161.1 L237.0 161.1 L238.0 161.1 L239.0 161.1 L240.0 161.1 L241.0 161.1 L242.0 161.1 L243.0 161.1 L244.0 161.1 L245.0 161.1 L246.0 161.1 L247.0 161.0 L248.0 161.0 L249.0 160.9 L250.0 160.8 L251.0 160.7 L252.0 160.5 L253.0 160.2 L254.0 159.8 L255.0 159.3 L256.0 158.7 L257.0 157.9 L258.0 156.8 L259.0 155.5 L260.0 153.8 L261.0 151.8 L262.0 149.3 L263.0 146.4 L264.0 143.0 L265.0 139.0 L266.0 134.4 L267.0 129.3 L268.0 123.7 L269.0 117.6 L270.0 111.1 L271.0 104.2 L272.0 97.2 L273.0 90.2 L274.0 83.3 L275.0 76.8 L276.0 70.8 L277.0 65.4 L278.0 61.0 L279.0 57.5 L280.0 55.2 L281.0 54.1 L282.0 54.2 L283.0 55.6 L284.0 58.2 L285.0 61.9 L286.0 66.6 L287.0 72.1 L288.0 78.3 L289.0 84.9 L290.0 91.8 L291.0 98.9 L292.0 105.8 L293.0 112.6 L294.0 119.0 L295.0 125.0 L296.0 130.6 L297.0 135.5 L298.0 139.9 L299.0 143.8 L300.0 147.1 L301.0 149.9 L302.0 152.3 L303.0 154.2 L304.0 155.8 L305.0 157.1 L306.0 158.1 L307.0 158.9 L308.0 159.5 L309.0 159.9 L310.0 160.3 L311.0 160.5 L312.0 160.7 L313.0 160.8 L314.0 160.9 L315.0 161.0 L316.0 161.0 L317.0 161.1 L318.0 161.1 L319.0 161.1 L320.0 161.1 L321.0 161.1 L322.0 161.1 L323.0 161.1 L324.0 161.1 L325.0 161.1 L326.0 161.1 L327.0 161.1 L328.0 161.1 L329.0 161.1 L330.0 161.1 L331.0 161.1 L332.0 161.1 L333.0 161.1 L334.0 161.1 L335.0 161.1 L336.0 161.1 L337.0 161.1 L338.0 161.1 L339.0 161.1 L340.0 161.1 L341.0 161.1 L342.0 161.1 L343.0 161.1 L344.0 161.1 L345.0 161.1 L346.0 161.1\" stroke=\"var(--teal)\" stroke-width=\"2\" fill=\"none\" /><circle cx=\"147.5\" cy=\"32.6\" r=\"3.6\" fill=\"var(--amber)\"/><text x=\"153.53846153846155\" y=\"30.571428571428584\" font-size=\"10.5\" fill=\"var(--amber)\" text-anchor=\"start\" font-weight=\"400\" >tR<\/text><line x1=\"46\" y1=\"164\" x2=\"352\" y2=\"164\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" marker-end=\"url(#ax60250)\"/><line x1=\"46\" y1=\"164\" x2=\"46\" y2=\"8\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" marker-end=\"url(#ax60250)\"/><line x1=\"46.0\" y1=\"164\" x2=\"46.0\" y2=\"168\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"46.0\" y=\"179\" font-size=\"10\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >0<\/text><line x1=\"138.30769230769232\" y1=\"164\" x2=\"138.30769230769232\" y2=\"168\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"138.30769230769232\" y=\"179\" font-size=\"10\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >2<\/text><line x1=\"230.6153846153846\" y1=\"164\" x2=\"230.6153846153846\" y2=\"168\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"230.6153846153846\" y=\"179\" font-size=\"10\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >4<\/text><line x1=\"322.92307692307696\" y1=\"164\" x2=\"322.92307692307696\" y2=\"168\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"322.92307692307696\" y=\"179\" font-size=\"10\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >6<\/text><text x=\"196.0\" y=\"196\" font-size=\"11\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >Zeit in min<\/text><text x=\"13\" y=\"89.0\" font-size=\"11\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" transform=\"rotate(-90 13 89.0)\">Signal<\/text><\/svg><figcaption>Chromatogramm: Luftpeak bei der Totzeit t₀, danach die Peaks der Probenbestandteile<\/figcaption><\/figure><\/div> <p>Die <strong>Retentionszeit t<sub>R<\/sub><\/strong> ist die Zeit von der Injektion bis zum Maximum eines Peaks. Unter gleichen Bedingungen ist sie für jeden Stoff charakteristisch. Die <strong>Totzeit t<sub>0<\/sub><\/strong> braucht ein Stoff, der gar nicht mit der stationären Phase wechselwirkt, z. B. die mit eingespritzte Luft.<\/p> <p>Die Retentionszeit wird größer bei<\/p> <ul><li>höherer Siedetemperatur des Stoffes (stärkere zwischenmolekulare Kräfte),<\/li><li>ähnlicher Polarität von Stoff und stationärer Phase,<\/li><li>niedrigerer Ofentemperatur, kleinerem Gasfluss und längerer Säule.<\/li><\/ul>"}, {"t": "Temperaturprogramm und Auflösung", "h": "<p>Bei <strong>isothermer<\/strong> Arbeitsweise bleibt die Ofentemperatur konstant. Ist sie niedrig, werden leichtflüchtige Stoffe gut getrennt, schwerflüchtige brauchen aber sehr lange und geben breite, flache Peaks. Ist sie hoch, laufen die Peaks früh und eng zusammen.<\/p> <p>Ein <strong>Temperaturprogramm<\/strong> löst das Problem: Man beginnt bei niedriger Temperatur und heizt dann mit einer festen Rate auf. So werden alle Bestandteile in vertretbarer Zeit mit schmalen Peaks getrennt.<\/p> <div class=\"gl-box gl-info\">Die <strong>Auflösung R<\/strong> beschreibt, wie gut zwei benachbarte Peaks getrennt sind: R = 2 · (t<sub>R2<\/sub> − t<sub>R1<\/sub>) / (w<sub>1<\/sub> + w<sub>2<\/sub>), w = Peakbreite an der Basis. Ab R ≈ 1,5 gelten zwei Peaks als vollständig getrennt.<\/div>"}, {"t": "Qualitative und quantitative Auswertung", "h": "<p><strong>Qualitativ – welcher Stoff?<\/strong> Man vergleicht die Retentionszeiten mit denen von Vergleichssubstanzen, die unter genau denselben Bedingungen gemessen wurden. Stimmt die Retentionszeit überein, ist der Stoff wahrscheinlich gleich; sicher ist es erst, wenn er auch unter anderen Bedingungen übereinstimmt.<\/p> <p><strong>Quantitativ – wie viel?<\/strong> Die <strong>Peakfläche<\/strong> ist proportional zur Stoffmenge des Stoffes. Bei der Flächenprozent-Methode teilt man jede Peakfläche durch die Summe aller Flächen:<\/p> <div class=\"gl-box gl-info\">Anteil (Flächen-%) = A<sub>i<\/sub> / ΣA · 100 %<\/div> <p>Weil der Detektor nicht auf jeden Stoff gleich stark anspricht, korrigiert man für genaue Ergebnisse mit <strong>Responsefaktoren<\/strong>, die mit bekannten Mischungen bestimmt werden. Der Luftpeak wird bei der Auswertung nicht mitgerechnet.<\/p>"}, {"t": "Analyse einer unbekannten Probe", "h": "<p><strong>Identifizieren:<\/strong> Man misst zuerst die Probe und danach mögliche Bestandteile einzeln als <strong>Referenzsubstanzen<\/strong> – unter genau denselben Bedingungen (Säule, Temperaturprogramm, Trägergasfluss). Hat ein Peak der Probe dieselbe Retentionszeit wie eine Referenz, ist dieser Stoff sehr wahrscheinlich in der Probe enthalten.<\/p> <p><strong>Quantifizieren mit externem Standard:<\/strong> Die Referenzlösung hat eine bekannte Konzentration c(Ref). Bei gleichem Injektionsvolumen ist die Peakfläche eines Stoffes proportional zu seiner Konzentration:<\/p> <div class=\"gl-box gl-info\">A(Probe) : A(Ref) = c(Probe) : c(Ref) &nbsp;⇒&nbsp; c(Probe) = A(Probe) : A(Ref) · c(Ref)<\/div> <p>Der Responsefaktor des Detektors kürzt sich heraus, weil Probe und Referenz denselben Stoff enthalten. Für jeden Bestandteil braucht man deshalb eine eigene Referenzmessung. Rauschen und die Grenzen der Integration verursachen eine kleine Messunsicherheit.<\/p> <p><strong>Beispiel:<\/strong> A(Probe) = 18,6; A(Ref) = 24,8; c(Ref) = 10,0 g/L &nbsp;⇒&nbsp; c(Probe) = 18,6 : 24,8 · 10,0 g/L = 7,50 g/L.<\/p>"}];
   const g = id => document.getElementById(id);
   const bd = g("glBackdrop"), box = bd.querySelector(".modal-box");
   let idx = 0;
