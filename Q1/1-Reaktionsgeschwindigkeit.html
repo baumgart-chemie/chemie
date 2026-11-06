@@ -385,6 +385,8 @@ footer sub{font-size:.75em;}
 .ex-n0 sub,.ex-n0 sup{font-size:.72em;}
 .ex-n0 input{width:110px;}
 canvas#exCanvas{height:300px;}
+.pen-opt{display:inline-flex; align-items:center; gap:6px; font-size:13px; color:var(--text-dim); cursor:pointer; margin-left:auto; user-select:none;}
+.pen-opt input{width:18px; height:18px; accent-color:var(--teal);}
 canvas#exPlotCanvas{height:460px; touch-action:none; cursor:crosshair;}
 .ex-prompt{padding:10px 4px 8px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:13.5px; color:var(--text-dim); border-top:1px solid var(--line-soft); margin-top:8px;}
 .ex-prompt input.cell, .ex-n0 input.cell{width:120px; min-width:0; flex:none;}
@@ -501,6 +503,12 @@ input.cell.shown{border-color:var(--amber-dim); color:var(--amber);}
       <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.1</span><span class="d">06.11.2026</span></div>
+      <ul>
+        <li><strong>c-t-Diagramm der Übung:</strong> größere Toleranz beim Setzen der Punkte; die Ausgleichskurven werden automatisch gezeichnet, sobald die Punkte einer Reihe geprüft und richtig sind („Kurve zeichnen“ und „Kurve löschen“ entfallen).</li>
+        <li>Neue Option <strong>„Nur mit Stift“</strong> (standardmäßig an): Finger und Maus setzen keine Punkte mehr, damit beim Berühren oder Scrollen mit dem iPad nichts versehentlich eingetragen wird.</li>
+        <li>Übung rechnet mit dem molaren Volumen <strong>V<sub>m</sub> = 24 L/mol</strong>.</li>
+      </ul>
       <div class="vh-ver"><span class="v">V1.0</span><span class="d">02.11.2026</span></div>
       <ul>
         <li>Erste Version mit sechs Reaktionen: <strong>Zink + Salzsäure</strong> (Standard), Magnesium + Salzsäure, Marmor + Salzsäure, Natriumthiosulfat + Salzsäure, Zersetzung von Wasserstoffperoxid und Iodwasserstoff-Bildung in der Gasphase.</li>
@@ -508,7 +516,7 @@ input.cell.shown{border-color:var(--amber-dim); color:var(--amber);}
         <li>Versuchsaufbau mit Kolbenprober bzw. „verschwindendem Kreuz“ und schematische <strong>Teilchenebene</strong> mit wirksamen Zusammenstößen.</li>
         <li>Erklärungen zu Reaktionsgeschwindigkeit, Stoßtheorie und Einflussfaktoren zuschaltbar, sobald „Bedingungen variieren“ gewählt ist.</li>
         <li>Messreihen vergleichen, Durchschnitts- und Momentangeschwindigkeit, Messwerttabelle mit CSV-Export, Temperaturabhängigkeit (RGT-Regel, Arrhenius-Darstellung).</li>
-        <li><strong>Übung „Zink + Salzsäure“</strong>: Messwerte am Kolbenprober zu festen Zeitpunkten ablesen (mit Lupe), Protokoll Schritt für Schritt berechnen (V in L, n(H<sub>2</sub>), n(Zn<sup>2+</sup>), c(Zn<sup>2+</sup>), n(H<sup>+</sup>), c(H<sup>+</sup>)), c-t-Diagramm für Zn<sup>2+</sup> und H<sup>+</sup> in zwei Farben mit dem Stift zeichnen („Punkte löschen“ für einzelne Punkte), Durchschnittsgeschwindigkeiten berechnen, Zusammenfassung als PDF; Zwischenstand als Datei speichern und wieder laden.</li>
+        <li><strong>Übung „Zink + Salzsäure“</strong>: Messwerte am Kolbenprober zu festen Zeitpunkten ablesen (mit Lupe), Protokoll Schritt für Schritt berechnen (V in L, n(H<sub>2</sub>), n(Zn<sup>2+</sup>), c(Zn<sup>2+</sup>), n(H<sup>+</sup>), c(H<sup>+</sup>)), c-t-Diagramm für Zn<sup>2+</sup> und H<sup>+</sup> in zwei Farben mit dem Stift eintragen (Option „Nur mit Stift zeichnen“ ist standardmäßig an; „Punkte löschen“ für einzelne Punkte; die Kurve erscheint automatisch, sobald die Punkte stimmen), Durchschnittsgeschwindigkeiten berechnen, Zusammenfassung als PDF; Zwischenstand als Datei speichern und wieder laden.</li>
         <li>Auswahl <strong>Simulation oder Übung</strong> in der linken Spalte direkt unter „Grundlagen“; alle weiteren Inhalte erscheinen erst nach der Auswahl.</li>
         <li><strong>Rubrik „Grundlagen“</strong> (über den Knopf „Grundlagen“ in der linken Spalte aufklappbar) mit neun Themen, Grafiken und Erklärtext. Bedienbar mit iPad und Stift.</li>
       </ul>
@@ -795,11 +803,10 @@ input.cell.shown{border-color:var(--amber-dim); color:var(--amber);}
         </div>
         <div class="grp" id="plotModeGrp">
           <button data-pm="pts" class="active">Punkte setzen</button>
-          <button data-pm="draw">Kurve zeichnen</button>
           <button data-pm="erase">Punkte löschen</button>
         </div>
         <button class="btn" id="ptCheck">Punkte prüfen</button>
-        <button class="btn ghost" id="strokeClear">Kurve löschen</button>
+        <label class="pen-opt"><input type="checkbox" id="penOnly" checked> Nur mit Stift zeichnen</label>
       </div>
       <canvas id="exPlotCanvas" aria-label="c-t-Diagramm zum Zeichnen"></canvas>
       <div class="under"><span class="legend"><span style="color:#ffb454">✕ c(Zn<sup>2+</sup>) – linke Achse</span><span style="color:#8fb4ff">+ c(H<sup>+</sup>) – rechte Achse</span></span><span class="lbl" id="exPlotInfo"></span></div>
@@ -832,7 +839,7 @@ input.cell.shown{border-color:var(--amber-dim); color:var(--amber);}
 
 <footer>
   <p class="footer-note">Simulierte Daten zu Lehrzwecken · Geschwindigkeitsgesetze vereinfacht (Feststoffe: Oberfläche schrumpft mit dem Umsatz; Thiosulfat und H<sub>2</sub>O<sub>2</sub> 1. Ordnung; HI-Bildung 2. Ordnung mit Rückreaktion). Aktivierungsenergien und Geschwindigkeitskonstanten gerundet bzw. Modellwerte. Gasvolumen im Kolbenprober bei 25 °C und dem eingestellten Druck, ideales Gas; Löslichkeit der Gase vernachlässigt.</p>
-  <p class="footer-credit">Bastian Baumgart · Simulation „Reaktionsgeschwindigkeit“ V1.0 · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Simulation „Reaktionsgeschwindigkeit“ V1.1 · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <script>
@@ -2227,7 +2234,7 @@ const STEPS=[
   {t:"c-t-Diagramm zeichnen", html:()=>`
     <p>Trage die Konzentrationen von <strong style="color:#ffb454">Zn<sup>2+</sup></strong> und <strong style="color:#8fb4ff">H<sup>+</sup></strong> mit unterschiedlichen Farben gegen die Zeit ein. Weil sich die Werte stark unterscheiden, hat das Diagramm zwei y-Achsen: <strong style="color:#ffb454">links c(Zn<sup>2+</sup>)</strong> von 0 bis 0,07 mol/L, <strong style="color:#8fb4ff">rechts c(H<sup>+</sup>)</strong> von 0,86 bis 1,00 mol/L.</p>
     <p>Wähle die Reihe (✕ c(Zn<sup>2+</sup>) oder + c(H<sup>+</sup>)), dann „Punkte setzen“, und tippe für jede Zeile des Protokolls an die passende Stelle – die Reihenfolge ist egal. Ein falsch gesetzter Punkt lässt sich im Modus <strong>„Punkte löschen“</strong> durch Antippen wieder entfernen. Prüfe danach die Punkte.</p>
-    <p>Zeichne zum Schluss mit „Kurve zeichnen“ und dem Stift für jede Reihe eine glatte <strong>Ausgleichskurve</strong> – keine Zickzacklinie von Punkt zu Punkt.</p>`},
+    <p>Sind alle Punkte einer Reihe richtig, wird die glatte <strong>Ausgleichskurve</strong> automatisch durch deine Punkte gezeichnet. Die Punkte dürfen etwas neben dem Idealwert liegen – es gibt eine kleine Toleranz. Du musst die Kurve nicht selbst zeichnen.</p>`},
   {t:"Durchschnittsgeschwindigkeit", html:()=>`
     <p>Die <strong>Durchschnittsgeschwindigkeit</strong> v̄ gibt an, wie stark sich eine Konzentration in einem Zeitraum im Mittel pro Sekunde ändert. Nimm die Konzentrationen aus dem Protokoll.</p>
     <div class="formula-box">v̄(Zn<sup>2+</sup>) = ${fr("Δc(Zn<sup>2+</sup>)","Δt")} = ${fr("c<sub>2</sub>(Zn<sup>2+</sup>) − c<sub>1</sub>(Zn<sup>2+</sup>)","t<sub>2</sub> − t<sub>1</sub>")} &nbsp;&nbsp;&nbsp;&nbsp; v̄(H<sup>+</sup>) = −${fr("Δc(H<sup>+</sup>)","Δt")} = −${fr("c<sub>2</sub>(H<sup>+</sup>) − c<sub>1</sub>(H<sup>+</sup>)","t<sub>2</sub> − t<sub>1</sub>")}</div>
@@ -2507,10 +2514,12 @@ function exDraw(dt){
 /* ---------- Schritt 8: c-t-Diagramm (Zn²⁺ und H⁺) ---------- */
 const pc=$("exPlotCanvas"); const PX={xmax:390, L:66, R:66, T:18, B:48};
 const AX={
-  zn:{min:0,    max:0.07, step:0.01, minor:0.002, col:"#ffb454", lab:"c(Zn²⁺) in mol/L", html:"c(Zn<sup>2+</sup>)", side:"linke",  key:"cZn", tol:0.002},
-  h: {min:0.86, max:1.00, step:0.02, minor:0.004, col:"#8fb4ff", lab:"c(H⁺) in mol/L",   html:"c(H<sup>+</sup>)",   side:"rechte", key:"cH",  tol:0.004}
+  zn:{min:0,    max:0.07, step:0.01, minor:0.002, col:"#ffb454", lab:"c(Zn²⁺) in mol/L", html:"c(Zn<sup>2+</sup>)", side:"linke",  key:"cZn", tol:0.004},
+  h: {min:0.86, max:1.00, step:0.02, minor:0.004, col:"#8fb4ff", lab:"c(H⁺) in mol/L",   html:"c(H<sup>+</sup>)",   side:"rechte", key:"cH",  tol:0.008}
 };
 const SER=["zn","h"];
+const TTOL=10;            // Toleranz der Zeit in s (Messzeitpunkte liegen 30 s und weiter auseinander)
+let PEN_ONLY=true;        // Punkte nur mit dem Stift (Finger/Maus werden ignoriert)
 const PAL_SCREEN={bg:"#0e1113", major:"#2b3a33", minor:"#18211d", tick:"#5f6870", axis:"#9aa2a9", text:"#9aa2a9", zn:"#ffb454", h:"#8fb4ff", ok:"#7fd68a", bad:"#e4785b", status:true};
 const PAL_PRINT ={bg:"#ffffff", major:"#bfc5cb", minor:"#e7eaed", tick:"#444", axis:"#222", text:"#222", zn:"#d9480f", h:"#1d4ed8", status:false};
 function mkGeo(W,H,sc){ const L=PX.L*sc, R=PX.R*sc, T=PX.T*sc, B=PX.B*sc; return {W,H,sc,L,R,T,B,pw:W-L-R,ph:H-T-B}; }
@@ -2520,18 +2529,41 @@ function pgeo(){ return mkGeo(pc.clientWidth, pc.clientHeight, 1); }
 function toPx(t,c,k){ const g=pgeo(); return [gX(g,t), gY(g,c,k)]; }
 function toData(x,y,k){ const g=pgeo(), a=AX[k]; return [(x-g.L)/g.pw*PX.xmax, a.min+(g.T+g.ph-y)/g.ph*(a.max-a.min)]; }
 const nearIdx = t => { let b=0; EXT.forEach((x,i)=>{ if(Math.abs(x-t)<Math.abs(EXT[b]-t)) b=i; }); return b; };
-function missing(k){ return EXT.map((t,i)=>i).filter(i=>!EX.pts[k].some(p=>Math.abs(p.t-EXT[i])<=5)); }
+function missing(k){ return EXT.map((t,i)=>i).filter(i=>!EX.pts[k].some(p=>Math.abs(p.t-EXT[i])<=TTOL)); }
 function serDone(k){ return EX.pts[k].length===EXT.length && EX.ptSt[k].every(x=>x==="ok"); }
 /* Bewertet alle Punkte einer Reihe: jeder Punkt wird dem nächsten Messzeitpunkt zugeordnet */
 function computePtSt(k){
   const a=AX[k], used=new Set(), res=[], msgs=[];
   EX.pts[k].forEach(p=>{
-    const i=nearIdx(p.t), tOk=Math.abs(p.t-EXT[i])<=5, cOk=Math.abs(p.c-vNum(a.key,i))<=a.tol, dup=used.has(i);
+    const i=nearIdx(p.t), tOk=Math.abs(p.t-EXT[i])<=TTOL, cOk=Math.abs(p.c-vNum(a.key,i))<=a.tol, dup=used.has(i);
     const ok=tOk&&cOk&&!dup; if(ok) used.add(i);
     res.push(ok?"ok":"bad");
     if(!ok) msgs.push(!tOk ? `Ein Punkt liegt bei etwa ${Math.round(p.t)} s – dort gibt es keinen Messwert.` : dup ? `Für t = ${EXT[i]} s ist schon ein Punkt gesetzt – ein Punkt ist doppelt.` : `Bei t = ${EXT[i]} s stimmt die Konzentration nicht (getroffen etwa ${f3(p.c)} mol/L, richtig ${esc(EX.val[a.key][i])} mol/L). Achte auf die ${a.side} Achse.`);
   });
   return {res, msgs};
+}
+/* Glatte Ausgleichskurve durch die (geprüften) Punkte einer Reihe – monotone kubische Interpolation */
+function autoCurve(k){
+  const P=EX.pts[k].slice().sort((a,b)=>a.t-b.t);
+  EX.strokes=EX.strokes.filter(s=>s.k!==k);
+  if(P.length<2) return;
+  const n=P.length, h=[], d=[], m=new Array(n);
+  for(let i=0;i<n-1;i++){ h[i]=P[i+1].t-P[i].t; d[i]=(P[i+1].c-P[i].c)/h[i]; }
+  m[0]=d[0]; m[n-1]=d[n-2];
+  for(let i=1;i<n-1;i++) m[i]= d[i-1]*d[i]<=0 ? 0 : (d[i-1]+d[i])/2;
+  for(let i=0;i<n-1;i++){
+    if(d[i]===0){ m[i]=0; m[i+1]=0; continue; }
+    const a=m[i]/d[i], b=m[i+1]/d[i], r=a*a+b*b;
+    if(r>9){ const f=3/Math.sqrt(r); m[i]=f*a*d[i]; m[i+1]=f*b*d[i]; }
+  }
+  const pts=[];
+  for(let i=0;i<n-1;i++) for(let j=0;j<24;j++){
+    const u=j/24, u2=u*u, u3=u2*u;
+    const c=(2*u3-3*u2+1)*P[i].c + (u3-2*u2+u)*h[i]*m[i] + (-2*u3+3*u2)*P[i+1].c + (u3-u2)*h[i]*m[i+1];
+    pts.push([P[i].t+u*h[i], c]);
+  }
+  pts.push([P[n-1].t, P[n-1].c]);
+  EX.strokes.push({k, p:pts});
 }
 function renderPlotInfo(){
   [...$("plotModeGrp").children].forEach(b=>b.classList.toggle("active", b.dataset.pm===EX.plotMode));
@@ -2539,52 +2571,45 @@ function renderPlotInfo(){
   pc.style.cursor = EX.plotMode==="erase" ? "pointer" : "crosshair";
   const k=EX.series, a=AX[k], miss=missing(k);
   let info;
-  if(EX.plotMode==="erase") info=`<b style="color:var(--danger)">Punkte löschen:</b> Tippe auf einen Punkt, um ihn zu löschen (beide Reihen). Ein Tippen auf eine Kurve löscht diese Kurve.`;
-  else if(EX.plotMode==="draw") info=`Zeichne mit dem Stift die Ausgleichskurve für <b style="color:${a.col}">${a.html}</b>. Die Farbe richtet sich nach der gewählten Reihe.`;
-  else if(serDone(k)) info=`Alle Punkte für <b style="color:${a.col}">${a.html}</b> stimmen.${serDone(k==="zn"?"h":"zn")?" Zeichne jetzt die Ausgleichskurven.":` Wechsle zu ${AX[k==="zn"?"h":"zn"].html}.`}`;
+  if(EX.plotMode==="erase") info=`<b style="color:var(--danger)">Punkte löschen:</b> Tippe auf einen Punkt, um ihn zu löschen (beide Reihen). `;
+  else if(serDone(k)) info=`Alle Punkte für <b style="color:${a.col}">${a.html}</b> stimmen.${serDone(k==="zn"?"h":"zn")?" Die Kurven wurden automatisch gezeichnet.":` Wechsle zu ${AX[k==="zn"?"h":"zn"].html}.`}`;
   else if(miss.length){ const i=miss[0]; info=`Reihe <b style="color:${a.col}">${a.html}</b> (${a.side} Achse) – noch ${miss.length} von ${EXT.length} Punkten offen, z. B. <b style="color:${a.col}">t = ${EXT[i]} s, c = ${esc(EX.val[a.key][i])} mol/L</b>`; }
   else info=`Alle Punkte für <b style="color:${a.col}">${a.html}</b> gesetzt – tippe auf „Punkte prüfen“.`;
+  if(PEN_ONLY) info+=`<br><span style="color:var(--text-faint)">Stift-Modus: Nur der Stift setzt und löscht Punkte – Finger und Maus werden ignoriert. Die Kurven erscheinen automatisch.</span>`;
   $("exPlotInfo").innerHTML=info;
 }
 function erasePoint(x,y){
   let best=null, bd=16*16;
   SER.forEach(k=>EX.pts[k].forEach((p,j)=>{ const [px,py]=toPx(p.t,p.c,k), d=(px-x)**2+(py-y)**2; if(d<bd){ bd=d; best={k,j}; } }));
-  if(best){ EX.pts[best.k].splice(best.j,1); EX.ptSt[best.k].splice(best.j,1); setFb([{cls:"hint",html:`Punkt gelöscht (${AX[best.k].html}).`}]); return; }
-  let sb=null, sd=12*12;
-  EX.strokes.forEach((s,si)=>s.p.forEach(([t,v])=>{ const [px,py]=toPx(t,v,s.k), d=(px-x)**2+(py-y)**2; if(d<sd){ sd=d; sb=si; } }));
-  if(sb!=null){ const k=EX.strokes[sb].k; EX.strokes.splice(sb,1); setFb([{cls:"hint",html:`Kurve gelöscht (${AX[k].html}).`}]); }
+  if(best){ EX.pts[best.k].splice(best.j,1); EX.ptSt[best.k].splice(best.j,1); EX.strokes=EX.strokes.filter(s=>s.k!==best.k); setFb([{cls:"hint",html:`Punkt gelöscht (${AX[best.k].html}).`}]); return; }
 }
 pc.addEventListener("pointerdown", e=>{
   if(MODE!=="ex"||EX.step!==7) return;
+  if(PEN_ONLY && e.pointerType!=="pen") return;      // Finger/Maus ignorieren
   const r=pc.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top;
   const k=EX.series, a=AX[k], [t,c]=toData(x,y,k);
   const pad=(a.max-a.min)*0.05;
   if(EX.plotMode==="erase"){ erasePoint(x,y); renderPlotInfo(); }
   else if(EX.plotMode==="pts"){
-    if(serDone(k)){ setFb([{cls:"hint",html:`Die Punkte für ${a.html} sind fertig. Wechsle die Reihe oder wähle „Kurve zeichnen“.`}]); return; }
+    if(serDone(k)){ setFb([{cls:"hint",html:`Die Punkte für ${a.html} sind fertig. Wechsle die Reihe.`}]); return; }
     if(t<-8||t>PX.xmax+5||c<a.min-pad||c>a.max+pad) return;
     if(EX.pts[k].length>=EXT.length){ setFb([{cls:"hint",html:"Für diese Reihe sind schon alle 10 Punkte gesetzt. Prüfe sie oder lösche falsche Punkte mit „Punkte löschen“."}]); return; }
     EX.pts[k].push({t:Math.max(0,t), c}); EX.ptSt[k].push("");
     renderPlotInfo();
-  } else {
-    EX.drawing={k, p:[[t,c]]}; EX.strokes.push(EX.drawing);
-    try{ pc.setPointerCapture(e.pointerId); }catch(_){}
   }
   e.preventDefault();
 });
-pc.addEventListener("pointermove", e=>{ if(!EX.drawing) return; const r=pc.getBoundingClientRect(); EX.drawing.p.push(toData(e.clientX-r.left, e.clientY-r.top, EX.drawing.k)); });
-["pointerup","pointercancel","pointerleave"].forEach(ev=>pc.addEventListener(ev, ()=>{ EX.drawing=null; }));
+$("penOnly").addEventListener("change", e=>{ PEN_ONLY=e.target.checked; renderPlotInfo(); });
 $("plotModeGrp").addEventListener("click", e=>{ const b=e.target.closest("button"); if(!b) return; EX.plotMode=b.dataset.pm; renderPlotInfo(); });
 $("plotSerGrp").addEventListener("click", e=>{ const b=e.target.closest("button"); if(!b) return; EX.series=b.dataset.ser; if(EX.plotMode==="erase") EX.plotMode="pts"; renderPlotInfo(); });
-$("strokeClear").addEventListener("click", ()=>{ EX.strokes=EX.strokes.filter(s=>s.k!==EX.series); });
 $("ptCheck").addEventListener("click", ()=>{
   const k=EX.series, a=AX[k], P=EX.pts[k];
   if(!P.length){ setFb([{cls:"hint",html:`Setze zuerst die Punkte für ${a.html}.`}]); return; }
-  const {res,msgs}=computePtSt(k); EX.ptSt[k]=res;
+  const {res,msgs}=computePtSt(k); EX.ptSt[k]=res; if(serDone(k)) autoCurve(k);
   const bad=msgs.length, miss=missing(k).length;
   if(bad) setFb([{cls:"bad",html:`${a.html}: ${bad} Punkt${bad>1?"e sind":" ist"} falsch (rot). ${msgs[0]} Lösche falsche Punkte mit „Punkte löschen“ und setze sie neu.`}]);
   else if(miss) setFb([{cls:"good",html:`${a.html}: Die ${P.length} gesetzten Punkte stimmen. Es fehlen noch ${miss}.`}]);
-  else if(SER.every(serDone)){ completeStep(7,"Alle Punkte beider Reihen stimmen! Zeichne jetzt mit „Kurve zeichnen“ je eine Ausgleichskurve. Beachte: c(H<sup>+</sup>) nimmt doppelt so stark ab, wie c(Zn<sup>2+</sup>) zunimmt – deshalb verlaufen die Kurven spiegelbildlich."); EX.plotMode="draw"; renderEx(); return; }
+  else if(SER.every(serDone)){ completeStep(7,"Alle Punkte beider Reihen stimmen! Die Ausgleichskurven wurden automatisch durch deine Punkte gezeichnet. Beachte: c(H<sup>+</sup>) nimmt doppelt so stark ab, wie c(Zn<sup>2+</sup>) zunimmt – deshalb verlaufen die Kurven spiegelbildlich."); EX.plotMode="pts"; renderEx(); return; }
   else { const o=k==="zn"?"h":"zn"; EX.series=o; setFb([{cls:"good",html:`Alle Punkte für ${a.html} stimmen. Jetzt folgt ${AX[o].html} (${AX[o].side} Achse).`}]); }
   renderPlotInfo();
 });
@@ -2738,7 +2763,7 @@ function sumHTML(){
   <div class="s-sec s-keep">
     <h2>3 c-t-Diagramm</h2>
     <img class="s-img" src="${ctImage()}" alt="c-t-Diagramm">
-    <p class="s-small">Zwei y-Achsen: links c(Zn<sup>2+</sup>) von 0 bis 0,07 mol/L, rechts c(H<sup>+</sup>) von 0,86 bis 1,00 mol/L. Punkte und Ausgleichskurven wurden selbst gesetzt bzw. gezeichnet.</p>
+    <p class="s-small">Zwei y-Achsen: links c(Zn<sup>2+</sup>) von 0 bis 0,07 mol/L, rechts c(H<sup>+</sup>) von 0,86 bis 1,00 mol/L. Die Punkte wurden selbst gesetzt, die Ausgleichskurven automatisch durch die geprüften Punkte gezeichnet.</p>
   </div>
 
   <div class="s-sec s-keep">
@@ -2792,7 +2817,6 @@ function exSerialize(){
     val:EX.val, shown:Object.fromEntries(COLS.map(c=>[c.key, EX.st[c.key].map(s=>s==="shown")])),
     n0:EX.n0,
     pts:{zn:EX.pts.zn.map(p=>[+p.t.toFixed(2), +p.c.toFixed(5)]), h:EX.pts.h.map(p=>[+p.t.toFixed(2), +p.c.toFixed(5)])},
-    strokes:EX.strokes.map(s=>({k:s.k, p:s.p.map(([t,c])=>[+t.toFixed(1), +c.toFixed(5)])})),
     rv:EX.rv, rshown:{zn:EX.rs.zn.map(s=>s==="shown"), h:EX.rs.h.map(s=>s==="shown")}};
 }
 function exSaveFile(){
@@ -2838,9 +2862,9 @@ function exLoadObj(o){
   if(EX.done[6]){
     SER.forEach(k=>{ EX.pts[k]=arrOf(o.pts,k).slice(0,EXT.length).map(p=>Array.isArray(p)?{t:num(p[0]),c:num(p[1])}:null).filter(p=>p&&isFinite(p.t)&&isFinite(p.c)); EX.ptSt[k]=computePtSt(k).res; });
     let total=0;
-    EX.strokes=(Array.isArray(o.strokes)?o.strokes:[]).filter(s=>s&&(s.k==="zn"||s.k==="h")&&Array.isArray(s.p)).map(s=>({k:s.k, p:s.p.filter(q=>Array.isArray(q)&&isFinite(num(q[0]))&&isFinite(num(q[1]))).map(q=>[q[0],q[1]])})).filter(s=>{ total+=s.p.length; return s.p.length && total<=30000; });
   }
   EX.done[7]= EX.done[6] && SER.every(serDone);
+  EX.strokes=[]; if(EX.done[7]) SER.forEach(k=>autoCurve(k));
   // Durchschnittsgeschwindigkeiten
   if(EX.done[7]){
     ["zn","h"].forEach(k=>EXI.forEach((_,j)=>{
@@ -2856,7 +2880,7 @@ function exLoadObj(o){
   EX.maxStep=ms;
   const st=typeof o.step==="number"?Math.round(o.step):0;
   EX.step=clamp(st,0,EX.maxStep);
-  if(EX.step===7) EX.plotMode = EX.done[7] ? "draw" : "pts";
+  if(EX.step===7) EX.plotMode="pts";
   const when = typeof o.saved==="string" && !isNaN(Date.parse(o.saved)) ? (()=>{ const d=new Date(o.saved); return `${pad2(d.getDate())}.${pad2(d.getMonth()+1)}.${d.getFullYear()}, ${pad2(d.getHours())}:${pad2(d.getMinutes())} Uhr`; })() : "";
   EX.fb=[{cls:"good",html:`Zwischenstand${when?" vom "+when:""} geladen. Alle Werte wurden neu geprüft – weiter mit Schritt ${EX.step+1}.`}];
   renderEx();
