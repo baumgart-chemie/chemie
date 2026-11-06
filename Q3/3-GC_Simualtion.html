@@ -65,9 +65,11 @@ header .status.running{color:var(--amber); border-color:var(--amber-dim);}
   align-items:center; justify-content:center; padding:24px;
 }
 .modal-backdrop.open{display:flex;}
+body:has(.modal-backdrop.open){overflow:hidden;}  /* Seite hinter geöffnetem Fenster nicht mitscrollen */
+.modal-backdrop{overscroll-behavior:contain;}
 .modal-box{
   background:var(--panel); border:1px solid var(--line); border-radius:5px;
-  width:100%; max-width:620px; max-height:82vh; overflow-y:auto; padding:22px 26px 26px;
+  width:100%; max-width:620px; max-height:82vh; overflow-y:auto; padding:22px 26px 26px; overscroll-behavior:contain;
 }
 .modal-head{display:flex; align-items:center; justify-content:space-between; margin:-22px -26px 14px; padding:22px 26px 10px; position:sticky; top:-22px; background:var(--panel); z-index:1;}
 .modal-head h2{font-size:17px;}
@@ -489,13 +491,14 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
       <p>Gemische aus dem Dropdown „Stoffgemisch laden" erscheinen in der Liste nur mit ihrem Namen (siehe nächster Abschnitt).</p>
 
       <h3>Stoffgemische</h3>
-      <p>Im Dropdown „Stoffgemisch laden" stehen 15 Gemische in vier Gruppen zur Auswahl:</p>
-      <p><strong>Gase:</strong> Feuerzeuggas, Erdgas, Autogas (LPG)<br>
-      <strong>Kraftstoffe &amp; Benzine:</strong> Benzin, Superbenzin mit MTBE, E10-Kraftstoff, Petrolether 40/60, Waschbenzin<br>
+      <p>Im Dropdown „Stoffgemisch laden" stehen 18 Gemische in vier Gruppen zur Auswahl:</p>
+      <p><strong>Gase:</strong> Feuerzeuggas, Erdgas, Autogas (LPG), Campinggas<br>
+      <strong>Kraftstoffe &amp; Benzine:</strong> Benzin, Superbenzin mit MTBE, E10-Kraftstoff, Sommerdiesel, Winterdiesel, Petrolether 40/60, Waschbenzin<br>
       <strong>Haushalt &amp; Handwerk:</strong> Verdünner, Handdesinfektionsmittel, Nagellackentferner, Abbeizer<br>
       <strong>Labor &amp; Lebensmittel:</strong> DC-Laufmittel, halogenierter Lösemittelabfall, Obstbrand-Vorlauf</p>
       <p>Ein Gemisch erscheint in der Probenliste nur mit seinem Namen. Wie viele und welche Komponenten es enthält, zeigt sich erst nach dem Lauf in der Peaktabelle – so lässt sich die Zusammensetzung wie bei einer echten Analyse selbst ermitteln. Jedes Gemisch hat höchstens vier Komponenten.</p>
       <p><strong>Empfohlene Messbedingungen:</strong> Für flüssige Gemische eignet sich das Temperaturprogramm mit Start bei 40 °C, 1 min Haltezeit, 10 °C/min bis 220 °C. Gase eluieren bei diesen Bedingungen fast gleichzeitig; für sie das Programm bei −60 °C starten. Erscheint unter der Peaktabelle ein Hinweis auf fehlende Peaks, die Bedingungen anpassen oder den Schwellenwert senken.</p>
+      <p><strong>Diesel und Campinggas:</strong> Die Alkane im Diesel sieden bei 150–320 °C. Wähle das Temperaturprogramm mit Start bei 60 °C, 15–20 °C/min bis 280 °C und eine Laufzeit von 25–30 min. Winterdiesel enthält mehr leichte, Sommerdiesel mehr langkettige Alkane. Propan, Isobutan und n-Butan im Campinggas lassen sich nur mit einem Start bei −60 °C trennen.</p>
       <p><strong>Ideen zum Ausprobieren:</strong> Superbenzin und E10 unterscheiden sich im Oktanzahlverbesserer (MTBE bzw. Ethanol). Im Obstbrand-Vorlauf und im Handdesinfektionsmittel lässt sich giftiges Methanol nachweisen.</p>
 
       <h3>Lauf starten</h3>
@@ -547,6 +550,7 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
         <li><strong>Quantifizierung entfernt:</strong> Die bisherige Einpunkt-Kalibrierung verglich verschiedene Stoffe miteinander und lieferte wegen unterschiedlicher Responsefaktoren irreführende Werte. Die Mengenbestimmung erfolgt jetzt in der Analyse über Referenzen desselben Stoffes.</li>
         <li><strong>Auflösung überarbeitet:</strong> ohne Luftpeak, mit Stoffnamen; Stoffe, die als ein gemeinsamer Peak erscheinen, werden als „nicht getrennt“ gemeldet.</li>
         <li><strong>Grundlagen:</strong> neues Thema 6 „Analyse einer unbekannten Probe“.</li>
+        <li><strong>Neue Gemische:</strong> Campinggas, Sommerdiesel und Winterdiesel (Bibliothek um Isobutan und die Alkane n-Nonan bis n-Octadecan erweitert).</li>
         <li><strong>Auswertung als PDF</strong> statt CSV-Export: wählbare Läufe in einem Chromatogramm, je Lauf Peaktabelle und (Simulation) Auflösung, bei mehreren Läufen ein Vergleich der Retentionszeiten. Das PDF entsteht über den Druckdialog („Als PDF speichern“).</li>
       </ul>
       <div class="vh-ver"><span class="v">V1.2</span><span class="d">01.11.2026</span></div>
@@ -787,6 +791,7 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
     {name:"Methan",               bp:-161.5,rf:1.00},
     {name:"Ethan",                bp:-88.6, rf:1.00},
     {name:"Propan",               bp:-42.1, rf:1.00},
+    {name:"Isobutan",             bp:-11.7, rf:1.00},
     {name:"n-Butan",              bp:-0.5,  rf:1.00},
     {name:"Diethylether",         bp:34.6, rf:0.65},
     {name:"n-Pentan",             bp:36.1, rf:1.00},
@@ -807,7 +812,13 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
     {name:"Toluol",               bp:110.6,rf:1.05},
     {name:"Pyridin",              bp:115.2,rf:0.65},
     {name:"Essigsäure",           bp:118.1,rf:0.30},
-    {name:"n-Octan",              bp:125.6,rf:1.00}
+    {name:"n-Octan",              bp:125.6,rf:1.00},
+    {name:"n-Nonan",              bp:150.8,rf:1.00},
+    {name:"n-Decan",              bp:174.1,rf:1.00},
+    {name:"n-Dodecan",            bp:216.3,rf:1.00},
+    {name:"n-Tetradecan",         bp:253.5,rf:1.00},
+    {name:"n-Hexadecan",          bp:286.8,rf:1.00},
+    {name:"n-Octadecan",          bp:316.7,rf:1.00}
   ];
   const palette = ["#ffb454","#4fd1c5","#9d8cf1","#f18cae","#7fd68a","#e4a85b","#6fb7ff","#e07a7a"];
 
@@ -927,6 +938,9 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
     {group:0, name:"Autogas (LPG)", components:[
       {name:"Propan", conc:60}, {name:"n-Butan", conc:40}
     ]},
+    {group:0, name:"Campinggas", components:[
+      {name:"Propan", conc:20}, {name:"Isobutan", conc:25}, {name:"n-Butan", conc:55}
+    ]},
     {group:1, name:"Benzin (Ottokraftstoff)", components:[
       {name:"n-Hexan", conc:35}, {name:"n-Heptan", conc:35}, {name:"Benzol", conc:15}, {name:"Toluol", conc:40}
     ]},
@@ -935,6 +949,12 @@ footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
     ]},
     {group:1, name:"E10-Kraftstoff", components:[
       {name:"n-Hexan", conc:30}, {name:"Ethanol", conc:10}, {name:"n-Heptan", conc:30}, {name:"Toluol", conc:30}
+    ]},
+    {group:1, name:"Sommerdiesel", components:[
+      {name:"n-Dodecan", conc:20}, {name:"n-Tetradecan", conc:35}, {name:"n-Hexadecan", conc:30}, {name:"n-Octadecan", conc:15}
+    ]},
+    {group:1, name:"Winterdiesel", components:[
+      {name:"n-Nonan", conc:15}, {name:"n-Decan", conc:30}, {name:"n-Dodecan", conc:35}, {name:"n-Tetradecan", conc:20}
     ]},
     {group:1, name:"Petrolether 40/60", components:[
       {name:"n-Pentan", conc:65}, {name:"n-Hexan", conc:35}
