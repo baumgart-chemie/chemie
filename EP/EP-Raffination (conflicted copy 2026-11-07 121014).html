@@ -1,0 +1,1986 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simulation „Erdölraffination“ · Erdölaufbereitung zu Kraftstoffen</title>
+<style>
+:root{
+  --bg:#14171a; --panel:#1b1f23; --panel-alt:#20252a; --raise:#262c32;
+  --line:#31383e; --line-soft:#262c31;
+  --text:#e7e4dd; --text-dim:#9aa2a9; --text-faint:#5f6870;
+  --amber:#ffb454; --amber-dim:#8a6535;
+  --teal:#4fd1c5; --teal-dim:#2c5b56;
+  --grid:#233029;
+  --danger:#e4785b;
+  --good:#7fd68a;
+  --radius:3px;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#14171a; --panel:#1b1f23; --panel-alt:#20252a; --raise:#262c32;
+    --line:#31383e; --line-soft:#262c31; --text:#e7e4dd; --text-dim:#9aa2a9;
+  }
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  padding-top:env(safe-area-inset-top,0); padding-bottom:env(safe-area-inset-bottom,0);
+  -webkit-font-smoothing:antialiased;
+}
+.mono{font-family:ui-monospace,"Cascadia Mono",Consolas,"SF Mono",Menlo,monospace;}
+h1,h2,h3{font-weight:600; margin:0;}
+
+/* header */
+header{
+  padding:22px 28px 18px; border-bottom:1px solid var(--line);
+  display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;
+}
+header h1{font-size:20px; letter-spacing:.2px;}
+header .tag{color:var(--text-dim); font-size:13.5px;}
+header .status{
+  margin-left:auto; font-size:12.5px; padding:4px 10px; border:1px solid var(--line);
+  border-radius:20px; color:var(--text-dim); display:flex; align-items:center; gap:7px;
+}
+header .status .dot{width:7px;height:7px;border-radius:50%;background:var(--text-faint);}
+header .status.running .dot{background:var(--amber); box-shadow:0 0 6px var(--amber);}
+header .status.running{color:var(--amber); border-color:var(--amber-dim);}
+header .status.done .dot{background:var(--teal);}
+header .status.done{color:var(--teal); border-color:var(--teal-dim);}
+.back-btn{
+  display:inline-flex; align-items:center; gap:6px; align-self:center; color:var(--text-dim); font-size:13px; text-decoration:none;
+  border:1px solid var(--line); border-radius:var(--radius); background:var(--panel-alt); padding:5px 11px 5px 9px; white-space:nowrap;
+}
+.back-btn:hover{color:var(--text); border-color:var(--text-faint);}
+.back-btn:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.back-btn .ar{color:var(--teal); font-size:14px; line-height:1;}
+.guide-link{
+  color:var(--teal); font-size:13.5px; text-decoration:none; border-bottom:1px solid var(--teal-dim);
+  padding-bottom:1px;
+}
+.guide-link:hover{border-bottom-color:var(--teal);}
+
+.modal-backdrop{
+  display:none; position:fixed; inset:0; background:rgba(8,10,12,.7); z-index:100;
+  align-items:center; justify-content:center; padding:24px;
+}
+.modal-backdrop.open{display:flex;}
+.modal-box{
+  background:var(--panel); border:1px solid var(--line); border-radius:5px;
+  width:100%; max-width:620px; max-height:82vh; overflow-y:auto; padding:22px 26px 26px;
+}
+.modal-head{display:flex; align-items:center; justify-content:space-between; margin:-22px -26px 14px; padding:22px 26px 10px; position:sticky; top:-22px; background:var(--panel); z-index:1;}
+.modal-head h2{font-size:17px;}
+.modal-close{background:none; border:none; color:var(--text-dim); font-size:22px; line-height:1; cursor:pointer; padding:2px 6px;}
+.modal-close:hover{color:var(--text);}
+.modal-body h3{font-size:13.5px; color:var(--amber); margin:18px 0 6px; font-weight:600;}
+.modal-body h3:first-child{margin-top:0;}
+.modal-body p{font-size:13.5px; line-height:1.6; color:var(--text-dim); margin:0 0 4px;}
+.modal-body strong{color:var(--text); font-weight:600;}
+
+/* layout */
+.wrap{display:grid; grid-template-columns: 320px 1fr; gap:0; align-items:start;}
+@media (max-width:920px){ .wrap{grid-template-columns:1fr;} }
+
+.sidebar{
+  border-right:1px solid var(--line); padding:20px 20px 60px;
+  max-height:calc(100vh - 70px); overflow-y:auto;
+}
+@media (max-width:920px){ .sidebar{border-right:none; border-bottom:1px solid var(--line); max-height:none;} }
+
+.main{padding:20px 24px 60px; min-width:0;}
+
+section.block{margin-bottom:26px;}
+.block h2{
+  font-size:12.5px; text-transform:none; color:var(--text-dim); font-weight:600;
+  padding-bottom:8px; border-bottom:1px solid var(--line-soft); margin-bottom:14px;
+  letter-spacing:.2px;
+}
+
+.row{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px;}
+.row label{font-size:13px; color:var(--text-dim);}
+.row .val{font-size:13px; color:var(--amber); min-width:64px; text-align:right;}
+.sidebar .row{margin-bottom:7px;}
+.sidebar input[type=range]{display:block; margin:0 0 20px;}
+.sidebar input[type=range]:last-child{margin-bottom:0;}
+.sidebar div[id$=Controls] input[type=range]{margin-bottom:20px;}
+input[type=range]{
+  width:100%; accent-color: var(--teal); height:4px; background:transparent; cursor:pointer;
+}
+.field-full{margin-bottom:14px;}
+.field-full label{display:block; font-size:13px; color:var(--text-dim); margin-bottom:6px;}
+select, input[type=text], input[type=number]{
+  width:100%; background:var(--panel-alt); border:1px solid var(--line); color:var(--text);
+  padding:7px 9px; border-radius:var(--radius); font-size:13.5px; font-family:inherit;
+}
+select:focus, input:focus{outline:2px solid var(--teal-dim); outline-offset:1px;}
+.sub-note{font-size:11.5px; color:var(--text-faint); line-height:1.45; margin:-6px 0 14px;}
+
+.mode-toggle{display:flex; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; margin-bottom:16px;}
+.mode-toggle button{
+  flex:1; background:var(--panel-alt); color:var(--text-dim); border:none; padding:8px 6px;
+  font-size:12.5px; cursor:pointer; font-family:inherit;
+}
+.mode-toggle button + button{border-left:1px solid var(--line);}
+.mode-toggle button{line-height:1.25;}
+.mode-toggle button.active{background:var(--teal-dim); color:var(--text);}
+.ptog-grid{display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:10px;}
+.ptog{display:flex; align-items:center; gap:8px; text-align:left; background:var(--panel-alt); border:1px solid var(--line);
+  color:var(--text-dim); border-radius:var(--radius); padding:9px 10px; font-size:12.8px; line-height:1.25; cursor:pointer; font-family:inherit; min-height:44px;}
+.ptog:hover{border-color:var(--text-faint);}
+.ptog .led{width:8px; height:8px; border-radius:50%; background:var(--text-faint); flex:none;}
+.ptog.on{border-color:var(--teal); background:rgba(79,209,197,.12); color:var(--text);}
+.ptog.on .led{background:var(--teal); box-shadow:0 0 6px var(--teal);}
+.ptog-quick{display:flex; gap:6px; margin-bottom:6px;}
+.ptog-quick .btn{flex:1; font-size:12px; padding:6px 8px;}
+details.adv{margin-bottom:26px; border-top:1px solid var(--line-soft); padding-top:10px;}
+details.adv summary{font-size:12.5px; color:var(--text-dim); font-weight:600; cursor:pointer; list-style:none; display:flex; align-items:center; gap:7px; padding:4px 0 10px;}
+details.adv summary::-webkit-details-marker{display:none;}
+details.adv summary::before{content:"▸"; color:var(--text-faint); font-size:11px; transition:transform .15s;}
+details.adv[open] summary::before{transform:rotate(90deg);}
+.unit-label{display:flex; justify-content:space-between; align-items:baseline; font-size:13px; color:var(--text-dim); margin-bottom:6px;}
+.unit-label .info{font-size:11.5px; color:var(--teal); cursor:pointer; background:none; border:none; padding:0; font-family:inherit;}
+
+.btn{
+  border-radius:var(--radius); border:1px solid var(--line); background:var(--panel-alt);
+  color:var(--text); font-size:13px; padding:8px 14px; cursor:pointer; font-family:inherit;
+  font-weight:500;
+}
+.btn:hover{border-color:var(--text-faint);}
+.btn.primary{background:var(--teal); border-color:var(--teal); color:#0d1614;}
+.btn.primary:hover{filter:brightness(1.08);}
+.btn.ghost{background:transparent;}
+.btn:disabled{opacity:.4; cursor:not-allowed;}
+.btn-row{display:flex; gap:8px; flex-wrap:wrap;}
+
+/* plant screen */
+.screen-card{
+  border:1px solid var(--line); background:#0e1113; border-radius:4px; padding:14px 14px 6px; position:relative;
+}
+.screen-top{display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap;}
+.speed-group{display:flex; gap:4px; margin-left:auto;}
+.speed-group button{
+  background:var(--panel-alt); border:1px solid var(--line); color:var(--text-dim); font-size:11.5px;
+  padding:5px 9px; border-radius:var(--radius); cursor:pointer; font-family:ui-monospace,"Cascadia Mono",Consolas,"SF Mono",Menlo,monospace;
+}
+.speed-group button.active{background:var(--teal-dim); color:var(--text); border-color:var(--teal);}
+.plant-wrap{overflow-x:auto; -webkit-overflow-scrolling:touch;}
+canvas#plant{width:100%; min-width:720px; display:block; border-radius:2px; cursor:pointer; touch-action:manipulation;}
+.readout-bar{
+  display:flex; gap:26px; padding:10px 4px 12px; flex-wrap:wrap; border-top:1px solid var(--line-soft); margin-top:4px;
+}
+.readout{display:flex; flex-direction:column; gap:2px;}
+.readout .k{font-size:10.5px; color:var(--text-faint);}
+.readout .v{font-size:15px; color:var(--amber);}
+.readout .v.ok{color:var(--good);} .readout .v.bad{color:var(--danger);}
+.unit-info{margin:0 4px 12px; padding:10px 12px; border:1px solid var(--line-soft); border-radius:3px; background:var(--panel); font-size:13px; line-height:1.55; color:var(--text-dim);}
+.unit-info strong{color:var(--text); font-weight:600;}
+.unit-info .muted{color:var(--text-faint);}
+.chrom-hint{margin:0 4px 12px; padding:9px 12px; border:1px solid var(--amber-dim); border-radius:3px; background:rgba(255,180,84,.07); color:var(--amber); font-size:12.8px; line-height:1.5;}
+.chrom-hint p{margin:0;} .chrom-hint p + p{margin-top:5px;}
+
+/* tabs */
+.tabs{display:flex; gap:2px; margin:26px 0 0; border-bottom:1px solid var(--line); flex-wrap:wrap;}
+.tabs button{
+  background:none; border:none; color:var(--text-dim); font-size:13px; padding:9px 4px; margin-right:22px;
+  cursor:pointer; font-family:inherit; border-bottom:2px solid transparent; font-weight:500;
+}
+.tabs button.active{color:var(--text); border-bottom-color:var(--amber);}
+.tabpanel{display:none; padding-top:18px;}
+.tabpanel.active{display:block;}
+
+table{width:100%; border-collapse:collapse; font-size:12.8px;}
+thead th{
+  text-align:left; font-weight:500; color:var(--text-faint); font-size:11px; padding:6px 8px;
+  border-bottom:1px solid var(--line); white-space:nowrap;
+}
+tbody td{padding:7px 8px; border-bottom:1px solid var(--line-soft); white-space:nowrap;}
+tbody tr:hover{background:var(--panel-alt);}
+tbody tr.sep td{border-top:1px solid var(--line); color:var(--text-dim);}
+td.num{text-align:right; font-family:ui-monospace,"Cascadia Mono",Consolas,"SF Mono",Menlo,monospace;}
+th.num{text-align:right;}
+.table-wrap{overflow-x:auto; border:1px solid var(--line-soft); border-radius:4px;}
+.swatch{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:7px; vertical-align:0;}
+.ok{color:var(--good);} .bad{color:var(--danger);} .dim{color:var(--text-faint);}
+.note{font-size:12px; color:var(--text-faint); line-height:1.5; margin-top:10px; max-width:70ch;}
+.chart-card{border:1px solid var(--line-soft); border-radius:4px; background:#0e1113; padding:10px 10px 4px; margin-bottom:16px;}
+canvas.chart{width:100%; height:260px; display:block;}
+.chart-legend{display:flex; gap:16px; flex-wrap:wrap; font-size:11.8px; color:var(--text-dim); padding:6px 4px 6px;}
+.chart-legend i{display:inline-block; width:14px; height:9px; border-radius:2px; margin-right:6px; vertical-align:-1px;}
+
+.proc-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+@media (max-width:760px){ .proc-grid{grid-template-columns:1fr;} }
+.proc{border:1px solid var(--line-soft); border-radius:4px; background:var(--panel-alt); padding:12px 14px;}
+.proc h3{font-size:13.5px; color:var(--amber); margin-bottom:6px;}
+.proc p{font-size:13px; line-height:1.55; color:var(--text-dim); margin:0 0 8px;}
+.proc .eq{font-family:ui-monospace,"Cascadia Mono",Consolas,"SF Mono",Menlo,monospace; font-size:12.8px; color:var(--text); background:#0e1113; border:1px solid var(--line-soft); border-radius:3px; padding:7px 9px; margin:0 0 6px; white-space:normal; line-height:1.5;}
+.proc .eq small{color:var(--text-faint); font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; font-size:11.5px; display:block;}
+.proc.hl{border-color:var(--teal-dim); box-shadow:0 0 0 1px var(--teal-dim) inset;}
+
+footer{padding:16px 28px 30px; color:var(--text-faint); font-size:11.5px; border-top:1px solid var(--line-soft); margin-top:10px;}
+footer p{margin:0;}
+footer .footer-credit{margin-top:8px; color:var(--text-dim);}
+footer .footer-links{margin-top:6px;}
+::-webkit-scrollbar{width:9px; height:9px;}
+::-webkit-scrollbar-thumb{background:var(--line); border-radius:5px;}
+</style>
+
+<style>
+/* Versionshinweise */
+.modal-body ul{padding-left:18px; margin:0 0 6px;}
+.modal-body li{font-size:13.5px; line-height:1.6; color:var(--text-dim); margin:0 0 6px;}
+.modal-body li strong{color:var(--text); font-weight:600;}
+.vh-ver{display:flex; align-items:baseline; gap:10px; margin:18px 0 6px;}
+.vh-ver:first-child{margin-top:0;}
+.vh-ver .v{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:13px; color:var(--amber); border:1px solid var(--amber-dim); border-radius:var(--radius); padding:1px 7px;}
+.vh-ver .d{font-size:12px; color:var(--text-faint);}
+footer a{color:var(--text-dim); text-decoration:none; border-bottom:1px solid var(--line);}
+footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
+
+/* Linke Spalte: steht beim Scrollen still und scrollt als Ganzes (ein einziger Scrollbereich) */
+@media (min-width:921px){
+  .sidebar{
+    position:sticky; top:0; align-self:start;
+    height:calc(100vh - var(--hdr, 70px)); height:calc(100dvh - var(--hdr, 70px)); max-height:none;
+    overflow-y:auto; overscroll-behavior:contain; background:var(--bg);
+  }
+}
+
+/* Rubrik Grundlagen */
+.gl-toggle{display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; cursor:pointer; text-align:left;
+  border:1px solid var(--teal-dim); border-radius:4px; background:var(--panel-alt); color:var(--text);
+  font-size:14px; font-weight:600; font-family:inherit; touch-action:manipulation;}
+.gl-toggle:hover{border-color:var(--teal);}
+.gl-toggle:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-toggle .gl-n{font-size:12px; font-weight:400; color:var(--text-faint);}
+.gl-toggle .gl-ch{margin-left:auto; color:var(--teal); font-size:13px;}
+.gl-toggle .gl-ch::after{content:"▸";}
+.gl-toggle[aria-expanded="true"] .gl-ch::after{content:"▾";}
+.gl-panel{margin-top:8px;}
+.gl-list{display:flex; flex-direction:column; gap:6px;}
+.gl-item{display:flex; gap:10px; align-items:center; width:100%; text-align:left; padding:8px 11px; cursor:pointer;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel); color:var(--text);
+  font-size:13px; font-family:inherit; font-weight:500; touch-action:manipulation;}
+.gl-item:hover{border-color:var(--text-faint); background:var(--panel-alt);}
+.gl-item:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-item .nr{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--amber); min-width:14px;}
+.gl-item .go{margin-left:auto; color:var(--text-faint); font-size:12px;}
+.gl-note{font-size:12px; color:var(--text-faint); line-height:1.5; margin:8px 0 0;}
+.modal-box.gl-wide{max-width:900px; width:100%; max-height:88vh; overflow-y:auto;}
+.gl-wide .gl-num{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--text-faint); margin-right:10px;}
+.gl-body p, .gl-body li{font-size:13.5px; line-height:1.6; color:var(--text-dim);}
+.gl-body p{margin:0 0 10px;}
+.gl-body ul, .gl-body ol{margin:0 0 12px; padding-left:22px;}
+.gl-body strong{color:var(--text); font-weight:600;}
+.gl-body sub, .gl-body sup{font-size:.72em;}
+.gl-row{display:flex; flex-wrap:wrap; gap:12px; align-items:stretch; margin:8px 0 14px;}
+.gl-fig{margin:0; flex:1 1 220px; background:var(--screen, #0e1113); border:1px solid var(--line-soft); border-radius:4px; padding:10px 12px 8px;
+  display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:6px; max-width:100%; overflow-x:auto;}
+.gl-fig figcaption{font-size:12px; color:var(--text-dim); text-align:center; line-height:1.45; max-width:420px;}
+.gl-tw{overflow-x:auto; margin:6px 0 12px; border:1px solid var(--line-soft); border-radius:4px;}
+.gl-table{width:100%; border-collapse:collapse; font-size:12.8px;}
+.gl-table th{text-align:left; font-weight:500; color:var(--text-faint); font-size:11.5px; padding:6px 9px; border-bottom:1px solid var(--line); background:var(--panel-alt);}
+.gl-table td{padding:6px 9px; border-bottom:1px solid var(--line-soft); color:var(--text-dim); vertical-align:top; white-space:normal;}
+.gl-table tr:last-child td{border-bottom:none;}
+.gl-table td:first-child{color:var(--text);}
+.gl-steps{counter-reset:gls; list-style:none; padding-left:0 !important;}
+.gl-steps li{counter-increment:gls; position:relative; padding-left:30px; margin-bottom:6px;}
+.gl-steps li::before{content:counter(gls); position:absolute; left:0; top:1px; width:20px; height:20px; border-radius:50%; border:1px solid var(--teal-dim);
+  color:var(--teal); font-size:11.5px; display:flex; align-items:center; justify-content:center; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.gl-box{border:1px solid var(--line-soft); border-left:3px solid var(--teal); background:var(--panel-alt); border-radius:3px; padding:9px 12px; margin:8px 0 12px;
+  font-size:13.5px; line-height:1.65; color:var(--text);}
+.gl-box.gl-warn{border-left-color:var(--amber);}
+.gl-box small{color:var(--text-faint); font-size:12px;}
+.gl-nav{display:flex; align-items:center; gap:10px; border-top:1px solid var(--line-soft); padding-top:14px; margin-top:16px;}
+.gl-nav .sp{flex:1; text-align:center; font-size:12px; color:var(--text-faint);}
+/* Strukturformeln und Anlagenschema in den Grundlagen */
+.gl-body .mol-eq{background:#0e1113; border:1px solid var(--line-soft); border-radius:4px; padding:10px 8px 6px; margin:4px 0 8px; overflow-x:auto; -webkit-overflow-scrolling:touch;}
+.gl-body .mol-eq svg{display:block; margin:0 auto; max-width:100%; height:auto;}
+.gl-body .mol-cap{font-size:12.5px; color:var(--text-faint); line-height:1.5; margin:0 0 14px;}
+.gl-body .mol-cap b{color:var(--danger); font-weight:600;} .gl-body .mol-cap i{color:var(--amber); font-style:normal; font-weight:600;}
+.gl-fcc{align-items:stretch; margin:8px 0 14px;}
+.gl-fcc svg{display:block; width:100%; min-width:520px; height:auto;}
+.gl-fcc figcaption{align-self:center;}
+.flow{stroke-dasharray:7 7; animation:flowmove 1.1s linear infinite;}
+@keyframes flowmove{to{stroke-dashoffset:-14;}}
+@media (prefers-reduced-motion: reduce){ .flow{animation:none;} }
+</style>
+<style id="bk-style">
+/* ===== Baustein QR-Code + Auswertung als PDF (einheitlich nach Leitfaden) ===== */
+.bk-qr{display:flex;align-items:center;gap:7px;background:var(--panel,#1b1f23);border:1px solid var(--line,#31383e);border-radius:4px;padding:2px 8px 2px 2px;color:var(--text-dim,#9aa2a9);font:inherit;font-size:10px;line-height:1.2;text-align:left;cursor:pointer;min-height:0;touch-action:manipulation}
+.bk-qr:hover{border-color:var(--teal,#4fd1c5);color:var(--text,#e7e4dd)}
+.bk-qr b{display:block;color:var(--text,#e7e4dd);font-weight:600;font-size:10.5px}
+.bk-qr svg{width:30px;height:30px;display:block;border-radius:2px}
+.bk-hr{display:flex;align-items:center;gap:12px;margin-left:auto;align-self:center;flex-wrap:wrap;justify-content:flex-end}
+header .back-btn{align-self:baseline}
+header>.tag{flex:1 1 160px;min-width:0}
+.bk-hr .status,.bk-hr #statusBadge,.bk-hr #status{margin-left:0!important}
+.bk-ov{display:none;position:fixed;inset:0;z-index:1000;background:rgba(8,10,12,.82);align-items:center;justify-content:center;padding:20px;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+.bk-ov.open{display:flex}
+.bk-qrbox{background:var(--panel,#1b1f23);border:1px solid var(--line,#31383e);border-radius:6px;padding:22px 24px 20px;text-align:center;max-width:94vw}
+.bk-qrbox svg{width:min(62vh,80vw,520px);height:auto;display:block;margin:0 auto;border-radius:4px}
+.bk-qrbox .bk-url{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;font-size:clamp(14px,2.2vw,22px);color:var(--text,#e7e4dd);margin:16px 0 4px;word-break:break-all}
+.bk-qrbox .bk-qhint{font-size:13px;color:var(--text-dim,#9aa2a9);margin:0 0 14px}
+.bk-b{font:inherit;font-size:14px;color:var(--text,#e7e4dd);background:var(--panel-alt,#20252a);border:1px solid var(--line,#31383e);border-radius:8px;padding:8px 18px;min-height:44px;cursor:pointer;touch-action:manipulation}
+.bk-b:hover{border-color:var(--text-faint,#5f6870)}
+.bk-b.pri{background:var(--teal,#4fd1c5);border-color:var(--teal,#4fd1c5);color:#0e1113;font-weight:650}
+.bk-b:disabled{opacity:.4;cursor:default}
+.bk-dlg{background:var(--panel,#1b1f23);border:1px solid var(--line,#31383e);border-radius:6px;width:min(620px,100%);max-height:90vh;overflow:auto;padding:18px 22px 20px;color:var(--text,#e7e4dd);font-size:14px;line-height:1.5}
+.bk-dhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.bk-dhead h2{font-size:18px;margin:0;font-weight:650;color:var(--text,#e7e4dd)}
+.bk-x{background:none;border:0;color:var(--text-dim,#9aa2a9);font-size:24px;line-height:1;cursor:pointer;min-width:44px;min-height:44px}
+.bk-x:hover{color:var(--text,#e7e4dd)}
+.bk-dh{color:var(--amber,#ffb454);font-weight:650;font-size:15px;margin:14px 0 8px}
+.bk-dh:first-of-type{margin-top:2px}
+.bk-runs label{display:flex;align-items:center;gap:12px;border:1px solid var(--line,#31383e);border-radius:8px;padding:10px 12px;margin-bottom:8px;background:var(--panel-alt,#20252a);min-height:48px;cursor:pointer}
+.bk-runs input{width:22px;height:22px;accent-color:var(--teal,#4fd1c5);flex:none;margin:0}
+.bk-runs i{width:16px;height:4px;border-radius:2px;flex:none}
+.bk-none{color:var(--text-dim,#9aa2a9);font-size:13.5px;margin:0}
+.bk-stat{display:grid;grid-template-columns:1fr auto;gap:4px 12px;border:1px solid var(--line,#31383e);border-radius:8px;padding:10px 12px;background:var(--panel-alt,#20252a);font-size:14px}
+.bk-stat span:nth-child(even){font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;color:var(--amber,#ffb454);text-align:right}
+.bk-row{display:flex;gap:10px}
+.bk-row input{flex:1;min-width:0;font:inherit;font-size:15px;color:var(--text,#e7e4dd);background:var(--screen,#0e1113);border:1px solid var(--line,#31383e);border-radius:8px;padding:10px 12px;min-height:44px}
+.bk-row input::placeholder{color:var(--text-faint,#5f6870)}
+.bk-hint{color:var(--text-dim,#9aa2a9);font-size:13.5px;margin:14px 0 0}
+.bk-hint b{color:var(--text,#e7e4dd)}
+.bk-btns{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.bk-pdfrow{display:flex;justify-content:flex-end;gap:10px;margin-top:10px;flex-wrap:wrap}
+.bk-print-host{display:none}
+@media (max-width:600px){.bk-qr span:last-child{display:none}.bk-qr{padding:4px}.bk-row{flex-direction:column}}
+@media print{
+  @page{size:A4;margin:14mm}
+  :root,html,body.bk-pr{background:#fff!important;color:#000!important;color-scheme:light!important}
+  body.bk-pr > *:not(.bk-print-host){display:none!important}
+  body.bk-pr .bk-print-host{display:block!important;position:static!important}
+}
+.bk-sheet{--text:#111;--text-dim:#333;--text-faint:#555;--amber:#9a5b00;--teal:#0f766e;--good:#2e7d32;--danger:#b23c17;--line:#999;--line-soft:#bbb;--bg:#fff;--panel:#fff;--panel-alt:#fff;--screen:#fff;color:#000;background:#fff;font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;font-size:10.5pt;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact;text-align:left}
+.bk-sheet *{color:inherit;text-shadow:none!important;box-shadow:none!important}
+.bk-sheet h1.bk-h1{font-size:17pt;margin:0 0 6pt;font-weight:700;color:#000}
+.bk-sheet .bk-kick{font-size:9pt;text-transform:uppercase;letter-spacing:.06em;color:#555}
+.bk-sheet table.bk-meta{border-collapse:collapse;width:100%;margin:2pt 0 10pt}
+.bk-sheet table.bk-meta td{border:0!important;padding:3pt 10pt 3pt 0!important;font-size:11pt;background:none!important}
+.bk-sheet .bk-line{border-bottom:1px solid #000;min-width:120pt;display:inline-block}
+.bk-sheet .bk-sec{margin:0 0 10pt;break-inside:avoid;page-break-inside:avoid}
+.bk-sheet .bk-sec.bk-long{break-inside:auto;page-break-inside:auto}
+.bk-sheet h2.bk-h2{font-size:12.5pt;margin:12pt 0 4pt;padding-bottom:2pt;border-bottom:1px solid #999;font-weight:700;color:#000;break-after:avoid;page-break-after:avoid}
+.bk-sheet h3.bk-h3{font-size:11pt;margin:8pt 0 3pt;font-weight:700;color:#000;break-after:avoid;page-break-after:avoid}
+.bk-sheet table.bk-t{border-collapse:collapse;width:100%;margin:3pt 0 6pt;break-inside:avoid;page-break-inside:avoid}
+.bk-sheet .bk-long table.bk-t{break-inside:auto;page-break-inside:auto}
+.bk-sheet table.bk-t tr{break-inside:avoid;page-break-inside:avoid}
+.bk-sheet table.bk-t th,.bk-sheet table.bk-t td{border:1px solid #888!important;padding:3pt 6pt!important;text-align:left;vertical-align:middle;font-size:9.5pt;white-space:normal!important;background:#fff!important;color:#000!important}
+.bk-sheet table.bk-t th{background:#eee!important;font-weight:700}
+.bk-sheet table.bk-t td *{color:#000!important}
+.bk-sheet table.bk-sum{border-collapse:collapse;margin:2pt 0 4pt}
+.bk-sheet table.bk-sum td{border:0!important;padding:2pt 14pt 2pt 0!important;font-size:10.5pt;background:none!important}
+.bk-sheet .bk-small{font-size:8.5pt;color:#333}
+.bk-sheet .bk-img{display:block;max-width:100%;max-height:120mm;margin:4pt auto;border:1px solid #bbb}
+.bk-sheet .bk-leg{display:flex;flex-wrap:wrap;gap:4pt 14pt;font-size:9pt;margin:2pt 0 4pt}
+.bk-sheet .bk-leg i{display:inline-block;width:16pt;height:3pt;margin-right:5pt;vertical-align:middle;border-radius:1pt}
+.bk-sheet .bk-cond{margin:2pt 0 4pt}
+.bk-sheet svg{color:#000;max-width:100%}
+.bk-sheet{--oxy:#c0392b;--nitro:#1f5fbf;--hal:#2e7d32;--bond:#222;--amber-dim:#9a5b00;--teal-dim:#0f766e;--good-dim:#2e7d32}
+.bk-sheet .bk-task{border:1px solid #aaa;border-left:4pt solid #888;border-radius:3px;padding:5pt 8pt 6pt;margin:0 0 7pt}
+.bk-sheet .bk-task-ok{border-left-color:#2e7d32}.bk-sheet .bk-task-bad{border-left-color:#b23c17}.bk-sheet .bk-task-open{border-left-color:#999}
+.bk-sheet .bk-tk{display:flex;justify-content:space-between;align-items:baseline;gap:8pt;flex-wrap:wrap;font-size:10.5pt;margin-bottom:3pt}
+.bk-sheet .bk-v{font-weight:700;font-size:9.5pt;white-space:nowrap}
+.bk-sheet .bk-v-ok{color:#2e7d32}.bk-sheet .bk-v-bad{color:#b23c17}.bk-sheet .bk-v-open{color:#666}
+.bk-sheet .bk-tq{font-size:10pt;margin:0 0 4pt}
+.bk-sheet .bk-sol{background:#f4f6f5;border-radius:2px;padding:4pt 6pt;font-size:10pt}
+.bk-sheet .bk-sl{display:block;font-size:8pt;text-transform:uppercase;letter-spacing:.05em;color:#555;margin-bottom:2pt}
+.bk-sheet .bk-sb svg,.bk-sheet .bk-tq svg{max-width:100%;height:auto;max-height:60mm}
+.bk-sheet .bk-sb .figure,.bk-sheet .bk-tq .figure{max-width:100%!important;margin:2pt 0;background:none;border:0;padding:0}
+.bk-sheet .bk-sb p{margin:2pt 0}.bk-sheet .bk-sb ul{margin:2pt 0 2pt 14pt;padding:0}
+.bk-sheet .bk-eq{display:flex;flex-wrap:wrap;align-items:center;gap:3pt 8pt}
+.bk-sheet .bk-eq .co{font-weight:700;margin-right:2pt}
+.bk-sheet .bk-eq .sp{display:inline-flex;align-items:center;gap:2pt}
+.bk-sheet .bk-eq svg{max-height:32mm;width:auto}
+.bk-sheet .bk-tnote{font-size:9pt;color:#333;margin-top:3pt}
+.bk-sheet .bk-foot{margin-top:14pt;border-top:1px solid #888;padding-top:4pt;font-size:8.5pt;color:#444;text-align:center}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="../index.html" class="back-btn" title="Zur Übersicht aller Simulationen"><span class="ar" aria-hidden="true">←</span>Zurück</a>
+  <h1>Simulation „Erdölraffination“</h1>
+  <span class="tag">Erdölaufbereitung – Destillation, Konversion &amp; Veredelung zu Kraftstoffen</span>
+  <a href="#" class="guide-link" id="btnGuide">Anleitung</a>
+  <span class="status" id="statusBadge"><span class="dot"></span><span id="statusText">bereit</span></span>
+</header>
+
+<div class="modal-backdrop" id="guideBackdrop">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2>Anleitung</h2>
+      <button class="modal-close" id="closeGuide" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body">
+      <h3>Worum geht es?</h3>
+      <p>Rohöl ist ein Gemisch aus Tausenden Kohlenwasserstoffen. In der Raffinerie wird es zunächst durch <strong>Destillation</strong> in Fraktionen mit unterschiedlichen Siedebereichen getrennt. Weil die Fraktionen in Menge und Qualität nicht zum Bedarf passen, folgen <strong>Konversionsverfahren</strong> (Cracken) und <strong>Veredelungsverfahren</strong> (Reformieren, Entschwefeln).</p>
+
+      <h3>Bedienung</h3>
+      <p>Links wählst du das <strong>Rohöl</strong> und schaltest die Anlagenteile ein oder aus. Die Verfahren werden über Knöpfe zu- und abgeschaltet und lassen sich beliebig kombinieren. Alle Ergebnisse unten (Produktbilanz, Fraktionen) passen sich sofort an.</p>
+      <p>Mit <strong>„Anlage starten“</strong> werden 1000 t Rohöl verarbeitet: Die Ströme fließen durch die Anlage und die Produkttanks füllen sich. Wird während des Laufs ein Verfahren zu- oder abgeschaltet, beginnt der Lauf mit leeren Tanks neu. Temperaturen lassen sich auch während des Laufs verändern. <strong>Tippe ein Anlagenteil an</strong>, um eine kurze Erklärung zu erhalten.</p>
+
+      <h3>Atmosphärische Destillation</h3>
+      <p>Das Rohöl wird im Röhrenofen auf etwa 360 °C erhitzt und verdampft dabei größtenteils. In der Kolonne steigt der Dampf nach oben und kühlt sich ab; an den Glockenböden kondensieren die Bestandteile entsprechend ihrer Siedetemperatur. Unter „Erweiterte Einstellungen“ lässt sich über die <strong>Fraktionsgrenzen</strong> verschieben, welcher Siedebereich zum Benzin, Kerosin oder Gasöl zählt.</p>
+      <p>Ist der Ofen zu kalt, verdampft weniger und mehr Material bleibt im Rückstand. Oberhalb von etwa 380 °C beginnen sich langkettige Moleküle bereits im Ofen zu zersetzen und es bildet sich Koks.</p>
+
+      <h3>Vakuumdestillation &amp; Cracken</h3>
+      <p>Der Rückstand würde bei Normaldruck erst oberhalb von 400 °C sieden und sich dabei zersetzen. Bei vermindertem Druck sinken die Siedetemperaturen, sodass sich <strong>Vakuumgasöl</strong> abtrennen lässt. Es ist der Einsatzstoff für den <strong>katalytischen Cracker</strong>, der daraus vor allem Benzin und Gase erzeugt.</p>
+
+      <h3>Veredelung</h3>
+      <p>Destillatbenzin ist wenig klopffest (niedrige Oktanzahl). Der <strong>Reformer</strong> wandelt Alkane in Aromaten um und liefert dabei Wasserstoff. Die <strong>Entschwefelung</strong> entfernt Schwefelverbindungen mit Wasserstoff als Schwefelwasserstoff, aus dem elementarer Schwefel gewonnen wird.</p>
+
+      <h3>Auswertung</h3>
+      <p><strong>Produktbilanz:</strong> Mengen je 1000 t Rohöl, Vergleich mit dem Bedarf und Prüfung der Anforderungen an Ottokraftstoff (Normalbenzin ROZ ≥ 91, Super ROZ ≥ 95, Schwefel ≤ 10 mg/kg) und Diesel (Schwefel ≤ 10 mg/kg).<br>
+      <strong>Fraktionen:</strong> Siedekurve des gewählten Rohöls mit den Fraktionsgrenzen, Kettenlängen und Verwendungen.<br>
+      <strong>Verfahren &amp; Reaktionen:</strong> Beispielgleichungen zu allen Verfahren.</p>
+
+      <h3>Ideen zum Ausprobieren</h3>
+      <p>Vergleiche die Benzinausbeute einer reinen Destillation mit dem Bedarf. Wie viel mehr Benzin liefert der katalytische Cracker? Warum erreicht Destillatbenzin nicht einmal die Anforderung an Normalbenzin, und welche Reformertemperatur ist dafür nötig? Was passiert beim schweren Rohöl mit dem Schwefelgehalt des schweren Heizöls?</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="changelogBackdrop" role="dialog" aria-modal="true" aria-labelledby="changelogTitle">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2 id="changelogTitle">Versionshinweise</h2>
+      <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.3</span><span class="d">07.11.2026</span></div>
+      <ul>
+        <li><strong>Auswertung als PDF:</strong> einheitlicher Dialog „Auswertung als PDF“: Jeder abgeschlossene Lauf ist einzeln auswählbar, dazu optionale Felder für Name und Kurs. Das PDF enthält je Lauf Versuchsbedingungen, Diagramm (weißer Hintergrund) und Messwerte im druckfreundlichen A4-Layout.</li><li><strong>QR-Code:</strong> Schaltfläche rechts in der Kopfzeile; Antippen vergrößert den QR-Code, mit dem sich diese Seite direkt auf dem Mobilgerät öffnen lässt.</li>
+      </ul>
+      <div class="vh-ver"><span class="v">V1.2</span><span class="d">01.11.2026</span></div>
+      <ul>
+        <li><strong>Neue Rubrik „Grundlagen“:</strong> Der Knopf „Grundlagen“ oben in der linken Spalte klappt 7 Themen mit Erklärtext und Grafiken zu den fachlichen und methodischen Grundlagen auf. Mit den Knöpfen unten oder den Pfeiltasten blättert man zwischen den Themen.</li>
+        <li><strong>Grundlagen „Cracken“:</strong> Bindungsbruch und H-Übertragung an zwei Beispielen in Strukturformeln (Octan, Decan), allgemeine Gleichung, Vergleich von thermischem und katalytischem Cracken.</li>
+        <li><strong>Neues Grundlagen-Thema „Aufbau einer Crackanlage“:</strong> stark vereinfachtes Schema mit Reaktor, Regenerator und Trennkolonne sowie Erläuterung des Katalysatorkreislaufs.</li>
+        <li><strong>Grundlagen „Reformieren“:</strong> drei Beispiele in Strukturformeln (Cyclohexan → Benzol, Methylcyclohexan → Toluol, Heptan → Toluol).</li>
+        <li><strong>Linke Spalte:</strong> Sie bleibt beim Scrollen der Aufgabe stehen, füllt die Bildschirmhöhe und scrollt als Ganzes in einem einzigen Bereich.</li>
+      </ul>
+      <div class="vh-ver"><span class="v">V1.1</span><span class="d">29.10.2026</span></div>
+        <ul>
+          <li>Hydrocracker und Isomerisierung entfernt; zur Auswahl stehen Vakuumdestillation, Entschwefelung, katalytischer Cracker und Reformer.</li>
+          <li><strong>Entschwefelung im Fließbild:</strong> eigener, deutlich sichtbarer Anlagenblock, durch den Benzin, Kerosin und Gasöl laufen; Anzeige des gewonnenen Schwefels.</li>
+          <li>Qualitätsprüfung des Benzins nach Normalbenzin (ROZ ≥ 91) und Super (ROZ ≥ 95).</li>
+          <li>„Zurück“-Knopf zur Übersicht.</li>
+        </ul>
+      <div class="vh-ver"><span class="v">V1.0</span><span class="d">17.10.2026</span></div>
+        <ul>
+          <li>Erste Version der Simulation: vier Rohölsorten, atmosphärische Destillation mit einstellbarer Ofentemperatur und Fraktionsgrenzen, Vakuumdestillation, katalytischer Cracker, Reformieren und Entschwefeln.</li>
+          <li>Animiertes Fließbild mit Produkttanks; Anlagenteile lassen sich zur Erklärung antippen.</li>
+          <li>Auswertung mit Produktbilanz und Bedarfsvergleich, Qualitätsprüfung (Oktanzahl, Schwefelgehalt), Siedekurve und Beispielreaktionen.</li>
+          <li>Anleitung zur Bedienung.</li>
+        </ul>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <section class="block">
+      <button type="button" class="gl-toggle" id="glToggle" aria-expanded="false" aria-controls="glPanel">
+        <span>Grundlagen</span><span class="gl-n">7 Themen</span><span class="gl-ch" aria-hidden="true"></span>
+      </button>
+      <div class="gl-panel" id="glPanel" hidden>
+        <div class="gl-list" id="glList"></div>
+        <p class="gl-note">Erklärungen mit Grafiken zum Nachlesen – auch zur Besprechung im Unterricht.</p>
+      </div>
+    </section>
+
+
+    <section class="block">
+      <h2>Rohöl</h2>
+      <div class="field-full">
+        <label for="crudeSelect">Rohölsorte</label>
+        <select id="crudeSelect"></select>
+      </div>
+      <p class="sub-note" id="crudeInfo" style="margin-bottom:0"></p>
+    </section>
+
+    <section class="block">
+      <h2>Verfahren</h2>
+      <p class="sub-note" style="margin-top:-4px">Die atmosphärische Destillation läuft immer. Weitere Verfahren durch Antippen zu- oder abschalten – beliebig kombinierbar. Der katalytische Cracker benötigt Vakuumgasöl; die Vakuumdestillation wird dann automatisch eingeschaltet.</p>
+      <div class="ptog-grid" id="procToggles">
+        <button class="ptog" data-key="vac"><span class="led"></span>Vakuum&shy;destillation</button>
+        <button class="ptog" data-key="hds"><span class="led"></span>Entschwefelung</button>
+        <button class="ptog" data-key="fcc"><span class="led"></span>Katalytischer Cracker</button>
+        <button class="ptog" data-key="ref"><span class="led"></span>Reformer</button>
+      </div>
+      <div class="ptog-quick">
+        <button class="btn ghost" id="allOff">Alle aus</button>
+        <button class="btn ghost" id="allOn">Alle ein</button>
+      </div>
+      <p class="sub-note" style="margin:8px 0 0">Erklärungen: Anlagenteil im Fließbild antippen.</p>
+    </section>
+
+    <section class="block">
+      <h2>Betriebsbedingungen</h2>
+      <div class="row"><label>Ofentemperatur</label><span class="val mono" id="vFurn">360 °C</span></div>
+      <input type="range" id="rFurn" min="300" max="420" value="360" step="5">
+      <div id="fccControls" style="display:none">
+        <div class="row"><label>Katalytischer Cracker</label><span class="val mono" id="vFCC">510 °C</span></div>
+        <input type="range" id="rFCC" min="480" max="540" value="510" step="5">
+      </div>
+      <div id="refControls" style="display:none">
+        <div class="row"><label>Reformer</label><span class="val mono" id="vRef">500 °C</span></div>
+        <input type="range" id="rRef" min="470" max="530" value="500" step="5">
+      </div>
+    </section>
+
+    <details class="adv">
+      <summary>Erweiterte Einstellungen</summary>
+      <p class="sub-note" style="margin-top:0">Fraktionsgrenzen der atmosphärischen Destillation. Die Standardwerte müssen nicht verändert werden.</p>
+      <div class="row"><label>Grenze Benzin | Kerosin</label><span class="val mono" id="vCutBK">180 °C</span></div>
+      <input type="range" id="rCutBK" min="150" max="200" value="180" step="5">
+      <div class="row"><label>Grenze Kerosin | Gasöl</label><span class="val mono" id="vCutKG">250 °C</span></div>
+      <input type="range" id="rCutKG" min="220" max="290" value="250" step="5">
+    </details>
+
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <div class="screen-card">
+      <div class="screen-top">
+        <button class="btn primary" id="btnRun">Anlage starten</button>
+        <button class="btn" id="btnStop" disabled>Stopp</button>
+        <button class="btn ghost" id="btnReset">Zurücksetzen</button>
+        <div class="speed-group">
+          <button data-speed="1" class="active">×1</button>
+          <button data-speed="4">×4</button>
+          <button data-speed="15">×15</button>
+        </div>
+      </div>
+      <div class="plant-wrap"><canvas id="plant"></canvas></div>
+      <div class="readout-bar">
+        <div class="readout"><span class="k">verarbeitetes Rohöl</span><span class="v mono" id="roProc">0 t</span></div>
+        <div class="readout"><span class="k">Benzinausbeute</span><span class="v mono" id="roBen">–</span></div>
+        <div class="readout"><span class="k">Oktanzahl Benzin (ROZ)</span><span class="v mono" id="roRON">–</span></div>
+        <div class="readout"><span class="k">Schwefel im Diesel</span><span class="v mono" id="roSDie">–</span></div>
+      </div>
+      <div class="unit-info" id="unitInfo"><span class="muted">Tippe ein Anlagenteil im Fließbild an, um eine Erklärung zu erhalten.</span></div>
+      <div class="chrom-hint" id="warnBox" style="display:none;"></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tabbtn active" data-tab="bal">Produktbilanz</button>
+      <button class="tabbtn" data-tab="frac">Fraktionen</button>
+      <button class="tabbtn" data-tab="proc">Verfahren &amp; Reaktionen</button>
+    </div>
+
+    <div class="tabpanel active" id="tab-bal">
+      <div class="chart-card">
+        <canvas class="chart" id="balChart"></canvas>
+        <div class="chart-legend">
+          <span><i style="background:linear-gradient(90deg,#b79cf2,#ffd166,#7fd68a,#e8955c,#a68a6d)"></i>Ausbeute (Anteil an den Verkaufsprodukten)</span>
+          <span><i style="background:transparent; border:1.5px dashed var(--amber)"></i>Bedarf (grob gerundete Richtwerte)</span>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Produkt</th><th class="num">Menge</th><th class="num">Anteil</th><th class="num">Bedarf</th><th>Qualität</th><th>Anforderung</th></tr></thead>
+          <tbody id="balBody"></tbody>
+        </table>
+      </div>
+      <p class="note">Mengen je 1000 t Rohöl. „Anteil“ bezieht sich auf die Summe der fünf Verkaufsprodukte. Die Oktanzahl des Benzins ist als massengewichteter Mittelwert der Komponenten berechnet; in der Praxis mischen sich Oktanzahlen nicht streng linear.</p>
+    </div>
+
+    <div class="tabpanel" id="tab-frac">
+      <div class="chart-card">
+        <canvas class="chart" id="tbpChart"></canvas>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Fraktion</th><th>Siedebereich</th><th>C-Atome (ca.)</th><th class="num">Anteil am Rohöl</th><th>Verwendung</th></tr></thead>
+          <tbody id="fracBody"></tbody>
+        </table>
+      </div>
+      <p class="note">Die Siedekurve zeigt, welcher Massenanteil des Rohöls bis zu einer bestimmten Temperatur verdampft. Die Kettenlängen sind über die Siedetemperaturen der unverzweigten Alkane abgeschätzt: Mit wachsender Kettenlänge nehmen die Van-der-Waals-Kräfte zu und die Siedetemperatur steigt.</p>
+    </div>
+
+    <div class="tabpanel" id="tab-proc">
+      <div class="proc-grid">
+        <div class="proc" data-unit="col">
+          <h3>Fraktionierte Destillation</h3>
+          <p>Physikalisches Trennverfahren ohne chemische Reaktion. Die Komponenten werden nach ihrer Siedetemperatur getrennt; an jedem Glockenboden stellt sich ein Gleichgewicht zwischen aufsteigendem Dampf und herabfließender Flüssigkeit ein.</p>
+          <p class="eq">Siedetemperaturen: Butan −1 °C · Octan 126 °C · Hexadecan 287 °C<small>längere Ketten → stärkere Van-der-Waals-Kräfte → höhere Siedetemperatur</small></p>
+        </div>
+        <div class="proc" data-unit="vac">
+          <h3>Vakuumdestillation</h3>
+          <p>Bei etwa 20–50 hPa sieden die schweren Bestandteile des Rückstands schon unterhalb von 400 °C und lassen sich ohne Zersetzung destillieren. Kopfprodukt: Vakuumgasöl (Crack-Einsatz, Schmieröle), Sumpf: Vakuumrückstand (Bitumen, schweres Heizöl).</p>
+        </div>
+        <div class="proc" data-unit="crk">
+          <h3>Katalytischer Cracker</h3>
+          <p>Lange Alkanmoleküle werden bei etwa 500 °C an einem Zeolith-Katalysator in kürzere Alkane und Alkene gespalten. Der dabei abgeschiedene Koks wird im Regenerator abgebrannt und liefert die Prozesswärme.</p>
+          <p class="eq">C₁₆H₃₄ → C₈H₁₈ + C₈H₁₆<small>Hexadecan → Octan + Octen</small></p>
+          <p class="eq">C₁₀H₂₂ → C₇H₁₆ + C₃H₆<small>Decan → Heptan + Propen</small></p>
+        </div>
+        <div class="proc" data-unit="ref">
+          <h3>Katalytisches Reformieren</h3>
+          <p>An Platin-Katalysatoren bei etwa 500 °C werden aus Alkanen und Cycloalkanen Aromaten mit hoher Oktanzahl. Nebenprodukt ist Wasserstoff, der in der Entschwefelung gebraucht wird. Schwefel vergiftet den Katalysator.</p>
+          <p class="eq">C₇H₁₆ → C₇H₈ + 4 H₂<small>Heptan (ROZ 0) → Toluol (ROZ ≈ 120)</small></p>
+          <p class="eq">C₆H₁₂ → C₆H₆ + 3 H₂<small>Cyclohexan → Benzol</small></p>
+        </div>
+        <div class="proc" data-unit="hds">
+          <h3>Entschwefelung &amp; Claus-Verfahren</h3>
+          <p>Schwefelverbindungen reagieren an Co-Mo- oder Ni-Mo-Katalysatoren mit Wasserstoff zu Kohlenwasserstoffen und Schwefelwasserstoff. Aus dem H₂S wird im Claus-Verfahren elementarer Schwefel gewonnen.</p>
+          <p class="eq">C₄H₄S + 4 H₂ → C₄H₁₀ + H₂S<small>Thiophen + Wasserstoff → Butan + Schwefelwasserstoff</small></p>
+          <p class="eq">2 H₂S + 3 O₂ → 2 SO₂ + 2 H₂O<br>2 H₂S + SO₂ → 3 S + 2 H₂O<small>Claus-Verfahren</small></p>
+        </div>
+        <div class="proc" data-unit="blend">
+          <h3>Mischen (Blending)</h3>
+          <p>Fertige Kraftstoffe sind Mischungen mehrerer Raffinerieströme. Beim Ottokraftstoff werden Reformat, Crackbenzin, Leichtbenzin und Butan so kombiniert, dass Oktanzahl, Dampfdruck und Schwefelgehalt die Norm erfüllen. Für Super (ROZ ≥ 95) sind zusätzlich Oktanzahlverbesserer nötig, z. B. Isomerisat, Ethanol (E5/E10) oder ETBE. Dem Diesel wird Biodiesel (FAME) beigemischt.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <p class="footer-note">Simulierte Daten zu Lehrzwecken · Siedekurven, Ausbeuten, Oktanzahlen und Schwefelgehalte beruhen auf stark vereinfachten Modellen und gerundeten Richtwerten; sie bilden keine reale Raffinerie exakt ab.</p>
+  <p class="footer-credit">Bastian Baumgart · Simulation „Erdölraffination“ V1.3 · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const fmt = (x, d=0) => (isFinite(x) ? x.toFixed(d) : "–").replace(".", ",").replace("-", "−");
+  const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+
+  // ---------- Daten ----------
+  // Siedekurven: kumulierter Massenanteil (%), der bis zur Temperatur (°C) verdampft (vereinfachte Richtwerte)
+  const CRUDES = {
+    kond:  {name:"Sehr leichtes Rohöl (Kondensat-Typ)", rho:0.76,  S:0.05, pts:[[30,5],[100,25],[180,50],[250,65],[350,85],[450,94],[550,98]]},
+    light: {name:"Leichtes Rohöl (Nordsee-Typ)",        rho:0.835, S:0.4,  pts:[[30,2.5],[100,13],[180,31],[250,44],[350,62],[450,76],[550,86]]},
+    medium:{name:"Mittelschweres Rohöl (Arabien-Typ)",  rho:0.86,  S:1.8,  pts:[[30,1.5],[100,8],[180,21],[250,32],[350,50],[450,64],[550,75]]},
+    heavy: {name:"Schweres Rohöl (Venezuela-Typ)",      rho:0.93,  S:3.4,  pts:[[30,1],[100,4.5],[180,12],[250,20],[350,34],[450,47],[550,58]]}
+  };
+  // Bedarf (grob gerundete Richtwerte, Anteil an den Verkaufsprodukten in %)
+  const DEMAND = {lpg:4, ben:28, ker:10, die:46, hvy:12};
+  const PROD = [
+    {k:"lpg", name:"Flüssiggas",            col:"#b79cf2"},
+    {k:"ben", name:"Benzin",                col:"#ffd166"},
+    {k:"ker", name:"Kerosin",               col:"#7fd68a"},
+    {k:"die", name:"Diesel / Heizöl EL",    col:"#e8955c"},
+    {k:"hvy", name:"Schweres Heizöl / Bitumen", col:"#a68a6d"}
+  ];
+  const COL = {gas:"#b79cf2", ben:"#ffd166", ker:"#7fd68a", die:"#e8955c", hvy:"#a68a6d", crude:"#b89a78", h2:"#9fd3ff"};
+  // Siedetemperaturen der n-Alkane C1 … C25 (°C)
+  const ALK_BP = [null,-162,-89,-42,-0.5,36,69,98,126,151,174,196,216,235,254,271,287,302,316,330,343,357,369,380,391,402];
+  // längere Ketten: grob interpoliert (C30 ≈ 450 °C, C40 ≈ 524 °C, C50 ≈ 575 °C)
+  for(let n=26;n<=60;n++) ALK_BP[n] = n<=30 ? 402+(n-25)*9.6 : n<=40 ? 450+(n-30)*7.4 : 524+(n-40)*5.1;
+
+
+  const S = {
+    crude:"light", furnace:360, cutBK:180, cutKG:250,
+    vac:false, fcc:false, tFCC:510, ref:false, tRef:500, hds:false,
+    speed:1, running:false, processed:0, total:1000,
+    tanks:{lpg:0, ben:0, ker:0, die:0, hvy:0}, sel:null
+  };
+
+  // ---------- Modell ----------
+  function cum(c, T){
+    const p = [[-50,0], ...c.pts, [800,100]];
+    if(T <= p[0][0]) return 0;
+    if(T >= p[p.length-1][0]) return 1;
+    for(let i=1;i<p.length;i++){
+      if(T <= p[i][0]){
+        const [t0,y0] = p[i-1], [t1,y1] = p[i];
+        return (y0 + (y1-y0)*(T-t0)/(t1-t0))/100;
+      }
+    }
+    return 1;
+  }
+  // relative Schwefelverteilung: schwere Fraktionen enthalten mehr Schwefel
+  const sWeight = T => T < 30 ? 0 : 0.04 + 1.6*Math.pow(Math.max(T,0)/550, 1.6);
+  function sulfurTable(c){
+    const step = 5, bins = [];
+    let tot = 0;
+    for(let T=-50; T<800; T+=step){
+      const dm = cum(c, T+step) - cum(c, T), w = sWeight(T + step/2);
+      bins.push({lo:T, hi:T+step, dm, w}); tot += dm*w;
+    }
+    const k = c.S*1e4 / tot;                      // mg/kg je Gewichtseinheit
+    return {bins, k};
+  }
+  // mittlerer Schwefelgehalt (mg/kg) einer Fraktion lo…hi
+  function sFrac(st, lo, hi){
+    let m = 0, s = 0;
+    st.bins.forEach(b=>{
+      const a = Math.max(lo, b.lo), e = Math.min(hi, b.hi);
+      if(e > a){ const f = (e-a)/(b.hi-b.lo); m += b.dm*f; s += b.dm*f*b.w; }
+    });
+    return m > 0 ? s/m*st.k : 0;
+  }
+  function cRange(lo, hi){
+    let a = null, b = null;
+    for(let n=1;n<ALK_BP.length;n++){ if(ALK_BP[n] >= lo && a===null) a = n; if(ALK_BP[n] < hi) b = n; }
+    if(hi >= 800) return a ? "ab C" + sub(a) : "–";
+    if(a===null || b===null || b < a) return "–";
+    return a===b ? "C" + sub(a) : "C" + sub(a) + "–C" + sub(b);
+  }
+  function sub(n){ return String(n).split("").map(d=>"₀₁₂₃₄₅₆₇₈₉"[+d]).join(""); }
+
+  function model(){
+    const c = CRUDES[S.crude], st = sulfurTable(c);
+    const warn = [];
+    const AE = Math.min(S.furnace - 10, 370);      // Endsiedepunkt der atmosphärischen Destillation
+    const bk = Math.min(S.cutBK, AE), kg = Math.min(S.cutKG, AE);
+    const f = {
+      gas: cum(c,30),
+      ln:  cum(c,100) - cum(c,30),
+      hn:  cum(c,bk) - cum(c,100),
+      ker: cum(c,kg) - cum(c,bk),
+      go:  cum(c,AE) - cum(c,kg),
+      res: 1 - cum(c,AE)
+    };
+    const s = {
+      ln: sFrac(st,30,100), hn: sFrac(st,100,bk), ker: sFrac(st,bk,kg), go: sFrac(st,kg,AE),
+      vgo: sFrac(st,AE,550), vr: sFrac(st,550,800), res: sFrac(st,AE,800)
+    };
+    let coke = 0, sRec = 0, h2prod = 0, h2cons = 0;
+    sRec += f.gas * sFrac(st,-50,30);              // (praktisch null)
+
+    // Überhitzung im Ofen: thermisches Cracken des Rückstands
+    let kOver = 0;
+    if(S.furnace > 380){
+      kOver = Math.min(0.3, (S.furnace-380)*0.004);
+      const d = f.res*kOver;
+      f.res -= d; f.gas += d*0.5; coke += d*0.5;
+      warn.push("Ofentemperatur über 380 °C: Langkettige Moleküle zersetzen sich bereits im Ofen (thermisches Cracken). Es entsteht Koks, der die Ofenrohre zusetzt – in der Praxis wird der Ofen deshalb nicht so heiß betrieben.");
+    } else if(S.furnace < 340){
+      warn.push("Niedrige Ofentemperatur: Es verdampft weniger Rohöl. Ein Teil des Gasöls gelangt nicht in die Kolonne, sondern bleibt im Rückstand.");
+    }
+
+    // Vakuumdestillation
+    let vgo = 0, vr = 0, resBypass = 0;
+    if(S.vac){
+      vgo = (cum(c,550) - cum(c,AE)) * (1-kOver);
+      vr  = (1 - cum(c,550)) * (1-kOver);
+    } else {
+      resBypass = f.res;
+    }
+
+    // Katalytischer Cracker
+    let crkGas = 0, crkBen = 0, lco = 0, crkHvy = 0;
+    let sCrkBen = 0, sLco = 0, smHvy = 0;
+    const feedF = (S.vac && S.fcc) ? vgo : 0;
+    if(feedF > 0){
+      const x = (S.tFCC-480)/60, X = 0.55 + 0.25*x;
+      crkGas += feedF*X*(0.17+0.12*x);
+      crkBen  = feedF*X*(0.77-0.12*x);
+      coke   += feedF*X*0.06;
+      lco     = feedF*(1-X)*0.6;                     // leichtes Kreislauföl
+      const slurry = feedF*(1-X)*0.4;                // Sumpföl
+      crkHvy += slurry;
+      sCrkBen = s.vgo*0.12; sLco = s.vgo*1.6; smHvy += slurry*s.vgo*2.2;
+      sRec += Math.max(0, feedF*s.vgo - (crkBen*sCrkBen + lco*sLco + slurry*s.vgo*2.2));
+    }
+    const vgoRest = vgo - feedF;                     // nicht gecracktes Vakuumgasöl → schweres Heizöl
+    crkHvy += vgoRest; smHvy += vgoRest*s.vgo;
+    const crkDie = lco, crkKer = 0;
+
+    // Entschwefelung (Hydrotreating der Destillate und Crackprodukte)
+    const HDS_KEEP = 0.0002;
+    let sLN = s.ln, sHN = s.hn, sKER = s.ker, sGO = s.go;
+    if(S.hds){
+      const treated = f.ln + f.hn + f.ker + f.go + crkBen + lco;
+      const sIn = f.ln*sLN + f.hn*sHN + f.ker*sKER + f.go*sGO + crkBen*sCrkBen + lco*sLco;
+      sLN *= HDS_KEEP; sHN *= HDS_KEEP; sKER *= HDS_KEEP; sGO *= HDS_KEEP; sCrkBen *= HDS_KEEP;
+      sLco *= HDS_KEEP;
+      const sRem = sIn*(1-HDS_KEEP);
+      sRec += sRem;
+      h2cons += 0.2*sRem/1e6 + 0.003*treated;
+    }
+
+    const lnOut = f.ln, lnRON = 72;
+
+    // Reformer
+    const refFeed = f.hn, sRefFeed = sHN;
+    let hnOut = refFeed, hnRON = 55, refGas = 0, sHnOut = sRefFeed;
+    if(S.ref){
+      const x = (S.tRef-470)/60, Y = 0.90 - 0.12*x;
+      const h2 = refFeed*(0.02 + 0.015*x);
+      hnOut = refFeed*Y;
+      hnRON = 92 + 14*x;
+      refGas = refFeed*(1-Y);
+      h2prod += h2;
+      if(!S.hds){
+        hnRON -= 20;
+        warn.push("Schwefelverbindungen vergiften den Platin-Katalysator des Reformers – die Oktanzahl des Reformats bricht ein. Das Schwerbenzin muss vorher entschwefelt werden.");
+      }
+    }
+
+    // Produkte (Massenanteile bezogen auf das Rohöl)
+    const gasTot = f.gas + crkGas + Math.max(0, refGas - h2prod);
+    const p = {
+      lpg: gasTot*0.6,
+      ben: lnOut + hnOut + crkBen,
+      ker: f.ker + crkKer,
+      die: f.go + crkDie,
+      hvy: resBypass + vr + crkHvy
+    };
+    const own = gasTot*0.4 + coke + h2prod;            // Raffineriegas, Koks, Wasserstoff
+    const q = {};
+    q.benRON = p.ben > 0 ? (lnOut*lnRON + hnOut*hnRON + crkBen*93)/p.ben : 0;
+    q.benS   = p.ben > 0 ? (lnOut*sLN + hnOut*(S.ref && S.hds ? 0.5 : sHnOut) + crkBen*sCrkBen)/p.ben : 0;
+    q.kerS   = p.ker > 0 ? sKER : 0;
+    q.dieS   = p.die > 0 ? (f.go*sGO + lco*sLco)/p.die : 0;
+    const hvyS = (resBypass*s.res + vr*s.vr + smHvy);
+    q.hvyS   = p.hvy > 0 ? hvyS/p.hvy : 0;
+    if(h2cons > h2prod + 1e-9 && S.hds){
+      warn.push("Der Wasserstoffbedarf ist größer als die Produktion im Reformer. Die Fehlmenge (" + fmt((h2cons-h2prod)*S.total,1) + " t je 1000 t Rohöl) wird aus Erdgas durch Dampfreformierung erzeugt.");
+    }
+    return {c, st, AE, bk, kg, f, s, vgo, vr, resBypass, crkGas, crkBen, crkKer, crkDie, crkHvy,
+            lnOut, hnOut, refGas, refFeed, p, own, q, coke, sRec: sRec/1e6, h2prod, h2cons, warn, kOver};
+  }
+
+  // ---------- Fließbild ----------
+  const LW = 1100, LH = 520;
+  const plant = $("plant");
+  let pc = null, M = model(), tAnim = 0;
+
+  const TANKS = {lpg:{y:28}, ben:{y:118}, ker:{y:213}, die:{y:308}, hvy:{y:413}};
+  const TANK_X = 930, TANK_W = 150, TANK_H = 64, TANK_CAP = 700;
+
+  const UNITS = {
+    crude:{x:30,  y:380, w:80,  h:90,  name:"Rohöltank"},
+    furn: {x:150, y:400, w:80,  h:60,  name:"Röhrenofen"},
+    col:  {x:280, y:30,  w:60,  h:450, name:"Destillationskolonne"},
+    hds:  {x:372, y:92,  w:58,  h:272, name:"Entschwefelung"},
+    vac:  {x:410, y:390, w:50,  h:110, name:"Vakuumkolonne"},
+    ref:  {x:520, y:154, w:110, h:36,  name:"Reformer"},
+    crk:  {x:520, y:384, w:110, h:56,  name:"Cracker"}
+  };
+  Object.keys(TANKS).forEach(k=> UNITS["tank_"+k] = {x:TANK_X, y:TANKS[k].y, w:TANK_W, h:TANK_H});
+
+  const ROUTES = [
+    {pts:[[110,430],[150,430]], col:"crude", f:()=>1},
+    {pts:[[230,430],[280,430]], col:"crude", f:()=>1},
+    {pts:[[340,60],[650,60]],   col:"gas", f:m=>m.f.gas},
+    {pts:[[650,60],[930,60]],   col:"gas", f:m=>m.p.lpg},
+    {pts:[[630,162],[660,162],[660,60]], col:"gas", f:m=>m.refGas},
+    {pts:[[630,392],[650,392],[650,60]], col:"gas", f:m=>m.crkGas},
+    {pts:[[340,118],[700,118],[700,150]], col:"ben", f:m=>m.f.ln},
+    {pts:[[340,172],[520,172]], col:"ben", f:m=>m.f.hn},
+    {pts:[[630,172],[700,172],[700,150]], col:"ben", f:m=>m.hnOut},
+    {pts:[[630,404],[700,404],[700,150]], col:"ben", f:m=>m.crkBen},
+    {pts:[[700,150],[930,150]], col:"ben", f:m=>m.p.ben},
+    {pts:[[340,245],[690,245]], col:"ker", f:m=>m.f.ker},
+    {pts:[[690,245],[930,245]], col:"ker", f:m=>m.p.ker},
+    {pts:[[340,340],[680,340]], col:"die", f:m=>m.f.go},
+    {pts:[[680,340],[930,340]], col:"die", f:m=>m.p.die},
+    {pts:[[630,426],[680,426],[680,340]], col:"die", f:m=>m.crkDie},
+    {pts:[[340,465],[410,465]], col:"hvy", f:m=>m.f.res},
+    {pts:[[460,465],[720,465],[720,445]], col:"hvy", f:m=>m.resBypass},
+    {pts:[[460,405],[520,405]], col:"hvy", f:m=>m.vgo},
+    {pts:[[460,490],[720,490],[720,445]], col:"hvy", f:m=>m.vr},
+    {pts:[[630,436],[720,436],[720,445]], col:"hvy", f:m=>m.crkHvy},
+    {pts:[[720,445],[930,445]], col:"hvy", f:m=>m.p.hvy}
+  ];
+  ROUTES.forEach(r=>{
+    r.seg = []; r.len = 0;
+    for(let i=1;i<r.pts.length;i++){
+      const [x0,y0] = r.pts[i-1], [x1,y1] = r.pts[i];
+      const l = Math.hypot(x1-x0, y1-y0);
+      r.seg.push({x0,y0,x1,y1,l,start:r.len}); r.len += l;
+    }
+  });
+  function pointAt(r, d){
+    for(const s of r.seg){
+      if(d <= s.start + s.l){ const t = (d - s.start)/s.l; return [s.x0 + (s.x1-s.x0)*t, s.y0 + (s.y1-s.y0)*t]; }
+    }
+    const s = r.seg[r.seg.length-1]; return [s.x1, s.y1];
+  }
+
+  function sizeCanvas(cv, lw, lh){
+    const w = cv.clientWidth || cv.parentElement.clientWidth;
+    const h = w*lh/lw;
+    cv.style.height = h + "px";
+    const dpr = window.devicePixelRatio || 1;
+    cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+    const c = cv.getContext("2d");
+    const sc = dpr*w/lw;
+    c.setTransform(sc,0,0,sc,0,0);
+    return c;
+  }
+  function rr(c, x, y, w, h, r){
+    c.beginPath(); c.moveTo(x+r,y); c.lineTo(x+w-r,y); c.quadraticCurveTo(x+w,y,x+w,y+r);
+    c.lineTo(x+w,y+h-r); c.quadraticCurveTo(x+w,y+h,x+w-r,y+h); c.lineTo(x+r,y+h); c.quadraticCurveTo(x,y+h,x,y+h-r);
+    c.lineTo(x,y+r); c.quadraticCurveTo(x,y,x+r,y); c.closePath();
+  }
+  const FONT = "system-ui,-apple-system,'Segoe UI',Roboto,sans-serif";
+  const MONO = "ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace";
+
+  function unitOn(k){
+    if(k==="vac") return S.vac;
+    if(k==="crk") return S.fcc && S.vac;
+    if(k==="ref") return S.ref;
+    if(k==="hds") return S.hds;
+    return true;
+  }
+
+  function drawPlant(){
+    if(!pc) return;
+    const c = pc;
+    const line = css("--line"), soft = css("--line-soft"), text = css("--text"), dim = css("--text-dim"), faint = css("--text-faint");
+    const teal = css("--teal"), tealDim = css("--teal-dim"), amber = css("--amber");
+    c.clearRect(0,0,LW,LH);
+
+    // Leitungen
+    ROUTES.forEach(r=>{
+      const fl = r.f(M);
+      c.lineCap = "round"; c.lineJoin = "round";
+      c.strokeStyle = line; c.lineWidth = 7;
+      c.beginPath(); r.pts.forEach((p,i)=> i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1])); c.stroke();
+      if(fl > 1e-4){
+        c.strokeStyle = COL[r.col]; c.globalAlpha = .28; c.lineWidth = 3.5;
+        c.beginPath(); r.pts.forEach((p,i)=> i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1])); c.stroke();
+        c.globalAlpha = 1;
+      }
+    });
+
+    // Teilchen in den Leitungen
+    if(S.running){
+      ROUTES.forEach((r,ri)=>{
+        const fl = r.f(M);
+        if(fl <= 1e-4) return;
+        const spacing = clamp(11/Math.pow(fl,0.6), 11, 170);
+        const v = 34*Math.sqrt(S.speed);
+        const off = (tAnim*v + ri*7) % spacing;
+        c.fillStyle = COL[r.col];
+        for(let d = off; d < r.len; d += spacing){
+          const [x,y] = pointAt(r, d);
+          c.beginPath(); c.arc(x, y, 2.6, 0, Math.PI*2); c.fill();
+        }
+      });
+    }
+
+    // Rohöltank
+    const u = UNITS;
+    c.fillStyle = "#171b1f"; c.strokeStyle = line; c.lineWidth = 1.5;
+    rr(c, u.crude.x, u.crude.y, u.crude.w, u.crude.h, 6); c.fill(); c.stroke();
+    const left = 1 - S.processed/S.total;
+    c.save(); rr(c, u.crude.x, u.crude.y, u.crude.w, u.crude.h, 6); c.clip();
+    c.fillStyle = COL.crude; c.globalAlpha = .55;
+    const hc = (u.crude.h-4)*left; c.fillRect(u.crude.x, u.crude.y + u.crude.h - hc, u.crude.w, hc);
+    c.restore(); c.globalAlpha = 1;
+    c.fillStyle = text; c.font = "600 14px " + FONT; c.textAlign = "center"; c.textBaseline = "alphabetic";
+    c.fillText("Rohöl", u.crude.x + u.crude.w/2, u.crude.y - 8);
+    c.fillStyle = text; c.font = "13px " + MONO;
+    c.fillText(fmt(S.total - S.processed) + " t", u.crude.x + u.crude.w/2, u.crude.y + u.crude.h/2 + 5);
+
+    // Röhrenofen
+    const fu = u.furn;
+    c.fillStyle = "#171b1f"; c.strokeStyle = S.furnace > 380 ? css("--danger") : line;
+    rr(c, fu.x, fu.y, fu.w, fu.h, 4); c.fill(); c.stroke();
+    // Heizschlange
+    c.strokeStyle = faint; c.lineWidth = 1.5; c.beginPath();
+    for(let i=0;i<5;i++){ const x = fu.x + 12 + i*14; c.moveTo(x, fu.y+10); c.lineTo(x, fu.y+34); }
+    c.stroke();
+    // Flammen
+    const fl = S.running ? 1 : 0.5;
+    for(let i=0;i<4;i++){
+      const x = fu.x + 16 + i*16, h = 10 + 5*fl*Math.abs(Math.sin(tAnim*7 + i*1.7));
+      const g = c.createLinearGradient(0, fu.y+fu.h-6, 0, fu.y+fu.h-6-h);
+      g.addColorStop(0, "#ffb454"); g.addColorStop(1, "rgba(228,120,91,0)");
+      c.fillStyle = g; c.beginPath(); c.moveTo(x-5, fu.y+fu.h-5); c.quadraticCurveTo(x, fu.y+fu.h-6-h*1.3, x+5, fu.y+fu.h-5); c.fill();
+    }
+    c.fillStyle = text; c.font = "600 14px " + FONT; c.textAlign = "center";
+    c.fillText("Röhrenofen", fu.x + fu.w/2, fu.y - 24);
+    c.fillStyle = S.furnace > 380 ? css("--danger") : amber; c.font = "13px " + MONO;
+    c.fillText(S.furnace + " °C", fu.x + fu.w/2, fu.y - 8);
+
+    // Destillationskolonne
+    const co = u.col;
+    const g = c.createLinearGradient(0, co.y + co.h, 0, co.y);
+    g.addColorStop(0, "rgba(228,120,91,.28)"); g.addColorStop(1, "rgba(108,182,255,.16)");
+    c.fillStyle = g; c.strokeStyle = S.sel==="col" ? teal : line; c.lineWidth = S.sel==="col" ? 2 : 1.5;
+    rr(c, co.x, co.y, co.w, co.h, 26); c.fill(); c.stroke();
+    c.strokeStyle = soft; c.lineWidth = 1;
+    for(let y = co.y + 34; y < co.y + co.h - 20; y += 22){
+      c.beginPath(); c.moveTo(co.x + 6, y); c.lineTo(co.x + co.w - 6, y); c.stroke();
+    }
+    // Temperaturangaben links neben der Kolonne
+    const lab = [
+      [60,  "< 30 °C"],
+      [118, "30–100 °C"],
+      [172, "100–" + M.bk + " °C"],
+      [245, M.bk + "–" + M.kg + " °C"],
+      [340, M.kg + "–" + M.AE + " °C"],
+      [465, "> " + M.AE + " °C"]
+    ];
+    c.font = "12.5px " + MONO; c.textAlign = "right"; c.fillStyle = dim;
+    lab.forEach(([y,t])=> c.fillText(t, co.x - 8, y + 4));
+    // Fraktionsnamen
+    const names = [
+      [60, "Gas", "gas"], [118, "Leichtbenzin", "ben"], [172, "Schwerbenzin", "ben"],
+      [245, "Kerosin", "ker"], [340, "Gasöl", "die"]
+    ];
+    c.font = "600 12px " + FONT; c.textAlign = "left";
+    names.forEach(([y,t,k])=>{ c.fillStyle = COL[k]; c.fillText(t, 442, y - 8); });
+    c.fillStyle = COL.hvy; c.fillText("Rückstand", 344, 484);
+
+    // Entschwefelung
+    drawUnitBox(c, "hds", true);
+    // Vakuumkolonne
+    const va = u.vac, vOn = unitOn("vac");
+    c.globalAlpha = vOn ? 1 : .45;
+    c.fillStyle = "#171b1f"; c.strokeStyle = S.sel==="vac" ? teal : (vOn ? tealDim : line); c.lineWidth = S.sel==="vac" ? 2 : 1.5;
+    rr(c, va.x, va.y, va.w, va.h, 18); c.fill(); c.stroke();
+    c.strokeStyle = soft; c.lineWidth = 1;
+    for(let y = va.y + 24; y < va.y + va.h - 14; y += 18){ c.beginPath(); c.moveTo(va.x+5,y); c.lineTo(va.x+va.w-5,y); c.stroke(); }
+    c.globalAlpha = 1;
+    c.fillStyle = vOn ? text : faint; c.font = "600 12.5px " + FONT; c.textAlign = "center";
+    c.fillText("Vakuum", va.x + va.w/2, va.y - 6);
+    if(vOn){
+      c.font = "600 12px " + FONT; c.textAlign = "left"; c.fillStyle = COL.hvy;
+      c.fillText("Vakuumgasöl", 466, 379);
+      c.fillText("Vakuumrückstand", 466, 510);
+    }
+
+    drawUnitBox(c, "ref");
+    drawUnitBox(c, "crk");
+
+    // Produkttanks
+    PROD.forEach(pr=>{
+      const t = TANKS[pr.k], x = TANK_X, y = t.y;
+      c.fillStyle = "#171b1f"; c.strokeStyle = S.sel==="tank_"+pr.k ? teal : line; c.lineWidth = S.sel==="tank_"+pr.k ? 2 : 1.5;
+      rr(c, x, y, TANK_W, TANK_H, 6); c.fill(); c.stroke();
+      const lvl = clamp(S.tanks[pr.k]/TANK_CAP, 0, 1);
+      c.save(); rr(c, x, y, TANK_W, TANK_H, 6); c.clip();
+      c.fillStyle = pr.col; c.globalAlpha = .32;
+      c.fillRect(x, y + TANK_H*(1-lvl), TANK_W, TANK_H*lvl);
+      c.restore(); c.globalAlpha = 1;
+      c.fillStyle = text; c.font = "600 13.5px " + FONT; c.textAlign = "left";
+      c.fillText(pr.k==="hvy" ? "Schw. Heizöl/Bitumen" : (pr.k==="die" ? "Diesel/Heizöl EL" : pr.name), x + 9, y + 20);
+      c.fillStyle = amber; c.font = "13px " + MONO;
+      c.fillText(fmt(S.tanks[pr.k]) + " t", x + 9, y + 42);
+      c.fillStyle = dim; c.textAlign = "right";
+      c.fillText(fmt(M.p[pr.k]*100,1) + " %", x + TANK_W - 9, y + 42);
+      c.textAlign = "left";
+    });
+    c.fillStyle = faint; c.font = "12px " + FONT; c.textAlign = "left";
+    c.fillText("Eigenverbrauch & Verluste: " + fmt(M.own*100,1) + " %", 760, 512);
+  }
+
+  function drawUnitBox(c, k, vertical){
+    const u = UNITS[k], on = unitOn(k);
+    const teal = css("--teal"), tealDim = css("--teal-dim"), line = css("--line"), text = css("--text"), faint = css("--text-faint");
+    if(vertical){ drawHDS(c, u, on); return; }
+    c.globalAlpha = on ? 1 : .5;
+    c.fillStyle = on ? "rgba(79,209,197,.08)" : "#171b1f";
+    c.strokeStyle = S.sel===k ? teal : (on ? tealDim : line);
+    c.lineWidth = S.sel===k ? 2 : 1.5;
+    if(!on) c.setLineDash([4,4]);
+    rr(c, u.x, u.y, u.w, u.h, 4); c.fill(); c.stroke(); c.setLineDash([]);
+    c.globalAlpha = 1;
+    let label = u.name;
+    if(k==="crk") label = "Katalytischer|Cracker";
+    c.fillStyle = on ? text : faint; c.textAlign = "center";
+    if(vertical){
+      c.save(); c.translate(u.x + u.w/2, u.y + u.h/2); c.rotate(-Math.PI/2);
+      c.font = "600 13px " + FONT; c.fillText(label + (on ? "" : " (aus)"), 0, 5); c.restore();
+    } else {
+      c.font = "600 13px " + FONT;
+      const parts = label.split("|");
+      if(parts.length > 1){
+        c.font = "600 12px " + FONT;
+        c.fillText(parts[0], u.x + u.w/2, u.y + 17); c.fillText(parts[1], u.x + u.w/2, u.y + 32);
+        c.font = "11px " + MONO; c.fillStyle = css("--amber"); c.fillText(on ? S.tFCC + " °C" : "aus", u.x + u.w/2, u.y + 48);
+        return;
+      }
+      c.fillText(label, u.x + u.w/2, u.y + u.h/2 + (on ? 5 : -2));
+      if(!on){ c.font = "11px " + FONT; c.fillText("aus", u.x + u.w/2, u.y + u.h/2 + 13); }
+      else if(k==="ref"){ /* Platz knapp: Temperatur steht in der Seitenleiste */ }
+    }
+  }
+
+  function drawHDS(c, u, on){
+    const teal = css("--teal"), tealDim = css("--teal-dim"), line = css("--line"), text = css("--text"), faint = css("--text-faint"), amber = css("--amber");
+    c.fillStyle = on ? "#132422" : "#171b1f";
+    c.strokeStyle = S.sel==="hds" ? teal : (on ? teal : line);
+    c.lineWidth = S.sel==="hds" ? 2.5 : 1.8;
+    if(!on) c.setLineDash([5,4]);
+    rr(c, u.x, u.y, u.w, u.h, 5); c.fill(); c.stroke(); c.setLineDash([]);
+    // Ein- und Austrittsstutzen der vier Ströme
+    [[118,"ben"],[172,"ben"],[245,"ker"],[340,"die"]].forEach(([y,k])=>{
+      c.fillStyle = COL[k]; c.globalAlpha = on ? .9 : .4;
+      c.fillRect(u.x - 3, y - 4, 6, 8); c.fillRect(u.x + u.w - 3, y - 4, 6, 8);
+    });
+    c.globalAlpha = 1;
+    // Beschriftung senkrecht
+    c.save(); c.translate(u.x + u.w/2, on ? 186 : u.y + u.h/2); c.rotate(-Math.PI/2);
+    c.textAlign = "center"; c.fillStyle = on ? text : faint;
+    c.font = "600 14px " + FONT; c.fillText("Entschwefelung", 0, -4);
+    c.font = "11px " + FONT; c.fillStyle = on ? amber : faint;
+    c.fillText(on ? "+ H₂  →  H₂S  →  Schwefel" : "aus – Ströme laufen ungereinigt durch", 0, 13);
+    c.restore();
+    // gewonnener Schwefel unter der Box
+    if(on){
+      c.fillStyle = "#e6d36a"; c.font = "600 11px " + FONT; c.textAlign = "center";
+      c.fillText("Schwefel", u.x + u.w/2, 290);
+      c.font = "11px " + MONO; c.fillText(fmt(M.sRec*S.total,1) + " t", u.x + u.w/2, 304);
+    }
+  }
+
+  // ---------- Erklärungen ----------
+  const INFO = {
+    crude:"<strong>Rohöltank.</strong> Rohöl ist ein Gemisch aus Alkanen, Cycloalkanen und Aromaten mit 1 bis über 50 C-Atomen sowie Schwefel-, Stickstoff- und Sauerstoffverbindungen. Vor der Destillation wird es entsalzt und vorgewärmt.",
+    furn:"<strong>Röhrenofen.</strong> Das Rohöl strömt durch beheizte Rohre und wird auf etwa 350–370 °C erhitzt. Dabei verdampft ein großer Teil. Höhere Temperaturen sind nicht sinnvoll, weil sich langkettige Moleküle sonst thermisch zersetzen.",
+    col:"<strong>Atmosphärische Destillationskolonne.</strong> Der Dampf steigt durch die Glockenböden nach oben und kühlt sich dabei ab. Stoffe mit hoher Siedetemperatur kondensieren weiter unten, leicht siedende weiter oben. So entstehen Fraktionen mit bestimmten Siedebereichen – reine Stoffe erhält man nicht.",
+    hds:"<strong>Entschwefelung (Hydrotreating).</strong> Schwefelverbindungen reagieren bei etwa 350 °C und 30–60 bar an Co-Mo-Katalysatoren mit Wasserstoff zu Schwefelwasserstoff, aus dem im Claus-Verfahren Schwefel gewonnen wird. Kraftstoffe in der EU dürfen höchstens 10 mg Schwefel pro kg enthalten.",
+    vac:"<strong>Vakuumdestillation.</strong> Der Rückstand der atmosphärischen Destillation wird bei 20–50 hPa erneut destilliert. Bei vermindertem Druck sinken die Siedetemperaturen, sodass sich Vakuumgasöl ohne Zersetzung abtrennen lässt. Übrig bleibt der Vakuumrückstand (Bitumen, schweres Heizöl).",
+    ref:"<strong>Reformer.</strong> Aus Alkanen und Cycloalkanen des Schwerbenzins entstehen an Platin-Katalysatoren Aromaten mit hoher Oktanzahl. Je höher die Reaktortemperatur, desto höher die Oktanzahl – aber desto mehr Gas entsteht und desto geringer ist die Benzinausbeute. Nebenprodukt: Wasserstoff.",
+    crk:"<strong>Katalytischer Cracker.</strong> Langkettige Moleküle des Vakuumgasöls werden bei etwa 500 °C an einem Zeolith-Katalysator im Wirbelbett in kürzere Alkane und Alkene gespalten. Es entstehen vor allem Benzin mit hoher Oktanzahl und Gase. Höhere Temperatur bedeutet höheren Umsatz, aber mehr Gas und Koks.",
+    tank_lpg:"<strong>Flüssiggas (LPG).</strong> Propan und Butan, unter Druck verflüssigt. Verwendung als Autogas, Heiz- und Campinggas sowie als Chemierohstoff. Methan und Ethan (Raffineriegas) dienen als Brennstoff in der Raffinerie selbst.",
+    tank_ben:"<strong>Benzin (Ottokraftstoff).</strong> Gemisch aus Reformat, Crackbenzin und Leichtbenzin. Normalbenzin muss eine Research-Oktanzahl (ROZ) von mindestens 91, Superbenzin von mindestens 95 haben und darf höchstens 10 mg/kg Schwefel enthalten. Ein Teil des Destillatbenzins (Naphtha) geht als Rohstoff in die chemische Industrie.",
+    tank_ker:"<strong>Kerosin.</strong> Treibstoff für Düsenflugzeuge (Jet A-1). Wichtig sind ein niedriger Gefrierpunkt (unter −47 °C) und ein ausreichend hoher Flammpunkt.",
+    tank_die:"<strong>Diesel / leichtes Heizöl.</strong> Mittelschwere Fraktion aus Gasöl und Kreislauföl aus dem katalytischen Cracker. Dieselkraftstoff darf höchstens 10 mg/kg Schwefel enthalten. In Europa ist der Bedarf an Diesel deutlich größer als an Benzin.",
+    tank_hvy:"<strong>Schweres Heizöl / Bitumen.</strong> Rückstandsprodukte für Schiffsantriebe, Kraftwerke und Straßenbau. Seit 2020 gilt für Schiffskraftstoff weltweit ein Schwefelgrenzwert von 0,5 %. Der Bedarf ist gering – Konversionsanlagen verarbeiten diese Fraktion deshalb zu leichteren Produkten."
+  };
+  function showInfo(k){
+    S.sel = k;
+    $("unitInfo").innerHTML = INFO[k] || '<span class="muted">Tippe ein Anlagenteil im Fließbild an, um eine Erklärung zu erhalten.</span>';
+    document.querySelectorAll(".proc").forEach(p=> p.classList.toggle("hl", p.dataset.unit===k || false));
+    drawPlant();
+  }
+  plant.addEventListener("pointerup", e=>{
+    const r = plant.getBoundingClientRect();
+    const x = (e.clientX - r.left)/r.width*LW, y = (e.clientY - r.top)/r.height*LH;
+    let hit = null;
+    Object.entries(UNITS).forEach(([k,u])=>{ if(x>=u.x-4 && x<=u.x+u.w+4 && y>=u.y-4 && y<=u.y+u.h+4) hit = k; });
+    showInfo(hit);
+  });
+  document.querySelectorAll(".unit-label .info").forEach(b=> b.addEventListener("click", ()=>{
+    showInfo(b.dataset.unit);
+    $("unitInfo").scrollIntoView({behavior:"smooth", block:"nearest"});
+  }));
+
+  // ---------- Auswertung ----------
+  function sStr(v){ return v >= 1000 ? fmt(v/1e4, 2) + " %" : fmt(v, v < 10 ? 1 : 0) + " mg/kg"; }
+  function check(ok){ return ok ? '<span class="ok">✓</span>' : '<span class="bad">✗</span>'; }
+
+  function updateTables(){
+    const p = M.p, q = M.q;
+    const sum = p.lpg + p.ben + p.ker + p.die + p.hvy;
+    const rows = PROD.map(pr=>{
+      const m = p[pr.k]*S.total, share = sum > 0 ? p[pr.k]/sum*100 : 0;
+      let qual = "–", req = '<span class="dim">–</span>';
+      if(pr.k==="ben"){
+        qual = "ROZ " + fmt(q.benRON) + " · S " + sStr(q.benS);
+        req = check(q.benRON >= 91) + " Normal ROZ ≥ 91 &nbsp; " + check(q.benRON >= 95) + " Super ROZ ≥ 95 &nbsp; " + check(q.benS <= 10) + " S ≤ 10 mg/kg";
+      } else if(pr.k==="ker"){
+        qual = "S " + sStr(q.kerS); req = check(q.kerS <= 3000) + " S ≤ 0,3 %";
+      } else if(pr.k==="die"){
+        qual = "S " + sStr(q.dieS); req = check(q.dieS <= 10) + " S ≤ 10 mg/kg";
+      } else if(pr.k==="hvy"){
+        qual = "S " + sStr(q.hvyS); req = check(q.hvyS <= 5000) + " S ≤ 0,5 % (Schiffskraftstoff)";
+      }
+      return `<tr><td><span class="swatch" style="background:${pr.col}"></span>${pr.name}</td><td class="num">${fmt(m)} t</td><td class="num">${fmt(share,1)} %</td><td class="num">${DEMAND[pr.k]} %</td><td>${qual}</td><td>${req}</td></tr>`;
+    }).join("");
+    const h2net = (M.h2prod - M.h2cons)*S.total;
+    $("balBody").innerHTML = rows +
+      `<tr class="sep"><td>Eigenverbrauch &amp; Verluste</td><td class="num">${fmt(M.own*S.total)} t</td><td colspan="4" class="dim">Raffineriegas (C₁–C₂), Koks, Wasserstoff – wird als Brennstoff in der Raffinerie genutzt</td></tr>` +
+      `<tr><td>Schwefel (gewonnen)</td><td class="num">${fmt(M.sRec*S.total,1)} t</td><td colspan="4" class="dim">aus Schwefelwasserstoff im Claus-Verfahren</td></tr>` +
+      `<tr><td>Wasserstoff-Bilanz</td><td class="num">${h2net>=0?"+":""}${fmt(h2net,1)} t</td><td colspan="4" class="dim">Produktion im Reformer ${fmt(M.h2prod*S.total,1)} t · Verbrauch ${fmt(M.h2cons*S.total,1)} t</td></tr>`;
+
+    // Readouts
+    $("roBen").textContent = fmt(p.ben*100,1) + " %";
+    const ron = $("roRON"); ron.textContent = fmt(q.benRON); ron.className = "v mono " + (q.benRON >= 95 ? "ok" : (q.benRON >= 91 ? "" : "bad"));
+    const sd = $("roSDie"); sd.textContent = sStr(q.dieS); sd.className = "v mono " + (q.dieS <= 10 ? "ok" : "bad");
+
+    // Fraktionen
+    const f = M.f, c = M.c;
+    const fr = [
+      ["Gas (Raffineriegas, Flüssiggas)", "gas", "< 30 °C", cRange(-200,30), cum(c,30), "Heizgas, Flüssiggas, Chemierohstoff"],
+      ["Leichtbenzin", "ben", "30–100 °C", cRange(30,100), cum(c,100)-cum(c,30), "Ottokraftstoff, Naphtha für die Chemie"],
+      ["Schwerbenzin", "ben", "100–" + M.bk + " °C", cRange(100,M.bk), cum(c,M.bk)-cum(c,100), "Reformer-Einsatz → Ottokraftstoff"],
+      ["Kerosin (Petroleum)", "ker", M.bk + "–" + M.kg + " °C", cRange(M.bk,M.kg), cum(c,M.kg)-cum(c,M.bk), "Düsentreibstoff"],
+      ["Gasöl", "die", M.kg + "–" + M.AE + " °C", cRange(M.kg,M.AE), cum(c,M.AE)-cum(c,M.kg), "Dieselkraftstoff, leichtes Heizöl"],
+      ["Rückstand", "hvy", "> " + M.AE + " °C", cRange(M.AE,800), 1-cum(c,M.AE), "Vakuumdestillation, schweres Heizöl"]
+    ];
+    if(S.vac){
+      fr.push(["&nbsp;&nbsp;↳ Vakuumgasöl", "hvy", M.AE + "–550 °C*", cRange(M.AE,550), cum(c,550)-cum(c,M.AE), "Cracker-Einsatz, Schmieröle"]);
+      fr.push(["&nbsp;&nbsp;↳ Vakuumrückstand", "hvy", "> 550 °C*", cRange(550,800), 1-cum(c,550), "Bitumen, schweres Heizöl"]);
+    }
+    $("fracBody").innerHTML = fr.map(r=> `<tr><td><span class="swatch" style="background:${COL[r[1]]}"></span>${r[0]}</td><td class="mono">${r[2]}</td><td>${r[3]}</td><td class="num">${fmt(r[4]*100,1)} %</td><td>${r[5]}</td></tr>`).join("") +
+      (S.vac ? `<tr><td colspan="5" class="dim" style="white-space:normal">* auf Normaldruck umgerechnete Siedetemperaturen; im Vakuum sieden die Stoffe deutlich niedriger.</td></tr>` : "");
+
+    // Hinweise
+    const wb = $("warnBox");
+    if(M.warn.length){ wb.style.display = ""; wb.innerHTML = M.warn.map(w=>"<p>"+w+"</p>").join(""); }
+    else wb.style.display = "none";
+
+    drawBal(); drawTBP();
+  }
+
+  function prepChart(cv){
+    const w = cv.clientWidth; if(!w) return null;
+    const h = cv.clientHeight;
+    const dpr = window.devicePixelRatio || 1;
+    cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+    const c = cv.getContext("2d"); c.setTransform(dpr,0,0,dpr,0,0);
+    return {c, W:w, H:h};
+  }
+
+  function drawBal(){
+    const P = prepChart($("balChart")); if(!P) return;
+    const {c, W, H} = P;
+    const dim = css("--text-dim"), faint = css("--text-faint"), grid = css("--line-soft"), amber = css("--amber");
+    const padT = 14, padB = 40, padL = 44, padR = 10;
+    const pw = W - padL - padR, ph = H - padT - padB;
+    const p = M.p, sum = p.lpg + p.ben + p.ker + p.die + p.hvy;
+    const vals = PROD.map(pr=> sum > 0 ? p[pr.k]/sum*100 : 0);
+    const maxV = Math.max(60, Math.ceil(Math.max(...vals, ...Object.values(DEMAND))/10)*10);
+    const y = v => padT + ph - v/maxV*ph;
+    c.font = "10.5px " + MONO; c.textAlign = "right"; c.textBaseline = "middle";
+    for(let v=0; v<=maxV; v+=10){
+      c.strokeStyle = grid; c.lineWidth = 1; c.beginPath(); c.moveTo(padL, y(v)); c.lineTo(W-padR, y(v)); c.stroke();
+      c.fillStyle = faint; c.fillText(v + " %", padL - 6, y(v));
+    }
+    const gw = pw/PROD.length, bw = Math.min(46, gw*0.42);
+    PROD.forEach((pr,i)=>{
+      const cx = padL + gw*(i+0.5);
+      c.fillStyle = pr.col; c.globalAlpha = .85;
+      c.fillRect(cx - bw - 2, y(vals[i]), bw, y(0) - y(vals[i]));
+      c.globalAlpha = 1;
+      c.strokeStyle = amber; c.setLineDash([4,3]); c.lineWidth = 1.5;
+      c.strokeRect(cx + 2, y(DEMAND[pr.k]), bw, y(0) - y(DEMAND[pr.k]));
+      c.setLineDash([]);
+      c.fillStyle = dim; c.font = "11px " + MONO; c.textAlign = "center"; c.textBaseline = "bottom";
+      c.fillText(fmt(vals[i],0), cx - bw/2 - 2, y(vals[i]) - 3);
+      c.fillStyle = amber; c.fillText(DEMAND[pr.k], cx + bw/2 + 2, y(DEMAND[pr.k]) - 3);
+      c.fillStyle = dim; c.font = "11.5px " + FONT; c.textBaseline = "top";
+      const nm = pr.k==="hvy" ? "Schw. Heizöl" : (pr.k==="die" ? "Diesel/HEL" : pr.name);
+      c.fillText(nm, cx, H - padB + 8);
+    });
+  }
+
+  function drawTBP(){
+    const P = prepChart($("tbpChart")); if(!P) return;
+    const {c, W, H} = P;
+    const dim = css("--text-dim"), faint = css("--text-faint"), grid = css("--line-soft"), teal = css("--teal"), amber = css("--amber"), danger = css("--danger");
+    const padT = 14, padB = 36, padL = 48, padR = 14;
+    const pw = W - padL - padR, ph = H - padT - padB;
+    const T0 = 0, T1 = 650;
+    const x = T => padL + (T-T0)/(T1-T0)*pw, y = v => padT + ph - v*ph;
+    const bands = [[T0,30,"gas"],[30,100,"ben"],[100,M.bk,"ben"],[M.bk,M.kg,"ker"],[M.kg,M.AE,"die"],[M.AE,T1,"hvy"]];
+    bands.forEach(([a,b,k],i)=>{ c.fillStyle = COL[k]; c.globalAlpha = i===2 ? .10 : .16; c.fillRect(x(a), padT, x(b)-x(a), ph); });
+    c.globalAlpha = 1;
+    c.font = "10.5px " + MONO; c.textBaseline = "middle"; c.textAlign = "right";
+    for(let v=0; v<=1.0001; v+=0.2){
+      c.strokeStyle = grid; c.beginPath(); c.moveTo(padL, y(v)); c.lineTo(W-padR, y(v)); c.stroke();
+      c.fillStyle = faint; c.fillText(fmt(v*100) + " %", padL - 6, y(v));
+    }
+    c.textAlign = "center"; c.textBaseline = "top";
+    for(let T=0; T<=T1; T+=100){ c.fillStyle = faint; c.fillText(T + " °C", x(T), H - padB + 6); }
+    c.fillStyle = dim; c.font = "11px " + FONT; c.fillText("Siedetemperatur (bei Normaldruck)", padL + pw/2, H - 14);
+    // Kurve
+    c.strokeStyle = teal; c.lineWidth = 2; c.beginPath();
+    for(let T=T0; T<=T1; T+=2){ const px = x(T), py = y(cum(M.c,T)); T===T0 ? c.moveTo(px,py) : c.lineTo(px,py); }
+    c.stroke();
+    // Ofentemperatur
+    c.strokeStyle = S.furnace > 380 ? danger : amber; c.setLineDash([5,4]); c.lineWidth = 1.4;
+    c.beginPath(); c.moveTo(x(S.furnace), padT); c.lineTo(x(S.furnace), padT+ph); c.stroke(); c.setLineDash([]);
+    c.fillStyle = S.furnace > 380 ? danger : amber; c.font = "11px " + FONT; c.textAlign = "left"; c.textBaseline = "top";
+    c.fillText("Ofen " + S.furnace + " °C", x(S.furnace) + 5, padT + 4);
+    // Fraktionsnamen
+    c.font = "11px " + FONT; c.textAlign = "center";
+    [["Benzin", 30, M.bk, "ben"], ["Kerosin", M.bk, M.kg, "ker"], ["Gasöl", M.kg, M.AE, "die"], ["Rückstand", M.AE, 600, "hvy"]].forEach(([n,a,b,k])=>{
+      if(x(b)-x(a) < 34) return;
+      c.fillStyle = COL[k]; c.fillText(n, (x(a)+x(b))/2, padT + ph - 18);
+    });
+  }
+
+  // ---------- Steuerung ----------
+  function recompute(){ M = model(); updateTables(); drawPlant(); }
+
+  const crudeSel = $("crudeSelect");
+  Object.entries(CRUDES).forEach(([k,c])=>{ const o = document.createElement("option"); o.value = k; o.textContent = c.name; crudeSel.appendChild(o); });
+  crudeSel.value = S.crude;
+  function crudeInfo(){
+    const c = CRUDES[S.crude];
+    $("crudeInfo").textContent = "Dichte " + fmt(c.rho,3) + " g/cm³ · Schwefelgehalt " + fmt(c.S, c.S < 0.1 ? 2 : 1) + " %";
+  }
+  crudeSel.addEventListener("change", ()=>{ S.crude = crudeSel.value; crudeInfo(); recompute(); });
+
+  function bindRange(id, vid, key, unit){
+    const r = $(id);
+    r.addEventListener("input", ()=>{ S[key] = +r.value; $(vid).textContent = r.value + unit; recompute(); });
+  }
+  bindRange("rFurn", "vFurn", "furnace", " °C");
+  bindRange("rCutBK", "vCutBK", "cutBK", " °C");
+  bindRange("rCutKG", "vCutKG", "cutKG", " °C");
+  bindRange("rRef", "vRef", "tRef", " °C");
+  bindRange("rFCC", "vFCC", "tFCC", " °C");
+
+  const PROC_KEYS = ["vac","hds","fcc","ref"];
+  function syncControls(){
+    document.querySelectorAll(".ptog").forEach(b=> b.classList.toggle("on", !!S[b.dataset.key]));
+    $("refControls").style.display = S.ref ? "" : "none";
+    $("fccControls").style.display = S.fcc ? "" : "none";
+  }
+  document.querySelectorAll(".ptog").forEach(b=> b.addEventListener("click", ()=>{
+    const k = b.dataset.key; S[k] = !S[k];
+    // Cracker brauchen Vakuumgasöl: Vakuumdestillation automatisch mitschalten
+    if(k==="fcc" && S.fcc) S.vac = true;
+    if(k==="vac" && !S.vac) S.fcc = false;
+    procChanged();
+  }));
+  $("allOff").addEventListener("click", ()=>{ PROC_KEYS.forEach(k=> S[k] = false); procChanged(); });
+  $("allOn").addEventListener("click",  ()=>{ PROC_KEYS.forEach(k=> S[k] = true);  procChanged(); });
+  // Verfahren geändert: laufenden Prozess zurücksetzen und neu starten, sonst nur Tanks leeren
+  function procChanged(){
+    syncControls(); recompute();
+    if(S.running){ resetRun(); startRun(); }
+    else if(S.processed > 0) resetRun();
+  }
+
+  // Tabs
+  document.querySelectorAll(".tabbtn").forEach(b=> b.addEventListener("click", ()=>{
+    document.querySelectorAll(".tabbtn").forEach(x=> x.classList.toggle("active", x===b));
+    document.querySelectorAll(".tabpanel").forEach(x=> x.classList.toggle("active", x.id==="tab-"+b.dataset.tab));
+    drawBal(); drawTBP();
+  }));
+
+  // Lauf
+  function setStatus(mode, txt){
+    const sb = $("statusBadge"); sb.className = "status" + (mode ? " " + mode : ""); $("statusText").textContent = txt;
+  }
+  let lastTs = null;
+  function frame(ts){
+    if(lastTs===null) lastTs = ts;
+    const dt = Math.min(0.1, (ts - lastTs)/1000); lastTs = ts;
+    if(S.running){
+      tAnim += dt;
+      const rate = S.total/40*S.speed;            // ×1: 1000 t in 40 s
+      const d = Math.min(rate*dt, S.total - S.processed);
+      S.processed += d;
+      PROD.forEach(pr=> S.tanks[pr.k] += d*M.p[pr.k]);
+      $("roProc").textContent = fmt(S.processed) + " t";
+      if(S.processed >= S.total - 1e-6){
+        S.running = false; setStatus("done", "1000 t verarbeitet"); if(window.BK&&BK.cfg)BK.cfg.done();
+        $("btnRun").disabled = true; $("btnStop").disabled = true;
+      }
+      drawPlant();
+    }
+    requestAnimationFrame(frame);
+  }
+  function startRun(){
+    if(S.processed >= S.total) return;
+    S.running = true; setStatus("running", "Anlage läuft");
+    $("btnRun").disabled = true; $("btnStop").disabled = false;
+  }
+  $("btnRun").addEventListener("click", startRun);
+  $("btnStop").addEventListener("click", ()=>{
+    S.running = false; setStatus("", "angehalten");
+    $("btnRun").disabled = false; $("btnRun").textContent = "Fortsetzen"; $("btnStop").disabled = true; drawPlant();
+  });
+  function resetRun(){
+    S.running = false; S.processed = 0; PROD.forEach(pr=> S.tanks[pr.k] = 0);
+    setStatus("", "bereit"); $("roProc").textContent = "0 t";
+    $("btnRun").disabled = false; $("btnRun").textContent = "Anlage starten"; $("btnStop").disabled = true;
+    drawPlant();
+  }
+  $("btnReset").addEventListener("click", resetRun);
+  document.querySelectorAll(".speed-group button").forEach(b=> b.addEventListener("click", ()=>{
+    document.querySelectorAll(".speed-group button").forEach(x=> x.classList.toggle("active", x===b));
+    S.speed = +b.dataset.speed;
+  }));
+
+  // Modals
+  const guideBackdrop = $("guideBackdrop");
+  $("btnGuide").addEventListener("click", (e)=>{ e.preventDefault(); guideBackdrop.classList.add("open"); });
+  $("closeGuide").addEventListener("click", ()=> guideBackdrop.classList.remove("open"));
+  guideBackdrop.addEventListener("click", (e)=>{ if(e.target===guideBackdrop) guideBackdrop.classList.remove("open"); });
+  const changelogBackdrop = $("changelogBackdrop");
+  $("btnChangelog").addEventListener("click", (e)=>{ e.preventDefault(); changelogBackdrop.classList.add("open"); $("closeChangelog").focus(); });
+  $("closeChangelog").addEventListener("click", ()=> changelogBackdrop.classList.remove("open"));
+  changelogBackdrop.addEventListener("click", (e)=>{ if(e.target===changelogBackdrop) changelogBackdrop.classList.remove("open"); });
+  document.addEventListener("keydown", e=>{
+    if(e.key==="Escape"){ guideBackdrop.classList.remove("open"); changelogBackdrop.classList.remove("open"); }
+  });
+
+  function resize(){ pc = sizeCanvas(plant, LW, LH); drawPlant(); drawBal(); drawTBP(); }
+  window.addEventListener("resize", resize);
+
+  // Start
+  crudeInfo(); syncControls();
+  M = model(); resize(); updateTables();
+  requestAnimationFrame(frame);
+  globalThis.__raf = {S, model: ()=>model(), CRUDES};
+})();
+</script>
+<script>
+/* Höhe der Kopfzeile für die feststehende linke Spalte */
+(function(){
+  const hdr = document.querySelector("header");
+  if(!hdr) return;
+  const set = () => document.documentElement.style.setProperty("--hdr", Math.max(0, Math.round(hdr.getBoundingClientRect().bottom)) + "px");
+  addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
+})();
+</script>
+
+<div class="modal-backdrop" id="glBackdrop">
+  <div class="modal-box gl-wide" role="dialog" aria-modal="true" aria-labelledby="glTitle">
+    <div class="modal-head">
+      <h2><span class="gl-num" id="glNum"></span><span id="glTitle"></span></h2>
+      <button class="modal-close" id="glClose" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body gl-body" id="glBody"></div>
+    <div class="gl-nav">
+      <button class="btn ghost" id="glPrev">← Vorheriges Thema</button>
+      <span class="sp" id="glPos"></span>
+      <button class="btn" id="glNext">Nächstes Thema →</button>
+    </div>
+  </div>
+</div>
+<script>
+/* Rubrik Grundlagen */
+(function(){
+  const GL = [{"t": "Erdöl – ein Stoffgemisch", "h": "<p>Rohöl ist ein Gemisch aus sehr vielen Kohlenwasserstoffen, vor allem Alkanen, Cycloalkanen und Aromaten mit wenigen bis über 40 C-Atomen. Dazu kommen Schwefel-, Stickstoff- und Sauerstoffverbindungen.<\/p> <p>Je nach Herkunft unterscheidet sich die Zusammensetzung: <strong>leichte<\/strong> Rohöle enthalten viele kurzkettige Bestandteile, <strong>schwere<\/strong> viele langkettige; „saure“ Rohöle enthalten viel Schwefel.<\/p> <p>In der Raffinerie wird das Rohöl zuerst getrennt und dann chemisch umgewandelt, damit möglichst viel von den gefragten Produkten Benzin, Diesel und Kerosin entsteht – in der geforderten Qualität.<\/p>"}, {"t": "Fraktionierte Destillation", "h": "<p>Das Rohöl wird auf etwa 350–400 °C erhitzt und in eine <strong>Destillationskolonne<\/strong> geleitet. Die Kolonne ist unten heiß und oben kühler. Die Dämpfe steigen auf und kondensieren auf der Höhe, auf der die Temperatur unter ihre Siedetemperatur fällt.<\/p> <div class=\"gl-row\"><figure class=\"gl-fig\"><svg viewBox=\"0 0 380 300\" width=\"380\" style=\"max-width:380px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><defs><marker id=\"cl\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--amber)\"/><\/marker><marker id=\"cg\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--teal)\"/><\/marker><\/defs><rect x=\"130\" y=\"20\" width=\"70\" height=\"260\" rx=\"6\" fill=\"var(--panel-alt)\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" /><line x1=\"200\" y1=\"40\" x2=\"235\" y2=\"40\" stroke=\"var(--teal)\" stroke-width=\"1.6\" marker-end=\"url(#cg)\"/><text x=\"240\" y=\"44\" font-size=\"11\" fill=\"var(--text)\" text-anchor=\"start\" font-weight=\"400\" >Gas (Propan, Butan)<\/text><text x=\"240\" y=\"58\" font-size=\"10\" fill=\"var(--text-faint)\" text-anchor=\"start\" font-weight=\"400\" >&lt; 30 °C<\/text><line x1=\"200\" y1=\"92\" x2=\"235\" y2=\"92\" stroke=\"var(--teal)\" stroke-width=\"1.6\" marker-end=\"url(#cg)\"/><text x=\"240\" y=\"96\" font-size=\"11\" fill=\"var(--text)\" text-anchor=\"start\" font-weight=\"400\" >Benzin<\/text><text x=\"240\" y=\"110\" font-size=\"10\" fill=\"var(--text-faint)\" text-anchor=\"start\" font-weight=\"400\" >30–180 °C<\/text><line x1=\"135\" y1=\"66\" x2=\"195\" y2=\"66\" stroke=\"var(--line)\" stroke-width=\"1\" stroke-dasharray=\"3 3\"/><line x1=\"200\" y1=\"144\" x2=\"235\" y2=\"144\" stroke=\"var(--teal)\" stroke-width=\"1.6\" marker-end=\"url(#cg)\"/><text x=\"240\" y=\"148\" font-size=\"11\" fill=\"var(--text)\" text-anchor=\"start\" font-weight=\"400\" >Kerosin<\/text><text x=\"240\" y=\"162\" font-size=\"10\" fill=\"var(--text-faint)\" text-anchor=\"start\" font-weight=\"400\" >180–250 °C<\/text><line x1=\"135\" y1=\"118\" x2=\"195\" y2=\"118\" stroke=\"var(--line)\" stroke-width=\"1\" stroke-dasharray=\"3 3\"/><line x1=\"200\" y1=\"196\" x2=\"235\" y2=\"196\" stroke=\"var(--teal)\" stroke-width=\"1.6\" marker-end=\"url(#cg)\"/><text x=\"240\" y=\"200\" font-size=\"11\" fill=\"var(--text)\" text-anchor=\"start\" font-weight=\"400\" >Diesel/Heizöl<\/text><text x=\"240\" y=\"214\" font-size=\"10\" fill=\"var(--text-faint)\" text-anchor=\"start\" font-weight=\"400\" >250–350 °C<\/text><line x1=\"135\" y1=\"170\" x2=\"195\" y2=\"170\" stroke=\"var(--line)\" stroke-width=\"1\" stroke-dasharray=\"3 3\"/><line x1=\"200\" y1=\"248\" x2=\"235\" y2=\"248\" stroke=\"var(--teal)\" stroke-width=\"1.6\" marker-end=\"url(#cg)\"/><text x=\"240\" y=\"252\" font-size=\"11\" fill=\"var(--text)\" text-anchor=\"start\" font-weight=\"400\" >Rückstand<\/text><text x=\"240\" y=\"266\" font-size=\"10\" fill=\"var(--text-faint)\" text-anchor=\"start\" font-weight=\"400\" >&gt; 350 °C<\/text><line x1=\"135\" y1=\"222\" x2=\"195\" y2=\"222\" stroke=\"var(--line)\" stroke-width=\"1\" stroke-dasharray=\"3 3\"/><line x1=\"40\" y1=\"250\" x2=\"128\" y2=\"250\" stroke=\"var(--amber)\" stroke-width=\"2\" marker-end=\"url(#cl)\"/><text x=\"70\" y=\"240\" font-size=\"11\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"400\" >Rohöl<\/text><text x=\"70\" y=\"268\" font-size=\"10\" fill=\"var(--text-faint)\" text-anchor=\"middle\" font-weight=\"400\" >(≈ 380 °C)<\/text><text x=\"165\" y=\"296\" font-size=\"10.5\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >Destillationskolonne<\/text><text x=\"165\" y=\"14\" font-size=\"10\" fill=\"var(--text-faint)\" text-anchor=\"middle\" font-weight=\"400\" >kühler<\/text><\/svg><figcaption>Fraktionen mit ungefähren Siedebereichen<\/figcaption><\/figure><\/div> <p>So entstehen <strong>Fraktionen<\/strong> – Gemische ähnlicher Siedetemperatur. Die Siedetemperatur steigt mit der Kettenlänge, weil die Van-der-Waals-Kräfte zwischen den Molekülen zunehmen.<\/p>"}, {"t": "Vakuumdestillation", "h": "<p>Der Rückstand der ersten Destillation enthält sehr langkettige Kohlenwasserstoffe. Würde man ihn weiter erhitzen, zersetzten sich die Moleküle, bevor sie sieden.<\/p> <p>Deshalb destilliert man den Rückstand bei <strong>vermindertem Druck<\/strong>: Die Siedetemperaturen sinken, und man erhält Vakuumgasöl (Ausgangsstoff für den Cracker, Schmieröle) und als Rest Bitumen.<\/p>"}, {"t": "Cracken", "h": "<p>Bei der Destillation fällt viel mehr schweres Gasöl und Rückstand an, als gebraucht wird, aber zu wenig Benzin. Beim <strong>Cracken<\/strong> (engl. <em>to crack<\/em> = spalten) werden langkettige Alkanmoleküle in kürzere zerlegt.<\/p>\n<p>Dabei bricht eine <strong>C–C-Bindung<\/strong>. Die Wasserstoffatome reichen nicht für zwei gesättigte Bruchstücke. Deshalb wandert ein H-Atom auf das eine Bruchstück: Es entstehen ein <strong>kürzeres Alkan<\/strong> und ein <strong>Alken<\/strong> mit einer C=C-Doppelbindung. Die Zahl der C- und H-Atome bleibt insgesamt erhalten.<\/p>\n<p><strong>Beispiel 1: Octan → Butan + But-1-en<\/strong><\/p>\n<div class=\"mol-eq\" data-eq=\"crack1\"><\/div>\n<p class=\"mol-cap\"><b>rot gestrichelt:<\/b> die C–C-Bindung, die bricht · <i>orange:<\/i> das H-Atom, das vom rechten auf das linke Bruchstück übergeht. Links entsteht so ein vollständiges Alkan, rechts bildet sich die Doppelbindung.<\/p>\n<p><strong>Beispiel 2: Decan → Heptan + Propen<\/strong><\/p>\n<div class=\"mol-eq\" data-eq=\"crack2\"><\/div>\n<p>Die Kette kann an verschiedenen Stellen brechen. Deshalb entsteht beim Cracken immer ein <strong>Gemisch<\/strong> aus vielen Alkanen und Alkenen unterschiedlicher Kettenlänge. Kurze Alkene wie Ethen und Propen sind wichtige Grundstoffe für Kunststoffe.<\/p>\n<div class=\"gl-box gl-info\">C<sub>n<\/sub>H<sub>2n+2<\/sub> → C<sub>m<\/sub>H<sub>2m+2<\/sub> + C<sub>n−m<\/sub>H<sub>2(n−m)<\/sub><br>Alkan → kürzeres Alkan + Alken<br><small>Nachweis der Alkene: Crackprodukte entfärben Bromwasser.<\/small><\/div>\n<p><strong>Thermisches und katalytisches Cracken<\/strong><\/p>\n<div class=\"gl-tw\"><table class=\"gl-table\"><thead><tr><th><\/th><th>thermisches Cracken<\/th><th>katalytisches Cracken<\/th><\/tr><\/thead><tbody>\n<tr><td>Temperatur<\/td><td>450–850 °C, teils unter Druck<\/td><td>ca. 500 °C, Normaldruck<\/td><\/tr>\n<tr><td>Katalysator<\/td><td>keiner – nur Hitze<\/td><td>Zeolith: poröses Alumosilicat mit sehr großer innerer Oberfläche<\/td><\/tr>\n<tr><td>Produkte<\/td><td>viel Gas und Koks, unverzweigte Ketten<\/td><td>vor allem Benzin; viele verzweigte Alkane und Aromaten → höhere Oktanzahl<\/td><\/tr>\n<tr><td>Einsatz<\/td><td>Rückstandsverarbeitung, Steamcracker (Ethen, Propen)<\/td><td>Vakuumgasöl → Benzin (in dieser Simulation)<\/td><\/tr>\n<\/tbody><\/table><\/div>\n<p>Wie eine katalytische Crackanlage aufgebaut ist, zeigt das nächste Thema.<\/p>"}, {"t": "Aufbau einer Crackanlage", "h": "<p>Die Abbildung zeigt eine <strong>stark vereinfachte<\/strong> katalytische Crackanlage. Sie besteht im Kern aus drei Teilen: dem <strong>Reaktor<\/strong>, in dem gespalten wird, dem <strong>Regenerator<\/strong>, in dem der Katalysator gereinigt wird, und der <strong>Trennkolonne<\/strong>, in der die Produkte getrennt werden.<\/p>\n<div class=\"gl-fig gl-fcc\"><svg viewBox=\"0 0 640 330\" role=\"img\" aria-label=\"Stark vereinfachter Aufbau einer katalytischen Crackanlage mit Reaktor, Regenerator und Trennkolonne\">\n<defs>\n<marker id=\"sO\" viewBox=\"0 0 10 10\" refX=\"7\" refY=\"5\" markerUnits=\"userSpaceOnUse\" markerWidth=\"11\" markerHeight=\"11\" orient=\"auto-start-reverse\"><path d=\"M0,0 L10,5 L0,10 z\" fill=\"#ffb454\"/><\/marker>\n<marker id=\"sT\" viewBox=\"0 0 10 10\" refX=\"7\" refY=\"5\" markerUnits=\"userSpaceOnUse\" markerWidth=\"12\" markerHeight=\"12\" orient=\"auto-start-reverse\"><path d=\"M0,0 L10,5 L0,10 z\" fill=\"#4fd1c5\"/><\/marker>\n<marker id=\"sK\" viewBox=\"0 0 10 10\" refX=\"7\" refY=\"5\" markerUnits=\"userSpaceOnUse\" markerWidth=\"12\" markerHeight=\"12\" orient=\"auto-start-reverse\"><path d=\"M0,0 L10,5 L0,10 z\" fill=\"#a68a6d\"/><\/marker>\n<marker id=\"sB\" viewBox=\"0 0 10 10\" refX=\"7\" refY=\"5\" markerUnits=\"userSpaceOnUse\" markerWidth=\"10\" markerHeight=\"10\" orient=\"auto-start-reverse\"><path d=\"M0,0 L10,5 L0,10 z\" fill=\"#9fd3ff\"/><\/marker>\n<marker id=\"sG\" viewBox=\"0 0 10 10\" refX=\"7\" refY=\"5\" markerUnits=\"userSpaceOnUse\" markerWidth=\"10\" markerHeight=\"10\" orient=\"auto-start-reverse\"><path d=\"M0,0 L10,5 L0,10 z\" fill=\"#9aa2a9\"/><\/marker>\n<pattern id=\"sCat\" width=\"9\" height=\"9\" patternUnits=\"userSpaceOnUse\"><circle cx=\"4.5\" cy=\"4.5\" r=\"1.5\" fill=\"#4fd1c5\" opacity=\".6\"/><\/pattern>\n<pattern id=\"sCatK\" width=\"9\" height=\"9\" patternUnits=\"userSpaceOnUse\"><circle cx=\"4.5\" cy=\"4.5\" r=\"1.5\" fill=\"#a68a6d\" opacity=\".8\"/><\/pattern>\n<\/defs>\n<style>\n.sl{font:600 13px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; fill:#e7e4dd;}\n.ss{font:11.5px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; fill:#9aa2a9;}\n.st{font:11.5px ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; fill:#ffb454;}\n.sv{fill:#171b1f; stroke:#4a535b; stroke-width:1.6;}\n.sn circle{fill:#ffb454;} .sn text{font:700 12px system-ui,sans-serif; fill:#14171a; text-anchor:middle; dominant-baseline:central;}\n<\/style>\n<!-- Reaktor -->\n<rect class=\"sv\" x=\"200\" y=\"50\" width=\"130\" height=\"115\" rx=\"14\"/>\n<rect x=\"210\" y=\"96\" width=\"110\" height=\"60\" rx=\"8\" fill=\"url(#sCat)\"/>\n<text class=\"sl\" x=\"265\" y=\"72\" text-anchor=\"middle\">Reaktor<\/text>\n<text class=\"st\" x=\"265\" y=\"88\" text-anchor=\"middle\">≈ 500 °C<\/text>\n<!-- Regenerator -->\n<rect class=\"sv\" x=\"200\" y=\"220\" width=\"130\" height=\"95\" rx=\"14\"/>\n<rect x=\"210\" y=\"256\" width=\"110\" height=\"50\" rx=\"8\" fill=\"url(#sCat)\"/>\n<text class=\"sl\" x=\"265\" y=\"240\" text-anchor=\"middle\">Regenerator<\/text>\n<!-- Vakuumgasöl rein -->\n<path d=\"M40,110 L196,110\" stroke=\"#ffb454\" stroke-width=\"4\" fill=\"none\" marker-end=\"url(#sO)\" class=\"flow\"/>\n<text class=\"sl\" x=\"40\" y=\"98\" style=\"fill:#ffb454\">Vakuumgasöl<\/text>\n<text class=\"ss\" x=\"40\" y=\"128\">(lange Moleküle)<\/text>\n<!-- Katalysatorkreislauf -->\n<path d=\"M300,168 L300,216\" stroke=\"#a68a6d\" stroke-width=\"6\" fill=\"none\" marker-end=\"url(#sK)\" class=\"flow\"/>\n<text class=\"ss\" x=\"310\" y=\"190\" style=\"fill:#c4a785\">verkokter<\/text>\n<text class=\"ss\" x=\"310\" y=\"204\" style=\"fill:#c4a785\">Katalysator<\/text>\n<path d=\"M230,216 L230,168\" stroke=\"#4fd1c5\" stroke-width=\"6\" fill=\"none\" marker-end=\"url(#sT)\" class=\"flow\"/>\n<text class=\"ss\" x=\"220\" y=\"190\" text-anchor=\"end\" style=\"fill:#4fd1c5\">gereinigter, heißer<\/text>\n<text class=\"ss\" x=\"220\" y=\"204\" text-anchor=\"end\" style=\"fill:#4fd1c5\">Katalysator<\/text>\n<!-- Luft / Abgas -->\n<path d=\"M120,290 L196,290\" stroke=\"#9fd3ff\" stroke-width=\"3\" fill=\"none\" marker-end=\"url(#sB)\" class=\"flow\"/>\n<text class=\"ss\" x=\"120\" y=\"280\">Luft<\/text>\n<path d=\"M334,290 L410,290\" stroke=\"#9aa2a9\" stroke-width=\"3\" fill=\"none\" marker-end=\"url(#sG)\" class=\"flow\"/>\n<text class=\"ss\" x=\"342\" y=\"280\">Abgas (CO₂, H₂O)<\/text>\n<!-- Crackprodukte -->\n<path d=\"M265,50 L265,20 L480,20 L480,44\" stroke=\"#ffb454\" stroke-width=\"4\" fill=\"none\" marker-end=\"url(#sO)\" class=\"flow\"/>\n<text class=\"ss\" x=\"300\" y=\"13\">Crackprodukte (dampfförmig)<\/text>\n<!-- Trennkolonne -->\n<rect class=\"sv\" x=\"455\" y=\"48\" width=\"50\" height=\"240\" rx=\"22\"/>\n<g stroke=\"#31383e\" stroke-width=\"1\"><line x1=\"461\" y1=\"92\" x2=\"499\" y2=\"92\"/><line x1=\"461\" y1=\"130\" x2=\"499\" y2=\"130\"/><line x1=\"461\" y1=\"168\" x2=\"499\" y2=\"168\"/><line x1=\"461\" y1=\"206\" x2=\"499\" y2=\"206\"/><line x1=\"461\" y1=\"244\" x2=\"499\" y2=\"244\"/><\/g>\n<text class=\"sl\" x=\"480\" y=\"308\" text-anchor=\"middle\">Trennkolonne<\/text>\n<path d=\"M505,72 L546,72\" stroke=\"#b79cf2\" stroke-width=\"3\" marker-end=\"url(#sG)\"/><text class=\"sl\" x=\"552\" y=\"76\" style=\"fill:#b79cf2\">Gas<\/text>\n<path d=\"M505,130 L546,130\" stroke=\"#ffd166\" stroke-width=\"3\" marker-end=\"url(#sG)\"/><text class=\"sl\" x=\"552\" y=\"134\" style=\"fill:#ffd166\">Benzin<\/text>\n<path d=\"M505,200 L546,200\" stroke=\"#e8955c\" stroke-width=\"3\" marker-end=\"url(#sG)\"/><text class=\"sl\" x=\"552\" y=\"198\" style=\"fill:#e8955c\">Diesel/<\/text><text class=\"sl\" x=\"552\" y=\"213\" style=\"fill:#e8955c\">Heizöl<\/text>\n<path d=\"M505,266 L546,266\" stroke=\"#a68a6d\" stroke-width=\"3\" marker-end=\"url(#sG)\"/><text class=\"sl\" x=\"552\" y=\"270\" style=\"fill:#a68a6d\">Rückstand<\/text>\n<!-- Nummern -->\n<g class=\"sn\"><circle cx=\"318\" cy=\"64\" r=\"11\"/><text x=\"318\" y=\"64\">1<\/text><\/g>\n<g class=\"sn\"><circle cx=\"300\" cy=\"148\" r=\"0\" style=\"display:none\"/><\/g>\n<g class=\"sn\"><circle cx=\"265\" cy=\"192\" r=\"11\"/><text x=\"265\" y=\"192\">2<\/text><\/g>\n<g class=\"sn\"><circle cx=\"318\" cy=\"234\" r=\"11\"/><text x=\"318\" y=\"234\">3<\/text><\/g>\n<g class=\"sn\"><circle cx=\"480\" cy=\"70\" r=\"11\"/><text x=\"480\" y=\"70\">4<\/text><\/g>\n<\/svg><figcaption>Stark vereinfachter Aufbau einer katalytischen Crackanlage<\/figcaption><\/div>\n<ol class=\"gl-steps\">\n<li><strong>Reaktor:<\/strong> Das vorgewärmte Vakuumgasöl verdampft und trifft bei etwa 500 °C auf den pulverförmigen Katalysator. An seiner Oberfläche werden die langen Moleküle in kürzere gespalten. Dabei lagert sich auf dem Katalysator Koks (fast reiner Kohlenstoff) ab.<\/li>\n<li><strong>Katalysatorkreislauf:<\/strong> Der verkokte Katalysator wirkt kaum noch. Er wird laufend in den Regenerator geleitet, während gereinigter Katalysator von dort zurück in den Reaktor strömt.<\/li>\n<li><strong>Regenerator:<\/strong> Mit eingeblasener Luft verbrennt der Koks: C + O<sub>2<\/sub> → CO<sub>2<\/sub>. Der Katalysator ist danach wieder wirksam – und durch die Verbrennungswärme heiß. Diese Wärme bringt er in den Reaktor mit.<\/li>\n<li><strong>Trennkolonne:<\/strong> Die dampfförmigen Crackprodukte werden wie bei der Erdöldestillation nach ihren Siedetemperaturen getrennt: Gas, Benzin, Diesel/Heizöl und Rückstand.<\/li>\n<\/ol>\n<div class=\"gl-box gl-info\">Der Katalysator wird nicht verbraucht: Er läuft im Kreislauf zwischen Reaktor und Regenerator. Die Verbrennung des Kokses liefert die Wärme für das Cracken.<\/div>"}, {"t": "Reformieren und Oktanzahl", "h": "<p>Ottomotoren brauchen <strong>klopffestes<\/strong> Benzin, das sich erst durch den Zündfunken und nicht schon durch die Verdichtung entzündet. Ein Maß dafür ist die <strong>Research-Oktanzahl (ROZ)<\/strong>:<\/p> <div class=\"gl-tw\"><table class=\"gl-table\"><thead><tr><th>Bezugsstoff<\/th><th>ROZ<\/th><\/tr><\/thead><tbody><tr><td>n-Heptan (unverzweigt)<\/td><td>0<\/td><\/tr><tr><td>2,2,4-Trimethylpentan („Isooctan“, stark verzweigt)<\/td><td>100<\/td><\/tr><\/tbody><\/table><\/div> <p>Unverzweigte Alkane haben niedrige, verzweigte Alkane, Cycloalkane und Aromaten hohe Oktanzahlen. Im <strong>Reformer<\/strong> werden die Moleküle des Schwerbenzins bei etwa 500 °C an einem <strong>Platinkatalysator<\/strong> umgebaut, ohne dass sich die Zahl der C-Atome ändert: Aus Cycloalkanen und unverzweigten Alkanen entstehen <strong>Aromaten<\/strong>. Dabei wird <strong>Wasserstoff<\/strong> abgespalten. Schwefel vergiftet den Katalysator – das Schwerbenzin muss vorher entschwefelt werden.<\/p>\n<p><strong>Beispiel 1 – Dehydrierung: Cyclohexan → Benzol + 3 H<sub>2<\/sub><\/strong><\/p>\n<div class=\"mol-eq\" data-eq=\"ref1\"><\/div>\n<p class=\"mol-cap\">Aus dem gesättigten Sechsring werden sechs H-Atome abgespalten; es entsteht der aromatische Benzolring.<\/p>\n<p><strong>Beispiel 2 – Dehydrierung: Methylcyclohexan → Toluol + 3 H<sub>2<\/sub><\/strong><\/p>\n<div class=\"mol-eq\" data-eq=\"ref2\"><\/div>\n<p><strong>Beispiel 3 – Ringschluss und Dehydrierung: Heptan → Toluol + 4 H<sub>2<\/sub><\/strong><\/p>\n<div class=\"mol-eq\" data-eq=\"ref3\"><\/div>\n<p class=\"mol-cap\">Die Kette schließt sich zwischen C1 und C6 (<i>orange<\/i>) zum Ring, anschließend wird der Ring dehydriert. Die Oktanzahl steigt dabei von 0 auf etwa 120.<\/p> <div class=\"gl-box gl-info\">Normalbenzin: ROZ ≥ 91 · Super: ROZ ≥ 95<\/div>"}, {"t": "Entschwefelung", "h": "<p>Schwefelverbindungen würden bei der Verbrennung zu Schwefeldioxid und damit zu saurem Regen führen und Abgaskatalysatoren schädigen. Deshalb werden sie entfernt.<\/p> <p>Bei der <strong>Hydrodesulfurierung<\/strong> reagieren die Schwefelverbindungen mit Wasserstoff an einem Katalysator; der Schwefel wird als <strong>Schwefelwasserstoff H<sub>2<\/sub>S<\/strong> abgetrennt. Im <strong>Claus-Verfahren<\/strong> wird daraus elementarer Schwefel gewonnen.<\/p> <div class=\"gl-box gl-info\">Der Wasserstoff für die Entschwefelung stammt zu einem großen Teil aus dem Reformer – die Verfahren sind in der Raffinerie eng miteinander verknüpft.<\/div>"}];
+  const g = id => document.getElementById(id);
+  const bd = g("glBackdrop"), box = bd.querySelector(".modal-box");
+  let idx = 0;
+  function show(i){
+    idx = Math.max(0, Math.min(GL.length - 1, i));
+    g("glNum").textContent = (idx + 1) + ".";
+    g("glTitle").innerHTML = GL[idx].t;
+    g("glBody").innerHTML = GL[idx].h;
+    if (window.__glMol) window.__glMol(g("glBody"));
+    g("glPos").textContent = "Thema " + (idx + 1) + " von " + GL.length;
+    g("glPrev").disabled = idx === 0;
+    g("glNext").disabled = idx === GL.length - 1;
+    box.scrollTop = 0;
+    bd.classList.add("open");
+  }
+  g("glList").innerHTML = GL.map((b, i) => '<button type="button" class="gl-item" data-i="' + i + '"><span class="nr">' + (i + 1) + '</span>' + b.t + '<span class="go">›</span></button>').join("");
+  g("glToggle").addEventListener("click", () => {
+    const open = g("glToggle").getAttribute("aria-expanded") !== "true";
+    g("glToggle").setAttribute("aria-expanded", String(open));
+    g("glPanel").hidden = !open;
+  });
+  g("glList").addEventListener("click", e => { const b = e.target.closest(".gl-item"); if (b) show(+b.dataset.i); });
+  g("glPrev").addEventListener("click", () => show(idx - 1));
+  g("glNext").addEventListener("click", () => show(idx + 1));
+  g("glClose").addEventListener("click", () => bd.classList.remove("open"));
+  bd.addEventListener("click", e => { if (e.target === bd) bd.classList.remove("open"); });
+  document.addEventListener("keydown", e => {
+    if (!bd.classList.contains("open")) return;
+    if (e.key === "Escape") bd.classList.remove("open");
+    if (e.key === "ArrowRight" && idx < GL.length - 1) show(idx + 1);
+    if (e.key === "ArrowLeft" && idx > 0) show(idx - 1);
+  });
+})();
+</script>
+<script>
+/* Strukturformeln (Valenzstrichformeln mit allen H-Atomen) als SVG */
+(function(){
+  "use strict";
+  const U = 30;                         // Bindungslänge in px
+  const C_TXT = "#e7e4dd", H_TXT = "#9aa2a9", BOND = "#9aa2a9", BREAK = "#e4785b", MOVE = "#ffb454";
+  const FONT = "system-ui,-apple-system,'Segoe UI',Roboto,sans-serif";
+
+  // Molekül: atoms [{el,x,y,col?}], bonds [[i,j,ord,style?]] – Koordinaten in Bindungslängen
+  function chain(n, dbl, opt){
+    opt = opt || {};
+    const A = [], B = [], C = [];
+    for(let i=0;i<n;i++){ C.push(A.length); A.push({el:"C", x:i, y:0}); }
+    for(let i=0;i<n-1;i++){
+      const st = (opt.breakAt===i) ? "break" : null;
+      B.push([C[i], C[i+1], dbl===i ? 2 : 1, st]);
+    }
+    const addH = (ci, x, y, tag) => {
+      const col = (opt.hl && opt.hl.some(h=> h[0]===ci && h[1]===tag)) ? MOVE : null;
+      const k = A.length; A.push({el:"H", x, y, col}); B.push([C[ci], k, 1, col ? "move" : null]);
+    };
+    for(let i=0;i<n;i++){
+      const inDbl = (dbl===i || dbl===i-1);
+      if(i===0) addH(i, -1, 0, "l");
+      if(i===n-1) addH(i, n, 0, "r");
+      addH(i, i, -1, "u");
+      if(!inDbl) addH(i, i, 1, "d");
+    }
+    return {atoms:A, bonds:B};
+  }
+  // Sechsring; kind: "cyclo" | "aro"; methyl: true = CH3 an oberstem C
+  function ring(kind, methyl){
+    const A = [], B = [], C = [];
+    const R = 1.3;                                   // Abstand Mitte–Ecke (größer für Platz der H-Atome)
+    for(let k=0;k<6;k++){
+      const ang = (-90 + 60*k)*Math.PI/180;
+      C.push(A.length); A.push({el:"C", x:R*Math.cos(ang), y:R*Math.sin(ang), ang});
+    }
+    for(let k=0;k<6;k++) B.push([C[k], C[(k+1)%6], (kind==="aro" && k%2===0) ? 2 : 1, kind==="aro" ? "inner" : null]);
+    const out = (ci, dAng, d) => {
+      const a = A[ci].ang + dAng*Math.PI/180;
+      return [A[ci].x + d*Math.cos(a), A[ci].y + d*Math.sin(a)];
+    };
+    for(let k=0;k<6;k++){
+      const subst = methyl && k===0;
+      if(kind==="aro"){
+        if(subst) continue;
+        const [x,y] = out(C[k], 0, 0.95); const h = A.length; A.push({el:"H", x, y}); B.push([C[k], h, 1]);
+      } else {
+        const angs = subst ? [38] : [-34, 34];
+        angs.forEach(da=>{ const [x,y] = out(C[k], da, 0.9); const h = A.length; A.push({el:"H", x, y}); B.push([C[k], h, 1]); });
+      }
+    }
+    if(methyl){
+      const top = C[0];
+      const [mx,my] = out(top, kind==="aro" ? 0 : -38, 1);
+      const m = A.length; A.push({el:"C", x:mx, y:my}); B.push([top, m, 1]);
+      const hs = kind==="aro" ? [[0,-0.9],[-0.9,0],[0.9,0]] : [[0,-0.9],[-0.9,0],[0.65,-0.6]];
+      hs.forEach(([dx,dy])=>{ const h = A.length; A.push({el:"H", x:mx+dx, y:my+dy}); B.push([m, h, 1]); });
+    }
+    return {atoms:A, bonds:B};
+  }
+  // Heptan als offene Kette, die sich zum Ring schließt (zur Anschauung der Dehydrocyclisierung)
+  function heptaneArc(){
+    const m = chain(7, null, {});
+    m.atoms[0].col = MOVE; m.atoms[5].col = MOVE;
+    return m;
+  }
+  function h2(){ return {atoms:[{el:"H",x:0,y:0},{el:"H",x:1,y:0}], bonds:[[0,1,1]]}; }
+
+  function bbox(m){
+    let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
+    m.atoms.forEach(a=>{ x0=Math.min(x0,a.x); x1=Math.max(x1,a.x); y0=Math.min(y0,a.y); y1=Math.max(y1,a.y); });
+    return {x0,x1,y0,y1};
+  }
+  function drawMol(m, ox, oy, extra){
+    let s = "";
+    const P = a => [ox + a.x*U, oy + a.y*U];
+    const cx = m.atoms.filter(a=>a.el==="C").reduce((t,a)=>t+a.x,0)/Math.max(1,m.atoms.filter(a=>a.el==="C").length);
+    const cy = m.atoms.filter(a=>a.el==="C").reduce((t,a)=>t+a.y,0)/Math.max(1,m.atoms.filter(a=>a.el==="C").length);
+    m.bonds.forEach(([i,j,ord,st])=>{
+      const [x1,y1] = P(m.atoms[i]), [x2,y2] = P(m.atoms[j]);
+      const dx = x2-x1, dy = y2-y1, L = Math.hypot(dx,dy), ux = dx/L, uy = dy/L;
+      const r = 8.5;
+      const a1 = [x1+ux*r, y1+uy*r], a2 = [x2-ux*r, y2-uy*r];
+      const col = st==="break" ? BREAK : (st==="move" ? MOVE : (st==="close" ? MOVE : BOND));
+      const dash = st==="break" ? ' stroke-dasharray="4 3"' : "";
+      const w = (st==="break" || st==="move" || st==="close") ? 2.2 : 1.5;
+      const line = (p,q) => `<line x1="${p[0].toFixed(1)}" y1="${p[1].toFixed(1)}" x2="${q[0].toFixed(1)}" y2="${q[1].toFixed(1)}" stroke="${col}" stroke-width="${w}"${dash} stroke-linecap="round"/>`;
+      if(ord===2){
+        const nx = -uy, ny = ux;
+        if(st==="inner"){
+          // Kekulé-Doppelbindung: zweite Linie zur Ringmitte versetzt und verkürzt
+          s += line(a1,a2);
+          const mx = (x1+x2)/2, my = (y1+y2)/2, tx = ox+cx*U - mx, ty = oy+cy*U - my, tl = Math.hypot(tx,ty);
+          const sx = tx/tl*4.5, sy = ty/tl*4.5, sh = 4;
+          s += line([a1[0]+sx+ux*sh, a1[1]+sy+uy*sh],[a2[0]+sx-ux*sh, a2[1]+sy-uy*sh]);
+        } else {
+          s += line([a1[0]+nx*2.6, a1[1]+ny*2.6],[a2[0]+nx*2.6, a2[1]+ny*2.6]);
+          s += line([a1[0]-nx*2.6, a1[1]-ny*2.6],[a2[0]-nx*2.6, a2[1]-ny*2.6]);
+        }
+      } else s += line(a1,a2);
+    });
+    if(extra) s += extra(P);
+    m.atoms.forEach(a=>{
+      const [x,y] = P(a);
+      const col = a.col || (a.el==="C" ? C_TXT : H_TXT);
+      const wt = a.el==="C" ? 600 : (a.col ? 700 : 400);
+      s += `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" fill="${col}" font-family="${FONT}" font-size="${a.el==="C"?14:13}" font-weight="${wt}" text-anchor="middle" dominant-baseline="central">${a.el}</text>`;
+    });
+    return s;
+  }
+
+  // Gleichung zeichnen: items = [{mol, name, sub, ron, coef}, "→", "+", ...]
+  function equation(el, items){
+    const PAD = 14, GAP = 22;
+    let x = PAD, parts = [], yTop = 0, yBot = 0;
+    items.forEach(it=>{
+      if(typeof it === "string"){ parts.push({t:it, x, w:34}); x += 34 + 8; return; }
+      const b = bbox(it.mol);
+      const coefW = it.coef ? 18 : 0;
+      const w = (b.x1 - b.x0)*U + 20;
+      parts.push({it, b, x: x + coefW, w, coefX: x});
+      yTop = Math.min(yTop, b.y0*U); yBot = Math.max(yBot, b.y1*U, it.extra ? 2.35*U : 0);
+      x += coefW + w + GAP;
+    });
+    const W = x - GAP + PAD, top = -yTop + 20, H = top + yBot + 62;
+    let s = "";
+    parts.forEach(p=>{
+      if(p.t){
+        s += `<text x="${p.x + 17}" y="${top}" fill="#e7e4dd" font-family="${FONT}" font-size="22" text-anchor="middle" dominant-baseline="central">${p.t}</text>`;
+        return;
+      }
+      const it = p.it, ox = p.x + 10 - p.b.x0*U;
+      if(it.coef) s += `<text x="${p.coefX+6}" y="${top}" fill="#e7e4dd" font-family="${FONT}" font-size="17" font-weight="600" text-anchor="middle" dominant-baseline="central">${it.coef}</text>`;
+      s += drawMol(it.mol, ox, top, it.extra);
+      const mx = p.x + p.w/2, ly = top + yBot + 24;
+      s += `<text x="${mx}" y="${ly}" fill="#e7e4dd" font-family="${FONT}" font-size="12.5" font-weight="600" text-anchor="middle">${it.name}</text>`;
+      if(it.sub) s += `<text x="${mx}" y="${ly+15}" fill="#9aa2a9" font-family="${FONT}" font-size="11.5" text-anchor="middle">${it.sub}</text>`;
+      if(it.ron!==undefined) s += `<text x="${mx}" y="${ly+30}" fill="#ffb454" font-family="ui-monospace,Consolas,Menlo,monospace" font-size="11" text-anchor="middle">ROZ ${it.ron}</text>`;
+    });
+    el.innerHTML = `<svg viewBox="0 0 ${W.toFixed(0)} ${H.toFixed(0)}" width="${W.toFixed(0)}" role="img">${s}</svg>`;
+  }
+
+  // Ringschluss im Heptan andeuten: Bogen zwischen C1 und C6 (Index 0 und 5)
+  const closeArc = P => {
+    const [x1,y1] = P({x:0,y:0}), [x2,y2] = P({x:5,y:0});
+    const ys = y1 + 1.45*U, yb = y1 + 2.7*U;
+    return `<path d="M${x1},${ys} C${x1},${yb} ${x2},${yb} ${x2},${ys}" fill="none" stroke="${MOVE}" stroke-width="1.8" stroke-dasharray="5 4"/>`;
+  };
+
+  const EQ = {
+    crack1: [
+      {mol: chain(8, null, {breakAt:3, hl:[[5,"d"]]}), name:"Octan", sub:"C₈H₁₈"}, "→",
+      {mol: (()=>{ const m = chain(4, null, {hl:[[3,"r"]]}); return m; })(), name:"Butan", sub:"C₄H₁₀"}, "+",
+      {mol: chain(4, 0, {}), name:"But-1-en", sub:"C₄H₈"}
+    ],
+    crack2: [
+      {mol: chain(10, null, {breakAt:6, hl:[[8,"d"]]}), name:"Decan", sub:"C₁₀H₂₂"}, "→",
+      {mol: chain(7, null, {hl:[[6,"r"]]}), name:"Heptan", sub:"C₇H₁₆"}, "+",
+      {mol: chain(3, 0, {}), name:"Propen", sub:"C₃H₆"}
+    ],
+    ref1: [
+      {mol: ring("cyclo", false), name:"Cyclohexan", sub:"C₆H₁₂", ron:83}, "→",
+      {mol: ring("aro", false), name:"Benzol", sub:"C₆H₆", ron:"≈ 100"}, "+",
+      {mol: h2(), coef:"3", name:"Wasserstoff", sub:"3 H₂"}
+    ],
+    ref2: [
+      {mol: ring("cyclo", true), name:"Methylcyclohexan", sub:"C₇H₁₄", ron:75}, "→",
+      {mol: ring("aro", true), name:"Toluol", sub:"C₇H₈", ron:"≈ 120"}, "+",
+      {mol: h2(), coef:"3", name:"Wasserstoff", sub:"3 H₂"}
+    ],
+    ref3: [
+      {mol: heptaneArc(), name:"Heptan", sub:"C₇H₁₆", ron:0, extra:closeArc}, "→",
+      {mol: ring("aro", true), name:"Toluol", sub:"C₇H₈", ron:"≈ 120"}, "+",
+      {mol: h2(), coef:"4", name:"Wasserstoff", sub:"4 H₂"}
+    ]
+  };
+  window.__glMol = root => root.querySelectorAll("[data-eq]").forEach(el=>{ const d = EQ[el.dataset.eq]; if(d) equation(el, d); });
+})();
+</script>
+<script id="bk-kit">
+/* ===== Baustein QR-Code + Auswertung als PDF (einheitlich nach Leitfaden, keine Bibliotheken) ===== */
+(()=>{
+'use strict';
+const QR=(()=>{
+  const ECC=[7,10,15,20,26,18,20,24,30,18],NB=[1,1,1,1,1,2,2,2,2,4];
+  const raw=v=>{let r=(16*v+128)*v+64;if(v>=2){const n=Math.floor(v/7)+2;r-=(25*n-10)*n-55;if(v>=7)r-=36}return r};
+  const dataCw=v=>Math.floor(raw(v)/8)-ECC[v-1]*NB[v-1];
+  const mul=(x,y)=>{let z=0;for(let i=7;i>=0;i--){z=(z<<1)^((z>>>7)*0x11D);z^=((y>>>i)&1)*x}return z};
+  const divisor=d=>{const r=new Array(d).fill(0);r[d-1]=1;let root=1;for(let i=0;i<d;i++){for(let j=0;j<d;j++){r[j]=mul(r[j],root);if(j+1<d)r[j]^=r[j+1]}root=mul(root,2)}return r};
+  const rem=(data,div)=>{const r=new Array(div.length).fill(0);for(const b of data){const f=b^r.shift();r.push(0);div.forEach((c,i)=>{r[i]^=mul(c,f)})}return r};
+  const bit=(x,i)=>((x>>>i)&1)!==0;
+  function make(text){
+    const bytes=[...new TextEncoder().encode(text)];
+    let ver=0;for(let v=1;v<=10;v++){if(4+(v<10?8:16)+8*bytes.length<=dataCw(v)*8){ver=v;break}}
+    if(!ver)throw new Error('Text zu lang');
+    const bits=[];const put=(val,n)=>{for(let i=n-1;i>=0;i--)bits.push((val>>>i)&1)};
+    put(4,4);put(bytes.length,ver<10?8:16);bytes.forEach(b=>put(b,8));
+    const cap=dataCw(ver)*8;put(0,Math.min(4,cap-bits.length));put(0,(8-bits.length%8)%8);
+    for(let p=0xEC;bits.length<cap;p^=0xEC^0x11)put(p,8);
+    const data=[];for(let i=0;i<bits.length;i+=8){let b=0;for(let j=0;j<8;j++)b=(b<<1)|bits[i+j];data.push(b)}
+    const nb=NB[ver-1],el=ECC[ver-1],rc=Math.floor(raw(ver)/8),ns=nb-rc%nb,sl=Math.floor(rc/nb),div=divisor(el),blocks=[];
+    for(let i=0,k=0;i<nb;i++){const d=data.slice(k,k+sl-el+(i<ns?0:1));k+=d.length;const e=rem(d,div);if(i<ns)d.push(0);blocks.push(d.concat(e))}
+    const all=[];for(let i=0;i<blocks[0].length;i++)blocks.forEach((b,j)=>{if(i!==sl-el||j>=ns)all.push(b[i])});
+    const size=ver*4+17,m=[],fn=[];for(let i=0;i<size;i++){m.push(new Array(size).fill(false));fn.push(new Array(size).fill(false))}
+    const sf=(x,y,d)=>{m[y][x]=d;fn[y][x]=true};
+    for(let i=0;i<size;i++){sf(6,i,i%2===0);sf(i,6,i%2===0)}
+    const finder=(x,y)=>{for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){const d=Math.max(Math.abs(dx),Math.abs(dy)),xx=x+dx,yy=y+dy;if(xx>=0&&xx<size&&yy>=0&&yy<size)sf(xx,yy,d!==2&&d!==4)}};
+    finder(3,3);finder(size-4,3);finder(3,size-4);
+    let pos=[];if(ver>1){const n=Math.floor(ver/7)+2,step=Math.ceil((ver*4+4)/(n*2-2))*2;pos=[6];for(let p=size-7;pos.length<n;p-=step)pos.splice(1,0,p)}
+    pos.forEach((px,i)=>pos.forEach((py,j)=>{if((i===0&&j===0)||(i===0&&j===pos.length-1)||(i===pos.length-1&&j===0))return;for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)sf(px+dx,py+dy,Math.max(Math.abs(dx),Math.abs(dy))!==1)}));
+    const fmt=mask=>{const d=(1<<3)|mask;let r=d;for(let i=0;i<10;i++)r=(r<<1)^((r>>>9)*0x537);const b=((d<<10)|r)^0x5412;
+      for(let i=0;i<=5;i++)sf(8,i,bit(b,i));sf(8,7,bit(b,6));sf(8,8,bit(b,7));sf(7,8,bit(b,8));for(let i=9;i<15;i++)sf(14-i,8,bit(b,i));
+      for(let i=0;i<8;i++)sf(size-1-i,8,bit(b,i));for(let i=8;i<15;i++)sf(8,size-15+i,bit(b,i));sf(8,size-8,true)};
+    fmt(0);
+    if(ver>=7){let r=ver;for(let i=0;i<12;i++)r=(r<<1)^((r>>>11)*0x1F25);const b=(ver<<12)|r;for(let i=0;i<18;i++){const c=bit(b,i),a=size-11+i%3,bb=Math.floor(i/3);sf(a,bb,c);sf(bb,a,c)}}
+    let k=0;for(let right=size-1;right>=1;right-=2){if(right===6)right=5;for(let v=0;v<size;v++)for(let j=0;j<2;j++){const x=right-j,up=((right+1)&2)===0,y=up?size-1-v:v;if(!fn[y][x]&&k<all.length*8){m[y][x]=bit(all[k>>>3],7-(k&7));k++}}}
+    const MF=[(x,y)=>(x+y)%2===0,(x,y)=>y%2===0,(x,y)=>x%3===0,(x,y)=>(x+y)%3===0,(x,y)=>(Math.floor(x/3)+Math.floor(y/2))%2===0,(x,y)=>x*y%2+x*y%3===0,(x,y)=>(x*y%2+x*y%3)%2===0,(x,y)=>((x+y)%2+x*y%3)%2===0];
+    const apply=mk=>{for(let y=0;y<size;y++)for(let x=0;x<size;x++)if(!fn[y][x]&&MF[mk](x,y))m[y][x]=!m[y][x]};
+    const pen=()=>{let p=0;
+      for(let t=0;t<2;t++)for(let a=0;a<size;a++){let run=1;for(let b=1;b<size;b++){const c=t?m[b][a]:m[a][b],d=t?m[b-1][a]:m[a][b-1];if(c===d){run++;if(run===5)p+=3;else if(run>5)p++}else run=1}}
+      for(let y=0;y<size-1;y++)for(let x=0;x<size-1;x++){const c=m[y][x];if(c===m[y][x+1]&&c===m[y+1][x]&&c===m[y+1][x+1])p+=3}
+      let dark=0;m.forEach(r=>r.forEach(c=>{if(c)dark++}));p+=Math.floor(Math.abs(dark*20-size*size*10)/(size*size))*10;return p};
+    let best=0,bp=1e9;for(let mk=0;mk<8;mk++){apply(mk);fmt(mk);const p=pen();if(p<bp){bp=p;best=mk}apply(mk)}
+    apply(best);fmt(best);return m;
+  }
+  function svg(text,px){const m=make(text),n=m.length,q=4,tot=n+2*q;let d='';
+    for(let y=0;y<n;y++)for(let x=0;x<n;x++)if(m[y][x])d+=`M${x+q},${y+q}h1v1h-1z`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${px}" height="${px}" viewBox="0 0 ${tot} ${tot}" shape-rendering="crispEdges" role="img" aria-label="QR-Code"><rect width="${tot}" height="${tot}" fill="#fff"/><path d="${d}" fill="#000"/></svg>`}
+  return{make,svg};
+})();
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const el=(tag,cls,html)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e};
+const today=()=>{const d=new Date();return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear()};
+const BK={runs:[],cfg:null,nm:'',ku:'',esc,today,_id:0};
+window.BK=BK;
+
+/* ---------- Diagramme für den Ausdruck: Helligkeit umkehren (weißer Hintergrund, dunkle Linien) ---------- */
+function invertCanvas(src){
+  const w=src.width,h=src.height;if(!w||!h)return '';
+  const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');
+  x.drawImage(src,0,0);
+  let d;try{d=x.getImageData(0,0,w,h)}catch(_){return ''}
+  const p=d.data;
+  for(let i=0;i<p.length;i+=4){
+    if(p[i+3]===0)continue;
+    const r=p[i],g=p[i+1],b=p[i+2],mx=Math.max(r,g,b),mn=Math.min(r,g,b);
+    if(mx<46&&mx-mn<16){p[i]=p[i+1]=p[i+2]=255;continue}          // dunkler Hintergrund → weiß
+    const s=255-(mx+mn);                                             // Helligkeit spiegeln, Farbton behalten
+    const R=r+s,G=g+s,B=b+s;
+    p[i]=R<0?0:R>255?255:R;p[i+1]=G<0?0:G>255?255:G;p[i+2]=B<0?0:B>255?255:B;
+  }
+  x.putImageData(d,0,0);
+  return c.toDataURL('image/png');
+}
+/* Linienfarbe wie im invertierten Diagramm (für Legenden) */
+BK.ink=hex=>{const m=/^#?([0-9a-f]{6})$/i.exec(String(hex).trim());if(!m)return hex;const n=parseInt(m[1],16),r=n>>16,g=(n>>8)&255,b=n&255,s=255-(Math.max(r,g,b)+Math.min(r,g,b));
+  return '#'+[r+s,g+s,b+s].map(v=>Math.max(0,Math.min(255,v)).toString(16).padStart(2,'0')).join('')};
+BK.cimg=cv=>{try{return cv&&cv.width?invertCanvas(cv):''}catch(_){return ''}};
+const SVGP=['fill','stroke','stroke-width','stroke-dasharray','stroke-linecap','stroke-linejoin','opacity','fill-opacity','stroke-opacity','font-size','font-family','font-weight','font-style','text-anchor','dominant-baseline','visibility','display','letter-spacing'];
+BK.simg=svg=>new Promise(res=>{
+  try{
+    const r=svg.getBoundingClientRect(),W=Math.max(1,Math.round(r.width||svg.clientWidth||300)),H=Math.max(1,Math.round(r.height||svg.clientHeight||200));
+    const cl=svg.cloneNode(true),a=[svg,...svg.querySelectorAll('*')],b=[cl,...cl.querySelectorAll('*')];
+    a.forEach((n,i)=>{const cs=getComputedStyle(n);b[i].setAttribute('style',SVGP.map(k=>k+':'+cs.getPropertyValue(k)).join(';'))});
+    cl.setAttribute('width',W);cl.setAttribute('height',H);cl.setAttribute('xmlns','http://www.w3.org/2000/svg');
+    if(!cl.getAttribute('viewBox')&&svg.viewBox&&svg.viewBox.baseVal&&svg.viewBox.baseVal.width){const v=svg.viewBox.baseVal;cl.setAttribute('viewBox',`${v.x} ${v.y} ${v.width} ${v.height}`)}
+    const im=new Image(),sc=2;
+    im.onload=()=>{const c=document.createElement('canvas');c.width=W*sc;c.height=H*sc;const x=c.getContext('2d');x.scale(sc,sc);x.drawImage(im,0,0,W,H);res(invertCanvas(c))};
+    im.onerror=()=>res('');
+    im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(cl));
+  }catch(_){res('')}
+});
+BK.imgTag=(src,alt)=>src?`<img class="bk-img" src="${src}" alt="${esc(alt||'Diagramm')}">`:'<p class="bk-small">Diagramm nicht verfügbar.</p>';
+BK.leg=items=>items&&items.length?`<div class="bk-leg">${items.map(([c,t])=>`<span><i style="background:${c}"></i>${t}</span>`).join('')}</div>`:'';
+/* Tabelle der Seite sauber übernehmen (ohne Knöpfe, Eingaben als Text) */
+BK.tbl=(t,opt)=>{
+  opt=opt||{};if(!t)return '';
+  const c=t.cloneNode(true);
+  c.querySelectorAll('button,script,.empty-hint').forEach(n=>{const tr=n.closest('tr');if(n.classList.contains('empty-hint')&&tr)tr.remove();else n.remove()});
+  c.querySelectorAll('input,select,textarea').forEach(n=>{const v=n.tagName==='SELECT'?(n.options[n.selectedIndex]||{}).text:(n.type==='checkbox'?(n.checked?'✓':''):n.value);n.replaceWith(document.createTextNode(v||''))});
+  c.querySelectorAll('[style]').forEach(n=>{n.style.color='';n.style.background='';n.style.backgroundColor=''});
+  c.removeAttribute('id');c.className='bk-t';
+  if(opt.reverse){const tb=c.tBodies[0];if(tb)[...tb.rows].reverse().forEach(r=>tb.appendChild(r))}
+  const rows=c.tBodies[0]?c.tBodies[0].rows.length:0;
+  if(!rows&&opt.emptyText)return `<p class="bk-small">${opt.emptyText}</p>`;
+  return c.outerHTML;
+};
+BK.condRows=list=>`<table class="bk-t"><tbody>${list.filter(x=>x&&x[1]!==''&&x[1]!=null).map(([k,v])=>`<tr><th style="width:42%">${k}</th><td>${v}</td></tr>`).join('')}</tbody></table>`;
+BK.sec=(h,body,long)=>`<div class="bk-sec${long?' bk-long':''}">${h?`<h3 class="bk-h3">${h}</h3>`:''}${body}</div>`;
+
+/* Reiter kurz sichtbar machen, Diagramme neu zeichnen lassen (resize), fn ausführen, zurücksetzen */
+BK.showing=(panels,fn)=>{
+  panels=(Array.isArray(panels)?panels:[panels]).map(p=>typeof p==='string'?document.querySelector(p):p).filter(Boolean);
+  const keep=panels.map(p=>p.style.display);panels.forEach(p=>p.style.display='block');
+  window.dispatchEvent(new Event('resize'));
+  let r;try{r=fn()}finally{panels.forEach((p,i)=>p.style.display=keep[i]);window.dispatchEvent(new Event('resize'))}
+  return r;
+};
+BK.ro=sel=>[...document.querySelectorAll(sel||'.readout')].filter(r=>r.querySelector('.k')&&r.querySelector('.v')).map(r=>[r.querySelector('.k').innerHTML,r.querySelector('.v').innerHTML]);
+BK.COL=['#4fd1c5','#ffb454','#7fd68a','#e4785b','#b79cf2','#6cb6ff','#f2a3c7','#c9d36a'];
+
+/* Einstellungen der linken Spalte als Tabelle (sichtbare Bereiche, ohne Grundlagen/Darstellung/Beispiele) */
+BK.side=(root,skip)=>{
+  root=typeof root==='string'?document.querySelector(root):(root||document.querySelector('.sidebar'));const rows=[];if(!root)return rows;
+  skip=skip||/^(Darstellung|Beispiel|Diagramm|Grundlagen)/;
+  const vis=e=>e&&e.offsetParent!==null&&!e.closest('[hidden]');
+  root.querySelectorAll('section.block').forEach(sec=>{
+    if(!vis(sec)||sec.querySelector('.gl-toggle'))return;
+    const h2=sec.querySelector('h2'),h=h2?h2.firstChild.textContent.trim():'';if(skip.test(h))return;
+    sec.querySelectorAll('.mode-toggle,.seg').forEach(mt=>{if(!vis(mt))return;const a=mt.querySelector('button.active,button.on');if(a)rows.push([h,a.textContent.trim()])});
+    sec.querySelectorAll('select').forEach(x=>{if(!vis(x))return;const lab=x.id&&sec.querySelector('label[for="'+x.id+'"]');rows.push([(lab?lab.textContent:h).trim(),x.selectedOptions[0]?x.selectedOptions[0].text:''])});
+    sec.querySelectorAll('.row').forEach(r=>{if(!vis(r))return;const l=r.querySelector('label'),v=r.querySelector('.val');if(l&&v)rows.push([l.textContent.trim(),v.textContent.trim()])});
+    sec.querySelectorAll('label.sw').forEach(sw=>{if(!vis(sw))return;const i=sw.querySelector('input'),t=sw.querySelector('.sw-text');if(!i||!t)return;rows.push([t.childNodes[0].textContent.trim(),i.checked?'ein':'aus'])});
+  });
+  return rows.map(([k,v])=>[BK.esc(k),BK.esc(v)]);
+};
+
+/* ---------- QR-Schaltfläche ---------- */
+BK.qr=(url,what)=>{
+  const hd=document.querySelector('header');if(!hd||document.querySelector('.bk-qr'))return;
+  const b=el('button','bk-qr','<span class="bk-qs"></span><span><b>Auf dem Mobilgerät öffnen</b>QR-Code antippen zum Vergrößern</span>');
+  b.type='button';b.title='QR-Code vergrößern';b.setAttribute('aria-haspopup','dialog');
+  const st=hd.querySelector('#statusBadge,#status,.status'),grp=el('div','bk-hr');
+  if(st&&st.parentNode===hd){hd.insertBefore(grp,st);grp.appendChild(b);grp.appendChild(st)}else{hd.appendChild(grp);grp.appendChild(b)}
+  b.querySelector('.bk-qs').innerHTML=QR.svg(url,66);
+  const ov=el('div','bk-ov',`<div class="bk-qrbox" role="dialog" aria-modal="true" aria-label="QR-Code zu dieser Seite"><div class="bk-qbig"></div><p class="bk-url">${esc(decodeURI(url.replace(/^https?:\/\//,'')))}</p><p class="bk-qhint">Mit der Kamera scannen, um diese ${esc(what||'Simulation')} auf dem eigenen Gerät zu öffnen.</p><button type="button" class="bk-b bk-qclose">Schließen</button></div>`);
+  document.body.appendChild(ov);ov.querySelector('.bk-qbig').innerHTML=QR.svg(url,520);
+  const open=()=>{ov.classList.add('open');ov.querySelector('.bk-qclose').focus()},shut=()=>{ov.classList.remove('open');b.focus()};
+  b.addEventListener('click',open);ov.querySelector('.bk-qclose').addEventListener('click',shut);
+  ov.addEventListener('click',e=>{if(e.target===ov)shut()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&ov.classList.contains('open'))shut()});
+};
+
+/* ---------- Läufe ---------- */
+BK.addRun=r=>{if(!r)return;r.id=++BK._id;BK.runs.push(r);if(BK.runs.length>(BK.cfg&&BK.cfg.maxRuns||16))BK.runs.shift();return r};
+BK.clearRuns=()=>{BK.runs=[]};
+
+/* ---------- Dialog „Auswertung als PDF“ ---------- */
+let dlg,C=null,cur=[];
+function hostEl(){
+  let h=C.printHost?document.querySelector(C.printHost):document.getElementById('bkPrint');
+  if(!h){h=el('div');h.id='bkPrint';document.body.appendChild(h)}
+  h.classList.add('bk-print-host');return h;
+}
+function ensure(){
+  if(dlg)return;
+  dlg=el('div','bk-ov',`<div class="bk-dlg" role="dialog" aria-modal="true" aria-labelledby="bkDlgT">
+    <div class="bk-dhead"><h2 id="bkDlgT">Auswertung als PDF</h2><button type="button" class="bk-x" aria-label="Schließen">×</button></div>
+    <div class="bk-dh" id="bkSelH"></div>
+    <div id="bkSel"></div>
+    <div class="bk-dh">Angaben (optional)</div>
+    <div class="bk-row"><input id="bkName" placeholder="Name" autocomplete="off" maxlength="60" aria-label="Name"><input id="bkKurs" placeholder="Kurs" autocomplete="off" maxlength="40" aria-label="Kurs"></div>
+    <p class="bk-hint" id="bkHint"></p>
+    <p class="bk-hint"><b>So speicherst du das PDF:</b> Nach „PDF erstellen“ öffnet sich der Druckdialog des Browsers. Dort als Drucker bzw. Ziel <b>„Als PDF speichern“</b> wählen und auf „Speichern“ tippen (am iPad: Teilen → „In Dateien sichern“). Es wird nichts gedruckt oder übertragen.</p>
+    <div class="bk-btns"><button type="button" class="bk-b pri" id="bkGo">PDF erstellen</button><button type="button" class="bk-b" id="bkCancel">Abbrechen</button></div></div>`);
+  document.body.appendChild(dlg);
+  const shut=()=>dlg.classList.remove('open');
+  dlg.querySelector('.bk-x').addEventListener('click',shut);dlg.querySelector('#bkCancel').addEventListener('click',shut);
+  dlg.addEventListener('click',e=>{if(e.target===dlg)shut()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&dlg.classList.contains('open')){e.stopPropagation();shut()}},true);
+  dlg.querySelector('#bkSel').addEventListener('change',()=>{if(C&&C.sim)dlg.querySelector('#bkGo').disabled=!dlg.querySelector('#bkSel input:checked')});
+  dlg.querySelector('#bkGo').addEventListener('click',go);
+  window.addEventListener('afterprint',()=>document.body.classList.remove('bk-pr'));
+}
+BK.open=over=>{
+  C=Object.assign({},BK.cfg,over||{});ensure();
+  const sel=dlg.querySelector('#bkSel'),btn=dlg.querySelector('#bkGo');
+  dlg.querySelector('#bkSelH').textContent=C.sim?'Welche Läufe sollen ins PDF?':'Statistik';
+  sel.className=C.sim?'bk-runs':'bk-stat';
+  dlg.querySelector('#bkHint').innerHTML=C.hint||'';
+  if(C.sim){
+    cur=runList();
+    sel.innerHTML=cur.length?cur.map(r=>`<label><input type="checkbox" value="${esc(r.id)}" checked><i style="background:${r.color||'var(--teal,#4fd1c5)'}"></i><span>${r.label}</span></label>`).join(''):`<p class="bk-none">${C.noRuns||'Noch kein Lauf abgeschlossen.'}</p>`;
+    btn.disabled=!cur.length;
+  }else{
+    const s=C.stats();
+    sel.innerHTML=s.items.map(([k,v])=>`<span>${k}</span><span>${v}</span>`).join('');
+    btn.disabled=!s.ready;
+  }
+  dlg.querySelector('#bkName').value=BK.nm;dlg.querySelector('#bkKurs').value=BK.ku;
+  dlg.classList.add('open');setTimeout(()=>btn.focus(),30);
+};
+const runList=()=>{let l=C.runs?C.runs():BK.runs.slice();if(C.live){const lv=C.live();if(lv){lv.id=lv.id||'live';l=l.concat([lv])}}return l};
+async function go(){
+  const c=C,btn=dlg.querySelector('#bkGo');
+  BK.nm=dlg.querySelector('#bkName').value.trim().slice(0,60);BK.ku=dlg.querySelector('#bkKurs').value.trim().slice(0,40);
+  btn.disabled=true;
+  let body='';
+  try{
+    if(c.sim){
+      const ids=[...dlg.querySelectorAll('#bkSel input:checked')].map(i=>i.value);
+      const runs=cur.filter(r=>ids.includes(String(r.id)));
+      if(c.pre)body+=await c.pre(runs);
+      for(const r of runs){const h=await (typeof r.html==='function'?r.html():r.html);body+=`<h2 class="bk-h2">${r.label}</h2>${h||''}`}
+      if(c.extra)body+=await c.extra(runs);
+    }else{
+      const s=c.stats();
+      body+=`<h2 class="bk-h2">Statistik</h2><table class="bk-sum"><tbody>${s.items.map(([k,v],i)=>i%2?'':`<tr><td>${k}:</td><td><b>${v}</b></td>${s.items[i+1]?`<td>${s.items[i+1][0]}:</td><td><b>${s.items[i+1][1]}</b></td>`:''}</tr>`).join('')}</tbody></table>`;
+      if(s.note)body+=`<p class="bk-small">${s.note}</p>`;
+      body+=await c.build();
+    }
+  }catch(err){body+=`<p>Fehler beim Erstellen: ${esc(err.message)}</p>`}
+  const host=hostEl();
+  host.innerHTML=`<div class="bk-sheet"><div class="bk-kick">${esc(c.kick||(c.sim?'Simulation':'Übung'))}</div><h1 class="bk-h1">${c.printTitle}</h1>
+  <table class="bk-meta"><tr><td>Name: <span class="bk-line">${esc(BK.nm)}&nbsp;</span></td><td>Kurs: <span class="bk-line">${esc(BK.ku)}&nbsp;</span></td><td>Datum: <span class="bk-line">${today()}&nbsp;</span></td></tr></table>
+  ${body}
+  <div class="bk-foot">${c.footName} V${c.version} · Bastian Baumgart · chemie.mail-baumgart.de · Lizenz CC BY-NC-SA 4.0${c.sim||c.simNote?' · Simulierte Daten zu Lehrzwecken':''}</div></div>`;
+  dlg.classList.remove('open');btn.disabled=false;
+  document.body.classList.add('bk-pr');
+  const imgs=[...host.querySelectorAll('img')].filter(i=>!i.complete);
+  await Promise.all(imgs.map(i=>new Promise(r=>{i.onload=i.onerror=r})));
+  setTimeout(()=>window.print(),80);
+}
+
+/* ---------- Einrichtung ---------- */
+BK.button=(p,over)=>{
+  const c=Object.assign({},BK.cfg,over||{});
+  const b=el('button',(p.cls||c.btnClass||'btn')+' bk-pdfbtn',p.label||(c.sim?'Ausgabe als PDF':'Zusammenfassung als PDF'));b.type='button';
+  b.addEventListener('click',()=>BK.open(over));
+  const ref=typeof p.ref==='string'?document.querySelector(p.ref):p.ref;if(!ref)return b;
+  if(p.wrap){const w=el('div','bk-pdfrow');w.appendChild(b);ref.insertAdjacentElement(p.pos||'afterend',w)}
+  else ref.insertAdjacentElement(p.pos||'afterend',b);
+  return b;
+};
+BK.setup=cfg=>{
+  BK.cfg=cfg;
+  if(cfg.url)BK.qr(cfg.url,cfg.what||(cfg.sim?'Simulation':'Übung'));
+  (cfg.buttons||[]).forEach(p=>BK.button(p,p.over));
+};
+
+/* Aufgaben mit richtiger Lösung und Vermerk, ob richtig gelöst */
+const VERD={first:['ok','✓ richtig gelöst – im 1. Versuch'],clean:['ok','✓ richtig gelöst – ohne Fehlversuch'],ok:['ok','✓ richtig gelöst – nach Fehlversuch'],help:['ok','✓ richtig gelöst – mit Hilfen'],
+  shown:['bad','✗ nicht selbst gelöst – Lösung angesehen'],selfbad:['bad','✗ nicht richtig gelöst (Selbstkontrolle: Fehler)'],bad:['bad','✗ nicht richtig gelöst'],open:['open','– nicht beendet (abgebrochen)']};
+BK.verdict=(st,tries)=>{const v=VERD[st]||['open',String(st||'–')];let t=v[1];if(st==='ok'&&tries>1)t='✓ richtig gelöst – nach '+(tries-1)+' Fehlversuch'+(tries>2?'en':'');return {cls:v[0],txt:t}};
+BK.tasks=list=>{
+  list=(list||[]).filter(Boolean).slice().sort((a,b)=>(a.no||0)-(b.no||0));
+  if(!list.length)return '<p class="bk-small">Keine Aufgaben bearbeitet.</p>';
+  const n={ok:0,bad:0,open:0};list.forEach(i=>n[BK.verdict(i.st,i.tries).cls]++);
+  return `<h2 class="bk-h2">Aufgaben mit Lösung</h2><p class="bk-small">${list.length} Aufgabe${list.length>1?'n':''}: ${n.ok} richtig gelöst · ${n.bad} nicht richtig gelöst bzw. Lösung angesehen · ${n.open} nicht beendet. Zu jeder Aufgabe steht die richtige Lösung.</p>`
+   +list.map(i=>{const v=BK.verdict(i.st,i.tries);return `<div class="bk-sec bk-task bk-task-${v.cls}"><div class="bk-tk"><span><b>Aufgabe ${i.no}</b>${i.kind?' · '+i.kind:''}</span><span class="bk-v bk-v-${v.cls}">${v.txt}</span></div>
+     ${i.task?`<div class="bk-tq">${i.task}</div>`:''}<div class="bk-sol"><span class="bk-sl">Richtige Lösung</span><div class="bk-sb">${i.sol||'–'}</div></div>${i.note?`<div class="bk-tnote">${i.note}</div>`:''}</div>`}).join('');
+};
+
+/* ---------- Trainer mit Zählern und Verlauf (DOM-basiert) ---------- */
+BK.trainer=o=>{
+  const $=id=>document.getElementById(id),n=id=>{const e=$(id);return e?(parseInt(e.textContent,10)||0):0};
+  const fid=o.firstId||'roFirst';
+  const stats=()=>{
+    const so=n('roSolved'),fi=n(fid),se=n('roStreak'),sh=n('roShown'),done=so+sh,q=done?Math.round(fi/done*100):null;
+    return{ready:done>0,items:[['Aufgaben gelöst',so],[o.firstLabel||'beim 1. Versuch richtig',fi],['Serie',se],['Lösung angesehen',sh],['<b>Erfolgsquote</b>',q===null?'–':q+' %']],
+      note:`Erfolgsquote = Anteil der abgeschlossenen Aufgaben (gelöst oder Lösung angesehen), die ${o.firstLabel?'„'+o.firstLabel+'“ waren':'beim ersten Prüfen richtig waren'}. Aufgaben mit „Lösung zeigen“ zählen nicht als richtig.`};
+  };
+  const hb=$(o.histId||'histBody');
+  const bar=$('roSolved')&&$('roSolved').closest('.readout-bar');
+  BK.setup(Object.assign({sim:false,stats,
+    hint:'Die Auswertung enthält alle bearbeiteten Aufgaben aus dem Verlauf mit Ergebnis und Bewertung sowie die Statistik mit der Erfolgsquote.',
+    buttons:bar?[{ref:bar,wrap:true}]:[],
+    build:()=>(o.items?BK.tasks(o.items()):`<h2 class="bk-h2">Bearbeitete Aufgaben</h2><div class="bk-sec bk-long">${BK.tbl(hb&&hb.closest('table'),{reverse:o.reverse!==false,emptyText:'Keine Aufgaben im Verlauf.'})}</div>`)+(o.after?o.after():'')},o));
+};
+})();
+
+</script>
+<script id="bk-page">
+(()=>{
+const $=id=>document.getElementById(id);
+function cond(){
+  const procs=[...document.querySelectorAll('#procToggles .ptog.on')].map(b=>b.textContent.replace(/­/g,'').trim());
+  const rows=[['Rohölsorte',BK.esc($('crudeSelect').selectedOptions[0]?$('crudeSelect').selectedOptions[0].text:'')],
+    ['Verfahren','Atmosphärische Destillation'+(procs.length?', '+procs.join(', '):'')]];
+  document.querySelectorAll('.sidebar .row').forEach(r=>{if(r.offsetParent===null&&!r.closest('details'))return;const l=r.querySelector('label'),v=r.querySelector('.val');if(l&&v)rows.push([l.textContent,v.textContent])});
+  return rows;
+}
+function snap(label){
+  const c=cond(),ro=BK.ro('.readout');
+  const im=BK.showing(['#tab-bal','#tab-frac'],()=>({bal:BK.cimg($('balChart')),tbp:BK.cimg($('tbpChart'))}));
+  const html=BK.sec('Versuchsbedingungen',BK.condRows(c))
+    +BK.sec('Ergebnis',BK.condRows(ro))
+    +BK.sec('Produktbilanz (je 1000 t Rohöl)',BK.imgTag(im.bal,'Produktbilanz')+BK.leg([['#9a5b00','Ausbeute (Säulen)'],['#555','Bedarf (gestrichelt)']])+BK.tbl($('balBody').closest('table')))
+    +BK.sec('Fraktionen und Siedekurve',BK.imgTag(im.tbp,'Siedekurve')+BK.tbl($('fracBody').closest('table')));
+  const n=BK.runs.length+1, col=BK.COL[(n-1)%BK.COL.length];
+  const short=c[0][1]+' · '+c[1][1].replace('Atmosphärische Destillation','Destillation')+' · Ofen '+(c.find(x=>x[0]==='Ofentemperatur')||['',''])[1];
+  return {label:(label||'Lauf '+n)+': '+short,color:col,html};
+}
+BK.setup({url:'https://chemie.mail-baumgart.de/EP/EP-Raffination.html',sim:true,footName:'Simulation „Erdölraffination“',version:'1.3',printTitle:'Erdölraffination – Auswertung',
+  hint:'Die Auswertung enthält je gewähltem Lauf die Versuchsbedingungen, die Kennwerte, die Produktbilanz mit Diagramm und Tabelle sowie Fraktionen und Siedekurve.',
+  noRuns:'Noch kein Lauf abgeschlossen. Ein Lauf ist abgeschlossen, wenn 1000 t Rohöl verarbeitet sind.',
+  buttons:[{ref:'.screen-top #btnReset',pos:'afterend'}],btnClass:'btn ghost',
+  done:()=>BK.addRun(snap()),
+  live:()=>{const S=globalThis.__raf&&globalThis.__raf.S;if(!S||!(S.processed>0)||S.processed>=S.total-1e-6)return null;const r=snap('Aktueller Stand');r.label+=' ('+Math.round(S.processed)+' t verarbeitet)';r.color='#9aa2a9';return r}});
+})();
+
+</script>
+</body>
+</html>

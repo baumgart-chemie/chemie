@@ -1,0 +1,1817 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bindungsart-Trainer</title>
+<style>
+:root{
+  --bg:#14171a; --panel:#1b1f23; --panel-alt:#20252a; --raise:#262c32;
+  --line:#31383e; --line-soft:#262c31;
+  --text:#e7e4dd; --text-dim:#9aa2a9; --text-faint:#5f6870;
+  --amber:#ffb454; --amber-dim:#8a6535;
+  --teal:#4fd1c5; --teal-dim:#2c5b56;
+  --good:#7fd68a;
+  --danger:#e4785b; --danger-dim:#6b3a2d;
+  --screen:#0e1113; --grid:#233029;
+  --radius:3px;
+  color-scheme: dark;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{margin:0; background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; -webkit-font-smoothing:antialiased;}
+.mono{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-variant-numeric:tabular-nums;}
+h1,h2,h3{font-weight:600; margin:0;}
+
+header{padding:22px 28px 18px; border-bottom:1px solid var(--line); display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;}
+header h1{font-size:20px; letter-spacing:.2px;}
+header .tag{color:var(--text-dim); font-size:13.5px;}
+header .status{margin-left:auto; font-size:12.5px; padding:4px 10px; border:1px solid var(--line); border-radius:20px; color:var(--text-dim); display:flex; align-items:center; gap:7px;}
+header .status .dot{width:7px;height:7px;border-radius:50%;background:var(--text-faint);}
+header .status.running .dot{background:var(--amber); box-shadow:0 0 6px var(--amber);}
+header .status.running{color:var(--amber); border-color:var(--amber-dim);}
+header .status.done .dot{background:var(--teal); box-shadow:0 0 6px var(--teal);}
+header .status.done{color:var(--teal); border-color:var(--teal-dim);}
+.back-btn{
+  display:inline-flex; align-items:center; gap:6px; align-self:center; color:var(--text-dim); font-size:13px; text-decoration:none;
+  border:1px solid var(--line); border-radius:var(--radius); background:var(--panel-alt); padding:5px 11px 5px 9px; white-space:nowrap;
+}
+.back-btn:hover{color:var(--text); border-color:var(--text-faint);}
+.back-btn:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.back-btn .ar{color:var(--teal); font-size:14px; line-height:1;}
+.guide-link{color:var(--teal); font-size:13.5px; text-decoration:none; border-bottom:1px solid var(--teal-dim); padding-bottom:1px;}
+.guide-link:hover{border-bottom-color:var(--teal);}
+@media (max-width:600px){ header{padding:18px 16px 14px;} }
+
+.modal-backdrop{display:none; position:fixed; inset:0; background:rgba(8,10,12,.7); z-index:100; align-items:center; justify-content:center; padding:24px 16px;}
+.modal-backdrop.open{display:flex;}
+.modal-box{background:var(--panel); border:1px solid var(--line); border-radius:5px; width:100%; max-width:640px; max-height:82vh; overflow-y:auto; padding:22px 26px 26px;}
+.modal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;}
+.modal-head h2{font-size:17px;}
+.modal-close{background:none; border:none; color:var(--text-dim); font-size:22px; line-height:1; cursor:pointer; padding:2px 6px;}
+.modal-close:hover{color:var(--text);}
+.modal-body h3{font-size:13.5px; color:var(--amber); margin:18px 0 6px; font-weight:600;}
+.modal-body h3:first-child{margin-top:0;}
+.modal-body p, .modal-body li{font-size:13.5px; line-height:1.6; color:var(--text-dim); margin:0 0 6px;}
+.modal-body ol, .modal-body ul{padding-left:20px; margin:0 0 6px;}
+.modal-body strong{color:var(--text); font-weight:600;}
+.cl-ver{display:flex; align-items:baseline; gap:10px; margin:18px 0 6px;}
+.cl-ver:first-child{margin-top:0;}
+.cl-ver h3{margin:0 !important;}
+.cl-ver .date{font-size:12px; color:var(--text-faint); font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.formula-box{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:13px; color:var(--text); background:var(--screen); border:1px solid var(--line-soft); border-radius:4px; padding:10px 12px; margin:6px 0 8px; overflow-x:auto; white-space:nowrap; line-height:1.7;}
+.formula-box sub, .modal-body sub{font-size:.75em;}
+
+.wrap{display:grid; grid-template-columns: 350px 1fr; gap:0; align-items:start;}
+@media (max-width:920px){ .wrap{grid-template-columns:1fr;} }
+.sidebar{border-right:1px solid var(--line); padding:20px 20px 60px; max-height:calc(100vh - 70px); overflow-y:auto;}
+@media (max-width:920px){ .sidebar{border-right:none; border-bottom:1px solid var(--line); max-height:none; padding-bottom:24px;} }
+.main{padding:20px 24px 60px; min-width:0;}
+@media (max-width:600px){ .sidebar{padding:18px 16px 24px;} .main{padding:18px 16px 50px;} }
+
+section.block{margin-bottom:26px;}
+.block h2{font-size:12.5px; color:var(--text-dim); font-weight:600; padding-bottom:8px; border-bottom:1px solid var(--line-soft); margin-bottom:14px; letter-spacing:.2px;}
+.sub-label{font-size:13px; color:var(--text-dim); margin:0 0 6px;}
+
+.mode-toggle{display:flex; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; margin-bottom:16px;}
+.mode-toggle button{flex:1; background:var(--panel-alt); color:var(--text-dim); border:none; padding:8px 4px; font-size:12.5px; cursor:pointer; font-family:inherit; min-width:0;}
+.mode-toggle button + button{border-left:1px solid var(--line);}
+.mode-toggle button.active{background:var(--teal-dim); color:var(--text);}
+.mode-toggle button:focus-visible{outline:2px solid var(--teal); outline-offset:-2px;}
+.mode-toggle.big button{padding:10px 2px; font-size:12px; font-weight:500;}
+
+.check-row{display:flex; align-items:flex-start; gap:9px; font-size:13px; color:var(--text-dim); margin-bottom:12px; cursor:pointer; line-height:1.4;}
+.check-row input{accent-color:var(--teal); width:15px; height:15px; margin:1px 0 0; flex:none;}
+
+.btn{border-radius:var(--radius); border:1px solid var(--line); background:var(--panel-alt); color:var(--text); font-size:13px; padding:8px 14px; cursor:pointer; font-family:inherit; font-weight:500;}
+.btn:hover{border-color:var(--text-faint);}
+.btn.primary{background:var(--teal); border-color:var(--teal); color:#0d1614;}
+.btn.primary:hover{filter:brightness(1.08);}
+.btn.ghost{background:transparent;}
+.btn.check-btn{width:100%; padding:10px 14px; font-size:14px;}
+.btn:disabled{opacity:.4; cursor:not-allowed;}
+.btn:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+
+/* PSE – Hauptgruppen mit EN */
+.pse{display:grid; grid-template-columns:14px repeat(8,minmax(0,1fr)); gap:2px;}
+.pse .hd{font-size:9.5px; color:var(--text-faint); text-align:center; padding:2px 0; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.pse .rh{font-size:9.5px; color:var(--text-faint); display:flex; align-items:center; justify-content:center; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.pse .cell{position:relative; background:var(--panel-alt); border:1px solid var(--line-soft); border-radius:2px; height:42px; padding:0; cursor:pointer; color:var(--text); font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; display:flex; flex-direction:column; align-items:center; justify-content:center; min-width:0;}
+.pse .cell:hover{border-color:var(--text-faint);}
+.pse .cell:focus-visible{outline:2px solid var(--teal); outline-offset:1px;}
+.pse .cell .z{position:absolute; left:3px; top:1px; font-size:8.5px; color:var(--text-faint);}
+.pse .cell .sy{font-size:14px; font-weight:600; line-height:1; margin-top:4px;}
+.pse .cell .en{font-size:10px; color:var(--amber); line-height:1; margin-top:3px;}
+.pse .cell .en.none{color:var(--text-faint);}
+.pse.hide-en .cell .en{visibility:hidden;}
+.pse .cell.nm{background:#1a2a29;}
+.pse .cell.nm .sy{color:#bfe9e3;}
+.pse .cell.hm{background:#29251d;}
+.pse .cell.hm .sy{color:#f1d6ae;}
+.pse .cell.eg{background:#22222b;}
+.pse .cell.eg .sy{color:var(--text-dim);}
+.pse .cell.sel{border-color:var(--teal); box-shadow:0 0 0 1px var(--teal-dim);}
+.pse .cell.hint{border-color:var(--amber); box-shadow:0 0 0 1px var(--amber-dim); background:#3a2e1c;}
+.pse .legend{grid-column:3 / span 6; font-size:10.5px; color:var(--text-faint); line-height:1.35; display:flex; align-items:center; justify-content:center; text-align:center; padding:0 4px;}
+.pse-key{display:flex; gap:12px; flex-wrap:wrap; margin-top:8px; font-size:11px; color:var(--text-faint);}
+.pse-key span{display:inline-flex; align-items:center; gap:5px;}
+.pse-key i{display:inline-block; width:11px; height:11px; border-radius:2px; border:1px solid var(--line);}
+.pse-key b{color:var(--amber); font-weight:600; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.pse-info{margin-top:8px; font-size:12.5px; color:var(--text-dim); min-height:36px; line-height:1.45; background:var(--screen); border:1px solid var(--line-soft); border-radius:4px; padding:7px 10px;}
+.pse-info b{color:var(--text); font-weight:600;}
+.pse-info .a{color:var(--amber); font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+
+.lib-wrap{border:1px solid var(--line-soft); border-radius:4px; overflow:hidden;}
+.lib-table{width:100%; border-collapse:collapse; font-size:12.5px;}
+.lib-table td{padding:5px 8px; border-bottom:1px solid var(--line-soft); color:var(--text-dim); line-height:1.4;}
+.lib-table td.k{color:var(--amber); font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; width:1%; white-space:nowrap;}
+.lib-table tr.grp td{color:var(--text-faint); font-size:10.5px; letter-spacing:.4px; text-transform:uppercase; padding-top:10px; background:var(--bg);}
+.lib-table tr:last-child td{border-bottom:none;}
+.lib-table sub{font-size:.75em;}
+details.rules{margin-bottom:26px;}
+details.rules summary{list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:12.5px; color:var(--text-dim); font-weight:600; padding:8px 10px; border:1px solid var(--line); border-radius:var(--radius); background:var(--panel-alt); letter-spacing:.2px;}
+details.rules summary::-webkit-details-marker{display:none;}
+details.rules summary:hover{border-color:var(--text-faint); color:var(--text);}
+details.rules summary:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+details.rules .rules-state{font-weight:500; color:var(--teal); font-size:12px;}
+details.rules .rules-state::after{content:"anzeigen +";}
+details.rules[open] .rules-state::after{content:"ausblenden −";}
+details.rules[open] summary{margin-bottom:12px;}
+.note{font-size:12px; color:var(--text-faint); line-height:1.5; margin-top:10px; max-width:62ch;}
+
+/* Aufgaben-Screen */
+.screen-card{border:1px solid var(--line); background:var(--screen); border-radius:4px; padding:14px 14px 6px;}
+.screen-top{display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap;}
+.task-meta{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px;}
+.task-num{font-size:11.5px; color:var(--text-faint);}
+.chip{font-size:11px; padding:2px 8px; border-radius:20px; border:1px solid var(--line); color:var(--text-dim);}
+.chip.l1{color:var(--good); border-color:#35573a;}
+.chip.l2{color:var(--amber); border-color:var(--amber-dim);}
+.chip.l3{color:var(--danger); border-color:var(--danger-dim);}
+.task-ctx{font-size:13px; color:var(--text-dim);}
+.task-prompt{font-size:19px; margin:8px 0 2px; color:var(--text);}
+.task-prompt b{color:var(--amber); font-weight:600;}
+.task-prompt .f{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; color:var(--text); font-size:17px;}
+.task-prompt sub{font-size:.7em;}
+.task-elems{font-size:13px; color:var(--text-dim); margin:2px 0 0;}
+.task-elems .s{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; color:var(--text);}
+
+.work-grid{display:grid; grid-template-columns:minmax(0,1fr) 290px; gap:14px; align-items:start; margin:12px 0 4px;}
+@media (max-width:780px){ .work-grid{grid-template-columns:1fr;} }
+.stage{position:relative; border:1px solid var(--line-soft); border-radius:4px;
+  background: linear-gradient(var(--grid) 1px, transparent 1px) 0 0/28px 28px, linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/28px 28px, var(--screen);
+  min-height:330px; display:flex; align-items:center; justify-content:center; padding:30px 10px 34px; overflow:hidden;}
+.stage::before{content:""; position:absolute; inset:0; background:var(--screen); opacity:.72; pointer-events:none;}
+.stage svg{position:relative; display:block; width:100%; max-width:500px; height:auto; user-select:none; -webkit-user-select:none;}
+.stage.compact{min-height:230px;}
+.stage .stylelbl{position:absolute; left:10px; top:8px; font-size:10.5px; color:var(--text-faint); z-index:1; letter-spacing:.3px;}
+.stage .formula{position:absolute; right:10px; bottom:8px; font-size:12px; color:var(--teal); z-index:1; text-align:right;}
+.stage .result{position:absolute; left:10px; bottom:8px; font-size:12px; color:var(--text-faint); z-index:1;}
+.stage .result .rf{font-size:16px; color:var(--text); font-weight:600; margin-left:4px;}
+
+svg .sym{fill:var(--text); font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:48px; font-weight:600;}
+svg .bond{stroke:var(--text-dim); stroke-width:3; stroke-linecap:round;}
+svg .bond.pre{stroke:var(--line); stroke-dasharray:6 5;}
+svg .sym.s2{font-size:28px;}
+svg .bond.sb{stroke-width:2.2;}
+svg .bond.dash{stroke:var(--text-dim); stroke-width:2; stroke-dasharray:5 4; stroke-linecap:butt;}
+svg .lp{stroke:var(--text-dim); stroke-width:2; stroke-linecap:round;}
+svg .edot{fill:var(--text-dim);}
+svg .chg.s2{font-size:16px;}
+svg .dp.s2, svg .dm.s2{font-size:15px;}
+svg .cloud{fill:var(--teal); fill-opacity:.13; stroke:var(--teal-dim); stroke-width:1.2;}
+svg .dp{fill:var(--amber); font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:20px; font-weight:600;}
+svg .dm{fill:var(--teal); font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:20px; font-weight:600;}
+svg .chg{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:20px; font-weight:600;}
+svg .enl{fill:var(--text-faint); font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; font-size:11px;}
+svg .env{fill:var(--amber); font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:15px; font-weight:600;}
+svg .env.q{fill:var(--text-faint);}
+svg .env.bad{fill:var(--danger);}
+svg .axis{fill:var(--raise);}
+svg .z-u{fill:#24504b;} svg .z-p{fill:#6e5230;} svg .z-i{fill:#5e3327;}
+svg .tick{fill:var(--text-faint); font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:10.5px;}
+svg .tick.b{fill:var(--text); font-weight:600;}
+svg .tl{stroke:var(--text-faint); stroke-width:1;}
+svg .tl.b{stroke:var(--text); stroke-width:1.5;}
+svg .zl{fill:var(--text-dim); font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; font-size:10.5px;}
+svg .axl{fill:var(--text-faint); font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; font-size:10.5px;}
+svg .mk-s{fill:var(--amber);} svg .mk-c{fill:var(--teal);}
+svg .mkl-s{fill:var(--amber); font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px;}
+svg .mkl-c{fill:var(--teal); font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; font-weight:600;}
+
+.inputs{display:flex; flex-direction:column; gap:14px;}
+.stepbox{border:1px solid var(--line-soft); border-radius:4px; padding:10px 10px 12px; background:var(--panel); transition:opacity .15s;}
+.stepbox .sh{display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:12px; color:var(--text-dim); font-weight:600; margin-bottom:10px; letter-spacing:.2px;}
+.stepbox .sh .n{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; color:var(--amber); border:1px solid var(--amber-dim); border-radius:var(--radius); padding:0 6px; margin-right:6px; font-size:11px;}
+.stepbox .sh .st{font-weight:500; font-size:11.5px; color:var(--text-faint);}
+.stepbox.passed .sh .st{color:var(--good);}
+.stepbox.passed .sh .n{color:var(--good); border-color:#35573a;}
+.field{margin-bottom:10px;}
+.field:last-child{margin-bottom:0;}
+.field label{display:block; font-size:12px; color:var(--text-dim); margin-bottom:5px;}
+.field label .s{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; color:var(--text); font-weight:600;}
+.en-row{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+input.num-in{width:100%; background:var(--panel-alt); border:1px solid var(--line); color:var(--text); padding:8px 12px; border-radius:var(--radius); font-size:17px; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+input.num-in:focus{outline:2px solid var(--teal-dim); outline-offset:1px;}
+input.num-in.ok, .opt.ok{border-color:var(--teal); box-shadow:0 0 0 1px var(--teal-dim);}
+input.num-in.bad, .opt.bad{border-color:var(--danger); box-shadow:0 0 0 1px var(--danger-dim);}
+input.num-in[readonly]{color:var(--teal);}
+.opt-wrap{display:flex; flex-direction:column; gap:6px;}
+.opt-wrap.row{flex-direction:row;}
+.opt-wrap.row .opt{flex:1; justify-content:center; text-align:center;}
+.opt{display:flex; align-items:center; gap:10px; width:100%; border:1px solid var(--line); border-radius:var(--radius); background:var(--panel-alt); color:var(--text-dim); padding:8px 12px; font-size:13px; font-family:inherit; cursor:pointer; text-align:left;}
+.opt:hover:not(:disabled){border-color:var(--text-faint); color:var(--text);}
+.opt:focus-visible{outline:2px solid var(--teal); outline-offset:1px;}
+.opt .rd{width:13px; height:13px; border-radius:50%; border:1.5px solid var(--text-faint); flex:none;}
+.opt.sel{color:var(--text); background:#1f2d2c;}
+.opt.sel .rd{border-color:var(--teal); background:radial-gradient(circle, var(--teal) 0 3px, transparent 4px);}
+.opt.sym{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:15px; font-weight:600;}
+.opt.sym.none{font-family:inherit; font-size:13px; font-weight:400;}
+.opt:disabled{cursor:default;}
+.neg-grid{display:grid; grid-template-columns:1fr 1fr; gap:6px;}
+.neg-grid .opt{justify-content:center; text-align:center; padding:8px 6px;}
+.neg-grid .ng-h{font-size:11px; color:var(--text-faint); text-align:center;}
+.neg-grid .opt.full{grid-column:1 / -1;}
+.neg-grid .opt b{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:15px; color:var(--text); margin-right:2px;}
+.neg-grid .opt sup{font-size:.7em;}
+.stp-note{font-size:11.5px; color:var(--text-faint); line-height:1.45; margin:8px 0 0;}
+
+.feedback{display:flex; flex-direction:column; gap:6px; margin:14px 0 4px;}
+.fb{font-size:13px; line-height:1.5; padding:8px 11px; border-radius:4px; border:1px solid var(--line-soft); background:var(--panel);}
+.fb.good{color:var(--good); border-color:#35573a;}
+.fb.bad{color:var(--danger); border-color:var(--danger-dim);}
+.fb.hint{color:var(--amber); border-color:var(--amber-dim);}
+.fb.info{color:var(--text-dim);}
+.fb .nm{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; color:var(--text);}
+.fb sub{font-size:.75em;}
+
+.readout-bar{display:flex; gap:26px; padding:12px 4px 12px; flex-wrap:wrap; border-top:1px solid var(--line-soft); margin-top:12px;}
+.readout{display:flex; flex-direction:column; gap:2px;}
+.readout .k{font-size:10.5px; color:var(--text-faint);}
+.readout .v{font-size:15px; color:var(--amber);}
+
+.tabs{display:flex; gap:2px; margin:26px 0 0; border-bottom:1px solid var(--line); overflow-x:auto;}
+.tabs button{background:none; border:none; color:var(--text-dim); font-size:13px; padding:9px 4px; margin-right:22px; cursor:pointer; font-family:inherit; border-bottom:2px solid transparent; font-weight:500; white-space:nowrap;}
+.tabs button.active{color:var(--text); border-bottom-color:var(--amber);}
+.tabpanel{display:none; padding-top:18px;}
+.tabpanel.active{display:block;}
+.empty-hint{color:var(--text-faint); font-size:13px; padding:22px 4px;}
+
+.steps{display:flex; flex-direction:column; border:1px solid var(--line-soft); border-radius:4px; background:var(--screen);}
+.step{display:grid; grid-template-columns:28px 150px 1fr; gap:10px; padding:10px 14px; border-bottom:1px solid var(--line-soft); font-size:13.5px; line-height:1.55; align-items:baseline;}
+.step:last-child{border-bottom:none;}
+.step .n{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; color:var(--text-faint); font-size:12px;}
+.step .h{color:var(--text-dim);}
+.step .b{color:var(--text);}
+.step .b .a{color:var(--amber); font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.step .b .t{color:var(--teal); font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.step.final .b{font-size:17px; color:var(--teal); font-weight:600;}
+.step sub, .step sup{font-size:.75em;}
+@media (max-width:600px){ .step{grid-template-columns:22px 1fr;} .step .b{grid-column:2;} }
+
+.table-wrap{overflow-x:auto; border:1px solid var(--line-soft); border-radius:4px;}
+table.hist{width:100%; border-collapse:collapse; font-size:12.8px;}
+table.hist thead th{text-align:left; font-weight:500; color:var(--text-faint); font-size:11px; padding:6px 8px; border-bottom:1px solid var(--line); white-space:nowrap;}
+table.hist td{padding:7px 8px; border-bottom:1px solid var(--line-soft); white-space:nowrap;}
+table.hist sub{font-size:.75em;}
+.s-first{color:var(--good);} .s-ok{color:var(--teal);} .s-help{color:var(--amber);} .s-shown{color:var(--danger);} .s-open{color:var(--text-faint); font-style:italic;}
+
+footer{padding:16px 28px 30px; color:var(--text-faint); font-size:11.5px; border-top:1px solid var(--line-soft); margin-top:10px;}
+footer p{margin:0;}
+footer a{color:var(--text-dim); text-decoration:none; border-bottom:1px solid var(--line);}
+footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
+footer .footer-credit{margin-top:8px; color:var(--text-dim);}
+@media (max-width:600px){ footer{padding:16px 16px 30px;} }
+::-webkit-scrollbar{width:9px; height:9px;}
+::-webkit-scrollbar-thumb{background:var(--line); border-radius:5px;}
+@media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+</style>
+
+<style>
+/* Versionshinweise */
+.modal-body ul{padding-left:18px; margin:0 0 6px;}
+.modal-body li{font-size:13.5px; line-height:1.6; color:var(--text-dim); margin:0 0 6px;}
+.modal-body li strong{color:var(--text); font-weight:600;}
+.vh-ver{display:flex; align-items:baseline; gap:10px; margin:18px 0 6px;}
+.vh-ver:first-child{margin-top:0;}
+.vh-ver .v{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:13px; color:var(--amber); border:1px solid var(--amber-dim); border-radius:var(--radius); padding:1px 7px;}
+.vh-ver .d{font-size:12px; color:var(--text-faint);}
+footer a{color:var(--text-dim); text-decoration:none; border-bottom:1px solid var(--line);}
+footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
+
+/* Linke Spalte: steht beim Scrollen still und scrollt als Ganzes (ein einziger Scrollbereich) */
+@media (min-width:921px){
+  .sidebar{
+    position:sticky; top:0; align-self:start;
+    height:calc(100vh - var(--hdr, 70px)); height:calc(100dvh - var(--hdr, 70px)); max-height:none;
+    overflow-y:auto; overscroll-behavior:contain; background:var(--bg);
+  }
+}
+
+/* Rubrik Grundlagen */
+.gl-toggle{display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; cursor:pointer; text-align:left;
+  border:1px solid var(--teal-dim); border-radius:4px; background:var(--panel-alt); color:var(--text);
+  font-size:14px; font-weight:600; font-family:inherit; touch-action:manipulation;}
+.gl-toggle:hover{border-color:var(--teal);}
+.gl-toggle:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-toggle .gl-n{font-size:12px; font-weight:400; color:var(--text-faint);}
+.gl-toggle .gl-ch{margin-left:auto; color:var(--teal); font-size:13px;}
+.gl-toggle .gl-ch::after{content:"▸";}
+.gl-toggle[aria-expanded="true"] .gl-ch::after{content:"▾";}
+.gl-panel{margin-top:8px;}
+.gl-list{display:flex; flex-direction:column; gap:6px;}
+.gl-item{display:flex; gap:10px; align-items:center; width:100%; text-align:left; padding:8px 11px; cursor:pointer;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel); color:var(--text);
+  font-size:13px; font-family:inherit; font-weight:500; touch-action:manipulation;}
+.gl-item:hover{border-color:var(--text-faint); background:var(--panel-alt);}
+.gl-item:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-item .nr{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--amber); min-width:14px;}
+.gl-item .go{margin-left:auto; color:var(--text-faint); font-size:12px;}
+.gl-note{font-size:12px; color:var(--text-faint); line-height:1.5; margin:8px 0 0;}
+.modal-box.gl-wide{max-width:900px; width:100%; max-height:88vh; overflow-y:auto;}
+.gl-wide .gl-num{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--text-faint); margin-right:10px;}
+.gl-body p, .gl-body li{font-size:13.5px; line-height:1.6; color:var(--text-dim);}
+.gl-body p{margin:0 0 10px;}
+.gl-body ul, .gl-body ol{margin:0 0 12px; padding-left:22px;}
+.gl-body strong{color:var(--text); font-weight:600;}
+.gl-body sub, .gl-body sup{font-size:.72em;}
+.gl-row{display:flex; flex-wrap:wrap; gap:12px; align-items:stretch; margin:8px 0 14px;}
+.gl-fig{margin:0; flex:1 1 220px; background:var(--screen, #0e1113); border:1px solid var(--line-soft); border-radius:4px; padding:10px 12px 8px;
+  display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:6px; max-width:100%; overflow-x:auto;}
+.gl-fig figcaption{font-size:12px; color:var(--text-dim); text-align:center; line-height:1.45; max-width:420px;}
+.gl-tw{overflow-x:auto; margin:6px 0 12px; border:1px solid var(--line-soft); border-radius:4px;}
+.gl-table{width:100%; border-collapse:collapse; font-size:12.8px;}
+.gl-table th{text-align:left; font-weight:500; color:var(--text-faint); font-size:11.5px; padding:6px 9px; border-bottom:1px solid var(--line); background:var(--panel-alt);}
+.gl-table td{padding:6px 9px; border-bottom:1px solid var(--line-soft); color:var(--text-dim); vertical-align:top;}
+.gl-table tr:last-child td{border-bottom:none;}
+.gl-table td:first-child{color:var(--text);}
+.gl-steps{counter-reset:gls; list-style:none; padding-left:0 !important;}
+.gl-steps li{counter-increment:gls; position:relative; padding-left:30px; margin-bottom:6px;}
+.gl-steps li::before{content:counter(gls); position:absolute; left:0; top:1px; width:20px; height:20px; border-radius:50%; border:1px solid var(--teal-dim);
+  color:var(--teal); font-size:11.5px; display:flex; align-items:center; justify-content:center; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.gl-box{border:1px solid var(--line-soft); border-left:3px solid var(--teal); background:var(--panel-alt); border-radius:3px; padding:9px 12px; margin:8px 0 12px;
+  font-size:13.5px; line-height:1.65; color:var(--text);}
+.gl-box.gl-warn{border-left-color:var(--amber);}
+.gl-box small{color:var(--text-faint); font-size:12px;}
+.gl-nav{display:flex; align-items:center; gap:10px; border-top:1px solid var(--line-soft); padding-top:14px; margin-top:16px;}
+.gl-nav .sp{flex:1; text-align:center; font-size:12px; color:var(--text-faint);}
+</style>
+<style id="bk-style">
+/* ===== Baustein QR-Code + Auswertung als PDF (einheitlich nach Leitfaden) ===== */
+.bk-qr{display:flex;align-items:center;gap:7px;background:var(--panel,#1b1f23);border:1px solid var(--line,#31383e);border-radius:4px;padding:2px 8px 2px 2px;color:var(--text-dim,#9aa2a9);font:inherit;font-size:10px;line-height:1.2;text-align:left;cursor:pointer;min-height:0;touch-action:manipulation}
+.bk-qr:hover{border-color:var(--teal,#4fd1c5);color:var(--text,#e7e4dd)}
+.bk-qr b{display:block;color:var(--text,#e7e4dd);font-weight:600;font-size:10.5px}
+.bk-qr svg{width:30px;height:30px;display:block;border-radius:2px}
+.bk-hr{display:flex;align-items:center;gap:12px;margin-left:auto;align-self:center;flex-wrap:wrap;justify-content:flex-end}
+header .back-btn{align-self:baseline}
+header>.tag{flex:1 1 160px;min-width:0}
+.bk-hr .status,.bk-hr #statusBadge,.bk-hr #status{margin-left:0!important}
+.bk-ov{display:none;position:fixed;inset:0;z-index:1000;background:rgba(8,10,12,.82);align-items:center;justify-content:center;padding:20px;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+.bk-ov.open{display:flex}
+.bk-qrbox{background:var(--panel,#1b1f23);border:1px solid var(--line,#31383e);border-radius:6px;padding:22px 24px 20px;text-align:center;max-width:94vw}
+.bk-qrbox svg{width:min(62vh,80vw,520px);height:auto;display:block;margin:0 auto;border-radius:4px}
+.bk-qrbox .bk-url{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;font-size:clamp(14px,2.2vw,22px);color:var(--text,#e7e4dd);margin:16px 0 4px;word-break:break-all}
+.bk-qrbox .bk-qhint{font-size:13px;color:var(--text-dim,#9aa2a9);margin:0 0 14px}
+.bk-b{font:inherit;font-size:14px;color:var(--text,#e7e4dd);background:var(--panel-alt,#20252a);border:1px solid var(--line,#31383e);border-radius:8px;padding:8px 18px;min-height:44px;cursor:pointer;touch-action:manipulation}
+.bk-b:hover{border-color:var(--text-faint,#5f6870)}
+.bk-b.pri{background:var(--teal,#4fd1c5);border-color:var(--teal,#4fd1c5);color:#0e1113;font-weight:650}
+.bk-b:disabled{opacity:.4;cursor:default}
+.bk-dlg{background:var(--panel,#1b1f23);border:1px solid var(--line,#31383e);border-radius:6px;width:min(620px,100%);max-height:90vh;overflow:auto;padding:18px 22px 20px;color:var(--text,#e7e4dd);font-size:14px;line-height:1.5}
+.bk-dhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.bk-dhead h2{font-size:18px;margin:0;font-weight:650;color:var(--text,#e7e4dd)}
+.bk-x{background:none;border:0;color:var(--text-dim,#9aa2a9);font-size:24px;line-height:1;cursor:pointer;min-width:44px;min-height:44px}
+.bk-x:hover{color:var(--text,#e7e4dd)}
+.bk-dh{color:var(--amber,#ffb454);font-weight:650;font-size:15px;margin:14px 0 8px}
+.bk-dh:first-of-type{margin-top:2px}
+.bk-runs label{display:flex;align-items:center;gap:12px;border:1px solid var(--line,#31383e);border-radius:8px;padding:10px 12px;margin-bottom:8px;background:var(--panel-alt,#20252a);min-height:48px;cursor:pointer}
+.bk-runs input{width:22px;height:22px;accent-color:var(--teal,#4fd1c5);flex:none;margin:0}
+.bk-runs i{width:16px;height:4px;border-radius:2px;flex:none}
+.bk-none{color:var(--text-dim,#9aa2a9);font-size:13.5px;margin:0}
+.bk-stat{display:grid;grid-template-columns:1fr auto;gap:4px 12px;border:1px solid var(--line,#31383e);border-radius:8px;padding:10px 12px;background:var(--panel-alt,#20252a);font-size:14px}
+.bk-stat span:nth-child(even){font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;color:var(--amber,#ffb454);text-align:right}
+.bk-row{display:flex;gap:10px}
+.bk-row input{flex:1;min-width:0;font:inherit;font-size:15px;color:var(--text,#e7e4dd);background:var(--screen,#0e1113);border:1px solid var(--line,#31383e);border-radius:8px;padding:10px 12px;min-height:44px}
+.bk-row input::placeholder{color:var(--text-faint,#5f6870)}
+.bk-hint{color:var(--text-dim,#9aa2a9);font-size:13.5px;margin:14px 0 0}
+.bk-hint b{color:var(--text,#e7e4dd)}
+.bk-btns{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.bk-pdfrow{display:flex;justify-content:flex-end;gap:10px;margin-top:10px;flex-wrap:wrap}
+.bk-print-host{display:none}
+@media (max-width:600px){.bk-qr span:last-child{display:none}.bk-qr{padding:4px}.bk-row{flex-direction:column}}
+@media print{
+  @page{size:A4;margin:14mm}
+  :root,html,body.bk-pr{background:#fff!important;color:#000!important;color-scheme:light!important}
+  body.bk-pr > *:not(.bk-print-host){display:none!important}
+  body.bk-pr .bk-print-host{display:block!important;position:static!important}
+}
+.bk-sheet{--text:#111;--text-dim:#333;--text-faint:#555;--amber:#9a5b00;--teal:#0f766e;--good:#2e7d32;--danger:#b23c17;--line:#999;--line-soft:#bbb;--bg:#fff;--panel:#fff;--panel-alt:#fff;--screen:#fff;color:#000;background:#fff;font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;font-size:10.5pt;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact;text-align:left}
+.bk-sheet *{color:inherit;text-shadow:none!important;box-shadow:none!important}
+.bk-sheet h1.bk-h1{font-size:17pt;margin:0 0 6pt;font-weight:700;color:#000}
+.bk-sheet .bk-kick{font-size:9pt;text-transform:uppercase;letter-spacing:.06em;color:#555}
+.bk-sheet table.bk-meta{border-collapse:collapse;width:100%;margin:2pt 0 10pt}
+.bk-sheet table.bk-meta td{border:0!important;padding:3pt 10pt 3pt 0!important;font-size:11pt;background:none!important}
+.bk-sheet .bk-line{border-bottom:1px solid #000;min-width:120pt;display:inline-block}
+.bk-sheet .bk-sec{margin:0 0 10pt;break-inside:avoid;page-break-inside:avoid}
+.bk-sheet .bk-sec.bk-long{break-inside:auto;page-break-inside:auto}
+.bk-sheet h2.bk-h2{font-size:12.5pt;margin:12pt 0 4pt;padding-bottom:2pt;border-bottom:1px solid #999;font-weight:700;color:#000;break-after:avoid;page-break-after:avoid}
+.bk-sheet h3.bk-h3{font-size:11pt;margin:8pt 0 3pt;font-weight:700;color:#000;break-after:avoid;page-break-after:avoid}
+.bk-sheet table.bk-t{border-collapse:collapse;width:100%;margin:3pt 0 6pt;break-inside:avoid;page-break-inside:avoid}
+.bk-sheet .bk-long table.bk-t{break-inside:auto;page-break-inside:auto}
+.bk-sheet table.bk-t tr{break-inside:avoid;page-break-inside:avoid}
+.bk-sheet table.bk-t th,.bk-sheet table.bk-t td{border:1px solid #888!important;padding:3pt 6pt!important;text-align:left;vertical-align:middle;font-size:9.5pt;white-space:normal!important;background:#fff!important;color:#000!important}
+.bk-sheet table.bk-t th{background:#eee!important;font-weight:700}
+.bk-sheet table.bk-t td *{color:#000!important}
+.bk-sheet table.bk-sum{border-collapse:collapse;margin:2pt 0 4pt}
+.bk-sheet table.bk-sum td{border:0!important;padding:2pt 14pt 2pt 0!important;font-size:10.5pt;background:none!important}
+.bk-sheet .bk-small{font-size:8.5pt;color:#333}
+.bk-sheet .bk-img{display:block;max-width:100%;max-height:120mm;margin:4pt auto;border:1px solid #bbb}
+.bk-sheet .bk-leg{display:flex;flex-wrap:wrap;gap:4pt 14pt;font-size:9pt;margin:2pt 0 4pt}
+.bk-sheet .bk-leg i{display:inline-block;width:16pt;height:3pt;margin-right:5pt;vertical-align:middle;border-radius:1pt}
+.bk-sheet .bk-cond{margin:2pt 0 4pt}
+.bk-sheet svg{color:#000;max-width:100%}
+.bk-sheet{--oxy:#c0392b;--nitro:#1f5fbf;--hal:#2e7d32;--bond:#222;--amber-dim:#9a5b00;--teal-dim:#0f766e;--good-dim:#2e7d32}
+.bk-sheet .bk-task{border:1px solid #aaa;border-left:4pt solid #888;border-radius:3px;padding:5pt 8pt 6pt;margin:0 0 7pt}
+.bk-sheet .bk-task-ok{border-left-color:#2e7d32}.bk-sheet .bk-task-bad{border-left-color:#b23c17}.bk-sheet .bk-task-open{border-left-color:#999}
+.bk-sheet .bk-tk{display:flex;justify-content:space-between;align-items:baseline;gap:8pt;flex-wrap:wrap;font-size:10.5pt;margin-bottom:3pt}
+.bk-sheet .bk-v{font-weight:700;font-size:9.5pt;white-space:nowrap}
+.bk-sheet .bk-v-ok{color:#2e7d32}.bk-sheet .bk-v-bad{color:#b23c17}.bk-sheet .bk-v-open{color:#666}
+.bk-sheet .bk-tq{font-size:10pt;margin:0 0 4pt}
+.bk-sheet .bk-sol{background:#f4f6f5;border-radius:2px;padding:4pt 6pt;font-size:10pt}
+.bk-sheet .bk-sl{display:block;font-size:8pt;text-transform:uppercase;letter-spacing:.05em;color:#555;margin-bottom:2pt}
+.bk-sheet .bk-sb svg,.bk-sheet .bk-tq svg{max-width:100%;height:auto;max-height:60mm}
+.bk-sheet .bk-sb .figure,.bk-sheet .bk-tq .figure{max-width:100%!important;margin:2pt 0;background:none;border:0;padding:0}
+.bk-sheet .bk-sb p{margin:2pt 0}.bk-sheet .bk-sb ul{margin:2pt 0 2pt 14pt;padding:0}
+.bk-sheet .bk-eq{display:flex;flex-wrap:wrap;align-items:center;gap:3pt 8pt}
+.bk-sheet .bk-eq .co{font-weight:700;margin-right:2pt}
+.bk-sheet .bk-eq .sp{display:inline-flex;align-items:center;gap:2pt}
+.bk-sheet .bk-eq svg{max-height:32mm;width:auto}
+.bk-sheet .bk-tnote{font-size:9pt;color:#333;margin-top:3pt}
+.bk-sheet .bk-foot{margin-top:14pt;border-top:1px solid #888;padding-top:4pt;font-size:8.5pt;color:#444;text-align:center}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="../index.html" class="back-btn" title="Zur Übersicht aller Simulationen"><span class="ar" aria-hidden="true">←</span>Zurück</a>
+  <h1>Bindungsarten bestimmen</h1>
+  <span class="tag">Über die Elektronegativitätsdifferenz zur Bindungsart</span>
+  <a href="#" class="guide-link" id="btnGuide">Anleitung</a>
+  <span class="status running" id="statusBadge"><span class="dot"></span><span id="statusText">Aufgabe offen</span></span>
+</header>
+
+<div class="modal-backdrop" id="guideBackdrop">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+    <div class="modal-head">
+      <h2 id="guideTitle">Anleitung</h2>
+      <button class="modal-close" id="closeGuide" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body">
+      <h3>Worum es geht</h3>
+      <p>Du bekommst zwei Bindungspartner, entweder als Atompaar oder als Verbindung. Du sollst entscheiden, ob zwischen ihnen eine <strong>unpolare Atombindung</strong>, eine <strong>polare Atombindung</strong> oder eine <strong>Ionenbindung</strong> vorliegt. Maßgeblich ist die <strong>Elektronegativitätsdifferenz ΔEN</strong>.</p>
+
+      <h3>Schritt 1: ΔEN berechnen</h3>
+      <ol>
+        <li>Suche beide Elemente im PSE. Die <strong>gelbe Zahl</strong> unten im Feld ist die Elektronegativität (EN).</li>
+        <li>Trage beide EN-Werte ein.</li>
+        <li>Berechne die Differenz: <strong>ΔEN = größere EN − kleinere EN</strong>. ΔEN ist nie negativ.</li>
+      </ol>
+      <p>Dezimalzahlen kannst du mit Komma oder Punkt eingeben (1,4 oder 1.4). Weil Periodensysteme leicht unterschiedliche EN-Werte angeben, wird bei den EN-Werten eine Abweichung von <strong>±0,1</strong> akzeptiert. ΔEN muss dann zu deinen EN-Werten passen.</p>
+
+      <h3>Schritt 2: Bindungsart bestimmen</h3>
+      <div class="formula-box">ΔEN &lt; 0,5          → unpolare Atombindung<br>0,5 ≤ ΔEN ≤ 1,7    → polare Atombindung<br>ΔEN &gt; 1,7          → Ionenbindung</div>
+      <p>Liegt ΔEN <strong>genau auf einer Grenze</strong> (0,5 oder 1,7), zählen beide angrenzenden Bindungsarten als richtig.</p>
+
+      <h3>Schritt 3: Negative Ladung</h3>
+      <p>Das Atom mit der <strong>größeren EN</strong> zieht die Bindungselektronen stärker an und ist negativ geladen. Du entscheidest außerdem, welche Art von Ladung es trägt:</p>
+      <ul>
+        <li><strong>Teilladung δ−</strong> bei einer polaren Atombindung: Das Elektronenpaar wird nur zum Partner hin verschoben, beide Atome teilen es weiterhin.</li>
+        <li><strong>Anion</strong> bei einer Ionenbindung: Elektronen werden vollständig übertragen, es entsteht ein negativ geladenes Ion.</li>
+        <li><strong>„keine Ladungen“</strong> bei einer unpolaren Atombindung.</li>
+      </ul>
+      <div class="formula-box">H–Cl: EN(H) = 2,1 · EN(Cl) = 3,0<br>ΔEN = 3,0 − 2,1 = 0,9 → polare Atombindung<br>Cl hat die größere EN → Cl ist δ−, H ist δ+</div>
+
+      <h3>Darstellung</h3>
+      <p>Bei <strong>Verbindungen</strong> zeigt das Bild die vollständige Struktur: vor dem Prüfen alle möglichen Bindungen einheitlich <strong>gestrichelt</strong>, egal ob Atom- oder Ionenbindung. Nach dem Lösen werden Moleküle als <strong>Valenzstrichformel</strong> mit freien Elektronenpaaren gezeigt, Salze als Ionen einer Formeleinheit. Außerdem erscheinen die Ladungen: <strong>δ+ / δ−</strong> (Teilladungen) bei polarer Atombindung, <strong>Ionenladungen</strong> wie Mg²⁺ und Cl⁻ bei Ionenbindung. Bei unpolarer Atombindung gibt es keine Ladungen.</p>
+
+      <h3>Einstellungen</h3>
+      <p><strong>Atompaar</strong> fragt nach der Bindung zwischen zwei Elementen, <strong>Verbindung</strong> nennt einen Stoff mit Formel. Wenn die <strong>EN-Werte vorgegeben</strong> sind, entfällt das Ablesen. Der <strong>ΔEN-Strahl</strong> im Bild zeigt die drei Bereiche farbig und markiert deinen ΔEN-Wert. Ohne Strahl musst du die Grenzen selbst kennen. Das <strong>Periodensystem</strong> lässt sich ausblenden, dann liest du die EN in deinem eigenen PSE ab. Auch Schritt 3 lässt sich abschalten.</p>
+      <p><strong>Sonderfälle</strong> sind Stoffe, bei denen die Faustregel nicht zur Wirklichkeit passt. Beispiele sind Natriumiodid (ΔEN = 1,6, trotzdem ein Salz) und Fluorwasserstoff (ΔEN = 1,9, trotzdem ein Molekül). In der Übung zählt immer die Regel. Nach dem Lösen erscheint ein Hinweis, wie es in Wirklichkeit ist.</p>
+
+      <h3>Tipp, Lösung, Auswertung</h3>
+      <p>„Tipp“ hilft in vier Stufen: EN im PSE finden, Elemente markieren, ΔEN berechnen, mit den Grenzen vergleichen. Mit Tipp gelöste Aufgaben zählen nicht als „im 1. Versuch“. „Lösung zeigen“ beendet die Aufgabe ohne Wertung. Der Tab <strong>Lösungsweg</strong> erklärt jeden Schritt, der <strong>Verlauf</strong> listet alle Aufgaben dieser Sitzung.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="changelogBackdrop">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="changelogTitle">
+    <div class="modal-head">
+      <h2 id="changelogTitle">Versionshinweise</h2>
+      <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.3</span><span class="d">07.11.2026</span></div>
+      <ul>
+        <li><strong>Standard beim Öffnen:</strong> Aufgabenart „Atompaar“, Periodensystem mit EN-Werten eingeblendet, Schritt 3 (negative Ladung) aktiviert. Im PDF stehen zu jeder Aufgabe zusätzlich die EN-Werte beider Atome und die Ladungen (δ−/δ+ bzw. Anion/Kation).</li>
+        <li><strong>Auswertung als PDF:</strong> neuer Knopf „Zusammenfassung als PDF“ unter den Zählern. Der einheitliche Dialog „Auswertung als PDF“ zeigt die Statistik mit Erfolgsquote und optionale Felder für Name und Kurs; das PDF enthält zu jeder Aufgabe aus dem Verlauf die richtige Lösung mit dem Vermerk, ob sie richtig gelöst wurde, die Statistik und das Datum (druckfreundliches A4-Layout).</li><li><strong>QR-Code:</strong> Schaltfläche rechts in der Kopfzeile; Antippen vergrößert den QR-Code, mit dem sich diese Seite direkt auf dem Mobilgerät öffnen lässt.</li>
+      </ul>
+      <div class="vh-ver"><span class="v">V1.2</span><span class="d">01.11.2026</span></div>
+      <ul>
+        <li><strong>Neue Rubrik „Grundlagen“:</strong> Der Knopf „Grundlagen“ oben in der linken Spalte klappt 5 Themen mit Erklärtext und Grafiken zu den fachlichen und methodischen Grundlagen auf. Mit den Knöpfen unten oder den Pfeiltasten blättert man zwischen den Themen.</li>
+        <li><strong>Linke Spalte:</strong> Sie bleibt beim Scrollen der Aufgabe stehen, füllt die Bildschirmhöhe und scrollt als Ganzes in einem einzigen Bereich.</li>
+        <li><strong>Lösungshistorie:</strong> neue Kategorie „mit Hilfen gelöst“ für Aufgaben, die nach einem Tipp richtig gelöst wurden.</li>
+      </ul>
+      <div class="vh-ver"><span class="v">V1.1</span><span class="d">08.10.2026</span></div>
+      <ul>
+        <li><strong>Vollständige Strukturen:</strong> Verbindungen werden als Valenzstrichformel mit freien Elektronenpaaren gezeigt, Metallverbindungen zunächst als Atome einer Formeleinheit. Nach dem Lösen erscheinen Teilladungen (δ+/δ−) bzw. Ionenladungen.</li>
+        <li><strong>Schritt 3 erweitert:</strong> Neben dem negativen Partner wird auch die Art der Ladung bestimmt – Teilladung δ− oder Anion.</li>
+        <li><strong>Toleranz bei EN-Werten:</strong> Abweichungen von ±0,1 werden akzeptiert, damit unterschiedliche Periodensysteme genutzt werden können. ΔEN muss zu den eigenen Werten passen.</li>
+        <li><strong>Grenzfälle:</strong> Bei ΔEN von genau 0,5 oder 1,7 zählen beide angrenzenden Bindungsarten als richtig.</li>
+        <li><strong>Optionen:</strong> Periodensystem und ΔEN-Strahl lassen sich einblenden und sind standardmäßig ausgeblendet.</li>
+        <li><strong>Vor dem Prüfen</strong> werden alle möglichen Bindungen einheitlich gestrichelt gezeigt, damit das Bild die Bindungsart nicht verrät.</li>
+        <li><strong>Bedienung:</strong> Der Prüfen-Knopf steht direkt unter den Eingaben.</li>
+        <li>Stickstoffdioxid aus der Aufgabenliste entfernt (als Radikal nicht eindeutig als Strichformel darstellbar).</li>
+      </ul>
+      <div class="vh-ver"><span class="v">V1.0</span><span class="d">28.09.2026</span></div>
+      <ul>
+        <li>Erste Version: Bindungsart über ΔEN bestimmen (unpolare Atombindung, polare Atombindung, Ionenbindung; Grenzen 0,5 und 1,7).</li>
+        <li>Aufgaben als Atompaar oder Verbindung, Periodensystem mit EN-Werten, ΔEN-Skala, negativer Partner, Sonderfälle, Tipps, Lösungsweg und Verlauf.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="sidebar">
+
+    <section class="block">
+      <button type="button" class="gl-toggle" id="glToggle" aria-expanded="false" aria-controls="glPanel">
+        <span>Grundlagen</span><span class="gl-n">5 Themen</span><span class="gl-ch" aria-hidden="true"></span>
+      </button>
+      <div class="gl-panel" id="glPanel" hidden>
+        <div class="gl-list" id="glList"></div>
+        <p class="gl-note">Erklärungen mit Grafiken zum Nachlesen – auch zur Besprechung im Unterricht.</p>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>Aufgabe</h2>
+      <p class="sub-label">Art der Aufgabe</p>
+      <div class="mode-toggle big" id="modeToggle">
+        <button data-mode="pair" class="active">Atompaar</button>
+        <button data-mode="comp">Verbindung</button>
+        <button data-mode="mix">Gemischt</button>
+      </div>
+      <label class="check-row" for="chkGiven"><input type="checkbox" id="chkGiven"><span>EN-Werte in der Aufgabe vorgeben</span></label>
+      <label class="check-row" for="chkPSE"><input type="checkbox" id="chkPSE" checked><span>Periodensystem mit EN-Werten anzeigen</span></label>
+      <label class="check-row" for="chkScale"><input type="checkbox" id="chkScale"><span>ΔEN-Strahl mit den Bereichen der Bindungsarten anzeigen</span></label>
+      <label class="check-row" for="chkNeg"><input type="checkbox" id="chkNeg" checked><span>Schritt 3: negative Ladung bestimmen (Teilladung δ− oder Anion)</span></label>
+      <label class="check-row" for="chkSpecial"><input type="checkbox" id="chkSpecial"><span>Sonderfälle einbeziehen, bei denen die Faustregel nicht zur Wirklichkeit passt (z. B. NaI, AlCl<sub>3</sub>, HF)</span></label>
+    </section>
+
+    <section class="block" id="pseBlock">
+      <h2>Periodensystem mit Elektronegativität</h2>
+      <div class="pse" id="pse"></div>
+      <div class="pse-key">
+        <span><i style="background:var(--panel-alt)"></i>Metall</span>
+        <span><i style="background:#29251d"></i>Halbmetall</span>
+        <span><i style="background:#1a2a29"></i>Nichtmetall</span>
+        <span><i style="background:#22222b"></i>Edelgas</span>
+        <span><b>2,5</b> = EN</span>
+      </div>
+      <div class="pse-info" id="pseInfo">Klicke auf ein Element, um Namen und Elektronegativität zu sehen.</div>
+    </section>
+
+    <details class="block rules" id="rulesBox">
+      <summary><span>Regeln zur Bindungsart</span><span class="rules-state" aria-hidden="true"></span></summary>
+      <div class="lib-wrap">
+        <table class="lib-table">
+          <tbody>
+            <tr class="grp"><td colspan="2">Elektronegativität</td></tr>
+            <tr><td class="k">EN</td><td>Maß dafür, wie stark ein Atom Bindungselektronen anzieht</td></tr>
+            <tr><td class="k">ΔEN</td><td>größere EN − kleinere EN (nie negativ)</td></tr>
+            <tr class="grp"><td colspan="2">Bindungsart</td></tr>
+            <tr><td class="k">&lt; 0,5</td><td>unpolare Atombindung</td></tr>
+            <tr><td class="k">0,5 – 1,7</td><td>polare Atombindung</td></tr>
+            <tr><td class="k">= 0,5 / 1,7</td><td>Grenzfall: beide angrenzenden Bindungsarten zählen als richtig</td></tr>
+            <tr><td class="k">&gt; 1,7</td><td>Ionenbindung</td></tr>
+            <tr class="grp"><td colspan="2">Ladungen</td></tr>
+            <tr><td class="k">δ− / δ+</td><td>polar: Atom mit größerer EN wird δ−, der Partner δ+</td></tr>
+            <tr><td class="k">− / +</td><td>Ionenbindung: Atom mit größerer EN wird zum Anion, der Partner zum Kation</td></tr>
+            <tr><td class="k">ΔEN = 0</td><td>gleiche Atome (z. B. Cl<sub>2</sub>): immer unpolar</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">Die Grenzen 0,5 und 1,7 sind Faustregeln. Die Übergänge zwischen den Bindungsarten sind in Wirklichkeit fließend.</p>
+    </details>
+  </div>
+
+  <div class="main">
+    <div class="screen-card">
+      <div class="screen-top">
+        <button class="btn" id="btnNew">Neue Aufgabe</button>
+        <button class="btn ghost" id="btnHint">Tipp</button>
+        <button class="btn ghost" id="btnSolve">Lösung zeigen</button>
+      </div>
+
+      <div class="task-meta">
+        <span class="task-num mono" id="taskNum">Aufgabe 1</span>
+        <span class="chip" id="taskLevel">Atompaar</span>
+        <span class="task-ctx" id="taskCtx">Berechne ΔEN und bestimme die Bindungsart.</span>
+      </div>
+      <div class="task-prompt" id="taskPrompt"></div>
+      <div class="task-elems" id="taskElems"></div>
+
+      <div class="work-grid">
+        <div class="stage compact" id="stage">
+          <span class="stylelbl" id="stageLbl">Bindungsmodell &amp; ΔEN-Strahl</span>
+          <div id="svgBox" style="width:100%;display:flex;justify-content:center;position:relative"></div>
+          <span class="result" id="resLbl"></span>
+          <span class="formula" id="kindLbl"></span>
+        </div>
+        <div class="inputs">
+          <div class="stepbox" id="box1">
+            <div class="sh"><span><span class="n">1</span>ΔEN berechnen</span><span class="st" id="st1">offen</span></div>
+            <div class="en-row">
+              <div class="field">
+                <label for="enA" id="lblA">EN</label>
+                <input type="text" id="enA" class="num-in" autocomplete="off" inputmode="decimal" placeholder="z. B. 2,5">
+              </div>
+              <div class="field">
+                <label for="enB" id="lblB">EN</label>
+                <input type="text" id="enB" class="num-in" autocomplete="off" inputmode="decimal" placeholder="z. B. 3,0">
+              </div>
+            </div>
+            <div class="field">
+              <label for="dEN">ΔEN = größere EN − kleinere EN</label>
+              <input type="text" id="dEN" class="num-in" autocomplete="off" inputmode="decimal" placeholder="z. B. 0,5">
+            </div>
+          </div>
+          <div class="stepbox" id="box2">
+            <div class="sh"><span><span class="n">2</span>Bindungsart bestimmen</span><span class="st" id="st2">offen</span></div>
+            <div class="opt-wrap" id="kindWrap"></div>
+          </div>
+          <div class="stepbox" id="box3">
+            <div class="sh"><span><span class="n">3</span>Negative Ladung</span><span class="st" id="st3">offen</span></div>
+            <div class="neg-grid" id="negWrap"></div>
+            <p class="stp-note">Welches Atom ist negativ, und trägt es eine Teilladung (δ−) oder ist es ein Anion? Bei unpolarer Bindung: „keine Ladungen“.</p>
+          </div>
+          <button class="btn primary check-btn" id="btnCheck">Prüfen</button>
+        </div>
+      </div>
+
+      <div class="feedback" id="feedback"></div>
+
+      <div class="readout-bar">
+        <div class="readout"><span class="k">gelöst</span><span class="v mono" id="roSolved">0</span></div>
+        <div class="readout"><span class="k">davon im 1. Versuch</span><span class="v mono" id="roFirst">0</span></div>
+        <div class="readout"><span class="k">Serie</span><span class="v mono" id="roStreak">0</span></div>
+        <div class="readout"><span class="k">Lösung angesehen</span><span class="v mono" id="roShown">0</span></div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tabbtn active" data-tab="way">Lösungsweg</button>
+      <button class="tabbtn" data-tab="hist">Verlauf</button>
+    </div>
+    <div class="tabpanel active" id="tab-way">
+      <div id="wayBox"><div class="empty-hint">Der Lösungsweg erscheint, sobald die Aufgabe gelöst oder die Lösung angezeigt wurde.</div></div>
+    </div>
+    <div class="tabpanel" id="tab-hist">
+      <div class="table-wrap">
+        <table class="hist">
+          <thead><tr><th>#</th><th>Aufgabe</th><th>Bindung</th><th>ΔEN</th><th>Bindungsart</th><th>Status</th></tr></thead>
+          <tbody id="histBody"><tr><td colspan="6" class="empty-hint">Noch keine Aufgaben bearbeitet.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p class="footer-note">Elektronegativitätswerte nach Pauling, auf eine Nachkommastelle gerundet (Schulbuchwerte). Einteilung nach ΔEN: unter 0,5 unpolare Atombindung, 0,5 bis 1,7 polare Atombindung, über 1,7 Ionenbindung; genau auf einer Grenze zählen beide Bindungsarten. EN-Werte werden mit ±0,1 Toleranz akzeptiert. Vereinfachtes Schulmodell: Die Grenzen sind Faustregeln, die Übergänge sind fließend.</p>
+  <p class="footer-credit">Bastian Baumgart · Bindungsart-Trainer V1.3 · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  const $ = id => document.getElementById(id);
+
+  // ---------- Elementdaten (Hauptgruppen) ----------
+  // [Symbol, Ordnungszahl, Name, Klasse, EN × 10]  –  Klasse: m Metall, h Halbmetall, n Nichtmetall, e Edelgas
+  // EN nach Pauling, gerundet (übliche Schulbuchwerte). Werte werden intern in Zehnteln gespeichert.
+  const ROWS = [
+    [["H",1,"Wasserstoff","n",21], null,null,null,null,null,null, ["He",2,"Helium","e",null]],
+    [["Li",3,"Lithium","m",10],["Be",4,"Beryllium","m",15],["B",5,"Bor","h",20],["C",6,"Kohlenstoff","n",25],["N",7,"Stickstoff","n",30],["O",8,"Sauerstoff","n",35],["F",9,"Fluor","n",40],["Ne",10,"Neon","e",null]],
+    [["Na",11,"Natrium","m",9],["Mg",12,"Magnesium","m",12],["Al",13,"Aluminium","m",15],["Si",14,"Silicium","h",18],["P",15,"Phosphor","n",21],["S",16,"Schwefel","n",25],["Cl",17,"Chlor","n",30],["Ar",18,"Argon","e",null]],
+    [["K",19,"Kalium","m",8],["Ca",20,"Calcium","m",10],["Ga",31,"Gallium","m",16],["Ge",32,"Germanium","h",18],["As",33,"Arsen","h",20],["Se",34,"Selen","n",24],["Br",35,"Brom","n",28],["Kr",36,"Krypton","e",null]],
+    [["Rb",37,"Rubidium","m",8],["Sr",38,"Strontium","m",10],["In",49,"Indium","m",17],["Sn",50,"Zinn","m",18],["Sb",51,"Antimon","h",19],["Te",52,"Tellur","h",21],["I",53,"Iod","n",25],["Xe",54,"Xenon","e",null]],
+    [["Cs",55,"Caesium","m",7],["Ba",56,"Barium","m",9],["Tl",81,"Thallium","m",18],["Pb",82,"Blei","m",18],["Bi",83,"Bismut","m",19],["Po",84,"Polonium","m",20],["At",85,"Astat","h",22],["Rn",86,"Radon","e",null]]
+  ];
+  const EL = {};
+  ROWS.forEach((row,pi)=>row.forEach((d,gi)=>{ if(d) EL[d[0]] = {s:d[0], z:d[1], n:d[2], c:d[3], en:d[4], g:gi+1, p:pi+1}; }));
+
+  const CLS = {m:"Metall", h:"Halbmetall", n:"Nichtmetall", e:"Edelgas"};
+  const ROMAN = ["","I","II","III","IV","V","VI","VII","VIII"];
+  const KNAME = {u:"unpolare Atombindung", p:"polare Atombindung", i:"Ionenbindung"};
+  const KSHORT = {u:"unpolar", p:"polar", i:"Ionenbindung"};
+  const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+  const fmt = v10 => { let x = (v10/10).toFixed(2); if(x.endsWith("0")) x = x.slice(0, -1); return x.replace(".", ","); };
+  const eq = (x, y) => typeof x==="number" && !isNaN(x) && Math.abs(x - y) < 1e-6;
+  const sub = s => s.replace(/(\d+)/g, "<sub>$1</sub>");
+
+  // Einteilung nach ΔEN (in Zehnteln): < 5 unpolar · 5 … 17 polar · > 17 Ionenbindung
+  function cls(d10){ return d10 < 5 ? "u" : d10 <= 17 ? "p" : "i"; }
+  // erlaubte Bindungsarten: genau auf einer Grenze zählen beide angrenzenden Bereiche
+  function allowed(d10){ return eq(d10, 5) ? ["u","p"] : eq(d10, 17) ? ["p","i"] : [cls(d10)]; }
+  const EN_TOL = 1;   // Toleranz ±0,1 bei den EN-Werten (andere Periodensysteme)
+
+  // ---------- Aufgabenpool ----------
+  function mk(a, b, kind, name, formula){
+    const A = EL[a], B = EL[b];
+    const d = Math.abs(A.en - B.en), k = cls(d);
+    const hasM = A.c==="m" || B.c==="m";
+    let special = null;
+    if(hasM && k!=="i") special = "m";          // Metall + Nichtmetall, aber ΔEN ≤ 1,7 → real salzartig
+    if(!hasM && k==="i") special = "n";         // zwei Nichtmetalle, aber ΔEN > 1,7 → real molekular
+    return {a, b, kind, name, formula, d, k, special, boundary: d===5 || d===17};
+  }
+  const POOL = {pair:[], comp:[]};
+
+  // Atompaare: Nichtmetall–Nichtmetall (auch gleiche Atome) und Metall–Nichtmetall
+  const NM = ["H","B","C","N","O","F","Si","P","S","Cl","Br","I"];
+  const MT = ["Li","Na","K","Cs","Mg","Ca","Ba","Al"];
+  for(let i=0;i<NM.length;i++) for(let j=i;j<NM.length;j++) POOL.pair.push(mk(NM[i], NM[j], "pair"));
+  MT.forEach(m => NM.forEach(x => { if(x!=="B" && x!=="Si") POOL.pair.push(mk(m, x, "pair")); }));
+
+  // Verbindungen: [Name, Formel, Partner A, Partner B]
+  [
+    ["Wasserstoff","H2","H","H"],["Stickstoff","N2","N","N"],["Sauerstoff","O2","O","O"],["Fluor","F2","F","F"],
+    ["Chlor","Cl2","Cl","Cl"],["Brom","Br2","Br","Br"],["Iod","I2","I","I"],
+    ["Chlorwasserstoff","HCl","H","Cl"],["Bromwasserstoff","HBr","H","Br"],["Iodwasserstoff","HI","H","I"],["Fluorwasserstoff","HF","H","F"],
+    ["Wasser","H2O","H","O"],["Schwefelwasserstoff","H2S","H","S"],["Ammoniak","NH3","N","H"],["Methan","CH4","C","H"],
+    ["Silan","SiH4","Si","H"],["Phosphan","PH3","P","H"],
+    ["Kohlenstoffdioxid","CO2","C","O"],["Kohlenstoffmonooxid","CO","C","O"],["Schwefeldioxid","SO2","S","O"],["Schwefeltrioxid","SO3","S","O"],
+    ["Stickstoffmonooxid","NO","N","O"],["Tetrachlormethan","CCl4","C","Cl"],["Tetrafluormethan","CF4","C","F"],
+    ["Kohlenstoffdisulfid","CS2","C","S"],["Stickstofftrichlorid","NCl3","N","Cl"],["Stickstofftrifluorid","NF3","N","F"],
+    ["Phosphortrichlorid","PCl3","P","Cl"],["Sauerstoffdifluorid","OF2","O","F"],["Siliciumdioxid","SiO2","Si","O"],
+    ["Siliciumtetrachlorid","SiCl4","Si","Cl"],["Bortrichlorid","BCl3","B","Cl"],["Bortrifluorid","BF3","B","F"],
+    ["Schwefelhexafluorid","SF6","S","F"],["Iodchlorid","ICl","I","Cl"],["Bromchlorid","BrCl","Br","Cl"],
+    ["Natriumchlorid","NaCl","Na","Cl"],["Natriumfluorid","NaF","Na","F"],["Natriumbromid","NaBr","Na","Br"],["Natriumiodid","NaI","Na","I"],
+    ["Kaliumchlorid","KCl","K","Cl"],["Kaliumbromid","KBr","K","Br"],["Kaliumfluorid","KF","K","F"],["Kaliumiodid","KI","K","I"],
+    ["Lithiumfluorid","LiF","Li","F"],["Lithiumchlorid","LiCl","Li","Cl"],["Lithiumbromid","LiBr","Li","Br"],["Caesiumchlorid","CsCl","Cs","Cl"],
+    ["Magnesiumoxid","MgO","Mg","O"],["Magnesiumfluorid","MgF2","Mg","F"],["Magnesiumchlorid","MgCl2","Mg","Cl"],["Magnesiumbromid","MgBr2","Mg","Br"],
+    ["Magnesiumsulfid","MgS","Mg","S"],["Calciumoxid","CaO","Ca","O"],["Calciumfluorid","CaF2","Ca","F"],["Calciumchlorid","CaCl2","Ca","Cl"],
+    ["Calciumbromid","CaBr2","Ca","Br"],["Calciumsulfid","CaS","Ca","S"],["Bariumoxid","BaO","Ba","O"],["Bariumchlorid","BaCl2","Ba","Cl"],
+    ["Natriumoxid","Na2O","Na","O"],["Kaliumoxid","K2O","K","O"],["Lithiumoxid","Li2O","Li","O"],["Natriumsulfid","Na2S","Na","S"],
+    ["Aluminiumoxid","Al2O3","Al","O"],["Aluminiumfluorid","AlF3","Al","F"],["Aluminiumchlorid","AlCl3","Al","Cl"],["Aluminiumsulfid","Al2S3","Al","S"],
+    ["Natriumhydrid","NaH","Na","H"],["Lithiumhydrid","LiH","Li","H"],["Calciumhydrid","CaH2","Ca","H"]
+  ].forEach(d => POOL.comp.push(mk(d[2], d[3], "comp", d[0], d[1])));
+
+  const KIND = {pair:["Atompaar","l1"], comp:["Verbindung","l2"]};
+
+  // ---------- Strukturen der Verbindungen ----------
+  // Atome: [Symbol, x, y] in Bindungslängen (y nach unten), "" = offene Bindung (Gitter geht weiter)
+  // Bindungen: [i, j, Bindungsordnung] · lp: {Atomindex: {lp: Anzahl freier Paare, dot: ungepaartes Elektron}}
+  function chain(syms, orders, lp){ return {atoms: syms.map((x,i)=>[x, i, 0]), bonds: orders.map((o,i)=>[i, i+1, o]), lp: lp||{}}; }
+  function star(center, ligs, lp){
+    const atoms = [[center, 0, 0]], bonds = [];
+    ligs.forEach(([x, ang, o]) => { const r = ang*Math.PI/180; atoms.push([x, +Math.cos(r).toFixed(4), +(-Math.sin(r)).toFixed(4)]); bonds.push([0, atoms.length-1, o||1]); });
+    return {atoms, bonds, lp: lp||{}};
+  }
+  const row = syms => ({atoms: syms.map((x,i)=>[x, i*1.15, 0]), bonds: [], lp: {}});
+  const tri = (c3, x) => [[x,90],[x,210],[x,330]];
+  const pyr = x => [[x,180],[x,0],[x,270]];
+  const tet = x => [[x,0],[x,90],[x,180],[x,270]];
+  const ang = x => [[x,210],[x,330]];
+  const sio2 = (() => {
+    const st = star("Si", tet("O"));
+    [[1.7,0],[0.7,-1],[-1.7,0],[-0.7,1]].forEach(([x,y],k)=>{ st.atoms.push(["", x, y]); st.bonds.push([k+1, st.atoms.length-1, 1]); });
+    return st;
+  })();
+  const STR = {
+    H2: chain(["H","H"],[1]), N2: chain(["N","N"],[3]), O2: chain(["O","O"],[2]), F2: chain(["F","F"],[1]),
+    Cl2: chain(["Cl","Cl"],[1]), Br2: chain(["Br","Br"],[1]), I2: chain(["I","I"],[1]),
+    HCl: chain(["H","Cl"],[1]), HBr: chain(["H","Br"],[1]), HI: chain(["H","I"],[1]), HF: chain(["H","F"],[1]),
+    H2O: star("O", ang("H")), H2S: star("S", ang("H")), OF2: star("O", ang("F")),
+    NH3: star("N", pyr("H")), PH3: star("P", pyr("H")), NCl3: star("N", pyr("Cl")), NF3: star("N", pyr("F")), PCl3: star("P", pyr("Cl")),
+    CH4: star("C", tet("H")), SiH4: star("Si", tet("H")), CCl4: star("C", tet("Cl")), CF4: star("C", tet("F")), SiCl4: star("Si", tet("Cl")),
+    CO2: chain(["O","C","O"],[2,2]), CS2: chain(["S","C","S"],[2,2]), CO: chain(["C","O"],[3],{0:{lp:1},1:{lp:1}}),
+    SO2: star("S", [["O",210,2],["O",330,2]]), SO3: star("S", [["O",90,2],["O",210,2],["O",330,2]]),
+    NO: chain(["N","O"],[2]),
+    BCl3: star("B", tri(0,"Cl")), BF3: star("B", tri(0,"F")),
+    SF6: star("S", [0,60,120,180,240,300].map(a=>["F",a])),
+    ICl: chain(["I","Cl"],[1]), BrCl: chain(["Br","Cl"],[1]),
+    SiO2: sio2
+  };
+  // Formeleinheiten der Metallverbindungen (Anordnung der Ionen)
+  const ION = {
+    NaCl: row(["Na","Cl"]), NaF: row(["Na","F"]), NaBr: row(["Na","Br"]), NaI: row(["Na","I"]),
+    KCl: row(["K","Cl"]), KBr: row(["K","Br"]), KF: row(["K","F"]), KI: row(["K","I"]),
+    LiF: row(["Li","F"]), LiCl: row(["Li","Cl"]), LiBr: row(["Li","Br"]), CsCl: row(["Cs","Cl"]),
+    MgO: row(["Mg","O"]), MgF2: row(["F","Mg","F"]), MgCl2: row(["Cl","Mg","Cl"]), MgBr2: row(["Br","Mg","Br"]), MgS: row(["Mg","S"]),
+    CaO: row(["Ca","O"]), CaF2: row(["F","Ca","F"]), CaCl2: row(["Cl","Ca","Cl"]), CaBr2: row(["Br","Ca","Br"]), CaS: row(["Ca","S"]),
+    BaO: row(["Ba","O"]), BaCl2: row(["Cl","Ba","Cl"]),
+    Na2O: row(["Na","O","Na"]), K2O: row(["K","O","K"]), Li2O: row(["Li","O","Li"]), Na2S: row(["Na","S","Na"]),
+    Al2O3: row(["O","Al","O","Al","O"]), Al2S3: row(["S","Al","S","Al","S"]),
+    AlF3: (()=>{ const st = star("Al", tri(0,"F")); st.atoms.forEach(a=>{ a[1]*=1.15; a[2]*=1.15; }); st.bonds = []; return st; })(),
+    AlCl3: (()=>{ const st = star("Al", tri(0,"Cl")); st.atoms.forEach(a=>{ a[1]*=1.15; a[2]*=1.15; }); st.bonds = []; return st; })(),
+    NaH: row(["Na","H"]), LiH: row(["Li","H"]), CaH2: row(["H","Ca","H"])
+  };
+  // Metallverbindungen, die nach der Faustregel polar sind, als Moleküle
+  Object.assign(STR, {
+    NaI: chain(["Na","I"],[1]), KI: chain(["K","I"],[1]), MgBr2: chain(["Br","Mg","Br"],[1,1]),
+    MgS: chain(["Mg","S"],[2]), CaS: chain(["Ca","S"],[2]), Na2S: chain(["Na","S","Na"],[1,1]),
+    AlCl3: star("Al", tri(0,"Cl")), Al2S3: chain(["S","Al","S","Al","S"],[2,1,1,2]),
+    NaH: chain(["Na","H"],[1]), LiH: chain(["Li","H"],[1]), CaH2: chain(["H","Ca","H"],[1,1])
+  });
+  // Ionen-Anordnung für Nichtmetallverbindungen = Molekülgerüst ohne Striche
+  function ionLayout(c){
+    if(ION[c.formula]) return ION[c.formula];
+    const st = STR[c.formula];
+    return {atoms: st.atoms.filter(a=>a[0]!=="").map(a=>[a[0], a[1]*1.15, a[2]*1.15]), bonds: [], lp: {}};
+  }
+
+  // Ionenladung: Partner mit kleinerer EN wird Kation, der mit größerer EN Anion
+  function ionCharge(s, c){
+    const e = EL[s], other = EL[s===c.a ? c.b : c.a];
+    if(e.en < other.en) return s==="H" ? 1 : e.g;
+    return s==="H" ? -1 : -(8 - e.g);
+  }
+  const chgTxt = q => (Math.abs(q)>1 ? Math.abs(q) : "") + (q>0 ? "+" : "−");
+  const isHomo = c => c.a===c.b;
+  const negSide = c => EL[c.a].en > EL[c.b].en ? "a" : "b";
+  // negative Seite einer gelösten Aufgabe (eigene EN-Werte, falls vorhanden)
+  const negSideOf = c => (c.enA!=null && c.enB!=null && !eq(c.enA, c.enB)) ? (c.enA > c.enB ? "a" : "b") : negSide(c);
+  const negFor = (c, k) => k==="u" ? "none" : negSide(c) + (k==="i" ? ":i" : ":d");
+  const bondTxt = c => `${c.a}–${c.b}`;
+
+  // ---------- PSE ----------
+  function buildPSE(){
+    let h = `<div></div>`;
+    for(let g=1; g<=8; g++) h += `<div class="hd">${ROMAN[g]}</div>`;
+    ROWS.forEach((row,pi)=>{
+      h += `<div class="rh">${pi+1}</div>`;
+      if(pi===0){
+        h += cellHTML(EL.H) + `<div class="legend">Unten im Feld:<br>Elektronegativität</div>` + cellHTML(EL.He);
+      } else row.forEach(d=> h += cellHTML(EL[d[0]]));
+    });
+    $("pse").innerHTML = h;
+  }
+  function cellHTML(e){
+    const k = {m:"", h:" hm", n:" nm", e:" eg"}[e.c];
+    const en = e.en===null ? `<span class="en none">–</span>` : `<span class="en">${fmt(e.en)}</span>`;
+    const lab = e.en===null ? `${e.n}, keine EN` : `${e.n}, EN ${fmt(e.en)}`;
+    return `<button class="cell${k}" data-s="${e.s}" title="${e.n}" aria-label="${lab}"><span class="z">${e.z}</span><span class="sy">${e.s}</span>${en}</button>`;
+  }
+  function showInfo(s){
+    const e = EL[s];
+    document.querySelectorAll(".pse .cell").forEach(c=>c.classList.toggle("sel", c.dataset.s===s));
+    const en = e.en===null ? "keine EN (Edelgas)" : `EN <span class="a">${fmt(e.en)}</span>`;
+    $("pseInfo").innerHTML = `<b>${e.n}</b> (${e.s}) · ${en}<br>${ROMAN[e.g]}. Hauptgruppe · ${e.p}. Periode · ${CLS[e.c]}`;
+  }
+  function markHint(list){
+    document.querySelectorAll(".pse .cell").forEach(c=>c.classList.toggle("hint", !!list && list.includes(c.dataset.s)));
+  }
+
+  // ---------- Zustand ----------
+  let mode = "pair", givenEN = false, showScale = false, useNeg = true, useSpecial = false;
+  let task = null, taskCounter = 0;
+  const stats = {solved:0, first:0, streak:0, shown:0};
+  const history = [];
+  globalThis.__H = history;
+
+  function newTask(){
+    if(task && !task.done && task.touched) logHistory(task, "open");
+    const kinds = mode==="mix" ? ["pair","comp"] : [mode];
+    const kind = pick(kinds);
+    const cand = POOL[kind].filter(c => useSpecial || !c.special);
+    // gleichmäßig über die drei Bindungsarten verteilen
+    const groups = {u:[], p:[], i:[]};
+    cand.forEach(c => groups[c.k].push(c));
+    const ks = Object.keys(groups).filter(k => groups[k].length);
+    let c;
+    for(let i=0;i<20;i++){
+      c = pick(groups[pick(ks)]);
+      if(!task || bondTxt(c)!==bondTxt(task.c) || c.name!==task.c.name) break;
+    }
+    c = Object.assign({}, c);
+    if(c.kind==="pair" && !isHomo(c) && Math.random()<.5){ const x = c.a; c.a = c.b; c.b = x; }
+    task = {num:++taskCounter, c, choice:null, neg:null, okE:false, okD:false, okK:false, okN:false,
+            hint:0, wrong:false, done:false, shown:false, touched:false};
+    ["enA","enB","dEN"].forEach(id=>{ $(id).value=""; $(id).readOnly=false; $(id).classList.remove("ok","bad"); });
+    if(givenEN){
+      $("enA").value = fmt(EL[c.a].en); $("enB").value = fmt(EL[c.b].en);
+      $("enA").readOnly = true; $("enB").readOnly = true;
+    }
+    $("feedback").innerHTML = "";
+    markHint(null);
+    renderTask();
+    renderWay();
+    setTimeout(()=>$(givenEN ? "dEN" : "enA").focus({preventScroll:true}), 0);
+  }
+
+  function renderTask(){
+    const t = task, c = t.c, A = EL[c.a], B = EL[c.b];
+    $("taskNum").textContent = "Aufgabe " + t.num;
+    $("taskLevel").textContent = KIND[c.kind][0];
+    $("taskLevel").className = "chip " + KIND[c.kind][1];
+    $("taskCtx").textContent = t.done ? "Aufgabe abgeschlossen." : (useNeg ? "Berechne ΔEN, bestimme die Bindungsart und die negative Ladung." : "Berechne ΔEN und bestimme die Bindungsart.");
+    if(c.kind==="comp"){
+      $("taskPrompt").innerHTML = `Verbindung: <b>${c.name}</b> <span class="f">(${sub(c.formula)})</span>`;
+      $("taskElems").innerHTML = isHomo(c)
+        ? `Betrachte die Bindung zwischen zwei ${A.n}atomen (<span class="s">${A.s}–${B.s}</span>).`
+        : `Betrachte die Bindung zwischen ${A.n} (<span class="s">${A.s}</span>) und ${B.n} (<span class="s">${B.s}</span>).`;
+    } else {
+      $("taskPrompt").innerHTML = `Bindung: <b>${A.s} – ${B.s}</b>`;
+      $("taskElems").innerHTML = isHomo(c)
+        ? `Zwei ${A.n}atome (<span class="s">${A.s}</span>) sind miteinander verbunden.`
+        : `Elemente: ${A.n} (<span class="s">${A.s}</span>) und ${B.n} (<span class="s">${B.s}</span>)`;
+    }
+    $("lblA").innerHTML = `EN von <span class="s">${A.s}</span>`;
+    $("lblB").innerHTML = `EN von <span class="s">${B.s}</span>` + (isHomo(c) ? " (2. Atom)" : "");
+    const st = ok => t.shown ? "Lösung" : ok ? "✓ richtig" : "offen";
+    $("box1").classList.toggle("passed", t.okE && t.okD && !t.shown); $("st1").textContent = st(t.okE && t.okD);
+    $("box2").classList.toggle("passed", t.okK && !t.shown); $("st2").textContent = st(t.okK);
+    $("box3").classList.toggle("passed", t.okN && !t.shown); $("st3").textContent = st(t.okN);
+    $("box3").style.display = useNeg ? "" : "none";
+    renderOptions();
+    drawStage();
+    $("btnCheck").disabled = t.done;
+    $("btnHint").disabled = t.done;
+    $("btnSolve").disabled = t.done;
+    setStatus();
+  }
+  function setStatus(){
+    const b = $("statusBadge");
+    b.classList.remove("running","done");
+    if(!task.done){ b.classList.add("running"); $("statusText").textContent = "Aufgabe offen"; }
+    else if(task.shown){ $("statusText").textContent = "Lösung angezeigt"; }
+    else { b.classList.add("done"); $("statusText").textContent = "gelöst"; }
+  }
+
+  // ---------- Auswahlknöpfe ----------
+  function renderOptions(){
+    const t = task, c = t.c, lock = t.done;
+    const state = (sel, ok, badFlag) => (sel ? " sel" : "") + (sel && t.done && !t.shown ? " ok" : "") + (sel && badFlag ? " bad" : "");
+    let h = "";
+    ["u","p","i"].forEach(k=>{
+      h += `<button class="opt${state(t.choice===k, t.okK, t.badK)}" data-k="${k}" ${lock?"disabled":""}><span class="rd"></span>${KNAME[k]}</button>`;
+    });
+    $("kindWrap").innerHTML = h;
+    const sides = isHomo(c) ? [["a", c.a]] : [["a", c.a], ["b", c.b]];
+    const opts = [];
+    sides.forEach(([v, sy]) => {
+      opts.push([v+":d", `<b>${sy}</b> δ−`]);
+      opts.push([v+":i", `<b>${sy}</b> Anion`]);
+    });
+    opts.push(["none", "keine Ladungen"]);
+    $("negWrap").innerHTML = `<span class="ng-h">Teilladung</span><span class="ng-h">Ion</span>` + opts.map(([v, l]) =>
+      `<button class="opt${v==="none"?" full":""}${state(t.neg===v, t.okN, t.badN)}" data-n="${v}" ${lock?"disabled":""}>${l}</button>`).join("");
+  }
+
+  // ---------- Eingaben lesen ----------
+  function parseEN(str){
+    const s = String(str).trim().replace(",", ".").replace("−", "-");
+    if(s==="") return null;
+    if(!/^-?\d*\.?\d+$/.test(s)) return NaN;
+    return parseFloat(s) * 10;
+  }
+  const validEN = v => typeof v==="number" && !isNaN(v) && v>0 && v<=40;
+  function readEN(){
+    const c = task.c;
+    return givenEN ? [EL[c.a].en, EL[c.b].en] : [parseEN($("enA").value), parseEN($("enB").value)];
+  }
+
+  // ---------- Bindungsmodell & ΔEN-Skala zeichnen ----------
+  function enLabels(c, ea, eb, xA, xB, y){
+    const enCls = (v, id) => "env" + (validEN(v) ? "" : " q") + ($(id).classList.contains("bad") ? " bad" : "");
+    const enTxt = v => validEN(v) ? fmt(Math.round(v)) : "?";
+    let s = "";
+    s += `<text class="enl" x="${xA-4}" y="${y-1}" text-anchor="end">EN(${c.a}) =</text>`;
+    s += `<text class="${enCls(ea,"enA")}" x="${xA+2}" y="${y}">${enTxt(ea)}</text>`;
+    s += `<text class="enl" x="${xB-4}" y="${y-1}" text-anchor="end">EN(${c.b}) =</text>`;
+    s += `<text class="${enCls(eb,"enB")}" x="${xB+2}" y="${y}">${enTxt(eb)}</text>`;
+    return s;
+  }
+
+  // Atompaar: großes Bindungsmodell mit Elektronenwolke
+  function drawPair(c, done, ea, eb){
+    const A = EL[c.a], B = EL[c.b], cw = 48*0.6;
+    const xA = 150, xB = 310, yS = 100;
+    const wA = c.a.length*cw, wB = c.b.length*cw;
+    const bx1 = xA + wA/2 + 10, bx2 = xB - wB/2 - 10, by = yS - 16;
+    const kk = c.k, ionic = done && kk==="i";
+    let s = "";
+    if(done && !ionic){
+      const mid = (bx1 + bx2)/2, half = (bx2 - bx1)/2 + 6;
+      const dir = isHomo(c) || A.en===B.en ? 0 : (A.en > B.en ? -1 : 1);
+      const shift = dir * Math.min(c.d, 20) / 20 * half * .75;
+      s += `<ellipse class="cloud" cx="${mid+shift}" cy="${by}" rx="${half*.72}" ry="17"/>`;
+    }
+    if(!ionic) s += `<line class="bond${done?"":" dash"}" x1="${bx1}" y1="${by}" x2="${bx2}" y2="${by}"/>`;
+    s += `<text class="sym" x="${xA}" y="${yS}" text-anchor="middle">${c.a}</text>`;
+    s += `<text class="sym" x="${xB}" y="${yS}" text-anchor="middle">${c.b}</text>`;
+    if(done && kk!=="u"){
+      const neg = negSideOf(c);
+      if(ionic){
+        [[xA + wA/2 + 2, c.a], [xB + wB/2 + 2, c.b]].forEach(([x, sy])=>{
+          const q = ionCharge(sy, c);
+          s += `<text class="chg" x="${x}" y="${yS-30}" style="fill:var(${q>0?"--amber":"--teal"})">${chgTxt(q)}</text>`;
+        });
+      } else {
+        s += `<text class="${neg==="a"?"dm":"dp"}" x="${xA}" y="${yS-50}" text-anchor="middle">${neg==="a"?"δ−":"δ+"}</text>`;
+        s += `<text class="${neg==="b"?"dm":"dp"}" x="${xB}" y="${yS-50}" text-anchor="middle">${neg==="b"?"δ−":"δ+"}</text>`;
+      }
+    }
+    s += enLabels(c, ea, eb, xA, xB, yS+33);
+    return s;
+  }
+
+  // freie Richtungen um ein Atom wählen (Winkel in Grad, Bildschirmkoordinaten)
+  const adist = (a, b) => { const d = Math.abs(((a - b) % 360 + 360) % 360); return Math.min(d, 360 - d); };
+  function freeAngles(k, used, step){
+    if(k<=0) return [];
+    const cand = []; for(let a=0; a<360; a+=step) cand.push(a);
+    // Achse gegenüber den Bindungen (für symmetrische Anordnung)
+    let vx = 0, vy = 0; used.forEach(a=>{ vx += Math.cos(a*Math.PI/180); vy += Math.sin(a*Math.PI/180); });
+    const axis = Math.hypot(vx, vy) > .3 ? (Math.atan2(-vy, -vx)*180/Math.PI + 360) % 360 : 270;
+    let best = null, bestE = Infinity, bestSym = Infinity;
+    const combos = (start, pick) => {
+      if(pick.length===k){
+        const all = used.concat(pick);
+        let E = 0;
+        pick.forEach((a,i)=>{ all.forEach((b,j)=>{ if(j<used.length+i){ const d = adist(a,b); E += d<1 ? 1e9 : 1/(d*d); } }); });
+        E = Math.round(E*1e9);
+        const sym = Math.abs(pick.reduce((q,a)=>q + Math.sin((a-axis)*Math.PI/180), 0)) + pick.reduce((q,a)=>q + adist(a,axis), 0)*1e-4;
+        if(E < bestE || (E===bestE && sym < bestSym - 1e-9)){ bestE = E; bestSym = sym; best = pick.slice(); }
+        return;
+      }
+      for(let i=start; i<cand.length; i++){ pick.push(cand[i]); combos(i+1, pick); pick.pop(); }
+    };
+    combos(0, []);
+    return best;
+  }
+
+  // Verbindung: vollständige Struktur (Valenzstrichformel bzw. Ionen)
+  function drawCompound(c, done, ea, eb, top){
+    const metal = EL[c.a].c==="m" || EL[c.b].c==="m";
+    // vor dem Prüfen: alle möglichen Bindungen gestrichelt, für Atom- und Ionenbindung gleich
+    const mode = done ? (c.k==="i" ? "ion" : "mol") : "pre";
+    const st = mode==="mol" || (mode==="pre" && !metal) ? STR[c.formula] : ionLayout(c);
+    let bondList = st.bonds;
+    if(mode==="pre" && !bondList.length){
+      const line = st.atoms.every(a => Math.abs(a[2]) < 1e-6);
+      bondList = line ? st.atoms.slice(1).map((a, i) => [i, i+1, 1]) : st.atoms.slice(1).map((a, i) => [0, i+1, 1]);
+    }
+    const at = st.atoms;
+    const xs = at.map(a=>a[1]), ys = at.map(a=>a[2]);
+    const minx = Math.min(...xs), maxx = Math.max(...xs), miny = Math.min(...ys), maxy = Math.max(...ys);
+    const w = maxx - minx, h = maxy - miny;
+    const U = Math.min(64, w ? 330/w : 64, h ? (top-120)/h : 64);
+    const cx = 230, cy = (top - 30)/2 + 4;
+    const P = at.map(a=>[cx + (a[1] - (minx+maxx)/2)*U, cy + (a[2] - (miny+maxy)/2)*U]);
+    const len = i => at[i][0].length;
+    const rad = (i, deg) => { if(!at[i][0]) return 0; const r = deg*Math.PI/180; return Math.abs(Math.cos(r))*(5 + 8.6*len(i)) + Math.abs(Math.sin(r))*14; };
+    let s = "";
+    const occ = at.map(()=>[]);
+    // Richtungen zu nicht gebundenen Nachbaratomen (damit Striche und δ nicht in andere Atome ragen)
+    const near = at.map((a, i)=> at.map((b, j)=>{
+      if(i===j || !b[0]) return null;
+      const dx = P[j][0]-P[i][0], dy = P[j][1]-P[i][1];
+      return Math.hypot(dx, dy) < 1.5*U ? (Math.atan2(dy, dx)*180/Math.PI + 360) % 360 : null;
+    }).filter(v=>v!==null));
+
+    // Bindungsstriche
+    if(mode==="mol" || mode==="pre"){
+      bondList.forEach(([i, j, o])=>{
+        if(mode==="pre") o = 1;
+        const [x1, y1] = P[i], [x2, y2] = P[j];
+        const dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy), ux = dx/L, uy = dy/L;
+        const deg = Math.atan2(dy, dx)*180/Math.PI;
+        occ[i].push((deg+360)%360); occ[j].push((deg+540)%360);
+        const r1 = rad(i, deg) + 2, r2 = rad(j, deg) + 2;
+        const offs = o===1 ? [0] : o===2 ? [-3.6, 3.6] : [-6, 0, 6];
+        offs.forEach(off=>{
+          const ox = -uy*off, oy = ux*off;
+          s += `<line class="bond sb${mode==="pre" ? " dash" : ""}" x1="${x1+ux*r1+ox}" y1="${y1+uy*r1+oy}" x2="${x2-ux*r2+ox}" y2="${y2-uy*r2+oy}"/>`;
+        });
+      });
+      // freie Elektronenpaare (Valenzstriche) und ungepaarte Elektronen
+      at.forEach((a, i)=>{
+        if(!a[0] || mode==="pre") return;
+        const e = EL[a[0]], val = a[0]==="H" ? 1 : e.g;
+        const usedE = st.bonds.reduce((q,b)=> q + (b[0]===i || b[1]===i ? b[2] : 0), 0);
+        let n = Math.max(0, val - usedE), pairs = Math.floor(n/2), dot = n%2;
+        if(st.lp[i]){ pairs = st.lp[i].lp; dot = st.lp[i].dot||0; }
+        const angs = freeAngles(pairs + dot, occ[i].concat(near[i].filter(g=>!occ[i].some(o=>adist(o,g)<5))), 45);
+        angs.forEach((g, k)=>{
+          occ[i].push(g);
+          const r = g*Math.PI/180, R = rad(i, g) + 4, px = P[i][0] + Math.cos(r)*R, py = P[i][1] + Math.sin(r)*R;
+          if(k < pairs){
+            const tx = -Math.sin(r)*6, ty = Math.cos(r)*6;
+            s += `<line class="lp" x1="${px-tx}" y1="${py-ty}" x2="${px+tx}" y2="${py+ty}"/>`;
+          } else s += `<circle class="edot" cx="${px}" cy="${py}" r="2.4"/>`;
+        });
+      });
+    }
+
+    // Symbole
+    at.forEach((a, i)=>{ if(a[0]) s += `<text class="sym s2" x="${P[i][0]}" y="${P[i][1]+10}" text-anchor="middle">${a[0]}</text>`; });
+
+    // Ladungen nach dem Lösen
+    if(done && c.k==="i"){
+      at.forEach((a, i)=>{
+        if(!a[0]) return;
+        const q = ionCharge(a[0], c);
+        s += `<text class="chg s2" x="${P[i][0] + 4.3*len(i) + 2}" y="${P[i][1]-8}" style="fill:var(${q>0?"--amber":"--teal"})">${chgTxt(q)}</text>`;
+      });
+    } else if(done && c.k==="p"){
+      const negS = c[negSideOf(c)];
+      at.forEach((a, i)=>{
+        if(!a[0]) return;
+        const g = freeAngles(1, occ[i].concat(near[i]), 22.5)[0];
+        const bias = occ[i].length ? g : 270;
+        const r = bias*Math.PI/180, R = rad(i, bias) + 15;
+        const neg = a[0]===negS;
+        s += `<text class="${neg?"dm":"dp"} s2" x="${P[i][0] + Math.cos(r)*R}" y="${P[i][1] + Math.sin(r)*R + 5}" text-anchor="middle">${neg?"δ−":"δ+"}</text>`;
+      });
+    }
+
+    // Beschriftung
+    const cap = mode==="pre" ? "mögliche Bindungen (gestrichelt)" : c.formula==="SiO2" ? "Ausschnitt aus dem Atomgitter" : mode==="mol" ? "Valenzstrichformel" : "Ionen einer Formeleinheit";
+    s += `<text class="axl" x="450" y="12" text-anchor="end">${cap}</text>`;
+    s += isHomo(c) ? enLabels({a:c.a, b:c.b}, ea, eb, 150, 310, top-10) : enLabels(c, ea, eb, 150, 310, top-10);
+    return s;
+  }
+
+  function drawStage(){
+    const t = task, c = t.c, done = t.done;
+    const [ea, eb] = readEN();
+    const comp = c.kind==="comp";
+    const top = comp ? 230 : 140;
+    const W = 460, H = showScale ? top + 106 : top + 10;
+    let s = comp ? drawCompound(c, done, ea, eb, top) : drawPair(c, done, ea, eb);
+
+    // ΔEN-Strahl (optional)
+    if(showScale){
+      const x0 = 40, x1 = 420, max = 35, px = v => x0 + (x1 - x0) * Math.min(v, max) / max;
+      const yb = top + 48, hb = 12;
+      s += `<rect class="z-u" x="${px(0)}" y="${yb}" width="${px(5)-px(0)}" height="${hb}" rx="2"/>`;
+      s += `<rect class="z-p" x="${px(5)}" y="${yb}" width="${px(17)-px(5)}" height="${hb}"/>`;
+      s += `<rect class="z-i" x="${px(17)}" y="${yb}" width="${px(35)-px(17)}" height="${hb}" rx="2"/>`;
+      [[2.5,"unpolar"],[11,"polar"],[26,"Ionenbindung"]].forEach(([v,l])=> s += `<text class="zl" x="${px(v)}" y="${yb+44}" text-anchor="middle">${l}</text>`);
+      [0,10,20,30].forEach(v => s += `<line class="tl" x1="${px(v)}" y1="${yb+hb}" x2="${px(v)}" y2="${yb+hb+4}"/><text class="tick" x="${px(v)}" y="${yb+hb+16}" text-anchor="middle">${fmt(v)}</text>`);
+      [5,17].forEach(v => s += `<line class="tl b" x1="${px(v)}" y1="${yb-3}" x2="${px(v)}" y2="${yb+hb+4}"/><text class="tick b" x="${px(v)}" y="${yb+hb+16}" text-anchor="middle">${fmt(v)}</text>`);
+      s += `<text class="axl" x="${x0-8}" y="${yb+10}" text-anchor="end">ΔEN</text>`;
+
+      // Marker: eigene Eingabe (amber) und Lösung (teal)
+      const dS = parseEN($("dEN").value);
+      const tri = (x, cl) => `<path class="${cl}" d="M${x-6},${yb-12} L${x+6},${yb-12} L${x},${yb-2} z"/>`;
+      const showS = typeof dS==="number" && !isNaN(dS) && dS>=0 && dS<=max && !(done && eq(dS, c.d));
+      if(showS){ const x = px(dS); s += tri(x, "mk-s") + `<text class="mkl-s" x="${x}" y="${yb-17}" text-anchor="middle">${fmt(Math.round(dS))}</text>`; }
+      if(done){ const x = px(c.d); s += tri(x, "mk-c") + `<text class="mkl-c" x="${x}" y="${yb-17}" text-anchor="middle">${fmt(c.d)}</text>`; }
+    }
+    $("stageLbl").textContent = (comp ? "Struktur" : "Bindungsmodell") + (showScale ? " & ΔEN-Strahl" : "");
+
+    $("svgBox").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Bindungsmodell ${bondTxt(c)} und ΔEN-Skala">${s}</svg>`;
+    $("resLbl").innerHTML = `Bindung:<span class="rf mono">${bondTxt(c)}</span>`;
+    $("kindLbl").textContent = done ? KNAME[c.k] : "";
+  }
+
+  // ---------- Prüfen ----------
+  function fb(cls, html){ return `<div class="fb ${cls}">${html}</div>`; }
+
+  function enMsg(e, v, other){
+    if(isNaN(v) || v<=0) return `Gib die EN von ${e.n} als Zahl an, z. B. 2,5.`;
+    if(eq(v, other.en) && other.s!==e.s) return `Die EN von ${e.n} stimmt nicht. ${fmt(other.en)} ist die EN von ${other.n}, hast du die Werte vertauscht?`;
+    return `Die EN von ${e.n} stimmt nicht. ${$("chkPSE").checked ? `Lies den gelben Wert unten im Feld von ${e.s} im PSE ab.` : "Schau im Periodensystem noch einmal nach."}`;
+  }
+
+  function specialNote(c){
+    const what = c.kind==="comp" ? c.name : `Verbindungen aus ${EL[c.a].n} und ${EL[c.b].n}`;
+    if(c.special==="m") return `Hinweis: Nach der Faustregel ist das eine polare Atombindung. In Wirklichkeit sind ${c.kind==="comp" ? c.name + " und viele ähnliche Stoffe" : what} weitgehend salzartig aufgebaut. Bei Metall und Nichtmetall ist die Grenze 1,7 nur ein grober Richtwert.`;
+    if(c.special==="n") return `Hinweis: Nach der Faustregel ist das eine Ionenbindung. In Wirklichkeit besteht ${what} aus Molekülen mit stark polaren Atombindungen. Bei zwei Nichtmetallen ist die Grenze 1,7 nur ein grober Richtwert.`;
+    return "";
+  }
+  function boundaryNote(c){
+    if(eq(c.d, 5)) return "ΔEN = 0,5 liegt genau auf der Grenze zwischen unpolarer und polarer Atombindung. Beide Antworten zählen als richtig.";
+    if(eq(c.d, 17)) return "ΔEN = 1,7 liegt genau auf der Grenze zwischen polarer Atombindung und Ionenbindung. Beide Antworten zählen als richtig.";
+    return "";
+  }
+
+  function check(){
+    const t = task; if(t.done) return;
+    t.touched = true;
+    const c = t.c, A = EL[c.a], B = EL[c.b];
+    const msgs = [];
+
+    // --- Teil 1: EN-Werte ---
+    const [ea, eb] = readEN();
+    let okA = true, okB = true;
+    if(!givenEN){
+      const near = (v, e) => typeof v==="number" && !isNaN(v) && Math.abs(v - e) <= EN_TOL + 1e-6;
+      okA = near(ea, A.en); okB = near(eb, B.en);
+      if(ea===null) msgs.push(["info", `Trage die EN von ${A.n} ein.`]);
+      else if(!okA) msgs.push(["bad", enMsg(A, ea, B)]);
+      if(eb===null) msgs.push(["info", `Trage die EN von ${B.n} ein.`]);
+      else if(!okB && !(isHomo(c) && !okA)) msgs.push(["bad", enMsg(B, eb, A)]);
+      $("enA").classList.toggle("ok", okA); $("enA").classList.toggle("bad", !okA && ea!==null);
+      $("enB").classList.toggle("ok", okB); $("enB").classList.toggle("bad", !okB && eb!==null);
+    }
+    t.okE = okA && okB;
+
+    // --- Teil 1: ΔEN ---
+    const d = parseEN($("dEN").value);
+    const ownD = t.okE && validEN(ea) && validEN(eb) ? Math.abs(ea - eb) : null;   // ΔEN aus den eigenen (tolerierten) EN-Werten
+    t.okD = ownD!==null ? eq(d, ownD) : eq(d, c.d);
+    const dEff = t.okD ? d : c.d;                                                     // maßgeblicher ΔEN-Wert für Schritt 2 und 3
+    if(d===null) msgs.push(["info", "Trage ΔEN ein."]);
+    else if(!t.okD){
+      if(isNaN(d)) msgs.push(["bad", "Gib ΔEN als Zahl an, z. B. 1,4."]);
+      else if(d<0) msgs.push(["bad", "ΔEN ist nie negativ. Rechne größere EN minus kleinere EN."]);
+      else if(ownD!==null && eq(d, c.d)) msgs.push(["bad", "ΔEN muss zu deinen eingetragenen EN-Werten passen. Rechne mit deinen Werten: größere EN − kleinere EN."]);
+      else if(!t.okE && validEN(ea) && validEN(eb) && eq(d, Math.abs(ea - eb))) msgs.push(["bad", "Die Differenz passt zu deinen EN-Werten, das ist ein Folgefehler. Korrigiere zuerst die EN-Werte."]);
+      else if(eq(d, A.en + B.en)) msgs.push(["bad", "Du hast die EN-Werte addiert. ΔEN ist die Differenz: größere EN − kleinere EN."]);
+      else if(isHomo(c)) msgs.push(["bad", "Beide Atome sind gleich und haben dieselbe EN. Wie groß ist dann die Differenz?"]);
+      else msgs.push(["bad", "ΔEN stimmt noch nicht. Rechne: größere EN − kleinere EN."]);
+    }
+    $("dEN").classList.toggle("ok", t.okD); $("dEN").classList.toggle("bad", !t.okD && d!==null);
+
+    // --- Teil 2: Bindungsart ---
+    const k = t.choice;
+    t.okK = k!==null && allowed(dEff).includes(k); t.badK = false;
+    const dUsable = typeof d==="number" && !isNaN(d) && d>=0;
+    if(k===null) msgs.push(["info", "Wähle die Bindungsart."]);
+    else if(!t.okK){
+      t.badK = true;
+      if(!t.okD && dUsable && allowed(d).includes(k)) msgs.push(["bad", `Die Bindungsart passt zu deinem ΔEN-Wert (${fmt(d)}), das ist ein Folgefehler. Korrigiere zuerst ΔEN.`]);
+      else if(c.special==="m" && k==="i") msgs.push(["bad", "Auch wenn ein Metall beteiligt ist: In dieser Übung entscheidet nur ΔEN. Vergleiche ΔEN mit der Grenze 1,7."]);
+      else if(c.special==="n" && k==="p") msgs.push(["bad", "Auch wenn beide Partner Nichtmetalle sind: In dieser Übung entscheidet nur ΔEN. Vergleiche ΔEN mit der Grenze 1,7."]);
+      else if(isHomo(c)) msgs.push(["bad", "Zwei gleiche Atome ziehen die Bindungselektronen gleich stark an (ΔEN = 0)."]);
+      else msgs.push(["bad", "Die Bindungsart stimmt nicht. Vergleiche ΔEN mit den Grenzen 0,5 und 1,7."]);
+    }
+
+    // --- Teil 3: negativer Partner ---
+    t.okN = true; t.badN = false;
+    if(useNeg){
+      // negative Seite nach den eigenen EN-Werten (bei Toleranz), sonst nach der Tabelle
+      const side = t.okE && validEN(ea) && validEN(eb) && !eq(ea, eb) ? (ea > eb ? "a" : "b") : negSide(c);
+      const solFor = kk => kk==="u" ? "none" : side + (kk==="i" ? ":i" : ":d");
+      const kSol = t.okK ? k : cls(dEff);
+      const n = t.neg, sol = solFor(kSol);
+      t.okN = n===sol;
+      if(n===null) msgs.push(["info", "Wähle die negative Ladung oder „keine Ladungen“."]);
+      else if(!t.okN){
+        t.badN = true;
+        const nSide = n.split(":")[0], nType = n.split(":")[1], sSide = sol.split(":")[0], sType = sol.split(":")[1];
+        if(k && !t.okK && solFor(k)===n) msgs.push(["bad", "Die Ladung passt zu der von dir gewählten Bindungsart, das ist ein Folgefehler."]);
+        else if(n==="none") msgs.push(["bad", "Hier gibt es eine negative Ladung. Nur bei einer unpolaren Atombindung entstehen keine Ladungen."]);
+        else if(sol==="none") msgs.push(["bad", "Bei einer unpolaren Atombindung entstehen in diesem Modell keine Ladungen, also ist kein Partner negativ."]);
+        else if(nSide!==sSide) msgs.push(["bad", "Negativ wird das Atom mit der größeren Elektronegativität, weil es die Bindungselektronen stärker anzieht."]);
+        else if(nType==="i") msgs.push(["bad", "Das Atom stimmt, aber die Art der Ladung nicht. Bei einer polaren Atombindung wird das Elektronenpaar nur verschoben, es entsteht eine Teilladung δ− und kein Ion."]);
+        else msgs.push(["bad", "Das Atom stimmt, aber die Art der Ladung nicht. Bei einer Ionenbindung werden Elektronen vollständig übertragen, es entsteht ein Anion und keine Teilladung."]);
+      }
+    }
+
+    if(t.okE && t.okD && t.okK && t.okN){
+      t.done = true;
+      // gelöste Aufgabe mit den eigenen Werten (Toleranz) und der gewählten Bindungsart darstellen
+      const hasM = A.c==="m" || B.c==="m";
+      t.c = Object.assign({}, c, {d: dEff, k: k, enA: ea, enB: eb, boundary: eq(dEff, 5) || eq(dEff, 17),
+                                  special: hasM && k!=="i" ? "m" : (!hasM && k==="i" ? "n" : null)});
+      const tolMsgs = [];
+      if(!givenEN){
+        if(!eq(ea, A.en)) tolMsgs.push(`EN(${A.s}) = ${fmt(ea)} weicht leicht vom hier verwendeten Wert ${fmt(A.en)} ab und wird akzeptiert.`);
+        if(!eq(eb, B.en) && !isHomo(c)) tolMsgs.push(`EN(${B.s}) = ${fmt(eb)} weicht leicht vom hier verwendeten Wert ${fmt(B.en)} ab und wird akzeptiert.`);
+      }
+      ["enA","enB","dEN"].forEach(id=>{ $(id).readOnly = true; });
+      const firstTry = !t.wrong && t.hint===0;
+      stats.solved++; if(firstTry) stats.first++; stats.streak++;
+      const cc = t.c;
+      let extra = "";
+      if(useNeg && cc.k!=="u"){
+        const ns = negSideOf(cc), nS = cc[ns], pS = cc[ns==="a" ? "b" : "a"];
+        extra = cc.k==="i" ? ` ${nS} bildet das Anion, ${pS} das Kation.` : ` ${nS} ist δ−, ${pS} ist δ+.`;
+      }
+      let html = fb("good", `Richtig${firstTry?" im ersten Versuch":""}! <span class="nm">${bondTxt(cc)}</span>: ΔEN = ${fmt(cc.d)} → ${KNAME[cc.k]}.${extra}`);
+      tolMsgs.forEach(m => html += fb("info", m));
+      if(cc.boundary) html += fb("info", boundaryNote(cc));
+      if(cc.special) html += fb("hint", specialNote(cc));
+      $("feedback").innerHTML = html;
+      logHistory(t, firstTry ? "first" : (t.hint>0 ? "help" : "ok"));
+      renderTask(); renderWay(); updateStats();
+      return;
+    }
+    if(msgs.some(m=>m[0]==="bad")){ t.wrong = true; stats.streak = 0; }
+    const good = [];
+    if(t.okE && t.okD) good.push(givenEN ? "ΔEN stimmt." : "Die EN-Werte und ΔEN stimmen.");
+    else if(t.okE && !givenEN) good.push("Die EN-Werte stimmen.");
+    if(t.okK) good.push("Die Bindungsart stimmt.");
+    if(useNeg && t.okN && t.neg!==null) good.push("Die negative Ladung stimmt.");
+    $("feedback").innerHTML = good.map(m=>fb("good", m)).join("") + msgs.map(m=>fb(m[0], m[1])).join("");
+    renderTask(); updateStats();
+  }
+
+  // ---------- Tipps ----------
+  function hint(){
+    const t = task; if(t.done) return;
+    t.hint = Math.min(t.hint+1, 4); t.touched = true;
+    const c = t.c, A = EL[c.a], B = EL[c.b], out = [];
+    const hi = A.en >= B.en ? A : B, lo = hi===A ? B : A;
+    if(t.hint>=1) out.push($("chkPSE").checked ? "Tipp 1: Suche beide Elemente im PSE. Die gelbe Zahl unten im Feld ist die Elektronegativität (EN)." : "Tipp 1: Suche beide Elemente in deinem Periodensystem und lies ihre Elektronegativität (EN) ab.");
+    if(t.hint>=2){
+      out.push(isHomo(c) ? `Tipp 2: Das Element ist markiert. EN(${A.s}) = ${fmt(A.en)}, beide Atome haben dieselbe EN.`
+                         : `Tipp 2: Die Elemente sind markiert. EN(${A.s}) = ${fmt(A.en)} · EN(${B.s}) = ${fmt(B.en)}.`);
+      markHint([c.a, c.b]); showInfo(c.a);
+      if(isHomo(c) === false && !$("chkPSE").checked) out[out.length-1] = out[out.length-1].replace("Die Elemente sind markiert. ", "");
+      if(isHomo(c) && !$("chkPSE").checked) out[out.length-1] = out[out.length-1].replace("Das Element ist markiert. ", "");
+    }
+    if(t.hint>=3) out.push(`Tipp 3: ΔEN = größere EN − kleinere EN = ${fmt(hi.en)} − ${fmt(lo.en)} = ${fmt(c.d)}.`);
+    if(t.hint>=4) out.push("Tipp 4: Vergleiche mit den Grenzen: ΔEN < 0,5 unpolar · 0,5 bis 1,7 polar · ΔEN > 1,7 Ionenbindung. Genau auf einer Grenze zählen beide Bindungsarten." +
+                           (useNeg ? " Negativ ist das Atom mit der größeren EN: bei polarer Bindung als Teilladung δ−, bei Ionenbindung als Anion, bei unpolarer Bindung gibt es keine Ladungen." : ""));
+    $("feedback").innerHTML = out.map(m=>fb("hint", m)).join("");
+  }
+
+  function solve(){
+    const t = task; if(t.done) return;
+    const c = t.c;
+    t.done = true; t.shown = true; t.okE = t.okD = t.okK = t.okN = true; t.badK = t.badN = false;
+    stats.shown++; stats.streak = 0;
+    $("enA").value = fmt(EL[c.a].en); $("enB").value = fmt(EL[c.b].en); $("dEN").value = fmt(c.d);
+    ["enA","enB","dEN"].forEach(id=>{ $(id).readOnly = true; $(id).classList.remove("ok","bad"); });
+    t.choice = c.k; t.neg = useNeg ? negFor(c, c.k) : null;
+    let html = fb("info", `Lösung: <span class="nm">${bondTxt(c)}</span> · ΔEN = ${fmt(c.d)} → ${KNAME[c.k]}. Der Lösungsweg steht unten.`);
+    if(c.boundary) html += fb("info", boundaryNote(c));
+    if(c.special) html += fb("hint", specialNote(c));
+    $("feedback").innerHTML = html;
+    markHint([c.a, c.b]);
+    logHistory(t, "shown");
+    renderTask(); renderWay(); updateStats();
+  }
+
+  // ---------- Lösungsweg ----------
+  function renderWay(){
+    const t = task;
+    if(!t.done){ $("wayBox").innerHTML = `<div class="empty-hint">Der Lösungsweg erscheint, sobald die Aufgabe gelöst oder die Lösung angezeigt wurde.</div>`; return; }
+    const c = t.c;
+    const eA = c.enA!=null ? c.enA : EL[c.a].en, eB = c.enB!=null ? c.enB : EL[c.b].en;
+    const ns = negSideOf(c);
+    const hi = {s: c[ns], en: ns==="a" ? eA : eB}, lo = {s: c[ns==="a" ? "b" : "a"], en: ns==="a" ? eB : eA};
+    let range;
+    if(eq(c.d, 5)) range = `<span class="a">${fmt(c.d)}</span> = Grenzwert → Bereich <span class="t">unpolar oder polar</span> (beides richtig)`;
+    else if(eq(c.d, 17)) range = `<span class="a">${fmt(c.d)}</span> = Grenzwert → Bereich <span class="t">polar oder Ionenbindung</span> (beides richtig)`;
+    else range = (c.k==="u" ? `<span class="a">${fmt(c.d)}</span> &lt; 0,5` : c.k==="p" ? `0,5 &lt; <span class="a">${fmt(c.d)}</span> &lt; 1,7` : `<span class="a">${fmt(c.d)}</span> &gt; 1,7`) + ` → Bereich <span class="t">${KSHORT[c.k]}</span>`;
+    const rows = [
+      ["EN aus dem PSE", isHomo(c) ? `EN(${c.a}) = <span class="a">${fmt(eA)}</span> für beide Atome` : `EN(${c.a}) = <span class="a">${fmt(eA)}</span> · EN(${c.b}) = <span class="a">${fmt(eB)}</span>`],
+      ["ΔEN", `${fmt(hi.en)} − ${fmt(lo.en)} = <span class="t">${fmt(c.d)}</span>`],
+      ["Einordnung", range]
+    ];
+    if(c.k==="u"){
+      rows.push(["Ladungen", isHomo(c) ? "gleiche Atome ziehen die Bindungselektronen gleich stark an → keine Teilladungen"
+                                       : "Bindungselektronen werden nahezu gleich stark angezogen → keine Teilladungen"]);
+    } else if(c.k==="p"){
+      rows.push(["Teilladungen", `${hi.s} hat die größere EN und zieht das Elektronenpaar stärker an → <span class="t">${hi.s} δ−</span>, <span class="a">${lo.s} δ+</span>`]);
+    } else {
+      const qh = ionCharge(hi.s, c), ql = ionCharge(lo.s, c);
+      rows.push(["Ionen", `${lo.s} gibt Elektronen ab, ${hi.s} nimmt Elektronen auf → Kation <span class="a">${lo.s}<sup>${chgTxt(ql)}</sup></span>, Anion <span class="t">${hi.s}<sup>${chgTxt(qh)}</sup></span>`]);
+    }
+    if(c.boundary) rows.push(["Grenzfall", boundaryNote(c)]);
+    if(c.special) rows.push(["Wirklichkeit", specialNote(c).replace(/^Hinweis: /, "")]);
+    let h = `<div class="steps">`;
+    rows.forEach((r,i)=>{ h += `<div class="step"><span class="n">${i+1}</span><span class="h">${r[0]}</span><span class="b">${r[1]}</span></div>`; });
+    h += `<div class="step final"><span class="n">=</span><span class="h">Bindungsart</span><span class="b">${KNAME[c.k]}</span></div></div>`;
+    $("wayBox").innerHTML = h;
+  }
+
+  // ---------- Verlauf & Statistik ----------
+  function logHistory(t, status){
+    if(t.logged) return; t.logged = true;
+    const c = t.c;
+    const label = c.kind==="comp" ? `${c.name} (${sub(c.formula)})` : "Atompaar";
+    const ng = negSide(c), na = ng==="a" ? c.a : c.b, po = ng==="a" ? c.b : c.a;
+    const chg = c.k==="u" ? "keine Ladungen (unpolare Atombindung)"
+      : c.k==="p" ? `${na}: δ− (Teilladung) · ${po}: δ+ (Teilladung)`
+      : `${na}<sup>${chgTxt(ionCharge(na,c))}</sup> (Anion) · ${po}<sup>${chgTxt(ionCharge(po,c))}</sup> (Kation)`;
+    history.unshift({num:t.num, label, bond:bondTxt(c), d:fmt(c.d), k:KNAME[c.k], status,
+      a:c.a, b:c.b, ena:EL[c.a].en==null?"–":fmt(EL[c.a].en), enb:EL[c.b].en==null?"–":fmt(EL[c.b].en), chg});
+    const lbl = {first:["im 1. Versuch","s-first"], ok:["gelöst","s-ok"], help:["mit Hilfen gelöst","s-help"], shown:["Lösung angesehen","s-shown"], open:["abgebrochen","s-open"]};
+    $("histBody").innerHTML = history.map(r=>`<tr><td class="mono">${r.num}</td><td>${r.label}</td><td class="mono">${r.bond}</td><td class="mono">${r.d}</td><td>${r.k}</td><td class="${lbl[r.status][1]}">${lbl[r.status][0]}</td></tr>`).join("");
+  }
+  function updateStats(){
+    $("roSolved").textContent = stats.solved;
+    $("roFirst").textContent = stats.first;
+    $("roStreak").textContent = stats.streak;
+    $("roShown").textContent = stats.shown;
+  }
+
+  // ---------- Ereignisse ----------
+  $("modeToggle").addEventListener("click", ev=>{
+    const b = ev.target.closest("button"); if(!b) return;
+    $("modeToggle").querySelectorAll("button").forEach(x=>x.classList.toggle("active", x===b));
+    mode = b.dataset.mode; newTask();
+  });
+  $("chkGiven").addEventListener("change", ev=>{ givenEN = ev.target.checked; newTask(); });
+  $("chkScale").addEventListener("change", ev=>{ showScale = ev.target.checked; $("stage").classList.toggle("compact", !showScale); drawStage(); });
+  $("chkPSE").addEventListener("change", ev=>{ $("pseBlock").style.display = ev.target.checked ? "" : "none"; });
+  $("chkNeg").addEventListener("change", ev=>{ useNeg = ev.target.checked; newTask(); });
+  $("chkSpecial").addEventListener("change", ev=>{ useSpecial = ev.target.checked; newTask(); });
+
+  $("pse").addEventListener("click", ev=>{ const c = ev.target.closest(".cell"); if(c) showInfo(c.dataset.s); });
+
+  function resetBox1(){
+    task.touched = true; task.okE = false; task.okD = false;
+    $("box1").classList.remove("passed"); $("st1").textContent = "offen";
+  }
+  ["enA","enB","dEN"].forEach(id=>{
+    $(id).addEventListener("input", ()=>{ if(task.done) return; $(id).classList.remove("ok","bad"); resetBox1(); drawStage(); });
+    $(id).addEventListener("keydown", ev=>{ if(ev.key==="Enter") check(); });
+  });
+  $("kindWrap").addEventListener("click", ev=>{
+    const b = ev.target.closest("button[data-k]"); if(!b || task.done) return;
+    task.choice = b.dataset.k; task.touched = true; task.okK = false; task.badK = false;
+    $("box2").classList.remove("passed"); $("st2").textContent = "offen";
+    renderOptions();
+  });
+  $("negWrap").addEventListener("click", ev=>{
+    const b = ev.target.closest("button[data-n]"); if(!b || task.done) return;
+    task.neg = b.dataset.n; task.touched = true; task.okN = false; task.badN = false;
+    $("box3").classList.remove("passed"); $("st3").textContent = "offen";
+    renderOptions();
+  });
+  $("btnNew").addEventListener("click", newTask);
+  $("btnCheck").addEventListener("click", check);
+  $("btnHint").addEventListener("click", hint);
+  $("btnSolve").addEventListener("click", solve);
+
+  document.querySelectorAll(".tabbtn").forEach(b=>b.addEventListener("click", ()=>{
+    document.querySelectorAll(".tabbtn").forEach(x=>x.classList.toggle("active", x===b));
+    document.querySelectorAll(".tabpanel").forEach(p=>p.classList.toggle("active", p.id==="tab-"+b.dataset.tab));
+  }));
+  $("btnGuide").addEventListener("click", ev=>{ ev.preventDefault(); $("guideBackdrop").classList.add("open"); });
+  $("closeGuide").addEventListener("click", ()=>$("guideBackdrop").classList.remove("open"));
+  $("guideBackdrop").addEventListener("click", ev=>{ if(ev.target===$("guideBackdrop")) $("guideBackdrop").classList.remove("open"); });
+  $("btnChangelog").addEventListener("click", ev=>{ ev.preventDefault(); $("changelogBackdrop").classList.add("open"); });
+  $("closeChangelog").addEventListener("click", ()=>$("changelogBackdrop").classList.remove("open"));
+  $("changelogBackdrop").addEventListener("click", ev=>{ if(ev.target===$("changelogBackdrop")) $("changelogBackdrop").classList.remove("open"); });
+  document.addEventListener("keydown", ev=>{ if(ev.key==="Escape"){ $("guideBackdrop").classList.remove("open"); $("changelogBackdrop").classList.remove("open"); } });
+
+  buildPSE();
+  newTask();
+  updateStats();
+})();
+</script>
+
+<script>
+/* Höhe der Kopfzeile für die feststehende linke Spalte */
+(function(){
+  const hdr = document.querySelector("header");
+  if(!hdr) return;
+  const set = () => document.documentElement.style.setProperty("--hdr", Math.max(0, Math.round(hdr.getBoundingClientRect().bottom)) + "px");
+  addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
+})();
+</script>
+
+<div class="modal-backdrop" id="glBackdrop">
+  <div class="modal-box gl-wide" role="dialog" aria-modal="true" aria-labelledby="glTitle">
+    <div class="modal-head">
+      <h2><span class="gl-num" id="glNum"></span><span id="glTitle"></span></h2>
+      <button class="modal-close" id="glClose" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body gl-body" id="glBody"></div>
+    <div class="gl-nav">
+      <button class="btn ghost" id="glPrev">← Vorheriges Thema</button>
+      <span class="sp" id="glPos"></span>
+      <button class="btn" id="glNext">Nächstes Thema →</button>
+    </div>
+  </div>
+</div>
+<script>
+/* Rubrik Grundlagen */
+(function(){
+  const GL = [{"t": "Elektronegativität", "h": "<p>Die <strong>Elektronegativität (EN)<\/strong> beschreibt, wie stark ein Atom die Elektronen einer Bindung zu sich zieht. Die übliche Skala nach Pauling reicht von etwa 0,7 (Caesium) bis 4,0 (Fluor).<\/p> <div class=\"gl-row\"><figure class=\"gl-fig\"><svg viewBox=\"0 0 300 150\" width=\"300\" style=\"max-width:300px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><defs><marker id=\"en\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--amber)\"/><\/marker><\/defs><rect x=\"40\" y=\"30\" width=\"220\" height=\"90\" rx=\"3\" fill=\"none\" stroke=\"var(--line)\" stroke-width=\"1.3\" /><line x1=\"50\" y1=\"128\" x2=\"250\" y2=\"128\" stroke=\"var(--amber)\" stroke-width=\"1.8\" marker-end=\"url(#en)\"/><text x=\"150\" y=\"145\" font-size=\"11\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"400\" >EN steigt nach rechts<\/text><line x1=\"270\" y1=\"112\" x2=\"270\" y2=\"40\" stroke=\"var(--amber)\" stroke-width=\"1.8\" marker-end=\"url(#en)\"/><text x=\"285\" y=\"76\" font-size=\"11\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"400\" transform=\"rotate(-90 285 76)\">EN steigt nach oben<\/text><text x=\"245\" y=\"48\" font-size=\"12\" fill=\"var(--text)\" text-anchor=\"end\" font-weight=\"600\" >F 4,0<\/text><text x=\"55\" y=\"112\" font-size=\"12\" fill=\"var(--text)\" text-anchor=\"start\" font-weight=\"600\" >Cs 0,8<\/text><text x=\"150\" y=\"80\" font-size=\"11\" fill=\"var(--text-faint)\" text-anchor=\"middle\" font-weight=\"400\" >Periodensystem<\/text><\/svg><figcaption>Tendenz im Periodensystem: Fluor ist das elektronegativste Element.<\/figcaption><\/figure><\/div> <p>Metalle haben kleine EN-Werte, Nichtmetalle große. Je nach verwendetem Periodensystem weichen die Werte um wenige Hundertstel ab.<\/p>"}, {"t": "ΔEN und die drei Bindungsarten", "h": "<p>Entscheidend für die Art der Bindung ist die <strong>Elektronegativitätsdifferenz<\/strong>: ΔEN = größere EN − kleinere EN.<\/p> <div class=\"gl-row\"><figure class=\"gl-fig\"><svg viewBox=\"0 0 560 120\" width=\"560\" style=\"max-width:560px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><rect x=\"30.0\" y=\"40\" width=\"75.75757575757576\" height=\"22\" rx=\"0\" fill=\"rgba(79,209,197,.18)\" stroke=\"var(--teal)\" stroke-width=\"1.3\" /><rect x=\"105.75757575757576\" y=\"40\" width=\"181.8181818181818\" height=\"22\" rx=\"0\" fill=\"rgba(255,180,84,.16)\" stroke=\"var(--amber)\" stroke-width=\"1.3\" /><rect x=\"287.57575757575756\" y=\"40\" width=\"242.42424242424244\" height=\"22\" rx=\"0\" fill=\"rgba(228,120,91,.15)\" stroke=\"var(--danger, #e4785b)\" stroke-width=\"1.3\" /><text x=\"67.87878787878788\" y=\"33\" font-size=\"11\" fill=\"var(--teal)\" text-anchor=\"middle\" font-weight=\"400\" >unpolar<\/text><text x=\"196.66666666666666\" y=\"33\" font-size=\"11\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"400\" >polare Atombindung<\/text><text x=\"408.78787878787875\" y=\"33\" font-size=\"11\" fill=\"var(--danger, #e4785b)\" text-anchor=\"middle\" font-weight=\"400\" >Ionenbindung<\/text><line x1=\"30.0\" y1=\"62\" x2=\"30.0\" y2=\"68\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"30.0\" y=\"82\" font-size=\"10.5\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >0<\/text><line x1=\"105.75757575757576\" y1=\"62\" x2=\"105.75757575757576\" y2=\"68\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"105.75757575757576\" y=\"82\" font-size=\"10.5\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >0,5<\/text><line x1=\"181.51515151515153\" y1=\"62\" x2=\"181.51515151515153\" y2=\"68\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"181.51515151515153\" y=\"82\" font-size=\"10.5\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >1<\/text><line x1=\"287.57575757575756\" y1=\"62\" x2=\"287.57575757575756\" y2=\"68\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"287.57575757575756\" y=\"82\" font-size=\"10.5\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >1,7<\/text><line x1=\"408.7878787878788\" y1=\"62\" x2=\"408.7878787878788\" y2=\"68\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"408.7878787878788\" y=\"82\" font-size=\"10.5\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >2,5<\/text><line x1=\"530.0\" y1=\"62\" x2=\"530.0\" y2=\"68\" stroke=\"var(--text-dim)\" stroke-width=\"1.4\"/><text x=\"530.0\" y=\"82\" font-size=\"10.5\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >3,3<\/text><text x=\"280.0\" y=\"106\" font-size=\"11.5\" fill=\"var(--text)\" text-anchor=\"middle\" font-weight=\"600\" >ΔEN<\/text><circle cx=\"30.0\" cy=\"51\" r=\"3\" fill=\"var(--text)\"/><circle cx=\"90.6\" cy=\"51\" r=\"3\" fill=\"var(--text)\"/><circle cx=\"181.5\" cy=\"51\" r=\"3\" fill=\"var(--text)\"/><circle cx=\"211.8\" cy=\"51\" r=\"3\" fill=\"var(--text)\"/><circle cx=\"363.3\" cy=\"51\" r=\"3\" fill=\"var(--text)\"/><circle cx=\"499.7\" cy=\"51\" r=\"3\" fill=\"var(--text)\"/><\/svg><figcaption>Einteilung nach ΔEN mit Beispielen (Punkte von links: H–H, C–H, H–Cl, O–H, Na–Cl, Cs–F)<\/figcaption><\/figure><\/div> <div class=\"gl-tw\"><table class=\"gl-table\"><thead><tr><th>ΔEN<\/th><th>Bindungsart<\/th><th>Beispiel<\/th><\/tr><\/thead><tbody><tr><td>unter 0,5<\/td><td>unpolare Atombindung<\/td><td>H<sub>2<\/sub>, Cl<sub>2<\/sub>, C–H<\/td><\/tr><tr><td>0,5 bis 1,7<\/td><td>polare Atombindung<\/td><td>H–Cl, O–H in H<sub>2<\/sub>O<\/td><\/tr><tr><td>über 1,7<\/td><td>Ionenbindung<\/td><td>NaCl, MgO<\/td><\/tr><\/tbody><\/table><\/div> <div class=\"gl-box gl-warn\">Die Grenzen 0,5 und 1,7 sind <strong>Richtwerte<\/strong>, keine Naturgesetze: Die Übergänge sind fließend. Liegt ΔEN genau auf einer Grenze, kann man beide Bindungsarten begründen.<\/div>"}, {"t": "Unpolare und polare Atombindung", "h": "<p>Bei einer <strong>Atombindung<\/strong> (Elektronenpaarbindung) teilen sich zwei Atome ein oder mehrere Elektronenpaare.<\/p> <ul><li><strong>Unpolar:<\/strong> Beide Atome ziehen etwa gleich stark – das Elektronenpaar liegt in der Mitte (H–H, Cl–Cl).<\/li> <li><strong>Polar:<\/strong> Das elektronegativere Atom zieht das Elektronenpaar näher zu sich. Es erhält eine negative <strong>Teilladung δ−<\/strong>, der Partner eine positive Teilladung δ+.<\/li><\/ul> <div class=\"gl-row\"><figure class=\"gl-fig\"><svg viewBox=\"0 0 260 90\" width=\"260\" style=\"max-width:260px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><text x=\"70\" y=\"52\" font-size=\"26\" fill=\"var(--text)\" text-anchor=\"middle\" font-weight=\"600\" >H<\/text><line x1=\"90\" y1=\"44\" x2=\"160\" y2=\"44\" stroke=\"var(--text)\" stroke-width=\"2.2\"/><text x=\"185\" y=\"52\" font-size=\"26\" fill=\"var(--text)\" text-anchor=\"middle\" font-weight=\"600\" >Cl<\/text><text x=\"70\" y=\"20\" font-size=\"14\" fill=\"var(--amber)\" text-anchor=\"middle\" font-weight=\"400\" >δ+<\/text><text x=\"185\" y=\"20\" font-size=\"14\" fill=\"var(--teal)\" text-anchor=\"middle\" font-weight=\"400\" >δ−<\/text><text x=\"70\" y=\"80\" font-size=\"10.5\" fill=\"var(--text-faint)\" text-anchor=\"middle\" font-weight=\"400\" >EN 2,2<\/text><text x=\"185\" y=\"80\" font-size=\"10.5\" fill=\"var(--text-faint)\" text-anchor=\"middle\" font-weight=\"400\" >EN 3,2<\/text><\/svg><figcaption>Chlorwasserstoff: ΔEN = 3,2 − 2,2 = 1,0 → polare Atombindung<\/figcaption><\/figure><\/div> <p>Ein Molekül mit polaren Bindungen kann ein <strong>Dipol<\/strong> sein, wenn die Teilladungen nicht symmetrisch verteilt sind (H<sub>2<\/sub>O ja, CO<sub>2<\/sub> nein).<\/p>"}, {"t": "Ionenbindung", "h": "<p>Ist die EN-Differenz sehr groß, wird das Elektron nicht mehr geteilt, sondern <strong>vollständig übertragen<\/strong>: Das Metallatom gibt Elektronen ab und wird zum positiv geladenen <strong>Kation<\/strong>, das Nichtmetallatom nimmt sie auf und wird zum negativ geladenen <strong>Anion<\/strong>.<\/p> <div class=\"gl-box gl-info\">Na → Na<sup>+<\/sup> + e<sup>−<\/sup> &nbsp;&nbsp;·&nbsp;&nbsp; Cl + e<sup>−<\/sup> → Cl<sup>−<\/sup><\/div> <p>Die Ionen ziehen sich elektrostatisch an und bilden ein regelmäßiges <strong>Ionengitter<\/strong>. Salze sind deshalb fest, haben hohe Schmelztemperaturen und leiten als Schmelze oder in Lösung den elektrischen Strom.<\/p> <div class=\"gl-row\"><figure class=\"gl-fig\"><svg viewBox=\"0 0 200 130\" width=\"200\" style=\"max-width:200px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><circle cx=\"40\" cy=\"25\" r=\"9\" fill=\"var(--teal)\" opacity=\".8\"/><circle cx=\"40\" cy=\"65\" r=\"13\" fill=\"var(--danger, #e4785b)\" opacity=\".8\"/><circle cx=\"40\" cy=\"105\" r=\"9\" fill=\"var(--teal)\" opacity=\".8\"/><circle cx=\"80\" cy=\"25\" r=\"13\" fill=\"var(--danger, #e4785b)\" opacity=\".8\"/><circle cx=\"80\" cy=\"65\" r=\"9\" fill=\"var(--teal)\" opacity=\".8\"/><circle cx=\"80\" cy=\"105\" r=\"13\" fill=\"var(--danger, #e4785b)\" opacity=\".8\"/><circle cx=\"120\" cy=\"25\" r=\"9\" fill=\"var(--teal)\" opacity=\".8\"/><circle cx=\"120\" cy=\"65\" r=\"13\" fill=\"var(--danger, #e4785b)\" opacity=\".8\"/><circle cx=\"120\" cy=\"105\" r=\"9\" fill=\"var(--teal)\" opacity=\".8\"/><circle cx=\"160\" cy=\"25\" r=\"13\" fill=\"var(--danger, #e4785b)\" opacity=\".8\"/><circle cx=\"160\" cy=\"65\" r=\"9\" fill=\"var(--teal)\" opacity=\".8\"/><circle cx=\"160\" cy=\"105\" r=\"13\" fill=\"var(--danger, #e4785b)\" opacity=\".8\"/><\/svg><figcaption>Ausschnitt aus einem Ionengitter: Kationen (klein) und Anionen (groß) wechseln sich ab.<\/figcaption><\/figure><\/div>"}, {"t": "Vorgehen", "h": "<ol class=\"gl-steps\"><li>Beide Elemente im Periodensystem suchen und ihre EN-Werte ablesen.<\/li><li>ΔEN berechnen: größerer Wert minus kleinerer Wert.<\/li><li>Mit den Grenzen vergleichen: unter 0,5 unpolar, 0,5 bis 1,7 polar, über 1,7 Ionenbindung.<\/li><li>Bei polaren Bindungen: Das Atom mit der größeren EN erhält δ−. Bei Ionenbindung: Das Atom mit der größeren EN wird zum Anion.<\/li><\/ol> <div class=\"gl-box gl-info\"><strong>Beispiel Magnesiumoxid:<\/strong> EN(O) = 3,4; EN(Mg) = 1,3; ΔEN = 2,1 &gt; 1,7 → Ionenbindung aus Mg<sup>2+<\/sup> und O<sup>2−<\/sup>.<\/div>"}];
+  const g = id => document.getElementById(id);
+  const bd = g("glBackdrop"), box = bd.querySelector(".modal-box");
+  let idx = 0;
+  function show(i){
+    idx = Math.max(0, Math.min(GL.length - 1, i));
+    g("glNum").textContent = (idx + 1) + ".";
+    g("glTitle").innerHTML = GL[idx].t;
+    g("glBody").innerHTML = GL[idx].h;
+    g("glPos").textContent = "Thema " + (idx + 1) + " von " + GL.length;
+    g("glPrev").disabled = idx === 0;
+    g("glNext").disabled = idx === GL.length - 1;
+    box.scrollTop = 0;
+    bd.classList.add("open");
+  }
+  g("glList").innerHTML = GL.map((b, i) => '<button type="button" class="gl-item" data-i="' + i + '"><span class="nr">' + (i + 1) + '</span>' + b.t + '<span class="go">›</span></button>').join("");
+  g("glToggle").addEventListener("click", () => {
+    const open = g("glToggle").getAttribute("aria-expanded") !== "true";
+    g("glToggle").setAttribute("aria-expanded", String(open));
+    g("glPanel").hidden = !open;
+  });
+  g("glList").addEventListener("click", e => { const b = e.target.closest(".gl-item"); if (b) show(+b.dataset.i); });
+  g("glPrev").addEventListener("click", () => show(idx - 1));
+  g("glNext").addEventListener("click", () => show(idx + 1));
+  g("glClose").addEventListener("click", () => bd.classList.remove("open"));
+  bd.addEventListener("click", e => { if (e.target === bd) bd.classList.remove("open"); });
+  document.addEventListener("keydown", e => {
+    if (!bd.classList.contains("open")) return;
+    if (e.key === "Escape") bd.classList.remove("open");
+    if (e.key === "ArrowRight" && idx < GL.length - 1) show(idx + 1);
+    if (e.key === "ArrowLeft" && idx > 0) show(idx - 1);
+  });
+})();
+</script>
+<script id="bk-kit">
+/* ===== Baustein QR-Code + Auswertung als PDF (einheitlich nach Leitfaden, keine Bibliotheken) ===== */
+(()=>{
+'use strict';
+const QR=(()=>{
+  const ECC=[7,10,15,20,26,18,20,24,30,18],NB=[1,1,1,1,1,2,2,2,2,4];
+  const raw=v=>{let r=(16*v+128)*v+64;if(v>=2){const n=Math.floor(v/7)+2;r-=(25*n-10)*n-55;if(v>=7)r-=36}return r};
+  const dataCw=v=>Math.floor(raw(v)/8)-ECC[v-1]*NB[v-1];
+  const mul=(x,y)=>{let z=0;for(let i=7;i>=0;i--){z=(z<<1)^((z>>>7)*0x11D);z^=((y>>>i)&1)*x}return z};
+  const divisor=d=>{const r=new Array(d).fill(0);r[d-1]=1;let root=1;for(let i=0;i<d;i++){for(let j=0;j<d;j++){r[j]=mul(r[j],root);if(j+1<d)r[j]^=r[j+1]}root=mul(root,2)}return r};
+  const rem=(data,div)=>{const r=new Array(div.length).fill(0);for(const b of data){const f=b^r.shift();r.push(0);div.forEach((c,i)=>{r[i]^=mul(c,f)})}return r};
+  const bit=(x,i)=>((x>>>i)&1)!==0;
+  function make(text){
+    const bytes=[...new TextEncoder().encode(text)];
+    let ver=0;for(let v=1;v<=10;v++){if(4+(v<10?8:16)+8*bytes.length<=dataCw(v)*8){ver=v;break}}
+    if(!ver)throw new Error('Text zu lang');
+    const bits=[];const put=(val,n)=>{for(let i=n-1;i>=0;i--)bits.push((val>>>i)&1)};
+    put(4,4);put(bytes.length,ver<10?8:16);bytes.forEach(b=>put(b,8));
+    const cap=dataCw(ver)*8;put(0,Math.min(4,cap-bits.length));put(0,(8-bits.length%8)%8);
+    for(let p=0xEC;bits.length<cap;p^=0xEC^0x11)put(p,8);
+    const data=[];for(let i=0;i<bits.length;i+=8){let b=0;for(let j=0;j<8;j++)b=(b<<1)|bits[i+j];data.push(b)}
+    const nb=NB[ver-1],el=ECC[ver-1],rc=Math.floor(raw(ver)/8),ns=nb-rc%nb,sl=Math.floor(rc/nb),div=divisor(el),blocks=[];
+    for(let i=0,k=0;i<nb;i++){const d=data.slice(k,k+sl-el+(i<ns?0:1));k+=d.length;const e=rem(d,div);if(i<ns)d.push(0);blocks.push(d.concat(e))}
+    const all=[];for(let i=0;i<blocks[0].length;i++)blocks.forEach((b,j)=>{if(i!==sl-el||j>=ns)all.push(b[i])});
+    const size=ver*4+17,m=[],fn=[];for(let i=0;i<size;i++){m.push(new Array(size).fill(false));fn.push(new Array(size).fill(false))}
+    const sf=(x,y,d)=>{m[y][x]=d;fn[y][x]=true};
+    for(let i=0;i<size;i++){sf(6,i,i%2===0);sf(i,6,i%2===0)}
+    const finder=(x,y)=>{for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){const d=Math.max(Math.abs(dx),Math.abs(dy)),xx=x+dx,yy=y+dy;if(xx>=0&&xx<size&&yy>=0&&yy<size)sf(xx,yy,d!==2&&d!==4)}};
+    finder(3,3);finder(size-4,3);finder(3,size-4);
+    let pos=[];if(ver>1){const n=Math.floor(ver/7)+2,step=Math.ceil((ver*4+4)/(n*2-2))*2;pos=[6];for(let p=size-7;pos.length<n;p-=step)pos.splice(1,0,p)}
+    pos.forEach((px,i)=>pos.forEach((py,j)=>{if((i===0&&j===0)||(i===0&&j===pos.length-1)||(i===pos.length-1&&j===0))return;for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)sf(px+dx,py+dy,Math.max(Math.abs(dx),Math.abs(dy))!==1)}));
+    const fmt=mask=>{const d=(1<<3)|mask;let r=d;for(let i=0;i<10;i++)r=(r<<1)^((r>>>9)*0x537);const b=((d<<10)|r)^0x5412;
+      for(let i=0;i<=5;i++)sf(8,i,bit(b,i));sf(8,7,bit(b,6));sf(8,8,bit(b,7));sf(7,8,bit(b,8));for(let i=9;i<15;i++)sf(14-i,8,bit(b,i));
+      for(let i=0;i<8;i++)sf(size-1-i,8,bit(b,i));for(let i=8;i<15;i++)sf(8,size-15+i,bit(b,i));sf(8,size-8,true)};
+    fmt(0);
+    if(ver>=7){let r=ver;for(let i=0;i<12;i++)r=(r<<1)^((r>>>11)*0x1F25);const b=(ver<<12)|r;for(let i=0;i<18;i++){const c=bit(b,i),a=size-11+i%3,bb=Math.floor(i/3);sf(a,bb,c);sf(bb,a,c)}}
+    let k=0;for(let right=size-1;right>=1;right-=2){if(right===6)right=5;for(let v=0;v<size;v++)for(let j=0;j<2;j++){const x=right-j,up=((right+1)&2)===0,y=up?size-1-v:v;if(!fn[y][x]&&k<all.length*8){m[y][x]=bit(all[k>>>3],7-(k&7));k++}}}
+    const MF=[(x,y)=>(x+y)%2===0,(x,y)=>y%2===0,(x,y)=>x%3===0,(x,y)=>(x+y)%3===0,(x,y)=>(Math.floor(x/3)+Math.floor(y/2))%2===0,(x,y)=>x*y%2+x*y%3===0,(x,y)=>(x*y%2+x*y%3)%2===0,(x,y)=>((x+y)%2+x*y%3)%2===0];
+    const apply=mk=>{for(let y=0;y<size;y++)for(let x=0;x<size;x++)if(!fn[y][x]&&MF[mk](x,y))m[y][x]=!m[y][x]};
+    const pen=()=>{let p=0;
+      for(let t=0;t<2;t++)for(let a=0;a<size;a++){let run=1;for(let b=1;b<size;b++){const c=t?m[b][a]:m[a][b],d=t?m[b-1][a]:m[a][b-1];if(c===d){run++;if(run===5)p+=3;else if(run>5)p++}else run=1}}
+      for(let y=0;y<size-1;y++)for(let x=0;x<size-1;x++){const c=m[y][x];if(c===m[y][x+1]&&c===m[y+1][x]&&c===m[y+1][x+1])p+=3}
+      let dark=0;m.forEach(r=>r.forEach(c=>{if(c)dark++}));p+=Math.floor(Math.abs(dark*20-size*size*10)/(size*size))*10;return p};
+    let best=0,bp=1e9;for(let mk=0;mk<8;mk++){apply(mk);fmt(mk);const p=pen();if(p<bp){bp=p;best=mk}apply(mk)}
+    apply(best);fmt(best);return m;
+  }
+  function svg(text,px){const m=make(text),n=m.length,q=4,tot=n+2*q;let d='';
+    for(let y=0;y<n;y++)for(let x=0;x<n;x++)if(m[y][x])d+=`M${x+q},${y+q}h1v1h-1z`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${px}" height="${px}" viewBox="0 0 ${tot} ${tot}" shape-rendering="crispEdges" role="img" aria-label="QR-Code"><rect width="${tot}" height="${tot}" fill="#fff"/><path d="${d}" fill="#000"/></svg>`}
+  return{make,svg};
+})();
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const el=(tag,cls,html)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e};
+const today=()=>{const d=new Date();return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear()};
+const BK={runs:[],cfg:null,nm:'',ku:'',esc,today,_id:0};
+window.BK=BK;
+
+/* ---------- Diagramme für den Ausdruck: Helligkeit umkehren (weißer Hintergrund, dunkle Linien) ---------- */
+function invertCanvas(src){
+  const w=src.width,h=src.height;if(!w||!h)return '';
+  const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');
+  x.drawImage(src,0,0);
+  let d;try{d=x.getImageData(0,0,w,h)}catch(_){return ''}
+  const p=d.data;
+  for(let i=0;i<p.length;i+=4){
+    if(p[i+3]===0)continue;
+    const r=p[i],g=p[i+1],b=p[i+2],mx=Math.max(r,g,b),mn=Math.min(r,g,b);
+    if(mx<46&&mx-mn<16){p[i]=p[i+1]=p[i+2]=255;continue}          // dunkler Hintergrund → weiß
+    const s=255-(mx+mn);                                             // Helligkeit spiegeln, Farbton behalten
+    const R=r+s,G=g+s,B=b+s;
+    p[i]=R<0?0:R>255?255:R;p[i+1]=G<0?0:G>255?255:G;p[i+2]=B<0?0:B>255?255:B;
+  }
+  x.putImageData(d,0,0);
+  return c.toDataURL('image/png');
+}
+/* Linienfarbe wie im invertierten Diagramm (für Legenden) */
+BK.ink=hex=>{const m=/^#?([0-9a-f]{6})$/i.exec(String(hex).trim());if(!m)return hex;const n=parseInt(m[1],16),r=n>>16,g=(n>>8)&255,b=n&255,s=255-(Math.max(r,g,b)+Math.min(r,g,b));
+  return '#'+[r+s,g+s,b+s].map(v=>Math.max(0,Math.min(255,v)).toString(16).padStart(2,'0')).join('')};
+BK.cimg=cv=>{try{return cv&&cv.width?invertCanvas(cv):''}catch(_){return ''}};
+const SVGP=['fill','stroke','stroke-width','stroke-dasharray','stroke-linecap','stroke-linejoin','opacity','fill-opacity','stroke-opacity','font-size','font-family','font-weight','font-style','text-anchor','dominant-baseline','visibility','display','letter-spacing'];
+BK.simg=svg=>new Promise(res=>{
+  try{
+    const r=svg.getBoundingClientRect(),W=Math.max(1,Math.round(r.width||svg.clientWidth||300)),H=Math.max(1,Math.round(r.height||svg.clientHeight||200));
+    const cl=svg.cloneNode(true),a=[svg,...svg.querySelectorAll('*')],b=[cl,...cl.querySelectorAll('*')];
+    a.forEach((n,i)=>{const cs=getComputedStyle(n);b[i].setAttribute('style',SVGP.map(k=>k+':'+cs.getPropertyValue(k)).join(';'))});
+    cl.setAttribute('width',W);cl.setAttribute('height',H);cl.setAttribute('xmlns','http://www.w3.org/2000/svg');
+    if(!cl.getAttribute('viewBox')&&svg.viewBox&&svg.viewBox.baseVal&&svg.viewBox.baseVal.width){const v=svg.viewBox.baseVal;cl.setAttribute('viewBox',`${v.x} ${v.y} ${v.width} ${v.height}`)}
+    const im=new Image(),sc=2;
+    im.onload=()=>{const c=document.createElement('canvas');c.width=W*sc;c.height=H*sc;const x=c.getContext('2d');x.scale(sc,sc);x.drawImage(im,0,0,W,H);res(invertCanvas(c))};
+    im.onerror=()=>res('');
+    im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(cl));
+  }catch(_){res('')}
+});
+BK.imgTag=(src,alt)=>src?`<img class="bk-img" src="${src}" alt="${esc(alt||'Diagramm')}">`:'<p class="bk-small">Diagramm nicht verfügbar.</p>';
+BK.leg=items=>items&&items.length?`<div class="bk-leg">${items.map(([c,t])=>`<span><i style="background:${c}"></i>${t}</span>`).join('')}</div>`:'';
+/* Tabelle der Seite sauber übernehmen (ohne Knöpfe, Eingaben als Text) */
+BK.tbl=(t,opt)=>{
+  opt=opt||{};if(!t)return '';
+  const c=t.cloneNode(true);
+  c.querySelectorAll('button,script,.empty-hint').forEach(n=>{const tr=n.closest('tr');if(n.classList.contains('empty-hint')&&tr)tr.remove();else n.remove()});
+  c.querySelectorAll('input,select,textarea').forEach(n=>{const v=n.tagName==='SELECT'?(n.options[n.selectedIndex]||{}).text:(n.type==='checkbox'?(n.checked?'✓':''):n.value);n.replaceWith(document.createTextNode(v||''))});
+  c.querySelectorAll('[style]').forEach(n=>{n.style.color='';n.style.background='';n.style.backgroundColor=''});
+  c.removeAttribute('id');c.className='bk-t';
+  if(opt.reverse){const tb=c.tBodies[0];if(tb)[...tb.rows].reverse().forEach(r=>tb.appendChild(r))}
+  const rows=c.tBodies[0]?c.tBodies[0].rows.length:0;
+  if(!rows&&opt.emptyText)return `<p class="bk-small">${opt.emptyText}</p>`;
+  return c.outerHTML;
+};
+BK.condRows=list=>`<table class="bk-t"><tbody>${list.filter(x=>x&&x[1]!==''&&x[1]!=null).map(([k,v])=>`<tr><th style="width:42%">${k}</th><td>${v}</td></tr>`).join('')}</tbody></table>`;
+BK.sec=(h,body,long)=>`<div class="bk-sec${long?' bk-long':''}">${h?`<h3 class="bk-h3">${h}</h3>`:''}${body}</div>`;
+
+/* Reiter kurz sichtbar machen, Diagramme neu zeichnen lassen (resize), fn ausführen, zurücksetzen */
+BK.showing=(panels,fn)=>{
+  panels=(Array.isArray(panels)?panels:[panels]).map(p=>typeof p==='string'?document.querySelector(p):p).filter(Boolean);
+  const keep=panels.map(p=>p.style.display);panels.forEach(p=>p.style.display='block');
+  window.dispatchEvent(new Event('resize'));
+  let r;try{r=fn()}finally{panels.forEach((p,i)=>p.style.display=keep[i]);window.dispatchEvent(new Event('resize'))}
+  return r;
+};
+BK.ro=sel=>[...document.querySelectorAll(sel||'.readout')].filter(r=>r.querySelector('.k')&&r.querySelector('.v')).map(r=>[r.querySelector('.k').innerHTML,r.querySelector('.v').innerHTML]);
+BK.COL=['#4fd1c5','#ffb454','#7fd68a','#e4785b','#b79cf2','#6cb6ff','#f2a3c7','#c9d36a'];
+
+/* Einstellungen der linken Spalte als Tabelle (sichtbare Bereiche, ohne Grundlagen/Darstellung/Beispiele) */
+BK.side=(root,skip)=>{
+  root=typeof root==='string'?document.querySelector(root):(root||document.querySelector('.sidebar'));const rows=[];if(!root)return rows;
+  skip=skip||/^(Darstellung|Beispiel|Diagramm|Grundlagen)/;
+  const vis=e=>e&&e.offsetParent!==null&&!e.closest('[hidden]');
+  root.querySelectorAll('section.block').forEach(sec=>{
+    if(!vis(sec)||sec.querySelector('.gl-toggle'))return;
+    const h2=sec.querySelector('h2'),h=h2?h2.firstChild.textContent.trim():'';if(skip.test(h))return;
+    sec.querySelectorAll('.mode-toggle,.seg').forEach(mt=>{if(!vis(mt))return;const a=mt.querySelector('button.active,button.on');if(a)rows.push([h,a.textContent.trim()])});
+    sec.querySelectorAll('select').forEach(x=>{if(!vis(x))return;const lab=x.id&&sec.querySelector('label[for="'+x.id+'"]');rows.push([(lab?lab.textContent:h).trim(),x.selectedOptions[0]?x.selectedOptions[0].text:''])});
+    sec.querySelectorAll('.row').forEach(r=>{if(!vis(r))return;const l=r.querySelector('label'),v=r.querySelector('.val');if(l&&v)rows.push([l.textContent.trim(),v.textContent.trim()])});
+    sec.querySelectorAll('label.sw').forEach(sw=>{if(!vis(sw))return;const i=sw.querySelector('input'),t=sw.querySelector('.sw-text');if(!i||!t)return;rows.push([t.childNodes[0].textContent.trim(),i.checked?'ein':'aus'])});
+  });
+  return rows.map(([k,v])=>[BK.esc(k),BK.esc(v)]);
+};
+
+/* ---------- QR-Schaltfläche ---------- */
+BK.qr=(url,what)=>{
+  const hd=document.querySelector('header');if(!hd||document.querySelector('.bk-qr'))return;
+  const b=el('button','bk-qr','<span class="bk-qs"></span><span><b>Auf dem Mobilgerät öffnen</b>QR-Code antippen zum Vergrößern</span>');
+  b.type='button';b.title='QR-Code vergrößern';b.setAttribute('aria-haspopup','dialog');
+  const st=hd.querySelector('#statusBadge,#status,.status'),grp=el('div','bk-hr');
+  if(st&&st.parentNode===hd){hd.insertBefore(grp,st);grp.appendChild(b);grp.appendChild(st)}else{hd.appendChild(grp);grp.appendChild(b)}
+  b.querySelector('.bk-qs').innerHTML=QR.svg(url,66);
+  const ov=el('div','bk-ov',`<div class="bk-qrbox" role="dialog" aria-modal="true" aria-label="QR-Code zu dieser Seite"><div class="bk-qbig"></div><p class="bk-url">${esc(decodeURI(url.replace(/^https?:\/\//,'')))}</p><p class="bk-qhint">Mit der Kamera scannen, um diese ${esc(what||'Simulation')} auf dem eigenen Gerät zu öffnen.</p><button type="button" class="bk-b bk-qclose">Schließen</button></div>`);
+  document.body.appendChild(ov);ov.querySelector('.bk-qbig').innerHTML=QR.svg(url,520);
+  const open=()=>{ov.classList.add('open');ov.querySelector('.bk-qclose').focus()},shut=()=>{ov.classList.remove('open');b.focus()};
+  b.addEventListener('click',open);ov.querySelector('.bk-qclose').addEventListener('click',shut);
+  ov.addEventListener('click',e=>{if(e.target===ov)shut()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&ov.classList.contains('open'))shut()});
+};
+
+/* ---------- Läufe ---------- */
+BK.addRun=r=>{if(!r)return;r.id=++BK._id;BK.runs.push(r);if(BK.runs.length>(BK.cfg&&BK.cfg.maxRuns||16))BK.runs.shift();return r};
+BK.clearRuns=()=>{BK.runs=[]};
+
+/* ---------- Dialog „Auswertung als PDF“ ---------- */
+let dlg,C=null,cur=[];
+function hostEl(){
+  let h=C.printHost?document.querySelector(C.printHost):document.getElementById('bkPrint');
+  if(!h){h=el('div');h.id='bkPrint';document.body.appendChild(h)}
+  h.classList.add('bk-print-host');return h;
+}
+function ensure(){
+  if(dlg)return;
+  dlg=el('div','bk-ov',`<div class="bk-dlg" role="dialog" aria-modal="true" aria-labelledby="bkDlgT">
+    <div class="bk-dhead"><h2 id="bkDlgT">Auswertung als PDF</h2><button type="button" class="bk-x" aria-label="Schließen">×</button></div>
+    <div class="bk-dh" id="bkSelH"></div>
+    <div id="bkSel"></div>
+    <div class="bk-dh">Angaben (optional)</div>
+    <div class="bk-row"><input id="bkName" placeholder="Name" autocomplete="off" maxlength="60" aria-label="Name"><input id="bkKurs" placeholder="Kurs" autocomplete="off" maxlength="40" aria-label="Kurs"></div>
+    <p class="bk-hint" id="bkHint"></p>
+    <p class="bk-hint"><b>So speicherst du das PDF:</b> Nach „PDF erstellen“ öffnet sich der Druckdialog des Browsers. Dort als Drucker bzw. Ziel <b>„Als PDF speichern“</b> wählen und auf „Speichern“ tippen (am iPad: Teilen → „In Dateien sichern“). Es wird nichts gedruckt oder übertragen.</p>
+    <div class="bk-btns"><button type="button" class="bk-b pri" id="bkGo">PDF erstellen</button><button type="button" class="bk-b" id="bkCancel">Abbrechen</button></div></div>`);
+  document.body.appendChild(dlg);
+  const shut=()=>dlg.classList.remove('open');
+  dlg.querySelector('.bk-x').addEventListener('click',shut);dlg.querySelector('#bkCancel').addEventListener('click',shut);
+  dlg.addEventListener('click',e=>{if(e.target===dlg)shut()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&dlg.classList.contains('open')){e.stopPropagation();shut()}},true);
+  dlg.querySelector('#bkSel').addEventListener('change',()=>{if(C&&C.sim)dlg.querySelector('#bkGo').disabled=!dlg.querySelector('#bkSel input:checked')});
+  dlg.querySelector('#bkGo').addEventListener('click',go);
+  window.addEventListener('afterprint',()=>document.body.classList.remove('bk-pr'));
+}
+BK.open=over=>{
+  C=Object.assign({},BK.cfg,over||{});ensure();
+  const sel=dlg.querySelector('#bkSel'),btn=dlg.querySelector('#bkGo');
+  dlg.querySelector('#bkSelH').textContent=C.sim?'Welche Läufe sollen ins PDF?':'Statistik';
+  sel.className=C.sim?'bk-runs':'bk-stat';
+  dlg.querySelector('#bkHint').innerHTML=C.hint||'';
+  if(C.sim){
+    cur=runList();
+    sel.innerHTML=cur.length?cur.map(r=>`<label><input type="checkbox" value="${esc(r.id)}" checked><i style="background:${r.color||'var(--teal,#4fd1c5)'}"></i><span>${r.label}</span></label>`).join(''):`<p class="bk-none">${C.noRuns||'Noch kein Lauf abgeschlossen.'}</p>`;
+    btn.disabled=!cur.length;
+  }else{
+    const s=C.stats();
+    sel.innerHTML=s.items.map(([k,v])=>`<span>${k}</span><span>${v}</span>`).join('');
+    btn.disabled=!s.ready;
+  }
+  dlg.querySelector('#bkName').value=BK.nm;dlg.querySelector('#bkKurs').value=BK.ku;
+  dlg.classList.add('open');setTimeout(()=>btn.focus(),30);
+};
+const runList=()=>{let l=C.runs?C.runs():BK.runs.slice();if(C.live){const lv=C.live();if(lv){lv.id=lv.id||'live';l=l.concat([lv])}}return l};
+async function go(){
+  const c=C,btn=dlg.querySelector('#bkGo');
+  BK.nm=dlg.querySelector('#bkName').value.trim().slice(0,60);BK.ku=dlg.querySelector('#bkKurs').value.trim().slice(0,40);
+  btn.disabled=true;
+  let body='';
+  try{
+    if(c.sim){
+      const ids=[...dlg.querySelectorAll('#bkSel input:checked')].map(i=>i.value);
+      const runs=cur.filter(r=>ids.includes(String(r.id)));
+      if(c.pre)body+=await c.pre(runs);
+      for(const r of runs){const h=await (typeof r.html==='function'?r.html():r.html);body+=`<h2 class="bk-h2">${r.label}</h2>${h||''}`}
+      if(c.extra)body+=await c.extra(runs);
+    }else{
+      const s=c.stats();
+      body+=`<h2 class="bk-h2">Statistik</h2><table class="bk-sum"><tbody>${s.items.map(([k,v],i)=>i%2?'':`<tr><td>${k}:</td><td><b>${v}</b></td>${s.items[i+1]?`<td>${s.items[i+1][0]}:</td><td><b>${s.items[i+1][1]}</b></td>`:''}</tr>`).join('')}</tbody></table>`;
+      if(s.note)body+=`<p class="bk-small">${s.note}</p>`;
+      body+=await c.build();
+    }
+  }catch(err){body+=`<p>Fehler beim Erstellen: ${esc(err.message)}</p>`}
+  const host=hostEl();
+  host.innerHTML=`<div class="bk-sheet"><div class="bk-kick">${esc(c.kick||(c.sim?'Simulation':'Übung'))}</div><h1 class="bk-h1">${c.printTitle}</h1>
+  <table class="bk-meta"><tr><td>Name: <span class="bk-line">${esc(BK.nm)}&nbsp;</span></td><td>Kurs: <span class="bk-line">${esc(BK.ku)}&nbsp;</span></td><td>Datum: <span class="bk-line">${today()}&nbsp;</span></td></tr></table>
+  ${body}
+  <div class="bk-foot">${c.footName} V${c.version} · Bastian Baumgart · chemie.mail-baumgart.de · Lizenz CC BY-NC-SA 4.0${c.sim||c.simNote?' · Simulierte Daten zu Lehrzwecken':''}</div></div>`;
+  dlg.classList.remove('open');btn.disabled=false;
+  document.body.classList.add('bk-pr');
+  const imgs=[...host.querySelectorAll('img')].filter(i=>!i.complete);
+  await Promise.all(imgs.map(i=>new Promise(r=>{i.onload=i.onerror=r})));
+  setTimeout(()=>window.print(),80);
+}
+
+/* ---------- Einrichtung ---------- */
+BK.button=(p,over)=>{
+  const c=Object.assign({},BK.cfg,over||{});
+  const b=el('button',(p.cls||c.btnClass||'btn')+' bk-pdfbtn',p.label||(c.sim?'Ausgabe als PDF':'Zusammenfassung als PDF'));b.type='button';
+  b.addEventListener('click',()=>BK.open(over));
+  const ref=typeof p.ref==='string'?document.querySelector(p.ref):p.ref;if(!ref)return b;
+  if(p.wrap){const w=el('div','bk-pdfrow');w.appendChild(b);ref.insertAdjacentElement(p.pos||'afterend',w)}
+  else ref.insertAdjacentElement(p.pos||'afterend',b);
+  return b;
+};
+BK.setup=cfg=>{
+  BK.cfg=cfg;
+  if(cfg.url)BK.qr(cfg.url,cfg.what||(cfg.sim?'Simulation':'Übung'));
+  (cfg.buttons||[]).forEach(p=>BK.button(p,p.over));
+};
+
+/* Aufgaben mit richtiger Lösung und Vermerk, ob richtig gelöst */
+const VERD={first:['ok','✓ richtig gelöst – im 1. Versuch'],clean:['ok','✓ richtig gelöst – ohne Fehlversuch'],ok:['ok','✓ richtig gelöst – nach Fehlversuch'],help:['ok','✓ richtig gelöst – mit Hilfen'],
+  shown:['bad','✗ nicht selbst gelöst – Lösung angesehen'],selfbad:['bad','✗ nicht richtig gelöst (Selbstkontrolle: Fehler)'],bad:['bad','✗ nicht richtig gelöst'],open:['open','– nicht beendet (abgebrochen)']};
+BK.verdict=(st,tries)=>{const v=VERD[st]||['open',String(st||'–')];let t=v[1];if(st==='ok'&&tries>1)t='✓ richtig gelöst – nach '+(tries-1)+' Fehlversuch'+(tries>2?'en':'');return {cls:v[0],txt:t}};
+BK.tasks=list=>{
+  list=(list||[]).filter(Boolean).slice().sort((a,b)=>(a.no||0)-(b.no||0));
+  if(!list.length)return '<p class="bk-small">Keine Aufgaben bearbeitet.</p>';
+  const n={ok:0,bad:0,open:0};list.forEach(i=>n[BK.verdict(i.st,i.tries).cls]++);
+  return `<h2 class="bk-h2">Aufgaben mit Lösung</h2><p class="bk-small">${list.length} Aufgabe${list.length>1?'n':''}: ${n.ok} richtig gelöst · ${n.bad} nicht richtig gelöst bzw. Lösung angesehen · ${n.open} nicht beendet. Zu jeder Aufgabe steht die richtige Lösung.</p>`
+   +list.map(i=>{const v=BK.verdict(i.st,i.tries);return `<div class="bk-sec bk-task bk-task-${v.cls}"><div class="bk-tk"><span><b>Aufgabe ${i.no}</b>${i.kind?' · '+i.kind:''}</span><span class="bk-v bk-v-${v.cls}">${v.txt}</span></div>
+     ${i.task?`<div class="bk-tq">${i.task}</div>`:''}<div class="bk-sol"><span class="bk-sl">Richtige Lösung</span><div class="bk-sb">${i.sol||'–'}</div></div>${i.note?`<div class="bk-tnote">${i.note}</div>`:''}</div>`}).join('');
+};
+
+/* ---------- Trainer mit Zählern und Verlauf (DOM-basiert) ---------- */
+BK.trainer=o=>{
+  const $=id=>document.getElementById(id),n=id=>{const e=$(id);return e?(parseInt(e.textContent,10)||0):0};
+  const fid=o.firstId||'roFirst';
+  const stats=()=>{
+    const so=n('roSolved'),fi=n(fid),se=n('roStreak'),sh=n('roShown'),done=so+sh,q=done?Math.round(fi/done*100):null;
+    return{ready:done>0,items:[['Aufgaben gelöst',so],[o.firstLabel||'beim 1. Versuch richtig',fi],['Serie',se],['Lösung angesehen',sh],['<b>Erfolgsquote</b>',q===null?'–':q+' %']],
+      note:`Erfolgsquote = Anteil der abgeschlossenen Aufgaben (gelöst oder Lösung angesehen), die ${o.firstLabel?'„'+o.firstLabel+'“ waren':'beim ersten Prüfen richtig waren'}. Aufgaben mit „Lösung zeigen“ zählen nicht als richtig.`};
+  };
+  const hb=$(o.histId||'histBody');
+  const bar=$('roSolved')&&$('roSolved').closest('.readout-bar');
+  BK.setup(Object.assign({sim:false,stats,
+    hint:'Die Auswertung enthält alle bearbeiteten Aufgaben aus dem Verlauf mit Ergebnis und Bewertung sowie die Statistik mit der Erfolgsquote.',
+    buttons:bar?[{ref:bar,wrap:true}]:[],
+    build:()=>(o.items?BK.tasks(o.items()):`<h2 class="bk-h2">Bearbeitete Aufgaben</h2><div class="bk-sec bk-long">${BK.tbl(hb&&hb.closest('table'),{reverse:o.reverse!==false,emptyText:'Keine Aufgaben im Verlauf.'})}</div>`)+(o.after?o.after():'')},o));
+};
+})();
+
+</script>
+<script id="bk-page">
+BK.trainer({url:'https://chemie.mail-baumgart.de/SekI/SekI-Bindungsarten.html',footName:'Bindungsart-Trainer',version:'1.3',printTitle:'Bindungsart-Trainer – Zusammenfassung',
+  hint:'Die Auswertung enthält jede bearbeitete Aufgabe mit der richtigen Lösung und dem Vermerk, ob sie richtig gelöst wurde, sowie die Statistik mit der Erfolgsquote.',
+  items:()=>globalThis.__H.map(h=>({no:h.num,st:h.status,task:`Bestimme die Bindungsart: ${h.label}, Bindung ${h.bond}.`,sol:`EN(${h.a}) = ${h.ena} · EN(${h.b}) = ${h.enb} → ΔEN = ${h.d} → <b>${h.k}</b><br>Ladungen: <b>${h.chg}</b>`}))});
+
+</script>
+</body>
+</html>

@@ -296,6 +296,98 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
 .gl-nav{display:flex; align-items:center; gap:10px; border-top:1px solid var(--line-soft); padding-top:14px; margin-top:16px;}
 .gl-nav .sp{flex:1; text-align:center; font-size:12px; color:var(--text-faint);}
 </style>
+<style id="bk-style">
+/* ===== Baustein QR-Code + Auswertung als PDF (einheitlich nach Leitfaden) ===== */
+.bk-qr{display:flex;align-items:center;gap:7px;background:var(--panel,#1b1f23);border:1px solid var(--line,#31383e);border-radius:4px;padding:2px 8px 2px 2px;color:var(--text-dim,#9aa2a9);font:inherit;font-size:10px;line-height:1.2;text-align:left;cursor:pointer;min-height:0;touch-action:manipulation}
+.bk-qr:hover{border-color:var(--teal,#4fd1c5);color:var(--text,#e7e4dd)}
+.bk-qr b{display:block;color:var(--text,#e7e4dd);font-weight:600;font-size:10.5px}
+.bk-qr svg{width:30px;height:30px;display:block;border-radius:2px}
+.bk-hr{display:flex;align-items:center;gap:12px;margin-left:auto;align-self:center;flex-wrap:wrap;justify-content:flex-end}
+header .back-btn{align-self:baseline}
+header>.tag{flex:1 1 160px;min-width:0}
+.bk-hr .status,.bk-hr #statusBadge,.bk-hr #status{margin-left:0!important}
+.bk-ov{display:none;position:fixed;inset:0;z-index:1000;background:rgba(8,10,12,.82);align-items:center;justify-content:center;padding:20px;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+.bk-ov.open{display:flex}
+.bk-qrbox{background:var(--panel,#1b1f23);border:1px solid var(--line,#31383e);border-radius:6px;padding:22px 24px 20px;text-align:center;max-width:94vw}
+.bk-qrbox svg{width:min(62vh,80vw,520px);height:auto;display:block;margin:0 auto;border-radius:4px}
+.bk-qrbox .bk-url{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;font-size:clamp(14px,2.2vw,22px);color:var(--text,#e7e4dd);margin:16px 0 4px;word-break:break-all}
+.bk-qrbox .bk-qhint{font-size:13px;color:var(--text-dim,#9aa2a9);margin:0 0 14px}
+.bk-b{font:inherit;font-size:14px;color:var(--text,#e7e4dd);background:var(--panel-alt,#20252a);border:1px solid var(--line,#31383e);border-radius:8px;padding:8px 18px;min-height:44px;cursor:pointer;touch-action:manipulation}
+.bk-b:hover{border-color:var(--text-faint,#5f6870)}
+.bk-b.pri{background:var(--teal,#4fd1c5);border-color:var(--teal,#4fd1c5);color:#0e1113;font-weight:650}
+.bk-b:disabled{opacity:.4;cursor:default}
+.bk-dlg{background:var(--panel,#1b1f23);border:1px solid var(--line,#31383e);border-radius:6px;width:min(620px,100%);max-height:90vh;overflow:auto;padding:18px 22px 20px;color:var(--text,#e7e4dd);font-size:14px;line-height:1.5}
+.bk-dhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.bk-dhead h2{font-size:18px;margin:0;font-weight:650;color:var(--text,#e7e4dd)}
+.bk-x{background:none;border:0;color:var(--text-dim,#9aa2a9);font-size:24px;line-height:1;cursor:pointer;min-width:44px;min-height:44px}
+.bk-x:hover{color:var(--text,#e7e4dd)}
+.bk-dh{color:var(--amber,#ffb454);font-weight:650;font-size:15px;margin:14px 0 8px}
+.bk-dh:first-of-type{margin-top:2px}
+.bk-runs label{display:flex;align-items:center;gap:12px;border:1px solid var(--line,#31383e);border-radius:8px;padding:10px 12px;margin-bottom:8px;background:var(--panel-alt,#20252a);min-height:48px;cursor:pointer}
+.bk-runs input{width:22px;height:22px;accent-color:var(--teal,#4fd1c5);flex:none;margin:0}
+.bk-runs i{width:16px;height:4px;border-radius:2px;flex:none}
+.bk-none{color:var(--text-dim,#9aa2a9);font-size:13.5px;margin:0}
+.bk-stat{display:grid;grid-template-columns:1fr auto;gap:4px 12px;border:1px solid var(--line,#31383e);border-radius:8px;padding:10px 12px;background:var(--panel-alt,#20252a);font-size:14px}
+.bk-stat span:nth-child(even){font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;color:var(--amber,#ffb454);text-align:right}
+.bk-row{display:flex;gap:10px}
+.bk-row input{flex:1;min-width:0;font:inherit;font-size:15px;color:var(--text,#e7e4dd);background:var(--screen,#0e1113);border:1px solid var(--line,#31383e);border-radius:8px;padding:10px 12px;min-height:44px}
+.bk-row input::placeholder{color:var(--text-faint,#5f6870)}
+.bk-hint{color:var(--text-dim,#9aa2a9);font-size:13.5px;margin:14px 0 0}
+.bk-hint b{color:var(--text,#e7e4dd)}
+.bk-btns{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.bk-pdfrow{display:flex;justify-content:flex-end;gap:10px;margin-top:10px;flex-wrap:wrap}
+.bk-print-host{display:none}
+@media (max-width:600px){.bk-qr span:last-child{display:none}.bk-qr{padding:4px}.bk-row{flex-direction:column}}
+@media print{
+  @page{size:A4;margin:14mm}
+  :root,html,body.bk-pr{background:#fff!important;color:#000!important;color-scheme:light!important}
+  body.bk-pr > *:not(.bk-print-host){display:none!important}
+  body.bk-pr .bk-print-host{display:block!important;position:static!important}
+}
+.bk-sheet{--text:#111;--text-dim:#333;--text-faint:#555;--amber:#9a5b00;--teal:#0f766e;--good:#2e7d32;--danger:#b23c17;--line:#999;--line-soft:#bbb;--bg:#fff;--panel:#fff;--panel-alt:#fff;--screen:#fff;color:#000;background:#fff;font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;font-size:10.5pt;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact;text-align:left}
+.bk-sheet *{color:inherit;text-shadow:none!important;box-shadow:none!important}
+.bk-sheet h1.bk-h1{font-size:17pt;margin:0 0 6pt;font-weight:700;color:#000}
+.bk-sheet .bk-kick{font-size:9pt;text-transform:uppercase;letter-spacing:.06em;color:#555}
+.bk-sheet table.bk-meta{border-collapse:collapse;width:100%;margin:2pt 0 10pt}
+.bk-sheet table.bk-meta td{border:0!important;padding:3pt 10pt 3pt 0!important;font-size:11pt;background:none!important}
+.bk-sheet .bk-line{border-bottom:1px solid #000;min-width:120pt;display:inline-block}
+.bk-sheet .bk-sec{margin:0 0 10pt;break-inside:avoid;page-break-inside:avoid}
+.bk-sheet .bk-sec.bk-long{break-inside:auto;page-break-inside:auto}
+.bk-sheet h2.bk-h2{font-size:12.5pt;margin:12pt 0 4pt;padding-bottom:2pt;border-bottom:1px solid #999;font-weight:700;color:#000;break-after:avoid;page-break-after:avoid}
+.bk-sheet h3.bk-h3{font-size:11pt;margin:8pt 0 3pt;font-weight:700;color:#000;break-after:avoid;page-break-after:avoid}
+.bk-sheet table.bk-t{border-collapse:collapse;width:100%;margin:3pt 0 6pt;break-inside:avoid;page-break-inside:avoid}
+/* Tabellen nie mitten durchtrennen: passt sie nicht mehr auf die Seite, beginnt sie auf der nächsten; nur eine Tabelle, die länger als eine Seite ist, bricht zwischen den Zeilen um */
+.bk-sheet table.bk-t tr{break-inside:avoid;page-break-inside:avoid}
+.bk-sheet table.bk-t th,.bk-sheet table.bk-t td{border:1px solid #888!important;padding:3pt 6pt!important;text-align:left;vertical-align:middle;font-size:9.5pt;white-space:normal!important;background:#fff!important;color:#000!important}
+.bk-sheet table.bk-t th{background:#eee!important;font-weight:700}
+.bk-sheet table.bk-t td *{color:#000!important}
+.bk-sheet table.bk-sum{border-collapse:collapse;margin:2pt 0 4pt}
+.bk-sheet table.bk-sum td{border:0!important;padding:2pt 14pt 2pt 0!important;font-size:10.5pt;background:none!important}
+.bk-sheet .bk-small{font-size:8.5pt;color:#333}
+.bk-sheet .bk-img{display:block;max-width:100%;max-height:120mm;margin:4pt auto;border:1px solid #bbb}
+.bk-sheet .bk-leg{display:flex;flex-wrap:wrap;gap:4pt 14pt;font-size:9pt;margin:2pt 0 4pt}
+.bk-sheet .bk-leg i{display:inline-block;width:16pt;height:3pt;margin-right:5pt;vertical-align:middle;border-radius:1pt}
+.bk-sheet .bk-cond{margin:2pt 0 4pt}
+.bk-sheet svg{color:#000;max-width:100%}
+.bk-sheet{--oxy:#c0392b;--nitro:#1f5fbf;--hal:#2e7d32;--bond:#222;--amber-dim:#9a5b00;--teal-dim:#0f766e;--good-dim:#2e7d32}
+.bk-sheet .bk-task{border:1px solid #aaa;border-left:4pt solid #888;border-radius:3px;padding:5pt 8pt 6pt;margin:0 0 7pt}
+.bk-sheet .bk-task-ok{border-left-color:#2e7d32}.bk-sheet .bk-task-bad{border-left-color:#b23c17}.bk-sheet .bk-task-open{border-left-color:#999}
+.bk-sheet .bk-tk{display:flex;justify-content:space-between;align-items:baseline;gap:8pt;flex-wrap:wrap;font-size:10.5pt;margin-bottom:3pt}
+.bk-sheet .bk-v{font-weight:700;font-size:9.5pt;white-space:nowrap}
+.bk-sheet .bk-v-ok{color:#2e7d32}.bk-sheet .bk-v-bad{color:#b23c17}.bk-sheet .bk-v-open{color:#666}
+.bk-sheet .bk-tq{font-size:10pt;margin:0 0 4pt}
+.bk-sheet .bk-sol{background:#f4f6f5;border-radius:2px;padding:4pt 6pt;font-size:10pt}
+.bk-sheet .bk-sl{display:block;font-size:8pt;text-transform:uppercase;letter-spacing:.05em;color:#555;margin-bottom:2pt}
+.bk-sheet .bk-sb svg,.bk-sheet .bk-tq svg{max-width:100%;height:auto;max-height:60mm}
+.bk-sheet .bk-sb .figure,.bk-sheet .bk-tq .figure{max-width:100%!important;margin:2pt 0;background:none;border:0;padding:0}
+.bk-sheet .bk-sb p{margin:2pt 0}.bk-sheet .bk-sb ul{margin:2pt 0 2pt 14pt;padding:0}
+.bk-sheet .bk-eq{display:flex;flex-wrap:wrap;align-items:center;gap:3pt 8pt}
+.bk-sheet .bk-eq .co{font-weight:700;margin-right:2pt}
+.bk-sheet .bk-eq .sp{display:inline-flex;align-items:center;gap:2pt}
+.bk-sheet .bk-eq svg{max-height:32mm;width:auto}
+.bk-sheet .bk-tnote{font-size:9pt;color:#333;margin-top:3pt}
+.bk-sheet .bk-foot{margin-top:14pt;border-top:1px solid #888;padding-top:4pt;font-size:8.5pt;color:#444;text-align:center}
+</style>
 </head>
 <body>
 
@@ -348,6 +440,10 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
       <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.3</span><span class="d">07.11.2026</span></div>
+      <ul>
+        <li><strong>Auswertung als PDF:</strong> neuer Knopf „Zusammenfassung als PDF“ unter den Zählern. Der einheitliche Dialog „Auswertung als PDF“ zeigt die Statistik mit Erfolgsquote und optionale Felder für Name und Kurs; das PDF enthält zu jeder Aufgabe aus dem Verlauf die richtige Lösung mit dem Vermerk, ob sie richtig gelöst wurde, die Statistik und das Datum (druckfreundliches A4-Layout).</li><li><strong>QR-Code:</strong> Schaltfläche rechts in der Kopfzeile; Antippen vergrößert den QR-Code, mit dem sich diese Seite direkt auf dem Mobilgerät öffnen lässt.</li>
+      </ul>
       <div class="vh-ver"><span class="v">V1.2</span><span class="d">01.11.2026</span></div>
       <ul>
         <li><strong>Neue Rubrik „Grundlagen“:</strong> Der Knopf „Grundlagen“ oben in der linken Spalte klappt 5 Themen mit Erklärtext und Grafiken zu den fachlichen und methodischen Grundlagen auf. Mit den Knöpfen unten oder den Pfeiltasten blättert man zwischen den Themen.</li>
@@ -499,7 +595,7 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
 
 <footer>
   <p class="footer-note">Vereinfachtes Atommodell nach Niels Bohr (1913) für die Hauptgruppenelemente der ersten drei Perioden, wahlweise mit der 4. Periode. Atommassen gerundet nach IUPAC-Standardwerten.</p>
-  <p class="footer-credit">Bastian Baumgart · Schalenmodell-Trainer V1.2 · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Schalenmodell-Trainer V1.3 · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <script>
@@ -564,6 +660,7 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
   let task = null, taskCounter = 0;
   const stats = {solved:0, first:0, streak:0, shown:0};
   const history = [];
+  globalThis.__H = history;
   const nShells = () => 3 + (useN?1:0);
   const maxPer = () => nShells();
 
@@ -1008,6 +1105,295 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
     if (e.key === "ArrowLeft" && idx > 0) show(idx - 1);
   });
 })();
+</script>
+<script id="bk-kit">
+/* ===== Baustein QR-Code + Auswertung als PDF (einheitlich nach Leitfaden, keine Bibliotheken) ===== */
+(()=>{
+'use strict';
+const QR=(()=>{
+  const ECC=[7,10,15,20,26,18,20,24,30,18],NB=[1,1,1,1,1,2,2,2,2,4];
+  const raw=v=>{let r=(16*v+128)*v+64;if(v>=2){const n=Math.floor(v/7)+2;r-=(25*n-10)*n-55;if(v>=7)r-=36}return r};
+  const dataCw=v=>Math.floor(raw(v)/8)-ECC[v-1]*NB[v-1];
+  const mul=(x,y)=>{let z=0;for(let i=7;i>=0;i--){z=(z<<1)^((z>>>7)*0x11D);z^=((y>>>i)&1)*x}return z};
+  const divisor=d=>{const r=new Array(d).fill(0);r[d-1]=1;let root=1;for(let i=0;i<d;i++){for(let j=0;j<d;j++){r[j]=mul(r[j],root);if(j+1<d)r[j]^=r[j+1]}root=mul(root,2)}return r};
+  const rem=(data,div)=>{const r=new Array(div.length).fill(0);for(const b of data){const f=b^r.shift();r.push(0);div.forEach((c,i)=>{r[i]^=mul(c,f)})}return r};
+  const bit=(x,i)=>((x>>>i)&1)!==0;
+  function make(text){
+    const bytes=[...new TextEncoder().encode(text)];
+    let ver=0;for(let v=1;v<=10;v++){if(4+(v<10?8:16)+8*bytes.length<=dataCw(v)*8){ver=v;break}}
+    if(!ver)throw new Error('Text zu lang');
+    const bits=[];const put=(val,n)=>{for(let i=n-1;i>=0;i--)bits.push((val>>>i)&1)};
+    put(4,4);put(bytes.length,ver<10?8:16);bytes.forEach(b=>put(b,8));
+    const cap=dataCw(ver)*8;put(0,Math.min(4,cap-bits.length));put(0,(8-bits.length%8)%8);
+    for(let p=0xEC;bits.length<cap;p^=0xEC^0x11)put(p,8);
+    const data=[];for(let i=0;i<bits.length;i+=8){let b=0;for(let j=0;j<8;j++)b=(b<<1)|bits[i+j];data.push(b)}
+    const nb=NB[ver-1],el=ECC[ver-1],rc=Math.floor(raw(ver)/8),ns=nb-rc%nb,sl=Math.floor(rc/nb),div=divisor(el),blocks=[];
+    for(let i=0,k=0;i<nb;i++){const d=data.slice(k,k+sl-el+(i<ns?0:1));k+=d.length;const e=rem(d,div);if(i<ns)d.push(0);blocks.push(d.concat(e))}
+    const all=[];for(let i=0;i<blocks[0].length;i++)blocks.forEach((b,j)=>{if(i!==sl-el||j>=ns)all.push(b[i])});
+    const size=ver*4+17,m=[],fn=[];for(let i=0;i<size;i++){m.push(new Array(size).fill(false));fn.push(new Array(size).fill(false))}
+    const sf=(x,y,d)=>{m[y][x]=d;fn[y][x]=true};
+    for(let i=0;i<size;i++){sf(6,i,i%2===0);sf(i,6,i%2===0)}
+    const finder=(x,y)=>{for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){const d=Math.max(Math.abs(dx),Math.abs(dy)),xx=x+dx,yy=y+dy;if(xx>=0&&xx<size&&yy>=0&&yy<size)sf(xx,yy,d!==2&&d!==4)}};
+    finder(3,3);finder(size-4,3);finder(3,size-4);
+    let pos=[];if(ver>1){const n=Math.floor(ver/7)+2,step=Math.ceil((ver*4+4)/(n*2-2))*2;pos=[6];for(let p=size-7;pos.length<n;p-=step)pos.splice(1,0,p)}
+    pos.forEach((px,i)=>pos.forEach((py,j)=>{if((i===0&&j===0)||(i===0&&j===pos.length-1)||(i===pos.length-1&&j===0))return;for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)sf(px+dx,py+dy,Math.max(Math.abs(dx),Math.abs(dy))!==1)}));
+    const fmt=mask=>{const d=(1<<3)|mask;let r=d;for(let i=0;i<10;i++)r=(r<<1)^((r>>>9)*0x537);const b=((d<<10)|r)^0x5412;
+      for(let i=0;i<=5;i++)sf(8,i,bit(b,i));sf(8,7,bit(b,6));sf(8,8,bit(b,7));sf(7,8,bit(b,8));for(let i=9;i<15;i++)sf(14-i,8,bit(b,i));
+      for(let i=0;i<8;i++)sf(size-1-i,8,bit(b,i));for(let i=8;i<15;i++)sf(8,size-15+i,bit(b,i));sf(8,size-8,true)};
+    fmt(0);
+    if(ver>=7){let r=ver;for(let i=0;i<12;i++)r=(r<<1)^((r>>>11)*0x1F25);const b=(ver<<12)|r;for(let i=0;i<18;i++){const c=bit(b,i),a=size-11+i%3,bb=Math.floor(i/3);sf(a,bb,c);sf(bb,a,c)}}
+    let k=0;for(let right=size-1;right>=1;right-=2){if(right===6)right=5;for(let v=0;v<size;v++)for(let j=0;j<2;j++){const x=right-j,up=((right+1)&2)===0,y=up?size-1-v:v;if(!fn[y][x]&&k<all.length*8){m[y][x]=bit(all[k>>>3],7-(k&7));k++}}}
+    const MF=[(x,y)=>(x+y)%2===0,(x,y)=>y%2===0,(x,y)=>x%3===0,(x,y)=>(x+y)%3===0,(x,y)=>(Math.floor(x/3)+Math.floor(y/2))%2===0,(x,y)=>x*y%2+x*y%3===0,(x,y)=>(x*y%2+x*y%3)%2===0,(x,y)=>((x+y)%2+x*y%3)%2===0];
+    const apply=mk=>{for(let y=0;y<size;y++)for(let x=0;x<size;x++)if(!fn[y][x]&&MF[mk](x,y))m[y][x]=!m[y][x]};
+    const pen=()=>{let p=0;
+      for(let t=0;t<2;t++)for(let a=0;a<size;a++){let run=1;for(let b=1;b<size;b++){const c=t?m[b][a]:m[a][b],d=t?m[b-1][a]:m[a][b-1];if(c===d){run++;if(run===5)p+=3;else if(run>5)p++}else run=1}}
+      for(let y=0;y<size-1;y++)for(let x=0;x<size-1;x++){const c=m[y][x];if(c===m[y][x+1]&&c===m[y+1][x]&&c===m[y+1][x+1])p+=3}
+      let dark=0;m.forEach(r=>r.forEach(c=>{if(c)dark++}));p+=Math.floor(Math.abs(dark*20-size*size*10)/(size*size))*10;return p};
+    let best=0,bp=1e9;for(let mk=0;mk<8;mk++){apply(mk);fmt(mk);const p=pen();if(p<bp){bp=p;best=mk}apply(mk)}
+    apply(best);fmt(best);return m;
+  }
+  function svg(text,px){const m=make(text),n=m.length,q=4,tot=n+2*q;let d='';
+    for(let y=0;y<n;y++)for(let x=0;x<n;x++)if(m[y][x])d+=`M${x+q},${y+q}h1v1h-1z`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${px}" height="${px}" viewBox="0 0 ${tot} ${tot}" shape-rendering="crispEdges" role="img" aria-label="QR-Code"><rect width="${tot}" height="${tot}" fill="#fff"/><path d="${d}" fill="#000"/></svg>`}
+  return{make,svg};
+})();
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const el=(tag,cls,html)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e};
+const today=()=>{const d=new Date();return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear()};
+const BK={runs:[],cfg:null,nm:'',ku:'',esc,today,_id:0};
+window.BK=BK;
+
+/* ---------- Diagramme für den Ausdruck: Helligkeit umkehren (weißer Hintergrund, dunkle Linien) ---------- */
+function invertCanvas(src){
+  const w=src.width,h=src.height;if(!w||!h)return '';
+  const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');
+  x.drawImage(src,0,0);
+  let d;try{d=x.getImageData(0,0,w,h)}catch(_){return ''}
+  const p=d.data;
+  for(let i=0;i<p.length;i+=4){
+    if(p[i+3]===0)continue;
+    const r=p[i],g=p[i+1],b=p[i+2],mx=Math.max(r,g,b),mn=Math.min(r,g,b);
+    if(mx<46&&mx-mn<16){p[i]=p[i+1]=p[i+2]=255;continue}          // dunkler Hintergrund → weiß
+    const s=255-(mx+mn);                                             // Helligkeit spiegeln, Farbton behalten
+    const R=r+s,G=g+s,B=b+s;
+    p[i]=R<0?0:R>255?255:R;p[i+1]=G<0?0:G>255?255:G;p[i+2]=B<0?0:B>255?255:B;
+  }
+  x.putImageData(d,0,0);
+  return c.toDataURL('image/png');
+}
+/* Linienfarbe wie im invertierten Diagramm (für Legenden) */
+BK.ink=hex=>{const m=/^#?([0-9a-f]{6})$/i.exec(String(hex).trim());if(!m)return hex;const n=parseInt(m[1],16),r=n>>16,g=(n>>8)&255,b=n&255,s=255-(Math.max(r,g,b)+Math.min(r,g,b));
+  return '#'+[r+s,g+s,b+s].map(v=>Math.max(0,Math.min(255,v)).toString(16).padStart(2,'0')).join('')};
+BK.cimg=cv=>{try{return cv&&cv.width?invertCanvas(cv):''}catch(_){return ''}};
+const SVGP=['fill','stroke','stroke-width','stroke-dasharray','stroke-linecap','stroke-linejoin','opacity','fill-opacity','stroke-opacity','font-size','font-family','font-weight','font-style','text-anchor','dominant-baseline','visibility','display','letter-spacing'];
+BK.simg=svg=>new Promise(res=>{
+  try{
+    const r=svg.getBoundingClientRect(),W=Math.max(1,Math.round(r.width||svg.clientWidth||300)),H=Math.max(1,Math.round(r.height||svg.clientHeight||200));
+    const cl=svg.cloneNode(true),a=[svg,...svg.querySelectorAll('*')],b=[cl,...cl.querySelectorAll('*')];
+    a.forEach((n,i)=>{const cs=getComputedStyle(n);b[i].setAttribute('style',SVGP.map(k=>k+':'+cs.getPropertyValue(k)).join(';'))});
+    cl.setAttribute('width',W);cl.setAttribute('height',H);cl.setAttribute('xmlns','http://www.w3.org/2000/svg');
+    if(!cl.getAttribute('viewBox')&&svg.viewBox&&svg.viewBox.baseVal&&svg.viewBox.baseVal.width){const v=svg.viewBox.baseVal;cl.setAttribute('viewBox',`${v.x} ${v.y} ${v.width} ${v.height}`)}
+    const im=new Image(),sc=2;
+    im.onload=()=>{const c=document.createElement('canvas');c.width=W*sc;c.height=H*sc;const x=c.getContext('2d');x.scale(sc,sc);x.drawImage(im,0,0,W,H);res(invertCanvas(c))};
+    im.onerror=()=>res('');
+    im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(cl));
+  }catch(_){res('')}
+});
+BK.imgTag=(src,alt)=>src?`<img class="bk-img" src="${src}" alt="${esc(alt||'Diagramm')}">`:'<p class="bk-small">Diagramm nicht verfügbar.</p>';
+BK.leg=items=>items&&items.length?`<div class="bk-leg">${items.map(([c,t])=>`<span><i style="background:${c}"></i>${t}</span>`).join('')}</div>`:'';
+/* Tabelle der Seite sauber übernehmen (ohne Knöpfe, Eingaben als Text) */
+BK.tbl=(t,opt)=>{
+  opt=opt||{};if(!t)return '';
+  const c=t.cloneNode(true);
+  c.querySelectorAll('button,script,.empty-hint').forEach(n=>{const tr=n.closest('tr');if(n.classList.contains('empty-hint')&&tr)tr.remove();else n.remove()});
+  c.querySelectorAll('input,select,textarea').forEach(n=>{const v=n.tagName==='SELECT'?(n.options[n.selectedIndex]||{}).text:(n.type==='checkbox'?(n.checked?'✓':''):n.value);n.replaceWith(document.createTextNode(v||''))});
+  c.querySelectorAll('[style]').forEach(n=>{n.style.color='';n.style.background='';n.style.backgroundColor=''});
+  c.removeAttribute('id');c.className='bk-t';
+  if(opt.reverse){const tb=c.tBodies[0];if(tb)[...tb.rows].reverse().forEach(r=>tb.appendChild(r))}
+  const rows=c.tBodies[0]?c.tBodies[0].rows.length:0;
+  if(!rows&&opt.emptyText)return `<p class="bk-small">${opt.emptyText}</p>`;
+  return c.outerHTML;
+};
+BK.condRows=list=>`<table class="bk-t"><tbody>${list.filter(x=>x&&x[1]!==''&&x[1]!=null).map(([k,v])=>`<tr><th style="width:42%">${k}</th><td>${v}</td></tr>`).join('')}</tbody></table>`;
+BK.sec=(h,body,long)=>`<div class="bk-sec${long?' bk-long':''}">${h?`<h3 class="bk-h3">${h}</h3>`:''}${body}</div>`;
+
+/* Reiter kurz sichtbar machen, Diagramme neu zeichnen lassen (resize), fn ausführen, zurücksetzen */
+BK.showing=(panels,fn)=>{
+  panels=(Array.isArray(panels)?panels:[panels]).map(p=>typeof p==='string'?document.querySelector(p):p).filter(Boolean);
+  const keep=panels.map(p=>p.style.display);panels.forEach(p=>p.style.display='block');
+  window.dispatchEvent(new Event('resize'));
+  let r;try{r=fn()}finally{panels.forEach((p,i)=>p.style.display=keep[i]);window.dispatchEvent(new Event('resize'))}
+  return r;
+};
+BK.ro=sel=>[...document.querySelectorAll(sel||'.readout')].filter(r=>r.querySelector('.k')&&r.querySelector('.v')).map(r=>[r.querySelector('.k').innerHTML,r.querySelector('.v').innerHTML]);
+BK.COL=['#4fd1c5','#ffb454','#7fd68a','#e4785b','#b79cf2','#6cb6ff','#f2a3c7','#c9d36a'];
+
+/* Einstellungen der linken Spalte als Tabelle (sichtbare Bereiche, ohne Grundlagen/Darstellung/Beispiele) */
+BK.side=(root,skip)=>{
+  root=typeof root==='string'?document.querySelector(root):(root||document.querySelector('.sidebar'));const rows=[];if(!root)return rows;
+  skip=skip||/^(Darstellung|Beispiel|Diagramm|Grundlagen)/;
+  const vis=e=>e&&e.offsetParent!==null&&!e.closest('[hidden]');
+  root.querySelectorAll('section.block').forEach(sec=>{
+    if(!vis(sec)||sec.querySelector('.gl-toggle'))return;
+    const h2=sec.querySelector('h2'),h=h2?h2.firstChild.textContent.trim():'';if(skip.test(h))return;
+    sec.querySelectorAll('.mode-toggle,.seg').forEach(mt=>{if(!vis(mt))return;const a=mt.querySelector('button.active,button.on');if(a)rows.push([h,a.textContent.trim()])});
+    sec.querySelectorAll('select').forEach(x=>{if(!vis(x))return;const lab=x.id&&sec.querySelector('label[for="'+x.id+'"]');rows.push([(lab?lab.textContent:h).trim(),x.selectedOptions[0]?x.selectedOptions[0].text:''])});
+    sec.querySelectorAll('.row').forEach(r=>{if(!vis(r))return;const l=r.querySelector('label'),v=r.querySelector('.val');if(l&&v)rows.push([l.textContent.trim(),v.textContent.trim()])});
+    sec.querySelectorAll('label.sw').forEach(sw=>{if(!vis(sw))return;const i=sw.querySelector('input'),t=sw.querySelector('.sw-text');if(!i||!t)return;rows.push([t.childNodes[0].textContent.trim(),i.checked?'ein':'aus'])});
+  });
+  return rows.map(([k,v])=>[BK.esc(k),BK.esc(v)]);
+};
+
+/* ---------- QR-Schaltfläche ---------- */
+BK.qr=(url,what)=>{
+  const hd=document.querySelector('header');if(!hd||document.querySelector('.bk-qr'))return;
+  const b=el('button','bk-qr','<span class="bk-qs"></span><span><b>Auf dem Mobilgerät öffnen</b>QR-Code antippen zum Vergrößern</span>');
+  b.type='button';b.title='QR-Code vergrößern';b.setAttribute('aria-haspopup','dialog');
+  const st=hd.querySelector('#statusBadge,#status,.status'),grp=el('div','bk-hr');
+  if(st&&st.parentNode===hd){hd.insertBefore(grp,st);grp.appendChild(b);grp.appendChild(st)}else{hd.appendChild(grp);grp.appendChild(b)}
+  b.querySelector('.bk-qs').innerHTML=QR.svg(url,66);
+  const ov=el('div','bk-ov',`<div class="bk-qrbox" role="dialog" aria-modal="true" aria-label="QR-Code zu dieser Seite"><div class="bk-qbig"></div><p class="bk-url">${esc(decodeURI(url.replace(/^https?:\/\//,'')))}</p><p class="bk-qhint">Mit der Kamera scannen, um diese ${esc(what||'Simulation')} auf dem eigenen Gerät zu öffnen.</p><button type="button" class="bk-b bk-qclose">Schließen</button></div>`);
+  document.body.appendChild(ov);ov.querySelector('.bk-qbig').innerHTML=QR.svg(url,520);
+  const open=()=>{ov.classList.add('open');ov.querySelector('.bk-qclose').focus()},shut=()=>{ov.classList.remove('open');b.focus()};
+  b.addEventListener('click',open);ov.querySelector('.bk-qclose').addEventListener('click',shut);
+  ov.addEventListener('click',e=>{if(e.target===ov)shut()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&ov.classList.contains('open'))shut()});
+};
+
+/* ---------- Läufe ---------- */
+BK.addRun=r=>{if(!r)return;r.id=++BK._id;BK.runs.push(r);if(BK.runs.length>(BK.cfg&&BK.cfg.maxRuns||16))BK.runs.shift();return r};
+BK.clearRuns=()=>{BK.runs=[]};
+
+/* ---------- Dialog „Auswertung als PDF“ ---------- */
+let dlg,C=null,cur=[];
+function hostEl(){
+  let h=C.printHost?document.querySelector(C.printHost):document.getElementById('bkPrint');
+  if(!h){h=el('div');h.id='bkPrint';document.body.appendChild(h)}
+  h.classList.add('bk-print-host');return h;
+}
+function ensure(){
+  if(dlg)return;
+  dlg=el('div','bk-ov',`<div class="bk-dlg" role="dialog" aria-modal="true" aria-labelledby="bkDlgT">
+    <div class="bk-dhead"><h2 id="bkDlgT">Auswertung als PDF</h2><button type="button" class="bk-x" aria-label="Schließen">×</button></div>
+    <div class="bk-dh" id="bkSelH"></div>
+    <div id="bkSel"></div>
+    <div class="bk-dh">Angaben (optional)</div>
+    <div class="bk-row"><input id="bkName" placeholder="Name" autocomplete="off" maxlength="60" aria-label="Name"><input id="bkKurs" placeholder="Kurs" autocomplete="off" maxlength="40" aria-label="Kurs"></div>
+    <p class="bk-hint" id="bkHint"></p>
+    <p class="bk-hint"><b>So speicherst du das PDF:</b> Nach „PDF erstellen“ öffnet sich der Druckdialog des Browsers. Dort als Drucker bzw. Ziel <b>„Als PDF speichern“</b> wählen und auf „Speichern“ tippen (am iPad: Teilen → „In Dateien sichern“). Es wird nichts gedruckt oder übertragen.</p>
+    <div class="bk-btns"><button type="button" class="bk-b pri" id="bkGo">PDF erstellen</button><button type="button" class="bk-b" id="bkCancel">Abbrechen</button></div></div>`);
+  document.body.appendChild(dlg);
+  const shut=()=>dlg.classList.remove('open');
+  dlg.querySelector('.bk-x').addEventListener('click',shut);dlg.querySelector('#bkCancel').addEventListener('click',shut);
+  dlg.addEventListener('click',e=>{if(e.target===dlg)shut()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&dlg.classList.contains('open')){e.stopPropagation();shut()}},true);
+  dlg.querySelector('#bkSel').addEventListener('change',()=>{if(C&&C.sim)dlg.querySelector('#bkGo').disabled=!dlg.querySelector('#bkSel input:checked')});
+  dlg.querySelector('#bkGo').addEventListener('click',go);
+  window.addEventListener('afterprint',()=>document.body.classList.remove('bk-pr'));
+}
+BK.open=over=>{
+  C=Object.assign({},BK.cfg,over||{});ensure();
+  const sel=dlg.querySelector('#bkSel'),btn=dlg.querySelector('#bkGo');
+  dlg.querySelector('#bkSelH').textContent=C.sim?'Welche Läufe sollen ins PDF?':'Statistik';
+  sel.className=C.sim?'bk-runs':'bk-stat';
+  dlg.querySelector('#bkHint').innerHTML=C.hint||'';
+  if(C.sim){
+    cur=runList();
+    sel.innerHTML=cur.length?cur.map(r=>`<label><input type="checkbox" value="${esc(r.id)}" checked><i style="background:${r.color||'var(--teal,#4fd1c5)'}"></i><span>${r.label}</span></label>`).join(''):`<p class="bk-none">${C.noRuns||'Noch kein Lauf abgeschlossen.'}</p>`;
+    btn.disabled=!cur.length;
+  }else{
+    const s=C.stats();
+    sel.innerHTML=s.items.map(([k,v])=>`<span>${k}</span><span>${v}</span>`).join('');
+    btn.disabled=!s.ready;
+  }
+  dlg.querySelector('#bkName').value=BK.nm;dlg.querySelector('#bkKurs').value=BK.ku;
+  dlg.classList.add('open');setTimeout(()=>btn.focus(),30);
+};
+const runList=()=>{let l=C.runs?C.runs():BK.runs.slice();if(C.live){const lv=C.live();if(lv){lv.id=lv.id||'live';l=l.concat([lv])}}return l};
+async function go(){
+  const c=C,btn=dlg.querySelector('#bkGo');
+  BK.nm=dlg.querySelector('#bkName').value.trim().slice(0,60);BK.ku=dlg.querySelector('#bkKurs').value.trim().slice(0,40);
+  btn.disabled=true;
+  let body='';
+  try{
+    if(c.sim){
+      const ids=[...dlg.querySelectorAll('#bkSel input:checked')].map(i=>i.value);
+      const runs=cur.filter(r=>ids.includes(String(r.id)));
+      if(c.pre)body+=await c.pre(runs);
+      for(const r of runs){const h=await (typeof r.html==='function'?r.html():r.html);body+=`<h2 class="bk-h2">${r.label}</h2>${h||''}`}
+      if(c.extra)body+=await c.extra(runs);
+    }else{
+      const s=c.stats();
+      body+=`<h2 class="bk-h2">Statistik</h2><table class="bk-sum"><tbody>${s.items.map(([k,v],i)=>i%2?'':`<tr><td>${k}:</td><td><b>${v}</b></td>${s.items[i+1]?`<td>${s.items[i+1][0]}:</td><td><b>${s.items[i+1][1]}</b></td>`:''}</tr>`).join('')}</tbody></table>`;
+      if(s.note)body+=`<p class="bk-small">${s.note}</p>`;
+      body+=await c.build();
+    }
+  }catch(err){body+=`<p>Fehler beim Erstellen: ${esc(err.message)}</p>`}
+  const host=hostEl();
+  host.innerHTML=`<div class="bk-sheet"><div class="bk-kick">${esc(c.kick||(c.sim?'Simulation':'Übung'))}</div><h1 class="bk-h1">${c.printTitle}</h1>
+  <table class="bk-meta"><tr><td>Name: <span class="bk-line">${esc(BK.nm)}&nbsp;</span></td><td>Kurs: <span class="bk-line">${esc(BK.ku)}&nbsp;</span></td><td>Datum: <span class="bk-line">${today()}&nbsp;</span></td></tr></table>
+  ${body}
+  <div class="bk-foot">${c.footName} V${c.version} · Bastian Baumgart · chemie.mail-baumgart.de · Lizenz CC BY-NC-SA 4.0${c.sim||c.simNote?' · Simulierte Daten zu Lehrzwecken':''}</div></div>`;
+  dlg.classList.remove('open');btn.disabled=false;
+  document.body.classList.add('bk-pr');
+  const imgs=[...host.querySelectorAll('img')].filter(i=>!i.complete);
+  await Promise.all(imgs.map(i=>new Promise(r=>{i.onload=i.onerror=r})));
+  setTimeout(()=>window.print(),80);
+}
+
+/* ---------- Einrichtung ---------- */
+BK.button=(p,over)=>{
+  const c=Object.assign({},BK.cfg,over||{});
+  const b=el('button',(p.cls||c.btnClass||'btn')+' bk-pdfbtn',p.label||(c.sim?'Ausgabe als PDF':'Zusammenfassung als PDF'));b.type='button';
+  b.addEventListener('click',()=>BK.open(over));
+  const ref=typeof p.ref==='string'?document.querySelector(p.ref):p.ref;if(!ref)return b;
+  if(p.wrap){const w=el('div','bk-pdfrow');w.appendChild(b);ref.insertAdjacentElement(p.pos||'afterend',w)}
+  else ref.insertAdjacentElement(p.pos||'afterend',b);
+  return b;
+};
+BK.setup=cfg=>{
+  BK.cfg=cfg;
+  if(cfg.url)BK.qr(cfg.url,cfg.what||(cfg.sim?'Simulation':'Übung'));
+  (cfg.buttons||[]).forEach(p=>BK.button(p,p.over));
+};
+
+/* Aufgaben mit richtiger Lösung und Vermerk, ob richtig gelöst */
+const VERD={first:['ok','✓ richtig gelöst – im 1. Versuch'],clean:['ok','✓ richtig gelöst – ohne Fehlversuch'],ok:['ok','✓ richtig gelöst – nach Fehlversuch'],help:['ok','✓ richtig gelöst – mit Hilfen'],
+  shown:['bad','✗ nicht selbst gelöst – Lösung angesehen'],selfbad:['bad','✗ nicht richtig gelöst (Selbstkontrolle: Fehler)'],bad:['bad','✗ nicht richtig gelöst'],open:['open','– nicht beendet (abgebrochen)']};
+BK.verdict=(st,tries)=>{const v=VERD[st]||['open',String(st||'–')];let t=v[1];if(st==='ok'&&tries>1)t='✓ richtig gelöst – nach '+(tries-1)+' Fehlversuch'+(tries>2?'en':'');return {cls:v[0],txt:t}};
+BK.tasks=list=>{
+  list=(list||[]).filter(Boolean).slice().sort((a,b)=>(a.no||0)-(b.no||0));
+  if(!list.length)return '<p class="bk-small">Keine Aufgaben bearbeitet.</p>';
+  const n={ok:0,bad:0,open:0};list.forEach(i=>n[BK.verdict(i.st,i.tries).cls]++);
+  return `<h2 class="bk-h2">Aufgaben mit Lösung</h2><p class="bk-small">${list.length} Aufgabe${list.length>1?'n':''}: ${n.ok} richtig gelöst · ${n.bad} nicht richtig gelöst bzw. Lösung angesehen · ${n.open} nicht beendet. Zu jeder Aufgabe steht die richtige Lösung.</p>`
+   +list.map(i=>{const v=BK.verdict(i.st,i.tries);return `<div class="bk-sec bk-task bk-task-${v.cls}"><div class="bk-tk"><span><b>Aufgabe ${i.no}</b>${i.kind?' · '+i.kind:''}</span><span class="bk-v bk-v-${v.cls}">${v.txt}</span></div>
+     ${i.task?`<div class="bk-tq">${i.task}</div>`:''}<div class="bk-sol"><span class="bk-sl">Richtige Lösung</span><div class="bk-sb">${i.sol||'–'}</div></div>${i.note?`<div class="bk-tnote">${i.note}</div>`:''}</div>`}).join('');
+};
+
+/* ---------- Trainer mit Zählern und Verlauf (DOM-basiert) ---------- */
+BK.trainer=o=>{
+  const $=id=>document.getElementById(id),n=id=>{const e=$(id);return e?(parseInt(e.textContent,10)||0):0};
+  const fid=o.firstId||'roFirst';
+  const stats=()=>{
+    const so=n('roSolved'),fi=n(fid),se=n('roStreak'),sh=n('roShown'),done=so+sh,q=done?Math.round(fi/done*100):null;
+    return{ready:done>0,items:[['Aufgaben gelöst',so],[o.firstLabel||'beim 1. Versuch richtig',fi],['Serie',se],['Lösung angesehen',sh],['<b>Erfolgsquote</b>',q===null?'–':q+' %']],
+      note:`Erfolgsquote = Anteil der abgeschlossenen Aufgaben (gelöst oder Lösung angesehen), die ${o.firstLabel?'„'+o.firstLabel+'“ waren':'beim ersten Prüfen richtig waren'}. Aufgaben mit „Lösung zeigen“ zählen nicht als richtig.`};
+  };
+  const hb=$(o.histId||'histBody');
+  const bar=$('roSolved')&&$('roSolved').closest('.readout-bar');
+  BK.setup(Object.assign({sim:false,stats,
+    hint:'Die Auswertung enthält alle bearbeiteten Aufgaben aus dem Verlauf mit Ergebnis und Bewertung sowie die Statistik mit der Erfolgsquote.',
+    buttons:bar?[{ref:bar,wrap:true}]:[],
+    build:()=>(o.items?BK.tasks(o.items()):`<h2 class="bk-h2">Bearbeitete Aufgaben</h2><div class="bk-sec bk-long">${BK.tbl(hb&&hb.closest('table'),{reverse:o.reverse!==false,emptyText:'Keine Aufgaben im Verlauf.'})}</div>`)+(o.after?o.after():'')},o));
+};
+})();
+
+</script>
+<script id="bk-page">
+BK.trainer({url:'https://chemie.mail-baumgart.de/SekI/SekI-Schalenmodell.html',footName:'Schalenmodell-Trainer',version:'1.3',printTitle:'Schalenmodell-Trainer – Zusammenfassung',
+  hint:'Die Auswertung enthält jede bearbeitete Aufgabe mit der richtigen Lösung und dem Vermerk, ob sie richtig gelöst wurde, sowie die Statistik mit der Erfolgsquote.',
+  items:()=>globalThis.__H.map(h=>({no:h.num,st:h.status,task:`Gib den Atombau im Schalenmodell an: ${h.nuc}.`,sol:`Kern: ${h.kern} · Elektronen auf den Schalen: <b>${h.sh}</b>`}))});
+
 </script>
 </body>
 </html>

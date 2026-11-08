@@ -33,14 +33,14 @@ header .tag{color:var(--text-dim); font-size:13.5px;}
 
 /* QR-Code zur Startseite */
 .qr-btn{
-  margin-left:auto; align-self:center; display:flex; align-items:center; gap:10px;
-  background:var(--panel); border:1px solid var(--line); border-radius:4px; padding:5px 12px 5px 5px;
-  color:var(--text-dim); font:inherit; font-size:12.5px; line-height:1.3; text-align:left; cursor:pointer;
+  margin-left:auto; align-self:center; display:flex; align-items:center; gap:7px;
+  background:var(--panel); border:1px solid var(--line); border-radius:4px; padding:2px 8px 2px 2px;
+  color:var(--text-dim); font:inherit; font-size:10px; line-height:1.2; text-align:left; cursor:pointer;
 }
 .qr-btn:hover{border-color:var(--teal); color:var(--text);}
 .qr-btn:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
-.qr-btn .qr-svg{width:66px; height:66px; display:block; border-radius:2px;}
-.qr-btn b{display:block; color:var(--text); font-weight:600;}
+.qr-btn .qr-svg{width:30px; height:30px; display:block; border-radius:2px;}
+.qr-btn b{display:block; color:var(--text); font-weight:600; font-size:10.5px;}
 .qr-modal{display:none; position:fixed; inset:0; z-index:100; background:rgba(8,10,12,.82); align-items:center; justify-content:center; padding:20px;}
 .qr-modal.open{display:flex;}
 .qr-box{background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:22px 24px 20px; text-align:center; max-width:94vw;}
@@ -156,43 +156,43 @@ const rubriken = [
         titel: "Schalenmodell nach Bohr",
         beschreibung: "Atombau der Hauptgruppenelemente der 1.–3. Periode – Protonen & Neutronen aus dem PSE bestimmen, Elektronen auf die Schalen verteilen.",
         link: "SekI/SekI-Schalenmodell.html",
-        version: "1.2",
-        neu: "Rubrik „Grundlagen“ mit Erklärungen und Grafiken"
+        version: "1.3",
+        neu: "QR-Code und einheitliche Auswertung als PDF"
       },
       {
         titel: "Berechnung der molaren Masse",
         beschreibung: "Von der Summenformel zur molaren Masse – Atommassen im Periodensystem ablesen und mit der Anzahl der Atome verrechnen.",
         link: "SekI/SekI-Molare_Masse.html",
-        version: "1.3",
-        neu: "Rubrik „Grundlagen“ mit Erklärungen und Grafiken"
+        version: "1.4",
+        neu: "QR-Code und einheitliche Auswertung als PDF"
       },
       {
         titel: "Summenformeln aufstellen",
         beschreibung: "Wertigkeit der Elemente mit dem PSE ermitteln, dann die Summenformel über kgV und Kreuzregel aufstellen – Salze, Wasserstoffverbindungen & römische Zahlen.",
         link: "SekI/SekI-Summenformeln.html",
-        version: "1.1",
-        neu: "Rubrik „Grundlagen“ mit Erklärungen und Grafiken"
+        version: "1.2",
+        neu: "QR-Code und einheitliche Auswertung als PDF"
       },
       {
         titel: "Reaktionsgleichungen",
         beschreibung: "Reaktionsgleichungen aufstellen und ausgleichen.",
         link: "SekI/SekI-Reaktionsgleichungen.html",
-        version: "1.1",
-        neu: "Rubrik „Grundlagen“ mit Erklärungen und Grafiken"
+        version: "1.2",
+        neu: "QR-Code und einheitliche Auswertung als PDF"
       },
       {
         titel: "Bindungsarten bestimmen",
         beschreibung: "Elektronegativität im PSE ablesen, ΔEN berechnen und die Bindungsart bestimmen – unpolare & polare Atombindung oder Ionenbindung (Grenzen 0,5 und 1,7).",
         link: "SekI/SekI-Bindungsarten.html",
-        version: "1.2",
-        neu: "Rubrik „Grundlagen“ mit Erklärungen und Grafiken"
+        version: "1.3",
+        neu: "QR-Code und einheitliche Auswertung als PDF"
       },
       {
         titel: "Chemisches Rechnen",
         beschreibung: "Molare Masse, Stoffmenge, Masse, Volumen von Gasen und Flüssigkeiten, Konzentration von Lösungen (n = c · V) – Grundrechnungen, einfache und komplexe Textaufgaben mit geprüften Zwischenschritten und zuschaltbaren Hilfen.",
         link: "SekI/SekI-Chemisches_Rechnen.html",
-        version: "1.1",
-        neu: "Rubrik „Grundlagen“ mit Erklärungen und Grafiken"
+        version: "1.2",
+        neu: "QR-Code und einheitliche Auswertung als PDF"
       }
   ]},
   { id: "ef", kurz: "EF", titel: "Einführungsphase", eintraege: [
@@ -200,29 +200,29 @@ const rubriken = [
         titel: "Nomenklatur organischer Verbindungen",
         beschreibung: "Alkane, Alkene, Alkine & Alkohole nach IUPAC benennen oder zum Namen die Strukturformel zeichnen – mit Baukasten (automatische Prüfung) oder freihand mit dem Stift, Tipps und Lösungsweg.",
         link: "EP/EP-Nomenklatur.html",
-        version: "2.2",
-        neu: "Rubrik „Grundlagen“ mit Erklärungen und Grafiken"
+        version: "2.3",
+        neu: "QR-Code und einheitliche Auswertung als PDF"
       },
       {
         titel: "Simulation „Erdölraffination“",
         beschreibung: "Erdölaufbereitung zu Kraftstoffen – Rohöl wählen, Destillation, Konversion & Veredelung mit eigenen Betriebsbedingungen durchspielen.",
         link: "EP/EP-Raffination.html",
-        version: "1.2",
-        neu: "Rubrik „Grundlagen“ mit Erklärungen und Grafiken"
+        version: "1.3",
+        neu: "QR-Code und einheitliche Auswertung als PDF"
       },
       {
         titel: "Verbrennungsenthalpie von Alkanen",
         beschreibung: "Reaktionsgleichung der Verbrennung aufstellen und ΔcH mit mittleren Bindungsenthalpien abschätzen – mit Energiediagramm & Vergleich mit Literaturwerten.",
         link: "EP/EP-Verbrennungsenthalpie.html",
-        version: "1.3",
-        neu: "Rubrik „Grundlagen“ mit Erklärungen und Grafiken"
+        version: "1.4",
+        neu: "QR-Code und einheitliche Auswertung als PDF"
       },
       {
         titel: "Oxidationszahlen bestimmen",
         beschreibung: "Anorganische Verbindungen & Ionen per Summenregel, organische Verbindungen in Valenzstrichformeln – dazu Oxidation und Reduktion in Redoxreaktionen erkennen.",
         link: "EP/EP-Oxidationszahlen.html",
-        version: "1.1",
-        neu: "Rubrik „Grundlagen“ mit Erklärungen und Grafiken"
+        version: "1.2",
+        neu: "QR-Code und einheitliche Auswertung als PDF"
       }
   ]},
   { id: "q1", kurz: "Q1", titel: "Qualifikationsphase 1. Semester", eintraege: [
@@ -230,58 +230,65 @@ const rubriken = [
         titel: "Simulation „Kalorimetrie“",
         beschreibung: "Verbrennungskalorimetrie (Alkanole, Holz, Kerzenwachs, Holzkohle) und Kalorimetrie in Lösung (Lösungsenthalpien, Neutralisationen, Redoxreaktionen): Massen wiegen, Temperatur am Thermometer ablesen, Q, ΔH und molare Reaktionsenthalpie Schritt für Schritt berechnen – mit Formeln, Tipps und PDF-Zusammenfassung.",
         link: "Q1/1-Kalorimetrie.html",
-        version: "1.0"
+        version: "1.1",
+        neu: "QR-Code und einheitliche Auswertung als PDF"
       },
       {
         titel: "Berechnung der Reaktionsenthalpie",
         beschreibung: "Molare Standardreaktionsenthalpie aus Standardbildungsenthalpien berechnen – mit Ausgleichen, Tipps & Enthalpiediagramm.",
         link: "Q1/1-Reaktionsenthalpie.html",
-        version: "1.2",
-        neu: "Rubrik „Grundlagen“ mit Erklärungen und Grafiken"
+        version: "1.3",
+        neu: "QR-Code und einheitliche Auswertung als PDF"
       },
       {
         titel: "Berechnung der freien Enthalpie",
         beschreibung: "Freie Standardreaktionsenthalpie mit der Gibbs-Helmholtz-Gleichung – ΔrH° und ΔrS° aus Tabellenwerten, jeder Teilschritt mit Prüfung, exergonisch/endergonisch, Grenztemperatur & ΔG-T-Diagramm.",
         link: "Q1/1-Freie_Enthalpie.html",
-        version: "1.1",
-        neu: "Rubrik „Grundlagen“ mit Erklärungen und Grafiken"
+        version: "1.2",
+        neu: "QR-Code und einheitliche Auswertung als PDF"
       },
       {
         titel: "Simulation „Reaktionsgeschwindigkeit“",
         beschreibung: "Zink + Salzsäure und fünf weitere Reaktionen messen – Einfluss von Temperatur, Druck, Konzentration, Zerteilungsgrad & Katalysator, Durchschnitts- und Momentangeschwindigkeit, Teilchenebene & Grundlagen. Dazu eine Übung mit Messprotokoll, Berechnungen und c-t-Diagramm.",
         link: "Q1/1-Reaktionsgeschwindigkeit.html",
-        version: "1.1",
-        neu: "Übung: c-t-Diagramm mit größerer Toleranz, automatischer Kurve und Option „Nur mit Stift“"
+        version: "1.2",
+        neu: "QR-Code und einheitliche Auswertung als PDF"
       },
       {
         titel: "Simulation „Chemisches Gleichgewicht“",
         beschreibung: "Verschiebung des Gleichgewichts durch Temperatur, Druck & Konzentration – Le Chatelier, Kc und Qc.",
         link: "Q1/1-Chemisches_Gleichgewicht.html",
-        version: "1.1",
-        neu: "Rubrik „Grundlagen“ mit Erklärungen und Grafiken"
+        version: "1.2",
+        neu: "QR-Code und einheitliche Auswertung als PDF"
       }
   ]},
   { id: "q2", kurz: "Q2", titel: "Qualifikationsphase 2. Semester", eintraege: [
       {
+        titel: "Protolysegleichungen aufstellen",
+        beschreibung: "Säure-Base-Reaktionen nach Brönsted – anorganische und organische Säuren in drei Stufen, einprotonig bis dreiprotonig mit Protolysestufen & Gesamtgleichung, Formeleingabe bzw. Strukturformeln bearbeiten, Auswertung als PDF.",
+        link: "Q2/2-Protolysegleichungen.html",
+        version: "1.0"
+      },
+      {
         titel: "Simulation „Titration“",
         beschreibung: "Säure-Base- und Redox-Titration – Titrationskurven (pH, Leitfähigkeit, Potential), Indikatoren, Reaktionsgleichungen & Konzentrationsbestimmung.",
         link: "Q2/2-Titration.html",
-        version: "1.1",
-        neu: "Rubrik „Grundlagen“ mit Erklärungen und Grafiken"
+        version: "1.2",
+        neu: "QR-Code und einheitliche Auswertung als PDF"
       },
       {
         titel: "Simulation „Galvanische Zelle“",
         beschreibung: "Halbzellen kombinieren – Elektrodenvorgänge, Nernst-Gleichung & Zellspannung.",
         link: "Q2/2-Galvanische_Zelle.html",
-        version: "1.1",
-        neu: "Rubrik „Grundlagen“ mit Erklärungen und Grafiken"
+        version: "1.2",
+        neu: "QR-Code und einheitliche Auswertung als PDF"
       },
       {
         titel: "Redoxgleichungen aufstellen",
         beschreibung: "Teilgleichungen mit Oxidationszahlen, Gesamtgleichung mit Elektronenausgleich & Stoffgleichung – 44 anorganische und organische Redoxreaktionen in drei Stufen, Strukturformeln & Drag & Drop.",
         link: "Q2/2-Redoxgleichungen.html",
-        version: "1.1",
-        neu: "Rubrik „Grundlagen“ mit Erklärungen und Grafiken"
+        version: "1.2",
+        neu: "QR-Code und einheitliche Auswertung als PDF"
       }
   ]},
   { id: "q3", kurz: "Q3", titel: "Qualifikationsphase 3. Semester", eintraege: [
@@ -289,43 +296,43 @@ const rubriken = [
         titel: "Nomenklatur – funktionelle Gruppen",
         beschreibung: "Carbonsäuren, Aldehyde, Ketone, Alkohole & Amine nach IUPAC benennen – auch mit mehreren funktionellen Gruppen, Rangfolge, Tipps & Lösungsweg.",
         link: "Q3/3-Nomenklatur_Funktionelle_Gruppen.html",
-        version: "1.2",
-        neu: "Rubrik „Grundlagen“ mit Erklärungen und Grafiken"
+        version: "1.3",
+        neu: "QR-Code und einheitliche Auswertung als PDF"
       },
       {
         titel: "Simulation „Gaschromatograph“",
         beschreibung: "Gaschromatographie – Trennung, Aufzeichnung & Auswertung von Stoffgemischen; Analyse unbekannter Proben mit Referenzstoffen.",
         link: "Q3/3-GC_Simualtion.html",
-        version: "2.0",
-        neu: "Neue Aufgabenart „Analyse“: unbekannte Probe mit Referenzstoffen bestimmen, Konzentrationen berechnen, Protokoll als PDF"
+        version: "2.1",
+        neu: "QR-Code und einheitliche Auswertung als PDF"
       },
       {
         titel: "Orbitalmodell – Hybridisierung, σ- und π-Bindungen",
         beschreibung: "Grundlagen mit Grafiken, Elektronen in der Kästchenschreibweise eintragen, sp³-, sp²- und sp-Hybridisierung bestimmen, σ- und π-Bindungen zählen und zuordnen sowie Orbitalbilder von Methan, Ethan, Ethen, Ethin und Methanal deuten.",
         link: "Q3/3-Orbitalmodell.html",
-        version: "1.1",
-        neu: "Rubrik „Grundlagen“ mit Erklärungen und Grafiken"
+        version: "1.2",
+        neu: "QR-Code und einheitliche Auswertung als PDF"
       },
       {
         titel: "Simulation „Nucleophile Substitution“ mit Trainer",
         beschreibung: "SN1, SN2, E1 & E2 – animierte Mechanismen mit Elektronenpaar-Pfeilen, Produktverteilung, Kinetik, Energiediagramm und Trainer.",
         link: "Q3/3-Nucleophile%20Substitution.html",
-        version: "1.1",
-        neu: "Rubrik „Grundlagen“ mit Erklärungen und Grafiken"
+        version: "1.2",
+        neu: "QR-Code und einheitliche Auswertung als PDF"
       },
       {
         titel: "Synthesewege",
         beschreibung: "Organische Stoffe gezielt herstellen – vom vorgegebenen Edukt aus Reagenzien wählen und für jeden Schritt den Reaktionstyp bestimmen.",
         link: "Q3/3-Synthesewege.html",
-        version: "1.1",
-        neu: "Rubrik „Grundlagen“ mit Erklärungen und Grafiken"
+        version: "1.2",
+        neu: "QR-Code und einheitliche Auswertung als PDF"
       },
       {
         titel: "Polymerisation & Kunststoffe",
         beschreibung: "Monomer ↔ Polymer, radikalische Polymerisation, Polykondensation & Polyaddition sowie Struktur & Eigenschaften von Thermoplasten, Elastomeren und Duroplasten.",
         link: "Q3/3-Polymere.html",
-        version: "1.2",
-        neu: "Rubrik „Grundlagen“ mit Erklärungen und Grafiken"
+        version: "1.4",
+        neu: "QR-Code und einheitliche Auswertung als PDF"
       }
   ]},
   { id: "q4", kurz: "Q4", titel: "Qualifikationsphase 4. Semester", eintraege: [] }

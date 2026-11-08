@@ -1,0 +1,2201 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Oxidationszahlen bestimmen</title>
+<style>
+:root{
+  --bg:#14171a; --panel:#1b1f23; --panel-alt:#20252a; --raise:#262c32;
+  --line:#31383e; --line-soft:#262c31;
+  --text:#e7e4dd; --text-dim:#9aa2a9; --text-faint:#5f6870;
+  --amber:#ffb454; --amber-dim:#8a6535;
+  --teal:#4fd1c5; --teal-dim:#2c5b56;
+  --good:#7fd68a;
+  --danger:#e4785b; --danger-dim:#6b3a2d;
+  --oxy:#ff8a7a; --nitro:#8fb4ff; --hal:#9bd88f;
+  --bond:#b9c0c6;
+  --screen:#0e1113; --grid:#233029;
+  --radius:3px;
+  color-scheme: dark;
+}
+*{box-sizing:border-box;}
+[hidden]{display:none !important;}
+html,body{height:100%;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.mono{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-variant-numeric:tabular-nums;}
+h1,h2,h3{font-weight:600; margin:0;}
+
+/* header */
+header{
+  padding:22px 28px 18px; border-bottom:1px solid var(--line);
+  display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;
+}
+header h1{font-size:20px; letter-spacing:.2px;}
+header .tag{color:var(--text-dim); font-size:13.5px;}
+header .status{
+  margin-left:auto; font-size:12.5px; padding:4px 10px; border:1px solid var(--line);
+  border-radius:20px; color:var(--text-dim); display:flex; align-items:center; gap:7px;
+}
+header .status .dot{width:7px;height:7px;border-radius:50%;background:var(--text-faint);}
+header .status.running .dot{background:var(--amber); box-shadow:0 0 6px var(--amber);}
+header .status.running{color:var(--amber); border-color:var(--amber-dim);}
+header .status.done .dot{background:var(--teal); box-shadow:0 0 6px var(--teal);}
+header .status.done{color:var(--teal); border-color:var(--teal-dim);}
+header .status.shown .dot{background:var(--danger);}
+header .status.shown{color:var(--danger); border-color:var(--danger-dim);}
+.back-btn{
+  display:inline-flex; align-items:center; gap:6px; align-self:center; color:var(--text-dim); font-size:13px; text-decoration:none;
+  border:1px solid var(--line); border-radius:var(--radius); background:var(--panel-alt); padding:5px 11px 5px 9px; white-space:nowrap;
+}
+.back-btn:hover{color:var(--text); border-color:var(--text-faint);}
+.back-btn:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.back-btn .ar{color:var(--teal); font-size:14px; line-height:1;}
+.guide-link{
+  color:var(--teal); font-size:13.5px; text-decoration:none; border-bottom:1px solid var(--teal-dim);
+  padding-bottom:1px;
+}
+.guide-link:hover{border-bottom-color:var(--teal);}
+@media (max-width:600px){ header{padding:18px 16px 14px;} }
+
+.modal-backdrop{
+  display:none; position:fixed; inset:0; background:rgba(8,10,12,.7); z-index:100;
+  align-items:center; justify-content:center; padding:24px 16px;
+}
+.modal-backdrop.open{display:flex;}
+.modal-box{
+  background:var(--panel); border:1px solid var(--line); border-radius:5px;
+  width:100%; max-width:640px; max-height:82vh; overflow-y:auto; padding:22px 26px 26px;
+}
+.modal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;}
+.modal-head h2{font-size:17px;}
+.modal-close{background:none; border:none; color:var(--text-dim); font-size:22px; line-height:1; cursor:pointer; padding:2px 6px;}
+.modal-close:hover{color:var(--text);}
+.modal-body h3{font-size:13.5px; color:var(--amber); margin:18px 0 6px; font-weight:600;}
+.modal-body h3:first-child{margin-top:0;}
+.modal-body p{font-size:13.5px; line-height:1.6; color:var(--text-dim); margin:0 0 6px;}
+.modal-body strong{color:var(--text); font-weight:600;}
+.formula-box{
+  font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:13px; color:var(--text);
+  background:var(--screen); border:1px solid var(--line-soft); border-radius:4px; padding:10px 12px; margin:6px 0 8px;
+  overflow-x:auto; white-space:nowrap;
+}
+
+/* layout */
+.wrap{display:grid; grid-template-columns: 330px 1fr; gap:0; align-items:start;}
+@media (max-width:920px){ .wrap{grid-template-columns:1fr;} }
+.sidebar{
+  border-right:1px solid var(--line); padding:20px 20px 60px;
+  max-height:calc(100vh - 70px); overflow-y:auto;
+}
+@media (max-width:920px){ .sidebar{border-right:none; border-bottom:1px solid var(--line); max-height:none; padding-bottom:24px;} }
+.main{padding:20px 24px 60px; min-width:0;}
+@media (max-width:600px){ .sidebar{padding:18px 16px 24px;} .main{padding:18px 16px 50px;} }
+
+section.block{margin-bottom:26px;}
+.block h2{
+  font-size:12.5px; color:var(--text-dim); font-weight:600;
+  padding-bottom:8px; border-bottom:1px solid var(--line-soft); margin-bottom:14px; letter-spacing:.2px;
+}
+.sub-label{font-size:13px; color:var(--text-dim); margin:0 0 6px;}
+
+.type-list{display:flex; flex-direction:column; gap:8px; margin-bottom:6px;}
+.type-item{
+  display:flex; gap:10px; align-items:flex-start; padding:9px 11px; cursor:pointer;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel);
+}
+.type-item:hover{border-color:var(--text-faint);}
+.type-item input{accent-color:var(--teal); width:16px; height:16px; margin:2px 0 0; flex:none;}
+.type-item .tt{font-size:13px; color:var(--text); font-weight:500;}
+.type-item .td{font-size:12px; color:var(--text-faint); line-height:1.45; margin-top:2px;}
+.type-item.on{border-color:var(--teal-dim); background:var(--panel-alt);}
+
+.field-full{margin-bottom:14px;}
+.field-full label{display:block; font-size:13px; color:var(--text-dim); margin-bottom:6px;}
+select{
+  width:100%; background:var(--panel-alt); border:1px solid var(--line); color:var(--text);
+  padding:7px 9px; border-radius:var(--radius); font-size:13.5px; font-family:inherit;
+}
+select:focus{outline:2px solid var(--teal-dim); outline-offset:1px;}
+
+.btn{
+  border-radius:var(--radius); border:1px solid var(--line); background:var(--panel-alt);
+  color:var(--text); font-size:13px; padding:8px 14px; cursor:pointer; font-family:inherit; font-weight:500;
+}
+.btn:hover{border-color:var(--text-faint);}
+.btn.primary{background:var(--teal); border-color:var(--teal); color:#0d1614;}
+.btn.primary:hover{filter:brightness(1.08);}
+.btn.ghost{background:transparent;}
+.btn:disabled{opacity:.4; cursor:not-allowed;}
+.btn:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.note{font-size:12px; color:var(--text-faint); line-height:1.5; margin-top:10px; max-width:62ch;}
+
+.legend{display:flex; flex-direction:column; gap:6px; font-size:12.5px; color:var(--text-dim);}
+.legend span.sw{display:inline-block; min-width:44px; font-weight:600;}
+
+/* Aufgaben-Screen */
+.screen-card{border:1px solid var(--line); background:var(--screen); border-radius:4px; padding:14px 14px 6px;}
+.screen-top{display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap;}
+.task-meta{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px;}
+.task-num{font-size:11.5px; color:var(--text-faint);}
+.chip{font-size:11px; padding:2px 8px; border-radius:20px; border:1px solid var(--line); color:var(--text-dim);}
+.chip.tA{color:var(--teal); border-color:var(--teal-dim);}
+.chip.tB{color:var(--amber); border-color:var(--amber-dim);}
+.chip.tC{color:var(--good); border-color:#35573a;}
+.chip.tD{color:var(--oxy); border-color:var(--danger-dim);}
+.ctx{font-size:14px; color:var(--text); line-height:1.55; margin:4px 0 10px;}
+.ctx p{margin:0 0 8px;}
+.ctx .dim{color:var(--text-dim); font-size:13px;}
+.mol-row{
+  display:flex; align-items:center; gap:14px; flex-wrap:wrap; padding:12px 4px 14px;
+  overflow-x:auto;
+}
+.mol-box{display:flex; flex-direction:column; align-items:center; gap:6px;}
+.mol-box .cap{font-size:12.5px; color:var(--text-dim); text-align:center; max-width:280px;}
+.mol-row .plus{color:var(--text-faint); font-size:22px;}
+.eqline{
+  font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:18px; color:var(--text);
+  padding:12px 2px 16px; line-height:1.5; overflow-x:auto; white-space:nowrap;
+}
+.eqline sub, .opt sub, .q sub{font-size:.68em;}
+.rad{color:var(--amber); font-weight:700;}
+.arr{color:var(--teal); margin:0 .5em;}
+@media (max-width:600px){ .eqline{font-size:15px;} }
+
+svg.mol{display:block; max-width:100%; height:auto; overflow:visible;}
+svg.mol line, svg.mol path, svg.mol polygon{stroke:var(--bond); stroke-width:1.5; fill:none; stroke-linecap:round; stroke-linejoin:round;}
+svg.mol path.br{stroke:var(--text-dim); stroke-width:1.4;}
+svg.mol text{fill:var(--text); font-size:15px; font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;}
+svg.mol .ox{fill:var(--oxy);}
+svg.mol .ni{fill:var(--nitro);}
+svg.mol .hal{fill:var(--hal);}
+svg.mol text.nn{fill:var(--text-dim); font-size:13px; font-style:italic;}
+svg.mol text.ix{fill:var(--text-dim); font-size:11.5px;}
+svg.mol line.lp{stroke-width:1.7;}
+svg.mol line.lp.ox{stroke:var(--oxy);}
+svg.mol line.lp.ni{stroke:var(--nitro);}
+svg.mol line.lp.hal{stroke:var(--hal);}
+svg.mol circle.rd{fill:var(--amber); stroke:none;}
+svg.mol path.wv{stroke:var(--text-dim); stroke-width:1.4;}
+.eqs{display:flex; align-items:center; flex-wrap:wrap; gap:6px 12px; padding:8px 2px 12px;}
+.eqop{font-size:20px; color:var(--text-faint); line-height:1;}
+.eqop.arr{color:var(--teal); font-size:22px;}
+.eqop.co{color:var(--text); font-size:17px; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; margin-right:-6px;}
+.opt .eqs{padding:2px 0;}
+.eqnum{display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--line-soft);}
+.eqnum:last-child{border-bottom:none;}
+.eqnum > span{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; color:var(--amber); font-size:15px; flex:none;}
+.formula-box .eqs{padding:2px 0;}
+
+svg.net{display:block; width:100%; max-width:340px; height:auto;}
+svg.net polyline{fill:none; stroke:var(--text-dim); stroke-width:2; stroke-linejoin:round; stroke-linecap:round;}
+svg.net line{stroke:var(--amber); stroke-width:3; stroke-linecap:round;}
+svg.net circle{fill:var(--amber);}
+
+/* Teilaufgaben */
+.q-group{border-top:1px solid var(--line-soft); padding:12px 0 12px;}
+.q-group .q{font-size:13.5px; color:var(--text-dim); margin-bottom:9px;}
+.q-group .q b{color:var(--text); font-weight:600;}
+.q-group .q .qn{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--amber); margin-right:7px;}
+.q-group.inline{display:grid; grid-template-columns:1fr auto; gap:8px 16px; align-items:center;}
+.q-group.inline .q{margin:0;}
+.q-group.inline .q.eqq{overflow-x:auto; min-width:0;}
+.q-group.inline .q.eqq .eqs{padding:2px 0;}
+@media (max-width:700px){ .q-group.inline{grid-template-columns:1fr;} }
+.choices{display:flex; flex-wrap:wrap; gap:8px;}
+.cards{display:grid; gap:10px; grid-template-columns:repeat(auto-fill, minmax(220px,1fr));}
+.cards.wide{grid-template-columns:1fr;}
+.cards.net3{grid-template-columns:repeat(auto-fill, minmax(190px,1fr));}
+.opt{
+  background:var(--panel-alt); border:1px solid var(--line); color:var(--text);
+  border-radius:var(--radius); padding:8px 13px; min-height:38px; font-size:13.5px; font-family:inherit;
+  cursor:pointer; text-align:left; touch-action:manipulation;
+}
+.opt:hover{border-color:var(--text-faint);}
+.opt:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.opt.card{display:flex; align-items:center; justify-content:center; padding:12px 10px; min-height:96px; background:var(--panel); overflow-x:auto;}
+.opt.card.txt{justify-content:flex-start; min-height:52px; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:14px; white-space:nowrap;}
+.opt.sel{border-color:var(--teal); background:var(--teal-dim);}
+.opt.card.sel{background:#16302d;}
+.q-group.ok .opt.sel{border-color:var(--good); background:#1d3322; box-shadow:0 0 0 1px #35573a;}
+.q-group.bad .opt.sel{border-color:var(--danger); background:#33201b; box-shadow:0 0 0 1px var(--danger-dim);}
+.q-group.done .opt:not(.sel){opacity:.55;}
+.mark{font-size:12px; margin-left:8px; font-weight:600;}
+.q-group.ok .mark::after{content:"✓ richtig"; color:var(--good);}
+.q-group.bad .mark::after{content:"✗ falsch"; color:var(--danger);}
+.why{font-size:12.5px; color:var(--danger); margin-top:8px; line-height:1.5;}
+.why sub{font-size:.75em;}
+
+.check-row{display:flex; justify-content:flex-end; padding:12px 0 2px; border-top:1px solid var(--line-soft);}
+.feedback{display:flex; flex-direction:column; gap:6px; margin:12px 0 4px;}
+.feedback:empty{display:none;}
+.fb{font-size:13px; line-height:1.5; padding:8px 11px; border-radius:4px; border:1px solid var(--line-soft); background:var(--panel);}
+.fb.good{color:var(--good); border-color:#35573a;}
+.fb.bad{color:var(--danger); border-color:var(--danger-dim);}
+.fb.hint{color:var(--amber); border-color:var(--amber-dim);}
+.fb.info{color:var(--text-dim);}
+.fb sub{font-size:.75em;}
+
+.readout-bar{display:flex; gap:26px; padding:12px 4px 12px; flex-wrap:wrap; border-top:1px solid var(--line-soft); margin-top:12px;}
+.readout{display:flex; flex-direction:column; gap:2px;}
+.readout .k{font-size:10.5px; color:var(--text-faint);}
+.readout .v{font-size:15px; color:var(--amber);}
+
+/* tabs */
+.tabs{display:flex; gap:2px; margin:26px 0 0; border-bottom:1px solid var(--line); overflow-x:auto;}
+.tabs button{
+  background:none; border:none; color:var(--text-dim); font-size:13px; padding:9px 4px; margin-right:22px;
+  cursor:pointer; font-family:inherit; border-bottom:2px solid transparent; font-weight:500; white-space:nowrap;
+}
+.tabs button.active{color:var(--text); border-bottom-color:var(--amber);}
+.tabpanel{display:none; padding-top:18px;}
+.tabpanel.active{display:block;}
+.empty-hint{color:var(--text-faint); font-size:13px; padding:22px 4px;}
+
+.explain{font-size:13.5px; color:var(--text-dim); line-height:1.65; max-width:78ch;}
+.explain p{margin:0 0 10px;}
+.explain strong{color:var(--text); font-weight:600;}
+.explain .figure{background:var(--screen); border:1px solid var(--line-soft); border-radius:4px; padding:12px 14px; margin:6px 0 12px; overflow-x:auto;}
+.explain .figure .eqline{padding:4px 0; font-size:15px;}
+.explain ul{margin:0 0 10px; padding-left:18px;}
+.explain li{margin-bottom:4px;}
+
+.table-wrap{overflow-x:auto; border:1px solid var(--line-soft); border-radius:4px;}
+table.hist{width:100%; border-collapse:collapse; font-size:12.8px;}
+table.hist thead th{text-align:left; font-weight:500; color:var(--text-faint); font-size:11px; padding:6px 8px; border-bottom:1px solid var(--line); white-space:nowrap;}
+table.hist td{padding:7px 8px; border-bottom:1px solid var(--line-soft); vertical-align:top;}
+table.hist td sub{font-size:.72em;}
+table.hist tr.grp td{color:var(--text-faint); font-size:10.5px; letter-spacing:.4px; text-transform:uppercase; padding-top:12px; background:var(--panel);}
+table.hist td.k{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; color:var(--amber); white-space:nowrap;}
+.s-first{color:var(--good);} .s-ok{color:var(--teal);} .s-help{color:var(--amber);} .s-shown{color:var(--danger);} .s-open{color:var(--text-faint); font-style:italic;}
+
+footer{padding:16px 28px 30px; color:var(--text-faint); font-size:11.5px; border-top:1px solid var(--line-soft); margin-top:10px;}
+footer p{margin:0;}
+footer a{color:var(--text-dim); text-decoration:none; border-bottom:1px solid var(--line);}
+footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
+footer .footer-credit{margin-top:8px; color:var(--text-dim);}
+@media (max-width:600px){ footer{padding:16px 16px 30px;} }
+::-webkit-scrollbar{width:9px; height:9px;}
+::-webkit-scrollbar-thumb{background:var(--line); border-radius:5px;}
+@media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+</style>
+<style>
+/* Versionshinweise */
+.modal-body ul{padding-left:18px; margin:0 0 6px;}
+.modal-body li{font-size:13.5px; line-height:1.6; color:var(--text-dim); margin:0 0 6px;}
+.modal-body li strong{color:var(--text); font-weight:600;}
+.vh-ver{display:flex; align-items:baseline; gap:10px; margin:18px 0 6px;}
+.vh-ver:first-child{margin-top:0;}
+.vh-ver .v{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:13px; color:var(--amber); border:1px solid var(--amber-dim); border-radius:var(--radius); padding:1px 7px;}
+.vh-ver .d{font-size:12px; color:var(--text-faint);}
+</style>
+<style>
+/* ---------- Oxidationszahlen: Ergänzungen ---------- */
+.mode-toggle{display:flex; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; margin-bottom:12px;}
+.mode-toggle button{flex:1; background:var(--panel-alt); color:var(--text-dim); border:none; padding:8px 6px; font-size:12.5px; cursor:pointer; font-family:inherit;}
+.mode-toggle button + button{border-left:1px solid var(--line);}
+.mode-toggle button.active{background:var(--teal-dim); color:var(--text);}
+.sw{display:flex; align-items:flex-start; gap:11px; margin-bottom:14px; cursor:pointer; position:relative;}
+.sw input{position:absolute; opacity:0; pointer-events:none;}
+.sw .track{flex:none; width:34px; height:19px; margin-top:1px; border-radius:20px; background:var(--panel-alt); border:1px solid var(--line); position:relative; transition:background .15s, border-color .15s;}
+.sw .track::after{content:""; position:absolute; top:2px; left:2px; width:13px; height:13px; border-radius:50%; background:var(--text-faint); transition:transform .15s, background .15s;}
+.sw input:checked + .track{background:var(--teal-dim); border-color:var(--teal);}
+.sw input:checked + .track::after{transform:translateX(15px); background:var(--teal);}
+.sw input:focus-visible + .track{outline:2px solid var(--teal-dim); outline-offset:2px;}
+.sw .sw-text{font-size:13px; color:var(--text); line-height:1.35;}
+.sw .sw-text small{display:block; font-size:11.5px; color:var(--text-faint); margin-top:2px;}
+.legend span.lgk{display:inline-block; min-width:52px; font-weight:600;}
+.chip.tE{color:var(--nitro); border-color:#34466b;}
+header .status.idle .dot{background:var(--text-faint);}
+
+/* Startauswahl */
+.start-q{font-size:15px; color:var(--text); margin:2px 2px 4px;}
+.start-sub{font-size:13px; color:var(--text-dim); margin:0 2px 16px;}
+.start-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:14px; margin-bottom:12px;}
+.start-opt{
+  display:flex; flex-direction:column; align-items:flex-start; gap:8px; text-align:left;
+  background:var(--panel); border:1px solid var(--line); border-radius:4px; padding:16px 18px 18px;
+  color:var(--text); font-family:inherit; cursor:pointer; touch-action:manipulation; min-height:190px;
+}
+.start-opt:hover{border-color:var(--teal-dim); background:var(--panel-alt);}
+.start-opt:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.start-opt .st{font-size:16px; font-weight:600;}
+.start-opt .sd{font-size:12.5px; color:var(--text-dim); line-height:1.5;}
+.start-opt .sx{display:flex; align-items:center; justify-content:center; width:100%; padding:6px 0 2px; min-height:86px;}
+.start-opt .sx .fx{font-size:22px;}
+
+/* Summenformeln mit Feldern */
+.fx{display:inline-flex; align-items:flex-end; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:24px; color:var(--text); line-height:1;}
+.fcol{display:inline-flex; flex-direction:column; align-items:center;}
+.ftop{height:34px; display:flex; align-items:flex-end; justify-content:center; padding:0 2px 6px;}
+.fbot{white-space:nowrap; padding:0 1px;}
+.fbot sub{font-size:.62em; vertical-align:-.3em;}
+.fbot sup{font-size:.62em; vertical-align:.75em; margin-left:1px;}
+.fcol.co .fbot{margin-right:.35em; color:var(--text);}
+.fx-row{display:flex; align-items:flex-end; flex-wrap:wrap; gap:8px 14px; padding:8px 2px 14px; overflow-x:auto;}
+.fx-row .op{font-size:22px; color:var(--text-faint); padding-bottom:2px;}
+.fx-row .op.arr{color:var(--teal); font-size:24px;}
+
+button.slot, span.slot{
+  min-width:42px; height:28px; padding:0 6px; border-radius:var(--radius);
+  border:1px solid var(--line); background:var(--panel-alt); color:var(--amber);
+  font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:14px; line-height:26px;
+  text-align:center; touch-action:manipulation; display:inline-block;
+}
+button.slot{cursor:pointer;}
+button.slot.empty{color:var(--text-faint);}
+button.slot:hover{border-color:var(--text-faint);}
+button.slot.act{border-color:var(--teal); box-shadow:0 0 0 1px var(--teal);}
+button.slot.ok{border-color:var(--good); background:#1d3322;}
+button.slot.bad{border-color:var(--danger); background:#33201b;}
+button.slot.rev{border-color:var(--amber-dim);}
+span.slot.static{min-width:36px; height:24px; line-height:22px; font-size:13px; border-color:var(--line-soft); background:transparent;}
+
+svg.mol g.slot{cursor:pointer;}
+svg.mol g.slot rect.hit{fill:transparent; stroke:none; pointer-events:all;}
+svg.mol g.slot rect.box{fill:var(--panel-alt); stroke:var(--line); stroke-width:1.2;}
+svg.mol g.slot text{fill:var(--amber); font-size:13px; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; text-anchor:middle; dominant-baseline:central;}
+svg.mol g.slot.empty text{fill:var(--text-faint);}
+svg.mol g.slot:hover rect.box{stroke:var(--text-faint);}
+svg.mol g.slot.act rect.box{stroke:var(--teal); stroke-width:2;}
+svg.mol g.slot.ok rect.box{stroke:var(--good); fill:#1d3322;}
+svg.mol g.slot.bad rect.box{stroke:var(--danger); fill:#33201b;}
+svg.mol g.slot.rev rect.box{stroke:var(--amber-dim);}
+svg.mol g.slot.static{cursor:default;}
+svg.mol g.slot.static rect.box{fill:transparent; stroke:var(--line-soft);}
+svg.mol text.el{text-anchor:middle; dominant-baseline:central;}
+svg.mol text.ix{text-anchor:middle; dominant-baseline:central;}
+.eqs .rg{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:19px; color:var(--text);}
+.eqs .rg sub{font-size:.65em;}
+
+/* Zahlenpalette */
+.pal-wrap{border-top:1px dashed var(--line-soft); padding-top:10px; margin-top:4px;}
+.pal-lbl{font-size:12px; color:var(--text-faint); margin-bottom:7px;}
+.pal{display:flex; flex-wrap:wrap; gap:6px;}
+.pal button{
+  min-width:50px; min-height:40px; padding:0 8px; border-radius:var(--radius); border:1px solid var(--line);
+  background:var(--panel); color:var(--text); font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;
+  font-size:15px; cursor:pointer; touch-action:manipulation;
+}
+.pal button:hover{border-color:var(--text-faint);}
+.pal button.neg{color:var(--nitro);}
+.pal button.pos{color:var(--oxy);}
+.pal button.clr{color:var(--text-dim); font-family:inherit; font-size:13px;}
+.pal button:disabled{opacity:.35; cursor:not-allowed;}
+.q-group.done .pal-wrap{display:none;}
+.q-group.ok .q .mark::after{content:"✓ richtig"; color:var(--good);}
+.q-group.bad .q .mark::after{content:"✗ falsch"; color:var(--danger);}
+.why ul{margin:4px 0 0; padding-left:18px;}
+.why li{margin-bottom:3px;}
+
+.explain .sumeq{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; color:var(--text); font-size:13.5px; background:var(--screen); border:1px solid var(--line-soft); border-radius:4px; padding:8px 11px; margin:4px 0 10px; overflow-x:auto; white-space:nowrap;}
+.explain .sumeq sub{font-size:.72em;}
+.explain h4{font-size:13px; color:var(--amber); margin:14px 0 6px; font-weight:600;}
+.explain .figure .fx{font-size:20px;}
+.explain .figure .ftop{height:30px;}
+.explain .figure .fx-row{padding:2px 0 6px;}
+.explain .figure .eqs{padding:2px 0;}
+.ox-up{color:var(--oxy);} .ox-down{color:var(--nitro);}
+table.hist td .fx{font-size:14px;}
+
+/* Linke Spalte: steht beim Scrollen still und scrollt als Ganzes (ein einziger Scrollbereich) */
+@media (min-width:921px){
+  .sidebar{
+    position:sticky; top:0; align-self:start;
+    height:calc(100vh - var(--hdr, 70px)); height:calc(100dvh - var(--hdr, 70px)); max-height:none;
+    overflow-y:auto; overscroll-behavior:contain; background:var(--bg);
+  }
+}
+
+/* Rubrik Grundlagen */
+.gl-toggle{display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; cursor:pointer; text-align:left;
+  border:1px solid var(--teal-dim); border-radius:4px; background:var(--panel-alt); color:var(--text);
+  font-size:14px; font-weight:600; font-family:inherit; touch-action:manipulation;}
+.gl-toggle:hover{border-color:var(--teal);}
+.gl-toggle:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-toggle .gl-n{font-size:12px; font-weight:400; color:var(--text-faint);}
+.gl-toggle .gl-ch{margin-left:auto; color:var(--teal); font-size:13px;}
+.gl-toggle .gl-ch::after{content:"▸";}
+.gl-toggle[aria-expanded="true"] .gl-ch::after{content:"▾";}
+.gl-panel{margin-top:8px;}
+.gl-list{display:flex; flex-direction:column; gap:6px;}
+.gl-item{display:flex; gap:10px; align-items:center; width:100%; text-align:left; padding:8px 11px; cursor:pointer;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel); color:var(--text);
+  font-size:13px; font-family:inherit; font-weight:500; touch-action:manipulation;}
+.gl-item:hover{border-color:var(--text-faint); background:var(--panel-alt);}
+.gl-item:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+.gl-item .nr{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--amber); min-width:14px;}
+.gl-item .go{margin-left:auto; color:var(--text-faint); font-size:12px;}
+.gl-note{font-size:12px; color:var(--text-faint); line-height:1.5; margin:8px 0 0;}
+.modal-box.gl-wide{max-width:900px; width:100%; max-height:88vh; overflow-y:auto;}
+.gl-wide .gl-num{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--text-faint); margin-right:10px;}
+.gl-body p, .gl-body li{font-size:13.5px; line-height:1.6; color:var(--text-dim);}
+.gl-body p{margin:0 0 10px;}
+.gl-body ul, .gl-body ol{margin:0 0 12px; padding-left:22px;}
+.gl-body strong{color:var(--text); font-weight:600;}
+.gl-body sub, .gl-body sup{font-size:.72em;}
+.gl-row{display:flex; flex-wrap:wrap; gap:12px; align-items:stretch; margin:8px 0 14px;}
+.gl-fig{margin:0; flex:1 1 220px; background:var(--screen, #0e1113); border:1px solid var(--line-soft); border-radius:4px; padding:10px 12px 8px;
+  display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:6px; max-width:100%; overflow-x:auto;}
+.gl-fig figcaption{font-size:12px; color:var(--text-dim); text-align:center; line-height:1.45; max-width:420px;}
+.gl-tw{overflow-x:auto; margin:6px 0 12px; border:1px solid var(--line-soft); border-radius:4px;}
+.gl-table{width:100%; border-collapse:collapse; font-size:12.8px;}
+.gl-table th{text-align:left; font-weight:500; color:var(--text-faint); font-size:11.5px; padding:6px 9px; border-bottom:1px solid var(--line); background:var(--panel-alt);}
+.gl-table td{padding:6px 9px; border-bottom:1px solid var(--line-soft); color:var(--text-dim); vertical-align:top;}
+.gl-table tr:last-child td{border-bottom:none;}
+.gl-table td:first-child{color:var(--text);}
+.gl-steps{counter-reset:gls; list-style:none; padding-left:0 !important;}
+.gl-steps li{counter-increment:gls; position:relative; padding-left:30px; margin-bottom:6px;}
+.gl-steps li::before{content:counter(gls); position:absolute; left:0; top:1px; width:20px; height:20px; border-radius:50%; border:1px solid var(--teal-dim);
+  color:var(--teal); font-size:11.5px; display:flex; align-items:center; justify-content:center; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.gl-box{border:1px solid var(--line-soft); border-left:3px solid var(--teal); background:var(--panel-alt); border-radius:3px; padding:9px 12px; margin:8px 0 12px;
+  font-size:13.5px; line-height:1.65; color:var(--text);}
+.gl-box.gl-warn{border-left-color:var(--amber);}
+.gl-box small{color:var(--text-faint); font-size:12px;}
+svg.mol.asg circle.ea{fill:var(--teal); stroke:var(--screen); stroke-width:1.8;}
+svg.mol.asg circle.ea.ox{fill:var(--oxy);}
+svg.mol.asg circle.ea.hal{fill:var(--hal);}
+svg.mol.asg circle.ea.ni{fill:var(--nitro);}
+svg.mol.asg line.cut{stroke:var(--text-dim); stroke-width:1.3; stroke-dasharray:2.5 2.5;}
+.gl-fig.gl-mini{flex:1 1 150px;}
+.gl-series .gl-fig{flex:1 1 170px;}
+.gl-ex .gl-fig{flex:1 1 270px;}
+.gl-body h3{font-size:13.5px; color:var(--amber); margin:18px 0 8px; font-weight:600;}
+.gl-legend{font-size:12.5px !important; display:flex; flex-wrap:wrap; align-items:center; gap:4px 6px;}
+.gl-dot{display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--teal); margin-left:6px;}
+.gl-dot.ox{background:var(--oxy);} .gl-dot.hal{background:var(--hal);} .gl-dot.ni{background:var(--nitro);}
+.gl-cut{display:inline-block; width:0; height:13px; border-left:1.5px dashed var(--text-dim); margin:0 4px 0 10px;}
+.gl-legend .li{white-space:nowrap; margin-right:10px;}
+.gl-count li{margin-bottom:4px;}
+.gl-nav{display:flex; align-items:center; gap:10px; border-top:1px solid var(--line-soft); padding-top:14px; margin-top:16px;}
+.gl-nav .sp{flex:1; text-align:center; font-size:12px; color:var(--text-faint);}
+</style>
+<style id="bk-style">
+/* ===== Baustein QR-Code + Auswertung als PDF (einheitlich nach Leitfaden) ===== */
+.bk-qr{display:flex;align-items:center;gap:7px;background:var(--panel,#1b1f23);border:1px solid var(--line,#31383e);border-radius:4px;padding:2px 8px 2px 2px;color:var(--text-dim,#9aa2a9);font:inherit;font-size:10px;line-height:1.2;text-align:left;cursor:pointer;min-height:0;touch-action:manipulation}
+.bk-qr:hover{border-color:var(--teal,#4fd1c5);color:var(--text,#e7e4dd)}
+.bk-qr b{display:block;color:var(--text,#e7e4dd);font-weight:600;font-size:10.5px}
+.bk-qr svg{width:30px;height:30px;display:block;border-radius:2px}
+.bk-hr{display:flex;align-items:center;gap:12px;margin-left:auto;align-self:center;flex-wrap:wrap;justify-content:flex-end}
+header .back-btn{align-self:baseline}
+header>.tag{flex:1 1 160px;min-width:0}
+.bk-hr .status,.bk-hr #statusBadge,.bk-hr #status{margin-left:0!important}
+.bk-ov{display:none;position:fixed;inset:0;z-index:1000;background:rgba(8,10,12,.82);align-items:center;justify-content:center;padding:20px;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+.bk-ov.open{display:flex}
+.bk-qrbox{background:var(--panel,#1b1f23);border:1px solid var(--line,#31383e);border-radius:6px;padding:22px 24px 20px;text-align:center;max-width:94vw}
+.bk-qrbox svg{width:min(62vh,80vw,520px);height:auto;display:block;margin:0 auto;border-radius:4px}
+.bk-qrbox .bk-url{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;font-size:clamp(14px,2.2vw,22px);color:var(--text,#e7e4dd);margin:16px 0 4px;word-break:break-all}
+.bk-qrbox .bk-qhint{font-size:13px;color:var(--text-dim,#9aa2a9);margin:0 0 14px}
+.bk-b{font:inherit;font-size:14px;color:var(--text,#e7e4dd);background:var(--panel-alt,#20252a);border:1px solid var(--line,#31383e);border-radius:8px;padding:8px 18px;min-height:44px;cursor:pointer;touch-action:manipulation}
+.bk-b:hover{border-color:var(--text-faint,#5f6870)}
+.bk-b.pri{background:var(--teal,#4fd1c5);border-color:var(--teal,#4fd1c5);color:#0e1113;font-weight:650}
+.bk-b:disabled{opacity:.4;cursor:default}
+.bk-dlg{background:var(--panel,#1b1f23);border:1px solid var(--line,#31383e);border-radius:6px;width:min(620px,100%);max-height:90vh;overflow:auto;padding:18px 22px 20px;color:var(--text,#e7e4dd);font-size:14px;line-height:1.5}
+.bk-dhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.bk-dhead h2{font-size:18px;margin:0;font-weight:650;color:var(--text,#e7e4dd)}
+.bk-x{background:none;border:0;color:var(--text-dim,#9aa2a9);font-size:24px;line-height:1;cursor:pointer;min-width:44px;min-height:44px}
+.bk-x:hover{color:var(--text,#e7e4dd)}
+.bk-dh{color:var(--amber,#ffb454);font-weight:650;font-size:15px;margin:14px 0 8px}
+.bk-dh:first-of-type{margin-top:2px}
+.bk-runs label{display:flex;align-items:center;gap:12px;border:1px solid var(--line,#31383e);border-radius:8px;padding:10px 12px;margin-bottom:8px;background:var(--panel-alt,#20252a);min-height:48px;cursor:pointer}
+.bk-runs input{width:22px;height:22px;accent-color:var(--teal,#4fd1c5);flex:none;margin:0}
+.bk-runs i{width:16px;height:4px;border-radius:2px;flex:none}
+.bk-none{color:var(--text-dim,#9aa2a9);font-size:13.5px;margin:0}
+.bk-stat{display:grid;grid-template-columns:1fr auto;gap:4px 12px;border:1px solid var(--line,#31383e);border-radius:8px;padding:10px 12px;background:var(--panel-alt,#20252a);font-size:14px}
+.bk-stat span:nth-child(even){font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;color:var(--amber,#ffb454);text-align:right}
+.bk-row{display:flex;gap:10px}
+.bk-row input{flex:1;min-width:0;font:inherit;font-size:15px;color:var(--text,#e7e4dd);background:var(--screen,#0e1113);border:1px solid var(--line,#31383e);border-radius:8px;padding:10px 12px;min-height:44px}
+.bk-row input::placeholder{color:var(--text-faint,#5f6870)}
+.bk-hint{color:var(--text-dim,#9aa2a9);font-size:13.5px;margin:14px 0 0}
+.bk-hint b{color:var(--text,#e7e4dd)}
+.bk-btns{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.bk-pdfrow{display:flex;justify-content:flex-end;gap:10px;margin-top:10px;flex-wrap:wrap}
+.bk-print-host{display:none}
+@media (max-width:600px){.bk-qr span:last-child{display:none}.bk-qr{padding:4px}.bk-row{flex-direction:column}}
+@media print{
+  @page{size:A4;margin:14mm}
+  :root,html,body.bk-pr{background:#fff!important;color:#000!important;color-scheme:light!important}
+  body.bk-pr > *:not(.bk-print-host){display:none!important}
+  body.bk-pr .bk-print-host{display:block!important;position:static!important}
+}
+.bk-sheet{--text:#111;--text-dim:#333;--text-faint:#555;--amber:#9a5b00;--teal:#0f766e;--good:#2e7d32;--danger:#b23c17;--line:#999;--line-soft:#bbb;--bg:#fff;--panel:#fff;--panel-alt:#fff;--screen:#fff;color:#000;background:#fff;font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;font-size:10.5pt;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact;text-align:left}
+.bk-sheet *{color:inherit;text-shadow:none!important;box-shadow:none!important}
+.bk-sheet h1.bk-h1{font-size:17pt;margin:0 0 6pt;font-weight:700;color:#000}
+.bk-sheet .bk-kick{font-size:9pt;text-transform:uppercase;letter-spacing:.06em;color:#555}
+.bk-sheet table.bk-meta{border-collapse:collapse;width:100%;margin:2pt 0 10pt}
+.bk-sheet table.bk-meta td{border:0!important;padding:3pt 10pt 3pt 0!important;font-size:11pt;background:none!important}
+.bk-sheet .bk-line{border-bottom:1px solid #000;min-width:120pt;display:inline-block}
+.bk-sheet .bk-sec{margin:0 0 10pt;break-inside:avoid;page-break-inside:avoid}
+.bk-sheet .bk-sec.bk-long{break-inside:auto;page-break-inside:auto}
+.bk-sheet h2.bk-h2{font-size:12.5pt;margin:12pt 0 4pt;padding-bottom:2pt;border-bottom:1px solid #999;font-weight:700;color:#000;break-after:avoid;page-break-after:avoid}
+.bk-sheet h3.bk-h3{font-size:11pt;margin:8pt 0 3pt;font-weight:700;color:#000;break-after:avoid;page-break-after:avoid}
+.bk-sheet table.bk-t{border-collapse:collapse;width:100%;margin:3pt 0 6pt;break-inside:avoid;page-break-inside:avoid}
+.bk-sheet .bk-long table.bk-t{break-inside:auto;page-break-inside:auto}
+.bk-sheet table.bk-t tr{break-inside:avoid;page-break-inside:avoid}
+.bk-sheet table.bk-t th,.bk-sheet table.bk-t td{border:1px solid #888!important;padding:3pt 6pt!important;text-align:left;vertical-align:middle;font-size:9.5pt;white-space:normal!important;background:#fff!important;color:#000!important}
+.bk-sheet table.bk-t th{background:#eee!important;font-weight:700}
+.bk-sheet table.bk-t td *{color:#000!important}
+.bk-sheet table.bk-sum{border-collapse:collapse;margin:2pt 0 4pt}
+.bk-sheet table.bk-sum td{border:0!important;padding:2pt 14pt 2pt 0!important;font-size:10.5pt;background:none!important}
+.bk-sheet .bk-small{font-size:8.5pt;color:#333}
+.bk-sheet .bk-img{display:block;max-width:100%;max-height:120mm;margin:4pt auto;border:1px solid #bbb}
+.bk-sheet .bk-leg{display:flex;flex-wrap:wrap;gap:4pt 14pt;font-size:9pt;margin:2pt 0 4pt}
+.bk-sheet .bk-leg i{display:inline-block;width:16pt;height:3pt;margin-right:5pt;vertical-align:middle;border-radius:1pt}
+.bk-sheet .bk-cond{margin:2pt 0 4pt}
+.bk-sheet svg{color:#000;max-width:100%}
+.bk-sheet{--oxy:#c0392b;--nitro:#1f5fbf;--hal:#2e7d32;--bond:#222;--amber-dim:#9a5b00;--teal-dim:#0f766e;--good-dim:#2e7d32}
+.bk-sheet .bk-task{border:1px solid #aaa;border-left:4pt solid #888;border-radius:3px;padding:5pt 8pt 6pt;margin:0 0 7pt}
+.bk-sheet .bk-task-ok{border-left-color:#2e7d32}.bk-sheet .bk-task-bad{border-left-color:#b23c17}.bk-sheet .bk-task-open{border-left-color:#999}
+.bk-sheet .bk-tk{display:flex;justify-content:space-between;align-items:baseline;gap:8pt;flex-wrap:wrap;font-size:10.5pt;margin-bottom:3pt}
+.bk-sheet .bk-v{font-weight:700;font-size:9.5pt;white-space:nowrap}
+.bk-sheet .bk-v-ok{color:#2e7d32}.bk-sheet .bk-v-bad{color:#b23c17}.bk-sheet .bk-v-open{color:#666}
+.bk-sheet .bk-tq{font-size:10pt;margin:0 0 4pt}
+.bk-sheet .bk-sol{background:#f4f6f5;border-radius:2px;padding:4pt 6pt;font-size:10pt}
+.bk-sheet .bk-sl{display:block;font-size:8pt;text-transform:uppercase;letter-spacing:.05em;color:#555;margin-bottom:2pt}
+.bk-sheet .bk-sb svg,.bk-sheet .bk-tq svg{max-width:100%;height:auto;max-height:60mm}
+.bk-sheet .bk-sb .figure,.bk-sheet .bk-tq .figure{max-width:100%!important;margin:2pt 0;background:none;border:0;padding:0}
+.bk-sheet .bk-sb p{margin:2pt 0}.bk-sheet .bk-sb ul{margin:2pt 0 2pt 14pt;padding:0}
+.bk-sheet .bk-eq{display:flex;flex-wrap:wrap;align-items:center;gap:3pt 8pt}
+.bk-sheet .bk-eq .co{font-weight:700;margin-right:2pt}
+.bk-sheet .bk-eq .sp{display:inline-flex;align-items:center;gap:2pt}
+.bk-sheet .bk-eq svg{max-height:32mm;width:auto}
+.bk-sheet .bk-tnote{font-size:9pt;color:#333;margin-top:3pt}
+.bk-sheet .bk-foot{margin-top:14pt;border-top:1px solid #888;padding-top:4pt;font-size:8.5pt;color:#444;text-align:center}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="../index.html" class="back-btn" title="Zur Übersicht aller Simulationen"><span class="ar" aria-hidden="true">←</span>Zurück</a>
+  <h1>Oxidationszahlen bestimmen</h1>
+  <span class="tag">Anorganische und organische Verbindungen – Regeln, Strukturformeln &amp; Redoxreaktionen</span>
+  <a href="#" class="guide-link" id="btnGuide">Anleitung</a>
+  <span class="status idle" id="statusBadge"><span class="dot"></span><span id="statusText">Auswahl offen</span></span>
+</header>
+
+<div class="modal-backdrop" id="guideBackdrop">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+    <div class="modal-head">
+      <h2 id="guideTitle">Anleitung</h2>
+      <button class="modal-close" id="closeGuide" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body">
+      <h3>Worum es geht</h3>
+      <p>Die <strong>Oxidationszahl</strong> ist eine gedachte Ladung: Man tut so, als ob alle Bindungselektronen vollständig zum <strong>elektronegativeren</strong> Bindungspartner gehören. Sie wird als römische Ziffer mit Vorzeichen über das Elementsymbol geschrieben, z. B. +VI oder −II. Mit Oxidationszahlen lassen sich Redoxreaktionen erkennen: Steigt die Oxidationszahl, liegt eine <strong>Oxidation</strong> vor, sinkt sie, eine <strong>Reduktion</strong>.</p>
+
+      <h3>Anorganische Verbindungen</h3>
+      <p>Bei Summenformeln helfen feste Regeln: Elemente haben 0, Fluor −I, Alkalimetalle +I, Erdalkalimetalle +II, Wasserstoff meist +I und Sauerstoff meist −II. Die <strong>Summe aller Oxidationszahlen</strong> entspricht der Ladung des Teilchens. Damit lässt sich die letzte, unbekannte Oxidationszahl ausrechnen.</p>
+      <div class="formula-box" style="white-space:pre">H₂SO₄:  2·(+I) + x + 4·(−II) = 0   ⇒   x = +VI</div>
+
+      <h3>Organische Verbindungen</h3>
+      <p>Hier wird jedes C-Atom einzeln betrachtet. In der Strukturformel ordnest du jedes Bindungselektronenpaar dem elektronegativeren Atom zu. Bindungen zwischen zwei C-Atomen werden geteilt. Als Kurzregel gilt für ein C-Atom: Jede Bindung zu <strong>H</strong> zählt <strong>−I</strong>, jede Bindung zu <strong>O, N</strong> oder einem <strong>Halogen</strong> zählt <strong>+I</strong> (eine Doppelbindung +II), Bindungen zu <strong>C</strong> zählen <strong>0</strong>.</p>
+      <div class="formula-box" style="white-space:pre">Ethanol:  H₃C– : −III     –CH₂–OH : −I</div>
+
+      <h3>Bedienung</h3>
+      <p>Zu Beginn wählst du, ob du mit <strong>anorganischen</strong> oder <strong>organischen</strong> Verbindungen üben möchtest. Links lässt sich jederzeit umschalten. Unter „Aufgabentypen“ sind mehrere Typen gleichzeitig wählbar, „Neue Aufgabe“ wählt zufällig daraus. Über „Aufgabe gezielt wählen“ lässt sich jede Aufgabe direkt aufrufen.</p>
+      <p>Tippe ein Feld über einem Atom an und wähle darunter die Oxidationszahl. Danach springt die Auswahl automatisch zum nächsten Feld. Am Rechner gehen auch die Tasten: Vorzeichen (+ oder −), dann eine Ziffer, ← löscht. „Prüfen“ markiert richtige Felder grün und falsche rot, oft mit einem Hinweis auf den Denkfehler.</p>
+      <p>„Tipp“ gibt zuerst zwei allgemeine Hinweise und trägt danach jeweils einen Wert ein. „Lösung zeigen“ füllt alles aus, die Aufgabe zählt dann nicht als gelöst. Der Tab <strong>Erklärung</strong> zeigt den Lösungsweg, <strong>Regeln</strong> fasst alle Regeln zusammen, der <strong>Verlauf</strong> listet die Aufgaben dieser Sitzung.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="changelogBackdrop">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="changelogTitle">
+    <div class="modal-head">
+      <h2 id="changelogTitle">Versionshinweise</h2>
+      <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.2</span><span class="d">07.11.2026</span></div>
+      <ul>
+        <li><strong>Auswertung als PDF:</strong> neuer Knopf „Zusammenfassung als PDF“ unter den Zählern. Der einheitliche Dialog „Auswertung als PDF“ zeigt die Statistik mit Erfolgsquote und optionale Felder für Name und Kurs; das PDF enthält zu jeder Aufgabe aus dem Verlauf die richtige Lösung mit dem Vermerk, ob sie richtig gelöst wurde, die Statistik und das Datum (druckfreundliches A4-Layout).</li><li><strong>QR-Code:</strong> Schaltfläche rechts in der Kopfzeile; Antippen vergrößert den QR-Code, mit dem sich diese Seite direkt auf dem Mobilgerät öffnen lässt.</li>
+      </ul>
+      <div class="vh-ver"><span class="v">V1.1</span><span class="d">02.11.2026</span></div>
+      <ul>
+        <li><strong>Neue Rubrik „Grundlagen“:</strong> Der Knopf „Grundlagen“ oben in der linken Spalte klappt 4 Themen mit Erklärtext und Grafiken zu den fachlichen und methodischen Grundlagen auf. Mit den Knöpfen unten oder den Pfeiltasten blättert man zwischen den Themen.</li>
+        <li><strong>Grundlagen „Oxidationszahlen in organischen Molekülen“ überarbeitet:</strong> Alle Moleküle sind jetzt Valenzstrichformeln mit freien Elektronenpaaren. Die Bindungselektronen sind als Punkte bei dem Atom eingezeichnet, dem sie zugesprochen werden, geteilte C–C-Bindungen sind mit einem Trennstrich markiert.</li>
+        <li>Neu: Vorgehen in vier Schritten, Ethanol als ausgezähltes Beispiel (Valenzelektronen − zugeordnete Elektronen), weitere Beispiele (Ethanal, Ethansäure, Chlormethan) und die Oxidationsreihe des Methans als Strukturformeln.</li>
+        <li><strong>Linke Spalte:</strong> Sie bleibt beim Scrollen der Aufgabe stehen, füllt die Bildschirmhöhe und scrollt als Ganzes in einem einzigen Bereich.</li>
+        <li><strong>Lösungshistorie:</strong> neue Kategorie „mit Hilfen gelöst“ für Aufgaben, die nach einem Tipp richtig gelöst wurden.</li>
+      </ul>
+      <div class="vh-ver"><span class="v">V1.0</span><span class="d">26.10.2026</span></div>
+      <ul>
+        <li>Startauswahl zwischen <strong>anorganischen</strong> und <strong>organischen Verbindungen</strong>, jederzeit umschaltbar.</li>
+        <li>Anorganisch: Moleküle &amp; Salze, Ionen, Sonderfälle (Elemente, Peroxide, Hydride, OF₂, NH₄NO₃) und Redoxreaktionen mit Frage nach oxidiertem und reduziertem Element.</li>
+        <li>Organisch: Valenzstrichformeln mit freien Elektronenpaaren für Kohlenwasserstoffe, Alkohole, Aldehyde, Ketone, Carbonsäuren, Ester, Halogen- und Stickstoffverbindungen sowie organische Redoxreaktionen. Wahlweise auch Oxidationszahlen der Heteroatome.</li>
+        <li>Eingabe über Zahlenpalette (iPad &amp; Stift) oder Tastatur, Oxidationszahlen in römischer Schreibweise, Rückmeldung zu typischen Fehlern, Tipps, Lösungsweg, Regelübersicht und Verlauf.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <section class="block">
+      <button type="button" class="gl-toggle" id="glToggle" aria-expanded="false" aria-controls="glPanel">
+        <span>Grundlagen</span><span class="gl-n">4 Themen</span><span class="gl-ch" aria-hidden="true"></span>
+      </button>
+      <div class="gl-panel" id="glPanel" hidden>
+        <div class="gl-list" id="glList"></div>
+        <p class="gl-note">Erklärungen mit Grafiken zum Nachlesen – auch zur Besprechung im Unterricht.</p>
+      </div>
+    </section>
+
+
+    <section class="block">
+      <h2>Verbindungen</h2>
+      <div class="mode-toggle" id="clsWrap" style="margin-bottom:0">
+        <button id="clsAn" data-cls="an">Anorganisch</button>
+        <button id="clsOrg" data-cls="org">Organisch</button>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>Aufgabentypen</h2>
+      <div class="type-list" id="typeList"><p class="note" style="margin-top:0">Wähle zuerst anorganische oder organische Verbindungen.</p></div>
+      <p class="note" id="typeNote" hidden>Mehrfachauswahl möglich. „Neue Aufgabe“ wählt zufällig aus den markierten Typen.</p>
+    </section>
+
+    <section class="block" id="selBlock" hidden>
+      <h2>Aufgabe gezielt wählen</h2>
+      <div class="field-full">
+        <div style="display:flex; gap:6px;">
+          <select id="taskSelect" style="flex:1; min-width:0;" aria-label="Aufgabe gezielt wählen"></select>
+          <button class="btn ghost" id="btnLoad" style="flex:none;">Laden</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>Darstellung</h2>
+      <label class="sw" id="heteroWrap"><input type="checkbox" id="swHetero"><span class="track"></span>
+        <span class="sw-text">Auch Heteroatome bestimmen<small>organisch: zusätzlich O, N, Cl, Br – H-Atome (+I) werden nie abgefragt</small></span></label>
+    </section>
+
+    <section class="block" id="legendBlock">
+      <h2>Farben in den Strukturformeln</h2>
+      <div class="legend">
+        <div><span class="lgk" style="color:var(--oxy)">O</span>Sauerstoff</div>
+        <div><span class="lgk" style="color:var(--nitro)">N</span>Stickstoff</div>
+        <div><span class="lgk" style="color:var(--hal)">Cl, Br</span>Halogene</div>
+        <div><span class="lgk">|</span>freies Elektronenpaar</div>
+      </div>
+      <p class="note">Alle organischen Formeln sind Valenzstrichformeln mit freien Elektronenpaaren. Die kleinen grauen Ziffern nummerieren die C-Atome für Tipps und Erklärung.</p>
+    </section>
+
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <div class="screen-card" id="startCard">
+      <div class="start-q">Womit möchtest du üben?</div>
+      <p class="start-sub">Du kannst später links jederzeit umschalten.</p>
+      <div class="start-grid">
+        <button type="button" class="start-opt" data-cls="an">
+          <span class="st">Anorganische Verbindungen</span>
+          <span class="sx" id="startAnFx"></span>
+          <span class="sd">Summenformeln von Molekülen, Salzen und Ionen, Sonderfälle und Redoxreaktionen – mit Regeln und Summenregel.</span>
+        </button>
+        <button type="button" class="start-opt" data-cls="org">
+          <span class="st">Organische Verbindungen</span>
+          <span class="sx" id="startOrgFx"></span>
+          <span class="sd">Oxidationszahlen der C-Atome in Strukturformeln bestimmen – von Alkanen bis Carbonsäuren, dazu organische Redoxreaktionen.</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="screen-card" id="taskCard" hidden>
+      <div class="screen-top">
+        <button class="btn primary" id="btnNew">Neue Aufgabe</button>
+        <button class="btn ghost" id="btnHint">Tipp</button>
+        <button class="btn ghost" id="btnSolve">Lösung zeigen</button>
+      </div>
+
+      <div class="task-meta">
+        <span class="task-num mono" id="taskNum">Aufgabe 1</span>
+        <span class="chip" id="taskChip"></span>
+      </div>
+      <div class="ctx" id="ctx"></div>
+      <div id="groups"></div>
+
+      <div class="check-row">
+        <button class="btn" id="btnCheck">Prüfen</button>
+      </div>
+      <div class="feedback" id="feedback"></div>
+
+      <div class="readout-bar">
+        <div class="readout"><span class="k">gelöst</span><span class="v mono" id="roSolved">0</span></div>
+        <div class="readout"><span class="k">davon im 1. Versuch</span><span class="v mono" id="roFirst">0</span></div>
+        <div class="readout"><span class="k">Serie</span><span class="v mono" id="roStreak">0</span></div>
+        <div class="readout"><span class="k">Lösung angesehen</span><span class="v mono" id="roShown">0</span></div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tabbtn active" data-tab="exp">Erklärung</button>
+      <button class="tabbtn" data-tab="rules">Regeln</button>
+      <button class="tabbtn" data-tab="hist">Verlauf</button>
+    </div>
+
+    <div class="tabpanel active" id="tab-exp">
+      <div id="expBox"><div class="empty-hint">Die Erklärung erscheint, sobald die Aufgabe gelöst oder die Lösung angezeigt wurde.</div></div>
+    </div>
+
+    <div class="tabpanel" id="tab-rules">
+      <div class="table-wrap">
+        <table class="hist">
+          <thead><tr><th>Regel</th><th>Oxidationszahl</th><th>Beispiel</th></tr></thead>
+          <tbody id="rulesBody"></tbody>
+        </table>
+      </div>
+      <p class="note">Elektronegativitäten (Pauling): H 2,2 · C 2,6 · N 3,0 · Br 3,0 · Cl 3,2 · O 3,4 · F 4,0. In der Übung werden die genauen Werte verwendet, deshalb ist Cl elektronegativer als N und Br.</p>
+    </div>
+
+    <div class="tabpanel" id="tab-hist">
+      <div class="table-wrap">
+        <table class="hist">
+          <thead><tr><th>#</th><th>Typ</th><th>Aufgabe</th><th>Status</th></tr></thead>
+          <tbody id="histBody"><tr><td colspan="4" class="empty-hint">Noch keine Aufgaben bearbeitet.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <p class="footer-note">Oxidationszahlen nach der Elektronegativität (Pauling-Werte); organische Formeln als Valenzstrichformeln mit freien Elektronenpaaren. Bei Teilchen mit gleichen Atomen in verschiedener Bindungssituation wird jedes Atom einzeln bestimmt.</p>
+  <p class="footer-credit">Bastian Baumgart · Oxidationszahlen V1.2 · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+</footer>
+
+<script>
+(function(){
+"use strict";
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const shuffle = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; };
+
+/* ============================================================
+   Schreibweise der Oxidationszahlen
+   ============================================================ */
+let HETERO = false;
+const ROM = ["0","I","II","III","IV","V","VI","VII","VIII"];
+function rn(v){
+  if(v==null) return "?";
+  if(v===0) return "0";
+  const a=Math.abs(v);
+  return (v>0?"+":"−") + ROM[a];
+}
+const par = v => v<0 ? "("+rn(v)+")" : (v===0 ? "0" : "("+rn(v)+")");
+const qTxt = q => q===1 ? "+" : q===-1 ? "−" : Math.abs(q)+(q>0?"+":"−");
+const qNum = q => q===0 ? "0" : (q>0?"+":"−")+Math.abs(q);
+const PAL = [-4,-3,-2,-1,0,1,2,3,4,5,6,7];
+function fm(s){ return esc(s).replace(/([A-Za-z\)])(\d+)/g,(m,a,d)=>a+"<sub>"+d+"</sub>"); }
+
+/* ============================================================
+   ANORGANISCH: Summenformeln
+   S("Al2(SO4)3", 0, {Al:3, S:6, O:-2})
+   gleiche Elemente mit verschiedenen Oxidationszahlen: {N:[-3,5]}
+   ============================================================ */
+const NAMES = {H:"Wasserstoff",Li:"Lithium",Na:"Natrium",K:"Kalium",Mg:"Magnesium",Ca:"Calcium",Ba:"Barium",Al:"Aluminium",
+  O:"Sauerstoff",F:"Fluor",Cl:"Chlor",Br:"Brom",I:"Iod",S:"Schwefel",N:"Stickstoff",P:"Phosphor",C:"Kohlenstoff",
+  Fe:"Eisen",Cu:"Kupfer",Zn:"Zink",Ag:"Silber",Mn:"Mangan",Cr:"Chrom"};
+
+function S(f, q, ox, extra){
+  const toks=[]; const re=/([A-Z][a-z]?)(\d*)|\(|\)(\d*)/g; let m;
+  while((m=re.exec(f))){
+    if(m[1]) toks.push({t:"el", el:m[1], n:m[2]?+m[2]:1, mult:1});
+    else if(m[0]==="(") toks.push({t:"("});
+    else toks.push({t:")", n:m[3]?+m[3]:1});
+  }
+  for(let i=0;i<toks.length;i++) if(toks[i].t==="("){
+    let j=i+1; while(toks[j].t!==")") j++;
+    for(let k=i+1;k<j;k++) toks[k].mult=toks[j].n;
+  }
+  const used={};
+  toks.forEach(t=>{
+    if(t.t!=="el") return;
+    const v=ox[t.el];
+    if(Array.isArray(v)){ used[t.el]=(used[t.el]||0); t.ox=v[used[t.el]++]; } else t.ox=v;
+    t.cnt=t.n*t.mult;
+  });
+  const sp=Object.assign({f, q, toks, els:toks.filter(t=>t.t==="el")}, extra||{});
+  // Feste Werte (Regeln) und Unbekannte bestimmen
+  const single = new Set(sp.els.map(t=>t.el)).size===1;
+  const hasO = sp.els.some(t=>t.el==="O");
+  sp.els.forEach(t=>{
+    t.reason=null;
+    if(single && q===0){ t.reason="elementarer Stoff: 0"; return; }
+    if(single && sp.els.length===1 && t.cnt===1){ t.reason="einatomiges Ion: Oxidationszahl = Ionenladung"; return; }
+    const r = RULE(t.el, t.ox, hasO);
+    if(r) t.reason=r;
+  });
+  sp.unk = sp.els.filter(t=>!t.reason);
+  return sp;
+}
+function RULE(el, ox, hasO){
+  if(el==="F" && ox===-1) return "Fluor ist das elektronegativste Element: immer −I";
+  if(["Li","Na","K"].includes(el) && ox===1) return "Alkalimetall: +I";
+  if(["Mg","Ca","Ba"].includes(el) && ox===2) return "Erdalkalimetall: +II";
+  if(el==="Al" && ox===3) return "Aluminium: +III";
+  if(el==="H" && ox===1) return "Wasserstoff in Verbindungen: +I";
+  if(el==="O" && ox===-2) return "Sauerstoff in Verbindungen: −II";
+  if(["Cl","Br","I"].includes(el) && ox===-1 && !hasO) return "Halogen in einem Halogenid: −I";
+  return null;
+}
+
+const AN = {
+  A1: [
+    ["H2O",0,{H:1,O:-2},"Wasser"], ["NH3",0,{N:-3,H:1},"Ammoniak"], ["CO2",0,{C:4,O:-2},"Kohlenstoffdioxid"],
+    ["CO",0,{C:2,O:-2},"Kohlenstoffmonooxid"], ["SO2",0,{S:4,O:-2},"Schwefeldioxid"], ["SO3",0,{S:6,O:-2},"Schwefeltrioxid"],
+    ["H2S",0,{H:1,S:-2},"Schwefelwasserstoff"], ["H2SO4",0,{H:1,S:6,O:-2},"Schwefelsäure"], ["H2SO3",0,{H:1,S:4,O:-2},"Schweflige Säure"],
+    ["HNO3",0,{H:1,N:5,O:-2},"Salpetersäure"], ["HNO2",0,{H:1,N:3,O:-2},"Salpetrige Säure"], ["H3PO4",0,{H:1,P:5,O:-2},"Phosphorsäure"],
+    ["N2O",0,{N:1,O:-2},"Distickstoffmonooxid"], ["NO",0,{N:2,O:-2},"Stickstoffmonooxid"], ["NO2",0,{N:4,O:-2},"Stickstoffdioxid"],
+    ["PCl5",0,{P:5,Cl:-1},"Phosphorpentachlorid"], ["NaCl",0,{Na:1,Cl:-1},"Natriumchlorid"], ["CaCl2",0,{Ca:2,Cl:-1},"Calciumchlorid"],
+    ["Al2O3",0,{Al:3,O:-2},"Aluminiumoxid"], ["FeO",0,{Fe:2,O:-2},"Eisen(II)-oxid"], ["Fe2O3",0,{Fe:3,O:-2},"Eisen(III)-oxid"],
+    ["CuCl2",0,{Cu:2,Cl:-1},"Kupfer(II)-chlorid"], ["MnO2",0,{Mn:4,O:-2},"Mangandioxid (Braunstein)"], ["KMnO4",0,{K:1,Mn:7,O:-2},"Kaliumpermanganat"],
+    ["K2Cr2O7",0,{K:1,Cr:6,O:-2},"Kaliumdichromat"], ["K2CrO4",0,{K:1,Cr:6,O:-2},"Kaliumchromat"], ["KClO3",0,{K:1,Cl:5,O:-2},"Kaliumchlorat"],
+    ["NaClO",0,{Na:1,Cl:1,O:-2},"Natriumhypochlorit"], ["HClO4",0,{H:1,Cl:7,O:-2},"Perchlorsäure"], ["CaCO3",0,{Ca:2,C:4,O:-2},"Calciumcarbonat"],
+    ["Na2SO3",0,{Na:1,S:4,O:-2},"Natriumsulfit"], ["Ca(OH)2",0,{Ca:2,O:-2,H:1},"Calciumhydroxid"], ["Mg3N2",0,{Mg:2,N:-3},"Magnesiumnitrid"],
+    ["Al2(SO4)3",0,{Al:3,S:6,O:-2},"Aluminiumsulfat"],
+    ["CuSO4",0,{Cu:2,S:6,O:-2},"Kupfer(II)-sulfat",{ex:"Hier sind zwei Oxidationszahlen unbekannt (Cu und S). Zerlege das Salz in seine Ionen: Das <strong>Sulfat-Ion</strong> SO<sub>4</sub><sup>2−</sup> kennst du. Darin gilt x + 4·(−II) = −2, also S: <strong>+VI</strong>. Zum Ladungsausgleich liegt Kupfer als Cu<sup>2+</sup> vor: <strong>+II</strong>."}],
+    ["Fe2(SO4)3",0,{Fe:3,S:6,O:-2},"Eisen(III)-sulfat",{ex:"Zwei Oxidationszahlen sind unbekannt (Fe und S). Zerlege das Salz in seine Ionen: Im <strong>Sulfat-Ion</strong> SO<sub>4</sub><sup>2−</sup> gilt x + 4·(−II) = −2, also S: <strong>+VI</strong>. Drei Sulfat-Ionen tragen zusammen die Ladung −6, die zwei Eisen-Ionen gleichen sie aus: Fe<sup>3+</sup>, also <strong>+III</strong>."}]
+  ],
+  A2: [
+    ["NH4",1,{N:-3,H:1},"Ammonium-Ion"], ["OH",-1,{O:-2,H:1},"Hydroxid-Ion"], ["H3O",1,{H:1,O:-2},"Oxonium-Ion"],
+    ["SO4",-2,{S:6,O:-2},"Sulfat-Ion"], ["SO3",-2,{S:4,O:-2},"Sulfit-Ion"], ["HSO4",-1,{H:1,S:6,O:-2},"Hydrogensulfat-Ion"],
+    ["NO3",-1,{N:5,O:-2},"Nitrat-Ion"], ["NO2",-1,{N:3,O:-2},"Nitrit-Ion"], ["PO4",-3,{P:5,O:-2},"Phosphat-Ion"],
+    ["CO3",-2,{C:4,O:-2},"Carbonat-Ion"], ["HCO3",-1,{H:1,C:4,O:-2},"Hydrogencarbonat-Ion"], ["MnO4",-1,{Mn:7,O:-2},"Permanganat-Ion"],
+    ["MnO4",-2,{Mn:6,O:-2},"Manganat-Ion"], ["Cr2O7",-2,{Cr:6,O:-2},"Dichromat-Ion"], ["CrO4",-2,{Cr:6,O:-2},"Chromat-Ion"],
+    ["ClO",-1,{Cl:1,O:-2},"Hypochlorit-Ion"], ["ClO2",-1,{Cl:3,O:-2},"Chlorit-Ion"], ["ClO3",-1,{Cl:5,O:-2},"Chlorat-Ion"],
+    ["ClO4",-1,{Cl:7,O:-2},"Perchlorat-Ion"]
+  ],
+  A3: [
+    ["H2O2",0,{H:1,O:-1},"Wasserstoffperoxid",{peroxid:1}], ["Na2O2",0,{Na:1,O:-1},"Natriumperoxid",{peroxid:1}], ["BaO2",0,{Ba:2,O:-1},"Bariumperoxid",{peroxid:1}],
+    ["NaH",0,{Na:1,H:-1},"Natriumhydrid",{hydrid:1}], ["CaH2",0,{Ca:2,H:-1},"Calciumhydrid",{hydrid:1}], ["LiAlH4",0,{Li:1,Al:3,H:-1},"Lithiumaluminiumhydrid",{hydrid:1}],
+    ["OF2",0,{O:2,F:-1},"Sauerstoffdifluorid"], ["O2",0,{O:0},"Sauerstoff"], ["O3",0,{O:0},"Ozon"], ["Cl2",0,{Cl:0},"Chlor"],
+    ["S8",0,{S:0},"Schwefel"], ["Fe",0,{Fe:0},"Eisen"], ["Fe",3,{Fe:3},"Eisen(III)-Ion"], ["S",-2,{S:-2},"Sulfid-Ion"],
+    ["NH4NO3",0,{N:[-3,5],H:1,O:-2},"Ammoniumnitrat",{ex:"Stickstoff kommt hier <strong>zweimal in verschiedener Bindungssituation</strong> vor. Zerlege das Salz in seine Ionen NH<sub>4</sub><sup>+</sup> und NO<sub>3</sub><sup>−</sup>. Im Ammonium-Ion gilt x + 4·(+I) = +1, also N: <strong>−III</strong>. Im Nitrat-Ion gilt x + 3·(−II) = −1, also N: <strong>+V</strong>. Ein Mittelwert (+I) wäre hier nicht sinnvoll."}],
+    ["(NH4)2SO4",0,{N:-3,H:1,S:6,O:-2},"Ammoniumsulfat",{ex:"Zwei Oxidationszahlen sind unbekannt (N und S). Zerlege das Salz in seine Ionen: Im Ammonium-Ion NH<sub>4</sub><sup>+</sup> gilt x + 4·(+I) = +1, also N: <strong>−III</strong>. Im Sulfat-Ion SO<sub>4</sub><sup>2−</sup> gilt x + 4·(−II) = −2, also S: <strong>+VI</strong>."}]
+  ]
+};
+
+/* Redoxreaktionen: [Koeffizient, Formel, Ladung, Oxidationszahlen] */
+const RX = [
+  {n:"Natrium + Chlor", L:[[2,"Na",0,{Na:0}],[1,"Cl2",0,{Cl:0}]], R:[[2,"NaCl",0,{Na:1,Cl:-1}]], ox:"Na", red:"Cl"},
+  {n:"Zink in Kupfersulfat-Lösung", L:[[1,"Zn",0,{Zn:0}],[1,"Cu",2,{Cu:2}]], R:[[1,"Zn",2,{Zn:2}],[1,"Cu",0,{Cu:0}]], ox:"Zn", red:"Cu"},
+  {n:"Kupfer in Silbernitrat-Lösung", L:[[1,"Cu",0,{Cu:0}],[2,"Ag",1,{Ag:1}]], R:[[1,"Cu",2,{Cu:2}],[2,"Ag",0,{Ag:0}]], ox:"Cu", red:"Ag"},
+  {n:"Knallgasreaktion", L:[[2,"H2",0,{H:0}],[1,"O2",0,{O:0}]], R:[[2,"H2O",0,{H:1,O:-2}]], ox:"H", red:"O"},
+  {n:"Zink in Salzsäure", L:[[1,"Zn",0,{Zn:0}],[2,"H3O",1,{H:1,O:-2}]], R:[[1,"Zn",2,{Zn:2}],[1,"H2",0,{H:0}],[2,"H2O",0,{H:1,O:-2}]], ox:"Zn", red:"H"},
+  {n:"Hochofen: Reduktion von Eisenoxid", L:[[1,"Fe2O3",0,{Fe:3,O:-2}],[3,"CO",0,{C:2,O:-2}]], R:[[2,"Fe",0,{Fe:0}],[3,"CO2",0,{C:4,O:-2}]], ox:"C", red:"Fe"},
+  {n:"Thermitverfahren", L:[[2,"Al",0,{Al:0}],[1,"Fe2O3",0,{Fe:3,O:-2}]], R:[[1,"Al2O3",0,{Al:3,O:-2}],[2,"Fe",0,{Fe:0}]], ox:"Al", red:"Fe"},
+  {n:"Chlordarstellung aus Braunstein", L:[[1,"MnO2",0,{Mn:4,O:-2}],[4,"HCl",0,{H:1,Cl:-1}]], R:[[1,"MnCl2",0,{Mn:2,Cl:-1}],[1,"Cl2",0,{Cl:0}],[2,"H2O",0,{H:1,O:-2}]], ox:"Cl", red:"Mn"},
+  {n:"Permanganometrie: Eisen(II)-Ionen", L:[[5,"Fe",2,{Fe:2}],[1,"MnO4",-1,{Mn:7,O:-2}],[8,"H3O",1,{H:1,O:-2}]], R:[[5,"Fe",3,{Fe:3}],[1,"Mn",2,{Mn:2}],[12,"H2O",0,{H:1,O:-2}]], ox:"Fe", red:"Mn"},
+  {n:"Verbrennung von Magnesium", L:[[2,"Mg",0,{Mg:0}],[1,"O2",0,{O:0}]], R:[[2,"MgO",0,{Mg:2,O:-2}]], ox:"Mg", red:"O"},
+  {n:"Chlor oxidiert Bromid-Ionen", L:[[1,"Cl2",0,{Cl:0}],[2,"Br",-1,{Br:-1}]], R:[[2,"Cl",-1,{Cl:-1}],[1,"Br2",0,{Br:0}]], ox:"Br", red:"Cl"},
+  {n:"Kupfer in verdünnter Salpetersäure", L:[[3,"Cu",0,{Cu:0}],[8,"HNO3",0,{H:1,N:5,O:-2}]], R:[[3,"Cu(NO3)2",0,{Cu:2,N:5,O:-2}],[2,"NO",0,{N:2,O:-2}],[4,"H2O",0,{H:1,O:-2}]], ox:"Cu", red:"N"},
+  {n:"Kontaktverfahren", L:[[2,"SO2",0,{S:4,O:-2}],[1,"O2",0,{O:0}]], R:[[2,"SO3",0,{S:6,O:-2}]], ox:"S", red:"O"}
+];
+
+/* ============================================================
+   ORGANISCH: Valenzstrichformeln auf einem Raster
+   Atom: [Element, x, y, Anzahl H, H-Richtungen "udlr" (optional)]
+   Bindung: [i, j, Bindungsordnung]
+   H-Atome und freie Elektronenpaare werden automatisch ergänzt.
+   ============================================================ */
+const ORG = {
+  methan:   {n:"Methan", a:[["C",0,0,4]], b:[]},
+  ethan:    {n:"Ethan", a:[["C",0,0,3],["C",1,0,3]], b:[[0,1]]},
+  propan:   {n:"Propan", a:[["C",0,0,3],["C",1,0,2],["C",2,0,3]], b:[[0,1],[1,2]]},
+  butan:    {n:"Butan", a:[["C",0,0,3],["C",1,0,2],["C",2,0,2],["C",3,0,3]], b:[[0,1],[1,2],[2,3]]},
+  ethen:    {n:"Ethen", a:[["C",0,0,2,"ud"],["C",1,0,2,"ud"]], b:[[0,1,2]]},
+  ethin:    {n:"Ethin", a:[["C",0,0,1],["C",1,0,1]], b:[[0,1,3]]},
+  propen:   {n:"Propen", a:[["C",0,0,2,"ud"],["C",1,0,1,"u"],["C",2,0,3]], b:[[0,1,2],[1,2]]},
+  but2en:   {n:"But-2-en", a:[["C",0,0,3],["C",1,0,1,"u"],["C",2,0,1,"u"],["C",3,0,3]], b:[[0,1],[1,2,2],[2,3]]},
+  mpropan:  {n:"2-Methylpropan", a:[["C",0,0,3],["C",1,0,1,"u"],["C",2,0,3],["C",1,2,3]], b:[[0,1],[1,2],[1,3]]},
+
+  methanol: {n:"Methanol", a:[["C",0,0,3],["O",1,0,1]], b:[[0,1]]},
+  ethanol:  {n:"Ethanol", a:[["C",0,0,3],["C",1,0,2],["O",2,0,1]], b:[[0,1],[1,2]]},
+  propan1ol:{n:"Propan-1-ol", a:[["C",0,0,3],["C",1,0,2],["C",2,0,2],["O",3,0,1]], b:[[0,1],[1,2],[2,3]]},
+  propan2ol:{n:"Propan-2-ol", a:[["C",0,0,3],["C",1,0,1,"d"],["C",2,0,3],["O",1,-1,1]], b:[[0,1],[1,2],[1,3]]},
+  ethandiol:{n:"Ethan-1,2-diol", a:[["O",0,0,1],["C",1,0,2],["C",2,0,2],["O",3,0,1]], b:[[0,1],[1,2],[2,3]]},
+  mpropan2ol:{n:"2-Methylpropan-2-ol", a:[["C",0,0,3],["C",1,0,0],["C",2,0,3],["C",1,2,3],["O",1,-1,1]], b:[[0,1],[1,2],[1,3],[1,4]]},
+  methanal: {n:"Methanal", a:[["C",0,0,2,"ud"],["O",1,0,0]], b:[[0,1,2]]},
+  ethanal:  {n:"Ethanal", a:[["C",0,0,3],["C",1,0,1,"r"],["O",1,-1,0]], b:[[0,1],[1,2,2]]},
+  propanal: {n:"Propanal", a:[["C",0,0,3],["C",1,0,2],["C",2,0,1,"r"],["O",2,-1,0]], b:[[0,1],[1,2],[2,3,2]]},
+  propanon: {n:"Propanon (Aceton)", a:[["C",0,0,3],["C",1,0,0],["C",2,0,3],["O",1,-1,0]], b:[[0,1],[1,2],[1,3,2]]},
+  butanon:  {n:"Butanon", a:[["C",0,0,3],["C",1,0,0],["C",2,0,2],["C",3,0,3],["O",1,-1,0]], b:[[0,1],[1,2],[2,3],[1,4,2]]},
+
+  methansre:{n:"Methansäure", a:[["C",0,0,1,"l"],["O",0,-1,0],["O",1,0,1]], b:[[0,1,2],[0,2]]},
+  ethansre: {n:"Ethansäure (Essigsäure)", a:[["C",0,0,3],["C",1,0,0],["O",1,-1,0],["O",2,0,1]], b:[[0,1],[1,2,2],[1,3]]},
+  propansre:{n:"Propansäure", a:[["C",0,0,3],["C",1,0,2],["C",2,0,0],["O",2,-1,0],["O",3,0,1]], b:[[0,1],[1,2],[2,3,2],[2,4]]},
+  oxalsre:  {n:"Ethandisäure (Oxalsäure)", a:[["O",0,0,1],["C",1,0,0],["C",2,0,0],["O",3,0,1],["O",1,-1,0],["O",2,-1,0]], b:[[0,1],[1,2],[2,3],[1,4,2],[2,5,2]]},
+  ester:    {n:"Ethansäuremethylester", a:[["C",0,0,3],["C",1,0,0],["O",1,-1,0],["O",2,0,0],["C",3,0,3]], b:[[0,1],[1,2,2],[1,3],[3,4]]},
+  milchsre: {n:"2-Hydroxypropansäure (Milchsäure)", a:[["C",0,0,3],["C",1,0,1,"u"],["C",2,0,0],["O",2,-1,0],["O",3,0,1],["O",1,1,1]], b:[[0,1],[1,2],[2,3,2],[2,4],[1,5]]},
+
+  chlormethan:{n:"Chlormethan", a:[["C",0,0,3],["Cl",1,0,0]], b:[[0,1]]},
+  dichlormethan:{n:"Dichlormethan", a:[["Cl",0,0,0],["C",1,0,2],["Cl",2,0,0]], b:[[0,1],[1,2]]},
+  trichlormethan:{n:"Trichlormethan", a:[["Cl",0,0,0],["C",1,0,1,"u"],["Cl",2,0,0],["Cl",1,1,0]], b:[[0,1],[1,2],[1,3]]},
+  tetrachlormethan:{n:"Tetrachlormethan", a:[["C",1,1,0],["Cl",1,0,0],["Cl",0,1,0],["Cl",2,1,0],["Cl",1,2,0]], b:[[0,1],[0,2],[0,3],[0,4]]},
+  chlorethan:{n:"Chlorethan", a:[["C",0,0,3],["C",1,0,2],["Cl",2,0,0]], b:[[0,1],[1,2]]},
+  dibromethan:{n:"1,2-Dibromethan", a:[["Br",0,0,0],["C",1,0,2],["C",2,0,2],["Br",3,0,0]], b:[[0,1],[1,2],[2,3]]},
+  methylamin:{n:"Methylamin", a:[["C",0,0,3],["N",1,0,2]], b:[[0,1]]},
+  harnstoff:{n:"Harnstoff", a:[["N",0,0,2],["C",1,0,0],["N",2,0,2],["O",1,-1,0]], b:[[0,1],[1,2],[1,3,2]]},
+  acetonitril:{n:"Ethannitril (Acetonitril)", a:[["C",0,0,3],["C",1,0,0],["N",2,0,0]], b:[[0,1],[1,2,3]]},
+  glycin:{n:"Aminoethansäure (Glycin)", a:[["N",0,0,2],["C",1,0,2],["C",2,0,0],["O",2,-1,0],["O",3,0,1]], b:[[0,1],[1,2],[2,3,2],[2,4]]}
+};
+const ORGTYP = {
+  O1:["methan","ethan","propan","butan","ethen","ethin","propen","but2en","mpropan"],
+  O2:["methanol","ethanol","propan1ol","propan2ol","ethandiol","mpropan2ol","methanal","ethanal","propanal","propanon","butanon"],
+  O3:["methansre","ethansre","propansre","oxalsre","ester","milchsre"],
+  O4:["chlormethan","dichlormethan","trichlormethan","tetrachlormethan","chlorethan","methylamin","harnstoff","acetonitril","glycin"]
+};
+/* organische Redoxreaktionen: L/R = Liste aus Molekülschlüsseln oder {t:"H2"} (Reaktionspartner ohne Felder) */
+const ORX = [
+  {n:"Ethanol → Ethanal", L:["ethanol"], R:["ethanal"], d:"Ethanol reagiert mit heißem Kupferoxid."},
+  {n:"Ethanal → Ethansäure", L:["ethanal"], R:["ethansre"], d:"Ethanal reagiert mit Fehling-Lösung."},
+  {n:"Propan-2-ol → Propanon", L:["propan2ol"], R:["propanon"], d:"Propan-2-ol reagiert mit heißem Kupferoxid."},
+  {n:"Methanol → Methanal", L:["methanol"], R:["methanal"], d:"Methanol reagiert an einem heißen Kupferkontakt."},
+  {n:"Methanal → Methansäure", L:["methanal"], R:["methansre"], d:"Methanal reagiert mit Tollens-Reagenz (Silberspiegelprobe)."},
+  {n:"Propanal → Propan-1-ol", L:["propanal"], R:["propan1ol"], d:"Propanal wird mit einem Hydrid-Reagenz umgesetzt."},
+  {n:"Ethen + Wasserstoff → Ethan", L:["ethen",{t:"H2"}], R:["ethan"], d:"Ethen wird an einem Nickel-Katalysator mit Wasserstoff umgesetzt."},
+  {n:"Ethen + Brom → 1,2-Dibromethan", L:["ethen",{t:"Br2"}], R:["dibromethan"], d:"Ethen entfärbt Bromwasser."},
+  {n:"Ethen + Wasser → Ethanol", L:["ethen",{t:"H2O"}], R:["ethanol"], d:"Ethen reagiert mit Wasser (säurekatalysiert)."},
+  {n:"Ethen + Chlorwasserstoff → Chlorethan", L:["ethen",{t:"HCl"}], R:["chlorethan"], d:"Ethen reagiert mit Chlorwasserstoff."}
+];
+
+const VE = {H:1, C:4, N:5, O:6, F:7, Cl:7, Br:7};
+const EN = {H:2.20, C:2.55, N:3.04, O:3.44, Cl:3.16, Br:2.96, F:3.98};
+const ELCLS = {O:"ox", N:"ni", F:"hal", Cl:"hal", Br:"hal"};
+const DIRS = {r:[1,0], l:[-1,0], u:[0,-1], d:[0,1]};
+
+function build(spec){
+  const A = spec.a.map(a=>({el:a[0], x:a[1], y:a[2], h:a[3]||0, hd:a[4]||null}));
+  const B = spec.b.map(b=>({i:b[0], j:b[1], o:b[2]||1}));
+  const occ = new Set(), key=(x,y)=>x+","+y;
+  A.forEach(a=>occ.add(key(a.x,a.y)));
+  B.forEach(b=>{
+    const p=A[b.i], q=A[b.j], dx=Math.sign(q.x-p.x), dy=Math.sign(q.y-p.y);
+    let x=p.x+dx, y=p.y+dy;
+    while(x!==q.x || y!==q.y){ occ.add(key(x,y)); x+=dx; y+=dy; }
+  });
+  const heavyN = A.length;
+  for(let i=0;i<heavyN;i++){
+    const a=A[i]; if(!a.h) continue;
+    const nb = B.filter(b=>b.i===i||b.j===i).map(b=>{ const o=A[b.i===i?b.j:b.i]; return [Math.sign(o.x-a.x), Math.sign(o.y-a.y)]; });
+    let order;
+    if(a.hd) order=a.hd.split("");
+    else {
+      const free = ["u","d","l","r"].filter(k=>!nb.some(v=>v[0]===DIRS[k][0]&&v[1]===DIRS[k][1]));
+      if(a.h===2 && nb.length===1){
+        const perp = nb[0][0]!==0 ? ["u","d"] : ["l","r"];
+        order = perp.filter(k=>free.includes(k)).concat(free.filter(k=>!perp.includes(k)));
+      } else {
+        const s = nb.reduce((p,v)=>[p[0]+v[0],p[1]+v[1]],[0,0]);
+        const dot = k => -(DIRS[k][0]*s[0]+DIRS[k][1]*s[1]);
+        order = free.slice().sort((k1,k2)=>dot(k2)-dot(k1));
+      }
+    }
+    let placed=0;
+    for(const k of order){
+      if(placed>=a.h) break;
+      const x=a.x+DIRS[k][0], y=a.y+DIRS[k][1];
+      if(occ.has(key(x,y))) continue;
+      occ.add(key(x,y)); A.push({el:"H", x, y, h:0}); B.push({i, j:A.length-1, o:1}); placed++;
+    }
+    if(placed<a.h) console.warn("H-Platzierung unvollständig:", spec.n, i);
+  }
+  let cNo=0;
+  A.forEach((a,i)=>{
+    const bs = B.filter(b=>b.i===i||b.j===i);
+    const bo = bs.reduce((s,b)=>s+b.o,0);
+    a.lp = (VE[a.el]-bo)/2;
+    let asg = 2*a.lp;
+    a.nbr = bs.map(b=>({k:b.i===i?b.j:b.i, o:b.o}));
+    a.nbr.forEach(n=>{ const o=A[n.k]; if(EN[o.el]<EN[a.el]) asg+=2*n.o; else if(o.el===a.el) asg+=n.o; });
+    a.asg = asg; a.ox = VE[a.el]-asg;
+    if(a.el==="C") a.cno = ++cNo;
+  });
+  return {n:spec.n, A, B, heavyN, nC:cNo};
+}
+
+/* ---------- Zeichnen ---------- */
+const UU = 52;
+function twoL(el){ return el.length>1; }
+function lpDirs(M, i, slotOn){
+  const a=M.A[i]; const k=a.lp; if(!k) return [];
+  const occ = a.nbr.map(n=>{ const o=M.A[n.k]; return Math.atan2(o.y-a.y, o.x-a.x)*180/Math.PI; });
+  if(slotOn) occ.push(-45);
+  const norm = d => ((d%360)+360)%360;
+  const diff = (p,q) => { const d=Math.abs(norm(p)-norm(q)); return Math.min(d,360-d); };
+  if(a.nbr.length===1 && !slotOn){
+    const opp = occ[0]+180;
+    if(k===1) return [opp];
+    if(k===2) return [opp-60, opp+60];
+    if(k===3) return [opp, opp-90, opp+90];
+  }
+  const res=[]; const cand=[0,45,90,135,180,225,270,315];
+  for(let n=0;n<k;n++){
+    let best=null, bs=-1;
+    cand.forEach(c=>{
+      const all = occ.concat(res);
+      let s = Math.min(...all.map(o=>diff(c,o)));
+      if(c%90===0) s+=1;
+      if(s>bs){ bs=s; best=c; }
+    });
+    res.push(best);
+  }
+  return res;
+}
+
+/* opts: reg(atomIndex) → Feldindex oder null · solved: Werte statisch anzeigen · idx: C-Nummern */
+function molSVG(M, o){
+  o=o||{};
+  const xs=M.A.map(a=>a.x), ys=M.A.map(a=>a.y);
+  const minX=Math.min(...xs), maxX=Math.max(...xs), minY=Math.min(...ys), maxY=Math.max(...ys);
+  const padL=28, padR=48, padT=44, padB=28;
+  const W=(maxX-minX)*UU+padL+padR, H=(maxY-minY)*UU+padT+padB;
+  const X=a=>(a.x-minX)*UU+padL, Y=a=>(a.y-minY)*UU+padT;
+  const out=[];
+  const shrink=(a,dx,dy)=> dx!==0 ? (twoL(a.el)?14:9) : 10;
+  M.B.forEach(b=>{
+    const p=M.A[b.i], q=M.A[b.j];
+    const dx=Math.sign(q.x-p.x), dy=Math.sign(q.y-p.y);
+    const x1=X(p)+dx*shrink(p,dx,dy), y1=Y(p)+dy*shrink(p,dx,dy);
+    const x2=X(q)-dx*shrink(q,dx,dy), y2=Y(q)-dy*shrink(q,dx,dy);
+    const offs = b.o===1?[0] : b.o===2?[-3.2,3.2] : [-4.6,0,4.6];
+    offs.forEach(f=>{
+      const ox=-dy*f, oy=dx*f;
+      out.push(`<line x1="${(x1+ox).toFixed(1)}" y1="${(y1+oy).toFixed(1)}" x2="${(x2+ox).toFixed(1)}" y2="${(y2+oy).toFixed(1)}"/>`);
+    });
+  });
+  const slotTags=[];
+  M.A.forEach((a,i)=>{
+    const cx=X(a), cy=Y(a), cls=ELCLS[a.el]||"";
+    out.push(`<text class="el ${cls}" x="${cx}" y="${cy}">${a.el}</text>`);
+    const si = o.reg ? o.reg(i) : null;
+    const slotOn = si!=null || (o.solved && o.slotAt && o.slotAt(i));
+    lpDirs(M,i,slotOn).forEach(deg=>{
+      const t=deg*Math.PI/180, c=Math.cos(t), s=Math.sin(t);
+      const R = twoL(a.el) ? 11+6*Math.abs(c) : 12.5;
+      const mx=cx+R*c, my=cy+R*s, hx=-s*4.6, hy=c*4.6;
+      out.push(`<line class="lp ${cls}" x1="${(mx+hx).toFixed(1)}" y1="${(my+hy).toFixed(1)}" x2="${(mx-hx).toFixed(1)}" y2="${(my-hy).toFixed(1)}"/>`);
+    });
+    if(o.idx && a.el==="C" && M.nC>1) out.push(`<text class="ix" x="${cx-15}" y="${cy+17}">${a.cno}</text>`);
+    const sx=cx+25, sy=cy-24;
+    if(si!=null){
+      slotTags.push(`<g class="slot empty" data-s="${si}"><rect class="hit" x="${sx-22}" y="${sy-16}" width="44" height="32"/><rect class="box" x="${sx-18}" y="${sy-11}" width="36" height="22" rx="3"/><text x="${sx}" y="${sy+0.5}">?</text></g>`);
+    } else if(slotOn){
+      slotTags.push(`<g class="slot static"><rect class="box" x="${sx-18}" y="${sy-11}" width="36" height="22" rx="3"/><text x="${sx}" y="${sy+0.5}">${rn(a.ox)}</text></g>`);
+    }
+  });
+  return `<svg class="mol" viewBox="0 0 ${W} ${H}" width="${Math.round(W*1.08)}" height="${Math.round(H*1.08)}" role="img" aria-label="Strukturformel ${esc(M.n)}">${out.join("")}${slotTags.join("")}</svg>`;
+}
+const isAsked = a => a.el==="C" || (HETERO && a.el!=="H");
+
+/* ---------- Summenformeln als HTML ---------- */
+function fxHTML(sp, top, coef){
+  let h=`<span class="fx">`;
+  if(coef && coef>1) h+=`<span class="fcol co"><span class="ftop"></span><span class="fbot">${coef}</span></span>`;
+  const last = sp.toks.length-1;
+  sp.toks.forEach((t,ti)=>{
+    let bot, tp="";
+    if(t.t==="el"){ bot = t.el+(t.n>1?`<sub>${t.n}</sub>`:""); tp = top ? top(t) : ""; }
+    else if(t.t==="(") bot="(";
+    else bot=")"+(t.n>1?`<sub>${t.n}</sub>`:"");
+    if(ti===last && sp.q) bot += `<sup>${qTxt(sp.q)}</sup>`;
+    h+=`<span class="fcol"><span class="ftop">${tp}</span><span class="fbot">${bot}</span></span>`;
+  });
+  return h+`</span>`;
+}
+const fxPlain = sp => fxHTML(sp, null);
+const fxSolved = sp => fxHTML(sp, t=>`<span class="slot static">${rn(t.ox)}</span>`);
+function fTxt(sp){ return fm(sp.f) + (sp.q?`<sup>${qTxt(sp.q)}</sup>`:""); }
+
+/* ============================================================
+   Typen & Katalog
+   ============================================================ */
+const TYP = {
+  an: {
+    A1:{n:"Moleküle & Salze", d:"neutrale Verbindungen – die Summe ist null", c:"tA"},
+    A2:{n:"Ionen", d:"mehratomige Ionen – die Summe ist die Ionenladung", c:"tB"},
+    A3:{n:"Sonderfälle", d:"Elemente, einatomige Ionen, Peroxide, Hydride, OF₂, gleiche Elemente mit verschiedenen Werten", c:"tD"},
+    A4:{n:"Redoxreaktionen", d:"Oxidation und Reduktion in Reaktionsgleichungen erkennen", c:"tC"}
+  },
+  org: {
+    O1:{n:"Kohlenwasserstoffe", d:"Alkane, Alkene, Alkine", c:"tA"},
+    O2:{n:"Alkohole, Aldehyde & Ketone", d:"Hydroxy- und Carbonylgruppe", c:"tB"},
+    O3:{n:"Carbonsäuren & Ester", d:"Carboxygruppe, Estergruppe", c:"tD"},
+    O4:{n:"Halogen- & Stickstoffverbindungen", d:"Halogenalkane, Amine, Harnstoff, Nitrile, Aminosäuren", c:"tE"},
+    O5:{n:"Redoxreaktionen", d:"Oxidation oder Reduktion? Summen der C-Oxidationszahlen vergleichen", c:"tC"}
+  }
+};
+const enabled = { an:{A1:true,A2:true,A3:false,A4:false}, org:{O1:true,O2:true,O3:true,O4:false,O5:false} };
+let CLS = null;
+
+const CATALOG = [];
+["A1","A2","A3"].forEach(t=>AN[t].forEach(d=>CATALOG.push({cls:"an", typ:t, label:d[3]+" ("+d[0].replace(/\d/g,m=>"₀₁₂₃₄₅₆₇₈₉"[m])+(d[1]?" "+qTxt(d[1]).replace("-","−"):"")+")", make:()=>makeSpeciesTask(t,d)})));
+RX.forEach(r=>CATALOG.push({cls:"an", typ:"A4", label:r.n, make:()=>makeRxTask(r)}));
+["O1","O2","O3","O4"].forEach(t=>ORGTYP[t].forEach(k=>CATALOG.push({cls:"org", typ:t, label:ORG[k].n, make:()=>makeOrgTask(t,k)})));
+ORX.forEach(r=>CATALOG.push({cls:"org", typ:"O5", label:r.n, make:()=>makeOrxTask(r)}));
+
+/* ============================================================
+   Aufgaben bauen
+   ============================================================ */
+const HINT_AN1 = "Die Summe aller Oxidationszahlen entspricht der Ladung des Teilchens – bei neutralen Verbindungen also null. Achte auf die Indizes: Jedes Atom zählt einzeln.";
+const HINT_ORG1 = "Ordne jedes Bindungselektronenpaar dem elektronegativeren Atom zu (EN: O 3,4 > Cl 3,2 > N 3,0 > Br 3,0 > C 2,6 > H 2,2). Bindungen zwischen zwei C-Atomen werden geteilt.";
+const HINT_ORG2 = "Kurzregel für ein C-Atom: Jede Bindung zu H zählt −I, jede Bindung zu O, N oder einem Halogen +I (Doppelbindung +II, Dreifachbindung +III), Bindungen zu C zählen 0.";
+
+function newSlotTask(cls, typ, title){
+  return {cls, typ, title, slots:[], groups:[], hints:[], ctx:"", ex:""};
+}
+function addSlot(T, info){ T.slots.push(Object.assign({val:null, st:"", rev:false}, info)); return T.slots.length-1; }
+function slotBtn(i){ return `<button type="button" class="slot empty" data-s="${i}" aria-label="Oxidationszahl">?</button>`; }
+
+/* --- Hinweise zu typischen Fehlern (anorganisch) --- */
+function whyAn(sp, t, v){
+  if(t.reason){
+    if(t.el==="O" && v===-2 && t.ox===-1) return "";
+    return `<b>${t.el}</b>: ${t.reason}.`;
+  }
+  const n=t.cnt;
+  const others = sp.els.filter(u=>u!==t);
+  const oSum = others.reduce((s,u)=>s+u.cnt*u.ox,0);
+  const oSumNoIdx = others.reduce((s,u)=>s+u.ox*u.mult,0);
+  if(sp.peroxid && t.el==="O" && v===-2) return "<b>O</b>: Hier liegt ein <b>Peroxid</b> mit O–O-Bindung vor. Sauerstoff hat dann nicht −II – rechne mit der Summenregel nach.";
+  if(sp.hydrid && t.el==="H" && v===1) return "<b>H</b>: In <b>Metallhydriden</b> ist Wasserstoff der elektronegativere Partner – rechne mit der Summenregel nach.";
+  if(sp.unk.length>1) return `<b>${t.el}</b>: Zerlege das Salz in seine Ionen und bestimme die Oxidationszahl im jeweiligen Ion.`;
+  if(sp.q!==0 && n*v+oSum===0) return `<b>${t.el}</b>: Die Summe muss der <b>Ionenladung ${qNum(sp.q)}</b> entsprechen, nicht null.`;
+  if(n>1 && v+oSum===sp.q) return `<b>${t.el}</b>: Es gibt ${n} ${t.el}-Atome. Die Summe ${n}·x muss ausgeglichen werden, nicht nur x.`;
+  if(n*v+oSumNoIdx===sp.q) return `<b>${t.el}</b>: Denke an die Indizes der anderen Atome – z. B. tragen 4 O-Atome zusammen 4·(−II) = ${rn(-8)} bei.`;
+  if(v===-t.ox) return `<b>${t.el}</b>: Vorzeichen prüfen.`;
+  return `<b>${t.el}</b>: Stelle die Summenregel auf: alle bekannten Oxidationszahlen mal Anzahl der Atome plus ${n>1?n+"·x":"x"} = ${qNum(sp.q)}.`;
+}
+
+function regSpecies(T, sp, g){
+  return t => slotBtn(addSlot(T, {ans:t.ox, el:t.el, why:v=>whyAn(sp,t,v), g}));
+}
+
+function makeSpeciesTask(typ, d){
+  const sp = S(d[0], d[1], d[2], Object.assign({name:d[3]}, d[4]||{}));
+  const T = newSlotTask("an", typ, d[3]);
+  const html = fxHTML(sp, regSpecies(T, sp, 0));
+  T.ctx = `<p>Bestimme die Oxidationszahlen aller Atome in <b>${esc(d[3])}</b>.</p>`;
+  T.groups.push({kind:"slots", q:"Tippe ein Feld an und wähle die Oxidationszahl.", html:`<div class="fx-row">${html}</div>`});
+  const fixed = sp.els.filter(t=>t.reason);
+  T.hints = [HINT_AN1,
+    fixed.length ? "Starte mit den Atomen, deren Oxidationszahl durch eine Regel feststeht: " + fixed.map(t=>`<b>${t.el}</b> (${t.reason})`).join(", ") + "."
+                 : "Hier steht keine Oxidationszahl durch eine einfache Regel fest. Zerlege die Verbindung in bekannte Ionen."];
+  T.ex = exSpecies(sp, true);
+  return T;
+}
+
+function sumEq(sp){
+  const unk = sp.unk[0];
+  const terms = sp.els.map(t=>{
+    if(t===unk) return t.cnt>1 ? `${t.cnt}·x` : "x";
+    return t.cnt>1 ? `${t.cnt}·${par(t.ox)}` : par(t.ox);
+  });
+  return terms.join(" + ") + " = " + qNum(sp.q);
+}
+function exSpecies(sp, withFig){
+  let h = "";
+  if(withFig) h += `<div class="figure"><div class="fx-row">${fxSolved(sp)}</div></div>`;
+  if(sp.ex){ h += `<p>${sp.ex}</p>`; return h; }
+  const fixed = sp.els.filter(t=>t.reason);
+  if(fixed.length){
+    h += `<p><strong>Feste Werte nach den Regeln:</strong></p><ul>` + fixed.map(t=>`<li><b>${t.el}</b>: ${rn(t.ox)} – ${t.reason}</li>`).join("") + `</ul>`;
+  }
+  if(sp.unk.length===1){
+    const u=sp.unk[0];
+    h += `<p><strong>Summenregel:</strong> Die Summe aller Oxidationszahlen entspricht der Ladung des Teilchens (${qNum(sp.q)}). Für ${u.el} setzt man x ein:</p>`;
+    h += `<div class="sumeq">${sumEq(sp)}&ensp;⇒&ensp;x = ${rn(u.ox)}</div>`;
+    if(sp.peroxid) h += `<p>Typisch für <strong>Peroxide</strong>: Die beiden O-Atome sind miteinander verbunden. Diese Bindung wird geteilt, deshalb hat Sauerstoff nur −I.</p>`;
+    if(sp.hydrid) h += `<p>Typisch für <strong>Metallhydride</strong>: Wasserstoff ist elektronegativer als das Metall und erhält die Bindungselektronen, deshalb −I.</p>`;
+    if(sp.f==="OF2") h += `<p>Fluor ist elektronegativer als Sauerstoff. Deshalb hat Sauerstoff hier ausnahmsweise eine <strong>positive</strong> Oxidationszahl.</p>`;
+  } else if(sp.unk.length===0 && sp.els.length>1){
+    const terms = sp.els.map(t=>t.cnt>1?`${t.cnt}·${par(t.ox)}`:par(t.ox)).join(" + ");
+    h += `<p><strong>Kontrolle mit der Summenregel:</strong></p><div class="sumeq">${terms} = ${qNum(sp.q)}  ✓</div>`;
+  }
+  return h;
+}
+
+function makeRxTask(r){
+  const T = newSlotTask("an", "A4", r.n);
+  const side = arr => arr.map(x=>({coef:x[0], sp:S(x[1],x[2],x[3])}));
+  const L=side(r.L), R=side(r.R);
+  const parts=[];
+  const put = (list)=>list.forEach((e,i)=>{ if(i) parts.push(`<span class="op">+</span>`); parts.push(fxHTML(e.sp, regSpecies(T,e.sp,0), e.coef)); });
+  put(L); parts.push(`<span class="op arr">→</span>`); put(R);
+  T.ctx = `<p><b>${esc(r.n)}</b>: Bestimme alle Oxidationszahlen und entscheide, welches Element oxidiert und welches reduziert wird.</p>`;
+  T.groups.push({kind:"slots", q:"Oxidationszahlen eintragen", html:`<div class="fx-row">${parts.join("")}</div>`});
+  const els=[]; L.concat(R).forEach(e=>e.sp.els.forEach(t=>{ if(!els.includes(t.el)) els.push(t.el); }));
+  const mk = (which)=>({kind:"choice", inline:true, q: which==="ox" ? "Welches Element wird <b>oxidiert</b>?" : "Welches Element wird <b>reduziert</b>?",
+    ans: which==="ox"?r.ox:r.red,
+    opts: els.map(e=>({k:e, html:e, why: (which==="ox"&&e===r.red) ? "Dieses Element nimmt Elektronen auf – seine Oxidationszahl sinkt. Das ist eine Reduktion."
+                                  : (which==="red"&&e===r.ox) ? "Die Oxidationszahl dieses Elements steigt – es gibt Elektronen ab. Das ist eine Oxidation."
+                                  : "Vergleiche die Oxidationszahlen dieses Elements links und rechts vom Reaktionspfeil."}))});
+  T.groups.push(mk("ox")); T.groups.push(mk("red"));
+  T.hints = [HINT_AN1 + " Elementare Stoffe wie Zn oder Cl₂ haben die Oxidationszahl 0.",
+    "Oxidation bedeutet Elektronenabgabe: Die Oxidationszahl <b>steigt</b>. Bei einer Reduktion (Elektronenaufnahme) <b>sinkt</b> sie."];
+  // Erklärung
+  const vals = list => { const m={}; list.forEach(e=>e.sp.els.forEach(t=>{ (m[t.el]=m[t.el]||new Set()).add(t.ox); })); return m; };
+  const VL=vals(L), VR=vals(R);
+  const rows = els.map(e=>{
+    const a=[...VL[e]], b=[...VR[e]];
+    const newV=b.filter(v=>!VL[e].has(v));
+    let res="unverändert", cls="";
+    if(newV.some(v=>v>Math.max(...a))){ res="Oxidation (Elektronenabgabe)"; cls="ox-up"; }
+    else if(newV.some(v=>v<Math.min(...a))){ res="Reduktion (Elektronenaufnahme)"; cls="ox-down"; }
+    return `<tr><td class="k">${e}</td><td class="mono">${a.map(rn).join(" / ")}</td><td class="mono">${b.map(rn).join(" / ")}</td><td class="${cls}">${res}</td></tr>`;
+  }).join("");
+  const oxM = L.filter(e=>e.sp.els.some(t=>t.el===r.red)).map(e=>fTxt(e.sp));
+  const redM = L.filter(e=>e.sp.els.some(t=>t.el===r.ox)).map(e=>fTxt(e.sp));
+  T.ex = `<div class="figure"><div class="fx-row">${eqSolved(L,R)}</div></div>
+    <div class="table-wrap" style="margin:4px 0 12px"><table class="hist"><thead><tr><th>Element</th><th>vorher</th><th>nachher</th><th>Ergebnis</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <p><strong>${r.ox}</strong> wird oxidiert, <strong>${r.red}</strong> wird reduziert. ${redM.join(", ")} ist das <strong>Reduktionsmittel</strong> (gibt Elektronen ab), ${oxM.join(", ")} das <strong>Oxidationsmittel</strong> (nimmt Elektronen auf).</p>`;
+  T.rx = {L, R};
+  return T;
+}
+function eqSolved(L,R){
+  const parts=[];
+  const put=list=>list.forEach((e,i)=>{ if(i) parts.push(`<span class="op">+</span>`); parts.push(fxHTML(e.sp, t=>`<span class="slot static">${rn(t.ox)}</span>`, e.coef)); });
+  put(L); parts.push(`<span class="op arr">→</span>`); put(R);
+  return parts.join("");
+}
+
+/* --- organisch --- */
+function contrib(a, o, ord){ return EN[o.el]<EN[a.el] ? -ord : (o.el===a.el ? 0 : ord); }
+function whyOrg(M, i, v){
+  const a=M.A[i];
+  const lbl = a.el==="C" ? `<b>C${M.nC>1?a.cno:""}</b>` : `<b>${a.el}</b>`;
+  if(a.el!=="C"){
+    return `${lbl}: ${NAMES[a.el]} ist elektronegativer als C und H und erhält alle Bindungselektronen: ${VE[a.el]} Valenzelektronen − ${a.asg} zugeordnete Elektronen.`;
+  }
+  if(v===-a.ox && v!==0) return `${lbl}: Vorzeichen prüfen – Bindungen zu H machen das C-Atom negativer, Bindungen zu O, N oder Halogenen positiver.`;
+  const single = a.nbr.reduce((s,n)=>s+contrib(a,M.A[n.k],1),0);
+  if(single!==a.ox && v===single) return `${lbl}: Mehrfachbindungen zählen mehrfach – eine C=O-Doppelbindung zählt +II, eine C≡N-Dreifachbindung +III.`;
+  const nH = a.nbr.filter(n=>M.A[n.k].el==="H").length;
+  if(nH && v===a.ox+2*nH) return `${lbl}: H ist <b>weniger</b> elektronegativ als C – jede C–H-Bindung zählt −I für das C-Atom.`;
+  const cc = a.nbr.filter(n=>M.A[n.k].el==="C").reduce((s,n)=>s+n.o,0);
+  if(cc && (v===a.ox+cc || v===a.ox-cc)) return `${lbl}: Bindungen zwischen zwei C-Atomen zählen 0 – die Elektronen werden geteilt.`;
+  return `${lbl}: Zähle die Bindungen dieses C-Atoms einzeln ab: zu H je −I, zu O/N/Halogen je +I pro Bindungsstrich, zu C 0.`;
+}
+function regMol(T, M, g, mi){
+  return i => isAsked(M.A[i]) ? addSlot(T, {ans:M.A[i].ox, el:M.A[i].el, why:v=>whyOrg(M,i,v), g, mol:mi, atom:i}) : null;
+}
+const BSYM = {1:"–", 2:"=", 3:"≡"};
+function atomLine(M, i){
+  const a=M.A[i];
+  const grp={};
+  a.nbr.forEach(n=>{ const o=M.A[n.k]; const k=o.el+"|"+n.o; grp[k]=(grp[k]||0)+1; });
+  const parts = Object.keys(grp).sort((p,q)=>{ const ord={H:0,C:1}; return (ord[p.split("|")[0]]??2)-(ord[q.split("|")[0]]??2); }).map(k=>{
+    const [el,ord]=k.split("|"); const n=grp[k]; const c=contrib(a,{el},+ord);
+    return `${n} × C${BSYM[ord]}${el} (${n>1?"je ":""}${rn(c)})`;
+  });
+  return `<li><b>C${M.nC>1?a.cno:""}</b>: ${parts.join(", ")}  ⇒  <b>${rn(a.ox)}</b></li>`;
+}
+function exMol(M){
+  let h = `<ul>` + M.A.map((a,i)=>a.el==="C"?atomLine(M,i):"").join("") + `</ul>`;
+  const het = M.A.filter(a=>a.el!=="C"&&a.el!=="H");
+  if(het.length){
+    const seen={};
+    het.forEach(a=>{ const k=a.el+a.ox; if(!seen[k]) seen[k]={a,n:0}; seen[k].n++; });
+    h += `<p>${Object.values(seen).map(s=>`<b>${s.a.el}</b>: ${rn(s.a.ox)}`).join(" · ")} · <b>H</b>: +I – die Heteroatome sind elektronegativer als C und H und erhalten alle Bindungselektronen.</p>`;
+  }
+  const tot = M.A.reduce((s,a)=>s+a.ox,0);
+  const byEl = {}; M.A.forEach(a=>{ byEl[a.el]=(byEl[a.el]||0)+a.ox; });
+  h += `<p class="dim" style="font-size:12.5px">Kontrolle: Die Summe aller Oxidationszahlen im Molekül ist ${tot===0?"null":tot} (${Object.keys(byEl).map(e=>`${e}: ${qNum(byEl[e])}`).join(", ")}).</p>`;
+  return h;
+}
+function molBox(M, reg){ return `<div class="mol-box">${molSVG(M,{reg, idx:true})}<div class="cap">${esc(M.n)}</div></div>`; }
+function molBoxSolved(M){ return `<div class="mol-box">${molSVG(M,{solved:true, idx:true, slotAt:i=>isAsked(M.A[i])})}<div class="cap">${esc(M.n)}</div></div>`; }
+function askedTxt(){ return HETERO ? "der C-Atome und der Heteroatome" : "aller C-Atome"; }
+
+function makeOrgTask(typ, key){
+  const M = build(ORG[key]);
+  const T = newSlotTask("org", typ, M.n);
+  T.key=key;
+  T.ctx = `<p>Bestimme die Oxidationszahlen ${askedTxt()} in <b>${esc(M.n)}</b>. H-Atome haben immer +I.</p>`;
+  T.groups.push({kind:"slots", q:"Tippe ein Feld an und wähle die Oxidationszahl.", html:`<div class="mol-row">${molBox(M, regMol(T,M,0,0))}</div>`});
+  T.hints = [HINT_ORG1, HINT_ORG2];
+  T.ex = `<div class="figure"><div class="mol-row">${molBoxSolved(M)}</div></div>` + exMol(M);
+  return T;
+}
+
+const RG = {H2:"H<sub>2</sub>", Br2:"Br<sub>2</sub>", H2O:"H<sub>2</sub>O", HCl:"HCl"};
+function makeOrxTask(r){
+  const T = newSlotTask("org","O5",r.n);
+  const ML = r.L.map(x=>typeof x==="string"?build(ORG[x]):x), MR = r.R.map(x=>typeof x==="string"?build(ORG[x]):x);
+  let mi=0;
+  const side=(list,solved)=>list.map((m,i)=>(i?`<span class="eqop">+</span>`:"")+(m.t?`<span class="rg">${RG[m.t]}</span>`:(solved?molBoxSolved(m):molBox(m, regMol(T,m,0,mi++))))).join("");
+  T.ctx = `<p>${esc(r.d)} Bestimme die Oxidationszahlen ${askedTxt()} und entscheide, ob das organische Molekül oxidiert oder reduziert wird.</p>`;
+  T.groups.push({kind:"slots", q:"Oxidationszahlen eintragen", html:`<div class="eqs">${side(ML)}<span class="eqop arr">→</span>${side(MR)}</div>`});
+  const cs = list => list.filter(m=>!m.t).reduce((s,m)=>s+m.A.filter(a=>a.el==="C").reduce((t,a)=>t+a.ox,0),0);
+  const sL=cs(ML), sR=cs(MR);
+  const ans = sR>sL?"ox":sR<sL?"red":"none";
+  T.groups.push({kind:"choice", q:"Wie verändert sich das organische Molekül?", ans, opts:[
+    {k:"ox", html:"Es wird oxidiert", why:"Vergleiche die Summe der Oxidationszahlen aller C-Atome vorher und nachher: Bei einer Oxidation steigt sie."},
+    {k:"red", html:"Es wird reduziert", why:"Vergleiche die Summe der Oxidationszahlen aller C-Atome vorher und nachher: Bei einer Reduktion sinkt sie."},
+    {k:"none", html:"Weder oxidiert noch reduziert", why:"Die Summe der Oxidationszahlen der C-Atome ändert sich – es liegt also eine Oxidation oder Reduktion vor."}
+  ]});
+  T.hints = [HINT_ORG2, "Bilde die Summe der Oxidationszahlen aller C-Atome vor und nach der Reaktion. Steigt sie, wurde das Molekül oxidiert, sinkt sie, wurde es reduziert."];
+  const cl = list => list.filter(m=>!m.t).map(m=>m.A.filter(a=>a.el==="C").map(a=>rn(a.ox)).join(" + ")).join(" + ");
+  let concl;
+  if(ans==="ox") concl=`Die Summe steigt von ${rn(sL)} auf ${rn(sR)}: Das organische Molekül wird <strong>oxidiert</strong>.`;
+  else if(ans==="red") concl=`Die Summe sinkt von ${rn(sL)} auf ${rn(sR)}: Das organische Molekül wird <strong>reduziert</strong>.`;
+  else concl=`Die Summe bleibt bei ${rn(sL)}. Ein C-Atom wird oxidiert, das andere reduziert – insgesamt wird das Molekül <strong>weder oxidiert noch reduziert</strong>. Additionen von H<sub>2</sub>O oder HX an Alkene sind deshalb keine Redoxreaktionen.`;
+  T.ex = `<div class="figure"><div class="eqs">${side(ML,true)}<span class="eqop arr">→</span>${side(MR,true)}</div></div>
+    <h4>Oxidationszahlen der C-Atome</h4>
+    ${ML.concat(MR).filter(m=>!m.t).map(m=>`<p style="margin:0 0 2px"><strong>${esc(m.n)}</strong></p>${`<ul>`+m.A.map((a,i)=>a.el==="C"?atomLine(m,i):"").join("")+`</ul>`}`).join("")}
+    <h4>Summen vergleichen</h4>
+    <div class="sumeq">vorher: ${cl(ML)} = ${rn(sL)}&emsp;&emsp;&emsp;nachher: ${cl(MR)} = ${rn(sR)}</div>
+    <p>${concl}</p>`;
+  return T;
+}
+
+/* ============================================================
+   Zustand & Anzeige
+   ============================================================ */
+let T=null, taskNo=0, lastLabel="", active=null, signBuf=0;
+const stats={solved:0, first:0, streak:0, shown:0};
+const history=[];
+globalThis.__oxHist=history;
+
+function setStatus(kind, txt){ const b=$("statusBadge"); b.className="status "+kind; $("statusText").textContent=txt; }
+function renderStats(){ $("roSolved").textContent=stats.solved; $("roFirst").textContent=stats.first; $("roStreak").textContent=stats.streak; $("roShown").textContent=stats.shown; }
+function renderHistory(){
+  if(!history.length){ $("histBody").innerHTML=`<tr><td colspan="4" class="empty-hint">Noch keine Aufgaben bearbeitet.</td></tr>`; return; }
+  const lab={first:["s-first","im 1. Versuch gelöst"], ok:["s-ok","gelöst"], help:["s-help","mit Hilfen gelöst"], shown:["s-shown","Lösung angesehen"], open:["s-open","nicht beendet"]};
+  $("histBody").innerHTML = history.slice().reverse().map(h=>`<tr><td class="mono">${h.no}</td><td>${esc(TYP[h.cls][h.typ].n)}</td><td>${esc(h.title)}</td><td class="${lab[h.st][0]}">${lab[h.st][1]}${h.tries>1&&(h.st==="ok"||h.st==="help")?` (${h.tries} Versuche)`:""}</td></tr>`).join("");
+}
+function renderTypes(){
+  if(!CLS) return;
+  const tt=TYP[CLS];
+  $("typeList").innerHTML = Object.keys(tt).map(k=>`
+    <label class="type-item ${enabled[CLS][k]?"on":""}" data-k="${k}">
+      <input type="checkbox" ${enabled[CLS][k]?"checked":""} data-k="${k}">
+      <span><span class="tt">${tt[k].n}</span><span class="td" style="display:block">${tt[k].d}</span></span>
+    </label>`).join("");
+  $("typeNote").hidden=false;
+}
+$("typeList").addEventListener("change", e=>{
+  const k=e.target.dataset.k; if(!k||!CLS) return;
+  enabled[CLS][k]=e.target.checked;
+  if(!Object.values(enabled[CLS]).some(Boolean)){ enabled[CLS][k]=true; e.target.checked=true; }
+  renderTypes();
+});
+function renderSelect(){
+  if(!CLS) return;
+  $("taskSelect").innerHTML = Object.keys(TYP[CLS]).map(t=>`<optgroup label="${esc(TYP[CLS][t].n)}">${
+    CATALOG.map((c,i)=>c.cls===CLS&&c.typ===t?`<option value="${i}">${esc(c.label)}</option>`:"").join("")}</optgroup>`).join("");
+  $("selBlock").hidden=false;
+}
+
+function palHTML(){
+  return `<div class="pal-wrap"><div class="pal-lbl">Oxidationszahl für das markierte Feld:</div><div class="pal">${
+    PAL.map(v=>`<button type="button" data-v="${v}" class="${v<0?"neg":v>0?"pos":""}">${rn(v)}</button>`).join("")
+  }<button type="button" class="clr" data-v="x">löschen</button></div></div>`;
+}
+
+function loadTask(t){
+  if(T && !T.done && (T.tries>0 || T.hintIdx>0)){ const fb=document.createElement("div"); fb.innerHTML=T.ex; const fg=fb.querySelector(".figure"); history.push({no:taskNo, cls:T.cls, typ:T.typ, title:T.title, st:"open", tries:T.tries, fig:fg?fg.innerHTML:"", kind:TYP[T.cls][T.typ].n}); }
+  T=t; taskNo++;
+  T.tries=0; T.hintIdx=0; T.done=false; T.shown=false;
+  T.groups.forEach(g=>{ g.sel=null; g.state=""; g.why=""; });
+  lastLabel=T.title;
+  $("taskNum").textContent="Aufgabe "+taskNo;
+  const chip=$("taskChip"); chip.className="chip "+TYP[T.cls][T.typ].c; chip.textContent=TYP[T.cls][T.typ].n;
+  $("ctx").innerHTML=T.ctx;
+  renderGroups();
+  $("feedback").innerHTML="";
+  $("expBox").innerHTML=`<div class="empty-hint">Die Erklärung erscheint, sobald die Aufgabe gelöst oder die Lösung angezeigt wurde.</div>`;
+  $("btnCheck").disabled=false; $("btnHint").disabled=false; $("btnSolve").disabled=false;
+  setStatus("running","Aufgabe offen");
+  setActive(T.slots.length?0:null);
+  renderHistory();
+}
+function renderGroups(){
+  const multi = T.groups.length>1;
+  $("groups").innerHTML = T.groups.map((g,gi)=>{
+    const qn = multi && !g.inline ? `<span class="qn">${String.fromCharCode(97+gi)})</span>` : "";
+    if(g.kind==="slots") return `
+      <div class="q-group" data-g="${gi}">
+        <div class="q">${qn}${g.q}<span class="mark"></span></div>
+        ${g.html}
+        ${palHTML()}
+        <div class="why" hidden></div>
+      </div>`;
+    return `
+      <div class="q-group${g.inline?" inline":""}" data-g="${gi}">
+        <div class="q">${qn}${g.q}<span class="mark"></span></div>
+        <div class="choices">${g.opts.map(o=>`<button type="button" class="opt" data-k="${esc(o.k)}">${o.html}</button>`).join("")}</div>
+        <div class="why" hidden></div>
+      </div>`;
+  }).join("");
+  T.groups.forEach((g,gi)=>paintGroup(gi));
+}
+function slotEls(){ return $("groups").querySelectorAll("[data-s]"); }
+function paintSlots(){
+  slotEls().forEach(el=>{
+    const s=T.slots[+el.dataset.s];
+    el.classList.toggle("empty", s.val==null);
+    el.classList.toggle("act", !T.done && active===+el.dataset.s);
+    el.classList.toggle("ok", s.st==="ok");
+    el.classList.toggle("bad", s.st==="bad");
+    el.classList.toggle("rev", !!s.rev && s.st!=="ok");
+    const txt = rn(s.val);
+    if(el.tagName.toLowerCase()==="button") el.textContent=txt; else el.querySelector("text").textContent=txt;
+  });
+}
+function paintGroup(gi){
+  const g=T.groups[gi], el=$("groups").querySelector(`.q-group[data-g="${gi}"]`);
+  if(!el) return;
+  el.classList.toggle("ok", g.state==="ok");
+  el.classList.toggle("bad", g.state==="bad");
+  el.classList.toggle("done", T.done);
+  if(g.kind==="choice") el.querySelectorAll(".opt").forEach(b=>b.classList.toggle("sel", b.dataset.k===g.sel));
+  else paintSlots();
+  const w=el.querySelector(".why");
+  if(g.why){ w.innerHTML=g.why; w.hidden=false; } else { w.hidden=true; w.innerHTML=""; }
+}
+function setActive(i){ active=i; signBuf=0; if(T) paintSlots(); }
+function setVal(v){
+  if(!T || T.done || active==null) return;
+  const s=T.slots[active];
+  s.val=v; s.st=""; s.rev=false;
+  const g=T.groups[s.g]; g.state=""; g.why="";
+  if(v!=null){
+    // zum nächsten leeren Feld springen
+    let nx=null;
+    for(let k=1;k<=T.slots.length;k++){ const j=(active+k)%T.slots.length; if(T.slots[j].val==null){ nx=j; break; } }
+    active = nx==null ? active : nx;
+  }
+  signBuf=0;
+  paintGroup(s.g);
+}
+
+$("groups").addEventListener("click", e=>{
+  if(!T || T.done) return;
+  const sl=e.target.closest("[data-s]");
+  if(sl){ setActive(+sl.dataset.s); return; }
+  const pb=e.target.closest(".pal button");
+  if(pb){ const v=pb.dataset.v; setVal(v==="x"?null:+v); return; }
+  const b=e.target.closest(".opt");
+  if(b){
+    const gi=+b.closest(".q-group").dataset.g, g=T.groups[gi];
+    g.sel=b.dataset.k; g.state=""; g.why="";
+    paintGroup(gi);
+  }
+});
+document.addEventListener("keydown", e=>{
+  if(!T || T.done || active==null) return;
+  if(document.querySelector(".modal-backdrop.open")) return;
+  const tag=(e.target.tagName||"").toLowerCase();
+  if(tag==="select"||tag==="input"||tag==="textarea") return;
+  if(e.key==="-"||e.key==="−"){ signBuf=-1; e.preventDefault(); return; }
+  if(e.key==="+"){ signBuf=1; e.preventDefault(); return; }
+  if(/^[0-8]$/.test(e.key)){
+    const d=+e.key; let v = d===0 ? 0 : (signBuf||1)*d;
+    if(signBuf===0 && d!==0 && T.slots[active].val!=null && T.slots[active].val<0) v=-d;
+    setVal(v); e.preventDefault(); return;
+  }
+  if(e.key==="Backspace"||e.key==="Delete"){ setVal(null); e.preventDefault(); return; }
+  if(e.key==="ArrowRight"||e.key==="ArrowLeft"){
+    const n=T.slots.length; setActive((active+(e.key==="ArrowRight"?1:n-1))%n); e.preventDefault();
+  }
+});
+
+function fb(cls, html, append){
+  const div=`<div class="fb ${cls}">${html}</div>`;
+  if(append) $("feedback").insertAdjacentHTML("beforeend", div); else $("feedback").innerHTML=div;
+}
+function finish(st){
+  T.done=true; active=null;
+  T.groups.forEach((g,gi)=>paintGroup(gi));
+  $("btnCheck").disabled=true; $("btnHint").disabled=true; $("btnSolve").disabled=true;
+  $("expBox").innerHTML=`<div class="explain">${T.ex}</div>`;
+  const figBox=document.createElement("div"); figBox.innerHTML=T.ex; const fig=figBox.querySelector(".figure");
+  history.push({no:taskNo, cls:T.cls, typ:T.typ, title:T.title, st, tries:T.tries, fig:fig?fig.innerHTML:"", kind:TYP[T.cls][T.typ].n});
+  renderHistory(); renderStats();
+}
+function check(){
+  if(!T || T.done) return;
+  const openS=T.slots.filter(s=>s.val==null).length;
+  const openC=T.groups.filter(g=>g.kind==="choice"&&g.sel==null).length;
+  if(openS||openC){
+    const p=[]; if(openS) p.push(openS===1?"ein Feld ist":"noch "+openS+" Felder sind"); if(openC) p.push(openC===1?"eine Frage ist":openC+" Fragen sind");
+    let m=p.join(", ")+" noch offen."; m=m.charAt(0).toUpperCase()+m.slice(1);
+    fb("info", m);
+    if(openS){ const j=T.slots.findIndex(s=>s.val==null); setActive(j); }
+    return;
+  }
+  T.tries++;
+  let nOk=0, nTot=0;
+  T.groups.forEach((g,gi)=>{
+    nTot++;
+    if(g.kind==="slots"){
+      const mine=T.slots.filter(s=>s.g===gi);
+      const whys=[];
+      mine.forEach(s=>{ s.st = s.val===s.ans ? "ok" : "bad"; if(s.st==="bad"){ const w=s.why(s.val); if(w && !whys.includes(w)) whys.push(w); } });
+      const ok=mine.every(s=>s.st==="ok");
+      g.state=ok?"ok":"bad";
+      g.why = ok ? "" : (whys.length ? `<ul>${whys.slice(0,4).map(w=>`<li>${w}</li>`).join("")}</ul>` : "");
+      if(ok) nOk++;
+    } else {
+      const ok=g.sel===g.ans; g.state=ok?"ok":"bad";
+      g.why = ok ? "" : ((g.opts.find(o=>o.k===g.sel)||{}).why||"");
+      if(ok) nOk++;
+    }
+    paintGroup(gi);
+  });
+  if(nOk===nTot){
+    stats.solved++; if(T.tries===1) stats.first++; stats.streak++;
+    fb("good", T.tries===1 ? "Alles richtig – im ersten Versuch! Den Lösungsweg findest du unten im Tab „Erklärung“." : "Alles richtig! Den Lösungsweg findest du unten im Tab „Erklärung“.");
+    setStatus("done","gelöst");
+    finish(T.hintIdx>0?"help":(T.tries===1?"first":"ok"));
+  } else {
+    stats.streak=0; renderStats();
+    const wrong=T.slots.filter(s=>s.st==="bad").length;
+    let m = wrong ? `${T.slots.length-wrong} von ${T.slots.length} Oxidationszahlen richtig.` : "Alle Oxidationszahlen stimmen.";
+    if(T.groups.some(g=>g.kind==="choice")) m += T.groups.filter(g=>g.kind==="choice"&&g.state==="bad").length ? " Mindestens eine Frage ist noch falsch beantwortet." : " Die Fragen sind richtig beantwortet.";
+    fb("bad", m+" Korrigiere die rot markierten Stellen und prüfe erneut.");
+    const j=T.slots.findIndex(s=>s.st==="bad"); if(j>=0) setActive(j);
+  }
+}
+function hint(){
+  if(!T || T.done) return;
+  if(T.hintIdx < T.hints.length){
+    fb("hint", `<strong>Tipp ${T.hintIdx+1}:</strong> ${T.hints[T.hintIdx]}`, true); T.hintIdx++; return;
+  }
+  const j=T.slots.findIndex(s=>s.val!==s.ans);
+  const left=T.slots.filter(s=>s.val!==s.ans).length;
+  if(j>=0 && left>1){
+    const s=T.slots[j]; s.val=s.ans; s.st=""; s.rev=true; T.hintIdx++;
+    const g=T.groups[s.g]; g.state=""; g.why="";
+    fb("hint", `<strong>Tipp ${T.hintIdx}:</strong> Ein Feld ist ausgefüllt (gelb umrandet): ${s.el==="C" ? "ein C-Atom" : s.el} hat ${rn(s.ans)}.`, true);
+    setActive(j); paintGroup(s.g);
+  } else fb("info","Keine weiteren Tipps – das letzte Feld schaffst du selbst, oder nutze „Lösung zeigen“.", true);
+}
+function solve(){
+  if(!T || T.done) return;
+  T.slots.forEach(s=>{ s.val=s.ans; s.st="ok"; s.rev=false; });
+  T.groups.forEach(g=>{ if(g.kind==="choice") g.sel=g.ans; g.state="ok"; g.why=""; });
+  T.shown=true; stats.shown++; stats.streak=0;
+  fb("info","Die Lösung ist eingetragen. Die Aufgabe zählt nicht als gelöst – den Lösungsweg findest du unten im Tab „Erklärung“.");
+  setStatus("shown","Lösung angezeigt");
+  finish("shown");
+}
+function newTask(){
+  if(!CLS) return;
+  const typs=Object.keys(enabled[CLS]).filter(k=>enabled[CLS][k]);
+  let c, guard=0;
+  do { const typ=pick(typs); c=pick(CATALOG.filter(p=>p.cls===CLS&&p.typ===typ)); guard++; } while(c.label===lastLabel && guard<12);
+  T_catalog = c;
+  loadTask(c.make());
+}
+let T_catalog=null;
+
+function setCls(cls){
+  CLS=cls;
+  $("clsAn").classList.toggle("active", cls==="an");
+  $("clsOrg").classList.toggle("active", cls==="org");
+  $("startCard").hidden=true; $("taskCard").hidden=false;
+  $("heteroWrap").hidden = cls!=="org";
+  $("legendBlock").hidden = cls!=="org";
+  renderTypes(); renderSelect();
+  newTask();
+}
+
+/* Regeln-Tab */
+function renderRules(){
+  const R = [
+    ["grp","Grundregeln"],
+    ["Atome in Elementen", "0", "Fe, O₂, Cl₂, S₈"],
+    ["Einatomige Ionen", "Ionenladung", "Na⁺: +I · Fe³⁺: +III · S²⁻: −II"],
+    ["Summenregel: Summe aller Oxidationszahlen", "= Ladung des Teilchens", "H₂SO₄: 0 · SO₄²⁻: −2"],
+    ["grp","Feste Werte in Verbindungen"],
+    ["Fluor", "−I", "HF, OF₂"],
+    ["Alkalimetalle (Li, Na, K)", "+I", "NaCl, KMnO₄"],
+    ["Erdalkalimetalle (Mg, Ca, Ba)", "+II", "CaCO₃, MgO"],
+    ["Aluminium", "+III", "Al₂O₃"],
+    ["Wasserstoff", "+I (in Metallhydriden −I)", "H₂O · NaH"],
+    ["Sauerstoff", "−II (Peroxide −I, in OF₂ +II)", "H₂O · H₂O₂"],
+    ["Halogene in Halogeniden", "−I", "NaCl, HCl, CaBr₂"],
+    ["grp","Organische Verbindungen"],
+    ["Bindungselektronen dem elektronegativeren Atom zuordnen, gleiche Atome teilen", "Valenzelektronen − zugeordnete Elektronen", "C in CH₄: 4 − 8 = −IV"],
+    ["Kurzregel für C: Bindung zu H", "je −I", "H₃C–: −III"],
+    ["Bindung zu O, N, Halogen (pro Bindungsstrich)", "je +I", "C=O: +II"],
+    ["Bindung zu C", "0", "C–C, C=C"],
+    ["Oxidationsreihe des Methans", "−IV → −II → 0 → +II → +IV", "CH₄ → CH₃OH → HCHO → HCOOH → CO₂"],
+    ["grp","Redoxreaktionen"],
+    ["Oxidation = Elektronenabgabe", "Oxidationszahl steigt", "Zn → Zn²⁺: 0 → +II"],
+    ["Reduktion = Elektronenaufnahme", "Oxidationszahl sinkt", "Cu²⁺ → Cu: +II → 0"],
+    ["Oxidationsmittel / Reduktionsmittel", "wird reduziert / wird oxidiert", "Cu²⁺ ist Oxidationsmittel, Zn Reduktionsmittel"]
+  ];
+  $("rulesBody").innerHTML = R.map(r=>r[0]==="grp" ? `<tr class="grp"><td colspan="3">${r[1]}</td></tr>`
+    : `<tr><td>${esc(r[0])}</td><td class="k">${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join("");
+}
+
+/* Darstellung */
+$("swHetero").addEventListener("change", e=>{
+  HETERO=e.target.checked;
+  if(T && T.cls==="org" && T_catalog){ loadTask(T_catalog.make()); }
+});
+
+/* Startkarten */
+function renderStart(){
+  $("startAnFx").innerHTML = `<div class="fx-row" style="padding:0">${fxSolved(S("H2SO4",0,{H:1,S:6,O:-2}))}</div>`;
+  const M=build(ORG.ethanol);
+  $("startOrgFx").innerHTML = molSVG(M,{solved:true, slotAt:i=>M.A[i].el==="C"}).replace(/width="(\d+)" height="(\d+)"/,(m,w,h)=>`width="${Math.round(w*0.82)}" height="${Math.round(h*0.82)}"`);
+}
+document.querySelectorAll(".start-opt").forEach(b=>b.addEventListener("click", ()=>setCls(b.dataset.cls)));
+$("clsAn").addEventListener("click", ()=>{ if(CLS!=="an") setCls("an"); });
+$("clsOrg").addEventListener("click", ()=>{ if(CLS!=="org") setCls("org"); });
+
+/* Bedienung */
+$("btnNew").addEventListener("click", newTask);
+$("btnCheck").addEventListener("click", check);
+$("btnHint").addEventListener("click", hint);
+$("btnSolve").addEventListener("click", solve);
+$("btnLoad").addEventListener("click", ()=>{ const c=CATALOG[+$("taskSelect").value]; if(c){ T_catalog=c; loadTask(c.make()); } });
+
+document.querySelectorAll(".tabbtn").forEach(b=>b.addEventListener("click", ()=>{
+  document.querySelectorAll(".tabbtn").forEach(x=>x.classList.toggle("active", x===b));
+  document.querySelectorAll(".tabpanel").forEach(p=>p.classList.toggle("active", p.id==="tab-"+b.dataset.tab));
+}));
+
+const gbd=$("guideBackdrop");
+$("btnGuide").addEventListener("click", e=>{ e.preventDefault(); gbd.classList.add("open"); });
+$("closeGuide").addEventListener("click", ()=>gbd.classList.remove("open"));
+gbd.addEventListener("click", e=>{ if(e.target===gbd) gbd.classList.remove("open"); });
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") gbd.classList.remove("open"); });
+
+$("heteroWrap").hidden=true; $("legendBlock").hidden=true;
+renderRules(); renderStart(); renderStats();
+
+/* ============================================================
+   Grundlagen: Strukturformeln mit Zuordnung der Bindungselektronen
+   Bindungselektronen = Punkte auf dem Bindungsstrich, beim Atom,
+   dem sie zugesprochen werden; C–C-Bindungen: je ein Elektron.
+   ============================================================ */
+function assignSVG(M, o){
+  o=o||{};
+  const G=o.u||60;
+  const xs=M.A.map(a=>a.x), ys=M.A.map(a=>a.y);
+  const minX=Math.min(...xs), maxX=Math.max(...xs), minY=Math.min(...ys), maxY=Math.max(...ys);
+  const padL=26, padR=o.ox?50:26, padT=o.ox?44:26, padB=26;
+  const W=(maxX-minX)*G+padL+padR, H=(maxY-minY)*G+padT+padB;
+  const X=a=>(a.x-minX)*G+padL, Y=a=>(a.y-minY)*G+padT;
+  const lines=[], dots=[], txt=[];
+  const sh=(a,dx)=> dx!==0 ? (twoL(a.el)?14:9) : 10;
+  const dot=(x,y,c)=>dots.push(`<circle class="ea${c?" "+c:""}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.9"/>`);
+  M.B.forEach(b=>{
+    const p=M.A[b.i], q=M.A[b.j];
+    const dx=Math.sign(q.x-p.x), dy=Math.sign(q.y-p.y);
+    const x1=X(p)+dx*sh(p,dx), y1=Y(p)+dy*sh(p,dx);
+    const x2=X(q)-dx*sh(q,dx), y2=Y(q)-dy*sh(q,dx);
+    const len=Math.hypot(x2-x1,y2-y1);
+    const offs=b.o===1?[0]:b.o===2?[-3.6,3.6]:[-5.4,0,5.4];
+    // Empfänger der Bindungselektronen
+    const recv = p.el===q.el ? null : (EN[p.el]>EN[q.el] ? "p" : "q");
+    const cls = recv ? (ELCLS[(recv==="p"?p:q).el]||"cc") : "cc";
+    offs.forEach(f=>{
+      const ox=-dy*f, oy=dx*f;
+      lines.push(`<line x1="${(x1+ox).toFixed(1)}" y1="${(y1+oy).toFixed(1)}" x2="${(x2+ox).toFixed(1)}" y2="${(y2+oy).toFixed(1)}"/>`);
+      const at=(d)=>[x1+ox+dx*d, y1+oy+dy*d];
+      if(recv==="q"){ const a=at(len-5), c=at(len-12.5); dot(...a,cls); dot(...c,cls); }
+      else if(recv==="p"){ const a=at(5), c=at(12.5); dot(...a,cls); dot(...c,cls); }
+      else { const a=at(6), c=at(len-6); dot(...a,cls); dot(...c,cls); }
+    });
+    if(!recv){ // Trennstrich: Bindung wird geteilt
+      const mx=(x1+x2)/2, my=(y1+y2)/2, ext=b.o===1?7:b.o===2?10:12;
+      lines.push(`<line class="cut" x1="${(mx-dy*ext).toFixed(1)}" y1="${(my-dx*ext).toFixed(1)}" x2="${(mx+dy*ext).toFixed(1)}" y2="${(my+dx*ext).toFixed(1)}"/>`);
+    }
+  });
+  M.A.forEach((a,i)=>{
+    const cx=X(a), cy=Y(a), cls=ELCLS[a.el]||"";
+    txt.push(`<text class="el ${cls}" x="${cx}" y="${cy}">${a.el}</text>`);
+    const slotOn = o.ox && (a.el==="C" || (o.het && a.el!=="H"));
+    (a.el==="C" ? [] : lpDirs(M,i,slotOn)).forEach(deg=>{
+      const t=deg*Math.PI/180, c=Math.cos(t), s=Math.sin(t);
+      const R = twoL(a.el) ? (Math.abs(c)>0.5 ? 17 : 13) : 12.5;
+      const mx=cx+R*c, my=cy+R*s, hx=-s*4.6, hy=c*4.6;
+      lines.push(`<line class="lp ${cls}" x1="${(mx+hx).toFixed(1)}" y1="${(my+hy).toFixed(1)}" x2="${(mx-hx).toFixed(1)}" y2="${(my-hy).toFixed(1)}"/>`);
+    });
+    if(o.idx && a.el==="C" && M.nC>1) txt.push(`<text class="ix" x="${cx-15}" y="${cy+18}">${a.cno}</text>`);
+    if(slotOn){
+      const sx=cx+25, sy=cy-24;
+      txt.push(`<g class="slot static"><rect class="box" x="${sx-18}" y="${sy-11}" width="36" height="22" rx="3"/><text x="${sx}" y="${sy+0.5}">${rn(a.ox)}</text></g>`);
+    }
+  });
+  const sc=o.scale||1;
+  return `<svg class="mol asg" viewBox="0 0 ${W} ${H}" width="${Math.round(W*sc)}" height="${Math.round(H*sc)}" role="img" aria-label="Strukturformel ${esc(M.n)} mit Zuordnung der Bindungselektronen">${lines.join("")}${dots.join("")}${txt.join("")}</svg>`;
+}
+
+function countLine(M, i){
+  const a=M.A[i];
+  const parts=[];
+  if(a.lp) parts.push(`${2*a.lp} aus freien Elektronenpaaren`);
+  const grp={};
+  a.nbr.forEach(n=>{
+    const b=M.A[n.k];
+    const per = EN[b.el]<EN[a.el] ? 2*n.o : (b.el===a.el ? n.o : 0);
+    const k=a.el+BSYM[n.o]+b.el+"|"+per; grp[k]=(grp[k]||0)+1;
+  });
+  Object.keys(grp).forEach(k=>{
+    const [nm,per]=k.split("|"); const n=grp[k];
+    parts.push(`${n>1?n+" × ":""}${nm}: ${n>1?"je ":""}${per}`);
+  });
+  const lbl = a.el==="C" && M.nC>1 ? "C"+a.cno : a.el;
+  return `<li><strong>${lbl}</strong>: ${parts.join(", ")} → ${a.asg} Elektronen · OZ = ${VE[a.el]} − ${a.asg} = <strong>${rn(a.ox)}</strong></li>`;
+}
+
+function glFig(key, opt, cap){
+  const M = typeof key==="string" ? build(ORG[key]) : build(key);
+  return `<figure class="gl-fig">${assignSVG(M, Object.assign({ox:true, idx:true}, opt||{}))}<figcaption>${cap||esc(M.n)}</figcaption></figure>`;
+}
+
+function glOrg(){
+  const ETH = build(ORG.ethanol);
+  const CO2 = {n:"Kohlenstoffdioxid", a:[["O",0,0,0],["C",1,0,0],["O",2,0,0]], b:[[0,1,2],[1,2,2]]};
+  const legend = (spec, cap) => `<figure class="gl-fig gl-mini">${assignSVG(build(spec),{u:62})}<figcaption>${cap}</figcaption></figure>`;
+  const ethList = `<ul class="gl-count">` + ETH.A.map((a,i)=>(a.el==="C"||a.el==="O")?countLine(ETH,i):"").join("") + `</ul>`;
+  return `
+<p>In organischen Molekülen bestimmt man die Oxidationszahl <strong>jedes C-Atoms einzeln</strong> aus der Strukturformel. Dazu ordnet man jedes bindende Elektronenpaar dem <strong>elektronegativeren</strong> Bindungspartner zu. In den Formeln unten sind die Bindungselektronen deshalb als <strong>Punkte</strong> eingezeichnet – sie sitzen bei dem Atom, dem sie zugesprochen werden.</p>
+<div class="gl-tw"><table class="gl-table"><thead><tr><th>Element</th><th>H</th><th>C</th><th>N</th><th>Br</th><th>Cl</th><th>O</th></tr></thead>
+<tbody><tr><td>Elektronegativität</td><td>2,2</td><td>2,6</td><td>3,0</td><td>3,0</td><td>3,2</td><td>3,4</td></tr></tbody></table></div>
+
+<div class="gl-row">
+  ${legend({n:"C–H", a:[["C",0,0,0],["H",1,0,0]], b:[[0,1]]}, "<strong>C–H:</strong> C ist elektronegativer – beide Elektronen gehen an C")}
+  ${legend({n:"C–C", a:[["C",0,0,0],["C",1,0,0]], b:[[0,1]]}, "<strong>C–C:</strong> gleiche Partner – jedes C erhält ein Elektron")}
+  ${legend({n:"C–O–H", a:[["C",0,0,0],["O",1,0,1,"r"]], b:[[0,1]]}, "<strong>C–O:</strong> O ist elektronegativer – beide Elektronen gehen an O (ebenso bei O–H)")}
+  ${legend({n:"C=O", a:[["C",0,0,0],["O",1,0,0]], b:[[0,1,2]]}, "<strong>C=O:</strong> beide Elektronenpaare gehen an O")}
+</div>
+<p class="gl-legend"><span class="li"><span class="gl-dot cc"></span> Elektronen beim C-Atom</span><span class="li"><span class="gl-dot ox"></span> Elektronen gehen an O</span><span class="li"><span class="gl-dot hal"></span> an ein Halogen</span><span class="li"><span class="gl-dot ni"></span> an N</span><span class="li"><span class="gl-cut"></span> Bindung wird geteilt</span></p>
+
+<h3>Vorgehen</h3>
+<ol class="gl-steps">
+  <li>Strukturformel mit <strong>allen</strong> Bindungen und freien Elektronenpaaren zeichnen.</li>
+  <li>Jedes bindende Elektronenpaar dem elektronegativeren Atom zuordnen. Bei zwei gleichen Atomen wird geteilt.</li>
+  <li>Die Elektronen zählen, die einem Atom jetzt gehören. Freie Elektronenpaare gehören immer dem Atom selbst.</li>
+  <li>Oxidationszahl = Anzahl der Valenzelektronen − Anzahl der zugeordneten Elektronen.</li>
+</ol>
+
+<h3>Beispiel Ethanol</h3>
+<div class="gl-row">${`<figure class="gl-fig">${assignSVG(ETH,{ox:true, idx:true, het:true, scale:1.1})}<figcaption>Ethanol: Die Punkte zeigen, wem die Bindungselektronen zugesprochen werden.</figcaption></figure>`}</div>
+${ethList}
+<p>Zur Kontrolle: Die H-Atome erhalten keine Elektronen (1 − 0 = +I). Die Summe aller Oxidationszahlen ist null: 2 · C (−III, −I) + O (−II) + 6 · H (+I) = 0.</p>
+
+<h3>Weitere Beispiele</h3>
+<div class="gl-row gl-ex">
+  ${glFig("ethanal", null, "Ethanal: Die C=O-Doppelbindung liefert dem C-Atom 2 keine Elektronen – es behält nur 1 aus C–C und 2 aus C–H → +I")}
+  ${glFig("ethansre", null, "Ethansäure: C2 gibt alle Elektronen aus C=O und C–O ab und behält nur 1 aus C–C → +III")}
+  ${glFig("chlormethan", null, "Chlormethan: Das Elektronenpaar der C–Cl-Bindung geht an Cl → C: 4 − 6 = −II")}
+</div>
+
+<h3>Kurzregel</h3>
+<p>Wer die Zuordnung verstanden hat, kann direkt abzählen: Jede Bindung des C-Atoms trägt einen festen Betrag zu seiner Oxidationszahl bei.</p>
+<div class="gl-tw"><table class="gl-table"><thead><tr><th>Bindung am C-Atom</th><th>Bindungselektronen gehen an …</th><th>Beitrag zur OZ des C-Atoms</th></tr></thead><tbody>
+<tr><td>C–H</td><td>C</td><td>−I</td></tr>
+<tr><td>C–C, C=C</td><td>je zur Hälfte an beide C</td><td>0</td></tr>
+<tr><td>C–O, C–N, C–Cl, C–Br</td><td>das Heteroatom</td><td>+I je Bindungsstrich</td></tr>
+<tr><td>C=O</td><td>O</td><td>+II</td></tr>
+<tr><td>C≡N</td><td>N</td><td>+III</td></tr>
+</tbody></table></div>
+
+<h3>Oxidationsreihe des Methans</h3>
+<p>Je mehr Bindungselektronen das C-Atom an Sauerstoff abgibt, desto höher ist seine Oxidationszahl:</p>
+<div class="gl-row gl-series">
+  ${glFig("methan", null, "Methan · −IV")}
+  ${glFig("methanol", null, "Methanol · −II")}
+  ${glFig("methanal", null, "Methanal · 0")}
+  ${glFig("methansre", null, "Methansäure · +II")}
+  ${glFig(CO2, null, "Kohlenstoffdioxid · +IV")}
+</div>`;
+}
+
+/* Für automatische Tests */
+window.__OX = {AN, RX, ORG, ORX, S, build, CATALOG, molSVG, glOrg};
+})();
+</script>
+
+<script>
+(function(){
+  const bd = document.getElementById("changelogBackdrop");
+  document.getElementById("btnChangelog").addEventListener("click", e=>{ e.preventDefault(); bd.classList.add("open"); });
+  document.getElementById("closeChangelog").addEventListener("click", ()=>bd.classList.remove("open"));
+  bd.addEventListener("click", e=>{ if(e.target===bd) bd.classList.remove("open"); });
+  document.addEventListener("keydown", e=>{ if(e.key==="Escape") bd.classList.remove("open"); });
+})();
+</script>
+<script>
+/* Höhe der Kopfzeile für die feststehende linke Spalte */
+(function(){
+  const hdr = document.querySelector("header");
+  if(!hdr) return;
+  const set = () => document.documentElement.style.setProperty("--hdr", Math.max(0, Math.round(hdr.getBoundingClientRect().bottom)) + "px");
+  addEventListener("resize", set); addEventListener("scroll", set, {passive:true}); set();
+})();
+</script>
+
+<div class="modal-backdrop" id="glBackdrop">
+  <div class="modal-box gl-wide" role="dialog" aria-modal="true" aria-labelledby="glTitle">
+    <div class="modal-head">
+      <h2><span class="gl-num" id="glNum"></span><span id="glTitle"></span></h2>
+      <button class="modal-close" id="glClose" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body gl-body" id="glBody"></div>
+    <div class="gl-nav">
+      <button class="btn ghost" id="glPrev">← Vorheriges Thema</button>
+      <span class="sp" id="glPos"></span>
+      <button class="btn" id="glNext">Nächstes Thema →</button>
+    </div>
+  </div>
+</div>
+<script>
+/* Rubrik Grundlagen */
+(function(){
+  const GL = [{"t": "Was ist eine Oxidationszahl?", "h": "<p>Die <strong>Oxidationszahl<\/strong> (OZ) ist eine gedachte Ladung: Man tut so, als bestünde jede Bindung aus Ionen und das bindende Elektronenpaar gehöre vollständig dem <strong>elektronegativeren<\/strong> Atom. Die Ladung, die ein Atom dann hätte, ist seine Oxidationszahl.<\/p> <p>Sie wird mit römischen Ziffern über das Symbol geschrieben, mit Vorzeichen: +I, −II, 0. Oxidationszahlen helfen, Redoxreaktionen zu erkennen und Teilgleichungen aufzustellen.<\/p> <div class=\"gl-box gl-info\"><strong>Oxidation<\/strong> = Erhöhung der Oxidationszahl (Elektronenabgabe)<br><strong>Reduktion<\/strong> = Erniedrigung der Oxidationszahl (Elektronenaufnahme)<\/div>"}, {"t": "Regeln für anorganische Stoffe", "h": "<ol class=\"gl-steps\"><li>Atome in <strong>elementaren Stoffen<\/strong> haben die OZ 0 (Fe, O<sub>2<\/sub>, Cl<sub>2<\/sub>).<\/li><li>Bei <strong>einatomigen Ionen<\/strong> ist die OZ gleich der Ladung (Na<sup>+<\/sup>: +I, S<sup>2−<\/sup>: −II).<\/li><li><strong>Fluor<\/strong> hat in Verbindungen immer −I.<\/li><li><strong>Wasserstoff<\/strong> hat meist +I (in Metallhydriden wie NaH −I).<\/li><li><strong>Sauerstoff<\/strong> hat meist −II (in Peroxiden wie H<sub>2<\/sub>O<sub>2<\/sub> −I).<\/li><li>Die <strong>Summe<\/strong> aller OZ ist gleich der Ladung des Teilchens: 0 im Molekül, Ionenladung im Ion.<\/li><\/ol> <div class=\"gl-box gl-info\"><strong>Beispiel Schwefelsäure H<sub>2<\/sub>SO<sub>4<\/sub>:<\/strong> 2 · (+I) + x + 4 · (−II) = 0 → x = <strong>+VI<\/strong><br><strong>Beispiel Permanganat MnO<sub>4<\/sub><sup>−<\/sup>:<\/strong> x + 4 · (−II) = −1 → x = <strong>+VII<\/strong><\/div>"}, {"t": "Oxidationszahlen in organischen Molekülen", "h": ""}, {"t": "Redoxreaktionen erkennen", "h": "<p>Eine Reaktion ist eine <strong>Redoxreaktion<\/strong>, wenn sich Oxidationszahlen ändern. Das Teilchen, dessen OZ steigt, wird oxidiert – es ist das <strong>Reduktionsmittel<\/strong>. Das Teilchen, dessen OZ sinkt, wird reduziert – es ist das <strong>Oxidationsmittel<\/strong>.<\/p> <div class=\"gl-box gl-info\">Cl<sub>2<\/sub> + 2 Br<sup>−<\/sup> → 2 Cl<sup>−<\/sup> + Br<sub>2<\/sub><br>Cl: 0 → −I (Reduktion) &nbsp;·&nbsp; Br: −I → 0 (Oxidation)<\/div> <p>In der organischen Chemie sind z. B. die Oxidation eines primären Alkohols zum Aldehyd (C: −I → +I) und weiter zur Carbonsäure (+I → +III) Redoxreaktionen. Säure-Base-Reaktionen und Fällungen sind dagegen keine Redoxreaktionen – dort bleiben alle OZ gleich.<\/p>"}];
+  if (window.__OX && window.__OX.glOrg) GL[2].h = window.__OX.glOrg();
+  const g = id => document.getElementById(id);
+  const bd = g("glBackdrop"), box = bd.querySelector(".modal-box");
+  let idx = 0;
+  function show(i){
+    idx = Math.max(0, Math.min(GL.length - 1, i));
+    g("glNum").textContent = (idx + 1) + ".";
+    g("glTitle").innerHTML = GL[idx].t;
+    g("glBody").innerHTML = GL[idx].h;
+    g("glPos").textContent = "Thema " + (idx + 1) + " von " + GL.length;
+    g("glPrev").disabled = idx === 0;
+    g("glNext").disabled = idx === GL.length - 1;
+    box.scrollTop = 0;
+    bd.classList.add("open");
+  }
+  g("glList").innerHTML = GL.map((b, i) => '<button type="button" class="gl-item" data-i="' + i + '"><span class="nr">' + (i + 1) + '</span>' + b.t + '<span class="go">›</span></button>').join("");
+  g("glToggle").addEventListener("click", () => {
+    const open = g("glToggle").getAttribute("aria-expanded") !== "true";
+    g("glToggle").setAttribute("aria-expanded", String(open));
+    g("glPanel").hidden = !open;
+  });
+  g("glList").addEventListener("click", e => { const b = e.target.closest(".gl-item"); if (b) show(+b.dataset.i); });
+  g("glPrev").addEventListener("click", () => show(idx - 1));
+  g("glNext").addEventListener("click", () => show(idx + 1));
+  g("glClose").addEventListener("click", () => bd.classList.remove("open"));
+  bd.addEventListener("click", e => { if (e.target === bd) bd.classList.remove("open"); });
+  document.addEventListener("keydown", e => {
+    if (!bd.classList.contains("open")) return;
+    if (e.key === "Escape") bd.classList.remove("open");
+    if (e.key === "ArrowRight" && idx < GL.length - 1) show(idx + 1);
+    if (e.key === "ArrowLeft" && idx > 0) show(idx - 1);
+  });
+})();
+</script>
+<script id="bk-kit">
+/* ===== Baustein QR-Code + Auswertung als PDF (einheitlich nach Leitfaden, keine Bibliotheken) ===== */
+(()=>{
+'use strict';
+const QR=(()=>{
+  const ECC=[7,10,15,20,26,18,20,24,30,18],NB=[1,1,1,1,1,2,2,2,2,4];
+  const raw=v=>{let r=(16*v+128)*v+64;if(v>=2){const n=Math.floor(v/7)+2;r-=(25*n-10)*n-55;if(v>=7)r-=36}return r};
+  const dataCw=v=>Math.floor(raw(v)/8)-ECC[v-1]*NB[v-1];
+  const mul=(x,y)=>{let z=0;for(let i=7;i>=0;i--){z=(z<<1)^((z>>>7)*0x11D);z^=((y>>>i)&1)*x}return z};
+  const divisor=d=>{const r=new Array(d).fill(0);r[d-1]=1;let root=1;for(let i=0;i<d;i++){for(let j=0;j<d;j++){r[j]=mul(r[j],root);if(j+1<d)r[j]^=r[j+1]}root=mul(root,2)}return r};
+  const rem=(data,div)=>{const r=new Array(div.length).fill(0);for(const b of data){const f=b^r.shift();r.push(0);div.forEach((c,i)=>{r[i]^=mul(c,f)})}return r};
+  const bit=(x,i)=>((x>>>i)&1)!==0;
+  function make(text){
+    const bytes=[...new TextEncoder().encode(text)];
+    let ver=0;for(let v=1;v<=10;v++){if(4+(v<10?8:16)+8*bytes.length<=dataCw(v)*8){ver=v;break}}
+    if(!ver)throw new Error('Text zu lang');
+    const bits=[];const put=(val,n)=>{for(let i=n-1;i>=0;i--)bits.push((val>>>i)&1)};
+    put(4,4);put(bytes.length,ver<10?8:16);bytes.forEach(b=>put(b,8));
+    const cap=dataCw(ver)*8;put(0,Math.min(4,cap-bits.length));put(0,(8-bits.length%8)%8);
+    for(let p=0xEC;bits.length<cap;p^=0xEC^0x11)put(p,8);
+    const data=[];for(let i=0;i<bits.length;i+=8){let b=0;for(let j=0;j<8;j++)b=(b<<1)|bits[i+j];data.push(b)}
+    const nb=NB[ver-1],el=ECC[ver-1],rc=Math.floor(raw(ver)/8),ns=nb-rc%nb,sl=Math.floor(rc/nb),div=divisor(el),blocks=[];
+    for(let i=0,k=0;i<nb;i++){const d=data.slice(k,k+sl-el+(i<ns?0:1));k+=d.length;const e=rem(d,div);if(i<ns)d.push(0);blocks.push(d.concat(e))}
+    const all=[];for(let i=0;i<blocks[0].length;i++)blocks.forEach((b,j)=>{if(i!==sl-el||j>=ns)all.push(b[i])});
+    const size=ver*4+17,m=[],fn=[];for(let i=0;i<size;i++){m.push(new Array(size).fill(false));fn.push(new Array(size).fill(false))}
+    const sf=(x,y,d)=>{m[y][x]=d;fn[y][x]=true};
+    for(let i=0;i<size;i++){sf(6,i,i%2===0);sf(i,6,i%2===0)}
+    const finder=(x,y)=>{for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){const d=Math.max(Math.abs(dx),Math.abs(dy)),xx=x+dx,yy=y+dy;if(xx>=0&&xx<size&&yy>=0&&yy<size)sf(xx,yy,d!==2&&d!==4)}};
+    finder(3,3);finder(size-4,3);finder(3,size-4);
+    let pos=[];if(ver>1){const n=Math.floor(ver/7)+2,step=Math.ceil((ver*4+4)/(n*2-2))*2;pos=[6];for(let p=size-7;pos.length<n;p-=step)pos.splice(1,0,p)}
+    pos.forEach((px,i)=>pos.forEach((py,j)=>{if((i===0&&j===0)||(i===0&&j===pos.length-1)||(i===pos.length-1&&j===0))return;for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)sf(px+dx,py+dy,Math.max(Math.abs(dx),Math.abs(dy))!==1)}));
+    const fmt=mask=>{const d=(1<<3)|mask;let r=d;for(let i=0;i<10;i++)r=(r<<1)^((r>>>9)*0x537);const b=((d<<10)|r)^0x5412;
+      for(let i=0;i<=5;i++)sf(8,i,bit(b,i));sf(8,7,bit(b,6));sf(8,8,bit(b,7));sf(7,8,bit(b,8));for(let i=9;i<15;i++)sf(14-i,8,bit(b,i));
+      for(let i=0;i<8;i++)sf(size-1-i,8,bit(b,i));for(let i=8;i<15;i++)sf(8,size-15+i,bit(b,i));sf(8,size-8,true)};
+    fmt(0);
+    if(ver>=7){let r=ver;for(let i=0;i<12;i++)r=(r<<1)^((r>>>11)*0x1F25);const b=(ver<<12)|r;for(let i=0;i<18;i++){const c=bit(b,i),a=size-11+i%3,bb=Math.floor(i/3);sf(a,bb,c);sf(bb,a,c)}}
+    let k=0;for(let right=size-1;right>=1;right-=2){if(right===6)right=5;for(let v=0;v<size;v++)for(let j=0;j<2;j++){const x=right-j,up=((right+1)&2)===0,y=up?size-1-v:v;if(!fn[y][x]&&k<all.length*8){m[y][x]=bit(all[k>>>3],7-(k&7));k++}}}
+    const MF=[(x,y)=>(x+y)%2===0,(x,y)=>y%2===0,(x,y)=>x%3===0,(x,y)=>(x+y)%3===0,(x,y)=>(Math.floor(x/3)+Math.floor(y/2))%2===0,(x,y)=>x*y%2+x*y%3===0,(x,y)=>(x*y%2+x*y%3)%2===0,(x,y)=>((x+y)%2+x*y%3)%2===0];
+    const apply=mk=>{for(let y=0;y<size;y++)for(let x=0;x<size;x++)if(!fn[y][x]&&MF[mk](x,y))m[y][x]=!m[y][x]};
+    const pen=()=>{let p=0;
+      for(let t=0;t<2;t++)for(let a=0;a<size;a++){let run=1;for(let b=1;b<size;b++){const c=t?m[b][a]:m[a][b],d=t?m[b-1][a]:m[a][b-1];if(c===d){run++;if(run===5)p+=3;else if(run>5)p++}else run=1}}
+      for(let y=0;y<size-1;y++)for(let x=0;x<size-1;x++){const c=m[y][x];if(c===m[y][x+1]&&c===m[y+1][x]&&c===m[y+1][x+1])p+=3}
+      let dark=0;m.forEach(r=>r.forEach(c=>{if(c)dark++}));p+=Math.floor(Math.abs(dark*20-size*size*10)/(size*size))*10;return p};
+    let best=0,bp=1e9;for(let mk=0;mk<8;mk++){apply(mk);fmt(mk);const p=pen();if(p<bp){bp=p;best=mk}apply(mk)}
+    apply(best);fmt(best);return m;
+  }
+  function svg(text,px){const m=make(text),n=m.length,q=4,tot=n+2*q;let d='';
+    for(let y=0;y<n;y++)for(let x=0;x<n;x++)if(m[y][x])d+=`M${x+q},${y+q}h1v1h-1z`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${px}" height="${px}" viewBox="0 0 ${tot} ${tot}" shape-rendering="crispEdges" role="img" aria-label="QR-Code"><rect width="${tot}" height="${tot}" fill="#fff"/><path d="${d}" fill="#000"/></svg>`}
+  return{make,svg};
+})();
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const el=(tag,cls,html)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e};
+const today=()=>{const d=new Date();return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear()};
+const BK={runs:[],cfg:null,nm:'',ku:'',esc,today,_id:0};
+window.BK=BK;
+
+/* ---------- Diagramme für den Ausdruck: Helligkeit umkehren (weißer Hintergrund, dunkle Linien) ---------- */
+function invertCanvas(src){
+  const w=src.width,h=src.height;if(!w||!h)return '';
+  const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');
+  x.drawImage(src,0,0);
+  let d;try{d=x.getImageData(0,0,w,h)}catch(_){return ''}
+  const p=d.data;
+  for(let i=0;i<p.length;i+=4){
+    if(p[i+3]===0)continue;
+    const r=p[i],g=p[i+1],b=p[i+2],mx=Math.max(r,g,b),mn=Math.min(r,g,b);
+    if(mx<46&&mx-mn<16){p[i]=p[i+1]=p[i+2]=255;continue}          // dunkler Hintergrund → weiß
+    const s=255-(mx+mn);                                             // Helligkeit spiegeln, Farbton behalten
+    const R=r+s,G=g+s,B=b+s;
+    p[i]=R<0?0:R>255?255:R;p[i+1]=G<0?0:G>255?255:G;p[i+2]=B<0?0:B>255?255:B;
+  }
+  x.putImageData(d,0,0);
+  return c.toDataURL('image/png');
+}
+/* Linienfarbe wie im invertierten Diagramm (für Legenden) */
+BK.ink=hex=>{const m=/^#?([0-9a-f]{6})$/i.exec(String(hex).trim());if(!m)return hex;const n=parseInt(m[1],16),r=n>>16,g=(n>>8)&255,b=n&255,s=255-(Math.max(r,g,b)+Math.min(r,g,b));
+  return '#'+[r+s,g+s,b+s].map(v=>Math.max(0,Math.min(255,v)).toString(16).padStart(2,'0')).join('')};
+BK.cimg=cv=>{try{return cv&&cv.width?invertCanvas(cv):''}catch(_){return ''}};
+const SVGP=['fill','stroke','stroke-width','stroke-dasharray','stroke-linecap','stroke-linejoin','opacity','fill-opacity','stroke-opacity','font-size','font-family','font-weight','font-style','text-anchor','dominant-baseline','visibility','display','letter-spacing'];
+BK.simg=svg=>new Promise(res=>{
+  try{
+    const r=svg.getBoundingClientRect(),W=Math.max(1,Math.round(r.width||svg.clientWidth||300)),H=Math.max(1,Math.round(r.height||svg.clientHeight||200));
+    const cl=svg.cloneNode(true),a=[svg,...svg.querySelectorAll('*')],b=[cl,...cl.querySelectorAll('*')];
+    a.forEach((n,i)=>{const cs=getComputedStyle(n);b[i].setAttribute('style',SVGP.map(k=>k+':'+cs.getPropertyValue(k)).join(';'))});
+    cl.setAttribute('width',W);cl.setAttribute('height',H);cl.setAttribute('xmlns','http://www.w3.org/2000/svg');
+    if(!cl.getAttribute('viewBox')&&svg.viewBox&&svg.viewBox.baseVal&&svg.viewBox.baseVal.width){const v=svg.viewBox.baseVal;cl.setAttribute('viewBox',`${v.x} ${v.y} ${v.width} ${v.height}`)}
+    const im=new Image(),sc=2;
+    im.onload=()=>{const c=document.createElement('canvas');c.width=W*sc;c.height=H*sc;const x=c.getContext('2d');x.scale(sc,sc);x.drawImage(im,0,0,W,H);res(invertCanvas(c))};
+    im.onerror=()=>res('');
+    im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(cl));
+  }catch(_){res('')}
+});
+BK.imgTag=(src,alt)=>src?`<img class="bk-img" src="${src}" alt="${esc(alt||'Diagramm')}">`:'<p class="bk-small">Diagramm nicht verfügbar.</p>';
+BK.leg=items=>items&&items.length?`<div class="bk-leg">${items.map(([c,t])=>`<span><i style="background:${c}"></i>${t}</span>`).join('')}</div>`:'';
+/* Tabelle der Seite sauber übernehmen (ohne Knöpfe, Eingaben als Text) */
+BK.tbl=(t,opt)=>{
+  opt=opt||{};if(!t)return '';
+  const c=t.cloneNode(true);
+  c.querySelectorAll('button,script,.empty-hint').forEach(n=>{const tr=n.closest('tr');if(n.classList.contains('empty-hint')&&tr)tr.remove();else n.remove()});
+  c.querySelectorAll('input,select,textarea').forEach(n=>{const v=n.tagName==='SELECT'?(n.options[n.selectedIndex]||{}).text:(n.type==='checkbox'?(n.checked?'✓':''):n.value);n.replaceWith(document.createTextNode(v||''))});
+  c.querySelectorAll('[style]').forEach(n=>{n.style.color='';n.style.background='';n.style.backgroundColor=''});
+  c.removeAttribute('id');c.className='bk-t';
+  if(opt.reverse){const tb=c.tBodies[0];if(tb)[...tb.rows].reverse().forEach(r=>tb.appendChild(r))}
+  const rows=c.tBodies[0]?c.tBodies[0].rows.length:0;
+  if(!rows&&opt.emptyText)return `<p class="bk-small">${opt.emptyText}</p>`;
+  return c.outerHTML;
+};
+BK.condRows=list=>`<table class="bk-t"><tbody>${list.filter(x=>x&&x[1]!==''&&x[1]!=null).map(([k,v])=>`<tr><th style="width:42%">${k}</th><td>${v}</td></tr>`).join('')}</tbody></table>`;
+BK.sec=(h,body,long)=>`<div class="bk-sec${long?' bk-long':''}">${h?`<h3 class="bk-h3">${h}</h3>`:''}${body}</div>`;
+
+/* Reiter kurz sichtbar machen, Diagramme neu zeichnen lassen (resize), fn ausführen, zurücksetzen */
+BK.showing=(panels,fn)=>{
+  panels=(Array.isArray(panels)?panels:[panels]).map(p=>typeof p==='string'?document.querySelector(p):p).filter(Boolean);
+  const keep=panels.map(p=>p.style.display);panels.forEach(p=>p.style.display='block');
+  window.dispatchEvent(new Event('resize'));
+  let r;try{r=fn()}finally{panels.forEach((p,i)=>p.style.display=keep[i]);window.dispatchEvent(new Event('resize'))}
+  return r;
+};
+BK.ro=sel=>[...document.querySelectorAll(sel||'.readout')].filter(r=>r.querySelector('.k')&&r.querySelector('.v')).map(r=>[r.querySelector('.k').innerHTML,r.querySelector('.v').innerHTML]);
+BK.COL=['#4fd1c5','#ffb454','#7fd68a','#e4785b','#b79cf2','#6cb6ff','#f2a3c7','#c9d36a'];
+
+/* Einstellungen der linken Spalte als Tabelle (sichtbare Bereiche, ohne Grundlagen/Darstellung/Beispiele) */
+BK.side=(root,skip)=>{
+  root=typeof root==='string'?document.querySelector(root):(root||document.querySelector('.sidebar'));const rows=[];if(!root)return rows;
+  skip=skip||/^(Darstellung|Beispiel|Diagramm|Grundlagen)/;
+  const vis=e=>e&&e.offsetParent!==null&&!e.closest('[hidden]');
+  root.querySelectorAll('section.block').forEach(sec=>{
+    if(!vis(sec)||sec.querySelector('.gl-toggle'))return;
+    const h2=sec.querySelector('h2'),h=h2?h2.firstChild.textContent.trim():'';if(skip.test(h))return;
+    sec.querySelectorAll('.mode-toggle,.seg').forEach(mt=>{if(!vis(mt))return;const a=mt.querySelector('button.active,button.on');if(a)rows.push([h,a.textContent.trim()])});
+    sec.querySelectorAll('select').forEach(x=>{if(!vis(x))return;const lab=x.id&&sec.querySelector('label[for="'+x.id+'"]');rows.push([(lab?lab.textContent:h).trim(),x.selectedOptions[0]?x.selectedOptions[0].text:''])});
+    sec.querySelectorAll('.row').forEach(r=>{if(!vis(r))return;const l=r.querySelector('label'),v=r.querySelector('.val');if(l&&v)rows.push([l.textContent.trim(),v.textContent.trim()])});
+    sec.querySelectorAll('label.sw').forEach(sw=>{if(!vis(sw))return;const i=sw.querySelector('input'),t=sw.querySelector('.sw-text');if(!i||!t)return;rows.push([t.childNodes[0].textContent.trim(),i.checked?'ein':'aus'])});
+  });
+  return rows.map(([k,v])=>[BK.esc(k),BK.esc(v)]);
+};
+
+/* ---------- QR-Schaltfläche ---------- */
+BK.qr=(url,what)=>{
+  const hd=document.querySelector('header');if(!hd||document.querySelector('.bk-qr'))return;
+  const b=el('button','bk-qr','<span class="bk-qs"></span><span><b>Auf dem Mobilgerät öffnen</b>QR-Code antippen zum Vergrößern</span>');
+  b.type='button';b.title='QR-Code vergrößern';b.setAttribute('aria-haspopup','dialog');
+  const st=hd.querySelector('#statusBadge,#status,.status'),grp=el('div','bk-hr');
+  if(st&&st.parentNode===hd){hd.insertBefore(grp,st);grp.appendChild(b);grp.appendChild(st)}else{hd.appendChild(grp);grp.appendChild(b)}
+  b.querySelector('.bk-qs').innerHTML=QR.svg(url,66);
+  const ov=el('div','bk-ov',`<div class="bk-qrbox" role="dialog" aria-modal="true" aria-label="QR-Code zu dieser Seite"><div class="bk-qbig"></div><p class="bk-url">${esc(decodeURI(url.replace(/^https?:\/\//,'')))}</p><p class="bk-qhint">Mit der Kamera scannen, um diese ${esc(what||'Simulation')} auf dem eigenen Gerät zu öffnen.</p><button type="button" class="bk-b bk-qclose">Schließen</button></div>`);
+  document.body.appendChild(ov);ov.querySelector('.bk-qbig').innerHTML=QR.svg(url,520);
+  const open=()=>{ov.classList.add('open');ov.querySelector('.bk-qclose').focus()},shut=()=>{ov.classList.remove('open');b.focus()};
+  b.addEventListener('click',open);ov.querySelector('.bk-qclose').addEventListener('click',shut);
+  ov.addEventListener('click',e=>{if(e.target===ov)shut()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&ov.classList.contains('open'))shut()});
+};
+
+/* ---------- Läufe ---------- */
+BK.addRun=r=>{if(!r)return;r.id=++BK._id;BK.runs.push(r);if(BK.runs.length>(BK.cfg&&BK.cfg.maxRuns||16))BK.runs.shift();return r};
+BK.clearRuns=()=>{BK.runs=[]};
+
+/* ---------- Dialog „Auswertung als PDF“ ---------- */
+let dlg,C=null,cur=[];
+function hostEl(){
+  let h=C.printHost?document.querySelector(C.printHost):document.getElementById('bkPrint');
+  if(!h){h=el('div');h.id='bkPrint';document.body.appendChild(h)}
+  h.classList.add('bk-print-host');return h;
+}
+function ensure(){
+  if(dlg)return;
+  dlg=el('div','bk-ov',`<div class="bk-dlg" role="dialog" aria-modal="true" aria-labelledby="bkDlgT">
+    <div class="bk-dhead"><h2 id="bkDlgT">Auswertung als PDF</h2><button type="button" class="bk-x" aria-label="Schließen">×</button></div>
+    <div class="bk-dh" id="bkSelH"></div>
+    <div id="bkSel"></div>
+    <div class="bk-dh">Angaben (optional)</div>
+    <div class="bk-row"><input id="bkName" placeholder="Name" autocomplete="off" maxlength="60" aria-label="Name"><input id="bkKurs" placeholder="Kurs" autocomplete="off" maxlength="40" aria-label="Kurs"></div>
+    <p class="bk-hint" id="bkHint"></p>
+    <p class="bk-hint"><b>So speicherst du das PDF:</b> Nach „PDF erstellen“ öffnet sich der Druckdialog des Browsers. Dort als Drucker bzw. Ziel <b>„Als PDF speichern“</b> wählen und auf „Speichern“ tippen (am iPad: Teilen → „In Dateien sichern“). Es wird nichts gedruckt oder übertragen.</p>
+    <div class="bk-btns"><button type="button" class="bk-b pri" id="bkGo">PDF erstellen</button><button type="button" class="bk-b" id="bkCancel">Abbrechen</button></div></div>`);
+  document.body.appendChild(dlg);
+  const shut=()=>dlg.classList.remove('open');
+  dlg.querySelector('.bk-x').addEventListener('click',shut);dlg.querySelector('#bkCancel').addEventListener('click',shut);
+  dlg.addEventListener('click',e=>{if(e.target===dlg)shut()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&dlg.classList.contains('open')){e.stopPropagation();shut()}},true);
+  dlg.querySelector('#bkSel').addEventListener('change',()=>{if(C&&C.sim)dlg.querySelector('#bkGo').disabled=!dlg.querySelector('#bkSel input:checked')});
+  dlg.querySelector('#bkGo').addEventListener('click',go);
+  window.addEventListener('afterprint',()=>document.body.classList.remove('bk-pr'));
+}
+BK.open=over=>{
+  C=Object.assign({},BK.cfg,over||{});ensure();
+  const sel=dlg.querySelector('#bkSel'),btn=dlg.querySelector('#bkGo');
+  dlg.querySelector('#bkSelH').textContent=C.sim?'Welche Läufe sollen ins PDF?':'Statistik';
+  sel.className=C.sim?'bk-runs':'bk-stat';
+  dlg.querySelector('#bkHint').innerHTML=C.hint||'';
+  if(C.sim){
+    cur=runList();
+    sel.innerHTML=cur.length?cur.map(r=>`<label><input type="checkbox" value="${esc(r.id)}" checked><i style="background:${r.color||'var(--teal,#4fd1c5)'}"></i><span>${r.label}</span></label>`).join(''):`<p class="bk-none">${C.noRuns||'Noch kein Lauf abgeschlossen.'}</p>`;
+    btn.disabled=!cur.length;
+  }else{
+    const s=C.stats();
+    sel.innerHTML=s.items.map(([k,v])=>`<span>${k}</span><span>${v}</span>`).join('');
+    btn.disabled=!s.ready;
+  }
+  dlg.querySelector('#bkName').value=BK.nm;dlg.querySelector('#bkKurs').value=BK.ku;
+  dlg.classList.add('open');setTimeout(()=>btn.focus(),30);
+};
+const runList=()=>{let l=C.runs?C.runs():BK.runs.slice();if(C.live){const lv=C.live();if(lv){lv.id=lv.id||'live';l=l.concat([lv])}}return l};
+async function go(){
+  const c=C,btn=dlg.querySelector('#bkGo');
+  BK.nm=dlg.querySelector('#bkName').value.trim().slice(0,60);BK.ku=dlg.querySelector('#bkKurs').value.trim().slice(0,40);
+  btn.disabled=true;
+  let body='';
+  try{
+    if(c.sim){
+      const ids=[...dlg.querySelectorAll('#bkSel input:checked')].map(i=>i.value);
+      const runs=cur.filter(r=>ids.includes(String(r.id)));
+      if(c.pre)body+=await c.pre(runs);
+      for(const r of runs){const h=await (typeof r.html==='function'?r.html():r.html);body+=`<h2 class="bk-h2">${r.label}</h2>${h||''}`}
+      if(c.extra)body+=await c.extra(runs);
+    }else{
+      const s=c.stats();
+      body+=`<h2 class="bk-h2">Statistik</h2><table class="bk-sum"><tbody>${s.items.map(([k,v],i)=>i%2?'':`<tr><td>${k}:</td><td><b>${v}</b></td>${s.items[i+1]?`<td>${s.items[i+1][0]}:</td><td><b>${s.items[i+1][1]}</b></td>`:''}</tr>`).join('')}</tbody></table>`;
+      if(s.note)body+=`<p class="bk-small">${s.note}</p>`;
+      body+=await c.build();
+    }
+  }catch(err){body+=`<p>Fehler beim Erstellen: ${esc(err.message)}</p>`}
+  const host=hostEl();
+  host.innerHTML=`<div class="bk-sheet"><div class="bk-kick">${esc(c.kick||(c.sim?'Simulation':'Übung'))}</div><h1 class="bk-h1">${c.printTitle}</h1>
+  <table class="bk-meta"><tr><td>Name: <span class="bk-line">${esc(BK.nm)}&nbsp;</span></td><td>Kurs: <span class="bk-line">${esc(BK.ku)}&nbsp;</span></td><td>Datum: <span class="bk-line">${today()}&nbsp;</span></td></tr></table>
+  ${body}
+  <div class="bk-foot">${c.footName} V${c.version} · Bastian Baumgart · chemie.mail-baumgart.de · Lizenz CC BY-NC-SA 4.0${c.sim||c.simNote?' · Simulierte Daten zu Lehrzwecken':''}</div></div>`;
+  dlg.classList.remove('open');btn.disabled=false;
+  document.body.classList.add('bk-pr');
+  const imgs=[...host.querySelectorAll('img')].filter(i=>!i.complete);
+  await Promise.all(imgs.map(i=>new Promise(r=>{i.onload=i.onerror=r})));
+  setTimeout(()=>window.print(),80);
+}
+
+/* ---------- Einrichtung ---------- */
+BK.button=(p,over)=>{
+  const c=Object.assign({},BK.cfg,over||{});
+  const b=el('button',(p.cls||c.btnClass||'btn')+' bk-pdfbtn',p.label||(c.sim?'Ausgabe als PDF':'Zusammenfassung als PDF'));b.type='button';
+  b.addEventListener('click',()=>BK.open(over));
+  const ref=typeof p.ref==='string'?document.querySelector(p.ref):p.ref;if(!ref)return b;
+  if(p.wrap){const w=el('div','bk-pdfrow');w.appendChild(b);ref.insertAdjacentElement(p.pos||'afterend',w)}
+  else ref.insertAdjacentElement(p.pos||'afterend',b);
+  return b;
+};
+BK.setup=cfg=>{
+  BK.cfg=cfg;
+  if(cfg.url)BK.qr(cfg.url,cfg.what||(cfg.sim?'Simulation':'Übung'));
+  (cfg.buttons||[]).forEach(p=>BK.button(p,p.over));
+};
+
+/* Aufgaben mit richtiger Lösung und Vermerk, ob richtig gelöst */
+const VERD={first:['ok','✓ richtig gelöst – im 1. Versuch'],clean:['ok','✓ richtig gelöst – ohne Fehlversuch'],ok:['ok','✓ richtig gelöst – nach Fehlversuch'],help:['ok','✓ richtig gelöst – mit Hilfen'],
+  shown:['bad','✗ nicht selbst gelöst – Lösung angesehen'],selfbad:['bad','✗ nicht richtig gelöst (Selbstkontrolle: Fehler)'],bad:['bad','✗ nicht richtig gelöst'],open:['open','– nicht beendet (abgebrochen)']};
+BK.verdict=(st,tries)=>{const v=VERD[st]||['open',String(st||'–')];let t=v[1];if(st==='ok'&&tries>1)t='✓ richtig gelöst – nach '+(tries-1)+' Fehlversuch'+(tries>2?'en':'');return {cls:v[0],txt:t}};
+BK.tasks=list=>{
+  list=(list||[]).filter(Boolean).slice().sort((a,b)=>(a.no||0)-(b.no||0));
+  if(!list.length)return '<p class="bk-small">Keine Aufgaben bearbeitet.</p>';
+  const n={ok:0,bad:0,open:0};list.forEach(i=>n[BK.verdict(i.st,i.tries).cls]++);
+  return `<h2 class="bk-h2">Aufgaben mit Lösung</h2><p class="bk-small">${list.length} Aufgabe${list.length>1?'n':''}: ${n.ok} richtig gelöst · ${n.bad} nicht richtig gelöst bzw. Lösung angesehen · ${n.open} nicht beendet. Zu jeder Aufgabe steht die richtige Lösung.</p>`
+   +list.map(i=>{const v=BK.verdict(i.st,i.tries);return `<div class="bk-sec bk-task bk-task-${v.cls}"><div class="bk-tk"><span><b>Aufgabe ${i.no}</b>${i.kind?' · '+i.kind:''}</span><span class="bk-v bk-v-${v.cls}">${v.txt}</span></div>
+     ${i.task?`<div class="bk-tq">${i.task}</div>`:''}<div class="bk-sol"><span class="bk-sl">Richtige Lösung</span><div class="bk-sb">${i.sol||'–'}</div></div>${i.note?`<div class="bk-tnote">${i.note}</div>`:''}</div>`}).join('');
+};
+
+/* ---------- Trainer mit Zählern und Verlauf (DOM-basiert) ---------- */
+BK.trainer=o=>{
+  const $=id=>document.getElementById(id),n=id=>{const e=$(id);return e?(parseInt(e.textContent,10)||0):0};
+  const fid=o.firstId||'roFirst';
+  const stats=()=>{
+    const so=n('roSolved'),fi=n(fid),se=n('roStreak'),sh=n('roShown'),done=so+sh,q=done?Math.round(fi/done*100):null;
+    return{ready:done>0,items:[['Aufgaben gelöst',so],[o.firstLabel||'beim 1. Versuch richtig',fi],['Serie',se],['Lösung angesehen',sh],['<b>Erfolgsquote</b>',q===null?'–':q+' %']],
+      note:`Erfolgsquote = Anteil der abgeschlossenen Aufgaben (gelöst oder Lösung angesehen), die ${o.firstLabel?'„'+o.firstLabel+'“ waren':'beim ersten Prüfen richtig waren'}. Aufgaben mit „Lösung zeigen“ zählen nicht als richtig.`};
+  };
+  const hb=$(o.histId||'histBody');
+  const bar=$('roSolved')&&$('roSolved').closest('.readout-bar');
+  BK.setup(Object.assign({sim:false,stats,
+    hint:'Die Auswertung enthält alle bearbeiteten Aufgaben aus dem Verlauf mit Ergebnis und Bewertung sowie die Statistik mit der Erfolgsquote.',
+    buttons:bar?[{ref:bar,wrap:true}]:[],
+    build:()=>(o.items?BK.tasks(o.items()):`<h2 class="bk-h2">Bearbeitete Aufgaben</h2><div class="bk-sec bk-long">${BK.tbl(hb&&hb.closest('table'),{reverse:o.reverse!==false,emptyText:'Keine Aufgaben im Verlauf.'})}</div>`)+(o.after?o.after():'')},o));
+};
+})();
+
+</script>
+<script id="bk-page">
+BK.trainer({url:'https://chemie.mail-baumgart.de/EP/EP-Oxidationszahlen.html',footName:'Oxidationszahlen',version:'1.2',printTitle:'Oxidationszahlen – Zusammenfassung',
+  hint:'Die Auswertung enthält jede bearbeitete Aufgabe mit der richtigen Lösung und dem Vermerk, ob sie richtig gelöst wurde, sowie die Statistik mit der Erfolgsquote.',
+  items:()=>(globalThis.__oxHist||[]).map(h=>({no:h.no,st:h.st,tries:h.tries,kind:h.kind,task:`Bestimme die Oxidationszahlen: <b>${BK.esc(h.title)}</b>`,sol:`<div class="ox-fig">${h.fig||'–'}</div>`}))});
+(()=>{const st=document.createElement('style');st.textContent=`
+.bk-sheet .ox-fig .fx{font-size:15pt;color:#000}
+.bk-sheet .ox-fig .ftop{height:20pt;padding-bottom:3pt;color:#9a5b00;font-size:10pt}
+.bk-sheet .ox-fig .mol-row,.bk-sheet .ox-fig .eqs{display:flex;flex-wrap:wrap;align-items:center;gap:4pt 10pt;padding:0}
+.bk-sheet .ox-fig .mol-box{display:flex;flex-direction:column;align-items:center;gap:3pt}
+.bk-sheet .ox-fig .mol-box .cap{font-size:9pt;color:#333}
+.bk-sheet .ox-fig .eqop{font-size:14pt;color:#333}
+.bk-sheet .ox-fig .eqline{padding:2pt 0;font-size:10.5pt}
+.bk-sheet .ox-fig svg.mol g.slot.static rect.box{fill:#fff;stroke:#999}
+.bk-sheet .ox-fig svg.mol g.slot text{fill:#9a5b00;font-weight:700}`;document.head.appendChild(st)})();
+</script>
+</body>
+</html>

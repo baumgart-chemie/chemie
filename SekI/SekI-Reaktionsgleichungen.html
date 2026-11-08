@@ -321,11 +321,13 @@ input.num-in.fin{font-size:16px;}
 </style>
 <style id="bk-style">
 /* ===== Baustein QR-Code + Auswertung als PDF (einheitlich nach Leitfaden) ===== */
-.bk-qr{display:flex;align-items:center;gap:10px;background:var(--panel,#1b1f23);border:1px solid var(--line,#31383e);border-radius:4px;padding:5px 12px 5px 5px;color:var(--text-dim,#9aa2a9);font:inherit;font-size:12.5px;line-height:1.3;text-align:left;cursor:pointer;min-height:44px;touch-action:manipulation}
+.bk-qr{display:flex;align-items:center;gap:7px;background:var(--panel,#1b1f23);border:1px solid var(--line,#31383e);border-radius:4px;padding:2px 8px 2px 2px;color:var(--text-dim,#9aa2a9);font:inherit;font-size:10px;line-height:1.2;text-align:left;cursor:pointer;min-height:0;touch-action:manipulation}
 .bk-qr:hover{border-color:var(--teal,#4fd1c5);color:var(--text,#e7e4dd)}
-.bk-qr b{display:block;color:var(--text,#e7e4dd);font-weight:600}
-.bk-qr svg{width:66px;height:66px;display:block;border-radius:2px}
+.bk-qr b{display:block;color:var(--text,#e7e4dd);font-weight:600;font-size:10.5px}
+.bk-qr svg{width:30px;height:30px;display:block;border-radius:2px}
 .bk-hr{display:flex;align-items:center;gap:12px;margin-left:auto;align-self:center;flex-wrap:wrap;justify-content:flex-end}
+header .back-btn{align-self:baseline}
+header>.tag{flex:1 1 160px;min-width:0}
 .bk-hr .status,.bk-hr #statusBadge,.bk-hr #status{margin-left:0!important}
 .bk-ov{display:none;position:fixed;inset:0;z-index:1000;background:rgba(8,10,12,.82);align-items:center;justify-content:center;padding:20px;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
 .bk-ov.open{display:flex}
@@ -377,7 +379,7 @@ input.num-in.fin{font-size:16px;}
 .bk-sheet h2.bk-h2{font-size:12.5pt;margin:12pt 0 4pt;padding-bottom:2pt;border-bottom:1px solid #999;font-weight:700;color:#000;break-after:avoid;page-break-after:avoid}
 .bk-sheet h3.bk-h3{font-size:11pt;margin:8pt 0 3pt;font-weight:700;color:#000;break-after:avoid;page-break-after:avoid}
 .bk-sheet table.bk-t{border-collapse:collapse;width:100%;margin:3pt 0 6pt;break-inside:avoid;page-break-inside:avoid}
-.bk-sheet .bk-long table.bk-t{break-inside:auto;page-break-inside:auto}
+/* Tabellen nie mitten durchtrennen: passt sie nicht mehr auf die Seite, beginnt sie auf der nächsten; nur eine Tabelle, die länger als eine Seite ist, bricht zwischen den Zeilen um */
 .bk-sheet table.bk-t tr{break-inside:avoid;page-break-inside:avoid}
 .bk-sheet table.bk-t th,.bk-sheet table.bk-t td{border:1px solid #888!important;padding:3pt 6pt!important;text-align:left;vertical-align:middle;font-size:9.5pt;white-space:normal!important;background:#fff!important;color:#000!important}
 .bk-sheet table.bk-t th{background:#eee!important;font-weight:700}
@@ -408,14 +410,6 @@ input.num-in.fin{font-size:16px;}
 .bk-sheet .bk-eq svg{max-height:32mm;width:auto}
 .bk-sheet .bk-tnote{font-size:9pt;color:#333;margin-top:3pt}
 .bk-sheet .bk-foot{margin-top:14pt;border-top:1px solid #888;padding-top:4pt;font-size:8.5pt;color:#444;text-align:center}
-</style>
-<style id="bk-page-style">
-/* kompakte QR-Schaltfläche auf dieser Seite: Zurück-Knopf und Titel bleiben auf einer Höhe */
-header .bk-hr{align-self:center;}
-header .back-btn{align-self:baseline;}
-header .bk-qr{padding:2px 8px 2px 2px; gap:7px; font-size:10px; line-height:1.2; min-height:0;}
-header .bk-qr svg{width:30px; height:30px;}
-header .bk-qr b{font-size:10.5px;}
 </style>
 </head>
 <body>
