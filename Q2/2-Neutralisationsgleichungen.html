@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Übung „Neutralisationsgleichungen“</title>
+<style>
+:root{--bg:#14171a;--panel:#1b1f23;--panel-alt:#20252a;--line:#31383e;--text:#e7e4dd;--text-dim:#9aa2a9;--text-faint:#5f6870;--amber:#ffb454;--teal:#4fd1c5;--good:#7fd68a;--danger:#e4785b;--screen:#0e1113;--mono:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;-webkit-text-size-adjust:100%}
+a{color:var(--teal)}
+h1{font-size:20px;margin:0;font-weight:650}
+h2{font-size:15px;margin:0 0 10px;font-weight:650;color:var(--text)}
+header{display:flex;align-items:center;gap:16px;padding:10px 18px;border-bottom:1px solid var(--line);background:var(--panel);flex-wrap:wrap}
+.back{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:8px;background:var(--panel-alt);color:var(--text);text-decoration:none}
+.ttl{flex:1;min-width:200px}
+.sub{color:var(--text-dim);font-size:13px}
+.lnk{display:inline-flex;align-items:center;min-height:44px;padding:0 6px;margin-left:12px}
+.status{font-family:var(--mono);font-size:13px;color:var(--amber);border:1px solid var(--line);border-radius:8px;padding:8px 12px;background:var(--screen)}
+.layout{display:grid;grid-template-columns:330px 1fr;gap:16px;padding:16px;max-width:1500px;margin:0 auto}
+aside{position:sticky;top:12px;align-self:start;max-height:calc(100vh - 24px);overflow:auto}
+main{min-width:0}
+@media(max-width:920px){.layout{grid-template-columns:1fr}aside{position:static;max-height:none}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px}
+button{font:inherit;color:var(--text);background:var(--panel-alt);border:1px solid var(--line);border-radius:8px;padding:8px 14px;min-height:44px;cursor:pointer;touch-action:manipulation}
+button:disabled{opacity:.4;cursor:default}
+button.primary{background:var(--teal);color:#0e1113;border-color:var(--teal);font-weight:650}
+button.wide{width:100%}
+.lbl{font-size:12px;color:var(--text-dim);margin:10px 0 6px;text-transform:uppercase;letter-spacing:.04em}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1}
+.seg button.on{border-color:var(--teal);color:var(--teal);background:rgba(79,209,197,.1)}
+.hint{color:var(--text-dim);font-size:13px;margin:10px 0}
+.gb{width:100%;display:flex;justify-content:space-between;align-items:center;font-weight:650}
+.gblist{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.gblist button{text-align:left;font-size:14px}
+.stats{display:grid;grid-template-columns:1fr auto;gap:4px 10px;font-size:14px}
+.stats span:nth-child(even){font-family:var(--mono);color:var(--amber);text-align:right}
+.btncol{display:flex;flex-direction:column;gap:8px}
+/* Aufgabe */
+.taskhead{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.acidbox{background:var(--screen);border:1px solid var(--line);border-radius:10px;padding:10px 16px;display:flex;align-items:center;justify-content:center;min-height:70px;color:var(--text)}
+.acidbox .fm{font-size:28px}
+.tasktext{flex:1;min-width:220px}
+.tasktext .nm{font-size:18px;font-weight:650;color:var(--amber)}
+.tag{display:inline-block;font-size:12px;border:1px solid var(--line);border-radius:20px;padding:1px 9px;color:var(--text-dim);margin-right:6px}
+.schema{background:var(--screen);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-top:10px;font-size:15px}
+.eq{border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:12px;background:var(--panel-alt)}
+.eq.locked{opacity:.45}
+.eq.done{border-color:rgba(127,214,138,.5)}
+.eq.cur{border-color:var(--teal)}
+.eqhead{display:flex;justify-content:space-between;gap:10px;margin-bottom:8px;font-weight:650}
+.eqstate{font-weight:400;font-size:13px;color:var(--text-dim)}
+.eqline{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.op{font-size:22px;color:var(--text-dim);padding:0 2px}
+.arr{color:var(--teal);font-size:24px}
+.slot{min-width:110px;min-height:64px;border:2px dashed var(--line);border-radius:10px;display:flex;align-items:center;gap:4px;padding:4px 8px 4px 4px;background:var(--screen);cursor:pointer;color:var(--text)}
+.slot.act{border-color:var(--teal);border-style:solid;box-shadow:0 0 0 3px rgba(79,209,197,.18)}
+.slot.ok{border-color:var(--good);border-style:solid;cursor:default}
+.slot.bad{border-color:var(--danger);border-style:solid}
+.slot .cf{min-width:38px;min-height:44px;padding:0;font-family:var(--mono);font-size:18px;color:var(--amber);background:var(--panel-alt)}
+.slot .cf.one{color:var(--text-faint)}
+.slot .sp{flex:1;display:flex;align-items:center;justify-content:center;min-height:52px}
+.slot .sp.empty{color:var(--text-faint);font-size:13px}
+.fm{font-size:20px;white-space:nowrap}
+.fm sub,.fm sup{font-size:.66em;line-height:0}
+.eqbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.fb{margin-top:10px;padding:9px 12px;border-radius:8px;font-size:14px}
+.fb.good{background:rgba(127,214,138,.1);border:1px solid rgba(127,214,138,.45)}
+.fb.bad{background:rgba(228,120,91,.1);border:1px solid rgba(228,120,91,.45)}
+.fb.tip{background:rgba(255,180,84,.08);border:1px solid rgba(255,180,84,.4)}
+.fb .fm{font-size:15px}
+.done-msg{margin-top:14px;padding:12px;border-radius:8px;background:rgba(127,214,138,.1);border:1px solid rgba(127,214,138,.45)}
+.pal{display:flex;flex-wrap:wrap;gap:10px}
+.tile{background:var(--panel-alt);border:1px solid var(--line);border-radius:10px;padding:8px 12px;min-height:60px;min-width:70px;display:flex;align-items:center;justify-content:center;color:var(--text)}
+.tile:active{border-color:var(--teal)}
+svg.mol{display:block;overflow:visible}
+.empty-state{color:var(--text-dim);text-align:center;padding:30px 10px}
+/* Verlauf */
+.hitem{border-top:1px solid var(--line);padding:10px 0}
+.hitem:first-child{border-top:0}
+.hitem .hn{font-weight:650}
+.hrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--text-dim);margin-top:4px}
+.ok-t{color:var(--good)}.bad-t{color:var(--danger)}.amb-t{color:var(--amber)}
+.eqv{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px}
+.eqv .term{display:inline-flex;align-items:center;gap:3px}
+.eqv .cf{font-family:var(--mono);color:var(--amber)}
+.eqv .op{font-size:17px}
+.eqv .fm{font-size:16px}
+/* Footer */
+footer{border-top:1px solid var(--line);padding:12px 18px;color:var(--text-dim);font-size:13px;text-align:center}
+footer p{margin:4px 0}
+footer a{color:var(--text-dim)}
+/* Modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:14px;z-index:50}
+.mbox{background:var(--panel);border:1px solid var(--line);border-radius:12px;width:min(720px,100%);max-height:92vh;display:flex;flex-direction:column}
+.mbox.wide{width:min(980px,100%)}
+.mhead{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
+.mhead h2{margin:0;font-size:17px}
+.mbody{padding:14px 18px;overflow:auto}
+.mbody h3{font-size:15px;color:var(--amber);margin:16px 0 6px}
+.mfoot{display:flex;justify-content:space-between;gap:8px;padding:10px 16px;border-top:1px solid var(--line);align-items:center;flex-wrap:wrap}
+.x{min-width:44px;padding:0}
+.fig{background:var(--screen);border:1px solid var(--line);border-radius:10px;padding:12px;margin:10px 0;display:flex;justify-content:center;flex-wrap:wrap;gap:10px;align-items:center;color:var(--text)}
+.fig .eqv .fm{font-size:18px}
+.mbody table{border-collapse:collapse;margin:8px 0}
+.mbody td,.mbody th{border:1px solid var(--line);padding:5px 10px;text-align:left}
+.mbody th{color:var(--text-dim);font-weight:600}
+.inp{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.inp input{font:inherit;color:var(--text);background:var(--screen);border:1px solid var(--line);border-radius:8px;padding:10px;min-height:44px}
+.c-ac{color:var(--danger)}.c-ba{color:var(--teal)}
+.fslot{display:flex;flex-direction:column;gap:3px;min-width:150px}
+.finp{font:18px var(--mono);color:var(--text);background:var(--screen);border:2px solid var(--line);border-radius:10px;padding:8px 10px;min-height:48px;width:160px}
+.finp:focus{outline:none;border-color:var(--teal)}
+.finp.bad{border-color:var(--danger)}
+.pv{min-height:30px;padding-left:4px;display:flex;align-items:center;gap:4px;color:var(--text-dim)}
+.pv .fm{font-size:17px}
+.cfp{font-family:var(--mono);color:var(--amber)}
+.pvq{color:var(--text-faint)}
+.ost{display:flex;align-items:center;gap:4px}
+.ost .cf{min-width:38px;min-height:44px;padding:0;font-family:var(--mono);font-size:18px;color:var(--amber);background:var(--panel-alt)}
+.ost .cf.one{color:var(--text-faint)}
+.ostruct{background:var(--screen);border:2px solid var(--line);border-radius:10px;padding:4px;color:var(--text);display:flex;align-items:center;justify-content:center;min-height:70px}
+.ostruct.editable{border-color:var(--teal);border-style:dashed}
+.ost.ok .ostruct{border-color:var(--good);border-style:solid}
+.ost.bad .ostruct.editable{border-color:var(--danger);border-style:solid}
+svg.mol.edit{touch-action:manipulation;max-width:100%;height:auto}
+.hit{fill:transparent;pointer-events:all;cursor:pointer}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.tool.on{border-color:var(--teal);color:var(--teal);background:rgba(79,209,197,.12)}
+
+#print{display:none}
+.dh{color:var(--amber);font-weight:650;font-size:15px;margin:2px 0 8px}
+.prow{display:flex;gap:10px}
+.prow input{flex:1;min-width:0;font:inherit;color:var(--text);background:var(--screen);border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-height:44px}
+.prow input::placeholder{color:var(--text-faint)}
+.pbtn{display:flex;gap:10px}
+.pitem{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:8px;background:var(--panel-alt);min-height:48px}
+.pitem input{width:22px;height:22px;accent-color:var(--teal);flex:none}
+.pitem .dash{width:16px;height:4px;border-radius:2px;flex:none}
+.pstat{display:grid;grid-template-columns:1fr auto;gap:4px 12px;border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--panel-alt);font-size:14px}
+.pstat span:nth-child(even){font-family:var(--mono);color:var(--amber);text-align:right}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 4px;cursor:pointer}
+.chk input{width:22px;height:22px;accent-color:var(--teal)}
+.qr-btn{align-self:center;display:flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:2px 8px 2px 2px;color:var(--text-dim);font:inherit;font-size:10px;line-height:1.2;text-align:left;cursor:pointer;min-height:0}
+.qr-btn:hover{border-color:var(--teal);color:var(--text)}
+.qr-btn b{display:block;color:var(--text);font-weight:600;font-size:10.5px}
+.qr-btn svg{width:30px;height:30px;display:block;border-radius:2px}
+.qr-modal{display:none;position:fixed;inset:0;z-index:100;background:rgba(8,10,12,.82);align-items:center;justify-content:center;padding:20px}
+.qr-modal.open{display:flex}
+.qr-box{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:22px 24px 20px;text-align:center;max-width:94vw}
+.qr-box svg{width:min(62vh,80vw,520px);height:auto;display:block;margin:0 auto;border-radius:4px}
+.qr-box .qr-url{font-family:var(--mono);font-size:clamp(14px,2.2vw,22px);color:var(--text);margin:16px 0 4px;word-break:break-all}
+.qr-box .qr-hint{font-size:13px;color:var(--text-dim);margin:0 0 14px}
+.qr-close{background:var(--panel-alt);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:8px 18px;font:inherit;font-size:13px;cursor:pointer;min-height:44px}
+@media (max-width:600px){.qr-btn span:last-child{display:none}.qr-btn{padding:4px}}
+@media print{
+  @page{size:A4;margin:14mm}
+  html,body{background:#fff!important;color:#000!important;font-size:11pt}
+  #app,.modal,.qr-modal{display:none!important}
+  #print{display:block;color:#000;font-family:Arial,Helvetica,sans-serif;line-height:1.4}
+  #print h1{font-size:17pt;margin:0 0 8px;color:#000}
+  #print h2{font-size:12pt;margin:14px 0 4px;color:#000;page-break-after:avoid}
+  #print table{border-collapse:collapse;width:100%;margin:4px 0 8px}
+  #print .task,#print table{break-inside:avoid;page-break-inside:avoid}
+  #print tr{break-inside:avoid;page-break-inside:avoid}
+  #print th,#print td{border:1px solid #888;padding:4px 6px;text-align:left;vertical-align:middle;font-size:10pt}
+  #print th{background:#eee}
+  #print table.meta td,#print table.sum td{border:0;padding:3px 8px 3px 0;font-size:11pt}
+  #print .line{border-bottom:1px solid #000;min-width:120px;display:inline-block}
+  #print .eqv .cf{color:#000;font-weight:bold}
+  #print .eqv .op{color:#000;font-size:12pt}
+  #print .eqv .fm{font-size:11pt}
+  #print svg.mol{color:#000}
+  #print .small{font-size:9pt;color:#333}
+  #print .pfoot{margin-top:16px;border-top:1px solid #888;padding-top:4px;font-size:8.5pt;color:#444;text-align:center}
+}
+/* --- Neutralisation: Ergänzungen --- */
+.seg.multi button[aria-pressed="true"]{border-color:var(--teal);color:var(--teal);background:rgba(79,209,197,.1)}
+.seg.multi button::before{content:"☐ ";color:var(--text-faint)}
+.seg.multi button[aria-pressed="true"]::before{content:"☑ ";color:var(--teal)}
+.basebox{background:var(--screen);border:1px solid var(--line);border-radius:10px;padding:10px 16px;display:flex;align-items:center;justify-content:center;min-height:70px;color:var(--text)}
+.basebox .fm{font-size:24px}
+.plus-big{font-size:26px;color:var(--text-dim)}
+.fm.eqtxt{white-space:normal}
+.note{font-size:13px;color:var(--text-dim);margin:8px 0 0}
+.tag.spec{border-color:rgba(255,180,84,.5);color:var(--amber)}
+.maintop{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.maintop .primary{min-height:44px;padding:0 26px;font-size:16px}
+.pkline{margin:6px 0 2px;font-size:13px;color:var(--text-dim);line-height:1.6}
+.pkline b{font-family:var(--mono);font-weight:500;color:var(--amber)}
+.pkline span.pk{display:inline-block;margin-right:16px}
+.finp.opt{border-style:dashed}
+.slot.opt{border-style:dashed}
+.tag.amph{border-color:rgba(79,209,197,.5);color:var(--teal)}
+
+.frow{display:flex;gap:6px;align-items:center}
+.fcf{font:18px var(--mono);color:var(--amber);background:var(--screen);border:2px solid var(--line);border-radius:10px;padding:8px 4px;min-height:48px;width:44px;text-align:center}
+.fcf:focus{outline:none;border-color:var(--teal)}
+.fcf.bad{border-color:var(--danger)}
+.fcf.opt{border-style:dashed}
+.fslot{min-width:0}
+</style>
+</head>
+<body>
+<div id="app">
+<header>
+  <a class="back" href="../index.html">← Zurück</a>
+  <div class="ttl"><h1>Übung „Neutralisationsgleichungen“</h1><div class="sub">Säure und Base vollständig neutralisieren – Teilchen- oder Salzgleichung</div></div>
+  <a href="#" class="lnk" id="lnkAnl">Anleitung</a>
+  <button type="button" class="qr-btn" id="qrBtn" aria-haspopup="dialog" title="QR-Code vergrößern"><span id="qrSmall"></span><span><b>Auf dem Mobilgerät öffnen</b>QR-Code antippen zum Vergrößern</span></button>
+  <div class="status" id="status">Bereit</div>
+</header>
+<div class="layout">
+<aside>
+  <div class="card">
+    <button class="gb" id="gbBtn" aria-expanded="false"><span>Grundlagen · <span id="gbN"></span> Themen</span><span id="gbArr">▸</span></button>
+    <div class="gblist" id="gbList" hidden></div>
+  </div>
+  <div class="card">
+    <h2>Aufgabenart wählen</h2>
+    <div class="lbl">Säuren</div>
+    <div class="seg multi" id="segAc"><button data-v="anorg">Anorganische Säuren</button><button data-v="org">Organische Säuren</button></div>
+    <div class="lbl">Basen</div>
+    <div class="seg multi" id="segBa"><button data-v="anorg">Anorganische Basen</button><button data-v="org">Organische Basen</button></div>
+    <p class="hint" id="catInfo">Mehrfachauswahl möglich; je Gruppe bleibt mindestens eine Art gewählt.</p>
+    <div class="lbl">Schwierigkeit</div>
+    <div class="seg" id="segLvl"><button data-v="1">Leicht</button><button data-v="2">Mittel</button><button data-v="3">Schwer</button></div>
+    <p class="hint" id="lvlInfo"></p>
+    <div class="lbl">Aufgabenstellung</div>
+    <label class="chk"><input type="checkbox" id="chkPk"><span>pKs- und pKb-Werte anzeigen</span></label>
+    <p class="hint">Die Werte erscheinen bei der Aufgabe (25 °C, gerundet; bei mehrprotonigen Säuren je Stufe). Sie dienen nur zur Information.</p>
+    <div class="lbl">Eingabe bei anorganischen Teilchen</div>
+    <div class="seg" id="segInp"><button data-v="free">Formeln eintippen</button><button data-v="tiles">Teilchen auswählen</button></div>
+    <p class="hint">Organische Teilchen: Die Edukte sind als Strukturformeln vorgegeben, die Produkte entstehen durch Verändern einer Kopie.</p>
+  </div>
+  <div class="card">
+    <h2>Bilanz</h2>
+    <div class="stats" id="stats"></div>
+  </div>
+  <div class="card">
+    <h2>Sichern und Abschluss</h2>
+    <div class="btncol">
+      <button id="btnSave">Zwischenstand speichern</button>
+      <button id="btnLoad">Zwischenstand laden</button>
+      <input type="file" id="fileLoad" accept=".json,application/json" hidden>
+      <button id="btnPdf">Zusammenfassung als PDF</button>
+    </div>
+    <p class="hint" id="ioMsg">Der Zwischenstand wird nur auf Knopfdruck als Datei auf deinem Gerät gespeichert.</p>
+  </div>
+</aside>
+<main>
+  <div class="maintop"><button class="primary" id="btnNew">Neue Aufgabe</button><span class="hint" id="topHint"></span></div>
+  <div class="card" id="taskCard"></div>
+  <div class="card" id="palCard" hidden>
+    <h2>Teilchen</h2>
+    <p class="hint" style="margin-top:0">Tippe zuerst auf ein Feld der Gleichung und dann auf ein Teilchen. Die Zahl links im Feld ist der Koeffizient – antippen erhöht ihn (1 → 2 → … → 9 → 1).</p>
+    <div class="pal" id="pal"></div>
+  </div>
+  <div class="card">
+    <h2>Verlauf</h2>
+    <div id="hist"><div class="hint">Noch keine Aufgaben bearbeitet.</div></div>
+  </div>
+</main>
+</div>
+<footer>
+  <p>Modellannahmen: Säure und Base reagieren vollständig und mit vollständiger Neutralisation (Reaktionspfeil ⟶); starke und schwache Säuren bzw. Basen werden nicht unterschieden (bei Ampholyten bestimmt der starke Partner die Rolle). Salze und Hydroxide liegen gelöst als Ionen vor; die Löslichkeit wird nicht betrachtet. pKs-/pKb-Werte sind gerundet.</p>
+  <p>Bastian Baumgart · Neutralisationsgleichungen V1.0 · <a href="#" id="lnkVer">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+</footer>
+</div>
+
+<!-- Anleitung -->
+<div class="modal" id="mAnl" hidden><div class="mbox">
+  <div class="mhead"><h2>Anleitung</h2><button class="x" data-close>✕</button></div>
+  <div class="mbody">
+    <p>In dieser Übung stellst du Neutralisationsgleichungen auf: Eine Säure reagiert vollständig mit einer Base. Geschrieben wird die <b>Teilchengleichung nach Brönsted</b> (die Säure gibt Protonen ab, die Base nimmt sie auf). Bei anorganischen Stoffen darf es auch die <b>Gleichung mit dem Salz</b> sein, z. B. HNO₃ + NaOH ⟶ NaNO₃ + H₂O.</p>
+    <h3>1. Aufgabenart wählen</h3>
+    <p>Wähle <b>anorganische</b> und/oder <b>organische Säuren</b> und <b>anorganische</b> und/oder <b>organische Basen</b> (Mehrfachauswahl). Standard sind anorganische Säuren und anorganische Basen. Die Schwierigkeit (Standard: leicht) richtet sich nach den Stoffmengenverhältnissen:</p>
+    <ul>
+      <li><b>Leicht:</b> einprotonige Säure und einwertige Base (Verhältnis 1 : 1)</li>
+      <li><b>Mittel:</b> zweiprotonige Säuren, zweiwertige Basen (z. B. Ca(OH)₂, Carbonat-Ion), organisch auch Säuren mit weiteren Gruppen</li>
+      <li><b>Schwer:</b> dreiprotonige Säuren, zweiprotonige Säuren mit zweiwertigen Basen, Hydroxycarbonsäuren, Diamine und <b>Ampholyte</b> (HCO₃⁻, HSO₃⁻, HS⁻, H₂PO₄⁻, HPO₄²⁻)</li>
+    </ul>
+    <p>Mit „Neue Aufgabe“ erhältst du eine Säure und eine Base. Mit der Option „pKs- und pKb-Werte anzeigen“ stehen die Werte der beiden Stoffe bei der Aufgabe.</p>
+    <h3>2. Gleichung aufstellen</h3>
+    <p>Die Gleichung hat links die Edukte (Säure und Base) und rechts die Produkte (korrespondierende Base der Säure und korrespondierende Säure der Base). Eine Base wie NaOH liegt in Lösung als Na⁺ und OH⁻ vor – als Base reagiert das <b>Hydroxid-Ion</b>.</p>
+    <p><b>Anorganische Teilchen</b> (Standard: Formeln eintippen): Ladungen schreibst du mit ^ (z. B. SO4^2-), den stöchiometrischen Faktor trägst du im kleinen Feld vor der Formel ein (Standard 1; z. B. Faktor 2 und Formel OH-). Auch Sonderzeichen wie OH⁻ werden verstanden; unter dem Feld siehst du die gesetzte Schreibweise. Mit den Knöpfen „Eingabehilfe“ fügst du ^, + und − ein. Alternativ wählst du links „Teilchen auswählen“: Dann tippst du ein Feld an und danach unten ein Teilchen; die Zahl links im Feld ist der Koeffizient (Antippen erhöht sie).</p>
+    <p><b>Organische Teilchen:</b> Die Edukte stehen als Strukturformeln in der Gleichung, die Produkte beginnen als Kopie der Edukte. Wähle ein Werkzeug und tippe auf Atome: <i>H-Atom löschen</i>, <i>H-Atom anfügen</i>, <i>Ladung −</i>, <i>Ladung +</i>. Bei einer Carbonsäure entfernst du die H-Atome der Carboxygruppen und setzt an den Sauerstoff-Atomen die Ladung −; bei einem Amin fügst du am Stickstoff-Atom ein H-Atom an und setzt die Ladung +. Freie Elektronenpaare werden automatisch ergänzt. „Rückgängig“ nimmt die letzte Änderung zurück. Die Zahl links neben jeder Formel ist der Koeffizient.</p>
+    <h3>3. Zwei Schreibweisen</h3>
+    <p>Bei <b>anorganischen</b> Säuren und Basen werden beide Schreibweisen als richtig gewertet: die <b>Teilchengleichung</b> (z. B. HNO₃ + OH⁻ ⟶ NO₃⁻ + H₂O) und die <b>Gleichung mit dem Salz</b> (z. B. HNO₃ + NaOH ⟶ NaNO₃ + H₂O). Das Salz schreibst du als Formel, z. B. NaNO3, Ca3(PO4)2 oder (NH4)2SO4; die Base steht dann als Formeleinheit (z. B. NaOH, Ca(OH)2). Beide Schreibweisen dürfen nicht gemischt werden. Bei <b>organischen</b> Teilchen gibt es nur die Teilchengleichung mit Strukturformeln. Reagiert eine organische Säure mit einem Metallhydroxid oder Natriumcarbonat, gibt es zusätzlich zwei <b>freiwillige Felder für das Zuschauerion</b> (Kation der Base, z. B. Na⁺): Du kannst sie leer lassen. Schreibst du das Zuschauerion mit, steht es links und rechts gleich oft in der Gleichung; dadurch können sich alle Koeffizienten ändern (kleinste ganze Zahlen für die gesamte Gleichung). Auch die <b>Gleichung mit Salz</b> wird akzeptiert: Links steht die Base als Formeleinheit (z. B. NaOH statt OH⁻), rechts das Anion der Säure (Strukturformel) <i>und</i> das Kation im gestrichelten Feld – zusammen ergeben sie das Salz, z. B. R–COO⁻ Na⁺. Das Zuschauer-Feld links bleibt dann leer, weil das Kation schon in NaOH steckt.</p>
+    <p><b>Ampholyte:</b> Bei den schweren Aufgaben kommt manchmal ein Ampholyt vor, also ein Teilchen, das ein Proton abgeben <i>oder</i> aufnehmen kann. Du entscheidest selbst, ob es hier als Säure oder als Base reagiert: Der Partner ist immer eine starke Säure oder eine starke Base. Mit der Option „pKs- und pKb-Werte anzeigen“ siehst du pKs und pKb des Ampholyten. Ampholyt-Aufgaben haben nur die Teilchengleichung.</p>
+    <h3>4. Koeffizienten</h3>
+    <p>Die abgegebenen und die aufgenommenen Protonen müssen gleich sein. Gesucht sind die kleinsten ganzen Zahlen.</p>
+    <h3>5. Prüfen und Hilfen</h3>
+    <p>„Prüfen“ kontrolliert die Gleichung sofort. Bei typischen Fehlern erhältst du einen gezielten Hinweis. „Tipp“ erklärt das Vorgehen, „Schema einblenden“ zeigt die allgemeine Form der Gleichung. „Lösung zeigen“ ist nach dem ersten Prüfen möglich; eingesetzte Lösungen werden mit * gekennzeichnet und zählen nicht als richtig.</p>
+    <h3>6. Bilanz und Zusammenfassung</h3>
+    <p>Die <b>Erfolgsquote</b> gibt an, welcher Anteil der abgeschlossenen Gleichungen beim ersten Prüfen richtig war. Mit „Zusammenfassung als PDF“ erstellst du über die Druckfunktion des Browsers ein PDF mit allen aufgestellten Gleichungen und der Erfolgsquote (im Druckdialog „Als PDF speichern“ wählen). „Zwischenstand speichern“ legt eine Datei auf deinem Gerät ab (iPad: Dateien → Downloads), die du später wieder laden kannst.</p>
+    <h3>Bedienung mit dem iPad</h3>
+    <p>Alle Elemente lassen sich mit Finger oder Stift antippen.</p>
+  </div>
+</div></div>
+
+<!-- Versionshinweise -->
+<div class="modal" id="mVer" hidden><div class="mbox">
+  <div class="mhead"><h2>Versionshinweise</h2><button class="x" data-close>✕</button></div>
+  <div class="mbody">
+    <h3>V1.0 – 09.11.2026</h3>
+    <ul>
+      <li>Übung zum Aufstellen von Neutralisationsgleichungen (Teilchengleichung nach Brönsted, vollständige Neutralisation)</li>
+      <li>Auswahl anorganische und/oder organische Säuren sowie anorganische und/oder organische Basen (Standard: anorganisch); Schwierigkeitsgrade leicht (Standard), mittel, schwer</li>
+      <li>Basen: Alkali- und Erdalkalihydroxide, Ammoniak, Carbonat-Ion, Amine und Diamine; Säuren: mehrprotonige anorganische und organische Säuren</li>
+      <li>Organische Säuren mit Metallhydroxiden: freiwillige Felder für das Zuschauerion (Kation der Base)</li>
+      <li>Anorganische Aufgaben: Teilchengleichung oder Gleichung mit Salz (z. B. HNO₃ + NaOH ⟶ NaNO₃ + H₂O) werden akzeptiert</li>
+      <li>Option: pKs- und pKb-Werte der beiden Stoffe in der Aufgabenstellung anzeigen</li>
+      <li>Schwere Aufgaben mit Ampholyten (HCO₃⁻, HSO₃⁻, HS⁻, H₂PO₄⁻, HPO₄²⁻) als Säure oder Base gegenüber einer starken Base bzw. Säure</li>
+      <li>Anorganische Teilchen: freie Eingabe der Formeln (Standard), alternativ Auswahl; organische Teilchen: Strukturformeln, Produkte durch Löschen/Anfügen von H-Atomen und Setzen von Ladungen</li>
+      <li>Sofortige Prüfung mit Rückmeldungen zu typischen Fehlern, Tipp, Schema, Lösung</li>
+      <li>Grundlagen zu Neutralisation, Salzschreibweise, Basen, Koeffizienten, pKs/pKb und organischen Teilchen</li>
+      <li>Zwischenstand als Datei, Zusammenfassung mit Gleichungen und Erfolgsquote als PDF</li>
+    </ul>
+  </div>
+</div></div>
+
+<!-- Grundlagen -->
+<div class="modal" id="mGb" hidden><div class="mbox wide">
+  <div class="mhead"><h2 id="gbTitle"></h2><button class="x" data-close>✕</button></div>
+  <div class="mbody" id="gbBody"></div>
+  <div class="mfoot"><button id="gbPrev">← Vorheriges Thema</button><span class="hint" id="gbPos" style="margin:0"></span><button id="gbNext">Nächstes Thema →</button></div>
+</div></div>
+
+<!-- QR / PDF -->
+<div class="qr-modal" id="qrModal" role="dialog" aria-modal="true" aria-label="QR-Code zu dieser Übung">
+  <div class="qr-box"><div id="qrBig"></div>
+    <p class="qr-url">chemie.mail-baumgart.de/Q2/2-Neutralisationsgleichungen.html</p>
+    <p class="qr-hint">Mit der Kamera scannen, um diese Übung auf dem eigenen Gerät zu öffnen.</p>
+    <button type="button" class="qr-close" id="qrClose">Schließen</button></div>
+</div>
+
+<div class="modal" id="mPdf" hidden><div class="mbox" style="width:min(620px,100%)">
+  <div class="mhead"><h2>Auswertung als PDF</h2><button class="x" data-close aria-label="Schließen">✕</button></div>
+  <div class="mbody">
+    <div class="dh">Statistik</div>
+    <div class="pstat" id="pdfStat"></div>
+    <div class="dh" style="margin-top:16px">Angaben (optional)</div>
+    <div class="prow"><input id="pName" placeholder="Name" autocomplete="off"><input id="pKurs" placeholder="Kurs" autocomplete="off"></div>
+    <p class="hint" style="margin-top:14px">Die Auswertung enthält alle gelösten Aufgaben mit den aufgestellten Gleichungen (Strukturformeln inklusive), den Versuchen und der Bewertung sowie die Statistik mit der Erfolgsquote.</p>
+    <p class="hint" style="margin:0 0 14px"><b style="color:var(--text)">So speicherst du das PDF:</b> Nach „PDF erstellen“ öffnet sich der Druckdialog des Browsers. Dort als Drucker bzw. Ziel <b style="color:var(--text)">„Als PDF speichern“</b> wählen und auf „Speichern“ tippen (am iPad: Teilen → „In Dateien sichern“). Es wird nichts gedruckt oder übertragen.</p>
+    <div class="pbtn"><button class="primary" id="btnPrint">PDF erstellen</button><button data-close>Abbrechen</button></div>
+  </div>
+</div></div>
+
+<div id="print"></div>
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ============ Teilchen ============ */
+const SP={};
+function parseF(f){
+  const st=[{}],re=/([A-Z][a-z]?)(\d*)|(\()|\)(\d*)/g;let m;
+  while((m=re.exec(f))){
+    if(m[1]){const o=st[st.length-1];o[m[1]]=(o[m[1]]||0)+(m[2]?+m[2]:1)}
+    else if(m[3])st.push({});
+    else{const t=st.pop(),k=m[4]?+m[4]:1,o=st[st.length-1];for(const e in t)o[e]=(o[e]||0)+t[e]*k}
+  }
+  return st[0];
+}
+function fmtF(f,ch){let s=f.replace(/(\d+)/g,'<sub>$1</sub>');if(ch){const m=Math.abs(ch);s+='<sup>'+(m>1?m:'')+(ch>0?'+':'−')+'</sup>'}return '<span class="fm">'+s+'</span>'}
+[
+ ['H2O','H2O',0,'Wasser'],['H3O+','H3O',1,'Oxonium-Ion'],['OH-','OH',-1,'Hydroxid-Ion'],['H+','H',1,'Proton'],
+ ['HCl','HCl',0,'Chlorwasserstoff'],['Cl-','Cl',-1,'Chlorid-Ion'],
+ ['HBr','HBr',0,'Bromwasserstoff'],['Br-','Br',-1,'Bromid-Ion'],
+ ['HF','HF',0,'Fluorwasserstoff'],['F-','F',-1,'Fluorid-Ion'],
+ ['HNO3','HNO3',0,'Salpetersäure'],['NO3-','NO3',-1,'Nitrat-Ion'],
+ ['HNO2','HNO2',0,'Salpetrige Säure'],['NO2-','NO2',-1,'Nitrit-Ion'],
+ ['HClO4','HClO4',0,'Perchlorsäure'],['ClO4-','ClO4',-1,'Perchlorat-Ion'],
+ ['HCN','HCN',0,'Cyanwasserstoff'],['CN-','CN',-1,'Cyanid-Ion'],
+ ['H2SO4','H2SO4',0,'Schwefelsäure'],['HSO4-','HSO4',-1,'Hydrogensulfat-Ion'],['SO4(2-)','SO4',-2,'Sulfat-Ion'],
+ ['H2SO3','H2SO3',0,'Schweflige Säure'],['HSO3-','HSO3',-1,'Hydrogensulfit-Ion'],['SO3(2-)','SO3',-2,'Sulfit-Ion'],
+ ['H2CO3','H2CO3',0,'Kohlensäure'],['HCO3-','HCO3',-1,'Hydrogencarbonat-Ion'],['CO3(2-)','CO3',-2,'Carbonat-Ion'],
+ ['H2S','H2S',0,'Schwefelwasserstoff'],['HS-','HS',-1,'Hydrogensulfid-Ion'],['S(2-)','S',-2,'Sulfid-Ion'],
+ ['H3PO4','H3PO4',0,'Phosphorsäure'],['H2PO4-','H2PO4',-1,'Dihydrogenphosphat-Ion'],['HPO4(2-)','HPO4',-2,'Hydrogenphosphat-Ion'],['PO4(3-)','PO4',-3,'Phosphat-Ion'],
+ ['NH4+','NH4',1,'Ammonium-Ion'],['NH3','NH3',0,'Ammoniak'],
+ ['Na+','Na',1,'Natrium-Ion'],['K+','K',1,'Kalium-Ion'],['Ca(2+)','Ca',2,'Calcium-Ion'],['Ba(2+)','Ba',2,'Barium-Ion'],
+ ['NaOH','NaOH',0,'Natriumhydroxid',1],['KOH','KOH',0,'Kaliumhydroxid',1],['Ca(OH)2','Ca(OH)2',0,'Calciumhydroxid',1],['Ba(OH)2','Ba(OH)2',0,'Bariumhydroxid',1],['Na2CO3','Na2CO3',0,'Natriumcarbonat',1]
+].forEach(([id,f,ch,name,fu])=>{SP[id]={id,kind:'in',f,ch,name,fu:!!fu,atoms:parseF(f)}});
+/* Formeleinheiten → Ionen (für Rückmeldungen) */
+const FU={'NaOH':['Na+','OH-'],'KOH':['K+','OH-'],'Ca(OH)2':['Ca(2+)','OH-'],'Ba(OH)2':['Ba(2+)','OH-'],'Na2CO3':['Na+','CO3(2-)']};
+const CATIONS=['Na+','K+','Ca(2+)','Ba(2+)'];
+const METALS=['Li','Na','K','Rb','Cs','Mg','Ca','Sr','Ba','Al','Zn','Fe','Cu','Ag'];
+
+/* ---- Strukturformeln ---- */
+function M(){return{a:[],b:[]}}
+function A(m,el,x,y,c){m.a.push({el,x,y,c:c||0});return m.a.length-1}
+function Bd(m,i,j,o){m.b.push([i,j,o||1])}
+const DV={u:[0,-1],d:[0,1],l:[-1,0],r:[1,0]};
+function Hs(m,i,dirs){for(const k of dirs){const a=m.a[i];Bd(m,i,A(m,'H',a.x+DV[k][0],a.y+DV[k][1]))}}
+function Cc(m,x,y,h){const i=A(m,'C',x,y);if(h)Hs(m,i,h);return i}
+function COOH(m,x,y,side,dep){const c=A(m,'C',x,y);Bd(m,c,A(m,'O',x,y-1),2);const dx=side==='r'?1:-1;const o=A(m,'O',x+dx,y,dep?-1:0);Bd(m,c,o);if(!dep)Bd(m,o,A(m,'H',x+2*dx,y));return c}
+function OHg(m,c,dir,dep){const a=m.a[c],d=DV[dir];const o=A(m,'O',a.x+d[0],a.y+d[1],dep?-1:0);Bd(m,c,o);if(!dep)Bd(m,o,A(m,'H',a.x+2*d[0],a.y+2*d[1]));return o}
+function chain(m,ids){for(let i=1;i<ids.length;i++)Bd(m,ids[i-1],ids[i])}
+
+const CA=[0,1,2,3,4,5,6,7].map(k=>k*Math.PI/4);
+const asep=(u,v)=>{let d=Math.abs(u-v)%(2*Math.PI);return d>Math.PI?2*Math.PI-d:d};
+function combos(n,start,acc,out){if(acc.length===n){out.push(acc.slice());return out}for(let k=start;k<8;k++){acc.push(k);combos(n,k+1,acc,out);acc.pop()}return out}
+function bestSet(bonds,n){
+  if(n<=0)return[];let best=[],bv=-1,bm=1e9;
+  for(const c of combos(n,0,[],[])){
+    const ang=c.map(k=>CA[k]),all=bonds.concat(ang);let mn=9;
+    for(let i=0;i<all.length;i++)for(let j=i+1;j<all.length;j++)mn=Math.min(mn,asep(all[i],all[j]));
+    if(all.length===1)mn=9;
+    let sx=0,sy=0,bx=0,by=0;all.forEach(a=>{sx+=Math.cos(a);sy+=Math.sin(a)});bonds.forEach(a=>{bx+=Math.cos(a);by+=Math.sin(a)});
+    const bl=Math.hypot(bx,by),mg=Math.hypot(sx,sy)+(bl>1e-6?Math.abs(sx*by-sy*bx)/bl:0);
+    if(mn>bv+1e-6||(Math.abs(mn-bv)<1e-6&&mg<bm-1e-6)){bv=mn;bm=mg;best=ang}
+  }
+  return best;
+}
+function molSVG(m,s,opt){
+  s=s||22;const a=m.a;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  for(const p of a){if(p.del)continue;x0=Math.min(x0,p.x);y0=Math.min(y0,p.y);x1=Math.max(x1,p.x);y1=Math.max(y1,p.y)}
+  const pad=0.62;x0-=pad;y0-=pad;x1+=pad;y1+=pad;
+  const X=x=>((x-x0)*s).toFixed(1),Y=y=>((y-y0)*s).toFixed(1);
+  const nb=a.map(()=>[]),bs=a.map(()=>0);
+  const R=el=>el==='Cl'?0.42:el==='H'?0.24:0.28;
+  let g='',t='',hit='';
+  for(const [i,j,o] of m.b){
+    if(a[i].del||a[j].del)continue;
+    const p=a[i],q=a[j],dx=q.x-p.x,dy=q.y-p.y,L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L;
+    nb[i].push(Math.atan2(dy,dx));nb[j].push(Math.atan2(-dy,-dx));bs[i]+=o;bs[j]+=o;
+    const sx=p.x+ux*R(p.el),sy=p.y+uy*R(p.el),ex=q.x-ux*R(q.el),ey=q.y-uy*R(q.el);
+    for(const d of (o===2?[-0.075,0.075]:[0])){const nx=-uy*d,ny=ux*d;g+=`<line x1="${X(sx+nx)}" y1="${Y(sy+ny)}" x2="${X(ex+nx)}" y2="${Y(ey+ny)}"/>`}
+  }
+  const VAL={O:6,N:5,Cl:7,S:6};
+  a.forEach((p,i)=>{
+    if(p.del)return;
+    t+=`<text x="${X(p.x)}" y="${Y(p.y)}">${p.el}</text>`;
+    if(opt){const r=(p.el==='H'?0.42:0.55)*s;hit+=`<circle class="hit" data-atom="${i}" cx="${X(p.x)}" cy="${Y(p.y)}" r="${r.toFixed(1)}"/>`}
+    if(!VAL[p.el])return;
+    const n=Math.max(0,Math.round((VAL[p.el]-bs[i]-p.c)/2));
+    const lp=bestSet(nb[i].map(v=>(v+2*Math.PI)%(2*Math.PI)),n);
+    const wide=p.el.length>1?0.15:0;
+    for(const an of lp){
+      const r=0.31+wide*Math.abs(Math.cos(an)),cx=p.x+Math.cos(an)*r,cy=p.y+Math.sin(an)*r,px=-Math.sin(an)*0.14,py=Math.cos(an)*0.14;
+      g+=`<line x1="${X(cx-px)}" y1="${Y(cy-py)}" x2="${X(cx+px)}" y2="${Y(cy+py)}"/>`;
+    }
+    if(p.c){
+      const used=nb[i].concat(lp);let ba=0,bv=-1;
+      for(const k of [7,1,5,3,0,6,2,4]){const an=CA[k];const mn=Math.min(...used.map(u=>asep(u,an)));if(mn>bv+1e-6){bv=mn;ba=an}}
+      const r=0.5+wide,cx=p.x+Math.cos(ba)*r,cy=p.y+Math.sin(ba)*r;
+      g+=`<circle cx="${X(cx)}" cy="${Y(cy)}" r="${(0.15*s).toFixed(1)}" fill="none" stroke-width="${(s*0.04).toFixed(2)}"/>`;
+      g+=`<line x1="${X(cx-0.08)}" y1="${Y(cy)}" x2="${X(cx+0.08)}" y2="${Y(cy)}" stroke-width="${(s*0.045).toFixed(2)}"/>`;
+      if(p.c>0)g+=`<line x1="${X(cx)}" y1="${Y(cy-0.08)}" x2="${X(cx)}" y2="${Y(cy+0.08)}" stroke-width="${(s*0.045).toFixed(2)}"/>`;
+    }
+  });
+  const W=((x1-x0)*s).toFixed(0),H=((y1-y0)*s).toFixed(0);
+  return `<svg class="mol${opt?' edit':''}" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img"${opt?` data-e="${opt.e}" data-s="${opt.s}"`:''}><g stroke="currentColor" stroke-width="${(s*0.06).toFixed(2)}" stroke-linecap="round">${g}</g><g fill="currentColor" font-family="system-ui,-apple-system,'Segoe UI',Roboto,sans-serif" font-size="${(s*0.56).toFixed(1)}" text-anchor="middle" dominant-baseline="central">${t}</g><g>${hit}</g></svg>`;
+}
+/* ---- organische Säuren ---- */
+const ORG=[
+ {id:'meth',lvl:1,name:'Methansäure',triv:'Ameisensäure',n:1,names:['Methansäure','Methanoat-Ion (Formiat-Ion)'],
+  build:k=>{const m=M();const c=COOH(m,0,0,'r',k>=1);Hs(m,c,'l');return m}},
+ {id:'eth',lvl:1,name:'Ethansäure',triv:'Essigsäure',n:1,names:['Ethansäure','Ethanoat-Ion (Acetat-Ion)'],
+  build:k=>{const m=M();chain(m,[Cc(m,0,0,'lud'),COOH(m,1,0,'r',k>=1)]);return m}},
+ {id:'prop',lvl:1,name:'Propansäure',triv:'Propionsäure',n:1,names:['Propansäure','Propanoat-Ion'],
+  build:k=>{const m=M();chain(m,[Cc(m,0,0,'lud'),Cc(m,1,0,'ud'),COOH(m,2,0,'r',k>=1)]);return m}},
+ {id:'chlor',lvl:2,name:'Chlorethansäure',triv:'Chloressigsäure',n:1,names:['Chlorethansäure','Chlorethanoat-Ion (Chloracetat-Ion)'],
+  build:k=>{const m=M();const cl=A(m,'Cl',-1,0);const c1=Cc(m,0,0,'ud');Bd(m,cl,c1);chain(m,[c1,COOH(m,1,0,'r',k>=1)]);return m}},
+ {id:'milch',lvl:2,name:'2-Hydroxypropansäure',triv:'Milchsäure',n:1,oh:true,names:['2-Hydroxypropansäure','2-Hydroxypropanoat-Ion (Lactat-Ion)'],
+  build:(k,oh)=>{const m=M();const c1=Cc(m,0,0,'lud'),c2=Cc(m,1,0,'u');OHg(m,c2,'d',oh);chain(m,[c1,c2,COOH(m,2,0,'r',k>=1)]);return m}},
+ {id:'oxal',lvl:2,name:'Ethandisäure',triv:'Oxalsäure',n:2,names:['Ethandisäure','Hydrogenethandioat-Ion (Hydrogenoxalat-Ion)','Ethandioat-Ion (Oxalat-Ion)'],
+  build:k=>{const m=M();chain(m,[COOH(m,0,0,'l',k>=2),COOH(m,1,0,'r',k>=1)]);return m}},
+ {id:'malon',lvl:2,name:'Propandisäure',triv:'Malonsäure',n:2,names:['Propandisäure','Hydrogenpropandioat-Ion (Hydrogenmalonat-Ion)','Propandioat-Ion (Malonat-Ion)'],
+  build:k=>{const m=M();chain(m,[COOH(m,0,0,'l',k>=2),Cc(m,1,0,'ud'),COOH(m,2,0,'r',k>=1)]);return m}},
+ {id:'bern',lvl:3,name:'Butandisäure',triv:'Bernsteinsäure',n:2,names:['Butandisäure','Hydrogenbutandioat-Ion (Hydrogensuccinat-Ion)','Butandioat-Ion (Succinat-Ion)'],
+  build:k=>{const m=M();chain(m,[COOH(m,0,0,'l',k>=2),Cc(m,1,0,'ud'),Cc(m,2,0,'ud'),COOH(m,3,0,'r',k>=1)]);return m}},
+ {id:'aepf',lvl:3,name:'2-Hydroxybutandisäure',triv:'Äpfelsäure',n:2,oh:true,names:['2-Hydroxybutandisäure','Hydrogen-2-hydroxybutandioat-Ion (Hydrogenmalat-Ion)','2-Hydroxybutandioat-Ion (Malat-Ion)'],
+  build:(k,oh)=>{const m=M();const c=Cc(m,1,0,'u');OHg(m,c,'d',oh);chain(m,[COOH(m,0,0,'l',k>=2),c,Cc(m,2,0,'ud'),COOH(m,3,0,'r',k>=1)]);return m}},
+ {id:'wein',lvl:3,name:'2,3-Dihydroxybutandisäure',triv:'Weinsäure',n:2,oh:true,names:['2,3-Dihydroxybutandisäure','Hydrogen-2,3-dihydroxybutandioat-Ion (Hydrogentartrat-Ion)','2,3-Dihydroxybutandioat-Ion (Tartrat-Ion)'],
+  build:(k,oh)=>{const m=M();const c1=Cc(m,1,0,'u'),c2=Cc(m,2,0,'u');OHg(m,c1,'d',oh);OHg(m,c2,'d',false);chain(m,[COOH(m,0,0,'l',k>=2),c1,c2,COOH(m,3,0,'r',k>=1)]);return m}},
+ {id:'citr',lvl:3,name:'2-Hydroxypropan-1,2,3-tricarbonsäure',triv:'Citronensäure',n:3,oh:true,names:['2-Hydroxypropan-1,2,3-tricarbonsäure','Dihydrogencitrat-Ion','Hydrogencitrat-Ion','Citrat-Ion'],
+  build:(k,oh)=>{const m=M();const c=A(m,'C',2,0);OHg(m,c,'u',oh);chain(m,[COOH(m,0,0,'l',k>=2),Cc(m,1,0,'ud'),c,Cc(m,3,0,'ud'),COOH(m,4,0,'r',k>=1)]);
+    const cc=A(m,'C',2,1);Bd(m,c,cc);Bd(m,cc,A(m,'O',1.35,1.75),2);const o2=A(m,'O',2.65,1.75,k>=3?-1:0);Bd(m,cc,o2);if(k<3)Bd(m,o2,A(m,'H',2.65,2.75));return m}}
+];
+function regOrg(o){
+  o.chain=[];
+  for(let k=0;k<=o.n;k++){
+    const id=o.id+k,mol=o.build(k,false),atoms={};let ch=0;mol.a.forEach(p=>{atoms[p.el]=(atoms[p.el]||0)+1;ch+=p.c});
+    SP[id]={id,kind:'org',mol,ch,atoms,name:o.names[k]};o.chain.push(id);
+  }
+  if(o.oh){const id=o.id+'x',mol=o.build(0,true),atoms={};let ch=0;mol.a.forEach(p=>{atoms[p.el]=(atoms[p.el]||0)+1;ch+=p.c});
+    SP[id]={id,kind:'org',mol,ch,atoms,name:'(an der Hydroxygruppe deprotoniert)',distr:true};o.distr=[id];}
+}
+ORG.forEach(regOrg);
+
+/* ---- organische Basen (Amine) ---- */
+function regAmine(o){
+  o.chain=[];
+  for(let k=0;k<=o.p;k++){
+    const id=o.id+k,mol=o.build(k),atoms={};let ch=0;mol.a.forEach(p=>{atoms[p.el]=(atoms[p.el]||0)+1;ch+=p.c});
+    SP[id]={id,kind:'org',mol,ch,atoms,name:o.names[k]};o.chain.push(id);
+  }
+}
+const AMINES=[
+ {id:'meam',lvl:1,name:'Methanamin',triv:'Methylamin',p:1,pkb:['3,36'],names:['Methanamin','Methylammonium-Ion'],
+  build:k=>{const m=M();const c=Cc(m,0,0,'lud');const n=A(m,'N',1,0,k>=1?1:0);Bd(m,c,n);Hs(m,n,k>=1?'udr':'ud');return m}},
+ {id:'etam',lvl:1,name:'Ethanamin',triv:'Ethylamin',p:1,pkb:['3,35'],names:['Ethanamin','Ethylammonium-Ion'],
+  build:k=>{const m=M();const c1=Cc(m,0,0,'lud'),c2=Cc(m,1,0,'ud');const n=A(m,'N',2,0,k>=1?1:0);chain(m,[c1,c2,n]);Hs(m,n,k>=1?'udr':'ud');return m}},
+ {id:'dmam',lvl:2,name:'Dimethylamin',triv:'N-Methylmethanamin',p:1,pkb:['3,27'],names:['Dimethylamin','Dimethylammonium-Ion'],
+  build:k=>{const m=M();const c1=Cc(m,0,0,'lud'),n=A(m,'N',1,0,k>=1?1:0),c2=Cc(m,2,0,'rud');chain(m,[c1,n,c2]);Hs(m,n,k>=1?'du':'d');return m}},
+ {id:'endi',lvl:3,name:'Ethan-1,2-diamin',triv:'Ethylendiamin',p:2,pkb:['4,07','7,15'],names:['Ethan-1,2-diamin','2-Aminoethylammonium-Ion','Ethan-1,2-diammonium-Ion'],
+  build:k=>{const m=M();const n1=A(m,'N',0,0,k>=1?1:0),c1=Cc(m,1,0,'ud'),c2=Cc(m,2,0,'ud'),n2=A(m,'N',3,0,k>=2?1:0);chain(m,[n1,c1,c2,n2]);Hs(m,n1,k>=1?'udl':'ud');Hs(m,n2,k>=2?'udr':'ud');return m}}
+];
+AMINES.forEach(regAmine);
+
+/* ---- Säuren ---- */
+const PKS={meth:['3,75'],eth:['4,76'],prop:['4,87'],chlor:['2,87'],milch:['3,86'],oxal:['1,23','4,19'],malon:['2,83','5,69'],bern:['4,16','5,61'],aepf:['3,40','5,20'],wein:['2,98','4,34'],citr:['3,13','4,76','6,40']};
+/* Ampholyte (Hydrogen-Ionen): reagieren mit starker Base als Säure, mit starker Säure als Base */
+const AMPH=[
+ {id:'hco3',ion:'HCO3-',acidConj:'CO3(2-)',baseConj:'H2CO3',chain:['HCO3-','CO3(2-)'],pks:['10,33'],pkb:['7,65']},
+ {id:'hso3',ion:'HSO3-',acidConj:'SO3(2-)',baseConj:'H2SO3',chain:['HSO3-','SO3(2-)'],pks:['7,20'],pkb:['12,19']},
+ {id:'hs',ion:'HS-',acidConj:'S(2-)',baseConj:'H2S',chain:['HS-','S(2-)'],pks:['12,9'],pkb:['7,0']},
+ {id:'h2po4',ion:'H2PO4-',acidConj:'HPO4(2-)',baseConj:'H3PO4',chain:['H2PO4-','HPO4(2-)','PO4(3-)'],pks:['7,21','12,32'],pkb:['11,87']},
+ {id:'hpo4',ion:'HPO4(2-)',acidConj:'PO4(3-)',baseConj:'H2PO4-',chain:['HPO4(2-)','PO4(3-)'],pks:['12,32'],pkb:['6,79']}
+];
+const STRONG_AC=['hcl','hbr','hno3','hclo4','h2so4'],STRONG_BA=['naoh','koh','caoh2','baoh2'];
+const ACIDS=[
+ {id:'hcl',lvl:1,name:'Chlorwasserstoff',triv:'Salzsäure',chain:['HCl','Cl-'],pks:['−6']},
+ {id:'hbr',lvl:1,name:'Bromwasserstoff',triv:'Bromwasserstoffsäure',chain:['HBr','Br-'],pks:['−9']},
+ {id:'hf',lvl:1,name:'Fluorwasserstoff',triv:'Flusssäure',chain:['HF','F-'],pks:['3,14']},
+ {id:'hno3',lvl:1,name:'Salpetersäure',chain:['HNO3','NO3-'],pks:['−1,32']},
+ {id:'hno2',lvl:1,name:'Salpetrige Säure',chain:['HNO2','NO2-'],pks:['3,34']},
+ {id:'hclo4',lvl:1,name:'Perchlorsäure',chain:['HClO4','ClO4-'],pks:['−10']},
+ {id:'hcn',lvl:1,name:'Cyanwasserstoff',triv:'Blausäure',chain:['HCN','CN-'],pks:['9,21']},
+ {id:'h2so4',lvl:2,name:'Schwefelsäure',chain:['H2SO4','HSO4-','SO4(2-)'],pks:['−3','1,92']},
+ {id:'h2so3',lvl:2,name:'Schweflige Säure',chain:['H2SO3','HSO3-','SO3(2-)'],pks:['1,81','7,20']},
+ {id:'h2co3',lvl:2,name:'Kohlensäure',chain:['H2CO3','HCO3-','CO3(2-)'],pks:['6,35','10,33']},
+ {id:'h2s',lvl:2,name:'Schwefelwasserstoff',chain:['H2S','HS-','S(2-)'],pks:['7,0','12,9']},
+ {id:'h3po4',lvl:3,name:'Phosphorsäure',chain:['H3PO4','H2PO4-','HPO4(2-)','PO4(3-)'],pks:['2,13','7,21','12,32']}
+].concat(AMPH.map(m=>({id:m.id+'_s',lvl:3,name:SP[m.ion].name,chain:m.chain,pks:m.pks,pkb:m.pkb,amph:m.id}))).map(a=>Object.assign(a,{cat:'anorg',n:a.chain.length-1}))
+ .concat(ORG.map(o=>({id:o.id,lvl:o.lvl,name:o.name,triv:o.triv,cat:'org',n:o.n,chain:o.chain,pks:PKS[o.id]})));
+const ACID=Object.fromEntries(ACIDS.map(a=>[a.id,a]));
+
+/* ---- Basen ---- */
+const BASES=[
+ {id:'naoh',cat:'anorg',lvl:1,name:'Natriumhydroxid',triv:'Natronlauge',unit:'NaOH',part:'OH-',conj:'H2O',p:1,q:1,cation:'Na+',k:1},
+ {id:'koh',cat:'anorg',lvl:1,name:'Kaliumhydroxid',triv:'Kalilauge',unit:'KOH',part:'OH-',conj:'H2O',p:1,q:1,cation:'K+',k:1},
+ {id:'nh3',cat:'anorg',lvl:1,name:'Ammoniak',triv:null,unit:'NH3',part:'NH3',conj:'NH4+',p:1,q:1,cation:null,k:0},
+ {id:'caoh2',cat:'anorg',lvl:2,name:'Calciumhydroxid',triv:'Kalkwasser',unit:'Ca(OH)2',part:'OH-',conj:'H2O',p:1,q:2,cation:'Ca(2+)',k:1},
+ {id:'baoh2',cat:'anorg',lvl:2,name:'Bariumhydroxid',triv:'Barytwasser',unit:'Ba(OH)2',part:'OH-',conj:'H2O',p:1,q:2,cation:'Ba(2+)',k:1},
+ {id:'na2co3',cat:'anorg',lvl:2,name:'Natriumcarbonat',triv:'Soda',unit:'Na2CO3',part:'CO3(2-)',conj:'H2CO3',p:2,q:1,cation:'Na+',k:2}
+].concat(AMPH.map(m=>({id:m.id+'_b',cat:'anorg',lvl:3,name:SP[m.ion].name,triv:null,unit:m.ion,part:m.ion,conj:m.baseConj,p:1,q:1,cation:null,k:0,pks:m.pks,pkb:m.pkb,amph:m.id})))
+ .concat(AMINES.map(a=>({id:a.id,cat:'org',lvl:a.lvl,name:a.name,triv:a.triv,part:a.chain[0],conj:a.chain[a.p],p:a.p,q:1,cation:null,k:0,chain:a.chain,pkb:a.pkb})));
+const BASE=Object.fromEntries(BASES.map(b=>[b.id,b]));
+/* Zeilen der pKb-Tabelle */
+const PKB_ROWS=[
+ {cat:'anorg',label:'Hydroxid-Ion',f:'OH-',note:'aus NaOH, KOH, Ca(OH)₂, Ba(OH)₂',ids:['naoh','koh','caoh2','baoh2'],v:['−1,74']},
+ {cat:'anorg',label:'Ammoniak',f:'NH3',ids:['nh3'],v:['4,75']},
+ {cat:'anorg',label:'Carbonat-Ion',f:'CO3(2-)',note:'Soda, Na₂CO₃',ids:['na2co3'],v:['3,67','7,65']}
+].concat(AMINES.map(a=>({cat:'org',label:a.name,note:a.triv,ids:[a.id],v:a.pkb})));
+
+const LVLTXT={1:'Leicht',2:'Mittel',3:'Schwer'},CATTXT={anorg:'anorganisch',org:'organisch'};
+const comboLvl=(a,b)=>{let l=Math.max(a.lvl,b.lvl);if(a.n>=2&&(b.p>=2||b.q>=2))l=3;return l};
+const degenerate=(a,b)=>{
+  if(a.chain.includes(b.part)||a.chain.includes(b.conj))return true;
+  if(a.amph&&(b.amph||!STRONG_BA.includes(b.id)))return true;   /* Ampholyt als Säure nur mit starker Base */
+  if(b.amph&&!STRONG_AC.includes(a.id))return true;              /* Ampholyt als Base nur mit starker Säure */
+  return false;
+};
+
+/* ---- Stöchiometrie ---- */
+const gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a);
+const lcm=(a,b)=>a/gcd(a,b)*b;
+/* kleinste ganze Koeffizienten: [Säure, Base, korr. Base, korr. Säure, (Kation)] */
+function coefs(acid,base,withCat){
+  const n=acid.n,p=base.p,q=base.q||1,kk=base.k||0;
+  const v=[[1,1],[n,p],[1,1],[n,p]];if(withCat)v.push([n*kk,p*q]);
+  const fr=v.map(([a,b])=>{const g=gcd(a,b);return[a/g,b/g]});
+  const L=fr.reduce((l,[,d])=>lcm(l,d),1);
+  const w=fr.map(([a,d])=>a*(L/d)),g=w.reduce((x,y)=>gcd(x,y),0);
+  return w.map(x=>x/g);
+}
+/* Salzschreibweise bei organischen Säuren: [Säure, Base-Formeleinheit, korr. Base, Kation, korr. Säure] */
+function coefsSalt(acid,base){
+  const n=acid.n,p=base.p,q=base.q||1,kk=base.k||0;
+  const fr=[[1,1],[n,p*q],[1,1],[n*kk,p*q],[n,p]].map(([a,b])=>{const g=gcd(a,b);return[a/g,b/g]});
+  const L=fr.reduce((l,[,d])=>lcm(l,d),1);
+  const w=fr.map(([a,d])=>a*(L/d)),g=w.reduce((x,y)=>gcd(x,y),0);
+  return w.map(x=>x/g);
+}
+/* Koeffizienten einer Gleichung aus Teilchen-IDs durch Atombilanz (kleinste ganze Zahlen) */
+function solveBal(L,R){
+  const all=L.concat(R),n=all.length,nL=L.length;
+  const els=[...new Set(all.flatMap(i=>Object.keys(SP[i].atoms)))];
+  const v=all.map(i=>els.map(e=>SP[i].atoms[e]||0));
+  let best=null,bs=1e9;const c=new Array(n).fill(1);
+  for(;;){
+    let ok=true;
+    for(let j=0;j<els.length&&ok;j++){let d=0;for(let i=0;i<n;i++)d+=(i<nL?1:-1)*c[i]*v[i][j];if(d)ok=false}
+    if(ok){const s=c.reduce((x,y)=>x+y,0);if(s<bs){bs=s;best=c.slice()}}
+    let k=0;while(k<n&&c[k]===9){c[k]=1;k++}
+    if(k===n)break;c[k]++;
+  }
+  return best;
+}
+function buildExp(acid,base){
+  const w=coefs(acid,base);
+  const mk=(w,cc)=>({
+    L:[{role:'acid',id:acid.chain[0],c:w[0]},{role:'base',id:base.part,c:w[1]}].concat(cc!==null?[{role:'cat',id:base.cation,c:cc,opt:true}]:[]),
+    R:[{role:'cb',id:acid.chain[acid.n],c:w[2]},{role:'ca',id:base.conj,c:w[3]}].concat(cc!==null?[{role:'cat',id:base.cation,c:cc,opt:true}]:[])});
+  let X;
+  /* organische Säure + Base mit Kation: freiwillige Felder für das Zuschauerion */
+  if(base.cation&&acid.cat==='org'){
+    const w5=coefs(acid,base,true),full=mk([w5[0],w5[1],w5[2],w5[3]],w5[4]),pl=mk(w,0);
+    const ws=coefsSalt(acid,base),cat=base.cation;
+    const sv={L:[{role:'acid',id:acid.chain[0],c:ws[0]},{role:'base',id:base.unit,c:ws[1]},{role:'cat',id:cat,c:0,opt:true}],
+      R:[{role:'cb',id:acid.chain[acid.n],c:ws[2]},{role:'ca',id:base.conj,c:ws[4]},{role:'cat',id:cat,c:ws[3],opt:true}],vec:[ws[0],ws[1],0,ws[2],ws[4],ws[3]]};
+    X=Object.assign(full,{vec:[w5[0],w5[1],w5[4],w5[2],w5[3],w5[4]],opt:true,alt:null,plain:Object.assign(pl,{vec:[w[0],w[1],0,w[2],w[3],0]}),saltV:sv});
+  }else X=Object.assign(mk(w,null),{vec:w,opt:false,alt:null});
+  const sid=(acid.amph||base.amph)?null:SALT[acid.id+'|'+base.id];
+  if(sid){
+    const aL=[acid.chain[0],base.unit],aR=[sid];
+    if(base.conj==='H2O'||base.conj==='H2CO3')aR.push(base.conj);
+    const cs=solveBal(aL,aR);
+    if(cs){X.alt={L:aL.map((id,i)=>({id,c:cs[i]})),R:aR.map((id,i)=>({id,c:cs[aL.length+i]})),salt:sid}}
+  }
+  return X;
+}
+const stripIon=s=>s.replace(/\s*\(.*?\)/g,'').replace(/-Ion$/,'');
+function saltName(acid,base){
+  const cat=base.cation?stripIon(SP[base.cation].name):stripIon(SP[base.conj].name);
+  const an=stripIon(SP[acid.chain[acid.n]].name);
+  return cat+(/^\d/.test(an)?'-'+an.replace(/^(\d[\d,]*-)([A-Z])/,(m,a,b)=>a+b.toLowerCase()):an.charAt(0).toLowerCase()+an.slice(1));
+}
+
+/* ---- Salze für die Formelgleichung (nur anorganisch) ---- */
+function saltFormula(cat,an){
+  const cc=SP[cat],aa=SP[an],m=cc.ch,z=-aa.ch,g=gcd(m,z),x=z/g,y=m/g;
+  const part=(f,n)=>n===1?f:(/^[A-Z][a-z]?$/.test(f)?f+n:'('+f+')'+n);
+  return part(cc.f,x)+part(aa.f,y);
+}
+const SALT={};
+ACIDS.forEach(a=>{
+  if(a.cat!=='anorg')return;
+  BASES.forEach(b=>{
+    if(b.cat!=='anorg'||a.amph||b.amph)return;
+    const cat=b.cation||b.conj,an=a.chain[a.n];
+    const f=saltFormula(cat,an);
+    if(!SP[f])SP[f]={id:f,kind:'in',f,ch:0,name:saltName(a,b),fu:false,salt:true,atoms:parseF(f)};
+    SALT[a.id+'|'+b.id]=f;
+  });
+});
+
+/* ============ Darstellung ============ */
+function spHTML(x,s){if(typeof x!=='string')return molSVG(x,s||18);const p=SP[x];return p.kind==='in'?fmtF(p.f,p.ch):molSVG(p.mol,s||18)}
+function termHTML(c,id,s){return `<span class="term">${c>1?`<span class="cf">${c}</span>`:''}${spHTML(id,s)}</span>`}
+function eqHTML(L,R,s){return `<span class="eqv">${L.map(t=>termHTML(t[0],t[1],s)).join('<span class="op">+</span>')}<span class="op arr">⟶</span>${R.map(t=>termHTML(t[0],t[1],s)).join('<span class="op">+</span>')}</span>`}
+function label(id){const p=SP[id];return p.kind==='in'?fmtF(p.f,p.ch):esc(p.name)}
+const NUMW={1:'ein',2:'zwei',3:'drei'};
+const isStruct=t=>t.eqs[0].slots.some(s=>s.kind==='mol');
+const WATERNAME='Wasser';
+/* ---- Molekül-Werkzeuge (Strukturformel-Editor) ---- */
+function nbrs(m,i){const r=[];for(const [x,y,o] of m.b){if(x===i&&!m.a[y].del)r.push([y,o]);else if(y===i&&!m.a[x].del)r.push([x,o])}return r}
+function hN(m,i){return nbrs(m,i).filter(([k])=>m.a[k].el==='H').map(([k])=>k)}
+function isCarboxylO(m,i){
+  if(m.a[i].el!=='O'||m.a[i].del)return false;
+  for(const [c,o] of nbrs(m,i)){
+    if(m.a[c].el==='C'&&o===1&&nbrs(m,c).some(([k,oo])=>k!==i&&m.a[k].el==='O'&&oo===2))return true;
+  }
+  return false;
+}
+function acidicOs(m){const r=[];m.a.forEach((a,i)=>{if(!a.del&&isCarboxylO(m,i)&&hN(m,i).length)r.push(i)});return r}
+function analyze(base,prod){
+  if(prod.a.length<base.a.length)return{invalid:true};
+  for(let i=0;i<prod.a.length;i++){
+    const p=prod.a[i];
+    if(i<base.a.length){
+      const b=base.a[i];
+      if(p.el!==b.el)return{invalid:true};
+      if(b.del){if(!p.del)return{invalid:true};continue}
+      if(p.del&&b.el!=='H')return{invalid:true};
+    }else if(p.el!=='H')return{invalid:true};
+  }
+  const ch=[];
+  for(let i=0;i<base.a.length;i++){
+    const b=base.a[i];if(b.del||b.el==='H')continue;
+    const dH=hN(prod,i).length-hN(base,i).length,dc=(prod.a[i].c||0)-(b.c||0);
+    if(dH||dc)ch.push({i,dH,dc});
+  }
+  return{changes:ch};
+}
+function bestAddAngle(m,i){
+  const ex=nbrs(m,i).map(([k])=>Math.atan2(m.a[k].y-m.a[i].y,m.a[k].x-m.a[i].x));
+  let best=CA[6],bv=-1;
+  for(const k of [6,2,0,4,7,5,1,3]){
+    const an=CA[k];const mn=ex.length?Math.min(...ex.map(u=>asep(u,an))):9;
+    if(mn>bv+1e-6){bv=mn;best=an}
+  }
+  return best;
+}
+function addH(m,i){const ang=bestAddAngle(m,i),a=m.a[i];m.a.push({el:'H',x:a.x+Math.cos(ang),y:a.y+Math.sin(ang),c:0});m.b.push([i,m.a.length-1,1])}
+function diagAcid(base,prod,all){
+  const an=analyze(base,prod);
+  if(an.invalid)return 'Bei der Säure dürfen nur H-Atome und Ladungen verändert werden.';
+  const ac=acidicOs(base),acS=new Set(ac),ch=an.changes;
+  if(!ch.length)return 'Das Produkt ist noch identisch mit der Säure. Die Säure gibt ein Proton ab – verändere die Formel entsprechend.';
+  const other=ch.filter(c=>!acS.has(c.i));
+  if(other.some(c=>base.a[c.i].el==='C'&&c.dH<0))return 'H-Atome an C-Atomen werden nicht abgegeben. Abgegeben wird das H-Atom der Carboxygruppe (–COOH).';
+  if(other.some(c=>base.a[c.i].el==='O'&&c.dH<0))return 'Die Hydroxygruppe (–OH) gibt in Wasser kein Proton ab. Abgegeben wird nur das H-Atom der Carboxygruppe (–COOH).';
+  if(ch.some(c=>c.dH>0))return 'Die Base entsteht durch Abgabe eines Protons, nicht durch Aufnahme. Entferne H-Atome, statt sie anzufügen.';
+  if(ch.some(c=>c.dc>0))return 'Die korrespondierende Base ist negativ geladen – eine positive Ladung entsteht bei der Abgabe eines Protons nicht.';
+  if(other.length)return 'Nur an der Carboxygruppe (–COOH) ändert sich etwas. Prüfe, wo du Änderungen vorgenommen hast.';
+  if(ch.some(c=>c.dH===0&&c.dc<0))return 'Eine negative Ladung allein genügt nicht: Die Base entsteht durch Abgabe eines Protons. Entferne auch das zugehörige H-Atom.';
+  if(ch.some(c=>c.dH<0&&c.dc===0))return 'Das H-Atom ist entfernt, aber es fehlt die Ladung: Das Proton verlässt das Molekül ohne das Bindungselektronenpaar. Das Sauerstoff-Atom behält es und wird dadurch negativ geladen.';
+  const done=ch.filter(c=>c.dH===-1&&c.dc===-1).length,need=all?ac.length:1;
+  if(done>need)return 'In einer Protolysestufe wird nur ein einziges Proton abgegeben. Entferne nur ein H-Atom.';
+  if(done<need)return `Insgesamt werden ${need} Protonen abgegeben – bisher ${done===1?'ist erst eine':'sind erst '+done}${done===1?' Carboxygruppe':' Carboxygruppen'} deprotoniert.`;
+  if(ch.length!==need)return 'Die Struktur stimmt noch nicht. Prüfe H-Atome und Ladungen.';
+  return null;
+}
+
+/* ============ Zustand ============ */
+const st={ac:{anorg:true,org:false},ba:{anorg:true,org:false},lvl:1,pk:false,inp:'free',task:null,hist:[],streak:0,lastKey:null,showSchema:false};
+const cloneMol=m=>JSON.parse(JSON.stringify(m));
+const KEYS={};
+const keyOf=(at,ch)=>Object.keys(at).sort().map(e=>e+at[e]).join('')+'|'+ch;
+Object.values(SP).forEach(p=>{if(p.kind==='in')KEYS[keyOf(p.atoms,p.ch)]=p.id});
+const F=id=>label(id);
+
+/* ---- Freie Formeleingabe ---- */
+const SUPS={'⁺':'+','⁻':'-'};
+for(let i=0;i<10;i++){SUPS[String.fromCharCode(0x2080+i)]=String(i)}
+['⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹'].forEach((c,i)=>{SUPS[c]=String(i)});
+function normTxt(s){return s.replace(/[⁰¹²³⁴-⁹⁺⁻₀-₉]/g,c=>SUPS[c]).replace(/[−–—]/g,'-')}
+const FRX=/^(?:[A-Z][a-z]?\d*|\((?:[A-Z][a-z]?\d*)+\)\d*)+$/;
+function parseTerm(raw){
+  let s=normTxt(raw||'').trim();if(!s)return{empty:true};
+  let c=1;const m=s.match(/^(\d+)\s*(.*)$/);if(m){c=+m[1];s=m[2]}
+  s=s.replace(/\s+/g,'');
+  if(!s)return{err:'Es fehlt die Formel.'};
+  if(c<1||c>9)return{err:'Der Koeffizient muss zwischen 1 und 9 liegen.'};
+  const cands=[];
+  const q=s.match(/^(.+?)(?:\^\(?(\d*)([+-])\)?|\((\d*)([+-])\))$/);
+  if(q){const mag=q[2]!==undefined&&q[2]!==''?+q[2]:(q[4]!==undefined&&q[4]!==''?+q[4]:1);cands.push([q[1],(q[3]||q[5])==='+'?mag:-mag])}
+  else{
+    const a=s.match(/^(.+?)([+-])$/);if(a)cands.push([a[1],a[2]==='+'?1:-1]);
+    const b=s.match(/^(.+?)(\d)([+-])$/);if(b)cands.push([b[1],b[3]==='+'?+b[2]:-b[2]]);
+    cands.push([s,0]);
+  }
+  for(const [f,ch] of cands){
+    if(!FRX.test(f))continue;
+    const id=KEYS[keyOf(parseF(f),ch)];
+    if(id)return{c,id};
+  }
+  for(const [f,ch] of cands){
+    if(!FRX.test(f)||ch!==0)continue;
+    const at=parseF(f);if(Object.keys(at).some(e=>METALS.includes(e)))return{err:'salt'};
+  }
+  return{err:'unknown'};
+}
+function plain(id){const p=SP[id];const ch=p.ch,m=Math.abs(ch);if(!ch)return p.f;return p.f+(m>1?'^'+m:'')+(ch>0?'+':'-')}
+/* Stöchiometrischer Faktor: eigenes Feld vor der Formel (s.fc = Text des Feldes, Standard 1) */
+const fcVal=s=>s.fc!==undefined?s.fc:String(s.c||1);
+function fcParse(fc){const v=String(fc===undefined?'1':fc).trim();if(v==='')return{c:1};if(!/^\d+$/.test(v))return{err:'Der Faktor muss eine ganze Zahl von 1 bis 9 sein.'};const n=+v;if(n<1||n>9)return{err:'Der Faktor muss zwischen 1 und 9 liegen.'};return{c:n}}
+function effC(r,fc){if(r.c>1)return r.c;const f=fcParse(fc);return f.c||1}
+function preview(txt,fc){const r=parseTerm(txt);if(r.empty)return '';if(r.id){const c=effC(r,fc);return (c>1?'<span class="cfp">'+c+'</span> ':'')+spHTML(r.id)}return '<span class="pvq">?</span>'}
+function syncMode(){
+  const t=st.task;if(!t)return;
+  t.eqs.forEach(e=>{if(e.done)return;e.slots.forEach(s=>{
+    if(s.kind!=='txt')return;
+    if(st.inp==='free'){if(s.id){s.txt=plain(s.id);s.fc=String(s.c)}}
+    else if(s.txt){const r=parseTerm(s.txt);if(r.id){s.id=r.id;s.c=effC(r,s.fc)}}
+  })});
+}
+
+/* ---- Strukturformel-Prüfung für Basen (Amine) ---- */
+const nOf=m=>m.a.map((a,i)=>(!a.del&&a.el==='N')?i:-1).filter(i=>i>=0);
+function diagBaseS(base,prod){
+  const an=analyze(base,prod);
+  if(an.invalid)return 'Bei der Base dürfen nur H-Atome und Ladungen verändert werden.';
+  const Ns=nOf(base),NS=new Set(Ns),ch=an.changes,need=Ns.length;
+  if(!ch.length)return `Die Base ist noch unverändert. Sie nimmt von der Säure ${need>1?need+' Protonen':'ein Proton'} auf: Füge ${need>1?'an jedem Stickstoff-Atom':'am Stickstoff-Atom'} ein H-Atom an („H-Atom anfügen“) und setze die Ladung + („Ladung +“).`;
+  if(ch.some(c=>!NS.has(c.i)))return 'Nur am Stickstoff-Atom (freies Elektronenpaar) ändert sich etwas: Dort wird das Proton gebunden. H-Atome an C-Atomen und andere Atome bleiben unverändert.';
+  if(ch.some(c=>c.dH<0))return 'Die Base nimmt Protonen auf – H-Atome werden angefügt, nicht gelöscht.';
+  if(ch.some(c=>c.dc<0))return 'Das aufgenommene Proton ist positiv geladen – die Ladung am Stickstoff-Atom wird positiv, nicht negativ.';
+  if(ch.some(c=>c.dH>1))return 'Ein Stickstoff-Atom bindet nur ein Proton (insgesamt vier Bindungen). Füge je N-Atom nur ein H-Atom an.';
+  if(ch.some(c=>c.dH===1&&c.dc===0))return 'Das H-Atom ist angefügt, aber es fehlt die Ladung: Das Proton bringt keine Elektronen mit, das Stickstoff-Atom trägt deshalb die Ladung +.';
+  if(ch.some(c=>c.dH===0&&c.dc>0))return 'Die positive Ladung entsteht erst durch die Aufnahme eines Protons. Füge dem Stickstoff-Atom ein H-Atom an.';
+  const done=ch.filter(c=>c.dH===1&&c.dc===1).length;
+  if(done<need)return `Die Base nimmt insgesamt ${need} Protonen auf (an jedem Stickstoff-Atom eines) – bisher ${done===1?'ist erst ein Stickstoff-Atom':'sind erst '+done+' Stickstoff-Atome'} protoniert.`;
+  return null;
+}
+function solveCb(m){const ap=cloneMol(m);acidicOs(ap).forEach(i=>{ap.a[hN(ap,i)[0]].del=true;ap.a[i].c=-1});return ap}
+function solveCa(m){const bp=cloneMol(m);nOf(bp).forEach(i=>{addH(bp,i);bp.a[i].c=1});return bp}
+
+/* ---- Prüfung ---- */
+const same=(a,b)=>{const ka=Object.keys(a),kb=Object.keys(b);return ka.length===kb.length&&ka.every(k=>a[k]===b[k])};
+const sameKeys=(a,b)=>Object.keys(a).sort().join('|')===Object.keys(b).sort().join('|');
+function atomsOfSlot(s){
+  if(s.kind==='mol'){const at={};let ch=0;s.mol.a.forEach(p=>{if(p.del)return;at[p.el]=(at[p.el]||0)+1;ch+=p.c||0});return{at,ch}}
+  const p=SP[s.id];return{at:p.atoms,ch:p.ch};
+}
+function balancedSlots(S,nL){
+  const t={};let q=[0,0];
+  S.forEach((s,i)=>{if(s.kind==='txt'&&!s.id)return;const {at,ch}=atomsOfSlot(s),side=i<nL?1:-1;q[i<nL?0:1]+=ch*s.c;for(const e in at)t[e]=(t[e]||0)+side*at[e]*s.c});
+  return Object.values(t).every(v=>v===0)&&q[0]===q[1];
+}
+function protonHint(a,b){return `Zähle die Protonen: Die Säure gibt je Teilchen ${a.n} Proton${a.n>1?'en':''} ab, die Base nimmt je Teilchen ${b.p} Proton${b.p>1?'en':''} auf.`}
+function earlyDiag(ids,allowCat){
+  if(ids.includes('H+'))return 'Freie Protonen (H⁺) liegen in Wasser nicht vor. Das Proton geht direkt von der Säure auf die Base über – es steht nicht als eigenes Teilchen in der Gleichung.';
+  if(ids.includes('H3O+'))return 'H₃O⁺ entsteht erst, wenn eine Säure mit Wasser reagiert. Bei der Neutralisation gibt die Säure ihr Proton direkt an die Base ab.';
+  const cat=allowCat?null:ids.find(i=>CATIONS.includes(i));
+  if(cat)return `${F(cat)} ist ein Zuschauerion: Es nimmt an der Reaktion nicht teil und steht nicht in der Teilchengleichung. Willst du das Kation der Base mitschreiben, schreibe die Gleichung mit dem Salz (z. B. NaCl) und der Base als Formeleinheit (z. B. NaOH).`;
+  return null;
+}
+function diagSalt(t,gL,gR,aL,aR){
+  const acid=ACID[t.acid],base=BASE[t.base],A=t.exp.alt,sid=A.salt;
+  const ids=Object.keys(gL).concat(Object.keys(gR));
+  const ei=earlyDiag(ids);if(ei)return ei;
+  const catTxt=base.cation?F(base.cation):F(base.conj),anTxt=F(acid.chain[acid.n]);
+  if(sameKeys(gL,aR)&&sameKeys(gR,aL))return 'Edukte und Produkte sind vertauscht. Links stehen Säure und Base, rechts das Salz (und Wasser).';
+  for(const id of Object.keys(gR)){
+    if(id===acid.chain[0])return 'Rechts steht unverändert die Säure – sie muss aber reagieren.';
+    if(id===base.unit)return 'Rechts steht unverändert die Base – sie muss aber reagieren.';
+  }
+  const exL=Object.keys(gL).find(i=>!(i in aL));
+  if(exL)return `${F(exL)} gehört nicht auf die linke Seite dieser Gleichung: Links stehen die Säure ${F(acid.chain[0])} und die Base ${F(base.unit)}.`;
+  const missL=Object.keys(aL).filter(i=>!(i in gL));
+  if(missL.length)return missL[0]===acid.chain[0]?'Links fehlt die Säure.':`Links fehlt die Base. In der Gleichung mit Salz steht sie als Formeleinheit ${F(base.unit)}.`;
+  const wrongSalt=Object.keys(gR).find(i=>SP[i].salt&&!(i in aR));
+  if(wrongSalt)return `${F(wrongSalt)} ist nicht das Salz dieser Aufgabe. Es besteht aus dem Kation der Base (${catTxt}) und dem Anion der Säure (${anTxt}).`;
+  const missR=Object.keys(aR).filter(i=>!(i in gR));
+  if(missR.length){
+    const id=missR[0];
+    if(id===sid)return `Rechts fehlt das Salz: Es besteht aus dem Kation der Base (${catTxt}) und dem Anion der Säure (${anTxt}). Die Indizes folgen aus den Ladungen.`;
+    if(id==='H2O')return 'Rechts fehlt Wasser: Bei einem Hydroxid bilden die abgegebenen Protonen mit den OH⁻-Ionen Wasser.';
+    return `Rechts fehlt ${F(id)}: Das Carbonat-Ion hat zwei Protonen aufgenommen.`;
+  }
+  const exR=Object.keys(gR).find(i=>!(i in aR));
+  if(exR){
+    if(SP[exR].salt)return `${F(exR)} ist nicht das Salz dieser Aufgabe. Es besteht aus dem Kation der Base (${catTxt}) und dem Anion der Säure (${anTxt}).`;
+    return `${F(exR)} gehört nicht auf die rechte Seite dieser Gleichung.`;
+  }
+  return 'Die Teilchen stimmen noch nicht. Vergleiche mit dem Schema.';
+}
+function diagSaltOrg(t,gL,gR){
+  const base=BASE[t.base],cn=base.cation,ids=Object.keys(gL).concat(Object.keys(gR));
+  const ei=earlyDiag(ids,true);if(ei)return ei;
+  if(cn in gL)return `${F(base.unit)} enthält das Kation ${F(cn)} bereits. In der Gleichung mit Salz steht ${F(cn)} nur rechts, zusammen mit dem Anion der Säure.`;
+  if(ids.some(i=>CATIONS.includes(i)&&i!==cn))return `Das Kation des Salzes ist das Kation der gewählten Base (${F(cn)}). Prüfe Formel und Ladung.`;
+  if(!(cn in gR))return `Rechts fehlt das Kation des Salzes (${F(cn)}): Das Salz besteht aus dem Anion der Säure (Strukturformel) und dem Kation der Base. Trage es in das gestrichelte Feld ein.`;
+  if(!(base.conj in gR))return `Rechts fehlt ${F(base.conj)}: Die Base nimmt Protonen auf (${F(base.part)} → ${F(base.conj)}).`;
+  const ex=ids.find(i=>i!==base.unit&&i!==cn&&i!==base.conj);
+  if(ex)return `${F(ex)} gehört nicht in diese Gleichung. Edukte: Säure und ${F(base.unit)}; Produkte: Anion der Säure, ${F(cn)} und ${F(base.conj)}.`;
+  return 'Die Teilchen stimmen noch nicht. Vergleiche mit dem Schema.';
+}
+function diagSpecies(t,gL,gR,eL,eR){
+  const acid=ACID[t.acid],base=BASE[t.base],X=t.exp;
+  const ids=Object.keys(gL).concat(Object.keys(gR));
+  const ei=earlyDiag(ids,X.opt);if(ei)return ei;
+  if(acid.amph||base.amph){
+    const m=AMPH.find(x=>x.id===(acid.amph||base.amph));
+    if(acid.amph&&Object.keys(gR).includes(m.baseConj))return `${F(m.ion)} reagiert hier als Säure, nicht als Base: Der Partner ${esc(base.name)} ist eine starke Base, die Protonen aufnimmt (pKs ${m.pks[0]}).`;
+    if(base.amph&&Object.keys(gR).includes(m.acidConj))return `${F(m.ion)} reagiert hier als Base, nicht als Säure: Der Partner ${esc(acid.name)} ist eine starke Säure, die Protonen abgibt (pKb ${m.pkb[0]}).`;
+  }
+  if(X.opt){
+    const cn=X.L.find(x=>x.role==='cat').id;
+    if(ids.some(i=>CATIONS.includes(i))){
+      if(Object.keys(gL).concat(Object.keys(gR)).some(i=>CATIONS.includes(i)&&i!==cn))return `Das Zuschauerion ist das Kation der gewählten Base (${F(cn)}). Prüfe Formel und Ladung.`;
+      if(!(cn in gL)||!(cn in gR))return `Schreibst du das Zuschauerion mit, steht ${F(cn)} links und rechts in der Gleichung. Oder lass beide Zuschauerion-Felder leer.`;
+    }
+  }
+  const saltLike=ids.find(i=>(SP[i].salt||SP[i].fu)&&!(i in eL)&&!(i in eR));
+  if(saltLike){
+    if(FU[saltLike]){const [ka,an]=FU[saltLike];return `${F(saltLike)} liegt in der Lösung als ${F(ka)} und ${F(an)} vor. Hier schreibst du die Teilchengleichung: Als Base reagiert das ${SP[an].name} ${F(an)}, das Kation steht nicht in der Gleichung.`}
+    return `${F(saltLike)} ist ein Salz. Hier schreibst du die Teilchengleichung: Säure und Base werden zu ihren korrespondierenden Teilchen.`;
+  }
+  if(sameKeys(gL,eR)&&sameKeys(gR,eL))return 'Edukte und Produkte sind vertauscht. Links stehen Säure und Base, rechts die Produkte der Protonenübertragung.';
+  for(const id of Object.keys(gR)){
+    if(id===acid.chain[0])return 'Rechts steht unverändert die Säure – sie muss aber Protonen abgeben.';
+    if(id===base.part)return 'Rechts steht unverändert die Base – sie muss aber Protonen aufnehmen.';
+    const ix=acid.chain.indexOf(id);
+    if(ix>0&&ix<acid.n)return `Bei vollständiger Neutralisation gibt die Säure alle ${acid.n} abgebbaren Protonen ab. ${F(id)} ist nur ein Zwischenprodukt.`;
+    if(base.id==='na2co3'&&id==='HCO3-')return 'Das Carbonat-Ion nimmt bei vollständiger Neutralisation zwei Protonen auf – es entsteht Kohlensäure H₂CO₃.';
+  }
+  const missL=Object.keys(eL).filter(i=>!(i in gL)),missR=Object.keys(eR).filter(i=>!(i in gR));
+  if(missL.length){
+    const id=missL[0];
+    if(id===acid.chain[0])return 'Links fehlt die Säure: Sie ist der Protonendonator.';
+    if(id===base.part)return base.part==='OH-'?'Links fehlt die Base: Bei Metallhydroxiden ist das Hydroxid-Ion der Protonenakzeptor – das Kation bleibt in der Teilchengleichung unverändert und steht nicht darin.':`Links fehlt die Base (${SP[base.part].name}): Sie ist der Protonenakzeptor.`;
+    return 'Links fehlt ein Teilchen.';
+  }
+  if(missR.length){
+    const id=missR[0];
+    if(id===acid.chain[acid.n])return 'Rechts fehlt die korrespondierende Base der Säure: je abgegebenem Proton ein H-Atom weniger und die Ladung entsprechend verringert.';
+    if(id===base.conj)return 'Rechts fehlt die korrespondierende Säure der Base: Die Base hat Protonen aufgenommen (z. B. OH⁻ → H₂O, NH₃ → NH₄⁺).';
+    return 'Rechts fehlt ein Teilchen.';
+  }
+  const ex=ids.find(i=>!(i in eL)&&!(i in eR));
+  if(ex)return `${F(ex)} gehört nicht in diese Gleichung. Nach Brönsted reagieren nur die Säure und die Base; sie bilden die korrespondierende Base und die korrespondierende Säure.`;
+  return 'Die Teilchen stimmen noch nicht. Vergleiche mit dem Schema.';
+}
+function evalEq(t,e){
+  const S=e.slots,nL=e.nL,acid=ACID[t.acid],base=BASE[t.base];
+  const catF=S.some(s=>s.kind==='txt'&&s.id&&CATIONS.includes(s.id));
+  const saltF=!!t.exp.opt&&S.some(s=>s.kind==='txt'&&s.id&&s.id===base.unit);
+  const X=saltF?t.exp.saltV:((t.exp.opt&&!catF)?t.exp.plain:t.exp),exp=X.L.concat(X.R);
+  for(let i=nL;i<S.length;i++){
+    const s=S[i];if(s.kind!=='mol')continue;
+    if(s.role==='cb'){const m=diagAcid(S[0].mol,s.mol,true);if(m)return{m:'<b>Säure → korrespondierende Base:</b> '+m}}
+    else if(s.role==='ca'){const m=diagBaseS(S[1].mol,s.mol);if(m)return{m:'<b>Base → korrespondierende Säure:</b> '+m}}
+  }
+  const got=(a,b)=>{const o={};for(let i=a;i<b;i++){const s=S[i];if(s.kind==='txt'&&s.id)o[s.id]=(o[s.id]||0)+s.c}return o};
+  const ex=arr=>{const o={};arr.forEach(x=>{if(x.c>0&&SP[x.id].kind==='in')o[x.id]=(o[x.id]||0)+x.c});return o};
+  const gL=got(0,nL),gR=got(nL,S.length),eL=ex(X.L),eR=ex(X.R);
+  const structC=S.every((s,i)=>s.kind!=='mol'||s.c===exp[i].c);
+  const A=X.alt,mp=arr=>{const o={};arr.forEach(x=>{o[x.id]=x.c});return o};
+  if(same(gL,eL)&&same(gR,eR)&&structC){e.form=saltF?'salt':'ion';e.spec=catF&&!saltF;return{ok:true}}
+  if(A){
+    const aL=mp(A.L),aR=mp(A.R);
+    if(same(gL,aL)&&same(gR,aR)){e.form='salt';return{ok:true}}
+    const ionIds=new Set(Object.keys(eL).concat(Object.keys(eR))),saltIds=new Set(Object.keys(aL).concat(Object.keys(aR)));
+    const G=Object.keys(gL).concat(Object.keys(gR));
+    const saltish=G.some(i=>(saltIds.has(i)&&!ionIds.has(i))||(!ionIds.has(i)&&!saltIds.has(i)&&(SP[i].salt||SP[i].fu)));
+    const ionish=G.some(i=>ionIds.has(i)&&!saltIds.has(i));
+    if(saltish&&ionish)return{m:'Du mischst zwei Schreibweisen: In der Teilchengleichung stehen Ionen und Moleküle (z. B. OH⁻), in der Gleichung mit Salz stehen die Formeleinheiten (z. B. NaOH, NaCl). Entscheide dich für eine Schreibweise.'};
+    if(saltish){
+      if(!(sameKeys(gL,aL)&&sameKeys(gR,aR)))return{m:diagSalt(t,gL,gR,aL,aR)};
+      const ks=Object.keys(aL)[0],k=gL[ks]/aL[ks];
+      if(k>1&&Number.isInteger(k)&&Object.keys(aL).every(i=>gL[i]===aL[i]*k)&&Object.keys(aR).every(i=>gR[i]===aR[i]*k))return{m:'Die Gleichung ist ausgeglichen, lässt sich aber noch kürzen: Gesucht sind die kleinsten ganzen Zahlen als Koeffizienten.'};
+      if(!balancedSlots(S,nL))return{m:'Die Gleichung ist nicht ausgeglichen. Zähle für jedes Element die Atome links und rechts und kontrolliere die Indizes der Formeln.'};
+      return{m:'Die Koeffizienten stimmen noch nicht. Zähle für jedes Element die Atome links und rechts.'};
+    }
+  }
+  if(!(sameKeys(gL,eL)&&sameKeys(gR,eR)))return{m:saltF?diagSaltOrg(t,gL,gR):diagSpecies(t,gL,gR,eL,eR)};
+  const vec=exp.map((x,i)=>S[i].kind==='mol'?S[i].c:(i<nL?gL:gR)[x.id]||0),k=vec[0]/X.vec[0];
+  if(k>1&&Number.isInteger(k)&&vec.every((v,i)=>v===X.vec[i]*k))return{m:'Die Gleichung ist ausgeglichen, lässt sich aber noch kürzen: Gesucht sind die kleinsten ganzen Zahlen als Koeffizienten.'};
+  if(!balancedSlots(S,nL))return{m:'Die Gleichung ist nicht ausgeglichen. Die Zahl der abgegebenen Protonen muss der Zahl der aufgenommenen entsprechen; kontrolliere auch Atome und Ladungen auf beiden Seiten. '+protonHint(acid,base)};
+  return{m:'Die Koeffizienten stimmen noch nicht. '+protonHint(acid,base)};
+}
+function okFeedback(t,e){
+  const a=ACID[t.acid],b=BASE[t.base],X=t.exp,A=X.alt,sn=esc(saltName(a,b));
+  const am=(a.amph||b.amph)?` ${F(AMPH.find(x=>x.id===(a.amph||b.amph)).ion)} ist ein Ampholyt und reagiert hier als ${a.amph?'Säure, weil der Partner eine starke Base':'Base, weil der Partner eine starke Säure'} ist.`:'';
+  const base=`Die Säure ${F(a.chain[0])} gibt ${a.n} Proton${a.n>1?'en':''} ab (→ ${F(a.chain[a.n])}), die Base ${F(b.part)} nimmt ${b.p} Proton${b.p>1?'en':''} auf (→ ${F(b.conj)}). ${b.amph?'':` Das gelöste Salz heißt ${sn}.`}${am}`;
+  if(X.opt&&e&&e.form==='salt')return `Richtig! Gleichung mit dem Salz ${sn}: Es besteht aus dem Anion der Säure (${esc(SP[a.chain[a.n]].name.replace(/\s*\(.*\)/,''))}) und dem Kation der Base (${F(b.cation)}). Als Teilchengleichung steht statt ${F(b.unit)} das Ion ${F(b.part)} links; ${F(b.cation)} ist dann Zuschauerion.`;
+  if(!A)return 'Richtig! '+base+((e&&e.spec&&X.opt)?` Das Zuschauerion ${F(X.L.find(x=>x.role==='cat').id)} steht links und rechts unverändert in der Gleichung.`:'');
+  const eq=(L,R)=>`<div class="fig">${eqHTML(L.map(x=>[x.c,x.id]),R.map(x=>[x.c,x.id]),16)}</div>`;
+  if(e&&e.form==='salt')return `Richtig! Gleichung mit dem Salz ${sn}. Als Teilchengleichung nach Brönsted lautet sie:${eq(X.L,X.R)}`;
+  return `Richtig! ${base} Mit dem Salz geschrieben lautet die Gleichung:${eq(A.L,A.R)}`;
+}
+function tipText(t){
+  const a=ACID[t.acid],b=BASE[t.base],n=a.n,p=b.p,X=t.exp;let h='';
+  if(b.cat==='anorg'&&b.part==='OH-')h+=`${esc(b.name)} liegt gelöst als ${F(b.cation)} und ${F('OH-')} vor. In der Teilchengleichung reagiert nur das Hydroxid-Ion${b.q>1?` (je Formeleinheit ${b.q} OH⁻)`:''}. `;
+  else if(b.id==='na2co3')h+=`Natriumcarbonat liegt gelöst als 2 ${F('Na+')} und ${F('CO3(2-)')} vor. Als Base reagiert das Carbonat-Ion. `;
+  if(a.amph||b.amph){const m=AMPH.find(x=>x.id===(a.amph||b.amph));h+=`${F(m.ion)} ist ein Ampholyt (pKs ${m.pks[0]}, pKb ${m.pkb[0]}): Mit einer starken Base reagiert es als Säure und gibt ein Proton ab, mit einer starken Säure reagiert es als Base und nimmt ein Proton auf. `}
+  h+=`Die Säure gibt je Teilchen ${n} Proton${n>1?'en':''} ab, die Base nimmt je Teilchen ${p} Proton${p>1?'en':''} auf. Alle abgegebenen Protonen müssen aufgenommen werden; die Koeffizienten sind die kleinsten ganzen Zahlen. `;
+  if(a.cat==='org')h+=`Säure: Entferne die H-Atome ${n>1?'aller '+n+' Carboxygruppen':'der Carboxygruppe'} und setze an den zugehörigen Sauerstoff-Atomen die Ladung −; H-Atome an C-Atomen und an Hydroxygruppen bleiben. `;
+  if(b.cat==='org')h+=`Base: Füge ${p>1?'an jedem der '+p+' Stickstoff-Atome':'am Stickstoff-Atom'} ein H-Atom an und setze die Ladung +. `;
+  if(X.opt)h+=`Statt des Ions ${F(b.part)} darfst du links auch die Formeleinheit ${F(b.unit)} schreiben; dann steht rechts das Kation ${F(b.cation)} (gestricheltes Feld) neben dem Anion der Säure, und links bleibt das Zuschauer-Feld leer. Bei der Teilchengleichung sind die beiden gestrichelten Felder für das Zuschauerion ${F(b.cation)} freiwillig. Schreibst du es mit, steht es links und rechts gleich oft; dann gelten für die ganze Gleichung die kleinsten ganzen Zahlen mit dem Kation. `;
+  if(X.alt)h+=`Du kannst die Gleichung auch mit dem Salz schreiben: Die Base steht dann als Formeleinheit (${F(b.unit)}), rechts steht das Salz aus dem Kation der Base und dem Anion der Säure.`;
+  return h.trim();
+}
+
+/* ============ Aufgaben ============ */
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function tileIds(acid,base,exp){
+  const s=new Set();
+  exp.L.concat(exp.R).forEach(x=>{if(SP[x.id].kind==='in')s.add(x.id)});
+  ['H2O','H3O+','OH-','H+'].forEach(x=>s.add(x));
+  if(base.unit)s.add(base.unit);if(exp.alt)exp.alt.L.concat(exp.alt.R).forEach(x=>s.add(x.id));
+  acid.chain.forEach(x=>{if(SP[x].kind==='in')s.add(x)});
+  if(base.id==='na2co3')s.add('HCO3-');
+  return shuffle([...s]);
+}
+function makeTask(acid,base){
+  const exp=buildExp(acid,base),all=exp.L.concat(exp.R);
+  const e={slots:all.map(x=>({role:x.role,kind:SP[x.id].kind==='org'?'mol':'txt',id:null,c:1,txt:'',mol:null})),nL:exp.L.length,attempts:0,tip:false,sol:false,done:false,first:false,fb:null,undo:[]};
+  const t={acid:acid.id,base:base.id,exp,eqs:[e],tiles:tileIds(acid,base,exp),act:{e:0,s:0},tool:'delH',inHist:false,complete:false};
+  initMols(t);
+  const fi=e.slots.findIndex(s=>s.kind==='txt');t.act={e:0,s:fi<0?0:fi};
+  return t;
+}
+function initMols(t){
+  const e=t.eqs[0],acid=ACID[t.acid],base=BASE[t.base],S=e.slots;
+  S.forEach(s=>{
+    if(s.kind!=='mol')return;
+    s.mol=cloneMol(s.role==='acid'||s.role==='cb'?SP[acid.chain[0]].mol:SP[base.part].mol);
+  });
+  e.undo=[];
+}
+function resetEq(t,e){
+  e.slots.forEach(s=>{s.c=1;if(s.kind==='txt'){s.id=null;s.txt='';delete s.fc}});
+  initMols(t);
+  const fi=e.slots.findIndex(s=>s.kind==='txt');t.act={e:0,s:fi<0?0:fi};
+}
+function solveEq(t,e){
+  const catF=e.slots.some(s=>s.kind==='txt'&&s.role==='cat'&&(s.id||(s.txt&&s.txt.trim())));
+  const X=(t.exp.opt&&!catF)?t.exp.plain:t.exp,exp=X.L.concat(X.R);
+  e.slots.forEach((s,i)=>{
+    if(exp[i].c===0){s.c=1;s.id=null;s.txt='';s.fc='1';return}
+    s.c=exp[i].c;
+    if(s.kind==='txt'){s.id=exp[i].id;s.txt=plain(s.id);s.fc=String(s.c)}
+    else if(s.role==='cb')s.mol=solveCb(e.slots[0].mol);
+    else if(s.role==='ca')s.mol=solveCa(e.slots[1].mol);
+  });
+}
+function pool(){
+  const out=[];
+  ACIDS.forEach(a=>{if(!st.ac[a.cat])return;BASES.forEach(b=>{if(!st.ba[b.cat])return;if(degenerate(a,b))return;if(comboLvl(a,b)===st.lvl)out.push([a,b])})});
+  return out;
+}
+function newTask(){
+  if(st.task&&!st.task.inHist&&st.task.eqs.some(e=>e.done)){st.task.inHist=true;st.hist.push(st.task)}
+  const pl=pool();if(!pl.length){st.task=null;render();return}
+  let cand=pl.filter(([a,b])=>a.id+'|'+b.id!==st.lastKey);if(!cand.length)cand=pl;
+  const am=cand.filter(([a,b])=>a.amph||b.amph),nm=cand.filter(([a,b])=>!(a.amph||b.amph));
+  if(am.length&&nm.length)cand=Math.random()<0.3?am:nm;
+  const [acid,base]=cand[Math.floor(Math.random()*cand.length)];
+  st.lastKey=acid.id+'|'+base.id;st.task=makeTask(acid,base);st.showSchema=false;
+  render();
+}
+
+/* ============ Rendern ============ */
+function slotHTML(t,e,k,cur){
+  const s=e.slots[k],bad=e.fb&&e.fb.bad&&!e.done;
+  if(s.kind==='mol'){
+    const editable=cur&&k>=e.nL;
+    return `<div class="ost ${e.done?'ok':''} ${bad?'bad':''}"><button class="cf ${s.c===1?'one':''}" data-e="0" data-s="${k}" ${cur?'':'disabled'} aria-label="Koeffizient">${s.c}</button><div class="ostruct ${editable?'editable':''}">${molSVG(s.mol,28,editable?{e:0,s:k}:null)}</div></div>`;
+  }
+  if(cur&&st.inp==='free')return `<div class="fslot"><div class="frow"><input class="fcf ${bad?'bad':''} ${s.role==='cat'?'opt':''}" data-e="0" data-s="${k}" value="${esc(fcVal(s))}" inputmode="numeric" maxlength="2" aria-label="Stöchiometrischer Faktor" title="Stöchiometrischer Faktor" autocomplete="off"><input class="finp ${bad?'bad':''} ${s.role==='cat'?'opt':''}" data-e="0" data-s="${k}" value="${esc(s.txt||'')}" placeholder="${s.role==='cat'?'optional':'Formel'}" aria-label="Formel" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></div><div class="pv">${preview(s.txt,s.fc)}</div></div>`;
+  const act=cur&&t.act.s===k;
+  return `<div class="slot ${act?'act':''} ${e.done?'ok':''} ${bad?'bad':''} ${s.role==='cat'?'opt':''}" data-e="0" data-s="${k}"><button class="cf ${s.c===1?'one':''}" data-e="0" data-s="${k}" ${cur?'':'disabled'} aria-label="Koeffizient">${s.c}</button><div class="sp ${s.id?'':'empty'}">${s.id?spHTML(s.id,19):(cur?(s.role==='cat'?'optional':'leer'):'')}</div></div>`;
+}
+function renderTask(){
+  const card=$('#taskCard'),t=st.task;
+  if(!t){card.innerHTML=`<div class="empty-state">${pool().length?'Wähle links die Aufgabenart und tippe auf <b>„Neue Aufgabe“</b>.':'Für diese Auswahl gibt es keine Aufgaben. Wähle eine andere Kombination.'}</div>`;$('#palCard').hidden=true;return}
+  const acid=ACID[t.acid],base=BASE[t.base],e=t.eqs[0],struct=isStruct(t);
+  const aDisp=acid.cat==='org'?molSVG(SP[acid.chain[0]].mol,26):spHTML(acid.chain[0]);
+  const bDisp=base.cat==='org'?molSVG(SP[base.part].mol,26):spHTML(base.unit);
+  const nmA=esc(acid.name)+(acid.triv?` <span style="color:var(--text-dim);font-weight:400">(${esc(acid.triv)})</span>`:'');
+  const nmB=esc(base.name)+(base.triv?` <span style="color:var(--text-dim);font-weight:400">(${esc(base.triv)})</span>`:'');
+  const amph=!!(acid.amph||base.amph);
+  let h=`<div class="taskhead"><div class="acidbox">${aDisp}</div><span class="plus-big">+</span><div class="basebox">${bDisp}</div><div class="tasktext"><div class="nm">${nmA} + ${nmB}</div>
+    <div style="margin:4px 0 6px">${amph?`<span class="tag amph">enthält einen Ampholyten</span>`:`<span class="tag">Säure: ${CATTXT[acid.cat]}</span><span class="tag">Base: ${CATTXT[base.cat]}</span>`}<span class="tag">${LVLTXT[comboLvl(acid,base)]}</span></div>${st.pk?pkLine(acid,base):''}
+    ${amph?'Eines der beiden Teilchen ist ein <b>Ampholyt</b>: Es kann ein Proton abgeben oder aufnehmen. Entscheide, als Säure oder als Base es hier reagiert, und stelle die Gleichung für die <b>vollständige Neutralisation</b> auf.'+(st.pk?'':' <span style="color:var(--text-dim)">(Hilfe: links „pKs- und pKb-Werte anzeigen“.)</span>'):'Stelle die Gleichung für die <b>vollständige Neutralisation</b> auf: Welche Teilchen reagieren, welche entstehen, in welchem Verhältnis?'}</div></div>
+    <div style="margin-top:10px"><button id="btnSchema">${st.showSchema?'Schema ausblenden':'Schema einblenden'}</button></div>`;
+  if(!struct&&st.inp==='free')h+='<p class="hint">Tippe die Formeln ein. Ladungen schreibst du mit ^ (z. B. SO4^2-, OH-), den stöchiometrischen Faktor trägst du im kleinen Feld vor der Formel ein (Standard 1).'+(t.exp.alt?' Die Gleichung darfst du auch mit dem Salz schreiben (z. B. NaNO3, Ca3(PO4)2).':'')+'</p>';
+  if(st.showSchema){
+    h+=`<div class="schema">Säure + Base ⟶ korrespondierende Base + korrespondierende Säure<br>
+      <span style="font-family:var(--mono)">HA + OH<sup>−</sup> ⟶ A<sup>−</sup> + H<sub>2</sub>O</span> (Hydroxide)<br>
+      <span style="font-family:var(--mono)">HA + NH<sub>3</sub> ⟶ A<sup>−</sup> + NH<sub>4</sub><sup>+</sup></span> (Ammoniak, ebenso Amine)<br>
+      Protonenbilanz: Säureteilchen · abgebbare H<sup>+</sup> = Baseteilchen · aufnehmbare H<sup>+</sup><br>Anorganische Aufgaben auch mit Salz: <span style="font-family:var(--mono)">HA + MOH ⟶ MA + H<sub>2</sub>O</span> (Base als Formeleinheit, Salz aus Kation der Base und Anion der Säure)</div>`;
+  }
+  const cur=!e.done;
+  const state=e.done?(e.sol?'<span class="amb-t">Lösung eingesetzt *</span>':(e.first?'<span class="ok-t">✓ beim 1. Versuch richtig</span>':`<span class="ok-t">✓ richtig nach ${e.attempts} Versuchen</span>`)):(e.attempts?`${e.attempts} Versuch${e.attempts>1?'e':''}`:'');
+  h+=`<div class="eq ${e.done?'done':'cur'}" data-e="0"><div class="eqhead"><span>Neutralisationsgleichung</span><span class="eqstate">${state}</span></div>`;
+  if(struct&&cur)h+='<div class="hint" style="margin:0 0 8px">Organische Teilchen: Die Strukturformeln links sind vorgegeben, die Produkte (rechts) beginnen als Kopie der Edukte. Wähle ein Werkzeug und tippe auf Atome der Produkte. Anorganische Teilchen trägst du selbst ein.'+(t.exp.opt?' Die gestrichelten Felder für das Zuschauerion (Kation der Base) sind freiwillig. Alternativ: Base als Formeleinheit (z. B. NaOH) links und das Kation rechts neben dem Anion der Säure (Gleichung mit Salz).':'')+'</div>';
+  h+='<div class="eqline">';
+  let shown=0,arr=false;
+  e.slots.forEach((s,k)=>{
+    if(e.done&&s.kind==='txt'&&!s.id)return;
+    if(k>=e.nL&&!arr){h+='<span class="op arr">⟶</span>';arr=true}else if(shown)h+='<span class="op">+</span>';
+    shown++;h+=slotHTML(t,e,k,cur);
+  });
+  h+='</div>';
+  if(cur&&st.inp==='free'&&e.slots.some(s=>s.kind==='txt'))h+='<div class="eqbtns" style="margin-top:8px"><span class="hint" style="margin:0 4px 0 0;align-self:center">Eingabehilfe:</span><button data-ins="^" aria-label="Hochstellen">^</button><button data-ins="+">+</button><button data-ins="-">−</button></div>';
+  if(cur&&e.slots.some((s,k)=>s.kind==='mol'&&k>=e.nL)){
+    const tools=[['delH','H-Atom löschen'],['addH','H-Atom anfügen'],['neg','Ladung −'],['pos','Ladung +']];
+    h+=`<div class="tools"><span class="hint" style="margin:0 4px 0 0;align-self:center">Werkzeug:</span>${tools.map(([v,l])=>`<button class="tool ${t.tool===v?'on':''}" data-tool="${v}">${l}</button>`).join('')}<button data-act="undo" ${e.undo&&e.undo.length?'':'disabled'}>↶ Rückgängig</button></div>`;
+  }
+  if(cur)h+=`<div class="eqbtns"><button class="primary" data-act="check">Prüfen</button><button data-act="tip">Tipp</button><button data-act="sol" ${e.attempts?'':'disabled'}>Lösung zeigen</button><button data-act="reset">Zurücksetzen</button></div>`;
+  if(e.fb)h+=`<div class="fb ${e.fb.cls}">${e.fb.html}</div>`;
+  h+='</div>';
+  if(t.complete)h+=`<div class="done-msg"><b>Aufgabe abgeschlossen.</b> ${e.first?'Die Gleichung war beim ersten Versuch richtig.':'Weiter mit „Neue Aufgabe“.'}${e.first?' Weiter mit „Neue Aufgabe“.':''}</div>`;
+  card.innerHTML=h;
+  const pc=$('#palCard');pc.hidden=t.complete||st.inp!=='tiles'||!e.slots.some(s=>s.kind==='txt');
+  if(!pc.hidden)$('#pal').innerHTML=t.tiles.map(id=>`<button class="tile" data-id="${id}" aria-label="${esc(SP[id].name)}">${spHTML(id,23)}</button>`).join('');
+}
+function allTasks(){return st.hist.concat(st.task&&!st.task.inHist?[st.task]:[])}
+function calcStats(list){
+  let tasks=0,eqs=0,first=0,sol=0;
+  (list||allTasks()).forEach(t=>{if(t.complete)tasks++;t.eqs.forEach(e=>{if(e.done){eqs++;if(e.first)first++;if(e.sol)sol++}})});
+  return{tasks,eqs,first,sol,q:eqs?Math.round(100*first/eqs):null};
+}
+function renderStats(){
+  const s=calcStats();
+  $('#stats').innerHTML=`<span>Aufgaben vollständig gelöst</span><span>${s.tasks}</span><span>Gleichungen abgeschlossen</span><span>${s.eqs}</span><span>beim 1. Versuch richtig</span><span>${s.first}</span><span>Lösung angesehen</span><span>${s.sol}</span><span>Serie (richtig in Folge)</span><span>${st.streak}</span><span><b>Erfolgsquote</b></span><span>${s.q===null?'–':s.q+' %'}</span>`;
+  $('#status').textContent=s.q===null?'Bereit':`Erfolgsquote ${s.q} % (${s.first}/${s.eqs})`;
+}
+function eqOfSlots(sl,nL,sc){const f=a=>a.filter(s=>s.mol||s.id).map(s=>[s.c,s.mol||s.id]);return eqHTML(f(sl.slice(0,nL)),f(sl.slice(nL)),sc||13)}
+const hasMol=t=>t.eqs[0].slots.some(s=>s.kind==='mol');
+function renderHist(){
+  const list=allTasks().filter(t=>t.eqs.some(e=>e.done));
+  if(!list.length){$('#hist').innerHTML='<div class="hint">Noch keine Aufgaben bearbeitet.</div>';return}
+  $('#hist').innerHTML=list.slice().reverse().map(t=>{
+    const a=ACID[t.acid],b=BASE[t.base],e=t.eqs[0];
+    return `<div class="hitem"><div class="hn">${esc(a.name)} + ${esc(b.name)} <span class="tag">${LVLTXT[comboLvl(a,b)]}</span></div>
+      <div class="hrow">${e.first?'<span class="ok-t">✓</span>':e.sol?'<span class="amb-t">*</span>':`<span class="bad-t">${e.attempts}×</span>`}${eqOfSlots(e.slots,e.nL,hasMol(t)?15:13)}</div></div>`;
+  }).join('');
+}
+/* pKs-/pKb-Werte in der Aufgabenstellung (Option) */
+function pkVals(sym,arr){return arr.length===1?`pK<sub>${sym}</sub> = <b>${arr[0]}</b>`:arr.map((v,i)=>`pK<sub>${sym}${i+1}</sub> = <b>${v}</b>`).join(', ')}
+function pkLine(acid,base){
+  const part=(x,role)=>{
+    if(x.amph)return `<span class="pk">${esc(x.name)} (Ampholyt): ${pkVals('s',x.pks)}, ${pkVals('b',x.pkb)}</span>`;
+    if(role==='s')return `<span class="pk">${esc(x.name)}: ${pkVals('s',x.pks)}</span>`;
+    const row=PKB_ROWS.find(r=>r.ids.includes(x.id));
+    return row?`<span class="pk">${esc(row.label)}: ${pkVals('b',row.v)}</span>`:'';
+  };
+  return `<div class="pkline">${part(acid,'s')}${part(base,'b')}</div>`;
+}
+const LVLINFO={1:'Einprotonige Säure und einwertige Base (Verhältnis 1 : 1).',2:'Zweiprotonige Säuren; zweiwertige Basen (Ca(OH)₂, Ba(OH)₂, Carbonat-Ion); organisch auch Säuren mit weiteren Gruppen (–Cl, –OH) und Dimethylamin.',3:'Dreiprotonige Säuren, zweiprotonige Säuren mit zweiwertigen Basen, Hydroxycarbonsäuren, Ethan-1,2-diamin und Ampholyte (HCO₃⁻, HSO₃⁻, HS⁻, H₂PO₄⁻, HPO₄²⁻) mit starker Säure oder Base.'};
+function render(){
+  document.querySelectorAll('#segAc button').forEach(b=>b.setAttribute('aria-pressed',String(!!st.ac[b.dataset.v])));
+  document.querySelectorAll('#segBa button').forEach(b=>b.setAttribute('aria-pressed',String(!!st.ba[b.dataset.v])));
+  document.querySelectorAll('#segLvl button').forEach(b=>b.classList.toggle('on',+b.dataset.v===st.lvl));
+  $('#chkPk').checked=st.pk;
+  document.querySelectorAll('#segInp button').forEach(b=>b.classList.toggle('on',b.dataset.v===st.inp));
+  $('#lvlInfo').textContent=LVLINFO[st.lvl];
+  renderTask();renderStats();renderHist();
+}
+
+/* ============ Interaktion ============ */
+let lastInput=null;
+function nextEmpty(e,from){const n=e.slots.length;for(let k=1;k<=n;k++){const s=(from+k)%n;if(e.slots[s].kind==='txt'&&!e.slots[s].id)return s}return from}
+const card=$('#taskCard');
+function editSnap(e){return e.slots.map((s,k)=>(s.kind==='mol'&&k>=e.nL)?cloneMol(s.mol):null)}
+function editAtom(t,si,ai){
+  const e=t.eqs[0];if(e.done)return;
+  const s=e.slots[si];if(!s||s.kind!=='mol'||si<e.nL)return;
+  const m=s.mol,a=m.a[ai];if(!a||a.del)return;
+  e.undo.push(editSnap(e));if(e.undo.length>40)e.undo.shift();
+  const tool=t.tool;e.fb=null;let bad=null;
+  if(tool==='delH'){if(a.el==='H')a.del=true;else bad='Mit „H-Atom löschen“ tippst du direkt auf das H-Atom, das entfernt werden soll.'}
+  else if(tool==='addH'){if(a.el!=='H')addH(m,ai);else bad='Mit „H-Atom anfügen“ tippst du auf das Atom, an das ein H-Atom gebunden werden soll (nicht auf ein H-Atom).'}
+  else{const v=tool==='neg'?-1:1;if(a.el!=='H')a.c=a.c===v?0:v;else bad='Ladungen setzt du an Atomen wie O oder N, nicht an H-Atomen.'}
+  if(bad){e.fb={cls:'tip',html:bad};e.undo.pop()}
+}
+card.addEventListener('pointerdown',ev=>{if(ev.target.closest('[data-ins]'))ev.preventDefault()});
+card.addEventListener('focusin',ev=>{if(ev.target.matches('input.finp'))lastInput=ev.target;if(ev.target.matches('input.fcf'))ev.target.select()});
+card.addEventListener('input',ev=>{
+  const inp=ev.target.closest('input.finp,input.fcf');if(!inp||!st.task)return;
+  const s=st.task.eqs[0].slots[+inp.dataset.s];
+  if(inp.classList.contains('fcf'))s.fc=inp.value;else s.txt=inp.value;
+  inp.closest('.fslot').querySelector('.pv').innerHTML=preview(s.txt,s.fc);
+});
+card.addEventListener('keydown',ev=>{
+  const inp=ev.target.closest('input.finp,input.fcf');if(!inp||ev.key!=='Enter')return;
+  ev.preventDefault();
+  const all=[...card.querySelectorAll('input.finp,input.fcf')],ix=all.indexOf(inp);
+  if(ix<all.length-1)all[ix+1].focus();else{const b=card.querySelector('button[data-act=check]');if(b)b.click()}
+});
+/* Leere Felder sind nur erlaubt, wenn die Salzschreibweise weniger Produkte hat (z. B. NH3 + HCl ⟶ NH4Cl): dann darf ein Produktfeld leer bleiben */
+function emptyOk(t,e,emp,tiles){
+  emp=emp.filter(k=>e.slots[k].role!=='cat');
+  if(!emp.length)return true;
+  const nR=e.slots.length-e.nL,A=t.exp.alt;
+  if(!A||A.R.length>=nR)return false;
+  const rightFilled=e.slots.filter((s,k)=>k>=e.nL&&s.kind==='txt'&&!emp.includes(k)).length;
+  return emp.every(k=>k>=e.nL)&&rightFilled>=A.R.length;
+}
+card.addEventListener('click',ev=>{
+  const t=st.task;if(!t)return;
+  const e=t.eqs[0];
+  if(ev.target.closest('#btnSchema')){st.showSchema=!st.showSchema;renderTask();return}
+  const ins=ev.target.closest('button[data-ins]');
+  if(ins){
+    const inp=(lastInput&&document.contains(lastInput))?lastInput:card.querySelector('input.finp');
+    if(inp){const a=inp.selectionStart??inp.value.length,b=inp.selectionEnd??a;inp.value=inp.value.slice(0,a)+ins.dataset.ins+inp.value.slice(b);inp.focus();inp.setSelectionRange(a+1,a+1);inp.dispatchEvent(new Event('input',{bubbles:true}))}
+    return;
+  }
+  const tl=ev.target.closest('button[data-tool]');if(tl){t.tool=tl.dataset.tool;renderTask();return}
+  const hit=ev.target.closest('[data-atom]');
+  if(hit){const svg=hit.closest('svg');editAtom(t,+svg.dataset.s,+hit.dataset.atom);renderTask();return}
+  const cf=ev.target.closest('.cf');
+  if(cf){ev.stopPropagation();if(e.done)return;const k=+cf.dataset.s,s=e.slots[k];s.c=s.c%9+1;if(s.kind==='txt')t.act={e:0,s:k};e.fb=null;renderTask();return}
+  const sl=ev.target.closest('.slot');
+  if(sl){const si=+sl.dataset.s;if(e.done)return;
+    if(t.act.s===si&&e.slots[si].id){e.slots[si].id=null;e.slots[si].c=1;e.slots[si].txt='';e.fb=null}
+    t.act={e:0,s:si};renderTask();return}
+  const b=ev.target.closest('button[data-act]');if(!b)return;
+  const act=b.dataset.act;
+  if(act==='reset'){resetEq(t,e);e.fb=null}
+  else if(act==='undo'){const u=e.undo&&e.undo.pop();if(u){u.forEach((m,k)=>{if(m)e.slots[k].mol=m})}e.fb=null}
+  else if(act==='tip'){e.tip=true;e.fb={cls:'tip',html:'<b>Tipp:</b> '+tipText(t)}}
+  else if(act==='check'){
+    const ts=e.slots.map((s,k)=>[s,k]).filter(([s])=>s.kind==='txt');
+    if(st.inp==='free'){
+      const ps=ts.map(([s])=>{
+        const p=parseTerm(s.txt);if(p.empty||p.err)return p;
+        const f=fcParse(s.fc);if(f.err)return{err:f.err};
+        if(p.c>1&&f.c!==1)return{err:'Schreibe den Faktor nur in das Feld vor der Formel, nicht zusätzlich in die Formel.'};
+        return{id:p.id,c:p.c>1?p.c:f.c,strip:p.c>1};
+      });
+      const emp=ps.map((p,j)=>p.empty?ts[j][1]:-1).filter(k=>k>=0);
+      if(emp.length&&!emptyOk(t,e,emp)){e.fb={cls:'bad',html:'Fülle alle Felder aus: links die Edukte (Säure und Base), rechts die Produkte.'};renderTask();return}
+      const bi=ps.findIndex(p=>p.err);
+      if(bi>=0){
+        const [s,k]=ts[bi],er=ps[bi].err;
+        const m=er==='unknown'?`Das Teilchen „${esc(s.txt)}“ wird nicht erkannt. Prüfe Formel und Ladung (Schreibweise z. B. SO4^2-, OH-, 2 H2O; Salze als Formel, z. B. NaNO3).`
+          :er==='salt'?`„${esc(s.txt)}“ passt nicht zu dieser Aufgabe. Bei vollständiger Neutralisation besteht das Salz aus dem Kation der Base und dem Anion der Säure, die keine abgebbaren Protonen mehr enthält.`:esc(er);
+        e.fb={cls:'bad',html:`Feld ${k+1}: ${m}`};renderTask();return;
+      }
+      ps.forEach((p,j)=>{const s=ts[j][0];if(p.empty){s.id=null;s.c=1}else{s.id=p.id;s.c=p.c;s.fc=String(p.c);if(p.strip)s.txt=s.txt.replace(/^\s*\d+\s*/,'')}});
+    }else if(!emptyOk(t,e,ts.filter(([s])=>!s.id).map(([,k])=>k),true)){e.fb={cls:'bad',html:'Wähle für alle Felder ein Teilchen: Feld antippen, dann unten das Teilchen.'};renderTask();return}
+    const r=evalEq(t,e);
+    e.attempts++;
+    if(r.ok){e.done=true;e.first=e.attempts===1;st.streak=e.first?st.streak+1:0;e.fb={cls:'good',html:okFeedback(t,e)};finishEq(t)}
+    else{st.streak=0;e.fb={cls:'bad',bad:true,html:r.m}}
+  }else if(act==='sol'){
+    solveEq(t,e);
+    e.done=true;e.sol=true;e.first=false;st.streak=0;
+    e.fb={cls:'tip',html:'Lösung eingesetzt (im Verlauf und im PDF mit * gekennzeichnet). '+okFeedback(t).replace('Richtig! ','')};finishEq(t);
+  }
+  render();
+});
+function finishEq(t){if(t.eqs.every(e=>e.done)){t.complete=true;if(!t.inHist){t.inHist=true;st.hist.push(t)}}}
+$('#pal').addEventListener('click',ev=>{
+  const b=ev.target.closest('.tile');const t=st.task;if(!b||!t||t.complete)return;
+  const e=t.eqs[0];let si=t.act.s;
+  if(!e.slots[si]||e.slots[si].kind!=='txt')si=nextEmpty(e,si);
+  if(!e.slots[si]||e.slots[si].kind!=='txt')return;
+  e.slots[si].id=b.dataset.id;e.fb=null;
+  t.act={e:0,s:nextEmpty(e,si)};
+  renderTask();
+});
+function catToggle(key,ev,infoMsg){
+  const b=ev.target.closest('button');if(!b)return;
+  const v=b.dataset.v,grp=st[key],on=!grp[v];
+  if(!on&&!Object.keys(grp).some(k=>k!==v&&grp[k])){
+    const el=$('#catInfo'),old=el.textContent;el.textContent='Mindestens eine Art muss gewählt bleiben.';setTimeout(()=>{el.textContent=old},2200);return;
+  }
+  grp[v]=on;render();
+}
+$('#segAc').addEventListener('click',ev=>catToggle('ac',ev));
+$('#segBa').addEventListener('click',ev=>catToggle('ba',ev));
+$('#segLvl').addEventListener('click',ev=>{const b=ev.target.closest('button');if(!b)return;st.lvl=+b.dataset.v;render()});
+$('#segInp').addEventListener('click',ev=>{const b=ev.target.closest('button');if(!b)return;st.inp=b.dataset.v;syncMode();render()});
+$('#btnNew').addEventListener('click',newTask);
+$('#chkPk').addEventListener('change',ev=>{st.pk=ev.target.checked;render()});
+
+/* ============ Modale ============ */
+function openM(id){$(id).hidden=false}
+document.querySelectorAll('.modal').forEach(m=>{m.addEventListener('click',ev=>{if(ev.target===m||ev.target.closest('[data-close]'))m.hidden=true})});
+$('#lnkAnl').addEventListener('click',ev=>{ev.preventDefault();openM('#mAnl')});
+$('#lnkVer').addEventListener('click',ev=>{ev.preventDefault();openM('#mVer')});
+
+/* ============ Grundlagen ============ */
+const GB=[
+ {t:'Neutralisation – Säure trifft Base',h:()=>`
+  <p>Bei einer <b>Neutralisation</b> reagiert eine Säure mit einer Base. Nach Brönsted geht dabei ein <b>Proton</b> (H⁺) von der Säure (<b class="c-ac">Protonendonator</b>) auf die Base (<b class="c-ba">Protonenakzeptor</b>) über.</p>
+  <p>Beispiel Salzsäure und Natronlauge: In der Lösung liegen die Ionen H₃O⁺, Cl⁻, Na⁺ und OH⁻ vor. Entscheidend ist die Reaktion von Oxonium- und Hydroxid-Ionen zu Wasser:</p>
+  <div class="fig">${eqHTML([[1,'H3O+'],[1,'OH-']],[[2,'H2O']])}</div>
+  <p>Zurück bleiben Na⁺- und Cl⁻-Ionen: Die Lösung enthält das Salz Natriumchlorid. Allgemein entstehen bei einer Neutralisation <b>Wasser</b> (bei Hydroxiden) und ein <b>Salz</b> (aus dem Kation der Base und dem Anion der Säure).</p>
+  <p>„Neutral“ (pH 7) ist die Lösung nur, wenn Säure und Base in genau passender Stoffmenge zusammenkommen <i>und</i> das Salz selbst neutral reagiert. Natriumethanoat zum Beispiel reagiert in Wasser schwach basisch.</p>
+  <p>In dieser Übung stellst du die Gleichung als <b>Teilchengleichung nach Brönsted</b> auf: Die Säure gibt ihre Protonen direkt an die Base ab.</p>`},
+ {t:'Teilchengleichung und Gleichung mit Salz',h:()=>`
+  <p>Salze und Hydroxide liegen in Wasser als Ionen vor. Ein Teil dieser Ionen verändert sich bei der Neutralisation nicht – sie sind <b>Zuschauerionen</b>. Beim Natriumhydroxid ist das das Na⁺-Ion; als Base reagiert nur das Hydroxid-Ion OH⁻.</p>
+  <p><b>Teilchengleichung</b> nach Brönsted (ohne Zuschauerionen):</p>
+  <div class="fig">${eqHTML([[1,'HCl'],[1,'OH-']],[[1,'Cl-'],[1,'H2O']])}</div>
+  <p><b>Gleichung mit Salz</b> (Formelgleichung): Die Base steht als Formeleinheit, das Salz entsteht aus dem Kation der Base und dem Anion der Säure:</p>
+  <div class="fig">${eqHTML([[1,'HCl'],[1,'NaOH']],[[1,'NaCl'],[1,'H2O']])}</div>
+  <p>Beide Schreibweisen beschreiben dieselbe Reaktion und werden bei anorganischen Aufgaben akzeptiert. Mischen darfst du sie nicht: Ein Na⁺-Ion gehört nicht in die Teilchengleichung, ein OH⁻-Ion nicht in die Gleichung mit Salz.</p>
+  <ul><li>Die Indizes im Salz folgen aus den Ladungen, z. B. Ca₃(PO₄)₂ aus 3 Ca²⁺ und 2 PO₄³⁻ oder (NH₄)₂SO₄ aus 2 NH₄⁺ und SO₄²⁻.</li>
+  <li>Ammoniak ist selbst die Base; das Salz ist ein Ammoniumsalz, z. B. NH₃ + HCl ⟶ NH₄Cl.</li>
+  <li>Bei organischen Teilchen gibt es nur die Teilchengleichung mit Strukturformeln.</li></ul>`},
+ {t:'Basen: Hydroxide, Ammoniak, Carbonat, Amine',h:()=>`
+  <p><b>Metallhydroxide</b> (NaOH, KOH, Ca(OH)₂, Ba(OH)₂) liegen gelöst als Metall-Kation und Hydroxid-Ionen vor. Das <b>Hydroxid-Ion</b> nimmt ein Proton auf: OH⁻ + H⁺ → H₂O. Ca(OH)₂ und Ba(OH)₂ liefern je Formeleinheit zwei OH⁻-Ionen.</p>
+  <p><b>Ammoniak</b> und <b>Amine</b> binden das Proton über das freie Elektronenpaar am Stickstoff-Atom. Es entsteht kein Wasser, sondern ein Ammonium-Ion bzw. ein Alkylammonium-Ion:</p>
+  <div class="fig">${eqHTML([[1,'HCl'],[1,'NH3']],[[1,'Cl-'],[1,'NH4+']])}</div>
+  <div class="fig">${eqHTML([[1,'HCl'],[1,'meam0']],[[1,'Cl-'],[1,'meam1']],20)}</div>
+  <p>Das <b>Carbonat-Ion</b> (Soda, Na₂CO₃) kann zwei Protonen aufnehmen. Es entsteht Kohlensäure, die weiter in CO₂ und Wasser zerfällt:</p>
+  <div class="fig">${eqHTML([[2,'HCl'],[1,'CO3(2-)']],[[2,'Cl-'],[1,'H2CO3']])}</div>
+  <p>Das <b>Diamin</b> Ethan-1,2-diamin hat zwei Stickstoff-Atome mit freiem Elektronenpaar und nimmt deshalb bis zu zwei Protonen auf.</p>`},
+ {t:'Koeffizienten bestimmen',h:()=>`
+  <p>Bei der vollständigen Neutralisation gilt die <b>Protonenbilanz</b>:</p>
+  <p style="text-align:center"><b>Zahl der Säureteilchen · abgebbare H⁺ = Zahl der Baseteilchen · aufnehmbare H⁺</b></p>
+  <ol><li>Teilchen bestimmen (bei Metallhydroxiden ist die Base das OH⁻-Ion).</li>
+  <li>Zählen, wie viele Protonen ein Säureteilchen abgeben und ein Baseteilchen aufnehmen kann.</li>
+  <li>Teilchenzahlen so wählen, dass abgegebene und aufgenommene Protonen gleich sind – mit den <b>kleinsten ganzen Zahlen</b>.</li>
+  <li>Kontrolle: Atome und Ladungen müssen auf beiden Seiten übereinstimmen.</li></ol>
+  <p>Beispiel Schwefelsäure (2 H⁺) mit OH⁻ (nimmt 1 H⁺ auf) – Verhältnis 1 : 2:</p>
+  <div class="fig">${eqHTML([[1,'H2SO4'],[2,'OH-']],[[1,'SO4(2-)'],[2,'H2O']])}</div>
+  <p>Beispiel Phosphorsäure (3 H⁺) mit Calciumhydroxid, als Gleichung mit Salz – Verhältnis 2 : 3:</p>
+  <div class="fig">${eqHTML([[2,'H3PO4'],[3,'Ca(OH)2']],[[1,'Ca3(PO4)2'],[6,'H2O']])}</div>
+  <p>Kontrolle der Atome: links 12 H, 2 P, 14 O, 3 Ca; rechts 12 H (in 6 H₂O), 2 P, 14 O (8 + 6) und 3 Ca ✓. Als Teilchengleichung gilt (nach Kürzen): H₃PO₄ + 3 OH⁻ ⟶ PO₄³⁻ + 3 H₂O.</p>`},
+ {t:'pKs- und pKb-Werte',h:()=>`
+  <p>Der <b>pKs-Wert</b> einer Säure ist der negative dekadische Logarithmus ihrer Säurekonstante Ks, der <b>pKb-Wert</b> einer Base der negative dekadische Logarithmus ihrer Basenkonstante Kb.</p>
+  <ul><li><b>Je kleiner der pKs-Wert, desto stärker die Säure.</b> Beispiel: HCl (pKs ≈ −6) gibt Protonen praktisch vollständig ab, Ethansäure (pKs 4,76) nur zu einem kleinen Teil.</li>
+  <li><b>Je kleiner der pKb-Wert, desto stärker die Base.</b> Das Hydroxid-Ion ist mit pKb −1,74 eine sehr starke Base, Ammoniak (pKb 4,75) eine schwache.</li>
+  <li>Für ein korrespondierendes Säure-Base-Paar gilt bei 25 °C: <b>pKs + pKb = 14</b>. Ammoniak: pKb 4,75 → Ammonium-Ion: pKs 9,25.</li>
+  <li>Mehrprotonige Säuren haben für jede Protolysestufe einen eigenen pKs-Wert; die erste Stufe ist die stärkste.</li></ul>
+  <p><b>Ampholyte</b> können Protonen abgeben und aufnehmen, z. B. HCO₃⁻: als Säure (pKs 10,33) wird es zu CO₃²⁻, als Base (pKb 7,65) zu H₂CO₃. Wie ein Ampholyt reagiert, hängt vom Partner ab: Gegenüber einer starken Base (OH⁻) ist es die Säure, gegenüber einer starken Säure (z. B. HCl) die Base. Der pKb-Wert eines Ampholyten ergibt sich aus pKs + pKb = 14 mit dem pKs-Wert seiner korrespondierenden Säure (HCO₃⁻: 14 − 6,35 = 7,65).</p>
+  <p>Je weiter die pKs- und pKb-Werte der Reaktionspartner auseinander liegen, desto vollständiger läuft die Neutralisation ab. Bei einer schwachen Säure mit einer schwachen Base (z. B. HCN und NH₃) stellt sich dagegen ein Gleichgewicht (⇌) ein.</p>
+  <p>In dieser Übung dient die Tabelle der <b>Information</b>: Alle Neutralisationen werden vereinfachend als vollständig angenommen (Reaktionspfeil ⟶).</p>`},
+ {t:'Organische Säuren und Basen',h:()=>`
+  <p><b>Carbonsäuren</b> geben das H-Atom ihrer Carboxygruppe (–COOH) ab; es entsteht die Carboxylatgruppe (–COO⁻). H-Atome an C-Atomen und Hydroxygruppen (–OH) werden nicht abgegeben.</p>
+  <p><b>Amine</b> nehmen das Proton am Stickstoff-Atom auf: Aus –NH₂ wird –NH₃⁺. Zeichnerisch: H-Atom anfügen und die Ladung + setzen.</p>
+  <div class="fig">${eqHTML([[1,'eth0'],[1,'meam0']],[[1,'eth1'],[1,'meam1']],20)}</div>
+  <p>Bei mehrprotonigen Säuren und mehrwertigen Basen passen die Koeffizienten nach der Protonenbilanz. Beispiel: Ethandisäure (2 H⁺) und Methanamin (je 1 H⁺):</p>
+  <div class="fig">${eqHTML([[1,'oxal0'],[2,'meam0']],[[1,'oxal2'],[2,'meam1']],20)}</div>
+  <p>Das gelöste Salz setzt sich aus Kation und Anion zusammen. Im Beispiel entsteht Methylammoniumethandioat (Methylammoniumoxalat).</p>
+  <p>Organische Verbindungen werden als <b>Valenzstrichformeln</b> mit freien Elektronenpaaren dargestellt. Die freien Elektronenpaare ergänzt die Seite automatisch.</p>`}
+];
+let gbI=0;
+$('#gbN').textContent=GB.length;
+$('#gbList').innerHTML=GB.map((g,i)=>`<button data-i="${i}">${i+1}. ${esc(g.t)}</button>`).join('');
+$('#gbBtn').addEventListener('click',()=>{const l=$('#gbList');l.hidden=!l.hidden;$('#gbBtn').setAttribute('aria-expanded',String(!l.hidden));$('#gbArr').textContent=l.hidden?'▸':'▾'});
+$('#gbList').addEventListener('click',ev=>{const b=ev.target.closest('button');if(!b)return;showGb(+b.dataset.i)});
+function showGb(i){gbI=(i+GB.length)%GB.length;$('#gbTitle').textContent=GB[gbI].t;$('#gbBody').innerHTML=GB[gbI].h();$('#gbBody').scrollTop=0;$('#gbPos').textContent=`Thema ${gbI+1} von ${GB.length}`;openM('#mGb')}
+$('#gbPrev').addEventListener('click',()=>showGb(gbI-1));
+$('#gbNext').addEventListener('click',()=>showGb(gbI+1));
+document.addEventListener('keydown',ev=>{
+  if(ev.key==='Escape')document.querySelectorAll('.modal').forEach(m=>m.hidden=true);
+  if(!$('#mGb').hidden){if(ev.key==='ArrowRight')showGb(gbI+1);if(ev.key==='ArrowLeft')showGb(gbI-1)}
+});
+/* ============ QR-Code (Byte-Modus, Fehlerkorrektur L) ============ */
+const QR=(()=>{
+  const ECC=[7,10,15,20,26,18,20,24,30,18],NB=[1,1,1,1,1,2,2,2,2,4];
+  const raw=v=>{let r=(16*v+128)*v+64;if(v>=2){const n=Math.floor(v/7)+2;r-=(25*n-10)*n-55;if(v>=7)r-=36}return r};
+  const dataCw=v=>Math.floor(raw(v)/8)-ECC[v-1]*NB[v-1];
+  const mul=(x,y)=>{let z=0;for(let i=7;i>=0;i--){z=(z<<1)^((z>>>7)*0x11D);z^=((y>>>i)&1)*x}return z};
+  const divisor=d=>{const r=new Array(d).fill(0);r[d-1]=1;let root=1;for(let i=0;i<d;i++){for(let j=0;j<d;j++){r[j]=mul(r[j],root);if(j+1<d)r[j]^=r[j+1]}root=mul(root,2)}return r};
+  const rem=(data,div)=>{const r=new Array(div.length).fill(0);for(const b of data){const f=b^r.shift();r.push(0);div.forEach((c,i)=>{r[i]^=mul(c,f)})}return r};
+  const bit=(x,i)=>((x>>>i)&1)!==0;
+  function make(text){
+    const bytes=[...new TextEncoder().encode(text)];
+    let ver=0;for(let v=1;v<=10;v++){if(4+(v<10?8:16)+8*bytes.length<=dataCw(v)*8){ver=v;break}}
+    if(!ver)throw new Error('Text zu lang');
+    const bits=[];const put=(val,n)=>{for(let i=n-1;i>=0;i--)bits.push((val>>>i)&1)};
+    put(4,4);put(bytes.length,ver<10?8:16);bytes.forEach(b=>put(b,8));
+    const cap=dataCw(ver)*8;put(0,Math.min(4,cap-bits.length));put(0,(8-bits.length%8)%8);
+    for(let p=0xEC;bits.length<cap;p^=0xEC^0x11)put(p,8);
+    const data=[];for(let i=0;i<bits.length;i+=8){let b=0;for(let j=0;j<8;j++)b=(b<<1)|bits[i+j];data.push(b)}
+    const nb=NB[ver-1],el=ECC[ver-1],rc=Math.floor(raw(ver)/8),ns=nb-rc%nb,sl=Math.floor(rc/nb),div=divisor(el),blocks=[];
+    for(let i=0,k=0;i<nb;i++){const d=data.slice(k,k+sl-el+(i<ns?0:1));k+=d.length;const e=rem(d,div);if(i<ns)d.push(0);blocks.push(d.concat(e))}
+    const all=[];for(let i=0;i<blocks[0].length;i++)blocks.forEach((b,j)=>{if(i!==sl-el||j>=ns)all.push(b[i])});
+    const size=ver*4+17,m=[],fn=[];for(let i=0;i<size;i++){m.push(new Array(size).fill(false));fn.push(new Array(size).fill(false))}
+    const sf=(x,y,d)=>{m[y][x]=d;fn[y][x]=true};
+    for(let i=0;i<size;i++){sf(6,i,i%2===0);sf(i,6,i%2===0)}
+    const finder=(x,y)=>{for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){const d=Math.max(Math.abs(dx),Math.abs(dy)),xx=x+dx,yy=y+dy;if(xx>=0&&xx<size&&yy>=0&&yy<size)sf(xx,yy,d!==2&&d!==4)}};
+    finder(3,3);finder(size-4,3);finder(3,size-4);
+    let pos=[];if(ver>1){const n=Math.floor(ver/7)+2,step=Math.ceil((ver*4+4)/(n*2-2))*2;pos=[6];for(let p=size-7;pos.length<n;p-=step)pos.splice(1,0,p)}
+    pos.forEach((px,i)=>pos.forEach((py,j)=>{if((i===0&&j===0)||(i===0&&j===pos.length-1)||(i===pos.length-1&&j===0))return;for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)sf(px+dx,py+dy,Math.max(Math.abs(dx),Math.abs(dy))!==1)}));
+    const fmt=mask=>{const d=(1<<3)|mask;let r=d;for(let i=0;i<10;i++)r=(r<<1)^((r>>>9)*0x537);const b=((d<<10)|r)^0x5412;
+      for(let i=0;i<=5;i++)sf(8,i,bit(b,i));sf(8,7,bit(b,6));sf(8,8,bit(b,7));sf(7,8,bit(b,8));for(let i=9;i<15;i++)sf(14-i,8,bit(b,i));
+      for(let i=0;i<8;i++)sf(size-1-i,8,bit(b,i));for(let i=8;i<15;i++)sf(8,size-15+i,bit(b,i));sf(8,size-8,true)};
+    fmt(0);
+    if(ver>=7){let r=ver;for(let i=0;i<12;i++)r=(r<<1)^((r>>>11)*0x1F25);const b=(ver<<12)|r;for(let i=0;i<18;i++){const c=bit(b,i),a=size-11+i%3,bb=Math.floor(i/3);sf(a,bb,c);sf(bb,a,c)}}
+    let k=0;for(let right=size-1;right>=1;right-=2){if(right===6)right=5;for(let v=0;v<size;v++)for(let j=0;j<2;j++){const x=right-j,up=((right+1)&2)===0,y=up?size-1-v:v;if(!fn[y][x]&&k<all.length*8){m[y][x]=bit(all[k>>>3],7-(k&7));k++}}}
+    const MF=[(x,y)=>(x+y)%2===0,(x,y)=>y%2===0,(x,y)=>x%3===0,(x,y)=>(x+y)%3===0,(x,y)=>(Math.floor(x/3)+Math.floor(y/2))%2===0,(x,y)=>x*y%2+x*y%3===0,(x,y)=>(x*y%2+x*y%3)%2===0,(x,y)=>((x+y)%2+x*y%3)%2===0];
+    const apply=mk=>{for(let y=0;y<size;y++)for(let x=0;x<size;x++)if(!fn[y][x]&&MF[mk](x,y))m[y][x]=!m[y][x]};
+    const pen=()=>{let p=0;
+      for(let t=0;t<2;t++)for(let a=0;a<size;a++){let run=1;for(let b=1;b<size;b++){const c=t?m[b][a]:m[a][b],d=t?m[b-1][a]:m[a][b-1];if(c===d){run++;if(run===5)p+=3;else if(run>5)p++}else run=1}}
+      for(let y=0;y<size-1;y++)for(let x=0;x<size-1;x++){const c=m[y][x];if(c===m[y][x+1]&&c===m[y+1][x]&&c===m[y+1][x+1])p+=3}
+      let dark=0;m.forEach(r=>r.forEach(c=>{if(c)dark++}));p+=Math.floor(Math.abs(dark*20-size*size*10)/(size*size))*10;return p};
+    let best=0,bp=1e9;for(let mk=0;mk<8;mk++){apply(mk);fmt(mk);const p=pen();if(p<bp){bp=p;best=mk}apply(mk)}
+    apply(best);fmt(best);return m;
+  }
+  function svg(text,px){const m=make(text),n=m.length,q=4,tot=n+2*q;let d='';
+    for(let y=0;y<n;y++)for(let x=0;x<n;x++)if(m[y][x])d+=`M${x+q},${y+q}h1v1h-1z`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${px}" height="${px}" viewBox="0 0 ${tot} ${tot}" shape-rendering="crispEdges" role="img" aria-label="QR-Code"><rect width="${tot}" height="${tot}" fill="#fff"/><path d="${d}" fill="#000"/></svg>`}
+  return{make,svg};
+})();
+const PAGE_URL='https://chemie.mail-baumgart.de/Q2/2-Neutralisationsgleichungen.html';
+
+/* ============ Zwischenstand ============ */
+const serMol=m=>({a:m.a.map(a=>[a.el,a.x,a.y,a.c||0,a.del?1:0]),b:m.b});
+function deserMol(o){
+  try{
+    if(!o||!Array.isArray(o.a)||!Array.isArray(o.b)||o.a.length>150||o.b.length>200)return null;
+    const OK=['C','H','O','Cl','N'];
+    const a=o.a.map(x=>{if(!Array.isArray(x)||!OK.includes(x[0])||!isFinite(x[1])||!isFinite(x[2]))throw 0;const r={el:x[0],x:+x[1],y:+x[2],c:[-1,0,1].includes(x[3])?x[3]:0};if(x[4])r.del=true;return r});
+    const b=o.b.map(x=>{if(!Array.isArray(x)||!(x[0]>=0&&x[0]<a.length&&x[1]>=0&&x[1]<a.length))throw 0;return[x[0]|0,x[1]|0,x[2]===2?2:1]});
+    return{a,b};
+  }catch(_){return null}
+}
+function serT(t){
+  return{acid:t.acid,base:t.base,tiles:t.tiles,inHist:t.inHist,eqs:t.eqs.map(e=>({
+    slots:e.slots.map((s,k)=>({id:s.id,c:s.c,txt:s.txt||'',fc:typeof s.fc==='string'?s.fc:undefined,mol:(s.kind==='mol'&&k>=e.nL)?serMol(s.mol):null})),
+    attempts:e.attempts,tip:e.tip,sol:e.sol}))};
+}
+function deserT(o){
+  const acid=ACID[o.acid],base=BASE[o.base];if(!acid||!base)throw new Error('Unbekannte Aufgabe');
+  const t=makeTask(acid,base);
+  if(Array.isArray(o.tiles)&&o.tiles.length===t.tiles.length&&o.tiles.every(id=>SP[id]))t.tiles=o.tiles;
+  const e=t.eqs[0],s0=(Array.isArray(o.eqs)&&o.eqs[0])||{},xs=Array.isArray(s0.slots)?s0.slots:[];
+  if(xs.length!==e.slots.length)throw new Error('Aufbau passt nicht');
+  e.slots.forEach((s,k)=>{
+    const x=xs[k]||{};s.c=[1,2,3,4,5,6,7,8,9].includes(x.c)?x.c:1;
+    if(s.kind==='txt'){s.id=(SP[x.id]&&SP[x.id].kind==='in')?x.id:null;s.txt=typeof x.txt==='string'?x.txt.slice(0,30):'';if(typeof x.fc==='string')s.fc=x.fc.slice(0,2);else delete s.fc}
+    else if(k>=e.nL){const mm=deserMol(x.mol);if(mm)s.mol=mm}
+  });
+  e.attempts=Math.max(0,parseInt(s0.attempts)||0);e.tip=!!s0.tip;
+  if(e.slots.some(s=>s.kind==='txt'&&s.id)&&evalEq(t,e).ok===true){   // neu prüfen
+    e.done=true;e.sol=!!s0.sol;if(!e.attempts&&!e.sol)e.attempts=1;e.first=!e.sol&&e.attempts===1;
+    e.fb={cls:e.sol?'tip':'good',html:e.sol?'Lösung eingesetzt *':okFeedback(t,e)};
+  }
+  t.complete=e.done;
+  return t;
+}
+$('#btnSave').addEventListener('click',()=>{
+  const data={app:'Neutralisationsgleichungen',version:'1.0',gespeichert:new Date().toISOString(),ac:st.ac,ba:st.ba,lvl:st.lvl,pk:st.pk,inp:st.inp,streak:st.streak,
+    hist:st.hist.map(serT),task:st.task&&!st.task.inHist?serT(st.task):null};
+  const blob=new Blob([JSON.stringify(data)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Neutralisationsgleichungen_Zwischenstand.json';document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);
+  $('#ioMsg').textContent='Zwischenstand gespeichert (Ordner „Downloads“).';
+});
+$('#btnLoad').addEventListener('click',()=>$('#fileLoad').click());
+$('#fileLoad').addEventListener('change',ev=>{
+  const f=ev.target.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{try{
+    const d=JSON.parse(r.result);if(d.app!=='Neutralisationsgleichungen')throw new Error('Keine Datei dieser Übung');
+    const hist=(d.hist||[]).map(deserT).filter(t=>t.eqs.some(e=>e.done));hist.forEach(t=>t.inHist=true);
+    const task=d.task?deserT(d.task):null;
+    st.hist=hist;st.task=task;if(task&&task.complete){task.inHist=true;st.hist.push(task)}
+    const g=(o,def)=>{const r={anorg:!!(o&&o.anorg),org:!!(o&&o.org)};return(r.anorg||r.org)?r:def};
+    st.ac=g(d.ac,{anorg:true,org:false});st.ba=g(d.ba,{anorg:true,org:false});
+    st.lvl=[1,2,3].includes(d.lvl)?d.lvl:1;st.pk=!!d.pk;st.inp=d.inp==='tiles'?'tiles':'free';st.streak=Math.max(0,parseInt(d.streak)||0);
+    syncMode();
+    $('#ioMsg').textContent='Zwischenstand geladen – alle Gleichungen wurden neu geprüft.';render();
+  }catch(err){$('#ioMsg').textContent='Die Datei konnte nicht geladen werden ('+err.message+').'}
+  ev.target.value=''};
+  r.readAsText(f);
+});
+
+/* ============ QR ============ */
+$('#qrSmall').innerHTML=QR.svg(PAGE_URL,66);$('#qrBig').innerHTML=QR.svg(PAGE_URL,520);
+const qrM=$('#qrModal'),qrOpen=()=>{qrM.classList.add('open');$('#qrClose').focus()},qrShut=()=>{qrM.classList.remove('open');$('#qrBtn').focus()};
+$('#qrBtn').addEventListener('click',qrOpen);$('#qrClose').addEventListener('click',qrShut);
+qrM.addEventListener('click',ev=>{if(ev.target===qrM)qrShut()});
+document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&qrM.classList.contains('open'))qrShut()});
+
+/* ============ PDF ============ */
+const pdfSel=()=>allTasks().filter(t=>t.eqs.some(e=>e.done));
+function pdfStat(){
+  const s=calcStats(pdfSel());
+  $('#pdfStat').innerHTML=`<span>Aufgaben vollständig gelöst</span><span>${s.tasks}</span><span>Gleichungen abgeschlossen</span><span>${s.eqs}</span><span>beim 1. Versuch richtig</span><span>${s.first}</span><span>Lösung angesehen</span><span>${s.sol}</span><span><b>Erfolgsquote</b></span><span>${s.q===null?'–':s.q+' %'}</span>`;
+  $('#btnPrint').disabled=!s.eqs;
+}
+$('#btnPdf').addEventListener('click',()=>{pdfStat();openM('#mPdf')});
+function buildPrint(){
+  const list=pdfSel(),s=calcStats(list);
+  let h=`<h1>Neutralisationsgleichungen – Zusammenfassung</h1>
+  <table class="meta"><tr><td>Name: <span class="line">${esc($('#pName').value)}&nbsp;</span></td><td>Kurs: <span class="line">${esc($('#pKurs').value)}&nbsp;</span></td><td>Datum: <span class="line">${new Date().toLocaleDateString('de-DE')}&nbsp;</span></td></tr></table>
+  <table class="sum"><tr><td>Aufgaben vollständig gelöst:</td><td><b>${s.tasks}</b></td><td>Gleichungen abgeschlossen:</td><td><b>${s.eqs}</b></td></tr>
+  <tr><td>beim 1. Versuch richtig:</td><td><b>${s.first}</b></td><td>Lösung angesehen (*):</td><td><b>${s.sol}</b></td></tr>
+  <tr><td><b>Erfolgsquote:</b></td><td><b>${s.q===null?'–':s.q+' %'}</b></td><td></td><td></td></tr></table>
+  <p class="small">Erfolgsquote = Anteil der abgeschlossenen Gleichungen, die beim ersten Prüfen richtig waren. * = Lösung automatisch eingesetzt.</p>`;
+  list.forEach((t,i)=>{
+    const a=ACID[t.acid],b=BASE[t.base],e=t.eqs[0];
+    h+=`<div class="task"><h2>${i+1}. ${esc(a.name)} + ${esc(b.name)} – Säure ${CATTXT[a.cat]}, Base ${CATTXT[b.cat]}, ${LVLTXT[comboLvl(a,b)].toLowerCase()}${t.complete?'':' – unvollständig'}</h2>
+    <table><tr><th>aufgestellte Gleichung</th><th style="width:9%">Versuche</th><th style="width:20%">Bewertung</th></tr>`;
+    if(!e.done)h+=`<tr><td>nicht bearbeitet</td><td>${e.attempts}</td><td>–</td></tr>`;
+    else h+=`<tr><td>${eqOfSlots(e.slots,e.nL,hasMol(t)?16:15)}${e.sol?' *':''}</td><td>${e.attempts}</td><td>${e.sol?'Lösung eingesetzt *':e.first?'richtig (1. Versuch)':'richtig (nach Korrektur)'}${e.tip?', mit Tipp':''}</td></tr>`;
+    h+='</table></div>';
+  });
+  h+=`<div class="pfoot">Übung „Neutralisationsgleichungen“ V1.0 · Bastian Baumgart · chemie.mail-baumgart.de · Lizenz CC BY-NC-SA 4.0</div>`;
+  return h;
+}
+$('#btnPrint').addEventListener('click',()=>{
+  $('#print').innerHTML=buildPrint();$('#mPdf').hidden=true;
+  setTimeout(()=>window.print(),50);
+});
+
+render();
+</script>
+</body>
+</html>
