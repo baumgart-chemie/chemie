@@ -228,12 +228,14 @@ input.num-in[readonly]{color:var(--teal);}
 .opt.sym{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:15px; font-weight:600;}
 .opt.sym.none{font-family:inherit; font-size:13px; font-weight:400;}
 .opt:disabled{cursor:default;}
-.neg-grid{display:grid; grid-template-columns:1fr 1fr; gap:6px;}
-.neg-grid .opt{justify-content:center; text-align:center; padding:8px 6px;}
-.neg-grid .ng-h{font-size:11px; color:var(--text-faint); text-align:center;}
-.neg-grid .opt.full{grid-column:1 / -1;}
-.neg-grid .opt b{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:15px; color:var(--text); margin-right:2px;}
-.neg-grid .opt sup{font-size:.7em;}
+.ch-wrap{display:flex; flex-direction:column; gap:8px;}
+.ch-row{display:flex; align-items:center; gap:10px;}
+.ch-row .sy{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:15px; font-weight:600; color:var(--text); min-width:34px;}
+.ch-row select{flex:1; min-width:0; background:var(--panel-alt); color:var(--text); border:1px solid var(--line); border-radius:var(--radius); padding:8px 10px; font-size:13.5px; font-family:inherit; cursor:pointer;}
+.ch-row select:focus-visible{outline:2px solid var(--teal); outline-offset:1px;}
+.ch-row select.ok{border-color:var(--teal); box-shadow:0 0 0 1px var(--teal-dim);}
+.ch-row select.bad{border-color:var(--danger); box-shadow:0 0 0 1px var(--danger-dim);}
+.ch-row select:disabled{opacity:1; color:var(--teal); cursor:default;}
 .stp-note{font-size:11.5px; color:var(--text-faint); line-height:1.45; margin:8px 0 0;}
 
 .feedback{display:flex; flex-direction:column; gap:6px; margin:14px 0 4px;}
@@ -481,12 +483,12 @@ header>.tag{flex:1 1 160px;min-width:0}
       <div class="formula-box">ΔEN &lt; 0,5          → unpolare Atombindung<br>0,5 ≤ ΔEN ≤ 1,7    → polare Atombindung<br>ΔEN &gt; 1,7          → Ionenbindung</div>
       <p>Liegt ΔEN <strong>genau auf einer Grenze</strong> (0,5 oder 1,7), zählen beide angrenzenden Bindungsarten als richtig.</p>
 
-      <h3>Schritt 3: Negative Ladung</h3>
-      <p>Das Atom mit der <strong>größeren EN</strong> zieht die Bindungselektronen stärker an und ist negativ geladen. Du entscheidest außerdem, welche Art von Ladung es trägt:</p>
+      <h3>Schritt 3: Ladungen</h3>
+      <p>Das Atom mit der <strong>größeren EN</strong> zieht die Bindungselektronen stärker an und ist negativ, sein Partner ist positiv. Du wählst für <strong>jedes Atom</strong> die passende Ladung:</p>
       <ul>
-        <li><strong>Teilladung δ−</strong> bei einer polaren Atombindung: Das Elektronenpaar wird nur zum Partner hin verschoben, beide Atome teilen es weiterhin.</li>
-        <li><strong>Anion</strong> bei einer Ionenbindung: Elektronen werden vollständig übertragen, es entsteht ein negativ geladenes Ion.</li>
-        <li><strong>„keine Ladungen“</strong> bei einer unpolaren Atombindung.</li>
+        <li><strong>Teilladung δ− / δ+</strong> bei einer polaren Atombindung: Das Elektronenpaar wird nur zum Partner hin verschoben, beide Atome teilen es weiterhin.</li>
+        <li><strong>Anion / Kation</strong> bei einer Ionenbindung: Elektronen werden vollständig übertragen, es entstehen ein negativ und ein positiv geladenes Ion.</li>
+        <li><strong>„keine Ladung“</strong> bei einer unpolaren Atombindung.</li>
       </ul>
       <div class="formula-box">H–Cl: EN(H) = 2,1 · EN(Cl) = 3,0<br>ΔEN = 3,0 − 2,1 = 0,9 → polare Atombindung<br>Cl hat die größere EN → Cl ist δ−, H ist δ+</div>
 
@@ -510,6 +512,12 @@ header>.tag{flex:1 1 160px;min-width:0}
       <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.4</span><span class="d">09.11.2026</span></div>
+      <ul>
+        <li><strong>Schritt 3 „Ladungen bestimmen“:</strong> Für jedes der beiden Atome wird die Ladung gewählt – keine Ladung, Teilladung δ+ oder δ−, Kation oder Anion. Das positive Atom wird also jetzt ebenfalls angegeben.</li>
+        <li><strong>Rückmeldung je Atom:</strong> Sie unterscheidet falsches Vorzeichen und verwechselte Art der Ladung (Teilladung statt Ion und umgekehrt); Folgefehler aus Schritt 2 werden erkannt.</li>
+        <li>Anleitung, Tipp 4 und Lösungsanzeige an die neue Aufgabe angepasst.</li>
+      </ul>
       <div class="vh-ver"><span class="v">V1.3</span><span class="d">07.11.2026</span></div>
       <ul>
         <li><strong>Standard beim Öffnen:</strong> Aufgabenart „Atompaar“, Periodensystem mit EN-Werten eingeblendet, Schritt 3 (negative Ladung) aktiviert. Im PDF stehen zu jeder Aufgabe zusätzlich die EN-Werte beider Atome und die Ladungen (δ−/δ+ bzw. Anion/Kation).</li>
@@ -565,7 +573,7 @@ header>.tag{flex:1 1 160px;min-width:0}
       <label class="check-row" for="chkGiven"><input type="checkbox" id="chkGiven"><span>EN-Werte in der Aufgabe vorgeben</span></label>
       <label class="check-row" for="chkPSE"><input type="checkbox" id="chkPSE" checked><span>Periodensystem mit EN-Werten anzeigen</span></label>
       <label class="check-row" for="chkScale"><input type="checkbox" id="chkScale"><span>ΔEN-Strahl mit den Bereichen der Bindungsarten anzeigen</span></label>
-      <label class="check-row" for="chkNeg"><input type="checkbox" id="chkNeg" checked><span>Schritt 3: negative Ladung bestimmen (Teilladung δ− oder Anion)</span></label>
+      <label class="check-row" for="chkNeg"><input type="checkbox" id="chkNeg" checked><span>Schritt 3: Ladungen bestimmen (δ+/δ−, Kation/Anion)</span></label>
       <label class="check-row" for="chkSpecial"><input type="checkbox" id="chkSpecial"><span>Sonderfälle einbeziehen, bei denen die Faustregel nicht zur Wirklichkeit passt (z. B. NaI, AlCl<sub>3</sub>, HF)</span></label>
     </section>
 
@@ -652,9 +660,9 @@ header>.tag{flex:1 1 160px;min-width:0}
             <div class="opt-wrap" id="kindWrap"></div>
           </div>
           <div class="stepbox" id="box3">
-            <div class="sh"><span><span class="n">3</span>Negative Ladung</span><span class="st" id="st3">offen</span></div>
-            <div class="neg-grid" id="negWrap"></div>
-            <p class="stp-note">Welches Atom ist negativ, und trägt es eine Teilladung (δ−) oder ist es ein Anion? Bei unpolarer Bindung: „keine Ladungen“.</p>
+            <div class="sh"><span><span class="n">3</span>Ladungen bestimmen</span><span class="st" id="st3">offen</span></div>
+            <div class="ch-wrap" id="negWrap"></div>
+            <p class="stp-note">Welche Ladung trägt jedes Atom? Negativ (δ− oder Anion) ist das Atom mit der größeren EN, das andere ist positiv (δ+ oder Kation). Bei unpolarer Bindung: „keine Ladung“.</p>
           </div>
           <button class="btn primary check-btn" id="btnCheck">Prüfen</button>
         </div>
@@ -690,7 +698,7 @@ header>.tag{flex:1 1 160px;min-width:0}
 
 <footer>
   <p class="footer-note">Elektronegativitätswerte nach Pauling, auf eine Nachkommastelle gerundet (Schulbuchwerte). Einteilung nach ΔEN: unter 0,5 unpolare Atombindung, 0,5 bis 1,7 polare Atombindung, über 1,7 Ionenbindung; genau auf einer Grenze zählen beide Bindungsarten. EN-Werte werden mit ±0,1 Toleranz akzeptiert. Vereinfachtes Schulmodell: Die Grenzen sind Faustregeln, die Übergänge sind fließend.</p>
-  <p class="footer-credit">Bastian Baumgart · Bindungsart-Trainer V1.3 · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Bindungsart-Trainer V1.4 · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <script>
@@ -844,7 +852,15 @@ header>.tag{flex:1 1 160px;min-width:0}
   const negSide = c => EL[c.a].en > EL[c.b].en ? "a" : "b";
   // negative Seite einer gelösten Aufgabe (eigene EN-Werte, falls vorhanden)
   const negSideOf = c => (c.enA!=null && c.enB!=null && !eq(c.enA, c.enB)) ? (c.enA > c.enB ? "a" : "b") : negSide(c);
-  const negFor = (c, k) => k==="u" ? "none" : negSide(c) + (k==="i" ? ":i" : ":d");
+  // Ladungen beider Atome: dm = δ−, dp = δ+, an = Anion, cat = Kation, none = keine
+  const chFor = (k, side) => {
+    if(k==="u") return {a:"none", b:"none"};
+    const o = side==="a" ? "b" : "a", r = {};
+    r[side] = k==="i" ? "an" : "dm"; r[o] = k==="i" ? "cat" : "dp";
+    return r;
+  };
+  const CH_LBL = {"": "– wählen –", none: "keine Ladung", dp: "Teilladung δ+", dm: "Teilladung δ−", cat: "Kation", an: "Anion"};
+  const chNeg = v => v==="dm" || v==="an";
   const bondTxt = c => `${c.a}–${c.b}`;
 
   // ---------- PSE ----------
@@ -898,7 +914,7 @@ header>.tag{flex:1 1 160px;min-width:0}
     }
     c = Object.assign({}, c);
     if(c.kind==="pair" && !isHomo(c) && Math.random()<.5){ const x = c.a; c.a = c.b; c.b = x; }
-    task = {num:++taskCounter, c, choice:null, neg:null, okE:false, okD:false, okK:false, okN:false,
+    task = {num:++taskCounter, c, choice:null, ch:{a:null, b:null}, badCh:{a:false, b:false}, okE:false, okD:false, okK:false, okN:false,
             hint:0, wrong:false, done:false, shown:false, touched:false};
     ["enA","enB","dEN"].forEach(id=>{ $(id).value=""; $(id).readOnly=false; $(id).classList.remove("ok","bad"); });
     if(givenEN){
@@ -917,7 +933,7 @@ header>.tag{flex:1 1 160px;min-width:0}
     $("taskNum").textContent = "Aufgabe " + t.num;
     $("taskLevel").textContent = KIND[c.kind][0];
     $("taskLevel").className = "chip " + KIND[c.kind][1];
-    $("taskCtx").textContent = t.done ? "Aufgabe abgeschlossen." : (useNeg ? "Berechne ΔEN, bestimme die Bindungsart und die negative Ladung." : "Berechne ΔEN und bestimme die Bindungsart.");
+    $("taskCtx").textContent = t.done ? "Aufgabe abgeschlossen." : (useNeg ? "Berechne ΔEN, bestimme die Bindungsart und die Ladungen." : "Berechne ΔEN und bestimme die Bindungsart.");
     if(c.kind==="comp"){
       $("taskPrompt").innerHTML = `Verbindung: <b>${c.name}</b> <span class="f">(${sub(c.formula)})</span>`;
       $("taskElems").innerHTML = isHomo(c)
@@ -960,15 +976,14 @@ header>.tag{flex:1 1 160px;min-width:0}
       h += `<button class="opt${state(t.choice===k, t.okK, t.badK)}" data-k="${k}" ${lock?"disabled":""}><span class="rd"></span>${KNAME[k]}</button>`;
     });
     $("kindWrap").innerHTML = h;
-    const sides = isHomo(c) ? [["a", c.a]] : [["a", c.a], ["b", c.b]];
-    const opts = [];
-    sides.forEach(([v, sy]) => {
-      opts.push([v+":d", `<b>${sy}</b> δ−`]);
-      opts.push([v+":i", `<b>${sy}</b> Anion`]);
-    });
-    opts.push(["none", "keine Ladungen"]);
-    $("negWrap").innerHTML = `<span class="ng-h">Teilladung</span><span class="ng-h">Ion</span>` + opts.map(([v, l]) =>
-      `<button class="opt${v==="none"?" full":""}${state(t.neg===v, t.okN, t.badN)}" data-n="${v}" ${lock?"disabled":""}>${l}</button>`).join("");
+    const sel = (side) => {
+      const v = t.ch[side] || "";
+      const cl = (t.done && !t.shown ? " ok" : "") + (t.badCh[side] ? " bad" : "");
+      const label = isHomo(c) ? (side==="a" ? `1. ${c.a}` : `2. ${c.b}`) : c[side];
+      return `<div class="ch-row"><span class="sy">${label}</span><select class="${cl.trim()}" data-s="${side}" aria-label="Ladung von ${label}" ${lock?"disabled":""}>` +
+             ["", "none", "dp", "dm", "cat", "an"].map(o => `<option value="${o}"${o===v?" selected":""}>${CH_LBL[o]}</option>`).join("") + `</select></div>`;
+    };
+    $("negWrap").innerHTML = sel("a") + sel("b");
   }
 
   // ---------- Eingaben lesen ----------
@@ -1253,25 +1268,32 @@ header>.tag{flex:1 1 160px;min-width:0}
       else msgs.push(["bad", "Die Bindungsart stimmt nicht. Vergleiche ΔEN mit den Grenzen 0,5 und 1,7."]);
     }
 
-    // --- Teil 3: negativer Partner ---
-    t.okN = true; t.badN = false;
+    // --- Teil 3: Ladungen beider Atome ---
+    t.okN = true; t.badCh = {a:false, b:false};
     if(useNeg){
       // negative Seite nach den eigenen EN-Werten (bei Toleranz), sonst nach der Tabelle
       const side = t.okE && validEN(ea) && validEN(eb) && !eq(ea, eb) ? (ea > eb ? "a" : "b") : negSide(c);
-      const solFor = kk => kk==="u" ? "none" : side + (kk==="i" ? ":i" : ":d");
       const kSol = t.okK ? k : cls(dEff);
-      const n = t.neg, sol = solFor(kSol);
-      t.okN = n===sol;
-      if(n===null) msgs.push(["info", "Wähle die negative Ladung oder „keine Ladungen“."]);
+      const sol = chFor(kSol, side), got = t.ch;
+      const nm = sd => isHomo(c) ? (sd==="a" ? `Das erste ${c.a}-Atom` : `Das zweite ${c.b}-Atom`) : EL[c[sd]].n;
+      t.okN = got.a===sol.a && got.b===sol.b;
+      if(got.a===null || got.b===null) { t.okN = false; msgs.push(["info", "Wähle für beide Atome die Ladung."]); }
       else if(!t.okN){
-        t.badN = true;
-        const nSide = n.split(":")[0], nType = n.split(":")[1], sSide = sol.split(":")[0], sType = sol.split(":")[1];
-        if(k && !t.okK && solFor(k)===n) msgs.push(["bad", "Die Ladung passt zu der von dir gewählten Bindungsart, das ist ein Folgefehler."]);
-        else if(n==="none") msgs.push(["bad", "Hier gibt es eine negative Ladung. Nur bei einer unpolaren Atombindung entstehen keine Ladungen."]);
-        else if(sol==="none") msgs.push(["bad", "Bei einer unpolaren Atombindung entstehen in diesem Modell keine Ladungen, also ist kein Partner negativ."]);
-        else if(nSide!==sSide) msgs.push(["bad", "Negativ wird das Atom mit der größeren Elektronegativität, weil es die Bindungselektronen stärker anzieht."]);
-        else if(nType==="i") msgs.push(["bad", "Das Atom stimmt, aber die Art der Ladung nicht. Bei einer polaren Atombindung wird das Elektronenpaar nur verschoben, es entsteht eine Teilladung δ− und kein Ion."]);
-        else msgs.push(["bad", "Das Atom stimmt, aber die Art der Ladung nicht. Bei einer Ionenbindung werden Elektronen vollständig übertragen, es entsteht ein Anion und keine Teilladung."]);
+        if(k && !t.okK && got.a===chFor(k, side).a && got.b===chFor(k, side).b) {
+          msgs.push(["bad", "Die Ladungen passen zu der von dir gewählten Bindungsart, das ist ein Folgefehler."]);
+          t.badCh = {a:true, b:true};
+        } else ["a","b"].forEach(sd => {
+          if(got[sd]===sol[sd]) return;
+          t.badCh[sd] = true;
+          const g = got[sd], r = sol[sd];
+          if(r==="none") msgs.push(["bad", `${nm(sd)} trägt keine Ladung: Bei einer unpolaren Atombindung entstehen in diesem Modell keine Ladungen.`]);
+          else if(g==="none") msgs.push(["bad", `${nm(sd)} trägt eine Ladung. Nur bei einer unpolaren Atombindung entstehen keine Ladungen.`]);
+          else if(chNeg(g)!==chNeg(r)) msgs.push(["bad", chNeg(r)
+              ? `${nm(sd)} ist negativ: Es hat die größere Elektronegativität und zieht die Bindungselektronen stärker an.`
+              : `${nm(sd)} ist positiv: Es hat die kleinere Elektronegativität, sein Partner zieht die Bindungselektronen stärker an.`]);
+          else if(r==="dm" || r==="dp") msgs.push(["bad", `Bei ${nm(sd)} stimmt das Vorzeichen, aber nicht die Art der Ladung. Bei einer polaren Atombindung wird das Elektronenpaar nur verschoben, es entsteht eine Teilladung (${r==="dm" ? "δ−" : "δ+"}) und kein Ion.`]);
+          else msgs.push(["bad", `Bei ${nm(sd)} stimmt das Vorzeichen, aber nicht die Art der Ladung. Bei einer Ionenbindung werden Elektronen vollständig übertragen, es entsteht ein ${r==="an" ? "Anion" : "Kation"} und keine Teilladung.`]);
+        });
       }
     }
 
@@ -1309,7 +1331,7 @@ header>.tag{flex:1 1 160px;min-width:0}
     if(t.okE && t.okD) good.push(givenEN ? "ΔEN stimmt." : "Die EN-Werte und ΔEN stimmen.");
     else if(t.okE && !givenEN) good.push("Die EN-Werte stimmen.");
     if(t.okK) good.push("Die Bindungsart stimmt.");
-    if(useNeg && t.okN && t.neg!==null) good.push("Die negative Ladung stimmt.");
+    if(useNeg && t.okN) good.push("Die Ladungen stimmen.");
     $("feedback").innerHTML = good.map(m=>fb("good", m)).join("") + msgs.map(m=>fb(m[0], m[1])).join("");
     renderTask(); updateStats();
   }
@@ -1330,7 +1352,7 @@ header>.tag{flex:1 1 160px;min-width:0}
     }
     if(t.hint>=3) out.push(`Tipp 3: ΔEN = größere EN − kleinere EN = ${fmt(hi.en)} − ${fmt(lo.en)} = ${fmt(c.d)}.`);
     if(t.hint>=4) out.push("Tipp 4: Vergleiche mit den Grenzen: ΔEN < 0,5 unpolar · 0,5 bis 1,7 polar · ΔEN > 1,7 Ionenbindung. Genau auf einer Grenze zählen beide Bindungsarten." +
-                           (useNeg ? " Negativ ist das Atom mit der größeren EN: bei polarer Bindung als Teilladung δ−, bei Ionenbindung als Anion, bei unpolarer Bindung gibt es keine Ladungen." : ""));
+                           (useNeg ? " Das Atom mit der größeren EN ist negativ, sein Partner positiv: bei polarer Bindung als Teilladung (δ− / δ+), bei Ionenbindung als Anion / Kation, bei unpolarer Bindung gibt es keine Ladungen." : ""));
     $("feedback").innerHTML = out.map(m=>fb("hint", m)).join("");
   }
 
@@ -1341,7 +1363,7 @@ header>.tag{flex:1 1 160px;min-width:0}
     stats.shown++; stats.streak = 0;
     $("enA").value = fmt(EL[c.a].en); $("enB").value = fmt(EL[c.b].en); $("dEN").value = fmt(c.d);
     ["enA","enB","dEN"].forEach(id=>{ $(id).readOnly = true; $(id).classList.remove("ok","bad"); });
-    t.choice = c.k; t.neg = useNeg ? negFor(c, c.k) : null;
+    t.choice = c.k; t.ch = chFor(c.k, negSide(c)); t.badCh = {a:false, b:false};
     let html = fb("info", `Lösung: <span class="nm">${bondTxt(c)}</span> · ΔEN = ${fmt(c.d)} → ${KNAME[c.k]}. Der Lösungsweg steht unten.`);
     if(c.boundary) html += fb("info", boundaryNote(c));
     if(c.special) html += fb("hint", specialNote(c));
@@ -1434,11 +1456,11 @@ header>.tag{flex:1 1 160px;min-width:0}
     $("box2").classList.remove("passed"); $("st2").textContent = "offen";
     renderOptions();
   });
-  $("negWrap").addEventListener("click", ev=>{
-    const b = ev.target.closest("button[data-n]"); if(!b || task.done) return;
-    task.neg = b.dataset.n; task.touched = true; task.okN = false; task.badN = false;
+  $("negWrap").addEventListener("change", ev=>{
+    const el = ev.target.closest("select[data-s]"); if(!el || task.done) return;
+    task.ch[el.dataset.s] = el.value || null; task.badCh[el.dataset.s] = false; task.touched = true; task.okN = false;
+    el.classList.remove("bad");
     $("box3").classList.remove("passed"); $("st3").textContent = "offen";
-    renderOptions();
   });
   $("btnNew").addEventListener("click", newTask);
   $("btnCheck").addEventListener("click", check);
@@ -1808,7 +1830,7 @@ BK.trainer=o=>{
 
 </script>
 <script id="bk-page">
-BK.trainer({url:'https://chemie.mail-baumgart.de/SekI/SekI-Bindungsarten.html',footName:'Bindungsart-Trainer',version:'1.3',printTitle:'Bindungsart-Trainer – Zusammenfassung',
+BK.trainer({url:'https://chemie.mail-baumgart.de/SekI/SekI-Bindungsarten.html',footName:'Bindungsart-Trainer',version:'1.4',printTitle:'Bindungsart-Trainer – Zusammenfassung',
   hint:'Die Auswertung enthält jede bearbeitete Aufgabe mit der richtigen Lösung und dem Vermerk, ob sie richtig gelöst wurde, sowie die Statistik mit der Erfolgsquote.',
   items:()=>globalThis.__H.map(h=>({no:h.num,st:h.status,task:`Bestimme die Bindungsart: ${h.label}, Bindung ${h.bond}.`,sol:`EN(${h.a}) = ${h.ena} · EN(${h.b}) = ${h.enb} → ΔEN = ${h.d} → <b>${h.k}</b><br>Ladungen: <b>${h.chg}</b>`}))});
 
