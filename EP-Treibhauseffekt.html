@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulation „Treibhauseffekt“</title>
+<style>
+:root{--bg:#14171a;--panel:#1b1f23;--panel-alt:#20252a;--line:#31383e;--line-soft:#262c31;--text:#e7e4dd;--text-dim:#9aa2a9;--text-faint:#5f6870;--amber:#ffb454;--teal:#4fd1c5;--good:#7fd68a;--danger:#e4785b;--screen:#0e1113;--violet:#b79cf2;
+--sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--mono:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.45}
+button,input,select{font:inherit;color:inherit}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;padding:14px 28px;border-bottom:1px solid var(--line);background:var(--panel)}
+header .back-btn{align-self:baseline;text-decoration:none;color:var(--text);border:1px solid var(--line);border-radius:6px;padding:7px 12px;background:var(--panel-alt);white-space:nowrap}
+header h1{margin:0;font-size:21px;font-weight:650;white-space:nowrap}
+header>.tag{flex:1 1 160px;min-width:0;color:var(--text-dim);font-size:13px}
+header .hlink{background:none;border:0;border-bottom:1px solid var(--line);color:var(--text-dim);padding:2px 0;cursor:pointer}
+header .status{align-self:center;font-family:var(--mono);font-size:12.5px;color:var(--amber);border:1px solid var(--line);border-radius:999px;padding:4px 10px;white-space:nowrap}
+.qr-btn{align-self:center;display:flex;align-items:center;gap:7px;padding:2px 8px 2px 2px;border:1px solid var(--line);border-radius:4px;background:var(--panel-alt);cursor:pointer;text-align:left}
+.qr-btn svg{width:30px;height:30px;display:block;background:#fff}
+.qr-btn span{font-size:10px;line-height:1.2;color:var(--text-dim)}
+.qr-btn b{display:block;font-size:10.5px;color:var(--text)}
+.layout{display:grid;grid-template-columns:330px minmax(0,1fr);gap:18px;padding:18px 28px;align-items:start}
+.side{position:sticky;top:10px;max-height:calc(100vh - 20px);overflow:auto;display:flex;flex-direction:column;gap:12px;padding-right:2px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px 14px}
+.panel h2{margin:0 0 9px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--amber);font-weight:650}
+.panel h3{margin:12px 0 4px;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-faint);font-weight:600}
+.btn{border:1px solid var(--line);background:var(--panel-alt);border-radius:7px;padding:9px 13px;cursor:pointer;min-height:40px}
+.btn:hover{border-color:var(--text-dim)}
+.btn.primary{background:var(--teal);border-color:var(--teal);color:#0d1b1a;font-weight:650}
+.btn.small{padding:6px 10px;min-height:34px;font-size:13px}
+.btn.on{border-color:var(--teal);color:var(--teal)}
+.btn:disabled{opacity:.4;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.gl-toggle{width:100%;text-align:left;display:flex;justify-content:space-between}
+.gl-list{display:flex;flex-direction:column;gap:5px;margin-top:9px}
+.gl-list button{text-align:left;border:1px solid var(--line-soft);background:var(--panel-alt);border-radius:6px;padding:8px 10px;cursor:pointer;font-size:13.5px}
+label.chk{display:flex;gap:9px;align-items:flex-start;padding:6px 0;cursor:pointer}
+input[type=checkbox],input[type=radio]{width:20px;height:20px;accent-color:var(--teal);flex:none;margin:1px 0 0}
+input[type=range]{width:100%;height:28px;accent-color:var(--teal);margin:0}
+select{background:var(--panel-alt);border:1px solid var(--line);border-radius:6px;padding:7px 8px;width:100%}
+.hint{font-size:12.5px;color:var(--text-dim)}
+.src{border-top:1px solid var(--line-soft);padding:7px 0 5px}
+.src-h{display:flex;align-items:center;gap:8px}
+.src-h .ico{width:28px;flex:none}
+img.pic{width:28px;height:24px;vertical-align:middle;margin-right:7px}
+.src-h img.pic{display:block;margin:0}
+.src-h .nm{flex:1;font-size:14px}
+.src-h .val{font-family:var(--mono);font-size:12.5px;color:var(--amber)}
+.src .sub{font-size:11.5px;color:var(--text-faint);font-family:var(--mono)}
+.src.off .extra{opacity:.5}
+.src.off .val{color:var(--text-faint)}
+.src .extra{margin-top:6px;padding:8px 9px;background:var(--panel-alt);border-radius:7px;font-size:13px}
+.src .extra .lbl{display:flex;justify-content:space-between;color:var(--text-dim)}
+.src .extra .lbl b{font-family:var(--mono);color:var(--teal);font-weight:500}
+.main{display:flex;flex-direction:column;gap:14px;min-width:0}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.toolbar .sp{flex:1}
+.year{font-family:var(--mono);color:var(--amber);font-size:15px;min-width:92px}
+.screen{background:var(--screen);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+canvas{display:block;width:100%;height:auto}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:9px 11px}
+.tile .k{font-size:11.5px;color:var(--text-dim)}
+.tile .v{font-family:var(--mono);font-size:19px;color:var(--amber);margin-top:2px}
+.tile .v small{font-size:12px;color:var(--text-dim)}
+.tile.big .v{font-size:25px}
+.fc{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:9px}
+.fc .tile .v{font-size:17px}
+.fc .tile .n{font-size:12px;color:var(--text-dim);margin-top:3px}
+.pos{color:var(--danger)!important}.neg{color:var(--good)!important}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;border-bottom:1px solid var(--line);margin-bottom:11px}
+.tabs button{background:none;border:0;border-bottom:2px solid transparent;padding:9px 12px;color:var(--text-dim);cursor:pointer;min-height:40px}
+.tabs button.act{color:var(--teal);border-bottom-color:var(--teal)}
+.legend{display:flex;flex-wrap:wrap;gap:5px 14px;font-size:12px;color:var(--text-dim);margin-top:7px}
+.legend i{display:inline-block;width:18px;height:0;border-top:3px solid;vertical-align:middle;margin-right:5px}
+.legend i.da{border-top-style:dashed}.legend i.do{border-top-style:dotted}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line-soft);text-align:right;font-family:var(--mono)}
+th{color:var(--text-dim);font-weight:500;font-family:var(--sans);font-size:12px}
+td:first-child,th:first-child{text-align:left}
+.tw{overflow:auto;max-height:420px}
+.bar{display:flex;height:14px;border-radius:3px;overflow:hidden;background:var(--panel-alt);min-width:80px}
+.bar span{display:block;height:100%}
+td.barc{width:38%;min-width:120px}
+td.nm{font-family:var(--sans)}
+.runitem{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line-soft);font-size:13.5px}
+.runitem i{flex:none;width:22px;border-top:3px solid;margin-top:9px}
+.runitem .d{flex:1}
+.runitem .d small{display:block;color:var(--text-dim)}
+.explain{font-size:14px}
+.explain p{margin:0 0 8px}
+.explain b{color:var(--amber);font-weight:600}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.62);display:flex;align-items:flex-start;justify-content:center;padding:4vh 14px;z-index:50;overflow:auto}
+.modal .box{background:var(--panel);border:1px solid var(--line);border-radius:12px;max-width:640px;width:100%;padding:18px 22px}
+.modal .box.wide{max-width:900px}
+.modal .box h2{margin:0 0 10px;font-size:19px;display:flex;justify-content:space-between;gap:12px}
+.modal .box h3{color:var(--amber);font-size:13px;letter-spacing:.05em;text-transform:uppercase;margin:16px 0 6px}
+.modal .x{background:none;border:0;font-size:24px;line-height:1;cursor:pointer;color:var(--text-dim);min-width:40px;min-height:40px}
+.modal p,.modal li{font-size:14.5px}
+.modal table{margin:8px 0}
+.modal .fig{background:var(--screen);border:1px solid var(--line-soft);border-radius:8px;padding:8px;margin:10px 0;text-align:center}
+.modal .fig svg{max-width:100%;height:auto}
+.modal .eq{font-family:var(--mono);background:var(--panel-alt);border-radius:6px;padding:8px 10px;margin:6px 0;font-size:14px;overflow:auto}
+.modal .nav{display:flex;justify-content:space-between;gap:8px;margin-top:14px}
+.pdf-runs label{display:flex;gap:9px;align-items:center;padding:6px 0;font-size:14px}
+.pdf-runs i{flex:none;width:22px;border-top:3px solid}
+.pdf-f{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pdf-f input{width:100%;background:var(--panel-alt);border:1px solid var(--line);border-radius:6px;padding:9px}
+.qr-big{background:#fff;padding:14px;border-radius:8px;display:inline-block}
+.qr-big svg{width:min(60vw,300px);height:min(60vw,300px);display:block}
+footer{padding:16px 28px 30px;color:var(--text-faint);font-size:11.5px;border-top:1px solid var(--line-soft);margin-top:10px}
+footer p{margin:0}
+footer a,footer button{color:var(--text-dim);text-decoration:none;border:0;border-bottom:1px solid var(--line);background:none;padding:0;cursor:pointer;font-size:inherit}
+footer a:hover,footer button:hover{color:var(--text);border-bottom-color:var(--text-dim)}
+footer .footer-credit{margin-top:8px;color:var(--text-dim)}
+#print{display:none}
+@media (max-width:920px){.layout{grid-template-columns:1fr;padding:14px 16px}.side{position:static;max-height:none}#srcList{max-height:42vh;overflow:auto;padding-right:6px}}
+@media (max-width:600px){header{padding:12px 16px}.qr-btn span{display:none}.qr-btn{padding:2px}footer{padding:16px 16px 30px}.pdf-f{grid-template-columns:1fr}}
+@page{size:A4;margin:14mm}
+@media print{
+ body>*:not(#print){display:none!important}
+ html,body{background:#fff;color:#111}
+ #print{display:block;font-family:system-ui,'Segoe UI',sans-serif;font-size:10.5pt;color:#111}
+ #print h1{font-size:16pt;margin:0 0 2mm}
+ #print h2{font-size:12.5pt;margin:6mm 0 2mm;border-bottom:1px solid #999;padding-bottom:1mm}
+ #print h3{font-size:10.5pt;margin:3mm 0 1mm}
+ #print .meta{display:flex;gap:10mm;border-bottom:1.5px solid #111;padding-bottom:2mm;margin-bottom:3mm}
+ #print .blk{break-inside:avoid;margin-bottom:4mm}
+ #print table{font-size:9pt;width:100%}
+ #print th,#print td{border-bottom:1px solid #ccc;color:#111;padding:1.2mm 2mm;font-family:inherit}
+ #print tr{break-inside:avoid}
+ #print img{width:100%;max-width:170mm;display:block}
+ #print ul{margin:1mm 0;padding-left:5mm}
+ #print .pleg span{margin-right:6mm;font-size:9pt}
+ #print .pleg i{display:inline-block;width:8mm;border-top:2.5px solid;vertical-align:middle;margin-right:1.5mm}
+ #print .pfoot{margin-top:6mm;border-top:1px solid #999;padding-top:2mm;font-size:8.5pt;color:#444}
+}
+</style>
+</head>
+<body>
+<header>
+  <a class="back-btn" href="../index.html">← Zurück</a>
+  <h1>Treibhauseffekt</h1>
+  <span class="tag">Vom natürlichen Treibhauseffekt zur Erwärmung durch Emissionsquellen</span>
+  <button class="hlink" id="btnHelp">Anleitung</button>
+  <button class="qr-btn" id="qrBtn" aria-label="QR-Code vergrößern"><span id="qrSmall"></span><span><b>Auf dem Mobilgerät öffnen</b>QR-Code antippen zum Vergrößern</span></button>
+  <span class="status" id="status">Jahr 0</span>
+</header>
+
+<div class="layout">
+  <aside class="side">
+    <div class="panel">
+      <button class="btn gl-toggle" id="glToggle" aria-expanded="false"><span>Grundlagen · <span id="glCount"></span> Themen</span><span id="glArrow">▸</span></button>
+      <div class="gl-list" id="glList" hidden></div>
+    </div>
+
+    <div class="panel">
+      <h2>Ausgangszustand</h2>
+      <label class="chk"><input type="radio" name="start" value="nat" checked><span>Natürlicher Treibhauseffekt<br><span class="hint">vor der Industrialisierung · 14,0 °C · 280 ppm CO₂ · alle Regler auf 0 %</span></span></label>
+      <label class="chk"><input type="radio" name="start" value="heute"><span>Heute (2025)<br><span class="hint">15,4 °C · 427 ppm CO₂ · alle Regler auf 100 %</span></span></label>
+      <label class="chk" style="border-top:1px solid var(--line-soft);margin-top:6px;padding-top:10px"><input type="checkbox" id="explChk"><span>Erklärungen einblenden</span></label>
+    </div>
+
+    <div class="panel" id="srcPanel">
+      <h2>Emissionsquellen</h2>
+      <div class="row" style="margin-bottom:6px">
+        <button class="btn small" id="allOn">Alle auf 100 %</button>
+        <button class="btn small" id="allOff">Alle auf 0 %</button>
+      </div>
+      <p class="hint" style="margin:4px 0 2px">Regler = Umfang der Quelle: 0 % = aus, 100 % = heutiger Stand weltweit</p>
+      <div id="srcList"></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="toolbar">
+      <button class="btn primary" id="btnPlay">▶ Start</button>
+      <button class="btn" id="btn10">+10 Jahre</button>
+      <button class="btn" id="btn50">+50 Jahre</button>
+      <span class="hint">Zeitraffer</span>
+      <button class="btn small spd on" data-s="2">×1</button>
+      <button class="btn small spd" data-s="6">×3</button>
+      <button class="btn small spd" data-s="20">×10</button>
+      <span class="sp"></span>
+      <span class="year" id="yearLbl">Jahr 0</span>
+      <button class="btn" id="btnReset">Zurücksetzen</button>
+    </div>
+
+    <div class="screen"><canvas id="scene" width="900" height="420" aria-label="Darstellung der Erde mit Sonnenstrahlung, Wärmestrahlung, Treibhausgasen und Emissionsquellen"></canvas></div>
+
+    <div class="tiles">
+      <div class="tile big"><div class="k">Mittlere Temperatur der Erdoberfläche</div><div class="v" id="tT"></div></div>
+      <div class="tile big"><div class="k">Änderung gegenüber dem natürlichen Zustand</div><div class="v" id="tD"></div></div>
+      <div class="tile"><div class="k">Kohlenstoffdioxid CO₂</div><div class="v" id="tC"></div></div>
+      <div class="tile"><div class="k">Methan CH₄</div><div class="v" id="tM"></div></div>
+      <div class="tile"><div class="k">Distickstoffmonooxid N₂O</div><div class="v" id="tN"></div></div>
+      <div class="tile"><div class="k">Ausstoß der aktiven Quellen</div><div class="v" id="tE"></div></div>
+    </div>
+
+    <div class="panel">
+      <h2>Prognose bei unveränderten Einstellungen</h2>
+      <div class="fc">
+        <div class="tile"><div class="k">Temperatur in 100 Jahren</div><div class="v" id="f100"></div><div class="n" id="f100n"></div></div>
+        <div class="tile"><div class="k">Zum Vergleich in 100 Jahren: alle Quellen wie heute</div><div class="v" id="fRef"></div><div class="n" id="fRefn"></div></div>
+        <div class="tile"><div class="k">Unterschied durch deine Einstellungen</div><div class="v" id="fDiff"></div><div class="n" id="fDiffn"></div></div>
+      </div>
+    </div>
+
+    <div class="panel explain" id="explBox" hidden>
+      <h2>Erklärungen zu den gewählten Einstellungen</h2>
+      <div id="explTxt"></div>
+    </div>
+
+    <div class="panel">
+      <div class="tabs" id="tabs">
+        <button data-t="dia" class="act">Diagramm</button>
+        <button data-t="src">Quellen</button>
+        <button data-t="val">Messwerte</button>
+        <button data-t="runs">Läufe</button>
+      </div>
+      <div id="tab-dia">
+        <div class="row" style="margin-bottom:8px"><span class="hint">Größe:</span>
+          <select id="qSel" style="width:auto;flex:1;max-width:420px">
+            <option value="T">Temperatur der Erdoberfläche (°C)</option>
+            <option value="C">CO₂-Gehalt der Luft (ppm)</option>
+            <option value="M">CH₄-Gehalt der Luft (ppb)</option>
+            <option value="N">N₂O-Gehalt der Luft (ppb)</option>
+            <option value="F">Zusätzliche Heizleistung – Strahlungsantrieb (W/m²)</option>
+          </select></div>
+        <div class="screen"><canvas id="chart" width="900" height="400"></canvas></div>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div id="tab-src" hidden>
+        <p class="hint" style="margin-top:0">Ausstoß der einzelnen Quellen pro Jahr, umgerechnet in CO₂-Äquivalente (Wirkung über 100 Jahre: 1 t CH₄ ≙ 28 t CO₂, 1 t N₂O ≙ 273 t CO₂), und Beitrag jeder Quelle zur Temperatur in 100 Jahren.</p>
+        <div class="tw"><table id="srcTab"></table></div>
+        <div class="legend"><span><i style="border-color:var(--amber)"></i>CO₂</span><span><i style="border-color:var(--teal)"></i>CH₄</span><span><i style="border-color:var(--violet)"></i>N₂O</span></div>
+      </div>
+      <div id="tab-val" hidden>
+        <div class="row" style="margin-bottom:8px"><button class="btn small" id="btnCsv">Messwerte als CSV</button><button class="btn small" id="btnPdf1">Ausgabe als PDF</button></div>
+        <div class="tw"><table id="valTab"></table></div>
+      </div>
+      <div id="tab-runs" hidden>
+        <div class="row" style="margin-bottom:8px"><button class="btn small" id="btnPdf2">Ausgabe als PDF</button><span class="hint">Ein Lauf endet mit „Zurücksetzen“ oder einem neuen Ausgangszustand. Bis zu sechs Läufe bleiben zum Vergleich im Diagramm.</span></div>
+        <div id="runList"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<footer>
+  <p class="footer-note">Simulierte Daten zu Lehrzwecken. Stark vereinfachtes Klimamodell mit gerundeten Modellwerten: weltweite Emissionen auf dem Stand von etwa 2023–2025, berechnet werden CO₂, CH₄ und N₂O, Aerosole und weitere Treibhausgase gehen nur pauschal ein; Rückkopplungen wie tauender Permafrost und die Herstellung der Fahrzeuge bleiben unberücksichtigt. Die Ergebnisse zeigen Größenordnungen und sind keine Klimavorhersage.</p>
+  <p class="footer-credit">Bastian Baumgart · Treibhauseffekt V1.0 · <button id="btnVer">Versionshinweise</button> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+</footer>
+
+<div id="modals"></div>
+<div id="print"></div>
+<script>
+"use strict";
+/* ===================== Hilfen ===================== */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const f=(x,d=0)=>x.toLocaleString('de-DE',{minimumFractionDigits:d,maximumFractionDigits:d});
+const sg=(x,d=2)=>{const r=+x.toFixed(d);return (r>0?'+':r<0?'−':'±')+f(Math.abs(r),d);};
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const VERSION='1.0', TITLE='Treibhauseffekt', URL_SELF='https://chemie.mail-baumgart.de/EP/EP-Treibhauseffekt.html';
+
+/* ===================== Modell ===================== */
+const T0=14.0, TMAX=200;
+// CO2: vier Speicher (Impulsantwort nach dem Berner Kohlenstoffkreislauf-Modell)
+const A=[0.2173,0.2240,0.2824,0.2763], TAU=[Infinity,394.4,36.54,4.304];
+const P={ppmGt:7.81,ch4Mt:2.78,tauCH4:9.2,n2oMt:7.6,tauN2O:109,lam:3.7/3,gam:0.9,C1:8,C2:100,rest:0.93}; // rest: pauschaler Abzug für Aerosole und übrige Einflüsse
+const natState=()=>({p:[0,0,0,0],M:720,N:270,T:0,Td:0,t:0});
+const todayState=()=>({p:[61,51,30,4.8],M:1948,N:339.1,T:1.4,Td:0.35,t:0});
+const clone=s=>({p:s.p.slice(),M:s.M,N:s.N,T:s.T,Td:s.Td,t:s.t});
+const conc=s=>280+s.p[0]+s.p[1]+s.p[2]+s.p[3];
+const forc=s=>P.rest*(5.35*Math.log(conc(s)/280)+0.036*(Math.sqrt(s.M)-Math.sqrt(720))+0.12*(Math.sqrt(s.N)-Math.sqrt(270)));
+function step(s,e,dt){
+  for(let i=0;i<4;i++){const inp=A[i]*e.co2/P.ppmGt; s.p[i]+=(i===0?inp:inp-s.p[i]/TAU[i])*dt;}
+  s.M+=(e.ch4/P.ch4Mt-(s.M-720)/P.tauCH4)*dt;
+  s.N+=(e.n2o/P.n2oMt-(s.N-270)/P.tauN2O)*dt;
+  const F=forc(s), dT=(F-P.lam*s.T-P.gam*(s.T-s.Td))/P.C1, dD=P.gam*(s.T-s.Td)/P.C2;
+  s.T+=dT*dt; s.Td+=dD*dt; s.t+=dt;
+}
+function ahead(s0,e,years){const s=clone(s0);for(let i=0;i<years*4;i++)step(s,e,0.25);return s;}
+
+/* ===================== Quellen ===================== */
+// Weltweite Emissionen pro Jahr bei 100 % (gerundete Modellwerte): CO2 in Gt, CH4 und N2O in Mt
+const SRC=[
+ {id:'pkw',g:'Verkehr',ico:'car',name:'Pkw',short:'Pkw',co2:3.2,ch4:0,n2o:0.1,unit:1.5},
+ {id:'lkw',g:'Verkehr',ico:'truck',name:'Lkw, Busse, Transporter',short:'Lkw',co2:2.8,ch4:0,n2o:0.1},
+ {id:'flug',g:'Verkehr',ico:'plane',name:'Flugverkehr',short:'Flugverkehr',co2:1.0,ch4:0,n2o:0},
+ {id:'schiff',g:'Verkehr',ico:'ship',name:'Schifffahrt',short:'Schiffe',co2:0.9,ch4:0,n2o:0},
+ {id:'kohle',g:'Energie',ico:'coal',name:'Kohlekraftwerke',short:'Kohle-KW',co2:10.8,ch4:0,n2o:0.3},
+ {id:'gas',g:'Energie',ico:'gasplant',name:'Gas- und Ölkraftwerke',short:'Gas-KW',co2:3.8,ch4:0,n2o:0.1},
+ {id:'foerd',g:'Energie',ico:'derrick',name:'Förderung von Kohle, Erdöl, Erdgas',short:'Förderung',co2:2.6,ch4:125,n2o:0},
+ {id:'ind',g:'Industrie und Gebäude',ico:'factory',name:'Industrie (Stahl, Zement, Chemie)',short:'Industrie',co2:10.0,ch4:0,n2o:0.5},
+ {id:'heiz',g:'Industrie und Gebäude',ico:'house',name:'Heizungen (Erdgas, Heizöl)',short:'Heizungen',co2:3.0,ch4:0,n2o:0},
+ {id:'rind',g:'Landwirtschaft und Abfall',ico:'cow',name:'Rinderhaltung',short:'Rinder',co2:0,ch4:120,n2o:1.0,unit:1.5},
+ {id:'acker',g:'Landwirtschaft und Abfall',ico:'crop',name:'Ackerbau (Dünger, Reis)',short:'Ackerbau',co2:0,ch4:30,n2o:6.5},
+ {id:'muell',g:'Landwirtschaft und Abfall',ico:'landfill',name:'Mülldeponien und Abwasser',short:'Deponien',co2:0,ch4:70,n2o:0.4},
+ {id:'rod',g:'Wald',ico:'burn',name:'Waldrodung und Brände',short:'Rodung',co2:4.1,ch4:25,n2o:1.0}
+];
+const STROM={mix:{n:'heutiger Strommix weltweit',k:'Strommix',t:1.2},kohle:{n:'reiner Kohlestrom',k:'Kohlestrom',t:2.4},oeko:{n:'Strom aus Wind und Sonne',k:'Ökostrom',t:0.08}};
+const CAR_T=3.2/1.5; // t CO2 je Verbrenner-Pkw und Jahr
+const GWP={ch4:28,n2o:273};
+function mkSet(lv){const z={src:{},share:0,strom:'mix'};SRC.forEach(s=>z.src[s.id]={on:lv>0,lv:lv});return z;} // on = Regler über 0 %
+const cloneSet=z=>JSON.parse(JSON.stringify(z));
+const TODAY=mkSet(100);
+function emis(z){
+  let co2=0,ch4=0,n2o=0;const per={};
+  for(const s of SRC){const q=z.src[s.id],a={co2:0,ch4:0,n2o:0};
+    if(q.on){const k=q.lv/100;
+      if(s.id==='pkw'){const e=z.share/100;a.co2=s.co2*k*(1-e)+s.unit*k*e*STROM[z.strom].t;a.n2o=s.n2o*k*(1-e);}
+      else{a.co2=s.co2*k;a.ch4=s.ch4*k;a.n2o=s.n2o*k;}}
+    a.eq=a.co2+a.ch4*GWP.ch4/1000+a.n2o*GWP.n2o/1000;per[s.id]=a;co2+=a.co2;ch4+=a.ch4;n2o+=a.n2o;}
+  return {co2,ch4,n2o,eq:co2+ch4*GWP.ch4/1000+n2o*GWP.n2o/1000,per};
+}
+function desc(z){
+  const on=SRC.filter(s=>z.src[s.id].on); if(!on.length) return 'keine Emissionsquellen';
+  const ev=(z.src.pkw.on&&z.share>0)?Math.round(z.share)+' % Elektroautos ('+STROM[z.strom].k+')':'';
+  if(on.length>SRC.length/2){const dev=[];
+    SRC.forEach(s=>{const q=z.src[s.id]; if(!q.on) dev.push(s.short+' aus'); else if(q.lv!==100) dev.push(s.short+' '+q.lv+' %');});
+    if(ev) dev.push(ev);
+    return dev.length?'wie heute, aber '+dev.join(', '):'alle Quellen wie heute';}
+  return 'nur '+on.map(s=>s.short+' '+z.src[s.id].lv+' %').join(', ')+(ev?', '+ev:'');
+}
+
+/* ===================== Zustand ===================== */
+let Z=mkSet(0), S=natState(), start='nat', cur=null, runs=[], runNo=0;
+let playing=false, speed=2, acc=0, proj=[], ref=[], fc={};
+const RUNCOL=['#4fd1c5','#b79cf2','#7fd68a','#e4785b','#6fa8ff','#f08bd0'];
+const snap=(s,e)=>({t:Math.round(s.t),T:s.T,C:conc(s),M:s.M,N:s.N,F:forc(s),eq:e.eq});
+function newRun(){S=start==='heute'?todayState():natState();runNo++;cur={no:runNo,start,rec:[],events:[],desc0:''};cur.rec.push(snap(S,emis(Z)));acc=0;setPlay(false);refresh(true);}
+function endRun(){if(cur&&cur.rec.length>1){cur.color=RUNCOL[(cur.no-1)%RUNCOL.length];runs.push(cur);if(runs.length>6)runs.shift();}else if(cur){runNo--;}cur=null;}
+function advance(q){ // q Viertelschritte
+  const e=emis(Z); if(S.t===0&&!cur.z0){cur.desc0=desc(Z);cur.z0=cloneSet(Z);}
+  for(let i=0;i<q&&S.t<TMAX-1e-9;i++){step(S,e,0.25); if(Math.abs(S.t-Math.round(S.t))<1e-6){S.t=Math.round(S.t);cur.rec.push(snap(S,e));}}
+  if(S.t>=TMAX-1e-9) setPlay(false);
+}
+function setPlay(p){playing=p&&S.t<TMAX;$('#btnPlay').textContent=playing?'❚❚ Pause':'▶ Start';}
+function diffSet(a,b){ // welche Einstellungen wurden geändert?
+  const d=[];
+  SRC.forEach(s=>{const x=a.src[s.id],y=b.src[s.id],u=q=>s.unit?f(s.unit*q.lv/100,2)+' Mrd':q.lv+' %';
+    if(x.on&&!y.on)d.push(s.name+' abgeschaltet');
+    else if(!x.on&&y.on)d.push(s.name+' zugeschaltet ('+u(y)+(s.unit?' = '+y.lv+' %':'')+')');
+    else if(y.on&&x.lv!==y.lv)d.push(s.name+' von '+u(x)+' auf '+u(y)+(s.unit?' ('+y.lv+' %)':''));});
+  if(b.src.pkw.on){
+    if(Math.round(a.share)!==Math.round(b.share))d.push('Anteil Elektroautos von '+Math.round(a.share)+' % auf '+Math.round(b.share)+' %');
+    if(a.strom!==b.strom&&b.share>0)d.push('Strom für die Elektroautos: '+STROM[b.strom].n+' statt '+STROM[a.strom].n);}
+  return d;
+}
+function logEvent(){if(!cur||S.t<=0||!cur.z0)return;const t=Math.round(S.t),l=cur.events[cur.events.length-1];
+  if(l&&l.t===t)l.z=cloneSet(Z);else cur.events.push({t,z:cloneSet(Z)});
+  const e=cur.events[cur.events.length-1],prev=cur.events.length>1?cur.events[cur.events.length-2].z:cur.z0;
+  e.ch=diffSet(prev,e.z);e.text=desc(e.z);if(!e.ch.length)cur.events.pop();}
+const startName=s=>s==='heute'?'Start: heute (2025)':'Start: natürlicher Treibhauseffekt';
+const runDesc=r=>'Lauf '+r.no+': '+startName(r.start).replace('Start: ','')+' · '+(r.desc0||desc(Z))+(r.events.length?' · '+r.events.length+' Änderung'+(r.events.length>1?'en':''):'');
+
+/* ===================== Quellen-Bedienung ===================== */
+function buildSrc(){
+  let h='',g='';
+  for(const s of SRC){
+    if(s.g!==g){g=s.g;h+='<h3>'+g+'</h3>';}
+    h+='<div class="src" data-id="'+s.id+'"><div class="src-h"><span class="ico">'+ico(s)+'</span><span class="nm">'+s.name+'</span><span class="val"></span></div>'+
+       '<input type="range" class="s-lv" min="0" max="200" step="5" value="100" aria-label="Umfang '+s.name+'"><div class="sub"></div>';
+    if(s.id==='pkw') h+='<div class="extra"><div class="lbl"><span>Anteil Elektroautos</span><b id="evVal">0 %</b></div>'+
+       '<input type="range" id="evShare" min="0" max="100" step="1" value="0" aria-label="Anteil Elektroautos">'+
+       '<div class="lbl" style="margin:4px 0 3px"><span>Strom für die Elektroautos</span></div>'+
+       '<select id="evStrom">'+Object.keys(STROM).map(k=>'<option value="'+k+'">'+STROM[k].n+'</option>').join('')+'</select></div>';
+    h+='</div>';
+  }
+  $('#srcList').innerHTML=h;
+  $$('.src').forEach(el=>{const id=el.dataset.id;
+    const r=el.querySelector('.s-lv');
+    r.addEventListener('input',()=>{Z.src[id].lv=+r.value;changed(false);});
+    r.addEventListener('change',()=>changed(true));
+  });
+  const sh=$('#evShare');
+  sh.addEventListener('input',()=>{Z.share=+sh.value;changed(false);});
+  sh.addEventListener('change',()=>changed(true));
+  $('#evStrom').addEventListener('change',e=>{Z.strom=e.target.value;changed(true);});
+}
+function syncSrc(){
+  const e=emis(Z);
+  $$('.src').forEach(el=>{const id=el.dataset.id,s=SRC.find(x=>x.id===id),q=Z.src[id],a=e.per[id];
+    el.classList.toggle('off',!q.on);
+    el.querySelector('.s-lv').value=q.lv;
+    el.querySelector('.val').textContent=s.unit?f(s.unit*q.lv/100,2)+' Mrd':q.lv+' %';
+    let t=[]; if(a.co2>0)t.push(f(a.co2,2)+' Gt CO₂'); if(a.ch4>0)t.push(f(a.ch4)+' Mt CH₄'); if(a.n2o>0)t.push(f(a.n2o,1)+' Mt N₂O');
+    el.querySelector('.sub').textContent=q.on?(t.join(' · ')||'kein Ausstoß')+(a.ch4+a.n2o>0?' ≙ '+f(a.eq,2)+' Gt CO₂-Äq.':'')+' pro Jahr':'aus';
+  });
+  $('#evShare').value=Z.share; $('#evVal').textContent=Math.round(Z.share)+' %'; $('#evStrom').value=Z.strom;
+}
+function changed(log){SRC.forEach(s=>{const q=Z.src[s.id];q.on=q.lv>0;});syncSrc();if(log)logEvent();refresh(true);}
+
+/* ===================== Anzeige ===================== */
+function refresh(full){
+  const e=emis(Z), eRef=emis(TODAY);
+  // Prognose bis zum Ende der Zeitachse und 100 Jahre voraus
+  proj=[];ref=[];
+  {const s=clone(S),r=clone(S),n=Math.max(TMAX-Math.round(S.t),100);
+   const add=y=>{const a=snap(s,e),b=snap(r,eRef);a.t=y;b.t=y;proj.push(a);ref.push(b);};add(0);
+   for(let y=1;y<=n;y++){for(let k=0;k<4;k++){step(s,e,0.25);step(r,eRef,0.25);}add(y);}}
+  fc={t100:proj[100].T,r100:ref[100].T,c100:proj[100].C};
+  const Tn=T0+S.T;
+  $('#tT').innerHTML=f(Tn,2)+' <small>°C</small>';
+  const d=$('#tD');d.innerHTML=sg(S.T,2)+' <small>K</small>';d.className='v'+(S.T>0.005?' pos':'');
+  $('#tC').innerHTML=f(conc(S))+' <small>ppm</small>';
+  $('#tM').innerHTML=f(S.M)+' <small>ppb</small>';
+  $('#tN').innerHTML=f(S.N)+' <small>ppb</small>';
+  $('#tE').innerHTML=f(e.eq,1)+' <small>Gt CO₂-Äq./Jahr</small>';
+  $('#f100').innerHTML=f(T0+fc.t100,2)+' °C';$('#f100n').textContent=sg(fc.t100-S.T,2)+' K gegenüber jetzt · CO₂ dann '+f(fc.c100)+' ppm';
+  $('#fRef').innerHTML=f(T0+fc.r100,2)+' °C';$('#fRefn').textContent='1,5 Mrd Pkw mit Verbrennungsmotor, alle Quellen 100 %';
+  const df=fc.t100-fc.r100,el=$('#fDiff');el.innerHTML=sg(df,Math.abs(df)<0.095&&Math.abs(df)>=0.0005?3:2)+' K';el.className='v'+(df>0.0005?' pos':df<-0.0005?' neg':'');
+  $('#fDiffn').textContent=Math.abs(df)<0.0005?'kein Unterschied zum heutigen Ausstoß':(df>0?'wärmer':'kühler')+' als mit dem heutigen Ausstoß';
+  const yt='Jahr '+Math.round(S.t)+(start==='heute'?' ('+(2025+Math.round(S.t))+')':'');
+  $('#yearLbl').textContent=yt;$('#status').textContent=yt+' · '+f(Tn,1)+' °C';
+  drawMain();
+  if(full||Math.round(S.t)%5===0){ if(!$('#tab-src').hidden)renderSrcTab(); if(!$('#tab-val').hidden)renderVal(); if(!$('#tab-runs').hidden)renderRuns(); if(!$('#explBox').hidden)renderExplain(); }
+}
+
+/* ---------- Diagramm ---------- */
+const QM={T:{lab:'Temperatur in °C',d:1,get:r=>T0+r.T,lo:13.5,hi:16},C:{lab:'CO₂-Gehalt in ppm',d:0,get:r=>r.C,lo:250,hi:450},
+  M:{lab:'CH₄-Gehalt in ppb',d:0,get:r=>r.M,lo:600,hi:2000},N:{lab:'N₂O-Gehalt in ppb',d:0,get:r=>r.N,lo:260,hi:340},F:{lab:'Strahlungsantrieb in W/m²',d:1,get:r=>r.F,lo:0,hi:3}};
+const PAL={dark:{bg:'#0e1113',grid:'#262c31',ax:'#5f6870',tx:'#9aa2a9'},light:{bg:'#ffffff',grid:'#dcdcdc',ax:'#555',tx:'#222'}};
+function niceStep(r){const p=Math.pow(10,Math.floor(Math.log10(r))),m=r/p;return (m<=1?1:m<=2?2:m<=5?5:10)*p;}
+function drawChart(c,W,H,o){
+  const dpr=o.dpr||Math.min(2,window.devicePixelRatio||1);c.width=W*dpr;c.height=H*dpr;
+  const x=c.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);const p=PAL[o.pal||'dark'],q=QM[o.q];
+  x.fillStyle=p.bg;x.fillRect(0,0,W,H);
+  let lo=q.lo,hi=q.hi;o.series.forEach(s=>s.pts.forEach(r=>{const v=q.get(r);if(v<lo)lo=v;if(v>hi)hi=v;}));
+  const st=niceStep((hi-lo)/5);lo=Math.floor(lo/st+1e-9)*st;hi=Math.ceil(hi/st-1e-9)*st;
+  const L=58,R=14,Tp=14,B=40,pw=W-L-R,ph=H-Tp-B,X=t=>L+t/TMAX*pw,Y=v=>Tp+ph-(v-lo)/(hi-lo)*ph;
+  x.font='11.5px system-ui,sans-serif';x.lineWidth=1;
+  x.textAlign='right';x.textBaseline='middle';
+  for(let v=lo;v<=hi+st/2;v+=st){x.strokeStyle=p.grid;x.beginPath();x.moveTo(L,Y(v));x.lineTo(W-R,Y(v));x.stroke();x.fillStyle=p.tx;x.fillText(f(v,st<1?(st<0.1?2:1):0),L-7,Y(v));}
+  x.textAlign='center';x.textBaseline='top';
+  for(let t=0;t<=TMAX;t+=25){x.strokeStyle=p.grid;x.beginPath();x.moveTo(X(t),Tp);x.lineTo(X(t),Tp+ph);x.stroke();x.fillStyle=p.tx;x.fillText(t,X(t),Tp+ph+6);}
+  x.strokeStyle=p.ax;x.strokeRect(L,Tp,pw,ph);
+  x.fillStyle=p.tx;x.fillText('Zeit in Jahren seit Beginn',L+pw/2,H-15);
+  x.save();x.translate(13,Tp+ph/2);x.rotate(-Math.PI/2);x.textBaseline='middle';x.fillText(q.lab,0,0);x.restore();
+  (o.marks||[]).forEach(t=>{x.strokeStyle=p.ax;x.setLineDash([3,4]);x.beginPath();x.moveTo(X(t),Tp);x.lineTo(X(t),Tp+ph);x.stroke();x.setLineDash([]);x.fillStyle=o.markCol||'#ffb454';x.beginPath();x.moveTo(X(t)-5,Tp);x.lineTo(X(t)+5,Tp);x.lineTo(X(t),Tp+8);x.fill();});
+  o.series.forEach(s=>{if(s.pts.length<1)return;x.strokeStyle=s.color;x.lineWidth=s.w||2;x.setLineDash(s.dash||[]);x.lineJoin='round';x.beginPath();
+    s.pts.forEach((r,i)=>{const px=X(r.t+(s.off||0)),py=Y(q.get(r));i?x.lineTo(px,py):x.moveTo(px,py);});x.stroke();x.setLineDash([]);
+    if(s.dot){const r=s.pts[s.pts.length-1];x.fillStyle=s.color;x.beginPath();x.arc(X(r.t+(s.off||0)),Y(q.get(r)),4.5,0,7);x.fill();}});
+}
+function drawMain(){
+  const c=$('#chart'),W=Math.max(300,c.parentElement.clientWidth||900),H=Math.round(clamp(W*0.46,250,420)),q=$('#qSel').value,t0=S.t;
+  const ser=runs.map(r=>({pts:r.rec,color:r.color,w:1.6}));
+  const cut=a=>a.filter(r=>r.t+t0<=TMAX);
+  ser.push({pts:cut(ref),color:'#7d858c',w:1.6,dash:[2,4],off:t0});
+  ser.push({pts:cut(proj),color:'#ffb454',w:2,dash:[7,5],off:t0});
+  ser.push({pts:cur.rec,color:'#ffb454',w:3,dot:true});
+  drawChart(c,W,H,{q,series:ser,marks:cur.events.map(e=>e.t)});
+  let l='<span><i style="border-color:#ffb454"></i>aktueller Lauf</span><span><i class="da" style="border-color:#ffb454"></i>Prognose mit den aktuellen Einstellungen</span><span><i class="do" style="border-color:#7d858c"></i>Vergleich: alle Quellen wie heute</span>';
+  if(cur.events.length)l+='<span>▼ Einstellungen geändert</span>';
+  runs.forEach(r=>l+='<span><i style="border-color:'+r.color+'"></i>Lauf '+r.no+'</span>');
+  $('#legend').innerHTML=l;
+}
+
+/* ---------- Quellen-Tabelle ---------- */
+function renderSrcTab(){
+  const e=emis(Z),base=ahead(S,e,100).T;let mx=0.01;SRC.forEach(s=>mx=Math.max(mx,e.per[s.id].eq));
+  let h='<tr><th>Quelle</th><th>Umfang</th><th>Ausstoß in Gt CO₂-Äq./Jahr</th><th></th><th>Anteil</th><th>Beitrag zur Temperatur in 100 Jahren</th></tr>';
+  SRC.forEach(s=>{const a=e.per[s.id],q=Z.src[s.id];let dT=0;
+    if(q.on&&a.eq>0){const z2=cloneSet(Z);z2.src[s.id].on=false;dT=base-ahead(S,emis(z2),100).T;}
+    const w=v=>(v/mx*100).toFixed(1)+'%';
+    h+='<tr'+(q.on?'':' style="opacity:.45"')+'><td class="nm">'+ico(s)+s.name+'</td><td>'+(q.on?(s.unit?f(s.unit*q.lv/100,2)+' Mrd':q.lv+' %'):'aus')+'</td><td>'+f(a.eq,2)+'</td>'+
+      '<td class="barc"><div class="bar"><span style="width:'+w(a.co2)+';background:var(--amber)"></span><span style="width:'+w(a.ch4*GWP.ch4/1000)+';background:var(--teal)"></span><span style="width:'+w(a.n2o*GWP.n2o/1000)+';background:var(--violet)"></span></div></td>'+
+      '<td>'+(e.eq>0?f(a.eq/e.eq*100,1)+' %':'–')+'</td><td>'+(q.on&&a.eq>0?sg(dT,2)+' K':'–')+'</td></tr>';});
+  h+='<tr><td class="nm"><b>Summe</b></td><td></td><td><b>'+f(e.eq,2)+'</b></td><td class="nm" style="font-size:12px;color:var(--text-dim)">CO₂ '+f(e.co2,1)+' Gt · CH₄ '+f(e.ch4)+' Mt · N₂O '+f(e.n2o,1)+' Mt</td><td>'+(e.eq>0?'100 %':'–')+'</td><td>'+sg(base-ahead(S,emis(mkSet(0)),100).T,2)+' K</td></tr>';
+  $('#srcTab').innerHTML=h;
+}
+/* ---------- Messwerte ---------- */
+function valRows(r,stepY){const a=r.rec.filter((x,i)=>x.t%stepY===0||i===r.rec.length-1);return a;}
+function valHTML(r,stepY){
+  let h='<tr><th>Jahr</th><th>Temperatur in °C</th><th>Änderung in K</th><th>CO₂ in ppm</th><th>CH₄ in ppb</th><th>N₂O in ppb</th><th>Ausstoß in Gt CO₂-Äq./Jahr</th></tr>';
+  valRows(r,stepY).forEach(x=>h+='<tr><td>'+x.t+'</td><td>'+f(T0+x.T,2)+'</td><td>'+sg(x.T,2)+'</td><td>'+f(x.C)+'</td><td>'+f(x.M)+'</td><td>'+f(x.N)+'</td><td>'+f(x.eq,1)+'</td></tr>');
+  return h;
+}
+function renderVal(){$('#valTab').innerHTML=valHTML(cur,10);}
+function csv(){
+  let t='Jahr;Temperatur in °C;Änderung in K;CO2 in ppm;CH4 in ppb;N2O in ppb;Ausstoß in Gt CO2-Äq. pro Jahr\r\n';
+  cur.rec.forEach(x=>t+=[x.t,f(T0+x.T,2),f(x.T,2),f(x.C,1),f(x.M),f(x.N,1),f(x.eq,2)].join(';').replace(/\./g,'')+'\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+t],{type:'text/csv;charset=utf-8'}));a.download='Treibhauseffekt_Messwerte.csv';document.body.appendChild(a);a.click();a.remove();
+}
+/* ---------- Läufe ---------- */
+function runItem(r,col,live){const l=r.rec[r.rec.length-1];
+  return '<div class="runitem"><i style="border-color:'+col+'"></i><div class="d"><b>'+(live?'Aktueller Lauf':'Lauf '+r.no)+'</b> · '+startName(r.start)+'<small>Zu Beginn: '+(r.desc0||desc(Z))+'</small>'+
+   r.events.map(e=>'<small>Jahr '+e.t+' geändert: '+e.ch.join('; ')+'</small>').join('')+'<small>Stand im Jahr '+l.t+': '+f(T0+l.T,2)+' °C ('+sg(l.T,2)+' K) · CO₂ '+f(l.C)+' ppm</small></div>'+
+   (live?'':'<button class="btn small" data-del="'+r.no+'">Löschen</button>')+'</div>';}
+function renderRuns(){
+  $('#runList').innerHTML=runItem(cur,'#ffb454',true)+runs.slice().reverse().map(r=>runItem(r,r.color,false)).join('');
+  $$('#runList [data-del]').forEach(b=>b.addEventListener('click',()=>{runs=runs.filter(r=>r.no!==+b.dataset.del);renderRuns();drawMain();}));
+}
+/* ---------- Erklärungen ---------- */
+function renderExplain(){
+  const e=emis(Z),C=conc(S),p=[];
+  if(e.eq===0){
+    p.push(C<281?'Es sind keine zusätzlichen Quellen aktiv. Wasserdampf, CO₂, CH₄ und N₂O der natürlichen Atmosphäre halten einen Teil der Wärmestrahlung zurück: Die Erde hat im Mittel <b>14 °C</b> statt etwa <b>−18 °C</b> ohne Treibhauseffekt. Aufnahme und Abgabe der Gase sind im Gleichgewicht, die Temperatur bleibt gleich.'
+      :'Alle Quellen sind abgeschaltet, trotzdem liegt die Temperatur weiter über dem natürlichen Wert: CO₂ wird nur sehr langsam von Ozeanen und Pflanzen aufgenommen (ein Teil bleibt Jahrhunderte in der Luft). Methan wird dagegen innerhalb von etwa zehn Jahren abgebaut.');
+  }else{
+    const top=SRC.map(s=>({s,a:e.per[s.id]})).sort((a,b)=>b.a.eq-a.a.eq)[0];
+    p.push('Die aktiven Quellen stoßen zusammen <b>'+f(e.eq,1)+' Gt CO₂-Äquivalente</b> pro Jahr aus (CO₂ '+f(e.co2,1)+' Gt, CH₄ '+f(e.ch4)+' Mt, N₂O '+f(e.n2o,1)+' Mt). Größte Einzelquelle: <b>'+top.s.name+'</b> mit '+f(top.a.eq/e.eq*100)+' %.');
+    if(Z.src.pkw.on){const a=e.per.pkw,n=1.5*Z.src.pkw.lv/100;
+      p.push('<b>Pkw:</b> '+f(n,2)+' Mrd Fahrzeuge verursachen '+f(a.eq,2)+' Gt pro Jahr, das sind '+f(a.eq/e.eq*100,1)+' % des gesamten Ausstoßes. Ein Pkw mit Verbrennungsmotor stößt im Modell etwa '+f(CAR_T,1)+' t CO₂ pro Jahr aus'+
+       (Z.share>0?', ein Elektroauto mit „'+STROM[Z.strom].n+'“ etwa '+f(STROM[Z.strom].t,STROM[Z.strom].t<1?2:1)+' t (über die Stromerzeugung). Bei '+Math.round(Z.share)+' % Elektroautos sinkt der Ausstoß der Pkw deshalb '+(STROM[Z.strom].t<CAR_T?'nur um den Unterschied zwischen beiden Werten':'nicht – Kohlestrom verursacht mehr CO₂ als der Verbrennungsmotor')+'.':'.')+
+       ' Weil Pkw nur einen kleinen Teil aller Emissionen ausmachen, ändert sich die Temperatur durch Pkw allein nur um Zehntel- bis Hundertstelgrad.');}
+    p.push('<b>CO₂ sammelt sich an:</b> Solange Quellen aktiv sind, steigt der CO₂-Gehalt immer weiter, weil Ozeane und Pflanzen nur etwa die Hälfte aufnehmen. Die Temperatur folgt verzögert, da sich die Ozeane langsam erwärmen.');
+    if(e.ch4>0)p.push('<b>Methan:</b> CH₄ wirkt je Tonne etwa 28-mal so stark wie CO₂, wird aber in rund zehn Jahren zu CO₂ und Wasser oxidiert. Bei gleichbleibendem Ausstoß stellt sich deshalb ein fester Gehalt ein (hier etwa '+f(720+e.ch4/P.ch4Mt*P.tauCH4)+' ppb).');
+  }
+  p.push('Die Wirkung von CO₂ wächst nicht gleichmäßig mit dem Gehalt: Jede Verdopplung erwärmt die Erde langfristig um etwa 3 K.');
+  $('#explTxt').innerHTML=p.map(x=>'<p>'+x+'</p>').join('');
+}
+
+/* ===================== Piktogramme (selbst gezeichnet, keine Fremdgrafiken) ===================== */
+const rr=(c,x,y,w,h,r,f)=>{c.fillStyle=f;c.beginPath();if(c.roundRect&&r)c.roundRect(x,y,w,h,r);else c.rect(x,y,w,h);c.fill();};
+const ci=(c,x,y,r,f)=>{c.fillStyle=f;c.beginPath();c.arc(x,y,r,0,7);c.fill();};
+const pg=(c,pts,f)=>{c.fillStyle=f;c.beginPath();pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();c.fill();};
+const wheel=(c,x,y,r)=>{ci(c,x,y,r,'#14171a');ci(c,x,y,r*.42,'#9aa2a9');};
+function carBody(c,col,dark){pg(c,[[-9,-9],[-5.5,-15.5],[5,-15.5],[9.5,-9]],dark);rr(c,-14,-10,28,7.5,3,col);
+  pg(c,[[-6.6,-9.6],[-4.3,-14.2],[-0.6,-14.2],[-0.6,-9.6]],'#cfeaf5');pg(c,[[0.6,-9.6],[0.6,-14.2],[4.2,-14.2],[7.3,-9.6]],'#cfeaf5');
+  rr(c,12,-8,2,2.2,1,'#ffe9a8');wheel(c,-8,-2.8,3.1);wheel(c,8,-2.8,3.1);}
+const IC={
+ car:c=>{rr(c,-16,-4.6,3,1.4,.6,'#5f6870');carBody(c,'#d9634c','#b24a36');},
+ ecar:c=>{carBody(c,'#4fd1c5','#35a69b');pg(c,[[1.2,-9.4],[-2.2,-5.6],[-0.2,-5.6],[-1.2,-2.8],[2.6,-6.9],[0.4,-6.9]],'#fff3c4');},
+ truck:c=>{rr(c,-16,-17,20,13.5,1.5,'#d5d8dc');rr(c,-16,-17,20,3,1.5,'#b9bec4');rr(c,5,-13,10.5,9.5,2,'#e0a23c');rr(c,9,-11.5,5.2,4,1,'#cfeaf5');rr(c,-16,-4.2,31.5,1.6,.5,'#3a4046');wheel(c,-10,-2.8,3);wheel(c,-3,-2.8,3);wheel(c,10,-2.8,3);},
+ plane:c=>{pg(c,[[-13,-2],[-17,-10],[-13,-10],[-8,-3]],'#4fd1c5');rr(c,-14,-3.5,27,7,3.5,'#e7e4dd');pg(c,[[11.5,-3.4],[16.5,0],[11.5,3.4]],'#e7e4dd');pg(c,[[2,1],[-7,9],[-3,9],[7,1]],'#aab0b6');for(let i=0;i<5;i++)ci(c,-6+i*3.6,-0.8,.9,'#3b6ea5');rr(c,10,-2.2,3.4,1.9,.8,'#3b6ea5');},
+ ship:c=>{rr(c,-8,-17.5,3,5.5,.5,'#5f6870');pg(c,[[-16,-7],[16,-7],[12,0],[-13,0]],'#34495c');rr(c,-15.3,-7,30.6,1.6,0,'#d9634c');rr(c,-12,-12.5,7,5.5,1,'#eef0f2');rr(c,-10.5,-11,4,1.6,.4,'#3b6ea5');['#ffb454','#4fd1c5','#d9634c','#b79cf2'].forEach((f,i)=>rr(c,-3+i*4.3,-11.2,3.8,4,.4,f));},
+ coal:c=>{rr(c,1,-22,4.2,22,.5,'#9aa2a9');rr(c,1,-22,4.2,2.2,.5,'#d9634c');rr(c,1,-17.5,4.2,2.2,0,'#d9634c');rr(c,7.5,-19,4.2,19,.5,'#8a9299');rr(c,7.5,-19,4.2,2.2,.5,'#d9634c');rr(c,-13,-10,15,10,1,'#6b7178');rr(c,-13,-10,15,2,1,'#565c63');for(let i=0;i<3;i++)rr(c,-11+i*4.3,-6.5,2.6,2.6,.3,'#ffcf7a');pg(c,[[-16,0],[-11.5,-4.5],[-7,0]],'#1b1e21');},
+ gasplant:c=>{rr(c,-2.5,-21,3,21,.5,'#9aa2a9');pg(c,[[-1,-21],[-2.8,-24],[-1,-27.5],[.8,-24]],'#ffb454');rr(c,-14,-9,11,9,1,'#6b7178');for(let i=0;i<2;i++)rr(c,-12+i*4.5,-6,2.6,2.6,.3,'#ffcf7a');rr(c,2.5,-2,1.4,2,0,'#6b7178');rr(c,12.2,-2,1.4,2,0,'#6b7178');ci(c,8,-7,6.5,'#cfd4d9');rr(c,1.6,-7.8,12.8,1.6,0,'#9aa2a9');},
+ factory:c=>{rr(c,7,-21,5,21,.5,'#a8573f');rr(c,6.5,-21,6,2,.5,'#8a4632');pg(c,[[-14,0],[-14,-9],[-8,-13.5],[-8,-9],[-2,-13.5],[-2,-9],[4,-13.5],[4,0]],'#7d858c');for(let i=0;i<3;i++)rr(c,-12.3+i*6,-6.5,3,3,.3,'#ffcf7a');rr(c,-1.5,-4,3.5,4,.3,'#4a5057');},
+ house:c=>{rr(c,4.5,-19,3,7,.3,'#8a9299');rr(c,-9,-10,18,10,.5,'#e3d6b8');pg(c,[[-11.5,-9.5],[0,-19.5],[11.5,-9.5]],'#a8573f');rr(c,-5.5,-6.5,4,6.5,.3,'#6b4a35');rr(c,1.5,-7.5,5,4,.3,'#cfeaf5');},
+ derrick:c=>{c.strokeStyle='#cfd4d9';c.lineWidth=1.3;c.lineCap='round';c.beginPath();[[-8,0,-1.5,-21],[5,0,1.5,-21],[-6.1,-6,4,-6],[-4.3,-12,3,-12],[-8,0,4,-6],[5,0,-6.1,-6],[-6.1,-6,3,-12],[4,-6,-4.3,-12],[-4.3,-12,1.5,-21],[3,-12,-1.5,-21]].forEach(l=>{c.moveTo(l[0],l[1]);c.lineTo(l[2],l[3]);});c.stroke();rr(c,-3,-23,6,2.2,.4,'#cfd4d9');rr(c,8,-8,6.5,8,1.2,'#3b6ea5');rr(c,8,-5.8,6.5,1.1,0,'#2b5280');rr(c,8,-3,6.5,1.1,0,'#2b5280');},
+ cow:c=>{[-8,-4.5,2.5,5.5].forEach(x=>rr(c,x,-6,1.9,6,.5,'#e3dfd3'));rr(c,-11.3,-12.5,1.1,6,.5,'#e3dfd3');rr(c,-10.5,-13.5,18,8.5,3.5,'#f4f1e9');ci(c,-4,-10.5,2.6,'#3a3f44');ci(c,2.5,-8,2,'#3a3f44');pg(c,[[6.5,-16.5],[5,-19.2],[8,-17.4]],'#cfc9b8');rr(c,6,-17,7,6.5,2.2,'#f4f1e9');rr(c,10.2,-13.3,3.4,3,1.3,'#e9a9a0');ci(c,9,-14.7,.7,'#14171a');},
+ crop:c=>{rr(c,-14,-2.5,28,2.5,.8,'#6b4a35');for(let i=0;i<6;i++){const x=-11.5+i*4.6;c.strokeStyle='#7fbf5a';c.lineWidth=1.1;c.beginPath();c.moveTo(x,-2.5);c.lineTo(x,-13);c.moveTo(x,-6);c.lineTo(x-2.2,-9);c.moveTo(x,-7.5);c.lineTo(x+2.2,-10.5);c.stroke();c.fillStyle='#e8c35a';c.beginPath();c.ellipse(x,-14.5,1.3,3,0,0,7);c.fill();}},
+ landfill:c=>{pg(c,[[-15,0],[-9,-7.5],[-3,-5.5],[3,-11],[9,-5],[15,0]],'#6f665a');[['#d9634c',-8,-4],['#4fd1c5',-2,-3.2],['#e7e4dd',2,-7.5],['#ffb454',6,-3],['#b79cf2',-5,-1.9],['#e7e4dd',9,-1.9]].forEach(a=>rr(c,a[1],a[2],2.6,1.8,.3,a[0]));},
+ tree:c=>{rr(c,-1.6,-8,3.2,8,.5,'#6b4a35');ci(c,0,-14,6.5,'#3f8f4f');ci(c,-4.5,-10.5,4.5,'#3f8f4f');ci(c,4.5,-10.5,4.5,'#3f8f4f');ci(c,-1.5,-15.5,3,'#56ad66');ci(c,3.5,-11.5,2.2,'#56ad66');},
+ burn:c=>{rr(c,-9.5,-4,5,4,.6,'#6b4a35');c.fillStyle='#9a7355';c.beginPath();c.ellipse(-7,-4,2.5,1,0,0,7);c.fill();pg(c,[[3,0],[-2.5,-5],[0,-9],[1,-6.5],[3.5,-15],[6,-8],[7.5,-10],[9,-4.5],[6.5,0]],'#e8742e');pg(c,[[4,0],[1.2,-4],[3.6,-9],[5.4,-5],[7,-3.5],[6,0]],'#ffd166');}
+};
+const PUFF={car:[[-18,-4,0]],truck:[[-19,-4,0]],ship:[[-6.5,-18,0]],coal:[[3,-23,1],[9.6,-20,1]],gasplant:[[-1,-28,0]],factory:[[9.5,-22,1]],house:[[6,-20,0]],cow:[[-13,-13,0]],landfill:[[3,-12,0]],burn:[[4,-15,1]]};
+function drawIcon(c,kind,x,y,s){c.save();c.translate(x,y);c.scale(s,s);IC[kind](c);c.restore();}
+const icoCache={};
+function icoURL(kind){if(!icoCache[kind]){const k=document.createElement('canvas');k.width=112;k.height=96;drawIcon(k.getContext('2d'),kind,56,kind==='plane'?46:88,3);icoCache[kind]=k.toDataURL('image/png');}return icoCache[kind];}
+const ico=s=>'<img class="pic" src="'+icoURL(s.ico)+'" alt="" width="28" height="24">';
+
+/* ===================== Szene ===================== */
+const cv=$('#scene'),cx=cv.getContext('2d');cv.width=1800;cv.height=840;
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const sunP=Array.from({length:9},(_,i)=>({u:i/9,tx:rnd(120,820)}));
+const irP=Array.from({length:24},()=>({x:rnd(40,810),y:rnd(262,318),dir:-1,vx:0}));
+const BAND=[104,258]; // Treibhausgas-Schicht
+const mol={co2:[],ch4:[],n2o:[],h2o:[]};
+function fitMol(a,n){while(a.length<n)a.push({x:rnd(20,805),y:rnd(BAND[0]+14,BAND[1]-12),ph:rnd(0,7),fl:0});while(a.length>n)a.pop();}
+function glyph(kind,x,y,al){
+  const dot=(dx,dy,r,c)=>{cx.fillStyle=c;cx.beginPath();cx.arc(x+dx,y+dy,r,0,7);cx.fill();};
+  cx.globalAlpha=al;
+  if(kind==='co2'){dot(-5.5,0,3.2,'#e4785b');dot(5.5,0,3.2,'#e4785b');dot(0,0,3,'#aab0b6');}
+  else if(kind==='ch4'){dot(-3.6,-3,1.8,'#f2f2f2');dot(3.6,-3,1.8,'#f2f2f2');dot(-3.6,3,1.8,'#f2f2f2');dot(3.6,3,1.8,'#f2f2f2');dot(0,0,3.2,'#4fd1c5');}
+  else if(kind==='n2o'){dot(-5.5,0,3,'#6fa8ff');dot(0,0,3,'#6fa8ff');dot(5.5,0,3.2,'#b79cf2');}
+  else{dot(-3.2,2.4,1.7,'#f2f2f2');dot(3.2,2.4,1.7,'#f2f2f2');dot(0,0,2.8,'#7fb6d6');}
+  cx.globalAlpha=1;
+}
+function puffs(x,y,now,i,big){for(let k=0;k<3;k++){const ph=((now/1100)+k/3+i*.37)%1;cx.globalAlpha=(1-ph)*.55;cx.fillStyle='#b4bac0';cx.beginPath();cx.arc(x+7*ph,y-ph*(big?26:16),(big?3:2)+(big?5:3)*ph,0,7);cx.fill();}cx.globalAlpha=1;}
+function nIcons(id,max,per){const q=Z.src[id];return q.on&&q.lv>0?clamp(Math.round(q.lv/per),1,max):0;}
+function place(kind,n,x0,x1,y,s,now,seed){for(let i=0;i<n;i++){const x=x0+(x1-x0)*(i+.5)/n;(PUFF[kind]||[]).forEach((q,k)=>puffs(x+q[0]*s,y+q[1]*s,now,i+k+seed,q[2]));drawIcon(cx,kind,x,y,s);}}
+function lbl(t,x,y,c){cx.font='10px system-ui,sans-serif';cx.textAlign='center';cx.fillStyle=c||'#9aa2a9';cx.fillText(t,x,y);}
+function drawScene(now,dt){
+  const F=forc(S),Tn=T0+S.T;
+  cx.setTransform(2,0,0,2,0,0);
+  let g=cx.createLinearGradient(0,0,0,318);g.addColorStop(0,'#090b0d');g.addColorStop(.22,'#0e1820');g.addColorStop(1,'#1c3947');cx.fillStyle=g;cx.fillRect(0,0,900,318);
+  // Treibhausgas-Schicht: wird mit steigendem Gehalt dichter
+  cx.fillStyle='rgba(150,205,225,'+clamp(0.09+0.035*F,0.09,0.3)+')';cx.fillRect(0,BAND[0],900,BAND[1]-BAND[0]);
+  cx.strokeStyle='rgba(170,215,235,.55)';cx.setLineDash([9,6]);cx.lineWidth=1.5;cx.beginPath();cx.moveTo(0,BAND[0]);cx.lineTo(900,BAND[0]);cx.moveTo(0,BAND[1]);cx.lineTo(900,BAND[1]);cx.stroke();cx.setLineDash([]);cx.lineWidth=1;
+  cx.fillStyle='rgba(228,120,91,'+clamp(S.T*0.05,0,0.3)+')';cx.fillRect(0,BAND[1],900,318-BAND[1]);
+  cx.strokeStyle='#3a444b';cx.setLineDash([5,6]);cx.beginPath();cx.moveTo(0,70);cx.lineTo(900,70);cx.stroke();cx.setLineDash([]);
+  cx.font='11px system-ui,sans-serif';cx.textAlign='right';cx.fillStyle='#5f6870';cx.fillText('Weltall',890,62);cx.fillStyle='#7d8b93';cx.fillText('Atmosphäre',812,86);cx.textAlign='left';cx.fillStyle='#b9dcea';cx.font='bold 11px system-ui,sans-serif';cx.fillText('Schicht der Treibhausgase',10,BAND[0]-6);cx.font='11px system-ui,sans-serif';cx.fillStyle='#7d8b93';cx.fillText('(Anzahl der Moleküle nicht maßstäblich)',160,BAND[0]-6);
+  // Boden
+  cx.fillStyle='#24402b';cx.fillRect(0,318,700,102);cx.fillStyle='#17384f';cx.fillRect(700,318,200,102);
+  cx.fillStyle='#2a2e32';cx.fillRect(0,372,700,30);cx.strokeStyle='#59606a';cx.setLineDash([12,12]);cx.beginPath();cx.moveTo(0,387);cx.lineTo(700,387);cx.stroke();cx.setLineDash([]);
+  // Sonne
+  g=cx.createRadialGradient(52,40,6,52,40,44);g.addColorStop(0,'#ffe9a8');g.addColorStop(.5,'#ffb454');g.addColorStop(1,'rgba(255,180,84,0)');cx.fillStyle=g;cx.beginPath();cx.arc(52,40,44,0,7);cx.fill();
+  // Legende im Weltall
+  const leg=[['#ffe08a','Sonnenstrahlung'],['#e4785b','Wärmestrahlung der Erde'],['#ffb454','von Treibhausgasen zurückgeworfen (Gegenstrahlung)']];
+  cx.font='11px system-ui,sans-serif';cx.textAlign='left';let lx=112;
+  leg.forEach(([c,t])=>{cx.strokeStyle=c;cx.lineWidth=3;cx.beginPath();cx.moveTo(lx,18);cx.lineTo(lx+18,18);cx.stroke();cx.fillStyle='#9aa2a9';cx.fillText(t,lx+24,22);lx+=34+cx.measureText(t).width;});
+  lx=112;[['co2','CO₂'],['ch4','CH₄'],['n2o','N₂O'],['h2o','H₂O (Wasserdampf)']].forEach(([k,t])=>{glyph(k,lx+8,44,1);cx.fillStyle='#9aa2a9';cx.font='11px system-ui,sans-serif';cx.textAlign='left';cx.fillText(t,lx+22,48);lx+=36+cx.measureText(t).width;});
+  cx.lineWidth=1;
+  // Moleküle
+  fitMol(mol.h2o,14);fitMol(mol.co2,clamp(Math.round(14+(conc(S)-280)/5),0,150));fitMol(mol.ch4,clamp(Math.round(3+(S.M-720)/100),0,40));fitMol(mol.n2o,clamp(Math.round(2+(S.N-270)/12),0,30));
+  const allMol=[];
+  for(const k of ['h2o','co2','ch4','n2o'])mol[k].forEach(m=>{m.px=m.x+Math.sin(now/2600+m.ph)*6;m.py=m.y+Math.cos(now/3100+m.ph)*4;allMol.push(m);
+    if(m.fl>0){cx.globalAlpha=m.fl*.8;cx.strokeStyle='#ffb454';cx.lineWidth=2;cx.beginPath();cx.arc(m.px,m.py,7+(1-m.fl)*9,0,7);cx.stroke();cx.globalAlpha=1;cx.lineWidth=1;m.fl-=dt*2.2;}
+    glyph(k,m.px,m.py,k==='h2o'?.6:1);});
+  // Sonnenstrahlung
+  cx.strokeStyle='#ffe08a';cx.lineWidth=2.2;cx.lineCap='round';
+  sunP.forEach(p=>{p.u+=dt*0.22;if(p.u>1){p.u=0;p.tx=rnd(120,820);}const x=70+(p.tx-70)*p.u,y=52+(318-52)*p.u,dx=(p.tx-70)/266*14,dy=14;cx.globalAlpha=.85;cx.beginPath();cx.moveTo(x,y);cx.lineTo(x-dx,y-dy);cx.stroke();});
+  cx.globalAlpha=1;
+  // Wärmestrahlung
+  irP.forEach(p=>{
+    p.y+=p.dir*dt*62;p.x+=p.vx*dt;
+    // trifft der Strahl ein Treibhausgas-Molekül, wird er zurückgeworfen
+    if(p.dir<0&&p.y<BAND[1]+4&&p.y>BAND[0])for(const m of allMol){if(Math.abs(m.px-p.x)<9&&Math.abs(m.py-p.y)<6){p.dir=1;p.vx=rnd(-22,22);m.fl=1;break;}}
+    if(p.y<-12||(p.dir>0&&p.y>=318)){p.x=rnd(40,810);p.y=318;p.dir=-1;p.vx=0;}
+    cx.strokeStyle=p.dir<0?'#e4785b':'#ffb454';cx.lineWidth=2;cx.beginPath();
+    for(let k=0;k<=4;k++){const yy=p.y-p.dir*k*4,xx=p.x+(k%2?3:-3);k?cx.lineTo(xx,yy):cx.moveTo(xx,yy);}cx.stroke();
+  });
+  cx.lineWidth=1;
+  // Quellen: hintere Reihe
+  const back=[['rind',82,156,'Rinder'],['acker',160,234,'Ackerbau'],['muell',238,300,'Deponien'],['heiz',304,378,'Heizungen'],['ind',382,456,'Industrie'],['kohle',460,534,'Kohle-KW'],['gas',538,612,'Gas-/Öl-KW'],['foerd',616,696,'Förderung']];
+  const nf=nIcons('rod',3,60);place('tree',3-nf,4,4+(3-nf)*25,350,.85,now,0);if(nf)place('burn',nf,4+(3-nf)*25,79,350,.85,now,1);lbl(nf?'Rodung':'Wald',42,362,nf?'#e7e4dd':'#7d8b93');
+  back.forEach(([id,x0,x1,t])=>{const s0=SRC.find(a=>a.id===id),n=nIcons(id,3,60);if(!n)return;const s=n===3?.8:n===2?.95:1.05,w=Math.min(x1-x0+6,n*29*s),m=(x0+x1)/2;
+    place(s0.ico,n,m-w/2,m+w/2,350,s,now,2);lbl(t,m,362,'#e7e4dd');});
+  // Straße
+  {const n=nIcons('pkw',6,100/3),ne=Math.round(n*Z.share/100);for(let i=0;i<n;i++)place(i>=n-ne?'ecar':'car',1,44+i*64,44+i*64,398,1.45,now,i);
+   const nl=nIcons('lkw',4,50);for(let i=0;i<nl;i++)place('truck',1,474+i*62,474+i*62,398,1.4,now,i+3);}
+  // Schiffe, Flugzeuge
+  {const n=nIcons('schiff',3,70);for(let i=0;i<n;i++)place('ship',1,728+i*46,728+i*46,398,1.25,now,i+5);
+   const nfl=nIcons('flug',4,50);for(let i=0;i<nfl;i++){const x=((now/45+i*235)%980)-40,y=280+(i%2)*21;cx.strokeStyle='rgba(230,230,230,.35)';cx.lineWidth=2;cx.beginPath();cx.moveTo(x-24,y);cx.lineTo(x-84,y);cx.stroke();drawIcon(cx,'plane',x,y,1.25);}}
+  // Thermometer
+  {const X0=862,top=98,bot=284,lo=13,hi=Math.max(18,Math.ceil(Tn)+1),Yv=v=>bot-(v-lo)/(hi-lo)*(bot-top),col=S.T>2?'#e4785b':'#ffb454';
+   cx.fillStyle='rgba(14,17,19,.72)';cx.beginPath();cx.roundRect?cx.roundRect(822,70,72,246,8):cx.rect(822,70,72,246);cx.fill();
+   cx.fillStyle='#2a3137';cx.fillRect(X0-6,top-6,12,bot-top+10);cx.beginPath();cx.arc(X0,bot+12,13,0,7);cx.fill();
+   cx.fillStyle=col;cx.fillRect(X0-3.5,Yv(clamp(Tn,lo,hi)),7,bot-Yv(clamp(Tn,lo,hi))+6);cx.beginPath();cx.arc(X0,bot+12,9.5,0,7);cx.fill();
+   cx.font='10px ui-monospace,Consolas,monospace';cx.textAlign='right';cx.fillStyle='#9aa2a9';cx.strokeStyle='#5f6870';
+   for(let v=lo;v<=hi;v++){if(hi-lo>8&&v%2)continue;cx.beginPath();cx.moveTo(X0-12,Yv(v));cx.lineTo(X0-7,Yv(v));cx.stroke();cx.fillText(v,X0-15,Yv(v)+3);}
+   cx.font='bold 13px ui-monospace,Consolas,monospace';cx.textAlign='center';cx.fillStyle=col;cx.fillText(f(Tn,1)+' °C',858,88);}
+}
+
+/* ===================== Ablauf ===================== */
+let last=0;
+function loop(now){
+  const dt=Math.min(0.1,(now-last)/1000||0);last=now;
+  if(playing){acc+=dt*speed*4;const q=Math.floor(acc);if(q>0){acc-=q;const n0=cur.rec.length;advance(q);if(cur.rec.length!==n0||!playing)refresh(false);}}
+  drawScene(now,dt);
+  requestAnimationFrame(loop);
+}
+function jump(y){setPlay(false);advance(y*4);refresh(true);}
+function applyStart(v){endRun();start=v;$$('input[name=start]').forEach(r=>r.checked=r.value===v);
+  Z=mkSet(v==='heute'?100:0);syncSrc();newRun();} // natürlich: alle Regler 0 %, heute: alle 100 %
+function initUI(){
+  buildSrc();syncSrc();
+  $('#btnPlay').addEventListener('click',()=>setPlay(!playing));
+  $('#btn10').addEventListener('click',()=>jump(10));$('#btn50').addEventListener('click',()=>jump(50));
+  $$('.spd').forEach(b=>b.addEventListener('click',()=>{speed=+b.dataset.s;$$('.spd').forEach(x=>x.classList.toggle('on',x===b));}));
+  $('#btnReset').addEventListener('click',()=>{endRun();newRun();});
+  $$('input[name=start]').forEach(r=>r.addEventListener('change',()=>applyStart(r.value)));
+  $('#explChk').addEventListener('change',e=>{$('#explBox').hidden=!e.target.checked;if(e.target.checked)renderExplain();});
+  $('#allOn').addEventListener('click',()=>{SRC.forEach(s=>Z.src[s.id].lv=100);changed(true);});
+  $('#allOff').addEventListener('click',()=>{SRC.forEach(s=>Z.src[s.id].lv=0);changed(true);});
+  $('#qSel').addEventListener('change',drawMain);
+  $$('#tabs button').forEach(b=>b.addEventListener('click',()=>{$$('#tabs button').forEach(x=>x.classList.toggle('act',x===b));
+    ['dia','src','val','runs'].forEach(t=>$('#tab-'+t).hidden=t!==b.dataset.t);refresh(true);}));
+  $('#btnCsv').addEventListener('click',csv);
+  window.addEventListener('resize',drawMain);
+  newRun();requestAnimationFrame(loop);
+}
+</script>
+<script>
+"use strict";
+/* ===================== Fenster ===================== */
+function modal(html,wide){
+  const m=document.createElement('div');m.className='modal';
+  m.innerHTML='<div class="box'+(wide?' wide':'')+'" role="dialog" aria-modal="true">'+html+'</div>';
+  const key=e=>{if(e.key==='Escape')m.close();else if(m.onkey)m.onkey(e);};
+  m.close=()=>{m.remove();document.removeEventListener('keydown',key);};
+  m.addEventListener('click',e=>{if(e.target===m||e.target.closest('[data-close]'))m.close();});
+  document.addEventListener('keydown',key);$('#modals').appendChild(m);return m;
+}
+const head=t=>'<h2><span>'+t+'</span><button class="x" data-close aria-label="Schließen">×</button></h2>';
+
+/* ===================== Grundlagen ===================== */
+// Valenzstrichformeln mit freien Elektronenpaaren (als Striche)
+const SVGF='font-family="system-ui,sans-serif" font-size="17" fill="#e7e4dd" text-anchor="middle"';
+const ln=(a,b,c,d)=>'<line x1="'+a+'" y1="'+b+'" x2="'+c+'" y2="'+d+'" stroke="#e7e4dd" stroke-width="1.8"/>';
+const at=(x,y,t)=>'<text x="'+x+'" y="'+(y+6)+'">'+t+'</text>';
+const lpTB=(x,y)=>ln(x-7,y-12,x+7,y-12)+ln(x-7,y+12,x+7,y+12);          // zwei Paare oben/unten
+const fCO2=x=>at(x,40,'O')+lpTB(x,40)+ln(x+9,36,x+31,36)+ln(x+9,44,x+31,44)+at(x+40,40,'C')+ln(x+49,36,x+71,36)+ln(x+49,44,x+71,44)+at(x+80,40,'O')+lpTB(x+80,40);
+const fH2O=x=>at(x+30,34,'O')+ln(x+17,24,x+27,19)+ln(x+33,19,x+43,24)+ln(x+23,41,x+10,51)+at(x+4,56,'H')+ln(x+37,41,x+50,51)+at(x+56,56,'H');
+const fCH4=x=>at(x+30,40,'C')+ln(x+9,40,x+21,40)+at(x,40,'H')+ln(x+39,40,x+51,40)+at(x+60,40,'H')+ln(x+30,31,x+30,19)+at(x+30,10,'H')+ln(x+30,49,x+30,61)+at(x+30,70,'H');
+const fO2=x=>at(x,40,'O')+lpTB(x,40)+ln(x+9,36,x+31,36)+ln(x+9,44,x+31,44)+at(x+40,40,'O')+lpTB(x+40,40);
+const fN2O=x=>at(x,40,'N')+ln(x-12,33,x-12,47)+ln(x+9,34,x+31,34)+ln(x+9,40,x+31,40)+ln(x+9,46,x+31,46)+at(x+40,40,'N')+'<text x="'+(x+50)+'" y="30" font-size="11">+</text>'+ln(x+49,40,x+71,40)+at(x+80,40,'O')+lpTB(x+80,40)+ln(x+92,33,x+92,47)+'<text x="'+(x+93)+'" y="26" font-size="12">−</text>';
+const fN2=x=>at(x,40,'N')+ln(x-12,33,x-12,47)+ln(x+9,34,x+31,34)+ln(x+9,40,x+31,40)+ln(x+9,46,x+31,46)+at(x+40,40,'N')+ln(x+52,33,x+52,47);
+const cap=(x,y,t)=>'<text x="'+x+'" y="'+y+'" font-size="12" fill="#9aa2a9">'+t+'</text>';
+const GL=[
+{t:'Strahlungshaushalt der Erde',h:()=>`
+<p>Die Sonne strahlt vor allem <b>kurzwelliges</b> sichtbares Licht auf die Erde. Etwa 30 % davon werden von Wolken, Eis und hellen Flächen sofort ins Weltall zurückgeworfen, rund 70 % erwärmen Boden, Wasser und Luft.</p>
+<p>Die erwärmte Erdoberfläche gibt ihre Energie als <b>langwellige Wärmestrahlung (Infrarot)</b> wieder ab. Die Temperatur der Erde bleibt gleich, wenn genauso viel Energie abgestrahlt wie aufgenommen wird.</p>
+<div class="fig"><svg viewBox="0 0 560 190" width="560" ${SVGF}>
+<circle cx="50" cy="40" r="26" fill="#ffb454"/><rect x="0" y="150" width="560" height="40" fill="#24402b"/>
+<g stroke="#ffe08a" stroke-width="3"><line x1="80" y1="56" x2="210" y2="146"/><line x1="170" y1="118" x2="245" y2="45"/></g>
+<g stroke="#e4785b" stroke-width="3" stroke-dasharray="6 5"><line x1="330" y1="148" x2="330" y2="20"/><line x1="430" y1="148" x2="430" y2="92"/><line x1="430" y1="92" x2="470" y2="146"/></g>
+${cap(250,38,'ca. 30 % zurückgeworfen')}${cap(150,170,'Sonnenstrahlung erwärmt die Oberfläche')}${cap(330,14,'Wärmestrahlung ins Weltall')}${cap(476,88,'von Treibhausgasen')}${cap(476,104,'zurückgehalten')}
+</svg></div>
+<p>Hätte die Erde keine Atmosphäre mit Treibhausgasen, läge ihre mittlere Oberflächentemperatur bei etwa <b>−18 °C</b>.</p>`},
+{t:'Der natürliche Treibhauseffekt',h:()=>`
+<p>Einige Gase der Luft lassen das Sonnenlicht fast ungehindert durch, nehmen aber die Wärmestrahlung der Erde auf (Absorption) und geben sie in alle Richtungen wieder ab. Ein Teil gelangt so zurück zum Boden (<b>Gegenstrahlung</b>) – die Erdoberfläche ist wärmer als ohne diese Gase.</p>
+<table><tr><th>Treibhausgas</th><th>Anteil am natürlichen Treibhauseffekt (ungefähr)</th></tr>
+<tr><td>Wasserdampf H₂O (mit Wolken)</td><td>etwa 3/4</td></tr><tr><td>Kohlenstoffdioxid CO₂</td><td>etwa 1/5</td></tr><tr><td>Methan CH₄, Distickstoffmonooxid N₂O, Ozon O₃</td><td>Rest</td></tr></table>
+<p>Der natürliche Treibhauseffekt erwärmt die Erde um rund <b>33 K</b>: von etwa −18 °C auf etwa +15 °C. Erst dadurch ist flüssiges Wasser und damit Leben möglich.</p>
+<p>In der Simulation ist der Ausgangszustand die Zeit vor der Industrialisierung mit <b>14,0 °C</b> und 280 ppm CO₂. Der oft genannte Wert von 15 °C entspricht ungefähr der heutigen, bereits erhöhten Temperatur.</p>
+<p>Der <b>menschengemachte (anthropogene) Treibhauseffekt</b> kommt hinzu, wenn durch Emissionen der Gehalt an CO₂, CH₄ und N₂O steigt.</p>`},
+{t:'Warum halten diese Gase Wärmestrahlung zurück?',h:()=>`
+<p>Wärmestrahlung kann Moleküle zu <b>Schwingungen</b> anregen: Bindungen werden gestreckt oder Bindungswinkel verändert. Das gelingt nur, wenn sich bei der Schwingung die Ladungsverteilung im Molekül ändert (das Dipolmoment).</p>
+<div class="fig"><svg viewBox="0 0 600 190" width="600" ${SVGF}>
+${fCO2(40)}${cap(80,84,'Kohlenstoffdioxid')}${fH2O(190)}${cap(220,100,'Wasser')}${fCH4(300)}${cap(330,100,'Methan')}${fN2O(430)}${cap(470,84,'Distickstoffmonooxid')}
+<g transform="translate(0,100)">${fN2(170)}${cap(190,84,'Stickstoff')}${fO2(330)}${cap(350,84,'Sauerstoff')}</g>
+</svg></div>
+<p><b>Oben:</b> Moleküle aus drei oder mehr Atomen (CO₂, H₂O, CH₄, N₂O) besitzen solche Schwingungen und sind Treibhausgase. Beim linearen CO₂-Molekül sind es die Knickschwingung und die unsymmetrische Streckschwingung.</p>
+<p><b>Unten:</b> Stickstoff und Sauerstoff bestehen aus zwei gleichen Atomen. Ihre einzige Schwingung ändert die Ladungsverteilung nicht – sie nehmen keine Wärmestrahlung auf, obwohl sie 99 % der Luft ausmachen.</p>`},
+{t:'Die Treibhausgase im Vergleich',h:()=>`
+<table><tr><th>Gas</th><th>vor 1750</th><th>2025</th><th>Verweilzeit in der Luft</th><th>Wirkung je Tonne (über 100 Jahre)</th></tr>
+<tr><td>CO₂</td><td>280 ppm</td><td>427 ppm</td><td>Jahrzehnte bis Jahrtausende</td><td>1</td></tr>
+<tr><td>CH₄</td><td>720 ppb</td><td>1 948 ppb</td><td>etwa 12 Jahre</td><td>28</td></tr>
+<tr><td>N₂O</td><td>270 ppb</td><td>339 ppb</td><td>etwa 110 Jahre</td><td>273</td></tr></table>
+<p><b>ppm</b> bedeutet „Teilchen pro Million“: Bei 427 ppm sind von einer Million Luftteilchen 427 CO₂-Moleküle. <b>ppb</b> bedeutet „pro Milliarde“ (1 ppm = 1 000 ppb).</p>
+<p>Um verschiedene Gase vergleichen zu können, rechnet man in <b>CO₂-Äquivalente</b> um: 1 t Methan erwärmt über 100 Jahre so stark wie 28 t CO₂, 1 t N₂O so stark wie 273 t CO₂.</p>
+<p>CO₂ ist trotz der kleinsten Wirkung je Tonne das wichtigste menschengemachte Treibhausgas, weil davon mit Abstand am meisten ausgestoßen wird und es sehr lange in der Luft bleibt.</p>`},
+{t:'Verbrennung: Woher das CO₂ kommt',h:()=>`
+<p>Kohle, Erdgas, Benzin, Diesel und Heizöl enthalten Kohlenstoff, der vor Jahrmillionen der Luft entzogen wurde. Bei der Verbrennung reagiert er mit Sauerstoff zu Kohlenstoffdioxid.</p>
+<p>Kohle (vereinfacht Kohlenstoff):</p><div class="eq">C + O₂ ⟶ CO₂</div>
+<p>Erdgas (Methan):</p>
+<div class="fig"><svg viewBox="0 0 600 84" width="600" ${SVGF}>
+${fCH4(10)}${at(100,40,'+ 2')}${fO2(135)}<text x="225" y="46" font-size="22">⟶</text>${fCO2(270)}${at(385,40,'+ 2')}${fH2O(410)}
+</svg></div>
+<p>Benzin (vereinfacht als Octan gerechnet):</p><div class="eq">2 Octan + 25 Sauerstoff ⟶ 16 Kohlenstoffdioxid + 18 Wasser</div>
+<h3>Rechenbeispiel: 1 Liter Benzin</h3>
+<p>1 L Benzin hat eine Masse von etwa 750 g. Mit M(Octan) = 114 g/mol:</p>
+<div class="eq">n(Octan) = 750 g : 114 g/mol = 6,58 mol<br>n(CO₂) = 8 · 6,58 mol = 52,6 mol<br>m(CO₂) = 52,6 mol · 44 g/mol ≈ 2 300 g = 2,3 kg</div>
+<p>Aus 0,75 kg Benzin entstehen also 2,3 kg CO₂, weil der Sauerstoff aus der Luft dazukommt. Ein Pkw mit 7 L auf 100 km und 13 000 km im Jahr stößt damit etwa <b>2,1 t CO₂ pro Jahr</b> aus – mit diesem Wert rechnet die Simulation.</p>`},
+{t:'Emissionsquellen',h:()=>{const e=emis(TODAY);return `
+<p>Die Simulation fasst die weltweiten Emissionen zu 13 Quellen zusammen (gerundete Werte, Stand etwa 2023–2025, je Jahr):</p>
+<table><tr><th>Quelle (100 %)</th><th>CO₂ in Gt</th><th>CH₄ in Mt</th><th>N₂O in Mt</th><th>Gt CO₂-Äq.</th></tr>`+
+SRC.map(s=>'<tr><td>'+ico(s)+s.name+'</td><td>'+(s.co2?f(s.co2,1):'–')+'</td><td>'+(s.ch4?f(s.ch4):'–')+'</td><td>'+(s.n2o?f(s.n2o,1):'–')+'</td><td>'+f(e.per[s.id].eq,1)+'</td></tr>').join('')+
+`<tr><td><b>Summe</b></td><td>${f(e.co2,1)}</td><td>${f(e.ch4)}</td><td>${f(e.n2o,1)}</td><td>${f(e.eq,1)}</td></tr></table>
+<p><b>CO₂</b> entsteht vor allem beim Verbrennen von Kohle, Erdöl und Erdgas, bei der Zementherstellung (Brennen von Kalk: Calciumcarbonat ⟶ Calciumoxid + CO₂) und beim Roden und Verbrennen von Wäldern.</p>
+<p><b>Methan</b> entsteht, wenn Mikroorganismen organisches Material ohne Sauerstoff abbauen: im Magen von Rindern, in überfluteten Reisfeldern, in Mülldeponien. Außerdem entweicht es bei der Förderung von Kohle, Erdöl und Erdgas.</p>
+<p><b>Distickstoffmonooxid (Lachgas)</b> bilden Bodenbakterien aus Stickstoffdünger und Gülle.</p>
+<p>Zum Vergleich: Weltweit gibt es rund 1,5 Milliarden Pkw und etwa 1,5 Milliarden Rinder.</p>`;}},
+{t:'Vom Ausstoß zur Temperatur',h:()=>`
+<p>Die Simulation rechnet in vier Schritten:</p>
+<ol><li><b>Ausstoß:</b> Die aktiven Quellen geben jedes Jahr CO₂, CH₄ und N₂O ab.</li>
+<li><b>Gehalt in der Luft:</b> Ozeane und Pflanzen nehmen etwa die Hälfte des CO₂ wieder auf, der Rest sammelt sich an (7,8 Gt CO₂ entsprechen 1 ppm). Methan wird in etwa zehn Jahren abgebaut, N₂O in etwa 110 Jahren.</li>
+<li><b>Zusätzliche Heizleistung (Strahlungsantrieb):</b> Je höher der Gehalt, desto mehr Wärmestrahlung wird zurückgehalten. Für CO₂ gilt näherungsweise ΔF = 5,35 W/m² · ln(c / 280 ppm). Die Wirkung wächst also mit dem Logarithmus: Jede Verdopplung bringt gleich viel.</li>
+<li><b>Temperatur:</b> Eine Verdopplung des CO₂-Gehalts erwärmt die Erde langfristig um etwa 3 K. Weil sich die Ozeane nur langsam erwärmen, folgt die Temperatur dem Gehalt mit Verzögerung.</li></ol>
+<p>Daraus folgen zwei wichtige Beobachtungen: Solange CO₂ ausgestoßen wird, steigt die Temperatur weiter – auch bei gleichbleibendem Ausstoß. Und nach dem Abschalten aller Quellen sinkt sie nur sehr langsam, weil das CO₂ in der Luft bleibt.</p>`},
+{t:'Elektroautos und Strommix',h:()=>`
+<p>Ein Elektroauto stößt beim Fahren kein CO₂ aus. Entscheidend ist, wie der Strom erzeugt wird. Die Simulation rechnet mit 13 000 km im Jahr und 19 kWh auf 100 km, also etwa 2 500 kWh pro Jahr:</p>
+<table><tr><th>Antrieb</th><th>CO₂ je kWh Strom</th><th>CO₂ je Pkw und Jahr</th></tr>
+<tr><td>Verbrennungsmotor (Benzin/Diesel)</td><td>–</td><td>2,1 t</td></tr>
+<tr><td>Elektroauto, heutiger Strommix weltweit</td><td>ca. 480 g</td><td>1,2 t</td></tr>
+<tr><td>Elektroauto, reiner Kohlestrom</td><td>ca. 950 g</td><td>2,4 t</td></tr>
+<tr><td>Elektroauto, Strom aus Wind und Sonne</td><td>ca. 30 g</td><td>0,08 t</td></tr></table>
+<p>Wird ein Drittel der 1,5 Milliarden Pkw elektrisch, sinkt der Ausstoß der Pkw mit dem heutigen Strommix nur von 3,2 auf etwa 2,7 Gt CO₂ pro Jahr, mit Ökostrom auf etwa 2,2 Gt. Elektromobilität wirkt also umso stärker, je sauberer der Strom ist.</p>
+<p>Nicht berücksichtigt sind die Emissionen bei der Herstellung der Fahrzeuge und Batterien.</p>`},
+{t:'Das Modell und seine Grenzen',h:()=>`
+<p>Die Simulation ist ein stark vereinfachtes Rechenmodell. Sie zeigt Größenordnungen und Zusammenhänge, aber keine Klimavorhersage.</p>
+<ul><li>Es gibt nur eine mittlere Temperatur für die ganze Erde – keine Regionen, kein Wetter, keine Jahreszeiten.</li>
+<li>Betrachtet werden nur CO₂, CH₄ und N₂O. Kühlende Schwebteilchen (Aerosole, z. B. aus Schwefeldioxid), Ozon, fluorierte Gase und Kondensstreifen werden nur pauschal berücksichtigt: Die Heizleistung der drei Gase wird um 7 % verringert.</li>
+<li>Rückkopplungen wie tauende Permafrostböden oder nachlassende Aufnahme durch Ozeane und Wälder sind nicht einzeln berechnet.</li>
+<li>Die Emissionswerte sind gerundete weltweite Werte; der Ausstoß bleibt im Modell so lange gleich, bis du ihn änderst.</li>
+<li>Klimasensitivität: 3 K je Verdopplung des CO₂-Gehalts (der wahrscheinliche Bereich liegt bei 2,5 bis 4 K).</li></ul>
+<p>Der Zustand „Heute (2025)“ startet mit den gemessenen Gehalten (427 ppm CO₂, 1 948 ppb CH₄, 339 ppb N₂O) und 15,4 °C, also etwa 1,4 K über dem natürlichen Zustand.</p>`}
+];
+function openGL(i){
+  const m=modal('',true),box=m.querySelector('.box');
+  const show=k=>{i=(k+GL.length)%GL.length;box.innerHTML=head('Grundlagen '+(i+1)+'/'+GL.length+': '+GL[i].t)+GL[i].h()+
+    '<div class="nav"><button class="btn" data-n="-1">← Vorheriges Thema</button><button class="btn" data-n="1">Nächstes Thema →</button></div>';
+    box.querySelectorAll('[data-n]').forEach(b=>b.addEventListener('click',()=>show(i+ +b.dataset.n)));m.scrollTop=0;};
+  m.onkey=e=>{if(e.key==='ArrowRight')show(i+1);if(e.key==='ArrowLeft')show(i-1);};show(i);
+}
+function initGL(){
+  $('#glCount').textContent=GL.length;
+  $('#glList').innerHTML=GL.map((g,i)=>'<button data-i="'+i+'">'+(i+1)+'. '+g.t+'</button>').join('');
+  $$('#glList button').forEach(b=>b.addEventListener('click',()=>openGL(+b.dataset.i)));
+  $('#glToggle').addEventListener('click',()=>{const l=$('#glList');l.hidden=!l.hidden;$('#glArrow').textContent=l.hidden?'▸':'▾';$('#glToggle').setAttribute('aria-expanded',!l.hidden);});
+}
+
+/* ===================== Anleitung, Versionshinweise ===================== */
+const HELP=head('Anleitung')+`
+<p>Die Simulation zeigt, wie Treibhausgase die Temperatur der Erde bestimmen und wie einzelne Emissionsquellen sie verändern.</p>
+<h3>Ausgangszustand</h3>
+<p>Beim Öffnen siehst du den <b>natürlichen Treibhauseffekt</b>: 14,0 °C, alle Regler der Emissionsquellen stehen auf 0 %. Beim Zustand „Heute (2025)“ stehen alle Regler auf 100 %, also auf dem heutigen Umfang.</p>
+<h3>Emissionsquellen</h3>
+<p>Jede Quelle hat einen Regler für ihren Umfang: 0 % bedeutet aus, 100 % ist der heutige Stand weltweit (z. B. 1,5 Mrd Pkw), 200 % das Doppelte. Die Regler lassen sich jederzeit verstellen. Bei den Pkw kannst du zusätzlich den Anteil der Elektroautos und die Art des Stroms wählen.</p>
+<h3>Zeit laufen lassen</h3>
+<p>„▶ Start“ lässt die Jahre laufen, „+10 Jahre“ und „+50 Jahre“ springen vor, der Zeitraffer bestimmt das Tempo. Einstellungen dürfen jederzeit geändert werden – im Diagramm markiert ein Dreieck die Änderung. „Zurücksetzen“ beendet den Lauf und beginnt wieder im Jahr 0; der beendete Lauf bleibt zum Vergleich im Diagramm.</p>
+<h3>Auswertung</h3>
+<ul><li><b>Bild:</b> Sonnenstrahlung durchquert die Schicht der Treibhausgase ungehindert. Wärmestrahlung der Erde wird zurückgeworfen, wenn sie auf ein Molekül trifft – je mehr Ausstoß, desto mehr Moleküle (Anzahl nicht maßstäblich). Dazu aktive Quellen und Thermometer.</li>
+<li><b>Prognose:</b> Temperatur in 100 Jahren, wenn die Einstellungen so bleiben – und der Unterschied zum heutigen Ausstoß. Hier liest du sofort ab, was z. B. doppelt so viele Pkw bewirken.</li>
+<li><b>Diagramm:</b> Verlauf von Temperatur oder Gasgehalten; gestrichelt die Prognose, gepunktet der Vergleich „alle Quellen wie heute“.</li>
+<li><b>Quellen:</b> Ausstoß jeder Quelle und ihr Beitrag zur Temperatur in 100 Jahren.</li>
+<li><b>Messwerte, Läufe:</b> Tabelle (auch als CSV) und „Ausgabe als PDF“.</li></ul>
+<p>Es werden keine Daten gespeichert oder übertragen.</p>`;
+const VERS=head('Versionshinweise')+`
+<h3>Version 1.0 · 10.11.2026</h3>
+<ul><li>Erste Fassung der Simulation „Treibhauseffekt“.</li>
+<li>Ausgangszustand natürlicher Treibhauseffekt (14,0 °C) oder heutiger Zustand (2025).</li>
+<li>13 Emissionsquellen, jede mit eigenem Regler von 0 bis 200 % (natürlicher Zustand: alle 0 %, heute: alle 100 %); Pkw mit Anteil Elektroautos und Wahl des Stroms.</li>
+<li>Alle Piktogramme (Fahrzeuge, Kraftwerke, Gebäude usw.) sind selbst gezeichnet; es werden keine fremden Grafiken, Schriften oder Emoji verwendet.</li>
+<li>Bild mit Strahlung, Schicht der Treibhausgase (Moleküle werfen Wärmestrahlung zurück) und Quellen; Prognose für 100 Jahre mit Vergleich zum heutigen Ausstoß.</li>
+<li>Diagramm mit wählbarer Größe, Vergleich mehrerer Läufe, Beitrag der einzelnen Quellen, Messwerte mit CSV-Ausgabe.</li>
+<li>Neun Grundlagen-Themen, Auswertung als PDF, QR-Code.</li></ul>`;
+
+/* ===================== QR-Code (Byte-Modus, Fehlerkorrektur L, Version 1–5) ===================== */
+function qrMatrix(text){
+  const bytes=[...new TextEncoder().encode(text)],V=[null,[19,7],[34,10],[55,15],[80,20],[108,26]];
+  let v=1;while(v<=5&&bytes.length+2>V[v][0])v++;if(v>5)return null;
+  const nd=V[v][0],ne=V[v][1],bits=[];const put=(val,n)=>{for(let i=n-1;i>=0;i--)bits.push(val>>i&1);};
+  put(4,4);put(bytes.length,8);bytes.forEach(b=>put(b,8));
+  for(let i=0;i<4&&bits.length<nd*8;i++)bits.push(0);while(bits.length%8)bits.push(0);
+  const data=[];for(let i=0;i<bits.length;i+=8){let b=0;for(let k=0;k<8;k++)b=b<<1|bits[i+k];data.push(b);}
+  for(let p=0;data.length<nd;p++)data.push(p%2?17:236);
+  const exp=[],log=[];let x=1;for(let i=0;i<255;i++){exp[i]=x;log[x]=i;x<<=1;if(x&256)x^=285;}
+  const mul=(a,b)=>a&&b?exp[(log[a]+log[b])%255]:0;
+  let gen=[1];for(let i=0;i<ne;i++){const g=new Array(gen.length+1).fill(0);gen.forEach((c,j)=>{g[j]^=c;g[j+1]^=mul(c,exp[i]);});gen=g;}
+  const rem=new Array(ne).fill(0);data.forEach(d=>{const fa=d^rem.shift();rem.push(0);for(let j=0;j<ne;j++)rem[j]^=mul(gen[j+1],fa);});
+  const cw=data.concat(rem),n=17+4*v,M=[],Fn=[];for(let r=0;r<n;r++){M.push(new Array(n).fill(0));Fn.push(new Array(n).fill(false));}
+  const set=(c,r,d)=>{if(r>=0&&r<n&&c>=0&&c<n){M[r][c]=d?1:0;Fn[r][c]=true;}};
+  const finder=(cx0,cy0)=>{for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){const d=Math.max(Math.abs(dx),Math.abs(dy));set(cx0+dx,cy0+dy,d!==2&&d!==4);}};
+  finder(3,3);finder(n-4,3);finder(3,n-4);
+  for(let i=0;i<n;i++){if(!Fn[6][i])set(i,6,i%2===0);if(!Fn[i][6])set(6,i,i%2===0);}
+  if(v>=2){const a=4*v+10;for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)set(a+dx,a+dy,Math.max(Math.abs(dx),Math.abs(dy))!==1);}
+  const fmt=mask=>{const d=(1<<3)|mask;let r=d<<10;for(let i=14;i>=10;i--)if(r>>i&1)r^=0x537<<(i-10);const b=((d<<10)|r)^0x5412,g=i=>b>>i&1;
+    for(let i=0;i<=5;i++)set(8,i,g(i));set(8,7,g(6));set(8,8,g(7));set(7,8,g(8));for(let i=9;i<15;i++)set(14-i,8,g(i));
+    for(let i=0;i<8;i++)set(n-1-i,8,g(i));for(let i=8;i<15;i++)set(8,n-15+i,g(i));set(8,n-8,1);};
+  fmt(0);
+  const cells=[];for(let c=n-1,up=true;c>0;c-=2,up=!up){if(c===6)c--;for(let k=0;k<n;k++){const r=up?n-1-k:k;for(const cc of [c,c-1])if(!Fn[r][cc])cells.push([r,cc]);}}
+  cells.forEach(([r,c],i)=>{const by=cw[i>>3];M[r][c]=by===undefined?0:by>>(7-(i&7))&1;});
+  const MASK=[(r,c)=>(r+c)%2===0,(r,c)=>r%2===0,(r,c)=>c%3===0,(r,c)=>(r+c)%3===0,(r,c)=>(Math.floor(r/2)+Math.floor(c/3))%2===0,(r,c)=>r*c%2+r*c%3===0,(r,c)=>(r*c%2+r*c%3)%2===0,(r,c)=>((r+c)%2+r*c%3)%2===0];
+  let best=null,bs=1e9;
+  for(let m=0;m<8;m++){const T=M.map(r=>r.slice());cells.forEach(([r,c])=>{if(MASK[m](r,c))T[r][c]^=1;});
+    let sc=0;for(let r=0;r<n;r++)for(let c=0;c<n;c++){if(c+1<n&&T[r][c]===T[r][c+1])sc++;if(r+1<n&&T[r][c]===T[r+1][c])sc++;}
+    if(sc<bs){bs=sc;best=[m,T];}}
+  for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(!Fn[r][c])M[r][c]=best[1][r][c];
+  fmt(best[0]);return M;
+}
+function qrSVG(text){const M=qrMatrix(text);if(!M)return'';const n=M.length;let d='';
+  M.forEach((row,r)=>row.forEach((b,c)=>{if(b)d+='M'+(c+2)+' '+(r+2)+'h1v1h-1z';}));
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+(n+4)+' '+(n+4)+'" shape-rendering="crispEdges"><rect width="100%" height="100%" fill="#fff"/><path d="'+d+'" fill="#000"/></svg>';}
+function initQR(){
+  $('#qrSmall').outerHTML=qrSVG(URL_SELF);
+  $('#qrBtn').addEventListener('click',()=>modal(head('Auf dem Mobilgerät öffnen')+'<div style="text-align:center"><div class="qr-big">'+qrSVG(URL_SELF)+'</div><p style="font-family:var(--mono);font-size:13px;word-break:break-all">'+URL_SELF+'</p><p class="hint">Mit der Kamera scannen, um diese Simulation auf dem eigenen Gerät zu öffnen.</p><button class="btn" data-close>Schließen</button></div>'));
+}
+
+/* ===================== Auswertung als PDF ===================== */
+const pdfInfo={name:'',kurs:''};
+const PCOL=['#b36b00','#0b7f76','#6a45c9','#2e8b3d','#c2452a','#2b62c9','#b82f8f'];
+function chartImg(series,q){const c=document.createElement('canvas');drawChart(c,900,360,{q,series,pal:'light',dpr:2,marks:series.length===1?series[0].marks:[],markCol:'#555'});return c.toDataURL('image/png');}
+function openPdf(){
+  const list=runs.map(r=>({r,col:r.color,name:runDesc(r)}));
+  if(cur.rec.length>1)list.push({r:cur,col:'#ffb454',name:'Aktueller Lauf: '+runDesc(cur).replace(/^Lauf \d+: /,'')});
+  const m=modal(head('Auswertung als PDF')+
+   '<h3>Welche Läufe sollen ins PDF?</h3><div class="pdf-runs">'+(list.length?list.map((l,i)=>'<label><input type="checkbox" checked data-i="'+i+'"><i style="border-color:'+l.col+'"></i><span>'+l.name+'</span></label>').join(''):'<p class="hint">Noch kein Lauf vorhanden. Lass die Simulation zuerst einige Jahre laufen.</p>')+'</div>'+
+   '<h3>Angaben (optional)</h3><div class="pdf-f"><input id="pdfName" placeholder="Name" autocomplete="off"><input id="pdfKurs" placeholder="Kurs" autocomplete="off"></div>'+
+   '<p class="hint">Das PDF enthält für jeden gewählten Lauf die Einstellungen der Quellen zu Beginn, alle vorgenommenen Veränderungen mit Jahr, das Temperatur-Diagramm und die Messwerte in 10-Jahres-Schritten, bei mindestens zwei Läufen zusätzlich einen Vergleich.</p>'+
+   '<p class="hint"><b>So speicherst du das PDF:</b> Nach „PDF erstellen“ öffnet sich der Druckdialog des Browsers. Dort als Drucker bzw. Ziel „Als PDF speichern“ wählen und auf „Speichern“ tippen (am iPad: Teilen → „In Dateien sichern“). Es wird nichts gedruckt oder übertragen.</p>'+
+   '<div class="row"><button class="btn primary" id="pdfGo"'+(list.length?'':' disabled')+'>PDF erstellen</button><button class="btn" data-close>Abbrechen</button></div>');
+  m.querySelector('#pdfName').value=pdfInfo.name;m.querySelector('#pdfKurs').value=pdfInfo.kurs;
+  m.querySelector('#pdfGo').addEventListener('click',()=>{
+    pdfInfo.name=m.querySelector('#pdfName').value.trim();pdfInfo.kurs=m.querySelector('#pdfKurs').value.trim();
+    const sel=[...m.querySelectorAll('.pdf-runs input:checked')].map(i=>list[+i.dataset.i]);if(!sel.length)return;
+    m.close();buildPrint(sel);setTimeout(()=>window.print(),150);});
+}
+function buildPrint(sel){
+  const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  const at=(r,y)=>{const x=r.rec.find(a=>a.t===y);return x?f(T0+x.T,2)+' °C':'–';};
+  let h='<h1>Simulation „Treibhauseffekt“ – Auswertung</h1><div class="meta"><span>Name: '+esc(pdfInfo.name||'____________________')+'</span><span>Kurs: '+esc(pdfInfo.kurs||'__________')+'</span><span>Datum: '+new Date().toLocaleDateString('de-DE')+'</span></div>';
+  sel.forEach((l,i)=>{const r=l.r,last=r.rec[r.rec.length-1],tt=r===cur?'Aktueller Lauf':'Lauf '+r.no,col=PCOL[i%PCOL.length];
+    h+='<div class="blk"><h2>'+tt+'</h2><h3>Versuchsbedingungen</h3><ul><li>'+startName(r.start)+' ('+f(T0+r.rec[0].T,1)+' °C, '+f(r.rec[0].C)+' ppm CO₂)</li><li>Quellen zu Beginn: '+(r.desc0||desc(Z))+'</li></ul>'+
+      '<h3>Vorgenommene Veränderungen</h3><ul>'+(r.events.length?r.events.map(e=>'<li><b>Jahr '+e.t+':</b> '+e.ch.join('; ')+'<br>Danach aktiv: '+e.text+'</li>').join(''):'<li>keine – die Einstellungen blieben während des gesamten Laufs unverändert</li>')+'</ul>'+
+      '<h3>Ergebnis</h3><ul><li>Stand im Jahr '+last.t+': '+f(T0+last.T,2)+' °C ('+sg(last.T,2)+' K gegenüber dem natürlichen Zustand), CO₂ '+f(last.C)+' ppm, CH₄ '+f(last.M)+' ppb, N₂O '+f(last.N)+' ppb</li></ul></div>';
+    const ser=q=>chartImg([{pts:r.rec,color:col,w:2.5,marks:r.events.map(e=>e.t)}],q);
+    h+='<div class="blk"><h3>Temperatur der Erdoberfläche'+(r.events.length?' (▼ = Veränderung)':'')+'</h3><img src="'+ser('T')+'" alt=""></div>';
+    h+='<div class="blk"><h3>Messwerte</h3><table>'+valHTML(r,10)+'</table></div>';});
+  if(sel.length>1){
+    h+='<div class="blk"><h2>Vergleich der Läufe</h2><img src="'+chartImg(sel.map((l,i)=>({pts:l.r.rec,color:PCOL[i%PCOL.length],w:2.5})),'T')+'" alt=""><div class="pleg">'+sel.map((l,i)=>'<span><i style="border-color:'+PCOL[i%PCOL.length]+'"></i>'+(l.r===cur?'Aktueller Lauf':'Lauf '+l.r.no)+'</span>').join('')+'</div></div>';
+    h+='<div class="blk"><table><tr><th>Lauf</th><th>Quellen zu Beginn</th><th>Veränderungen</th><th>nach 50 Jahren</th><th>nach 100 Jahren</th><th>am Ende</th></tr>'+sel.map(l=>{const r=l.r,z=r.rec[r.rec.length-1];
+      return '<tr><td>'+(r===cur?'Aktuell':'Lauf '+r.no)+'</td><td style="text-align:left">'+(r.desc0||desc(Z))+'</td><td style="text-align:left">'+(r.events.length?r.events.map(e=>'Jahr '+e.t+': '+e.ch.join('; ')).join('<br>'):'keine')+'</td><td>'+at(r,50)+'</td><td>'+at(r,100)+'</td><td>'+f(T0+z.T,2)+' °C (Jahr '+z.t+')</td></tr>';}).join('')+'</table></div>';}
+  h+='<p class="pfoot">'+TITLE+' V'+VERSION+' · Bastian Baumgart · chemie.mail-baumgart.de · Lizenz CC BY-NC-SA 4.0 · Simulierte Daten zu Lehrzwecken (vereinfachtes Klimamodell, keine Klimavorhersage)</p>';
+  $('#print').innerHTML=h;
+}
+
+/* ===================== Start ===================== */
+initUI();initGL();initQR();
+$('#btnHelp').addEventListener('click',()=>modal(HELP));
+$('#btnVer').addEventListener('click',()=>modal(VERS));
+$('#btnPdf1').addEventListener('click',openPdf);$('#btnPdf2').addEventListener('click',openPdf);
+</script>
+</body>
+</html>
