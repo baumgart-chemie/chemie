@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Übung „Protolysegleichungen“</title>
 <style>
-:root{--bg:#14171a;--panel:#1b1f23;--panel-alt:#20252a;--line:#31383e;--text:#e7e4dd;--text-dim:#9aa2a9;--text-faint:#5f6870;--amber:#ffb454;--teal:#4fd1c5;--good:#7fd68a;--danger:#e4785b;--screen:#0e1113;--mono:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace}
+:root{--bg:#14171a;--panel:#1b1f23;--panel-alt:#20252a;--line:#31383e;--line-soft:#262c31;--text:#e7e4dd;--text-dim:#9aa2a9;--text-faint:#5f6870;--amber:#ffb454;--teal:#4fd1c5;--good:#7fd68a;--danger:#e4785b;--screen:#0e1113;--mono:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;-webkit-text-size-adjust:100%}
@@ -89,9 +89,12 @@ svg.mol{display:block;overflow:visible}
 .eqv .op{font-size:17px}
 .eqv .fm{font-size:16px}
 /* Footer */
-footer{border-top:1px solid var(--line);padding:12px 18px;color:var(--text-dim);font-size:13px;text-align:center}
-footer p{margin:4px 0}
-footer a{color:var(--text-dim)}
+footer{padding:16px 28px 30px; color:var(--text-faint); font-size:11.5px; border-top:1px solid var(--line-soft); margin-top:10px;}
+footer p{margin:0;}
+footer a{color:var(--text-dim); text-decoration:none; border-bottom:1px solid var(--line);}
+footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
+footer .footer-credit{margin-top:8px; color:var(--text-dim);}
+@media (max-width:600px){ footer{padding:16px 16px 30px;} }
 /* Modal */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:14px;z-index:50}
 .mbox{background:var(--panel);border:1px solid var(--line);border-radius:12px;width:min(720px,100%);max-height:92vh;display:flex;flex-direction:column}
@@ -114,6 +117,13 @@ footer a{color:var(--text-dim)}
 .finp{font:18px var(--mono);color:var(--text);background:var(--screen);border:2px solid var(--line);border-radius:10px;padding:8px 10px;min-height:48px;width:160px}
 .finp:focus{outline:none;border-color:var(--teal)}
 .finp.bad{border-color:var(--danger)}
+.frow{display:flex;gap:6px;align-items:center}
+.fcf{font:18px var(--mono);color:var(--amber);background:var(--screen);border:2px solid var(--line);border-radius:10px;padding:8px 4px;min-height:48px;width:44px;text-align:center}
+.fcf:focus{outline:none;border-color:var(--teal)}
+.fcf.bad{border-color:var(--danger)}
+.fslot{min-width:0}
+.maintop{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.maintop .primary{min-height:44px;padding:0 26px;font-size:16px}
 .pv{min-height:30px;padding-left:4px;display:flex;align-items:center;gap:4px;color:var(--text-dim)}
 .pv .fm{font-size:17px}
 .cfp{font-family:var(--mono);color:var(--amber)}
@@ -203,7 +213,6 @@ svg.mol.edit{touch-action:manipulation;max-width:100%;height:auto}
     <div class="lbl">Eingabe bei anorganischen Säuren</div>
     <div class="seg" id="segInp"><button data-v="free">Formeln eintippen</button><button data-v="tiles">Teilchen auswählen</button></div>
     <p class="hint">Organische Säuren: Die Produkte werden in den vorgegebenen Strukturformeln verändert.</p>
-    <button class="primary wide" id="btnNew">Neue Aufgabe</button>
   </div>
   <div class="card">
     <h2>Bilanz</h2>
@@ -221,6 +230,7 @@ svg.mol.edit{touch-action:manipulation;max-width:100%;height:auto}
   </div>
 </aside>
 <main>
+  <div class="maintop"><button class="primary" id="btnNew">Neue Aufgabe</button></div>
   <div class="card" id="taskCard"></div>
   <div class="card" id="palCard" hidden>
     <h2>Teilchen</h2>
@@ -234,8 +244,8 @@ svg.mol.edit{touch-action:manipulation;max-width:100%;height:auto}
 </main>
 </div>
 <footer>
-  <p>Modellannahmen: Es wird stets eine vollständige Protolyse angenommen (Reaktionspfeil ⟶); starke und schwache Säuren werden nicht unterschieden. Reaktionspartner (Base) ist immer Wasser.</p>
-  <p>Bastian Baumgart · Protolysegleichungen V1.0 · <a href="#" id="lnkVer">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-note">Modellannahmen: Es wird stets eine vollständige Protolyse angenommen (Reaktionspfeil ⟶); starke und schwache Säuren werden nicht unterschieden. Reaktionspartner (Base) ist immer Wasser.</p>
+  <p class="footer-credit">Bastian Baumgart · Protolysegleichungen V1.0 · <a href="#" id="lnkVer">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 </div>
 
@@ -253,7 +263,7 @@ svg.mol.edit{touch-action:manipulation;max-width:100%;height:auto}
     </ul>
     <p>Mit „Neue Aufgabe“ erhältst du eine Säure. Organische Verbindungen werden als Strukturformeln dargestellt.</p>
     <h3>2. Gleichung aufstellen</h3>
-    <p><b>Anorganische Säuren</b> (Standard: Formeln eintippen): Tippe in jedes der vier Felder eine Formel: links die Säure und Wasser, rechts die beiden Produkte. Ladungen schreibst du mit ^ (z. B. SO4^2-), einen Koeffizienten setzt du davor (z. B. 2 H3O+). Auch Sonderzeichen wie H₃O⁺ werden verstanden; unter dem Feld siehst du die gesetzte Schreibweise. Mit den Knöpfen „Eingabehilfe“ fügst du ^, + und − ein. Alternativ wählst du links „Teilchen auswählen“: Dann tippst du ein Feld an und danach unten ein Teilchen; die Zahl links im Feld ist der Koeffizient (Antippen erhöht sie).</p>
+    <p><b>Anorganische Säuren</b> (Standard: Formeln eintippen): Tippe in jedes der vier Felder eine Formel: links die Säure und Wasser, rechts die beiden Produkte. Ladungen schreibst du mit ^ (z. B. SO4^2-), den stöchiometrischen Faktor trägst du im kleinen Feld vor der Formel ein (Standard 1; z. B. Faktor 2 und Formel H3O+). Auch Sonderzeichen wie H₃O⁺ werden verstanden; unter dem Feld siehst du die gesetzte Schreibweise. Mit den Knöpfen „Eingabehilfe“ fügst du ^, + und − ein. Alternativ wählst du links „Teilchen auswählen“: Dann tippst du ein Feld an und danach unten ein Teilchen; die Zahl links im Feld ist der Koeffizient (Antippen erhöht sie).</p>
     <p><b>Organische Säuren:</b> Säure und Wasser stehen als Strukturformeln in der Gleichung. Die beiden Produkte beginnen als Kopie der Edukte. Wähle ein Werkzeug und tippe auf Atome: <i>H-Atom löschen</i>, <i>H-Atom anfügen</i>, <i>Ladung −</i> oder <i>Ladung +</i>. Bei der Säure entfernst du das abgegebene H-Atom und setzt am Sauerstoff-Atom eine negative Ladung; beim Wasser fügst du ein H-Atom an und setzt eine positive Ladung (H₃O⁺). Freie Elektronenpaare werden automatisch ergänzt. „Rückgängig“ nimmt die letzte Änderung zurück. Die Zahl links neben jeder Formel ist der Koeffizient.</p>
     <h3>3. Mehrprotonige Säuren</h3>
     <p>Gib zuerst nacheinander die einzelnen <b>Protolysestufen</b> ein, danach die <b>Gesamtgleichung</b>. Eine Gleichung wird erst freigeschaltet, wenn die vorherige richtig ist.</p>
@@ -511,12 +521,16 @@ function parseTerm(raw){
   return{err:'unknown'};
 }
 function plain(id){const p=SP[id];const ch=p.ch,m=Math.abs(ch);if(!ch)return p.f;return p.f+(m>1?'^'+m:'')+(ch>0?'+':'-')}
-function preview(txt){const r=parseTerm(txt);if(r.empty)return '';if(r.id)return (r.c>1?'<span class="cfp">'+r.c+'</span> ':'')+spHTML(r.id);return '<span class="pvq">?</span>'}
+/* Stöchiometrischer Faktor: eigenes Feld vor der Formel (s.fc = Text des Feldes, Standard 1) */
+const fcVal=s=>s.fc!==undefined?s.fc:String(s.c||1);
+function fcParse(fc){const v=String(fc===undefined?'1':fc).trim();if(v==='')return{c:1};if(!/^\d+$/.test(v))return{err:'Der Faktor muss eine ganze Zahl von 1 bis 9 sein.'};const n=+v;if(n<1||n>9)return{err:'Der Faktor muss zwischen 1 und 9 liegen.'};return{c:n}}
+function effC(r,fc){if(r.c>1)return r.c;const f=fcParse(fc);return f.c||1}
+function preview(txt,fc){const r=parseTerm(txt);if(r.empty)return '';if(r.id){const c=effC(r,fc);return (c>1?'<span class="cfp">'+c+'</span> ':'')+spHTML(r.id)}return '<span class="pvq">?</span>'}
 function syncMode(){
   const t=st.task;if(!t||isStruct(t))return;
   t.eqs.forEach(e=>{if(e.done)return;e.slots.forEach(s=>{
-    if(st.inp==='free'){if(s.id)s.txt=(s.c>1?s.c+' ':'')+plain(s.id)}
-    else if(s.txt){const r=parseTerm(s.txt);if(r.id){s.id=r.id;s.c=r.c}}
+    if(st.inp==='free'){if(s.id){s.txt=plain(s.id);s.fc=String(s.c)}}
+    else if(s.txt){const r=parseTerm(s.txt);if(r.id){s.id=r.id;s.c=effC(r,s.fc)}}
   })});
 }
 
@@ -727,7 +741,7 @@ function freeLine(e,i){
   e.slots.forEach((s,k)=>{
     if(k===2)h+='<span class="op arr">⟶</span>';else if(k)h+='<span class="op">+</span>';
     const bad=e.fb&&e.fb.bad;
-    h+=`<div class="fslot"><input class="finp ${bad?'bad':''}" data-e="${i}" data-s="${k}" value="${esc(s.txt||'')}" placeholder="Formel" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"><div class="pv">${preview(s.txt)}</div></div>`;
+    h+=`<div class="fslot"><div class="frow"><input class="fcf ${bad?'bad':''}" data-e="${i}" data-s="${k}" value="${esc(fcVal(s))}" inputmode="numeric" maxlength="2" aria-label="Stöchiometrischer Faktor" title="Stöchiometrischer Faktor" autocomplete="off"><input class="finp ${bad?'bad':''}" data-e="${i}" data-s="${k}" value="${esc(s.txt||'')}" placeholder="Formel" aria-label="Formel" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></div><div class="pv">${preview(s.txt,s.fc)}</div></div>`;
   });
   h+='</div><div class="eqbtns" style="margin-top:8px"><span class="hint" style="margin:0 4px 0 0;align-self:center">Eingabehilfe:</span><button data-ins="^" aria-label="Hochstellen">^</button><button data-ins="+">+</button><button data-ins="-">−</button></div>';
   return h;
@@ -750,7 +764,7 @@ function structLine(t,e,i,cur){
 }
 function renderTask(){
   const card=$('#taskCard'),t=st.task;
-  if(!t){card.innerHTML=`<div class="empty-state">Wähle links die Aufgabenart und tippe auf <b>„Neue Aufgabe“</b>.</div>`;$('#palCard').hidden=true;return}
+  if(!t){card.innerHTML=`<div class="empty-state">Wähle links die Aufgabenart und tippe oben auf <b>„Neue Aufgabe“</b>.</div>`;$('#palCard').hidden=true;return}
   const acid=ACID[t.acid],n=acid.n,struct=isStruct(t);
   const disp=acid.cat==='org'?molSVG(SP[acid.chain[0]].mol,26):fmtF(SP[acid.chain[0]].f,SP[acid.chain[0]].ch);
   const nm=esc(acid.name)+(acid.triv?` <span style="color:var(--text-dim);font-weight:400">(${esc(acid.triv)})</span>`:'');
@@ -760,7 +774,7 @@ function renderTask(){
   let h=`<div class="taskhead"><div class="acidbox">${disp}</div><div class="tasktext"><div class="nm">${nm}</div>
     <div style="margin:4px 0 6px"><span class="tag">${CATTXT[acid.cat]}</span><span class="tag">${LVLTXT[acid.lvl]}</span>${acid.ion?'<span class="tag">Ion als Säure</span>':''}</div>${txt}</div></div>
     <div style="margin-top:10px"><button id="btnSchema">${st.showSchema?'Schema ausblenden':'Schema einblenden'}</button></div>`;
-  if(!struct&&st.inp==='free')h+='<p class="hint">Tippe die Formeln ein. Ladungen schreibst du mit ^ (z. B. SO4^2-, H3O+), einen Koeffizienten setzt du davor (z. B. 2 H3O+).</p>';
+  if(!struct&&st.inp==='free')h+='<p class="hint">Tippe die Formeln ein. Ladungen schreibst du mit ^ (z. B. SO4^2-, H3O+), den stöchiometrischen Faktor trägst du im kleinen Feld vor der Formel ein (Standard 1).</p>';
   if(st.showSchema){
     h+=`<div class="schema">Säure + H<sub>2</sub>O ⟶ H<sub>3</sub>O<sup>+</sup> + korrespondierende Base<br><span style="font-family:var(--mono)">HA + H<sub>2</sub>O ⟶ H<sub>3</sub>O<sup>+</sup> + A<sup>−</sup></span>`+
       (n>1?`<br>Gesamtgleichung: <span style="font-family:var(--mono)">H<sub>n</sub>A + n H<sub>2</sub>O ⟶ n H<sub>3</sub>O<sup>+</sup> + A<sup>n−</sup></span>`:'')+
@@ -820,16 +834,17 @@ let lastInput=null;
 function nextEmpty(e,from){for(let k=1;k<=4;k++){const s=(from+k)%4;if(!e.slots[s].id)return s}return from}
 const card=$('#taskCard');
 card.addEventListener('pointerdown',ev=>{if(ev.target.closest('[data-ins]'))ev.preventDefault()});
-card.addEventListener('focusin',ev=>{if(ev.target.matches('input.finp'))lastInput=ev.target});
+card.addEventListener('focusin',ev=>{if(ev.target.matches('input.finp'))lastInput=ev.target;if(ev.target.matches('input.fcf'))ev.target.select()});
 card.addEventListener('input',ev=>{
-  const inp=ev.target.closest('input.finp');if(!inp||!st.task)return;
-  st.task.eqs[+inp.dataset.e].slots[+inp.dataset.s].txt=inp.value;
-  inp.parentNode.querySelector('.pv').innerHTML=preview(inp.value);
+  const inp=ev.target.closest('input.finp,input.fcf');if(!inp||!st.task)return;
+  const s=st.task.eqs[+inp.dataset.e].slots[+inp.dataset.s];
+  if(inp.classList.contains('fcf'))s.fc=inp.value;else s.txt=inp.value;
+  inp.closest('.fslot').querySelector('.pv').innerHTML=preview(s.txt,s.fc);
 });
 card.addEventListener('keydown',ev=>{
-  const inp=ev.target.closest('input.finp');if(!inp||ev.key!=='Enter')return;
+  const inp=ev.target.closest('input.finp,input.fcf');if(!inp||ev.key!=='Enter')return;
   ev.preventDefault();
-  const all=[...card.querySelectorAll(`input.finp[data-e="${inp.dataset.e}"]`)],ix=all.indexOf(inp);
+  const all=[...card.querySelectorAll(`input.finp[data-e="${inp.dataset.e}"],input.fcf[data-e="${inp.dataset.e}"]`)],ix=all.indexOf(inp);
   if(ix<all.length-1)all[ix+1].focus();else{const b=card.querySelector('button[data-act=check]');if(b)b.click()}
 });
 card.addEventListener('click',ev=>{
@@ -848,7 +863,7 @@ card.addEventListener('click',ev=>{
   if(cf){ev.stopPropagation();const e=t.eqs[+cf.dataset.e];if(e.done)return;const s=e.slots[+cf.dataset.s];s.c=s.c%4+1;if(!isStruct(t))t.act={e:+cf.dataset.e,s:+cf.dataset.s};e.fb=null;renderTask();return}
   const sl=ev.target.closest('.slot');
   if(sl){const ei=+sl.dataset.e,si=+sl.dataset.s,e=t.eqs[ei];if(e.done||!unlocked(t,ei))return;
-    if(t.act.e===ei&&t.act.s===si&&e.slots[si].id){e.slots[si].id=null;e.slots[si].c=1;e.slots[si].txt='';e.fb=null}
+    if(t.act.e===ei&&t.act.s===si&&e.slots[si].id){e.slots[si].id=null;e.slots[si].c=1;e.slots[si].txt='';delete e.slots[si].fc;e.fb=null}
     t.act={e:ei,s:si};renderTask();return}
   const b=ev.target.closest('button[data-act]');if(!b)return;
   const ei=+b.dataset.e,e=t.eqs[ei],acid=ACID[t.acid],struct=isStruct(t),act=b.dataset.act;
@@ -863,14 +878,19 @@ card.addEventListener('click',ev=>{
     if(struct)r=diagStruct(acid,e);
     else{
       if(st.inp==='free'){
-        const ps=e.slots.map(s=>parseTerm(s.txt));
+        const ps=e.slots.map(s=>{
+          const p=parseTerm(s.txt);if(p.empty||p.err)return p;
+          const f=fcParse(s.fc);if(f.err)return{err:f.err};
+          if(p.c>1&&f.c!==1)return{err:'Schreibe den Faktor nur in das Feld vor der Formel, nicht zusätzlich in die Formel.'};
+          return{id:p.id,c:p.c>1?p.c:f.c,strip:p.c>1};
+        });
         if(ps.some(p=>p.empty)){e.fb={cls:'bad',html:'Fülle alle vier Felder aus: links die Säure und Wasser, rechts die beiden Produkte.'};renderTask();return}
         const bi=ps.findIndex(p=>p.err);
         if(bi>=0){
           const m=ps[bi].err==='unknown'?`Das Teilchen „${esc(e.slots[bi].txt)}“ wird nicht erkannt. Prüfe Formel und Ladung (Schreibweise z. B. SO4^2-, H3O+, 2 H2O).`:esc(ps[bi].err);
           e.fb={cls:'bad',html:`Feld ${bi+1}: ${m}`};renderTask();return;
         }
-        ps.forEach((p,k)=>{e.slots[k].id=p.id;e.slots[k].c=p.c});
+        ps.forEach((p,k)=>{const s=e.slots[k];s.id=p.id;s.c=p.c;s.fc=String(p.c);if(p.strip)s.txt=s.txt.replace(/^\s*\d+\s*/,'')});
       }
       r=diagnose(acid,e,e.slots);
       if(r.ok===false&&e.slots.some(s=>!s.id)){e.fb={cls:'bad',html:r.m};renderTask();return}
@@ -880,7 +900,7 @@ card.addEventListener('click',ev=>{
     else{st.streak=0;e.fb={cls:'bad',bad:true,html:r.m}}
   }else if(act==='sol'){
     if(struct)solveStruct(e);
-    else{const E=expected(acid,e);e.slots=E.L.concat(E.R).map(([c,id])=>({id,c,txt:(c>1?c+' ':'')+plain(id),mol:null}))}
+    else{const E=expected(acid,e);e.slots=E.L.concat(E.R).map(([c,id])=>({id,c,txt:plain(id),fc:String(c),mol:null}))}
     e.done=true;e.sol=true;e.first=false;st.streak=0;
     e.fb={cls:'tip',html:'Lösung eingesetzt (im Verlauf und im PDF mit * gekennzeichnet). '+(e.type==='all'?'':okFeedback(acid,e).replace('Richtig! ',''))};finishEq(t,ei);
   }
@@ -958,7 +978,7 @@ const GB=[
   <div class="fig">${eqHTML([[1,'HCl'],[1,'H2O']],[[1,'H3O+'],[1,'Cl-']])}</div>
   <div class="fig">${eqHTML([[1,'NH4+'],[1,'H2O']],[[1,'H3O+'],[1,'NH3']])}</div>
   <p>Ladungsbilanz im zweiten Beispiel: links (+1) + 0 = +1, rechts (+1) + 0 = +1 ✓</p>
-  <p><b>Schreibweise beim Eintippen:</b> Ladungen mit ^, z. B. SO4^2-; H₃O⁺ als H3O+; Koeffizient vor die Formel, z. B. 2 H3O+.</p>
+  <p><b>Schreibweise beim Eintippen:</b> Ladungen mit ^, z. B. SO4^2-; H₃O⁺ als H3O+; den stöchiometrischen Faktor trägst du im kleinen Feld vor der Formel ein (Standard 1).</p>
   <p><b>Vereinfachung in dieser Übung:</b> Es wird immer eine <b>vollständige Protolyse</b> angenommen. Deshalb wird ein einfacher Reaktionspfeil (⟶) verwendet. Tatsächlich reagieren viele Säuren (z. B. Essigsäure) nur teilweise; dort stellt sich ein Gleichgewicht ein (⇌). Starke und schwache Säuren werden hier nicht unterschieden.</p>`},
  {t:'Mehrprotonige Säuren',h:()=>`
   <p>Säuren, die mehrere Protonen abgeben können, heißen <b>mehrprotonige Säuren</b> (zwei-, dreiprotonig). Die Protonen werden <b>nacheinander</b> abgegeben – in jeder <b>Protolysestufe</b> genau eines. Das Produkt einer Stufe ist die Säure der nächsten Stufe.</p>
@@ -1057,7 +1077,7 @@ function deserMol(o){
 }
 function serT(t){
   return{acid:t.acid,tiles:t.tiles,inHist:t.inHist,eqs:t.eqs.map(e=>({
-    slots:e.slots.map((s,k)=>({id:s.id,c:s.c,txt:s.txt||'',mol:(k>=2&&s.mol)?serMol(s.mol):null})),
+    slots:e.slots.map((s,k)=>({id:s.id,c:s.c,txt:s.txt||'',fc:typeof s.fc==='string'?s.fc:undefined,mol:(k>=2&&s.mol)?serMol(s.mol):null})),
     attempts:e.attempts,tip:e.tip,sol:e.sol}))};
 }
 $('#btnSave').addEventListener('click',()=>{
@@ -1090,7 +1110,7 @@ function deserT(o){
         [0,1,2,3].forEach(k=>{const c=xs[k]&&xs[k].c;e.slots[k].c=[1,2,3,4].includes(c)?c:1});
       }
     }else{
-      e.slots=[0,1,2,3].map(k=>{const x=xs[k]||{};return{id:SP[x.id]?x.id:null,c:[1,2,3,4].includes(x.c)?x.c:1,txt:typeof x.txt==='string'?x.txt.slice(0,30):'',mol:null}});
+      e.slots=[0,1,2,3].map(k=>{const x=xs[k]||{};return{id:SP[x.id]?x.id:null,c:[1,2,3,4].includes(x.c)?x.c:1,txt:typeof x.txt==='string'?x.txt.slice(0,30):'',fc:typeof x.fc==='string'?x.fc.slice(0,2):undefined,mol:null}});
     }
     e.attempts=Math.max(0,parseInt(s.attempts)||0);e.tip=!!s.tip;
     const ok=un&&(struct?diagStruct(acid,e).ok===true:diagnose(acid,e,e.slots).ok===true);   // neu prüfen

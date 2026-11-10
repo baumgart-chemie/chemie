@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Übung „Säure-Base-Berechnungen“</title>
+<style>
+:root{--bg:#14171a;--panel:#1b1f23;--panel-alt:#20252a;--line:#31383e;--text:#e7e4dd;--text-dim:#9aa2a9;--text-faint:#5f6870;--amber:#ffb454;--teal:#4fd1c5;--good:#7fd68a;--danger:#e4785b;--screen:#0e1113;--mono:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;-webkit-text-size-adjust:100%}
+a{color:var(--teal)}
+h1{font-size:20px;margin:0;font-weight:650}
+h2{font-size:15px;margin:0 0 10px;font-weight:650;color:var(--text)}
+header{display:flex;align-items:center;gap:16px;padding:10px 18px;border-bottom:1px solid var(--line);background:var(--panel);flex-wrap:wrap}
+.back{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:8px;background:var(--panel-alt);color:var(--text);text-decoration:none}
+.ttl{flex:1;min-width:200px}
+.sub{color:var(--text-dim);font-size:13px}
+.lnk{display:inline-flex;align-items:center;min-height:44px;padding:0 6px;margin-left:12px}
+.status{font-family:var(--mono);font-size:13px;color:var(--amber);border:1px solid var(--line);border-radius:8px;padding:8px 12px;background:var(--screen)}
+.layout{display:grid;grid-template-columns:330px 1fr;gap:16px;padding:16px;max-width:1500px;margin:0 auto}
+aside{position:sticky;top:12px;align-self:start;max-height:calc(100vh - 24px);overflow:auto}
+main{min-width:0}
+@media(max-width:920px){.layout{grid-template-columns:1fr}aside{position:static;max-height:none}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px}
+button{font:inherit;color:var(--text);background:var(--panel-alt);border:1px solid var(--line);border-radius:8px;padding:8px 14px;min-height:44px;cursor:pointer;touch-action:manipulation}
+button:disabled{opacity:.4;cursor:default}
+button.primary{background:var(--teal);color:#0e1113;border-color:var(--teal);font-weight:650}
+button.wide{width:100%}
+.lbl{font-size:12px;color:var(--text-dim);margin:10px 0 6px;text-transform:uppercase;letter-spacing:.04em}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1}
+.seg button.on{border-color:var(--teal);color:var(--teal);background:rgba(79,209,197,.1)}
+.hint{color:var(--text-dim);font-size:13px;margin:10px 0}
+.gb{width:100%;display:flex;justify-content:space-between;align-items:center;font-weight:650}
+.gblist{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.gblist button{text-align:left;font-size:14px}
+.stats{display:grid;grid-template-columns:1fr auto;gap:4px 10px;font-size:14px}
+.stats span:nth-child(even){font-family:var(--mono);color:var(--amber);text-align:right}
+.btncol{display:flex;flex-direction:column;gap:8px}
+.tag{display:inline-block;font-size:12px;border:1px solid var(--line);border-radius:20px;padding:1px 9px;color:var(--text-dim);margin-right:6px}
+.fb{margin-top:10px;padding:9px 12px;border-radius:8px;font-size:14px}
+.fb.good{background:rgba(127,214,138,.1);border:1px solid rgba(127,214,138,.45)}
+.fb.bad{background:rgba(228,120,91,.1);border:1px solid rgba(228,120,91,.45)}
+.fb.tip{background:rgba(255,180,84,.08);border:1px solid rgba(255,180,84,.4)}
+.fb .fm{font-size:15px}
+.done-msg{margin-top:14px;padding:12px;border-radius:8px;background:rgba(127,214,138,.1);border:1px solid rgba(127,214,138,.45)}
+svg.mol{display:block;overflow:visible}
+.hitem{border-top:1px solid var(--line);padding:10px 0}
+.hitem:first-child{border-top:0}
+.hitem .hn{font-weight:650}
+.hrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--text-dim);margin-top:4px}
+.ok-t{color:var(--good)}.bad-t{color:var(--danger)}.amb-t{color:var(--amber)}
+/* Footer */
+footer{border-top:1px solid var(--line);padding:12px 18px;color:var(--text-dim);font-size:13px;text-align:center}
+footer p{margin:4px 0}
+footer a{color:var(--text-dim)}
+/* Modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:14px;z-index:50}
+.mbox{background:var(--panel);border:1px solid var(--line);border-radius:12px;width:min(720px,100%);max-height:92vh;display:flex;flex-direction:column}
+.mbox.wide{width:min(980px,100%)}
+.mhead{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
+.mhead h2{margin:0;font-size:17px}
+.mbody{padding:14px 18px;overflow:auto}
+.mbody h3{font-size:15px;color:var(--amber);margin:16px 0 6px}
+.mfoot{display:flex;justify-content:space-between;gap:8px;padding:10px 16px;border-top:1px solid var(--line);align-items:center;flex-wrap:wrap}
+.x{min-width:44px;padding:0}
+.fig{background:var(--screen);border:1px solid var(--line);border-radius:10px;padding:12px;margin:10px 0;display:flex;justify-content:center;flex-wrap:wrap;gap:10px;align-items:center;color:var(--text)}
+.fig .eqv .fm{font-size:18px}
+.mbody table{border-collapse:collapse;margin:8px 0}
+.mbody td,.mbody th{border:1px solid var(--line);padding:5px 10px;text-align:left}
+.mbody th{color:var(--text-dim);font-weight:600}
+.c-ac{color:var(--danger)}.c-ba{color:var(--teal)}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.tool.on{border-color:var(--teal);color:var(--teal);background:rgba(79,209,197,.12)}
+#print{display:none}
+.dh{color:var(--amber);font-weight:650;font-size:15px;margin:2px 0 8px}
+.prow{display:flex;gap:10px}
+.prow input{flex:1;min-width:0;font:inherit;color:var(--text);background:var(--screen);border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-height:44px}
+.prow input::placeholder{color:var(--text-faint)}
+.pbtn{display:flex;gap:10px}
+.pitem{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:8px;background:var(--panel-alt);min-height:48px}
+.pitem input{width:22px;height:22px;accent-color:var(--teal);flex:none}
+.pitem .dash{width:16px;height:4px;border-radius:2px;flex:none}
+.pstat{display:grid;grid-template-columns:1fr auto;gap:4px 12px;border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--panel-alt);font-size:14px}
+.pstat span:nth-child(even){font-family:var(--mono);color:var(--amber);text-align:right}
+.chk{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 4px;cursor:pointer}
+.chk input{width:22px;height:22px;accent-color:var(--teal)}
+.qr-btn{align-self:center;display:flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:2px 8px 2px 2px;color:var(--text-dim);font:inherit;font-size:10px;line-height:1.2;text-align:left;cursor:pointer;min-height:0}
+.qr-btn:hover{border-color:var(--teal);color:var(--text)}
+.qr-btn b{display:block;color:var(--text);font-weight:600;font-size:10.5px}
+.qr-btn svg{width:30px;height:30px;display:block;border-radius:2px}
+.qr-modal{display:none;position:fixed;inset:0;z-index:100;background:rgba(8,10,12,.82);align-items:center;justify-content:center;padding:20px}
+.qr-modal.open{display:flex}
+.qr-box{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:22px 24px 20px;text-align:center;max-width:94vw}
+.qr-box svg{width:min(62vh,80vw,520px);height:auto;display:block;margin:0 auto;border-radius:4px}
+.qr-box .qr-url{font-family:var(--mono);font-size:clamp(14px,2.2vw,22px);color:var(--text);margin:16px 0 4px;word-break:break-all}
+.qr-box .qr-hint{font-size:13px;color:var(--text-dim);margin:0 0 14px}
+.qr-close{background:var(--panel-alt);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:8px 18px;font:inherit;font-size:13px;cursor:pointer;min-height:44px}
+@media (max-width:600px){.qr-btn span:last-child{display:none}.qr-btn{padding:4px}}
+@media print{
+  @page{size:A4;margin:14mm}
+  html,body{background:#fff!important;color:#000!important;font-size:11pt}
+  #app,.modal,.qr-modal{display:none!important}
+  #print{display:block;color:#000;font-family:Arial,Helvetica,sans-serif;line-height:1.4}
+  #print h1{font-size:17pt;margin:0 0 8px;color:#000}
+  #print h2{font-size:12pt;margin:14px 0 4px;color:#000;page-break-after:avoid}
+  #print table{border-collapse:collapse;width:100%;margin:4px 0 8px}
+  #print .task,#print table{break-inside:avoid;page-break-inside:avoid}
+  #print tr{break-inside:avoid;page-break-inside:avoid}
+  #print th,#print td{border:1px solid #888;padding:4px 6px;text-align:left;vertical-align:middle;font-size:10pt}
+  #print th{background:#eee}
+  #print table.meta td,#print table.sum td{border:0;padding:3px 8px 3px 0;font-size:11pt}
+  #print .line{border-bottom:1px solid #000;min-width:120px;display:inline-block}
+  #print .eqv .cf{color:#000;font-weight:bold}
+  #print .eqv .op{color:#000;font-size:12pt}
+  #print .eqv .fm{font-size:11pt}
+  #print svg.mol{color:#000}
+  #print .small{font-size:9pt;color:#333}
+  #print .pfoot{margin-top:16px;border-top:1px solid #888;padding-top:4px;font-size:8.5pt;color:#444;text-align:center}
+}
+/* --- Säure-Base-Berechnungen: Ergänzungen --- */
+sub,sup{line-height:0}
+.seg.multi button{flex:1 1 30%}
+.seg.multi button[aria-pressed="true"]{border-color:var(--teal);color:var(--teal);background:rgba(79,209,197,.1)}
+.seg.multi button::before{content:"☐ ";color:var(--text-faint)}
+.seg.multi button[aria-pressed="true"]::before{content:"☑ ";color:var(--teal)}
+.maintop{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.maintop .primary{min-height:44px;padding:0 26px;font-size:16px}
+.thead{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.thead .nm{font-size:18px;font-weight:650;color:var(--amber)}
+.tq{font-size:15px;margin:6px 0 10px}
+.sfigs{display:flex;gap:14px;flex-wrap:wrap;margin:8px 0 10px}
+.sfig{margin:0;text-align:center}
+.sbox{background:var(--screen);border:1px solid var(--line);border-radius:10px;padding:8px 12px;display:flex;align-items:center;justify-content:center;min-height:70px;color:var(--text)}
+.sfig figcaption{font-size:13px;color:var(--text-dim);margin-top:4px}
+.given{background:var(--screen);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:8px 0}
+.given .gl{font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.given ul{margin:0;padding:0;list-style:none}
+.given li{font-size:16px;padding:2px 0}
+.given li b{font-family:var(--mono);font-weight:500;color:var(--amber)}
+.given .seek{color:var(--teal);font-weight:600;font-size:16px}
+.tools button.on{border-color:var(--teal);color:var(--teal);background:rgba(79,209,197,.12)}
+.infobox{margin-top:10px;padding:10px 14px;border-radius:8px;background:rgba(255,180,84,.07);border:1px solid rgba(255,180,84,.4);font-size:14px}
+.infobox h4{margin:0 0 6px;font-size:13px;color:var(--amber);text-transform:uppercase;letter-spacing:.04em;font-weight:650}
+.infobox ul{margin:0;padding-left:18px}
+.infobox li{margin:2px 0}
+ol.steps{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:10px}
+.step{display:flex;gap:12px;border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--panel-alt)}
+.step.locked{opacity:.45}
+.step.cur{border-color:var(--teal)}
+.step.done{border-color:rgba(127,214,138,.5)}
+.sn{flex:none;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:var(--mono);color:var(--text-dim);background:var(--screen)}
+.step.done .sn{color:var(--good);border-color:rgba(127,214,138,.6)}
+.step.cur .sn{color:var(--teal);border-color:var(--teal)}
+.sb{flex:1;min-width:0}
+.sl{font-weight:650}
+.sf{font-family:var(--mono);font-size:14px;color:var(--text-dim);margin:2px 0}
+.sres{margin-top:4px}
+.sres b{font-family:var(--mono);font-weight:500;color:var(--amber)}
+.auto{color:var(--amber);font-size:13px}
+.irow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.irow .sym{font-size:16px;white-space:nowrap}
+.sinp{font:18px var(--mono);color:var(--text);background:var(--screen);border:2px solid var(--line);border-radius:10px;padding:8px 10px;min-height:48px;width:170px}
+.sinp:focus{outline:none;border-color:var(--teal)}
+.sinp.bad{border-color:var(--danger)}
+.unit{color:var(--text-dim);font-size:14px}
+.mini{min-width:44px;padding:6px 10px;font-family:var(--mono)}
+.stepbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.step .fb{margin-top:8px}
+.done-msg .tip2{margin-top:6px;font-size:14px;color:var(--text-dim)}
+.hint-card{color:var(--text-dim);text-align:center;padding:26px 10px}
+.hitem .hn small{color:var(--text-dim);font-weight:400}
+.vm{margin-top:8px;padding:8px 12px;border-radius:8px;font-size:14px}
+.gfig{background:var(--screen);border:1px solid var(--line);border-radius:10px;padding:12px;margin:10px 0;color:var(--text)}
+.gfig svg{display:block;width:100%;height:auto;max-width:680px;margin:0 auto}
+.mbody .fml{font-family:var(--mono);background:var(--screen);border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:8px 0;display:block}
+@media print{
+  #print h2{font-size:12pt}
+  #print .pfigs{display:flex;gap:14px;margin:4px 0 6px;align-items:flex-end}
+  #print .pfig{text-align:center;font-size:9pt}
+  #print .pgiven{margin:2px 0 6px}
+  #print .vm{border:0;border-left:4px solid #888;background:#f4f4f4;padding:5px 8px;margin:4px 0 0;font-size:10pt}
+  #print td.c{white-space:nowrap}
+}
+
+.mbody .gex{border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:8px;background:var(--panel-alt);padding:4px 14px 10px;margin:14px 0}
+.mbody .gex h4{margin:8px 0 6px;color:var(--amber);font-size:14.5px}
+.mbody .gex .gx-giv{font-size:13.5px;line-height:1.55;margin-bottom:4px}
+.mbody .gex ol{margin:6px 0 4px;padding-left:0;list-style:none}
+.mbody .gex li{margin:8px 0;font-size:13.5px}
+.mbody .gex li .fml{margin:3px 0;padding:5px 10px;font-size:13px}
+.mbody .gex li .fml.calc{border-color:transparent;background:transparent;padding-top:0;color:var(--text)}
+.mbody .gex .gx-res{background:rgba(127,214,138,.10);border:1px solid rgba(127,214,138,.35);border-radius:6px;padding:6px 10px;margin:8px 0 2px;color:var(--good);font-size:13.5px}
+.mbody .gex .gx-note{font-size:12.5px;color:var(--text-dim);margin:6px 0 0}
+@media print{.mbody .gex{break-inside:avoid}}
+
+</style>
+</head>
+<body>
+<div id="app">
+<header>
+  <a class="back" href="../index.html">← Zurück</a>
+  <div class="ttl"><h1>Übung „Säure-Base-Berechnungen“</h1><div class="sub">pH, pOH, pK<sub>S</sub>, pK<sub>B</sub>, K<sub>S</sub>, K<sub>B</sub> und c<sub>0</sub> berechnen – schrittweise mit Prüfung</div></div>
+  <a href="#" class="lnk" id="lnkAnl">Anleitung</a>
+  <button type="button" class="qr-btn" id="qrBtn" aria-haspopup="dialog" title="QR-Code vergrößern"><span id="qrSmall"></span><span><b>Auf dem Mobilgerät öffnen</b>QR-Code antippen zum Vergrößern</span></button>
+  <div class="status" id="status">Bereit</div>
+</header>
+<div class="layout">
+<aside>
+  <div class="card">
+    <button class="gb" id="gbBtn" aria-expanded="false"><span>Grundlagen · <span id="gbN"></span> Themen</span><span id="gbArr">▸</span></button>
+    <div class="gblist" id="gbList" hidden></div>
+  </div>
+  <div class="card">
+    <h2>Aufgabenart wählen</h2>
+    <div class="lbl">Welche Größen sollen berechnet werden?</div>
+    <div class="seg multi" id="segT"></div>
+    <div class="lbl">Aus welchen Werten (Grundlage)?</div>
+    <div class="seg multi" id="segG"></div>
+    <p class="hint" id="selInfo">Mehrfachauswahl möglich. Beim Öffnen ist nichts gewählt.</p>
+    <div class="lbl">Schwierigkeit</div>
+    <div class="seg" id="segLvl"><button data-v="1">Leicht</button><button data-v="2">Mittel</button><button data-v="3">Schwer</button></div>
+    <p class="hint" id="lvlInfo"></p>
+  </div>
+  <div class="card">
+    <h2>Bilanz</h2>
+    <div class="stats" id="stats"></div>
+  </div>
+  <div class="card">
+    <h2>Sichern und Abschluss</h2>
+    <div class="btncol">
+      <button id="btnSave">Zwischenstand speichern</button>
+      <button id="btnLoad">Zwischenstand laden</button>
+      <input type="file" id="fileLoad" accept=".json,application/json" hidden>
+      <button id="btnPdf">Zusammenfassung als PDF</button>
+    </div>
+    <p class="hint" id="ioMsg">Der Zwischenstand wird nur auf Knopfdruck als Datei auf deinem Gerät gespeichert.</p>
+  </div>
+</aside>
+<main>
+  <div class="maintop"><button class="primary" id="btnNew">Neue Aufgabe</button><span class="hint" id="topHint" style="margin:0"></span></div>
+  <div class="card" id="taskCard"></div>
+  <div class="card">
+    <h2>Verlauf</h2>
+    <div id="hist"><div class="hint">Noch keine Aufgaben bearbeitet.</div></div>
+  </div>
+</main>
+</div>
+<footer>
+  <p>Modellannahmen: Alle Werte gelten bei 25 °C (pK<sub>w</sub> = 14, K<sub>w</sub> = 1,0·10<sup>−14</sup> mol²/L²); Stoffwerte (pK<sub>S</sub>, pK<sub>B</sub>) sind gerundete Tafelwerte. Starke Säuren und Basen reagieren vollständig. Schwache Säuren und Basen: unvollständige Protolyse mit der Näherung c(HA) ≈ c<sub>0</sub>(HA) (Protolysegrad unter 5 %), Pufferlösungen mit der Henderson-Hasselbalch-Gleichung (Konzentrationen im Gleichgewicht ≈ eingesetzte Konzentrationen); Formeln wie in der Formelsammlung, {…} = Zahlenwert; die Autoprotolyse des Wassers wird vernachlässigt.</p>
+  <p>Bastian Baumgart · Säure-Base-Berechnungen V1.0 · <a href="#" id="lnkVer">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+</footer>
+</div>
+
+<!-- Anleitung -->
+<div class="modal" id="mAnl" hidden><div class="mbox">
+  <div class="mhead"><h2>Anleitung</h2><button class="x" data-close>✕</button></div>
+  <div class="mbody">
+    <p>In dieser Übung berechnest du <b>pH</b>, <b>pOH</b>, <b>pK<sub>S</sub></b>, <b>pK<sub>B</sub></b>, <b>K<sub>S</sub></b>, <b>K<sub>B</sub></b> und die Ausgangskonzentration <b>c(Säure) bzw. c(Base)</b>. Jede Aufgabe ist in kleine Rechenschritte zerlegt, die du nacheinander eingibst und sofort prüfen lässt.</p>
+    <h3>1. Aufgabenart wählen</h3>
+    <p>Wähle links, <b>welche Größen</b> du berechnen möchtest und <b>aus welchen Werten</b> (Grundlage) sie berechnet werden sollen. Beide Auswahlen sind Mehrfachauswahlen und beim Öffnen leer: Erst wenn mindestens eine Größe <i>und</i> eine Grundlage gewählt sind, erscheint eine Aufgabe. Beispiel: Größe <i>pH</i> und Grundlage <i>K<sub>S</sub></i> und <i>pK<sub>S</sub></i> ergibt Aufgaben, bei denen der pH-Wert einer schwachen Säure aus ihrem K<sub>S</sub>- oder pK<sub>S</sub>-Wert berechnet wird.</p>
+    <p><b>c(Säure) bzw. c(Base)</b> ist die Ausgangskonzentration c<sub>0</sub>. Sie kann Größe <i>und</i> Grundlage sein. Bei schwachen Säuren und Basen (Pufferlösungen) sind es die Konzentrationen von Säure und korrespondierender Base; sie gehören dort automatisch zur Aufgabe dazu. Als gesuchte Größe wird sie bei starken Säuren und Basen aus pH, pOH, c(H<sub>3</sub>O<sup>+</sup>) oder c(OH<sup>−</sup>) berechnet, bei schwachen Säuren und Basen (Stufe schwer) aus pK<sub>S</sub>, K<sub>S</sub>, pK<sub>B</sub> oder K<sub>B</sub>; der dafür nötige pH-Wert (bzw. pOH oder c(H<sub>3</sub>O<sup>+</sup>)) und die zweite Konzentration werden dann automatisch mitgegeben.</p>
+    <h3>2. Schwierigkeit</h3>
+    <ul>
+      <li><b>Leicht</b> (Standard): eine einzige Umrechnung, z. B. pH aus pOH, K<sub>S</sub> aus pK<sub>S</sub>, pK<sub>B</sub> aus pK<sub>S</sub>.</li>
+      <li><b>Mittel:</b> zwei Umrechnungen hintereinander (z. B. pH aus c(OH<sup>−</sup>), K<sub>B</sub> aus pK<sub>S</sub>) sowie starke Säuren und Basen aus der Ausgangskonzentration.</li>
+      <li><b>Schwer:</b> schwache Säuren und Basen bei unvollständiger Protolyse mit pH ≈ ½ · (pK<sub>S</sub> − lg{c<sub>0</sub>(HA)}) (pH aus pK<sub>S</sub> und c<sub>0</sub>, umgekehrt pK<sub>S</sub> oder c<sub>0</sub> aus dem pH; Basen entsprechend mit pOH und pK<sub>B</sub>) sowie Pufferlösungen mit der Henderson-Hasselbalch-Gleichung: pH aus pK<sub>S</sub> (bzw. pOH aus pK<sub>B</sub>) und den Konzentrationen von Säure und Base, pK<sub>S</sub>, K<sub>S</sub>, pK<sub>B</sub>, K<sub>B</sub> oder eine Konzentration aus dem pH; außerdem zweiwertige Hydroxide.</li>
+    </ul>
+    <p>Wenn es für deine Auswahl auf der gewählten Stufe keine Aufgabe gibt, nennt die Seite die Stufen, auf denen es welche gibt.</p>
+    <h3>3. Rechnen und prüfen</h3>
+    <p>Die Schritte werden nacheinander freigeschaltet. Gib den Wert ein und tippe auf <b>Prüfen</b> (oder drücke Enter). Geprüft wird immer gegen deine eigenen vorherigen Werte, damit sich Rundungen nicht als Fehler fortpflanzen. Eingaben: Dezimalkomma, Zehnerpotenzen als <b>7,14·10^-4</b> oder <b>7,14e-4</b>. pH-, pOH-, pK-Werte auf zwei Nachkommastellen, c-, K<sub>S</sub>- und K<sub>B</sub>-Werte auf drei gültige Ziffern. Bei typischen Fehlern gibt es einen gezielten Hinweis.</p>
+    <h3>4. Hilfen</h3>
+    <ul>
+      <li><b>Hilfen:</b> blendet die Formel jedes Schritts und weitere Werte ein, d. h. allgemeine Konstanten und Beziehungen wie das Ionenprodukt des Wassers (pK<sub>w</sub> = 14), K<sub>S</sub> · K<sub>B</sub> = K<sub>w</sub> oder die Henderson-Hasselbalch-Gleichung. Beim Öffnen einer Aufgabe ausgeblendet. Schritte, die bei eingeblendeten Hilfen gelöst werden, gelten als „mit Hilfen“ gelöst und zählen nicht für die Erfolgsquote. Stoffwerte wie pK<sub>S</sub> und alle anderen Werte, die zur Berechnung nötig sind, stehen immer in der Aufgabe unter „Gegeben“ – auch wenn sie links nicht als Grundlage gewählt sind.</li>
+      <li><b>Tipp:</b> zeigt Formel und Rechenweg mit deinen Werten (ohne Ergebnis).</li>
+      <li><b>Wert einsetzen</b> erscheint nach zwei Fehlversuchen bei einem Schritt; <b>Rest ausfüllen</b>, wenn du zwei Werte selbst richtig berechnet hast; <b>Lösung zeigen</b> ist nach dem ersten Prüfen möglich. Eingesetzte Werte werden mit * gekennzeichnet und zählen nicht als richtig.</li>
+    </ul>
+    <h3>5. Bilanz und Zusammenfassung</h3>
+    <p>Die <b>Erfolgsquote</b> gibt an, welcher Anteil der abgeschlossenen Schritte beim ersten Prüfen ohne Hilfen richtig war. Die Bilanz zählt außerdem, wie viele Aufgaben mit Hilfen (Hilfen, Tipp oder eingesetzter Wert) gelöst wurden. Mit „Zusammenfassung als PDF“ erstellst du über die Druckfunktion des Browsers ein PDF mit allen bearbeiteten Aufgaben, der richtigen Lösung und der Bewertung (im Druckdialog „Als PDF speichern“ wählen). „Zwischenstand speichern“ legt eine Datei auf deinem Gerät ab (iPad: Dateien → Downloads), die du später wieder laden kannst; dabei werden alle Werte neu geprüft.</p>
+    <h3>Bedienung mit dem iPad</h3>
+    <p>Alle Elemente lassen sich mit Finger oder Stift antippen. Für Zehnerpotenzen gibt es unter dem Eingabefeld die Knöpfe „·10^“ und „−“.</p>
+  </div>
+</div></div>
+
+<!-- Versionshinweise -->
+<div class="modal" id="mVer" hidden><div class="mbox">
+  <div class="mhead"><h2>Versionshinweise</h2><button class="x" data-close>✕</button></div>
+  <div class="mbody">
+    <h3>V1.0 – 09.11.2026</h3>
+    <ul>
+      <li>Übung zur Berechnung von pH, pOH, pK<sub>S</sub>, pK<sub>B</sub>, K<sub>S</sub>, K<sub>B</sub> und der Ausgangskonzentration c(Säure) bzw. c(Base) in kleinen, schrittweise geprüften Rechenschritten</li>
+      <li>Auswahl der gesuchten Größen und der Grundlage (gegebene Werte) jeweils als Mehrfachauswahl (Standard: keine)</li>
+      <li>Drei Stufen: leicht (eine Umrechnung, Standard), mittel (zwei Umrechnungen, starke Säuren und Basen), schwer (schwache Säuren und Basen bei unvollständiger Protolyse und als Puffer mit der Henderson-Hasselbalch-Gleichung, zweiwertige Hydroxide)</li>
+      <li>Aufgaben mit Säure-Base-Paaren (anorganisch und organisch, Strukturformeln) und Tafelwerten</li>
+      <li>Formeln und Schreibweise wie in der Formelsammlung (K<sub>S</sub>, K<sub>B</sub>, Zahlenwert in { })</li>
+      <li>Knopf „Hilfen“ je Aufgabe (Formeln und weitere Werte); die Nutzung wird in Bilanz und PDF berücksichtigt</li>
+      <li>Rückmeldungen zu typischen Fehlern, Tipp, Wert einsetzen, Rest ausfüllen, Lösung zeigen</li>
+      <li>Grundlagen zu pH/pOH, Ionenprodukt, K<sub>S</sub>/K<sub>B</sub>, starken und schwachen Säuren und Basen, Pufferlösungen mit ausführlichen, schrittweise gerechneten Beispielen für alle Aufgabenarten</li>
+      <li>Zwischenstand als Datei, Zusammenfassung mit richtiger Lösung, Vermerk je Aufgabe und Erfolgsquote als PDF</li>
+    </ul>
+  </div>
+</div></div>
+
+<!-- Grundlagen -->
+<div class="modal" id="mGb" hidden><div class="mbox wide">
+  <div class="mhead"><h2 id="gbTitle"></h2><button class="x" data-close>✕</button></div>
+  <div class="mbody" id="gbBody"></div>
+  <div class="mfoot"><button id="gbPrev">← Vorheriges Thema</button><span class="hint" id="gbPos" style="margin:0"></span><button id="gbNext">Nächstes Thema →</button></div>
+</div></div>
+
+<!-- QR / PDF -->
+<div class="qr-modal" id="qrModal" role="dialog" aria-modal="true" aria-label="QR-Code zu dieser Übung">
+  <div class="qr-box"><div id="qrBig"></div>
+    <p class="qr-url">chemie.mail-baumgart.de/Q2/2-Saeure_Base_Berechnungen.html</p>
+    <p class="qr-hint">Mit der Kamera scannen, um diese Übung auf dem eigenen Gerät zu öffnen.</p>
+    <button type="button" class="qr-close" id="qrClose">Schließen</button></div>
+</div>
+
+<div class="modal" id="mPdf" hidden><div class="mbox" style="width:min(620px,100%)">
+  <div class="mhead"><h2>Auswertung als PDF</h2><button class="x" data-close aria-label="Schließen">✕</button></div>
+  <div class="mbody">
+    <div class="dh">Statistik</div>
+    <div class="pstat" id="pdfStat"></div>
+    <div class="dh" style="margin-top:16px">Angaben (optional)</div>
+    <div class="prow"><input id="pName" placeholder="Name" autocomplete="off"><input id="pKurs" placeholder="Kurs" autocomplete="off"></div>
+    <p class="hint" style="margin-top:14px">Die Auswertung enthält alle bearbeiteten Aufgaben mit den Rechenschritten, der richtigen Lösung, deinen Eingaben, den Versuchen und einem Vermerk je Aufgabe sowie die Statistik mit der Erfolgsquote.</p>
+    <p class="hint" style="margin:0 0 14px"><b style="color:var(--text)">So speicherst du das PDF:</b> Nach „PDF erstellen“ öffnet sich der Druckdialog des Browsers. Dort als Drucker bzw. Ziel <b style="color:var(--text)">„Als PDF speichern“</b> wählen und auf „Speichern“ tippen (am iPad: Teilen → „In Dateien sichern“). Es wird nichts gedruckt oder übertragen.</p>
+    <div class="pbtn"><button class="primary" id="btnPrint">PDF erstellen</button><button data-close>Abbrechen</button></div>
+  </div>
+</div></div>
+
+<div id="print"></div>
+
+<script>
+function M(){return{a:[],b:[]}}
+function A(m,el,x,y,c){m.a.push({el,x,y,c:c||0});return m.a.length-1}
+function Bd(m,i,j,o){m.b.push([i,j,o||1])}
+const DV={u:[0,-1],d:[0,1],l:[-1,0],r:[1,0]};
+function Hs(m,i,dirs){for(const k of dirs){const a=m.a[i];Bd(m,i,A(m,'H',a.x+DV[k][0],a.y+DV[k][1]))}}
+function Cc(m,x,y,h){const i=A(m,'C',x,y);if(h)Hs(m,i,h);return i}
+function COOH(m,x,y,side,dep){const c=A(m,'C',x,y);Bd(m,c,A(m,'O',x,y-1),2);const dx=side==='r'?1:-1;const o=A(m,'O',x+dx,y,dep?-1:0);Bd(m,c,o);if(!dep)Bd(m,o,A(m,'H',x+2*dx,y));return c}
+function OHg(m,c,dir,dep){const a=m.a[c],d=DV[dir];const o=A(m,'O',a.x+d[0],a.y+d[1],dep?-1:0);Bd(m,c,o);if(!dep)Bd(m,o,A(m,'H',a.x+2*d[0],a.y+2*d[1]));return o}
+function chain(m,ids){for(let i=1;i<ids.length;i++)Bd(m,ids[i-1],ids[i])}
+
+const CA=[0,1,2,3,4,5,6,7].map(k=>k*Math.PI/4);
+const asep=(u,v)=>{let d=Math.abs(u-v)%(2*Math.PI);return d>Math.PI?2*Math.PI-d:d};
+function combos(n,start,acc,out){if(acc.length===n){out.push(acc.slice());return out}for(let k=start;k<8;k++){acc.push(k);combos(n,k+1,acc,out);acc.pop()}return out}
+function bestSet(bonds,n){
+  if(n<=0)return[];let best=[],bv=-1,bm=1e9;
+  for(const c of combos(n,0,[],[])){
+    const ang=c.map(k=>CA[k]),all=bonds.concat(ang);let mn=9;
+    for(let i=0;i<all.length;i++)for(let j=i+1;j<all.length;j++)mn=Math.min(mn,asep(all[i],all[j]));
+    if(all.length===1)mn=9;
+    let sx=0,sy=0,bx=0,by=0;all.forEach(a=>{sx+=Math.cos(a);sy+=Math.sin(a)});bonds.forEach(a=>{bx+=Math.cos(a);by+=Math.sin(a)});
+    const bl=Math.hypot(bx,by),mg=Math.hypot(sx,sy)+(bl>1e-6?Math.abs(sx*by-sy*bx)/bl:0);
+    if(mn>bv+1e-6||(Math.abs(mn-bv)<1e-6&&mg<bm-1e-6)){bv=mn;bm=mg;best=ang}
+  }
+  return best;
+}
+function molSVG(m,s,opt){
+  s=s||22;const a=m.a;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  for(const p of a){if(p.del)continue;x0=Math.min(x0,p.x);y0=Math.min(y0,p.y);x1=Math.max(x1,p.x);y1=Math.max(y1,p.y)}
+  const pad=0.62;x0-=pad;y0-=pad;x1+=pad;y1+=pad;
+  const X=x=>((x-x0)*s).toFixed(1),Y=y=>((y-y0)*s).toFixed(1);
+  const nb=a.map(()=>[]),bs=a.map(()=>0);
+  const R=el=>el==='Cl'?0.42:el==='H'?0.24:0.28;
+  let g='',t='',hit='';
+  for(const [i,j,o] of m.b){
+    if(a[i].del||a[j].del)continue;
+    const p=a[i],q=a[j],dx=q.x-p.x,dy=q.y-p.y,L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L;
+    nb[i].push(Math.atan2(dy,dx));nb[j].push(Math.atan2(-dy,-dx));bs[i]+=o;bs[j]+=o;
+    const sx=p.x+ux*R(p.el),sy=p.y+uy*R(p.el),ex=q.x-ux*R(q.el),ey=q.y-uy*R(q.el);
+    for(const d of (o===2?[-0.075,0.075]:[0])){const nx=-uy*d,ny=ux*d;g+=`<line x1="${X(sx+nx)}" y1="${Y(sy+ny)}" x2="${X(ex+nx)}" y2="${Y(ey+ny)}"/>`}
+  }
+  const VAL={O:6,N:5,Cl:7,S:6};
+  a.forEach((p,i)=>{
+    if(p.del)return;
+    t+=`<text x="${X(p.x)}" y="${Y(p.y)}">${p.el}</text>`;
+    if(opt){const r=(p.el==='H'?0.42:0.55)*s;hit+=`<circle class="hit" data-atom="${i}" cx="${X(p.x)}" cy="${Y(p.y)}" r="${r.toFixed(1)}"/>`}
+    if(!VAL[p.el])return;
+    const n=Math.max(0,Math.round((VAL[p.el]-bs[i]-p.c)/2));
+    const lp=bestSet(nb[i].map(v=>(v+2*Math.PI)%(2*Math.PI)),n);
+    const wide=p.el.length>1?0.15:0;
+    for(const an of lp){
+      const r=0.31+wide*Math.abs(Math.cos(an)),cx=p.x+Math.cos(an)*r,cy=p.y+Math.sin(an)*r,px=-Math.sin(an)*0.14,py=Math.cos(an)*0.14;
+      g+=`<line x1="${X(cx-px)}" y1="${Y(cy-py)}" x2="${X(cx+px)}" y2="${Y(cy+py)}"/>`;
+    }
+    if(p.c){
+      const used=nb[i].concat(lp);let ba=0,bv=-1;
+      for(const k of [7,1,5,3,0,6,2,4]){const an=CA[k];const mn=Math.min(...used.map(u=>asep(u,an)));if(mn>bv+1e-6){bv=mn;ba=an}}
+      const r=0.5+wide,cx=p.x+Math.cos(ba)*r,cy=p.y+Math.sin(ba)*r;
+      g+=`<circle cx="${X(cx)}" cy="${Y(cy)}" r="${(0.15*s).toFixed(1)}" fill="none" stroke-width="${(s*0.04).toFixed(2)}"/>`;
+      g+=`<line x1="${X(cx-0.08)}" y1="${Y(cy)}" x2="${X(cx+0.08)}" y2="${Y(cy)}" stroke-width="${(s*0.045).toFixed(2)}"/>`;
+      if(p.c>0)g+=`<line x1="${X(cx)}" y1="${Y(cy-0.08)}" x2="${X(cx)}" y2="${Y(cy+0.08)}" stroke-width="${(s*0.045).toFixed(2)}"/>`;
+    }
+  });
+  const W=((x1-x0)*s).toFixed(0),H=((y1-y0)*s).toFixed(0);
+  return `<svg class="mol${opt?' edit':''}" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img"${opt?` data-e="${opt.e}" data-s="${opt.s}"`:''}><g stroke="currentColor" stroke-width="${(s*0.06).toFixed(2)}" stroke-linecap="round">${g}</g><g fill="currentColor" font-family="system-ui,-apple-system,'Segoe UI',Roboto,sans-serif" font-size="${(s*0.56).toFixed(1)}" text-anchor="middle" dominant-baseline="central">${t}</g><g>${hit}</g></svg>`;
+}
+/* Strukturformeln der Säure-Base-Paare (Aufbau wie in den Übungen Protolyse/Neutralisation) */
+const STRUCT={
+  HCOOH:()=>{const m=M();const c=COOH(m,0,0,'r',false);Hs(m,c,'l');return m},
+  HCOO:()=>{const m=M();const c=COOH(m,0,0,'r',true);Hs(m,c,'l');return m},
+  CH3COOH:()=>{const m=M();chain(m,[Cc(m,0,0,'lud'),COOH(m,1,0,'r',false)]);return m},
+  CH3COO:()=>{const m=M();chain(m,[Cc(m,0,0,'lud'),COOH(m,1,0,'r',true)]);return m},
+  C2H5COOH:()=>{const m=M();chain(m,[Cc(m,0,0,'lud'),Cc(m,1,0,'ud'),COOH(m,2,0,'r',false)]);return m},
+  C2H5COO:()=>{const m=M();chain(m,[Cc(m,0,0,'lud'),Cc(m,1,0,'ud'),COOH(m,2,0,'r',true)]);return m},
+  CH3NH2:()=>{const m=M();const c=Cc(m,0,0,'lud');const n=A(m,'N',1,0,0);Bd(m,c,n);Hs(m,n,'ud');return m},
+  CH3NH3:()=>{const m=M();const c=Cc(m,0,0,'lud');const n=A(m,'N',1,0,1);Bd(m,c,n);Hs(m,n,'udr');return m}
+};
+
+/* QR-Encoder (Byte-Modus, Fehlerkorrektur L, Version 1–9), Ausgabe als SVG */
+const QR=(function(){
+  const EXP=new Array(512),LOG=new Array(256);
+  let x=1;for(let i=0;i<255;i++){EXP[i]=x;LOG[x]=i;x<<=1;if(x&256)x^=0x11d;}
+  for(let i=255;i<512;i++)EXP[i]=EXP[i-255];
+  const mul=(a,b)=>a&&b?EXP[LOG[a]+LOG[b]]:0;
+  function rsGen(n){let g=[1];for(let i=0;i<n;i++){const ng=new Array(g.length+1).fill(0);for(let j=0;j<g.length;j++){ng[j]^=g[j];ng[j+1]^=mul(g[j],EXP[i]);}g=ng;}return g;}
+  function rsEnc(data,n){const g=rsGen(n);const res=new Array(n).fill(0);for(const d of data){const f=d^res[0];res.shift();res.push(0);for(let i=0;i<n;i++)res[i]^=mul(g[i+1],f);}return res;}
+  const VER={1:[7,[[1,19]]],2:[10,[[1,34]]],3:[15,[[1,55]]],4:[20,[[1,80]]],5:[26,[[1,108]]],6:[18,[[2,68]]],7:[20,[[2,78]]],8:[24,[[2,97]]],9:[30,[[2,116]]]};
+  const ALIGN={1:[],2:[6,18],3:[6,22],4:[6,26],5:[6,30],6:[6,34],7:[6,22,38],8:[6,24,42],9:[6,26,46]};
+  function encode(text){
+    const bytes=Array.from(new TextEncoder().encode(text));
+    let v=1;for(;v<=9;v++){const cap=VER[v][1].reduce((s,b)=>s+b[0]*b[1],0);if(bytes.length<=cap-2)break;}
+    if(v>9)throw new Error('QR: Text zu lang');
+    const ecn=VER[v][0],blocks=VER[v][1];
+    const total=blocks.reduce((s,b)=>s+b[0]*b[1],0);
+    const bits=[];const put=(val,len)=>{for(let i=len-1;i>=0;i--)bits.push((val>>i)&1);};
+    put(4,4);put(bytes.length,8);bytes.forEach(b=>put(b,8));
+    put(0,Math.min(4,total*8-bits.length));
+    while(bits.length%8)bits.push(0);
+    const cw=[];for(let i=0;i<bits.length;i+=8){let b=0;for(let j=0;j<8;j++)b=(b<<1)|bits[i+j];cw.push(b);}
+    for(let p=0;cw.length<total;p^=1)cw.push(p?0x11:0xEC);
+    const D=[],E=[];let off=0;
+    for(const bl of blocks)for(let i=0;i<bl[0];i++){const d=cw.slice(off,off+bl[1]);off+=bl[1];D.push(d);E.push(rsEnc(d,ecn));}
+    const out=[];const maxd=Math.max(...D.map(b=>b.length));
+    for(let i=0;i<maxd;i++)D.forEach(b=>{if(i<b.length)out.push(b[i]);});
+    for(let i=0;i<ecn;i++)E.forEach(b=>out.push(b[i]));
+    return {v,out};
+  }
+  function matrix(text){
+    const {v,out}=encode(text);const n=17+4*v;
+    const M=Array.from({length:n},()=>new Array(n).fill(false));
+    const F=Array.from({length:n},()=>new Array(n).fill(false));
+    const set=(r,c,val)=>{M[r][c]=val;F[r][c]=true;};
+    const finder=(r0,c0)=>{for(let dr=-1;dr<=7;dr++)for(let dc=-1;dc<=7;dc++){const r=r0+dr,c=c0+dc;if(r<0||c<0||r>=n||c>=n)continue;
+      const inside=dr>=0&&dr<=6&&dc>=0&&dc<=6;
+      set(r,c,inside&&((dr===0||dr===6||dc===0||dc===6)||(dr>=2&&dr<=4&&dc>=2&&dc<=4)));}};
+    finder(0,0);finder(0,n-7);finder(n-7,0);
+    for(let i=8;i<n-8;i++){set(6,i,i%2===0);set(i,6,i%2===0);}
+    const al=ALIGN[v];
+    for(const r of al)for(const c of al){
+      if((r===6&&c===6)||(r===6&&c===n-7)||(r===n-7&&c===6))continue;
+      for(let dr=-2;dr<=2;dr++)for(let dc=-2;dc<=2;dc++)set(r+dr,c+dc,Math.max(Math.abs(dr),Math.abs(dc))!==1);
+    }
+    for(let i=0;i<9;i++){if(!F[8][i])set(8,i,false);if(!F[i][8])set(i,8,false);}
+    for(let i=0;i<8;i++){if(!F[8][n-1-i])set(8,n-1-i,false);if(!F[n-1-i][8])set(n-1-i,8,false);}
+    set(n-8,8,true);
+    if(v>=7){let rem=v;for(let i=0;i<12;i++)rem=(rem<<1)^((rem>>11)*0x1F25);const vb=(v<<12)|rem;
+      for(let i=0;i<18;i++){const b=((vb>>i)&1)===1;const a=Math.floor(i/3),bb=i%3+n-11;set(a,bb,b);set(bb,a,b);}}
+    const bits=[];out.forEach(b=>{for(let i=7;i>=0;i--)bits.push((b>>i)&1);});
+    let idx=0;
+    for(let right=n-1;right>=1;right-=2){
+      if(right===6)right=5;
+      for(let vert=0;vert<n;vert++)for(let j=0;j<2;j++){
+        const c=right-j,up=((right+1)&2)===0,r=up?n-1-vert:vert;
+        if(!F[r][c]){M[r][c]=idx<bits.length?bits[idx]===1:false;idx++;}
+      }
+    }
+    const mf=[(r,c)=>(r+c)%2===0,(r,c)=>r%2===0,(r,c)=>c%3===0,(r,c)=>(r+c)%3===0,(r,c)=>(Math.floor(r/2)+Math.floor(c/3))%2===0,(r,c)=>(r*c)%2+(r*c)%3===0,(r,c)=>((r*c)%2+(r*c)%3)%2===0,(r,c)=>((r+c)%2+(r*c)%3)%2===0];
+    function withMask(mask){
+      const R=M.map(row=>row.slice());
+      for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(!F[r][c]&&mf[mask](r,c))R[r][c]=!R[r][c];
+      const data=(1<<3)|mask;let rem=data;for(let i=0;i<10;i++)rem=(rem<<1)^((rem>>9)*0x537);
+      const fb=((data<<10)|rem)^0x5412;const g=i=>((fb>>i)&1)===1;
+      for(let i=0;i<=5;i++)R[i][8]=g(i);
+      R[7][8]=g(6);R[8][8]=g(7);R[8][7]=g(8);
+      for(let i=9;i<15;i++)R[8][14-i]=g(i);
+      for(let i=0;i<8;i++)R[8][n-1-i]=g(i);
+      for(let i=8;i<15;i++)R[n-15+i][8]=g(i);
+      R[n-8][8]=true;
+      return R;
+    }
+    function penalty(R){
+      let p=0;
+      for(let a=0;a<2;a++)for(let i=0;i<n;i++){let run=1;for(let j=1;j<n;j++){const cur=a?R[j][i]:R[i][j],prev=a?R[j-1][i]:R[i][j-1];
+        if(cur===prev){run++;if(run===5)p+=3;else if(run>5)p++;}else run=1;}}
+      for(let r=0;r<n-1;r++)for(let c=0;c<n-1;c++){const t=R[r][c];if(t===R[r][c+1]&&t===R[r+1][c]&&t===R[r+1][c+1])p+=3;}
+      const pat=[1,0,1,1,1,0,1];
+      for(let a=0;a<2;a++)for(let i=0;i<n;i++)for(let j=0;j<=n-7;j++){
+        let ok=true;for(let k=0;k<7;k++){const val=a?R[j+k][i]:R[i][j+k];if((val?1:0)!==pat[k]){ok=false;break;}}
+        if(!ok)continue;
+        const lightL=[1,2,3,4].every(k=>j-k<0||!(a?R[j-k][i]:R[i][j-k]));
+        const lightR=[0,1,2,3].every(k=>j+7+k>=n||!(a?R[j+7+k][i]:R[i][j+7+k]));
+        if(lightL||lightR)p+=40;
+      }
+      let dark=0;for(const row of R)for(const x of row)if(x)dark++;
+      p+=Math.floor(Math.abs(dark*20-n*n*10)/(n*n))*10;
+      return p;
+    }
+    let best=null,bp=1e9;for(let m=0;m<8;m++){const R=withMask(m);const p=penalty(R);if(p<bp){bp=p;best=R;}}
+    return best;
+  }
+  function svg(text,opt){
+    opt=opt||{};const q=opt.quiet===undefined?4:opt.quiet;
+    const R=matrix(text),n=R.length,N=n+2*q;let d='';
+    for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(R[r][c])d+='M'+(c+q)+' '+(r+q)+'h1v1h-1z';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+N+' '+N+'" shape-rendering="crispEdges"><rect width="'+N+'" height="'+N+'" fill="#fff"/><path d="'+d+'" fill="#000"/></svg>';
+  }
+  return {svg,matrix};
+})();
+
+/* ============ Hilfen ============ */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const LG=Math.log10,MINUS='−',KW=1e-14;
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const r2=x=>Math.round(x*100)/100,r1=x=>Math.round(x*10)/10;
+const sig2=x=>parseFloat(x.toPrecision(2));
+const sciv=(a,n)=>parseFloat(a+'e-'+n);
+const E10=x=>Math.pow(10,x);
+
+/* ---- Zahlenformat ---- */
+const fnum=(x,d)=>x.toFixed(d).replace('.',',').replace('-',MINUS);
+function sci(x,sig,strip){
+  let e=Math.floor(LG(x)+1e-12),m=x/E10(e),ms=m.toFixed(sig-1);
+  if(parseFloat(ms)>=10){m/=10;e++;ms=m.toFixed(sig-1)}
+  if(strip&&ms.indexOf('.')>=0)ms=ms.replace(/0+$/,'').replace(/\.$/,'');
+  return ms.replace('.',',')+'·10<sup>'+(e<0?MINUS+(-e):e)+'</sup>';
+}
+function fk(x,sig,strip){
+  if(x>=1e-3&&x<100){
+    let s=x.toPrecision(sig);
+    if(s.indexOf('e')<0){if(strip&&s.indexOf('.')>=0)s=s.replace(/0+$/,'').replace(/\.$/,'');return s.replace('.',',')}
+  }
+  return sci(x,sig,strip);
+}
+const PKEYS=['pH','pOH','pKs','pKb'];
+const isP=k=>PKEYS.indexOf(k)>=0;
+const MODE=k=>isP(k)?'p':'k';
+const UNIT=k=>isP(k)?'':'mol/L';
+const fGiven=(k,x)=>isP(k)?fnum(x,2):fk(x,2,false);
+const fRes=(k,x)=>isP(k)?fnum(x,2):fk(x,3,false);
+const vv=(k,v)=>isP(k)?fnum(v[k],2):fk(v[k],3,true);
+
+/* ---- Eingabe lesen: 3,24 | 7,14·10^-4 | 7,14e-4 | 10^-5 ---- */
+function parseNum(s){
+  if(typeof s!=='string')return NaN;
+  const sup={'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9','⁻':'-','⁺':'+'};
+  s=s.trim().replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺]+/g,m=>'^'+[...m].map(c=>sup[c]).join(''))
+    .replace(/[−–‒]/g,'-').replace(/\s+/g,'').replace(/,/g,'.').replace(/[×·xX]/g,'*');
+  let m=s.match(/^([+-]?\d*\.?\d+)?\*?10\^\(?([+-]?\d+)\)?$/);
+  if(m)return(m[1]===undefined?1:parseFloat(m[1]))*E10(parseInt(m[2],10));
+  if(/^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/.test(s))return parseFloat(s);
+  return NaN;
+}
+/* ok / near / bad: p-Werte ±0,02 (Rundung), sonst ±3 % */
+function judge(mode,x,exp){
+  if(!isFinite(x)||!isFinite(exp))return 'bad';
+  if(mode==='p'){const d=Math.abs(x-exp);return d<=0.02?'ok':d<=0.06?'near':'bad'}
+  if(x<=0)return 'bad';
+  const r=Math.abs(x/exp-1);return r<=0.03?'ok':r<=0.08?'near':'bad';
+}
+
+/* ============ Symbole, Bezeichnungen ============ */
+const S={pH:'pH',pOH:'pOH',cH:'c(H<sub>3</sub>O<sup>+</sup>)',cOH:'c(OH<sup>−</sup>)',pKs:'pK<sub>S</sub>',Ks:'K<sub>S</sub>',pKb:'pK<sub>B</sub>',Kb:'K<sub>B</sub>',c0:'c<sub>0</sub>',cHA:'c(Säure)',cA:'c(Base)'};
+const TARGETS=['pH','pOH','pKs','pKb','Ks','Kb','c0'];
+const GIVENS=['pH','pOH','cH','cOH','pKs','pKb','Ks','Kb','c0'];
+const GLABEL=Object.assign({},S,{c0:'c(Säure) bzw. c(Base)'});
+const LVLTXT={1:'leicht',2:'mittel',3:'schwer'};
+const LVLINFO={
+  1:'Eine einzige Umrechnung, z. B. pH aus pOH, K<sub>S</sub> aus pK<sub>S</sub>, pK<sub>B</sub> aus pK<sub>S</sub>.',
+  2:'Zwei Umrechnungen hintereinander (z. B. pH aus c(OH<sup>−</sup>), K<sub>B</sub> aus pK<sub>S</sub>) sowie starke Säuren und Basen (pH aus c<sub>0</sub>, c<sub>0</sub> aus pH).',
+  3:'Schwache Säuren und Basen: unvollständige Protolyse (pH ≈ ½ · (pK<sub>S</sub> − lg{c<sub>0</sub>(HA)})) und Pufferlösungen mit der Henderson-Hasselbalch-Gleichung; außerdem zweiwertige Hydroxide.'
+};
+
+/* ============ Stoffe ============ */
+/* a = Säure, b = korrespondierende Base; f = Formel (nur anorganisch), s = Strukturformel (organisch) */
+const PAIRS=[
+ {id:'hf',pKs:3.14,a:{n:'Fluorwasserstoff',triv:'Flusssäure',f:'HF'},b:{n:'Fluorid-Ion',f:'F<sup>−</sup>',salt:'Natriumfluorid'}},
+ {id:'hno2',pKs:3.34,a:{n:'Salpetrige Säure',f:'HNO<sub>2</sub>'},b:{n:'Nitrit-Ion',f:'NO<sub>2</sub><sup>−</sup>',salt:'Natriumnitrit'}},
+ {id:'meth',pKs:3.75,a:{n:'Methansäure',triv:'Ameisensäure',s:'HCOOH'},b:{n:'Methanoat-Ion',triv:'Formiat-Ion',s:'HCOO',salt:'Natriummethanoat'}},
+ {id:'eth',pKs:4.76,a:{n:'Ethansäure',triv:'Essigsäure',s:'CH3COOH'},b:{n:'Ethanoat-Ion',triv:'Acetat-Ion',s:'CH3COO',salt:'Natriumethanoat'}},
+ {id:'prop',pKs:4.87,a:{n:'Propansäure',triv:'Propionsäure',s:'C2H5COOH'},b:{n:'Propanoat-Ion',s:'C2H5COO',salt:'Natriumpropanoat'}},
+ {id:'h2co3',pKs:6.35,a:{n:'Kohlensäure',f:'H<sub>2</sub>CO<sub>3</sub>'},b:{n:'Hydrogencarbonat-Ion',f:'HCO<sub>3</sub><sup>−</sup>'}},
+ {id:'h2s',pKs:7.0,a:{n:'Schwefelwasserstoff',f:'H<sub>2</sub>S'},b:{n:'Hydrogensulfid-Ion',f:'HS<sup>−</sup>'}},
+ {id:'hclo',pKs:7.54,a:{n:'Hypochlorige Säure',f:'HClO'},b:{n:'Hypochlorit-Ion',f:'ClO<sup>−</sup>',salt:'Natriumhypochlorit'}},
+ {id:'hcn',pKs:9.21,a:{n:'Cyanwasserstoff',triv:'Blausäure',f:'HCN'},b:{n:'Cyanid-Ion',f:'CN<sup>−</sup>',salt:'Natriumcyanid'}},
+ {id:'nh4',pKs:9.25,a:{n:'Ammonium-Ion',f:'NH<sub>4</sub><sup>+</sup>',salt:'Ammoniumchlorid'},b:{n:'Ammoniak',f:'NH<sub>3</sub>'}},
+ {id:'hco3',pKs:10.33,a:{n:'Hydrogencarbonat-Ion',f:'HCO<sub>3</sub><sup>−</sup>'},b:{n:'Carbonat-Ion',f:'CO<sub>3</sub><sup>2−</sup>',salt:'Natriumcarbonat'}},
+ {id:'mea',pKs:10.64,a:{n:'Methylammonium-Ion',s:'CH3NH3',salt:'Methylammoniumchlorid'},b:{n:'Methanamin',triv:'Methylamin',s:'CH3NH2'}},
+ {id:'hso4',pKs:1.92,a:{n:'Hydrogensulfat-Ion',f:'HSO<sub>4</sub><sup>−</sup>'},b:{n:'Sulfat-Ion',f:'SO<sub>4</sub><sup>2−</sup>'}},
+ {id:'h2po4',pKs:7.21,a:{n:'Dihydrogenphosphat-Ion',f:'H<sub>2</sub>PO<sub>4</sub><sup>−</sup>'},b:{n:'Hydrogenphosphat-Ion',f:'HPO<sub>4</sub><sup>2−</sup>'}}
+];
+/* geeignet für schwache Säure/Base mit Näherung (Protolysegrad < 5 % bei 0,001–1 mol/L erreichbar, keine Ampholyte) */
+const K3ACID=['hf','hno2','meth','eth','prop','h2s','hclo','hcn','nh4','mea'];
+const K3BASE=['meth','eth','prop','hclo','hcn','nh4','mea','hco3'];
+const STRONG=[
+ {id:'hcl',t:'A',n:'Salzsäure',f:'HCl'},{id:'hno3',t:'A',n:'Salpetersäure',f:'HNO<sub>3</sub>'},
+ {id:'hbr',t:'A',n:'Bromwasserstoffsäure',f:'HBr'},{id:'hclo4',t:'A',n:'Perchlorsäure',f:'HClO<sub>4</sub>'},
+ {id:'naoh',t:'B1',n:'Natronlauge',f:'NaOH'},{id:'koh',t:'B1',n:'Kalilauge',f:'KOH'},{id:'lioh',t:'B1',n:'Lithiumhydroxid-Lösung',f:'LiOH'},
+ {id:'caoh2',t:'B2',n:'Calciumhydroxid-Lösung',f:'Ca(OH)<sub>2</sub>',diss:'Ca(OH)<sub>2</sub> ⟶ Ca<sup>2+</sup> + 2 OH<sup>−</sup>'},
+ {id:'baoh2',t:'B2',n:'Bariumhydroxid-Lösung',f:'Ba(OH)<sub>2</sub>',diss:'Ba(OH)<sub>2</sub> ⟶ Ba<sup>2+</sup> + 2 OH<sup>−</sup>'}
+];
+const spName=(x,long)=>x.n+(long&&x.triv?' ('+x.triv+')':'');
+const spTxt=x=>x.f?x.n+' '+x.f:spName(x,true);
+
+/* ============ Rechenschritte (Knoten) ============ */
+const N={};
+const nd=(id,out,f,label,calc,ex,use,alt)=>{N[id]={id,out,f,label,calc,ex,use:use||[],alt:alt||(()=>[])}};
+const MSG_SIGN='Beachte das Vorzeichen: pX = −lg X. Der Wert ist hier positiv.';
+const MSG_EXP='Vorzeichen im Exponenten: Es gilt 10<sup>−pX</sup>, nicht 10<sup>+pX</sup>.';
+nd('pH_from_cH','pH',`pH = −lg{${S.cH}}`,`${S.pH}-Wert aus ${S.cH} berechnen`,v=>-LG(v.cH),v=>`−lg(${vv('cH',v)})`,[],
+  (v,e)=>[[-e,MSG_SIGN],[14-e,'Das ist der pOH-Wert. Gesucht ist der pH-Wert aus c(H<sub>3</sub>O<sup>+</sup>).'],[v.cH,'Das ist die Konzentration selbst. Gesucht ist ihr negativer dekadischer Logarithmus.']]);
+nd('pOH_from_cOH','pOH',`pOH = −lg{${S.cOH}}`,`${S.pOH}-Wert aus ${S.cOH} berechnen`,v=>-LG(v.cOH),v=>`−lg(${vv('cOH',v)})`,[],
+  (v,e)=>[[-e,MSG_SIGN],[14-e,'Das ist der pH-Wert. Gesucht ist der pOH-Wert aus c(OH<sup>−</sup>).'],[v.cOH,'Das ist die Konzentration selbst. Gesucht ist ihr negativer dekadischer Logarithmus.']]);
+nd('pOH_from_pH','pOH','pOH = 14 − pH',`${S.pOH}-Wert aus dem pH-Wert berechnen`,v=>14-v.pH,v=>`14 − ${vv('pH',v)}`,['phpoh'],
+  v=>[[v.pH,'Das ist der pH-Wert. Gesucht ist pOH = 14 − pH.']]);
+nd('pH_from_pOH','pH','pH = 14 − pOH',`${S.pH}-Wert aus dem pOH-Wert berechnen`,v=>14-v.pOH,v=>`14 − ${vv('pOH',v)}`,['phpoh'],
+  v=>[[v.pOH,'Das ist der pOH-Wert. Gesucht ist pH = 14 − pOH.']]);
+nd('cH_from_pH','cH',`${S.cH} = 10<sup>−pH</sup>`,`${S.cH} aus dem pH-Wert berechnen`,v=>E10(-v.pH),v=>`10<sup>−${vv('pH',v)}</sup>`,[],
+  v=>[[E10(v.pH),MSG_EXP]]);
+nd('cOH_from_pOH','cOH',`${S.cOH} = 10<sup>−pOH</sup>`,`${S.cOH} aus dem pOH-Wert berechnen`,v=>E10(-v.pOH),v=>`10<sup>−${vv('pOH',v)}</sup>`,[],
+  v=>[[E10(v.pOH),MSG_EXP]]);
+nd('Ks_from_pKs','Ks',`${S.Ks} = 10<sup>−pK<sub>S</sub></sup>`,`${S.Ks} aus ${S.pKs} berechnen`,v=>E10(-v.pKs),v=>`10<sup>−${vv('pKs',v)}</sup>`,[],
+  v=>[[E10(v.pKs),MSG_EXP]]);
+nd('pKs_from_Ks','pKs',`${S.pKs} = −lg{${S.Ks}}`,`${S.pKs} aus ${S.Ks} berechnen`,v=>-LG(v.Ks),v=>`−lg(${vv('Ks',v)})`,[],
+  (v,e)=>[[-e,MSG_SIGN],[v.Ks,'Das ist K<sub>S</sub> selbst. Gesucht ist der negative dekadische Logarithmus.']]);
+nd('Kb_from_pKb','Kb',`${S.Kb} = 10<sup>−pK<sub>B</sub></sup>`,`${S.Kb} aus ${S.pKb} berechnen`,v=>E10(-v.pKb),v=>`10<sup>−${vv('pKb',v)}</sup>`,[],
+  v=>[[E10(v.pKb),MSG_EXP]]);
+nd('pKb_from_Kb','pKb',`${S.pKb} = −lg{${S.Kb}}`,`${S.pKb} aus ${S.Kb} berechnen`,v=>-LG(v.Kb),v=>`−lg(${vv('Kb',v)})`,[],
+  (v,e)=>[[-e,MSG_SIGN],[v.Kb,'Das ist K<sub>B</sub> selbst. Gesucht ist der negative dekadische Logarithmus.']]);
+nd('pKb_from_pKs','pKb',`${S.pKb} = 14 − ${S.pKs}`,`${S.pKb} der korrespondierenden Base aus ${S.pKs} berechnen`,v=>14-v.pKs,v=>`14 − ${vv('pKs',v)}`,['pksum'],
+  v=>[[v.pKs,'Das ist pK<sub>S</sub> selbst. Gesucht ist pK<sub>B</sub> = 14 − pK<sub>S</sub>.']]);
+nd('pKs_from_pKb','pKs',`${S.pKs} = 14 − ${S.pKb}`,`${S.pKs} der korrespondierenden Säure aus ${S.pKb} berechnen`,v=>14-v.pKb,v=>`14 − ${vv('pKb',v)}`,['pksum'],
+  v=>[[v.pKb,'Das ist pK<sub>B</sub> selbst. Gesucht ist pK<sub>S</sub> = 14 − pK<sub>B</sub>.']]);
+nd('Kb_from_Ks','Kb',`${S.Kb} = K<sub>w</sub> / ${S.Ks}`,`${S.Kb} der korrespondierenden Base aus ${S.Ks} berechnen`,v=>KW/v.Ks,v=>`1·10<sup>−14</sup> / ${vv('Ks',v)}`,['kskb'],
+  v=>[[v.Ks,'Das ist K<sub>S</sub> selbst. Gesucht ist K<sub>B</sub> = K<sub>w</sub> / K<sub>S</sub>.'],[KW*v.Ks,'Es wird geteilt, nicht multipliziert: K<sub>B</sub> = K<sub>w</sub> / K<sub>S</sub>.']]);
+nd('Ks_from_Kb','Ks',`${S.Ks} = K<sub>w</sub> / ${S.Kb}`,`${S.Ks} der korrespondierenden Säure aus ${S.Kb} berechnen`,v=>KW/v.Kb,v=>`1·10<sup>−14</sup> / ${vv('Kb',v)}`,['kskb'],
+  v=>[[v.Kb,'Das ist K<sub>B</sub> selbst. Gesucht ist K<sub>S</sub> = K<sub>w</sub> / K<sub>B</sub>.'],[KW*v.Kb,'Es wird geteilt, nicht multipliziert: K<sub>S</sub> = K<sub>w</sub> / K<sub>B</sub>.']]);
+nd('cH_from_Ks','cH',`${S.cH} = √(${S.Ks} · ${S.c0})`,`${S.cH} der schwachen Säure berechnen`,v=>Math.sqrt(v.Ks*v.c0),v=>`√(${vv('Ks',v)} · ${vv('c0',v)})`,['naeh'],
+  v=>[[v.Ks*v.c0,'Die Wurzel fehlt: c(H<sub>3</sub>O<sup>+</sup>) = √(K<sub>S</sub> · c<sub>0</sub>).']]);
+nd('cOH_from_Kb','cOH',`${S.cOH} = √(${S.Kb} · ${S.c0})`,`${S.cOH} der schwachen Base berechnen`,v=>Math.sqrt(v.Kb*v.c0),v=>`√(${vv('Kb',v)} · ${vv('c0',v)})`,['naeh'],
+  v=>[[v.Kb*v.c0,'Die Wurzel fehlt: c(OH<sup>−</sup>) = √(K<sub>B</sub> · c<sub>0</sub>).']]);
+nd('Ks_from_cH','Ks',`${S.Ks} = ${S.cH}² / ${S.c0}`,`${S.Ks} der schwachen Säure aus ${S.cH} und ${S.c0} berechnen`,v=>v.cH*v.cH/v.c0,v=>`(${vv('cH',v)})² / ${vv('c0',v)}`,['naeh'],
+  v=>[[v.cH*v.cH,'Teile noch durch c<sub>0</sub>: K<sub>S</sub> = c(H<sub>3</sub>O<sup>+</sup>)² / c<sub>0</sub>.'],[v.cH/v.c0,'Das Quadrat von c(H<sub>3</sub>O<sup>+</sup>) fehlt: K<sub>S</sub> = c(H<sub>3</sub>O<sup>+</sup>)² / c<sub>0</sub>.']]);
+nd('Kb_from_cOH','Kb',`${S.Kb} = ${S.cOH}² / ${S.c0}`,`${S.Kb} der schwachen Base aus ${S.cOH} und ${S.c0} berechnen`,v=>v.cOH*v.cOH/v.c0,v=>`(${vv('cOH',v)})² / ${vv('c0',v)}`,['naeh'],
+  v=>[[v.cOH*v.cOH,'Teile noch durch c<sub>0</sub>: K<sub>B</sub> = c(OH<sup>−</sup>)² / c<sub>0</sub>.'],[v.cOH/v.c0,'Das Quadrat von c(OH<sup>−</sup>) fehlt: K<sub>B</sub> = c(OH<sup>−</sup>)² / c<sub>0</sub>.']]);
+nd('pH_from_c0A','pH',`pH ≈ −lg{c<sub>0</sub>(HA)}`,`${S.pH}-Wert bei vollständiger Protolyse berechnen`,v=>-LG(v.c0),v=>`−lg(${vv('c0',v)})`,['starkS'],
+  (v,e)=>[[-e,MSG_SIGN],[14-e,'Das ist der pOH-Wert. Gesucht ist der pH-Wert der Säure.']]);
+nd('pOH_from_c0B','pOH',`pOH ≈ −lg{c<sub>0</sub>(B)}`,`${S.pOH}-Wert der starken Base berechnen`,v=>-LG(v.c0),v=>`−lg(${vv('c0',v)})`,['starkB'],
+  (v,e)=>[[-e,MSG_SIGN],[14-e,'Das ist der pH-Wert. Gesucht ist der pOH-Wert der Base.']]);
+nd('cOH_from_c0n','cOH',`${S.cOH} = 2 · ${S.c0}`,`${S.cOH} der zweiwertigen Base berechnen`,v=>v.n*v.c0,v=>`${v.n} · ${vv('c0',v)}`,['zwei'],
+  v=>[[v.c0,'Je Formeleinheit entstehen zwei OH<sup>−</sup>-Ionen: c(OH<sup>−</sup>) = 2 · c<sub>0</sub>.']]);
+nd('c0_from_cH_A','c0',`${S.c0} = ${S.cH}`,`${S.c0} der starken Säure aus ${S.cH} bestimmen`,v=>v.cH,v=>`${vv('cH',v)}`,['starkS'],
+  v=>[[2*v.cH,'Bei einer starken, einprotonigen Säure ist c<sub>0</sub> = c(H<sub>3</sub>O<sup>+</sup>): Es wird nichts verdoppelt.']]);
+nd('c0_from_cOH_B','c0',`${S.c0} = ${S.cOH}`,`${S.c0} der starken Base aus ${S.cOH} bestimmen`,v=>v.cOH,v=>`${vv('cOH',v)}`,['starkB'],
+  v=>[[2*v.cOH,'Bei einer einwertigen starken Base ist c<sub>0</sub> = c(OH<sup>−</sup>): Es wird nichts verdoppelt.']]);
+nd('c0_from_cOH_n','c0',`${S.c0} = ${S.cOH} / 2`,`${S.c0} der zweiwertigen Base aus ${S.cOH} berechnen`,v=>v.cOH/v.n,v=>`${vv('cOH',v)} / ${v.n}`,['zwei'],
+  v=>[[v.cOH,'Je Formeleinheit entstehen zwei OH<sup>−</sup>-Ionen: c<sub>0</sub> = c(OH<sup>−</sup>) / 2.'],[v.cOH*v.n,'Es wird durch 2 geteilt, nicht mit 2 multipliziert: c<sub>0</sub> = c(OH<sup>−</sup>) / 2.']]);
+nd('c0_from_cH','c0',`${S.c0} = ${S.cH}² / ${S.Ks}`,`${S.c0} der schwachen Säure aus ${S.cH} und ${S.Ks} berechnen`,v=>v.cH*v.cH/v.Ks,v=>`(${vv('cH',v)})² / ${vv('Ks',v)}`,['naeh'],
+  v=>[[v.cH/v.Ks,'Das Quadrat von c(H<sub>3</sub>O<sup>+</sup>) fehlt: c<sub>0</sub> = c(H<sub>3</sub>O<sup>+</sup>)² / K<sub>S</sub>.'],[v.cH*v.cH*v.Ks,'Es wird durch K<sub>S</sub> geteilt, nicht multipliziert: c<sub>0</sub> = c(H<sub>3</sub>O<sup>+</sup>)² / K<sub>S</sub>.'],[Math.sqrt(v.Ks*v.cH*v.cH),'Das ist die Wurzelformel für c(H<sub>3</sub>O<sup>+</sup>). Hier wird nach c<sub>0</sub> umgestellt: c<sub>0</sub> = c(H<sub>3</sub>O<sup>+</sup>)² / K<sub>S</sub>.']]);
+nd('c0_from_cOHw','c0',`${S.c0} = ${S.cOH}² / ${S.Kb}`,`${S.c0} der schwachen Base aus ${S.cOH} und ${S.Kb} berechnen`,v=>v.cOH*v.cOH/v.Kb,v=>`(${vv('cOH',v)})² / ${vv('Kb',v)}`,['naeh'],
+  v=>[[v.cOH/v.Kb,'Das Quadrat von c(OH<sup>−</sup>) fehlt: c<sub>0</sub> = c(OH<sup>−</sup>)² / K<sub>B</sub>.'],[v.cOH*v.cOH*v.Kb,'Es wird durch K<sub>B</sub> geteilt, nicht multipliziert: c<sub>0</sub> = c(OH<sup>−</sup>)² / K<sub>B</sub>.']]);
+const LGQ=(a,b)=>`lg(${a} / ${b})`;
+nd('pH_HH','pH',`pH = ${S.pKs} + ${LGQ(S.cA,S.cHA)}`,`${S.pH}-Wert mit der Henderson-Hasselbalch-Gleichung berechnen`,v=>v.pKs+LG(v.cA/v.cHA),v=>`${vv('pKs',v)} + lg(${vv('cA',v)} / ${vv('cHA',v)})`,['hhS'],
+  v=>[[v.pKs+LG(v.cHA/v.cA),'Der Bruch ist vertauscht: Im Zähler steht die Base, im Nenner die Säure.'],[v.pKs,'Das ist der pK<sub>S</sub>-Wert. Das Konzentrationsverhältnis fehlt noch.'],[v.pKs+v.cA/v.cHA,'Vom Konzentrationsverhältnis muss der Logarithmus (lg) genommen werden.']]);
+nd('pOH_HH','pOH',`pOH = ${S.pKb} + ${LGQ(S.cHA,S.cA)}`,`${S.pOH}-Wert mit der Henderson-Hasselbalch-Gleichung für die Base berechnen`,v=>v.pKb+LG(v.cHA/v.cA),v=>`${vv('pKb',v)} + lg(${vv('cHA',v)} / ${vv('cA',v)})`,['hhB'],
+  v=>[[v.pKb+LG(v.cA/v.cHA),'Der Bruch ist vertauscht: Für die Base steht die (korrespondierende) Säure im Zähler, die Base im Nenner.'],[v.pKb,'Das ist der pK<sub>B</sub>-Wert. Das Konzentrationsverhältnis fehlt noch.'],[14-(v.pKb+LG(v.cHA/v.cA)),'Das ist der pH-Wert. Gesucht ist zuerst der pOH-Wert.']]);
+nd('pKs_HH','pKs',`${S.pKs} = pH − ${LGQ(S.cA,S.cHA)}`,`${S.pKs} mit der Henderson-Hasselbalch-Gleichung berechnen`,v=>v.pH-LG(v.cA/v.cHA),v=>`${vv('pH',v)} − lg(${vv('cA',v)} / ${vv('cHA',v)})`,['hhS'],
+  v=>[[v.pH+LG(v.cA/v.cHA),'Beim Umstellen wird der lg-Term abgezogen: pK<sub>S</sub> = pH − lg(c(Base) / c(Säure)).'],[v.pH-LG(v.cHA/v.cA),'Der Bruch ist vertauscht: Im Zähler steht die Base, im Nenner die Säure.']]);
+nd('pKb_HH','pKb',`${S.pKb} = pOH − ${LGQ(S.cHA,S.cA)}`,`${S.pKb} mit der Henderson-Hasselbalch-Gleichung für die Base berechnen`,v=>v.pOH-LG(v.cHA/v.cA),v=>`${vv('pOH',v)} − lg(${vv('cHA',v)} / ${vv('cA',v)})`,['hhB'],
+  v=>[[v.pOH+LG(v.cHA/v.cA),'Beim Umstellen wird der lg-Term abgezogen: pK<sub>B</sub> = pOH − lg(c(Säure) / c(Base)).'],[v.pOH-LG(v.cA/v.cHA),'Der Bruch ist vertauscht: Im Zähler steht die (korrespondierende) Säure, im Nenner die Base.']]);
+nd('cHA_HHs','cHA',`${S.cHA} = ${S.cA} · 10<sup>(pK<sub>S</sub> − pH)</sup>`,`${S.cHA} mit der Henderson-Hasselbalch-Gleichung berechnen`,v=>v.cA*E10(v.pKs-v.pH),v=>`${vv('cA',v)} · 10<sup>(${vv('pKs',v)} − ${vv('pH',v)})</sup>`,['hhS'],
+  v=>[[v.cA*E10(v.pH-v.pKs),'Der Exponent ist vertauscht: c(Säure) = c(Base) · 10<sup>(pK<sub>S</sub> − pH)</sup>.'],[v.cA/E10(v.pKs-v.pH),'Es wird multipliziert, nicht geteilt: c(Säure) = c(Base) · 10<sup>(pK<sub>S</sub> − pH)</sup>.']]);
+nd('cA_HHs','cA',`${S.cA} = ${S.cHA} · 10<sup>(pH − pK<sub>S</sub>)</sup>`,`${S.cA} mit der Henderson-Hasselbalch-Gleichung berechnen`,v=>v.cHA*E10(v.pH-v.pKs),v=>`${vv('cHA',v)} · 10<sup>(${vv('pH',v)} − ${vv('pKs',v)})</sup>`,['hhS'],
+  v=>[[v.cHA*E10(v.pKs-v.pH),'Der Exponent ist vertauscht: c(Base) = c(Säure) · 10<sup>(pH − pK<sub>S</sub>)</sup>.'],[v.cHA/E10(v.pH-v.pKs),'Es wird multipliziert, nicht geteilt: c(Base) = c(Säure) · 10<sup>(pH − pK<sub>S</sub>)</sup>.']]);
+nd('cHA_HHb','cHA',`${S.cHA} = ${S.cA} · 10<sup>(pOH − pK<sub>B</sub>)</sup>`,`${S.cHA} mit der Henderson-Hasselbalch-Gleichung für die Base berechnen`,v=>v.cA*E10(v.pOH-v.pKb),v=>`${vv('cA',v)} · 10<sup>(${vv('pOH',v)} − ${vv('pKb',v)})</sup>`,['hhB'],
+  v=>[[v.cA*E10(v.pKb-v.pOH),'Der Exponent ist vertauscht: c(Säure) = c(Base) · 10<sup>(pOH − pK<sub>B</sub>)</sup>.']]);
+nd('cA_HHb','cA',`${S.cA} = ${S.cHA} · 10<sup>(pK<sub>B</sub> − pOH)</sup>`,`${S.cA} mit der Henderson-Hasselbalch-Gleichung für die Base berechnen`,v=>v.cHA*E10(v.pKb-v.pOH),v=>`${vv('cHA',v)} · 10<sup>(${vv('pKb',v)} − ${vv('pOH',v)})</sup>`,['hhB'],
+  v=>[[v.cHA*E10(v.pOH-v.pKb),'Der Exponent ist vertauscht: c(Base) = c(Säure) · 10<sup>(pK<sub>B</sub> − pOH)</sup>.']]);
+nd('pH_w','pH',`pH ≈ ½ · (${S.pKs} − lg{c<sub>0</sub>(HA)})`,`${S.pH}-Wert bei unvollständiger Protolyse berechnen`,v=>0.5*(v.pKs-LG(v.c0)),v=>`½ · (${vv('pKs',v)} − lg ${vv('c0',v)})`,['naeh'],
+  v=>[[v.pKs-LG(v.c0),'Der Faktor ½ fehlt: pH ≈ ½ · (pK<sub>S</sub> − lg{c<sub>0</sub>(HA)}).'],[0.5*(v.pKs+LG(v.c0)),'Vorzeichen: Der Logarithmus von c<sub>0</sub> wird abgezogen: pH ≈ ½ · (pK<sub>S</sub> − lg{c<sub>0</sub>(HA)}).'],[-LG(v.c0),'Das ist der pH-Wert bei vollständiger Protolyse. Die Säure ist schwach: pH ≈ ½ · (pK<sub>S</sub> − lg{c<sub>0</sub>(HA)}).'],[0.5*v.pKs-LG(v.c0),'Die Klammer gilt für beide Glieder: pH ≈ ½ · (pK<sub>S</sub> − lg{c<sub>0</sub>(HA)}).']]);
+nd('pOH_w','pOH',`pOH ≈ ½ · (${S.pKb} − lg{c<sub>0</sub>(B)})`,`${S.pOH}-Wert der schwachen Base bei unvollständiger Protolyse berechnen`,v=>0.5*(v.pKb-LG(v.c0)),v=>`½ · (${vv('pKb',v)} − lg ${vv('c0',v)})`,['naeh'],
+  v=>[[v.pKb-LG(v.c0),'Der Faktor ½ fehlt: pOH ≈ ½ · (pK<sub>B</sub> − lg{c<sub>0</sub>(B)}).'],[0.5*(v.pKb+LG(v.c0)),'Vorzeichen: Der Logarithmus von c<sub>0</sub> wird abgezogen.'],[14-0.5*(v.pKb-LG(v.c0)),'Das ist der pH-Wert. Gesucht ist zuerst der pOH-Wert.']]);
+nd('pKs_w','pKs',`${S.pKs} ≈ 2 · pH + lg{c<sub>0</sub>(HA)}`,`${S.pKs} aus pH und c<sub>0</sub> berechnen (unvollständige Protolyse)`,v=>2*v.pH+LG(v.c0),v=>`2 · ${vv('pH',v)} + lg ${vv('c0',v)}`,['naeh'],
+  v=>[[2*v.pH-LG(v.c0),'Vorzeichen: Umgestellt gilt pK<sub>S</sub> ≈ 2 · pH + lg{c<sub>0</sub>(HA)}.'],[v.pH+LG(v.c0),'Der Faktor 2 fehlt: pK<sub>S</sub> ≈ 2 · pH + lg{c<sub>0</sub>(HA)}.']]);
+nd('pKb_w','pKb',`${S.pKb} ≈ 2 · pOH + lg{c<sub>0</sub>(B)}`,`${S.pKb} aus pOH und c<sub>0</sub> berechnen (unvollständige Protolyse)`,v=>2*v.pOH+LG(v.c0),v=>`2 · ${vv('pOH',v)} + lg ${vv('c0',v)}`,['naeh'],
+  v=>[[2*v.pOH-LG(v.c0),'Vorzeichen: Umgestellt gilt pK<sub>B</sub> ≈ 2 · pOH + lg{c<sub>0</sub>(B)}.'],[v.pOH+LG(v.c0),'Der Faktor 2 fehlt: pK<sub>B</sub> ≈ 2 · pOH + lg{c<sub>0</sub>(B)}.']]);
+nd('c0_wA','c0',`c<sub>0</sub>(HA) ≈ 10<sup>(pK<sub>S</sub> − 2 · pH)</sup>`,`c<sub>0</sub> der schwachen Säure aus pH und ${S.pKs} berechnen`,v=>E10(v.pKs-2*v.pH),v=>`10<sup>(${vv('pKs',v)} − 2 · ${vv('pH',v)})</sup>`,['naeh'],
+  v=>[[E10(2*v.pH-v.pKs),'Der Exponent ist vertauscht: c<sub>0</sub>(HA) ≈ 10<sup>(pK<sub>S</sub> − 2 · pH)</sup>.'],[E10(v.pKs-v.pH),'Der Faktor 2 vor dem pH fehlt: c<sub>0</sub>(HA) ≈ 10<sup>(pK<sub>S</sub> − 2 · pH)</sup>.']]);
+nd('c0_wB','c0',`c<sub>0</sub>(B) ≈ 10<sup>(pK<sub>B</sub> − 2 · pOH)</sup>`,`c<sub>0</sub> der schwachen Base aus pOH und ${S.pKb} berechnen`,v=>E10(v.pKb-2*v.pOH),v=>`10<sup>(${vv('pKb',v)} − 2 · ${vv('pOH',v)})</sup>`,['naeh'],
+  v=>[[E10(2*v.pOH-v.pKb),'Der Exponent ist vertauscht: c<sub>0</sub>(B) ≈ 10<sup>(pK<sub>B</sub> − 2 · pOH)</sup>.'],[E10(v.pKb-v.pOH),'Der Faktor 2 vor dem pOH fehlt: c<sub>0</sub>(B) ≈ 10<sup>(pK<sub>B</sub> − 2 · pOH)</sup>.']]);
+const NEED={
+  phpoh:'pH + pOH = pK<sub>w</sub> = 14 (25 °C); K<sub>w</sub> = c(H<sub>3</sub>O<sup>+</sup>) · c(OH<sup>−</sup>) = 1,0·10<sup>−14</sup> mol²/L²',
+  pksum:'pK<sub>S</sub> + pK<sub>B</sub> = 14 (korrespondierendes Säure-Base-Paar, 25 °C)',
+  kskb:'K<sub>S</sub> · K<sub>B</sub> = K<sub>w</sub> = 1,0·10<sup>−14</sup> mol²/L² (korrespondierendes Säure-Base-Paar, 25 °C)',
+  hhS:'Henderson-Hasselbalch-Gleichung für eine schwache Säure und ihre korrespondierende Base: pH = pK<sub>S</sub> + lg(c(Base) / c(Säure)), auch geschrieben als pH = pK<sub>S</sub> + lg(c(A<sup>−</sup>) / c(HA))',
+  hhB:'Henderson-Hasselbalch-Gleichung für eine schwache Base und ihre korrespondierende Säure: pOH = pK<sub>B</sub> + lg(c(Säure) / c(Base)), auch geschrieben als pOH = pK<sub>B</sub> + lg(c(HB<sup>+</sup>) / c(B))',
+  naeh:'pH-Wert bei unvollständiger Protolyse (schwache Säure): pH ≈ ½ · (pK<sub>S</sub> − lg{c<sub>0</sub>(HA)}); für schwache Basen entsprechend pOH ≈ ½ · (pK<sub>B</sub> − lg{c<sub>0</sub>(B)}). {…} = Zahlenwert, c<sub>0</sub> = Anfangskonzentration. Gilt, wenn nur ein kleiner Teil protolysiert (unter 5 %).',
+  starkS:'pH-Wert bei vollständiger Protolyse (starke Säure): pH ≈ −lg{c<sub>0</sub>(HA)}, d. h. c(H<sub>3</sub>O<sup>+</sup>) = c<sub>0</sub>(HA)',
+  starkB:'Starke Base, vollständige Dissoziation: pOH ≈ −lg{c<sub>0</sub>(B)}, d. h. c(OH<sup>−</sup>) = c<sub>0</sub>(B)',
+  zwei:'Zweiwertige Base: Je Formeleinheit entstehen zwei OH<sup>−</sup>-Ionen, c(OH<sup>−</sup>) = 2 · c<sub>0</sub>'
+};
+
+/* ============ Aufgabentypen (Rezepte) ============ */
+const RECIPES=[];
+const R=(kind,level,target,given,nodes,extra)=>RECIPES.push({kind,level,target,given,nodes,extra:extra||{}});
+/* K0: Beziehungen im Wasser */
+R('K0',1,'pH',['pOH'],['pH_from_pOH']);
+R('K0',1,'pOH',['pH'],['pOH_from_pH']);
+R('K0',1,'pH',['cH'],['pH_from_cH']);
+R('K0',1,'pOH',['cOH'],['pOH_from_cOH']);
+R('K0',2,'pH',['cOH'],['pOH_from_cOH','pH_from_pOH']);
+R('K0',2,'pOH',['cH'],['pH_from_cH','pOH_from_pH']);
+/* K1: Säure-Base-Paar, Umrechnung der Konstanten */
+[[1,'Ks','pKs',['Ks_from_pKs']],[1,'pKs','Ks',['pKs_from_Ks']],[1,'Kb','pKb',['Kb_from_pKb']],[1,'pKb','Kb',['pKb_from_Kb']],
+ [1,'pKb','pKs',['pKb_from_pKs']],[1,'pKs','pKb',['pKs_from_pKb']],[1,'Kb','Ks',['Kb_from_Ks']],[1,'Ks','Kb',['Ks_from_Kb']],
+ [2,'Kb','pKs',['pKb_from_pKs','Kb_from_pKb']],[2,'Ks','pKb',['pKs_from_pKb','Ks_from_pKs']],
+ [2,'pKb','Ks',['pKs_from_Ks','pKb_from_pKs']],[2,'pKs','Kb',['pKb_from_Kb','pKs_from_pKb']]
+].forEach(r=>R('K1',r[0],r[1],[r[2]],r[3]));
+/* K2: starke Säuren und Basen aus c0 */
+R('K2',2,'pH',['c0'],['pH_from_c0A'],{k:'A'});
+R('K2',2,'pOH',['c0'],['pH_from_c0A','pOH_from_pH'],{k:'A'});
+R('K2',2,'pOH',['c0'],['pOH_from_c0B'],{k:'B1'});
+R('K2',2,'pH',['c0'],['pOH_from_c0B','pH_from_pOH'],{k:'B1'});
+R('K2',3,'pH',['c0'],['cOH_from_c0n','pOH_from_cOH','pH_from_pOH'],{k:'B2'});
+R('K2',3,'pOH',['c0'],['cOH_from_c0n','pOH_from_cOH'],{k:'B2'});
+/* K2c: Ausgangskonzentration c0 starker Säuren und Basen */
+const K2C={
+  A:{cH:['c0_from_cH_A'],pH:['cH_from_pH','c0_from_cH_A'],pOH:['pH_from_pOH','cH_from_pH','c0_from_cH_A'],cOH:['pOH_from_cOH','pH_from_pOH','cH_from_pH','c0_from_cH_A']},
+  B1:{cOH:['c0_from_cOH_B'],pOH:['cOH_from_pOH','c0_from_cOH_B'],pH:['pOH_from_pH','cOH_from_pOH','c0_from_cOH_B'],cH:['pH_from_cH','pOH_from_pH','cOH_from_pOH','c0_from_cOH_B']},
+  B2:{cOH:['c0_from_cOH_n'],pOH:['cOH_from_pOH','c0_from_cOH_n'],pH:['pOH_from_pH','cOH_from_pOH','c0_from_cOH_n'],cH:['pH_from_cH','pOH_from_pH','cOH_from_pOH','c0_from_cOH_n']}
+};
+Object.keys(K2C).forEach(k=>Object.keys(K2C[k]).forEach(g=>{
+  const n=K2C[k][g];R('K2',(k==='B2'||n.length>=3)?3:2,'c0',[g],n,{k});
+}));
+/* K3: schwache Säuren und Basen – Henderson-Hasselbalch-Gleichung
+   Säure:  pH  = pKs + lg(c(Base)/c(Säure))     Base:  pOH = pKb + lg(c(Säure)/c(Base))  */
+const TO_PKS={pKs:[],Ks:['pKs_from_Ks'],pKb:['pKs_from_pKb'],Kb:['pKb_from_Kb','pKs_from_pKb']};
+const TO_PKB={pKb:[],Kb:['pKb_from_Kb'],pKs:['pKb_from_pKs'],Ks:['pKs_from_Ks','pKb_from_pKs']};
+const HH={
+  acid:{K:['pKs','Ks'],Q:{pH:[],pOH:['pH_from_pOH'],cH:['pH_from_cH']},to:TO_PKS,fw:'pH_HH',p:'pH',alt:'pOH',conv:'pOH_from_pH',back:'pH_from_pOH',rv:'pKs_HH',
+        tails:{pKs:[],Ks:['Ks_from_pKs'],pKb:['pKb_from_pKs'],Kb:['pKb_from_pKs','Kb_from_pKb']},cn:{cHA:'cHA_HHs',cA:'cA_HHs'}},
+  base:{K:['pKb','Kb','pKs','Ks'],Q:{pOH:[],pH:['pOH_from_pH'],cOH:['pOH_from_cOH']},to:TO_PKB,fw:'pOH_HH',p:'pOH',alt:'pH',conv:'pH_from_pOH',back:'pOH_from_pH',rv:'pKb_HH',
+        tails:{pKb:[],Kb:['Kb_from_pKb'],pKs:['pKs_from_pKb'],Ks:['pKs_from_pKb','Ks_from_pKs']},cn:{cHA:'cHA_HHb',cA:'cA_HHb'}}
+};
+/* K3w: unvollständige Protolyse (reine Lösung einer schwachen Säure bzw. Base) */
+const W={
+  acid:{K:['pKs','Ks'],Q:{pH:[],pOH:['pH_from_pOH'],cH:['pH_from_cH']},to:TO_PKS,fw:'pH_w',p:'pH',alt:'pOH',conv:'pOH_from_pH',back:'pH_from_pOH',rv:'pKs_w',kc:'pKs',
+        tails:{pKs:[],Ks:['Ks_from_pKs'],pKb:['pKb_from_pKs'],Kb:['pKb_from_pKs','Kb_from_pKb']},c0:'c0_wA'},
+  base:{K:['pKb','Kb','pKs','Ks'],Q:{pOH:[],pH:['pOH_from_pH'],cOH:['pOH_from_cOH']},to:TO_PKB,fw:'pOH_w',p:'pOH',alt:'pH',conv:'pH_from_pOH',back:'pOH_from_pH',rv:'pKb_w',kc:'pKb',
+        tails:{pKb:[],Kb:['Kb_from_pKb'],pKs:['pKs_from_pKb'],Ks:['pKs_from_pKb','Ks_from_pKs']},c0:'c0_wB'}
+};
+['acid','base'].forEach(type=>{
+  const H=W[type];
+  H.K.forEach(g=>{
+    R('K3',3,H.p,[g],H.to[g].concat([H.fw]),{type,m:'wfw'});
+    R('K3',3,H.alt,[g],H.to[g].concat([H.fw,H.conv]),{type,m:'wfw'});
+  });
+  R('K3',3,H.p,['c0'],[H.fw],{type,m:'wfw',gk:H.kc});
+  R('K3',3,H.alt,['c0'],[H.fw,H.conv],{type,m:'wfw',gk:H.kc});
+  [H.p,H.alt].forEach(q=>Object.keys(H.tails).forEach(t=>R('K3',3,t,[q],(q===H.p?[]:[H.back]).concat([H.rv],H.tails[t]),{type,m:'wrv'})));
+  H.K.forEach(kk=>Object.keys(H.Q).forEach(q=>R('K3',3,'c0',[kk],H.to[kk].concat(H.Q[q],[H.c0]),{type,m:'wc',q})));
+});
+['acid','base'].forEach(type=>{
+  const H=HH[type];
+  // pH bzw. pOH aus der Konstanten (Konzentrationen werden automatisch gegeben)
+  H.K.forEach(g=>{
+    R('K3',3,H.p,[g],H.to[g].concat([H.fw]),{type,m:'fw'});
+    R('K3',3,H.alt,[g],H.to[g].concat([H.fw,H.conv]),{type,m:'fw'});
+  });
+  // Grundlage c(Säure)/c(Base): pKs bzw. pKb (oder pH bzw. pOH) wird automatisch mitgegeben
+  const kc=type==='acid'?'pKs':'pKb';
+  R('K3',3,H.p,['c0'],[H.fw],{type,m:'fw',gk:kc});
+  R('K3',3,H.alt,['c0'],[H.fw,H.conv],{type,m:'fw',gk:kc});
+  Object.keys(H.tails).forEach(t=>R('K3',3,t,['c0'],[H.rv].concat(H.tails[t]),{type,m:'rv',gk:H.p}));
+  // Konstanten aus pH bzw. pOH
+  [H.p,H.alt].forEach(q=>Object.keys(H.tails).forEach(t=>{
+    R('K3',3,t,[q],(q===H.p?[]:[H.back]).concat([H.rv],H.tails[t]),{type,m:'rv'});
+  }));
+  // Konzentration c(Säure) bzw. c(Base) aus der Konstanten (pH, pOH bzw. c wird automatisch gegeben)
+  H.K.forEach(kk=>Object.keys(H.Q).forEach(q=>{
+    R('K3',3,'c0',[kk],H.to[kk].concat(H.Q[q],[H.cn.cHA]),{type,m:'c',q});
+  }));
+});
+
+/* ============ Aufgabe erzeugen ============ */
+const HHPOOL=PAIRS.filter(p=>p.id!=='hso4').map(p=>p.id);
+const CBUF=[0.01,0.02,0.025,0.04,0.05,0.08,0.1,0.15,0.2,0.25,0.3,0.4,0.5,0.75,1];
+const C0LIST=[0.001,0.002,0.005,0.01,0.02,0.05,0.1,0.2,0.5,1];
+const C0STRONG=[0.001,0.0015,0.002,0.0025,0.003,0.004,0.005,0.0075,0.008,0.01,0.015,0.02,0.025,0.03,0.04,0.05,0.075,0.1,0.15,0.2,0.25,0.5];
+const C0POLY=[0.001,0.0015,0.002,0.0025,0.003,0.004,0.005,0.0075,0.008,0.01,0.015,0.02];
+function pairVal(p,g){
+  switch(g){case 'pKs':return p.pKs;case 'pKb':return r2(14-p.pKs);case 'Ks':return sig2(E10(-p.pKs));case 'Kb':return sig2(E10(-(14-p.pKs)))}
+}
+function genSpec(Rc){
+  const sp={kind:Rc.kind,level:Rc.level,target:Rc.target,nodes:Rc.nodes.slice(),vals:{},givenKeys:[]};
+  const g=Rc.extra.gk||Rc.given[0];
+  if(Rc.target==='c0'&&Rc.kind==='K2'){
+    const k=Rc.extra.k,s=pick(STRONG.filter(x=>x.t===k)),c0=pick(k==='B2'?C0POLY:C0STRONG),n=k==='B2'?2:1;
+    sp.stoff=s.id;sp.givenKeys=[g];if(k==='B2')sp.vals.n=2;
+    const cc=k==='A'?c0:n*c0;                       // c(H3O+) bzw. c(OH-)
+    const pc=r2(-LG(cc));
+    sp.vals[g]=k==='A'?(g==='cH'?cc:g==='pH'?pc:g==='pOH'?r2(14-pc):sig2(KW/cc)):(g==='cOH'?cc:g==='pOH'?pc:g==='pH'?r2(14-pc):sig2(KW/cc));
+    return sp;
+  }
+  if(Rc.kind==='K0'){
+    sp.givenKeys=[g];
+    sp.vals[g]=(g==='pH'||g==='pOH')?r2(rnd(1,13)):sciv(r1(rnd(1,9.9)),Math.floor(rnd(1,14)));
+  }else if(Rc.kind==='K1'){
+    const p=pick(PAIRS);sp.pair=p.id;sp.givenKeys=[g];sp.vals[g]=pairVal(p,g);
+  }else if(Rc.kind==='K2'){
+    const k=Rc.extra.k,list=STRONG.filter(s=>s.t===k),s=pick(list);
+    sp.stoff=s.id;sp.givenKeys=['c0'];sp.vals.c0=pick(k==='B2'?C0POLY:C0STRONG);if(k==='B2')sp.vals.n=2;
+  }else{
+    const type=Rc.extra.type,m=Rc.extra.m;sp.type=type;sp.m=m;
+    if(m[0]==='w'){
+      const pool=type==='acid'?K3ACID:K3BASE;
+      for(let i=0;i<400;i++){
+        const pid=pick(pool),p=PAIRS.find(x=>x.id===pid),c0=pick(C0LIST),pK=type==='acid'?p.pKs:14-p.pKs;
+        const x=Math.sqrt(E10(-pK)*c0);
+        if(x/c0>0.05||-LG(x)>5.5)continue;
+        const half=0.5*(pK-LG(c0)),pP=type==='acid'?'pH':'pOH';   // pH (Säure) bzw. pOH (Base)
+        const qv=q=>q===pP?r2(half):q==='pH'||q==='pOH'?r2(14-half):sig2(E10(-half));
+        sp.pair=p.id;sp.vals={};
+        if(m==='wfw'){sp.vals[g]=pairVal(p,g);sp.vals.c0=c0;sp.givenKeys=[g,'c0']}
+        else if(m==='wrv'){sp.vals[g]=qv(g);sp.vals.c0=c0;sp.givenKeys=[g,'c0']}
+        else{
+          const q=Rc.extra.q;sp.vals[g]=pairVal(p,g);sp.vals[q]=qv(q);sp.givenKeys=[q,g];
+          let T;try{T=buildTask(sp)}catch(e){continue}
+          const res=T.res[T.res.length-1];if(Math.abs(res/c0-1)>0.1)continue;
+        }
+        return sp;
+      }
+      throw new Error('Keine passende Aufgabe');
+    }
+    for(let i=0;i<400;i++){
+      const pid=pick(HHPOOL),p=PAIRS.find(x=>x.id===pid),cHA=pick(CBUF),cA=pick(CBUF),r=cA/cHA;
+      if(r<0.1||r>10||r===1)continue;
+      const pH=p.pKs+LG(r);if(pH<1||pH>13)continue;
+      sp.pair=p.id;sp.vals={};
+      if(m==='fw'){sp.vals[g]=pairVal(p,g);sp.vals.cHA=cHA;sp.vals.cA=cA;sp.givenKeys=[g,'cHA','cA']}
+      else if(m==='rv'){sp.vals[g]=g==='pH'?r2(pH):r2(14-pH);sp.vals.cHA=cHA;sp.vals.cA=cA;sp.givenKeys=[g,'cHA','cA']}
+      else{
+        const q=Rc.extra.q,u=Math.random()<0.5?'cHA':'cA',o=u==='cHA'?'cA':'cHA';
+        sp.nodes[sp.nodes.length-1]=HH[type].cn[u];
+        sp.vals[g]=pairVal(p,g);sp.vals[q]=q==='pH'?r2(pH):q==='pOH'?r2(14-pH):q==='cH'?sig2(E10(-pH)):sig2(E10(pH-14));
+        sp.vals[o]=o==='cHA'?cHA:cA;sp.givenKeys=[q,g,o];
+        let T;try{T=buildTask(sp)}catch(e){continue}
+        const res=T.res[T.res.length-1];if(!(res>=0.005&&res<=2))continue;
+      }
+      return sp;
+    }
+    throw new Error('Keine passende Aufgabe');
+  }
+  return sp;
+}
+function buildTask(sp){
+  if(!sp||!Array.isArray(sp.nodes)||!sp.nodes.length||sp.nodes.length>8)throw new Error('Aufbau');
+  const T={sp,nodes:sp.nodes.map(id=>{if(!N[id])throw new Error('Schritt');return N[id]}),v0:Object.assign({},sp.vals)};
+  T.out=T.nodes[T.nodes.length-1].out;
+  if(T.out!==sp.target&&!(sp.target==='c0'&&(T.out==='cHA'||T.out==='cA')))throw new Error('Aufbau');
+  T.pair=sp.pair?PAIRS.find(p=>p.id===sp.pair):null;
+  T.stoff=sp.stoff?STRONG.find(s=>s.id===sp.stoff):null;
+  if((sp.pair&&!T.pair)||(sp.stoff&&!T.stoff)||![1,2,3].includes(sp.level)||!Array.isArray(sp.givenKeys))throw new Error('Stoff');
+  Object.keys(T.v0).forEach(k=>{if(typeof T.v0[k]!=='number'||!isFinite(T.v0[k]))throw new Error('Wert')});
+  sp.givenKeys.forEach(k=>{if(!(k in T.v0))throw new Error('Wert')});
+  const v=Object.assign({},T.v0);T.snap=[];T.res=[];
+  T.nodes.forEach(n=>{T.snap.push(Object.assign({},v));const r=n.calc(v);if(!isFinite(r))throw new Error('Rechnung');v[n.out]=r;T.res.push(r)});
+  T.need=[];T.nodes.forEach(n=>n.use.forEach(u=>{if(!T.need.includes(u))T.need.push(u)}));
+  return T;
+}
+const valuesBefore=(rec,i)=>{const v=Object.assign({},rec.T.v0);for(let j=0;j<i;j++)v[rec.T.nodes[j].out]=rec.steps[j].val;return v};
+
+/* ============ Beschriftungen einer Aufgabe ============ */
+function keyLabel(T,k){
+  const p=T.pair;
+  if(k==='pKs'||k==='Ks')return S[k]+(p?' ('+spName(p.a)+')':'');
+  if(k==='pKb'||k==='Kb')return S[k]+(p?' ('+spName(p.b)+')':'');
+  if(k==='cHA'&&p)return `c(${p.a.f||spName(p.a)})`;
+  if(k==='cA'&&p)return `c(${p.b.f||spName(p.b)})`;
+  if(k==='c0'){const nm=T.stoff?T.stoff.n:p?spName(T.sp.type==='base'?p.b:p.a):'';return S.c0+(nm?' ('+nm+')':'')}
+  return S[k];
+}
+function seekLabel(T,k){
+  const p=T.pair,a=p?' ('+spName(p.a)+')':'',b=p?' ('+spName(p.b)+')':'';
+  return {pH:'pH-Wert',pOH:'pOH-Wert',pKs:'pK<sub>S</sub>-Wert'+a,pKb:'pK<sub>B</sub>-Wert'+b,Ks:'Säurekonstante K<sub>S</sub>'+a,Kb:'Basenkonstante K<sub>B</sub>'+b,c0:T.out==='cHA'||T.out==='cA'?'Konzentration '+keyLabel(T,T.out):'Ausgangskonzentration '+keyLabel(T,'c0')}[k];
+}
+function introHTML(T){
+  const sp=T.sp,p=T.pair;
+  if(sp.kind==='K0')return 'Für eine wässrige Lösung bei 25 °C ist bekannt:';
+  if(sp.kind==='K1')return `Betrachtet wird das Säure-Base-Paar <b>${spTxt(p.a)}</b> / <b>${spTxt(p.b)}</b> (25 °C).`;
+  if(sp.kind==='K2'){const s=T.stoff;return `Betrachtet wird eine wässrige Lösung von <b>${s.n}</b> (${s.f}) bei 25 °C. ${s.t==='A'?'Die Säure ist stark und protolysiert vollständig.':'Die Base ist stark und dissoziiert vollständig.'}`}
+  const sl=x=>x.salt?` (z. B. aus ${x.salt})`:'';
+  if((sp.m||'')[0]==='w'){const x=sp.type==='acid'?p.a:p.b;return `Betrachtet wird eine wässrige Lösung von <b>${spTxt(x)}</b>${sl(x)} bei 25 °C. ${sp.type==='acid'?'Die Säure':'Die Base'} ist schwach und protolysiert nur unvollständig (Protolysegrad unter 5 %).`}
+  return `Betrachtet wird eine Pufferlösung bei 25 °C. Sie enthält die schwache Säure <b>${spTxt(p.a)}</b>${sl(p.a)} und ihre korrespondierende Base <b>${spTxt(p.b)}</b>${sl(p.b)}. ${sp.type==='acid'?'Rechne mit der Henderson-Hasselbalch-Gleichung für die Säure (pH, pK<sub>S</sub>).':'Rechne mit der Henderson-Hasselbalch-Gleichung für die Base (pOH, pK<sub>B</sub>).'}`;
+}
+function structList(T){
+  const p=T.pair,sp=T.sp;let L=[];
+  if(sp.kind==='K1')L=[p.a,p.b];else if(sp.kind==='K3')L=(sp.m||'')[0]==='w'?[sp.type==='acid'?p.a:p.b]:[p.a,p.b];
+  return L.filter(x=>x&&x.s);
+}
+const shortTitle=T=>{const g=T.sp.givenKeys.map(k=>S[k]);return `${S[T.out||T.sp.target]} aus ${g.length>1?g.slice(0,-1).join(', ')+' und '+g[g.length-1]:g[0]}`};
+const KONTROLLE=T=>'';
+
+/* ============ Zustand ============ */
+const PAGE_URL='https://chemie.mail-baumgart.de/Q2/2-Saeure_Base_Berechnungen.html';
+const st={tg:new Set(),gv:new Set(),lvl:1,hist:[],cur:null};
+const touched=r=>r.viewed||r.steps.some(s=>s.t>0||s.done);
+const allDone=r=>r.steps.every(s=>s.done);
+function newRec(sp){
+  const T=buildTask(sp);
+  return{sp,T,n:0,steps:T.nodes.map(()=>({in:'',t:0,a:false,h:false,done:false,val:null,fb:null,bad:false})),viewed:false,tip:false,ended:false,
+    help:false,tipI:-1,fin:false};
+}
+const levelMatch=(r,lvl)=>(lvl===undefined||r.level===lvl)&&st.tg.has(r.target)&&r.given.every(g=>st.gv.has(g));
+const eligible=()=>RECIPES.filter(r=>levelMatch(r,st.lvl));
+const levelsAvail=()=>[1,2,3].filter(l=>RECIPES.some(r=>levelMatch(r,l)));
+const selOK=()=>st.tg.size>0&&st.gv.size>0;
+
+/* ============ Neue Aufgabe ============ */
+function dropUntouched(){
+  const c=st.cur;
+  if(c){c.ended=true;if(!touched(c)){const i=st.hist.indexOf(c);if(i>=0)st.hist.splice(i,1)}}
+  st.cur=null;
+}
+function newTask(){
+  dropUntouched();
+  const pool=selOK()?eligible():[];
+  if(!pool.length){render();return}
+  const last=st.hist.slice(-3).map(r=>JSON.stringify(r.sp));
+  let rec=null;
+  for(let i=0;i<12&&!rec;i++){
+    const sp=genSpec(pick(pool));
+    if(last.indexOf(JSON.stringify(sp))>=0&&i<11)continue;
+    rec=newRec(sp);
+  }
+  rec.n=st.hist.length+1;
+  st.hist.push(rec);st.cur=rec;st.focus=true;
+  render();
+}
+function afterSelection(){
+  const c=st.cur;
+  if(c&&!touched(c)){dropUntouched()}
+  if(!st.cur&&selOK()&&eligible().length)newTask();else render();
+}
+
+/* ============ Prüfen ============ */
+function okHTML(rec,i){
+  const n=rec.T.nodes[i],v=valuesBefore(rec,i);
+  return `✓ Richtig. Rechnung: ${S[n.out]} = ${n.ex(v)} = <b>${fRes(n.out,n.calc(v))}</b> ${UNIT(n.out)}`;
+}
+function finish(rec){
+  if(!allDone(rec)||rec.fin)return;
+  rec.fin=true;
+}
+function check(i){
+  const rec=st.cur;if(!rec)return;st.focus=true;
+  const s=rec.steps[i],n=rec.T.nodes[i];if(s.done)return;
+  const raw=s.in||'';
+  if(!raw.trim()){s.fb={cls:'bad',html:'Gib zuerst einen Wert ein.'};s.bad=true;render();return}
+  const x=parseNum(raw);
+  if(!isFinite(x)){s.fb={cls:'bad',html:'Die Eingabe wird nicht verstanden. Schreibe z. B. <b>3,24</b> oder <b>7,14·10^-4</b> (auch 7,14e-4).'};s.bad=true;render();return}
+  const v=valuesBefore(rec,i),e=n.calc(v),mode=MODE(n.out),j=judge(mode,x,e);
+  s.t++;if(rec.help||rec.tipI===i)s.h=true;
+  if(j==='ok'){
+    s.done=true;s.val=x;s.bad=false;s.fb={cls:'good',html:okHTML(rec,i)};rec.tipI=-1;st.focus=true;finish(rec);
+  }else{
+    s.bad=true;let m=null;
+    if(mode==='k'&&x<=0)m='Konzentrationen und Konstanten sind positiv.';
+    else if(j==='near')m=mode==='p'?'Fast richtig – prüfe die Rundung (zwei Nachkommastellen).':'Fast richtig – prüfe die Rundung (drei gültige Ziffern).';
+    else{
+      for(const a of n.alt(v,e)){
+        if(isFinite(a[0])&&judge(mode,a[0],e)!=='ok'&&judge(mode,x,a[0])==='ok'){m=a[1];break}
+      }
+    }
+    if(!m)m=(mode==='p'?'Das stimmt noch nicht. Prüfe Formel und Rechnung.':'Das stimmt noch nicht. Prüfe Formel, Zehnerpotenz und Rechnung.')+(s.t>=2?'':' Mit „Tipp“ siehst du den Rechenweg.');
+    s.fb={cls:'bad',html:m};
+  }
+  render();
+}
+function fillStep(rec,i){
+  const s=rec.steps[i],n=rec.T.nodes[i],e=n.calc(valuesBefore(rec,i));
+  s.done=true;s.a=true;s.val=e;s.bad=false;s.in='';s.fb={cls:'tip',html:`Eingesetzt *: ${S[n.out]} = ${n.ex(valuesBefore(rec,i))} = <b>${fRes(n.out,e)}</b> ${UNIT(n.out)}`};
+}
+function fillRest(rec,viewed){
+  rec.steps.forEach((s,i)=>{if(!s.done)fillStep(rec,i)});
+  if(viewed)rec.viewed=true;
+  rec.tipI=-1;finish(rec);
+}
+const canRest=r=>!allDone(r)&&r.steps.filter(s=>s.done&&!s.a).length>=2;
+
+/* ============ Darstellung ============ */
+function figsHTML(T){
+  const L=structList(T);if(!L.length)return '';
+  return `<div class="sfigs">${L.map(x=>`<figure class="sfig"><div class="sbox">${molSVG(STRUCT[x.s](),26)}</div><figcaption>${esc(spName(x,true))}</figcaption></figure>`).join('')}</div>`;
+}
+function givenHTML(T){
+  const sp=T.sp;
+  return `<div class="given"><div class="gl">Gegeben</div><ul>${sp.givenKeys.map(k=>`<li>${keyLabel(T,k)} = <b>${fGiven(k,T.v0[k])}</b> ${UNIT(k)}</li>`).join('')}</ul><div class="gl" style="margin-top:8px">Gesucht</div><div class="seek">${seekLabel(T,sp.target)}</div></div>`;
+}
+function needHTML(T){
+  const items=T.need.map(k=>NEED[k]);
+  if(T.stoff&&T.stoff.diss&&T.need.indexOf('zwei')>=0)items.push(T.stoff.diss);
+  return `<div class="infobox"><h4>Hilfen: weitere Werte</h4>${items.length?`<ul>${items.map(i=>`<li>${i}</li>`).join('')}</ul>`:'<div>Für diese Aufgabe sind keine zusätzlichen Werte nötig – du brauchst nur lg und 10<sup>x</sup> am Taschenrechner.</div>'}</div>`;
+}
+function stepHTML(rec,i,cur){
+  const n=rec.T.nodes[i],s=rec.steps[i],out=n.out,k=MODE(out)==='k';
+  let h=`<li class="step ${s.done?'done':cur?'cur':'locked'}"><div class="sn">${s.done?'✓':i+1}</div><div class="sb"><div class="sl">${n.label}</div>`;
+  if(rec.help)h+=`<div class="sf">${n.f}</div>`;
+  if(s.done)h+=`<div class="sres">${S[out]} = <b>${fRes(out,s.val)}</b> ${UNIT(out)}${s.a?' <span class="auto">* eingesetzt</span>':''}</div>`;
+  else if(cur){
+    h+=`<div class="irow"><span class="sym">${S[out]} =</span><input class="sinp${s.bad?' bad':''}" data-i="${i}" value="${esc(s.in)}" inputmode="${k?'text':'decimal'}" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${k?'z. B. 7,1·10^-4':'z. B. 3,25'}" aria-label="${out}"><span class="unit">${UNIT(out)}</span><button class="primary" data-act="check" data-i="${i}">Prüfen</button></div>`;
+    h+=`<div class="stepbtns">${k?'<button class="mini" data-act="ins" data-t="·10^" aria-label="mal zehn hoch">·10^</button><button class="mini" data-act="ins" data-t="-" aria-label="Minus">−</button>':''}<button data-act="tip" data-i="${i}">Tipp</button>${s.t>=2?`<button data-act="put" data-i="${i}">Wert einsetzen</button>`:''}</div>`;
+  }
+  if(s.fb)h+=`<div class="fb ${s.fb.cls}">${s.fb.html}</div>`;
+  if(cur&&rec.tipI===i)h+=`<div class="fb tip"><b>Formel:</b> ${n.f}<br><b>Mit deinen Werten:</b> ${S[out]} = ${n.ex(valuesBefore(rec,i))}</div>`;
+  return h+'</div></li>';
+}
+function recStatus(rec){
+  const all=allDone(rec);
+  if(rec.viewed)return{c:'bad',t:'✗ Lösung angesehen'};
+  if(all){
+    const help=rec.steps.some(s=>s.a||s.h)||rec.tip;
+    if(help)return{c:'amb',t:'✓ mit Hilfen'};
+    return rec.steps.every(s=>s.t===1)?{c:'ok',t:'✓ im 1. Versuch'}:{c:'amb',t:'✓ nach Fehlversuch'};
+  }
+  return rec===st.cur&&!rec.ended?{c:'',t:'läuft'}:{c:'',t:'– nicht beendet'};
+}
+function renderMain(){
+  const card=$('#taskCard'),rec=st.cur;
+  if(!rec){
+    let m;
+    if(!st.tg.size&&!st.gv.size)m='Wähle links mindestens eine <b>Größe</b> und eine <b>Grundlage</b> aus. Dann erscheint eine Aufgabe.';
+    else if(!st.tg.size)m='Wähle links noch mindestens eine <b>Größe</b>, die berechnet werden soll.';
+    else if(!st.gv.size)m='Wähle links noch mindestens eine <b>Grundlage</b> (gegebene Werte).';
+    else{
+      const lv=levelsAvail();
+      m=lv.length?`Für diese Auswahl gibt es auf der Stufe „${LVLTXT[st.lvl]}“ keine Aufgabe. Aufgaben gibt es auf: <b>${lv.map(l=>LVLTXT[l]).join(', ')}</b>.`
+        :'Für diese Kombination gibt es keine Aufgabe: Eine Größe lässt sich nur aus passenden Werten berechnen (z. B. der pH aus pOH, c(H<sub>3</sub>O<sup>+</sup>) oder aus K<sub>S</sub> bzw. pK<sub>S</sub> und c<sub>0</sub>; c<sub>0</sub> aus dem pH). Ändere die Auswahl.';
+    }
+    card.innerHTML=`<div class="hint-card">${m}</div>`;return;
+  }
+  const T=rec.T,sp=T.sp,done=allDone(rec),act=rec.steps.findIndex(s=>!s.done);
+  let h=`<div class="thead"><span class="nm">Aufgabe ${rec.n}</span><span class="tag">${LVLTXT[sp.level]}</span></div><div class="tq">${introHTML(T)}</div>${figsHTML(T)}${givenHTML(T)}`;
+  h+=`<div class="tools"><button class="tool ${rec.help?'on':''}" data-act="help" aria-pressed="${rec.help}">Hilfen</button>${canRest(rec)?'<button data-act="rest">Rest ausfüllen</button>':''}<button data-act="sol" ${(done||!rec.steps.some(s=>s.t>0))?'disabled':''}>Lösung zeigen</button></div>`;
+  if(rec.help)h+=needHTML(T);
+  h+=`<ol class="steps">${T.nodes.map((n,i)=>stepHTML(rec,i,i===act)).join('')}</ol>`;
+  if(done){
+    const k=KONTROLLE(T),r=recStatus(rec);
+    h+=`<div class="done-msg"><b>${rec.viewed?'Lösung angezeigt.':'Aufgabe abgeschlossen.'}</b> ${r.t==='✓ im 1. Versuch'?'Alle Schritte waren beim ersten Versuch richtig. ':''}Ergebnis: ${seekLabel(T,sp.target)} = <b>${fRes(sp.target,rec.steps[rec.steps.length-1].val)}</b> ${UNIT(sp.target)}. Weiter mit „Neue Aufgabe“.${k?`<div class="tip2">${k}</div>`:''}</div>`;
+  }
+  card.innerHTML=h;
+}
+function renderSel(){
+  $('#segT').innerHTML=TARGETS.map(k=>`<button data-v="${k}" aria-pressed="${st.tg.has(k)}" style="${k==='c0'?'flex-basis:100%':''}">${GLABEL[k]}</button>`).join('');
+  $('#segG').innerHTML=GIVENS.map(k=>`<button data-v="${k}" aria-pressed="${st.gv.has(k)}" style="${k==='c0'?'flex-basis:100%':''}">${GLABEL[k]}</button>`).join('');
+  document.querySelectorAll('#segLvl button').forEach(b=>b.classList.toggle('on',+b.dataset.v===st.lvl));
+  $('#lvlInfo').innerHTML=LVLINFO[st.lvl];
+}
+/* ---- Statistik ---- */
+function calcStats(list){
+  let tasks=0,steps=0,first=0,sol=0,streak=0,helped=0;
+  (list||st.hist).forEach(r=>{
+    if(!touched(r))return;
+    const all=allDone(r);
+    if(all&&!r.viewed)tasks++;
+    if(all&&!r.viewed&&(r.tip||r.steps.some(s=>s.a||s.h)))helped++;
+    if(r.viewed)sol++;
+    r.steps.forEach(s=>{if(s.done){steps++;if(!s.a&&!s.h&&s.t===1)first++}});
+    const clean=all&&!r.viewed&&!r.tip&&r.steps.every(s=>!s.a&&!s.h&&s.t===1);
+    if(clean)streak++;else if(r.ended||all)streak=0;
+  });
+  return{tasks,steps,first,sol,streak,helped,q:steps?Math.round(100*first/steps):null};
+}
+function renderStats(){
+  const s=calcStats();
+  $('#stats').innerHTML=`<span>Aufgaben vollständig gelöst</span><span>${s.tasks}</span><span>Schritte abgeschlossen</span><span>${s.steps}</span><span>davon mit Hilfen gelöst</span><span>${s.helped}</span><span>Schritte im 1. Versuch ohne Hilfen</span><span>${s.first}</span><span>Lösung angesehen</span><span>${s.sol}</span><span>Serie (richtig in Folge)</span><span>${s.streak}</span><span><b>Erfolgsquote</b></span><span>${s.q===null?'–':s.q+' %'}</span>`;
+  $('#status').textContent=s.q===null?'Bereit':`Erfolgsquote ${s.q} % (${s.first}/${s.steps})`;
+}
+function renderHist(){
+  const list=st.hist.filter(touched);
+  if(!list.length){$('#hist').innerHTML='<div class="hint">Noch keine Aufgaben bearbeitet.</div>';return}
+  $('#hist').innerHTML=list.slice().reverse().map(r=>{
+    const T=r.T,sp=T.sp,s=recStatus(r),fin=allDone(r);
+    return `<div class="hitem"><div class="hn">Aufgabe ${r.n} · ${shortTitle(T)} <span class="tag">${LVLTXT[sp.level]}</span></div><div class="hrow"><span class="${s.c?s.c+'-t':''}">${s.t}</span>${fin?`<span>${S[sp.target]} = <b style="font-family:var(--mono);color:var(--amber);font-weight:500">${fRes(sp.target,r.steps[r.steps.length-1].val)}</b> ${UNIT(sp.target)}</span>`:''}</div></div>`;
+  }).join('');
+}
+function render(){
+  renderSel();renderMain();renderStats();renderHist();
+  const act=document.querySelector('.sinp');
+  if(st.focus&&act){try{act.focus({preventScroll:true})}catch(_){act.focus()}}
+  st.focus=false;
+}
+
+/* ============ Interaktion ============ */
+function multiToggle(set,ev){
+  const b=ev.target.closest('button');if(!b)return;
+  const v=b.dataset.v;if(set.has(v))set.delete(v);else set.add(v);
+  afterSelection();
+}
+$('#segT').addEventListener('click',ev=>multiToggle(st.tg,ev));
+$('#segG').addEventListener('click',ev=>multiToggle(st.gv,ev));
+$('#segLvl').addEventListener('click',ev=>{const b=ev.target.closest('button');if(!b)return;st.lvl=+b.dataset.v;afterSelection()});
+$('#btnNew').addEventListener('click',newTask);
+const main=$('#taskCard');
+main.addEventListener('input',ev=>{
+  const t=ev.target;if(!t.matches('.sinp')||!st.cur)return;
+  const s=st.cur.steps[+t.dataset.i];s.in=t.value;if(s.bad){s.bad=false;t.classList.remove('bad')}
+});
+main.addEventListener('keydown',ev=>{
+  if(ev.key==='Enter'&&ev.target.matches('.sinp')){ev.preventDefault();check(+ev.target.dataset.i)}
+});
+main.addEventListener('click',ev=>{
+  const b=ev.target.closest('[data-act]'),rec=st.cur;if(!b||!rec)return;
+  const act=b.dataset.act,i=+b.dataset.i;
+  if(act==='check')check(i);
+  else if(act==='ins'){
+    const inp=main.querySelector('.sinp');if(!inp)return;
+    const a=inp.selectionStart==null?inp.value.length:inp.selectionStart,e=inp.selectionEnd==null?a:inp.selectionEnd;
+    inp.value=inp.value.slice(0,a)+b.dataset.t+inp.value.slice(e);
+    const p=a+b.dataset.t.length;inp.focus();try{inp.setSelectionRange(p,p)}catch(_){}
+    rec.steps[+inp.dataset.i].in=inp.value;
+  }
+  else if(act==='tip'){rec.tipI=rec.tipI===i?-1:i;rec.tip=rec.tip||rec.tipI>=0;render()}
+  else if(act==='put'){fillStep(rec,i);finish(rec);st.focus=true;render()}
+  else if(act==='rest'){fillRest(rec,false);render()}
+  else if(act==='sol'){fillRest(rec,true);render()}
+  else if(act==='help'){rec.help=!rec.help;render()}
+});
+
+/* ============ Modale ============ */
+function openM(id){$(id).hidden=false}
+document.querySelectorAll('.modal').forEach(m=>{m.addEventListener('click',ev=>{if(ev.target===m||ev.target.closest('[data-close]'))m.hidden=true})});
+$('#lnkAnl').addEventListener('click',ev=>{ev.preventDefault();openM('#mAnl')});
+$('#lnkVer').addEventListener('click',ev=>{ev.preventDefault();openM('#mVer')});
+
+/* ============ Grundlagen ============ */
+function scaleSVG(){
+  let t='';for(let i=0;i<=14;i++){const x=20+i*600/14;t+=`<line x1="${x.toFixed(1)}" y1="70" x2="${x.toFixed(1)}" y2="77" stroke="currentColor"/><text x="${x.toFixed(1)}" y="93" text-anchor="middle" font-size="12" fill="currentColor">${i}</text>`}
+  const x3=20+3*600/14;
+  return `<svg viewBox="0 0 640 175" role="img" aria-label="pH-Skala mit pH und pOH" font-family="system-ui,sans-serif"><defs><linearGradient id="phg" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#e4785b"/><stop offset=".5" stop-color="#7fd68a"/><stop offset="1" stop-color="#4fd1c5"/></linearGradient></defs>
+  <rect x="20" y="44" width="600" height="24" rx="4" fill="url(#phg)" opacity=".9"/>${t}
+  <text x="20" y="34" font-size="13" fill="currentColor">sauer</text><text x="320" y="34" font-size="13" text-anchor="middle" fill="currentColor">neutral</text><text x="620" y="34" font-size="13" text-anchor="end" fill="currentColor">basisch</text>
+  <text x="14" y="108" font-size="12" fill="currentColor" opacity=".7">pH →</text><text x="626" y="108" font-size="12" text-anchor="end" fill="currentColor" opacity=".7">← pOH</text>
+  <path d="M20 118H${x3.toFixed(1)}" stroke="#ffb454" stroke-width="2"/><path d="M${x3.toFixed(1)} 118H620" stroke="#4fd1c5" stroke-width="2"/>
+  <line x1="${x3.toFixed(1)}" y1="44" x2="${x3.toFixed(1)}" y2="124" stroke="currentColor" stroke-dasharray="3 3"/>
+  <text x="${(20+x3)/2}" y="138" font-size="13" text-anchor="middle" fill="#ffb454">pH = 3</text><text x="${((x3+620)/2).toFixed(1)}" y="138" font-size="13" text-anchor="middle" fill="#4fd1c5">pOH = 11</text>
+  <text x="320" y="164" font-size="14" text-anchor="middle" fill="currentColor">pH + pOH = 14</text></svg>`;
+}
+function relSVG(){
+  const box=(x,y,t)=>`<rect x="${x}" y="${y}" width="120" height="44" rx="8" fill="none" stroke="currentColor"/><text x="${x+60}" y="${y+28}" text-anchor="middle" font-size="18" fill="currentColor">${t}</text>`;
+  const ar=(x1,y1,x2,y2)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#4fd1c5" stroke-width="2" marker-start="url(#ah2)" marker-end="url(#ah)"/>`;
+  return `<svg viewBox="0 0 640 250" role="img" aria-label="Umrechnung von pKs, Ks, pKb und Kb" font-family="system-ui,sans-serif"><defs><marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8z" fill="#4fd1c5"/></marker><marker id="ah2" markerWidth="8" markerHeight="8" refX="1" refY="4" orient="auto-start-reverse"><path d="M0 0L8 4L0 8z" fill="#4fd1c5"/></marker></defs>
+  ${box(30,28,'pK<tspan font-size="12" dy="4">s</tspan>')}${box(490,28,'K<tspan font-size="12" dy="4">s</tspan>')}${box(30,178,'pK<tspan font-size="12" dy="4">b</tspan>')}${box(490,178,'K<tspan font-size="12" dy="4">b</tspan>')}
+  ${ar(156,50,484,50)}${ar(156,200,484,200)}${ar(90,78,90,172)}${ar(550,78,550,172)}
+  <text x="320" y="42" text-anchor="middle" font-size="13" fill="currentColor">K<tspan font-size="10" dy="3">s</tspan><tspan dy="-3"> = 10</tspan><tspan font-size="10" dy="-6">−pKs</tspan></text>
+  <text x="320" y="72" text-anchor="middle" font-size="13" fill="currentColor">pK<tspan font-size="10" dy="3">s</tspan><tspan dy="-3"> = −lg K</tspan><tspan font-size="10" dy="3">s</tspan></text>
+  <text x="320" y="192" text-anchor="middle" font-size="13" fill="currentColor">K<tspan font-size="10" dy="3">b</tspan><tspan dy="-3"> = 10</tspan><tspan font-size="10" dy="-6">−pKb</tspan></text>
+  <text x="320" y="222" text-anchor="middle" font-size="13" fill="currentColor">pK<tspan font-size="10" dy="3">b</tspan><tspan dy="-3"> = −lg K</tspan><tspan font-size="10" dy="3">b</tspan></text>
+  <text x="102" y="130" font-size="13" fill="currentColor">pK<tspan font-size="10" dy="3">s</tspan><tspan dy="-3"> + pK</tspan><tspan font-size="10" dy="3">b</tspan><tspan dy="-3"> = 14</tspan></text>
+  <text x="538" y="130" font-size="13" text-anchor="end" fill="currentColor">K<tspan font-size="10" dy="3">s</tspan><tspan dy="-3"> · K</tspan><tspan font-size="10" dy="3">b</tspan><tspan dy="-3"> = K</tspan><tspan font-size="10" dy="3">w</tspan></text></svg>`;
+}
+function hhSVG(){
+  // pH in Abhängigkeit von lg(c(Base)/c(Säure)) für pKs = 4,76
+  const X=v=>80+(v+1)*230,Y=p=>170-(p-3.5)*55;
+  let ticks='';[-1,-0.5,0,0.5,1].forEach(v=>{ticks+=`<line x1="${X(v)}" y1="170" x2="${X(v)}" y2="175" stroke="#9aa2a9"/><text x="${X(v)}" y="190" fill="#9aa2a9" font-size="12" text-anchor="middle">${String(v).replace('.',',').replace('-','−')}</text>`});
+  [4,4.76,5.5].forEach(p=>{ticks+=`<text x="72" y="${Y(p)+4}" fill="#9aa2a9" font-size="12" text-anchor="end">${String(p).replace('.',',')}</text>`});
+  return `<svg viewBox="0 0 640 215" role="img" aria-label="Henderson-Hasselbalch-Gleichung" font-family="system-ui,sans-serif">
+  <rect x="80" y="20" width="460" height="150" fill="#0e1113" stroke="#31383e"/>
+  <line x1="${X(0)}" y1="20" x2="${X(0)}" y2="170" stroke="#31383e" stroke-dasharray="4 4"/>
+  <line x1="80" y1="${Y(4.76)}" x2="540" y2="${Y(4.76)}" stroke="#31383e" stroke-dasharray="4 4"/>
+  <line x1="${X(-1)}" y1="${Y(3.76)}" x2="${X(1)}" y2="${Y(5.76)}" stroke="#ffb454" stroke-width="2.5"/>
+  <circle cx="${X(0)}" cy="${Y(4.76)}" r="5" fill="#4fd1c5"/>
+  <text x="${X(0)+12}" y="${Y(4.76)+24}" fill="#4fd1c5" font-size="13">c(Base) = c(Säure): pH = pK<tspan baseline-shift="sub" font-size="10">S</tspan></text>
+  ${ticks}
+  <text x="310" y="210" fill="#e7e4dd" font-size="13" text-anchor="middle">lg ( c(Base) / c(Säure) )</text>
+  <text x="20" y="95" fill="#e7e4dd" font-size="13" transform="rotate(-90 20 95)" text-anchor="middle">pH</text>
+  <text x="545" y="${Y(5.76)+4}" fill="#ffb454" font-size="12">Ethansäure</text>
+  </svg>`;
+}
+function barSVG(){
+  const row=(y,label,w,col,extra)=>`<text x="10" y="${y+15}" font-size="13" fill="currentColor">${label}</text><rect x="250" y="${y}" width="${w}" height="22" rx="3" fill="${col}"/>${extra||''}`;
+  return `<svg viewBox="0 0 640 190" role="img" aria-label="Näherung bei schwachen Säuren" font-family="system-ui,sans-serif">
+  ${row(14,'Ausgangslösung: c(HA) = c<tspan font-size="10" dy="3">0</tspan>',380,'#4fd1c5')}
+  ${row(54,'im Gleichgewicht: c(HA) = c<tspan font-size="10" dy="3">0</tspan><tspan dy="-3"> − x ≈ c</tspan><tspan font-size="10" dy="3">0</tspan>',366,'#4fd1c5','<rect x="616" y="54" width="14" height="22" rx="3" fill="none" stroke="#ffb454" stroke-dasharray="3 2"/>')}
+  ${row(94,'c(H<tspan font-size="10" dy="3">3</tspan><tspan dy="-3">O</tspan><tspan font-size="10" dy="-6">+</tspan><tspan dy="6">) = x</tspan>',14,'#ffb454')}
+  ${row(134,'c(A<tspan font-size="10" dy="-6">−</tspan><tspan dy="6">) = x</tspan>',14,'#ffb454')}
+  <text x="320" y="182" text-anchor="middle" font-size="12" fill="currentColor" opacity=".75">x ist im Vergleich zu c0 sehr klein (hier stark übertrieben dargestellt)</text></svg>`;
+}
+/* ---- ausführliche Rechenbeispiele (Grundlagen) ---- */
+const exS=(t,f,c)=>`<li><b>${t}</b><span class="fml">${f}</span><span class="fml calc">${c}</span></li>`;
+const exB=(titel,gegeben,gesucht,steps,res,note)=>`<div class="gex"><h4>${titel}</h4><div class="gx-giv"><b>Gegeben:</b> ${gegeben}<br><b>Gesucht:</b> ${gesucht}</div><ol>${steps.join('')}</ol><div class="gx-res">${res}</div>${note?`<p class="gx-note">${note}</p>`:''}</div>`;
+const GB=[
+ {t:'pH- und pOH-Wert',h:()=>`
+  <p>Der <b>pH-Wert</b> ist der negative dekadische Logarithmus des Zahlenwerts der Oxonium-Ionen-Konzentration. Die geschweiften Klammern { } bedeuten „Zahlenwert von“ (die Einheit mol/L wird weggelassen):</p>
+  <span class="fml">pH = −lg{c(H₃O⁺)}      pOH = −lg{c(OH⁻)}      c(H₃O⁺) = 10<sup>−pH</sup> mol/L</span>
+  <p>Für Hydroxid-Ionen gilt entsprechend: pOH = −lg{c(OH⁻)} bzw. c(OH⁻) = 10<sup>−pOH</sup> mol/L. Bei 25 °C ist <b>pH + pOH = 14</b>.</p>
+  <div class="gfig">${scaleSVG()}</div>
+  <p><b>Beispiel:</b> c(H₃O⁺) = 3,2·10<sup>−4</sup> mol/L ergibt pH = −lg(3,2·10<sup>−4</sup>) = 3,49 und pOH = 14 − 3,49 = 10,51.</p>
+  <p>Eine pH-Einheit entspricht dem Faktor 10 in der Konzentration. Bei pH-Werten gehören die Nachkommastellen zu den gültigen Ziffern der Konzentration; in dieser Übung wird auf zwei Nachkommastellen gerundet.</p>`},
+ {t:'Ionenprodukt des Wassers',h:()=>`
+  <p>Wasser reagiert in geringem Maß mit sich selbst (Autoprotolyse): 2 H₂O ⇌ H₃O⁺ + OH⁻. Das <b>Ionenprodukt</b> ist bei 25 °C konstant:</p>
+  <span class="fml">K<sub>w</sub> = c(H₃O⁺) · c(OH⁻) = 1,0·10<sup>−14</sup> mol²/L²</span>
+  <p>In reinem Wasser ist c(H₃O⁺) = c(OH⁻) = 10<sup>−7</sup> mol/L, also pH = pOH = 7. Logarithmiert man das Ionenprodukt, erhält man pH + pOH = pK<sub>w</sub> = 14.</p>
+  <table><tr><th>pH</th><th>c(H₃O⁺) in mol/L</th><th>pOH</th><th>c(OH⁻) in mol/L</th></tr>
+  <tr><td>1</td><td>10<sup>−1</sup></td><td>13</td><td>10<sup>−13</sup></td></tr><tr><td>4</td><td>10<sup>−4</sup></td><td>10</td><td>10<sup>−10</sup></td></tr>
+  <tr><td>7</td><td>10<sup>−7</sup></td><td>7</td><td>10<sup>−7</sup></td></tr><tr><td>10</td><td>10<sup>−10</sup></td><td>4</td><td>10<sup>−4</sup></td></tr>
+  <tr><td>13</td><td>10<sup>−13</sup></td><td>1</td><td>10<sup>−1</sup></td></tr></table>
+  <p><b>Beispiel:</b> c(OH⁻) = 2,5·10<sup>−3</sup> mol/L ergibt pOH = 2,60 und pH = 14 − 2,60 = 11,40.</p>`},
+ {t:'K<sub>S</sub>, K<sub>B</sub>, pK<sub>S</sub> und pK<sub>B</sub>',h:()=>`
+  <p>Für HA + H₂O ⇌ A⁻ + H₃O⁺ gilt mit der <b>Säurekonstante</b> K<sub>S</sub> und dem <b>Säureexponenten</b> pK<sub>S</sub>:</p>
+  <span class="fml">K<sub>S</sub> = c(H₃O⁺) · c(A⁻) / c(HA)      pK<sub>S</sub> = −lg{K<sub>S</sub>}      K<sub>S</sub> = 10<sup>−pK<sub>S</sub></sup></span>
+  <p>Für H₂O + B ⇌ OH⁻ + HB⁺ gilt mit der <b>Basenkonstante</b> K<sub>B</sub> und dem <b>Basenexponenten</b> pK<sub>B</sub>:</p>
+  <span class="fml">K<sub>B</sub> = c(OH⁻) · c(HB⁺) / c(B)      pK<sub>B</sub> = −lg{K<sub>B</sub>}      K<sub>B</sub> = 10<sup>−pK<sub>B</sub></sup></span>
+  <p>Je kleiner der pK<sub>S</sub>-Wert, desto stärker ist die Säure. Für ein <b>korrespondierendes Säure-Base-Paar</b> (z. B. Ethansäure / Ethanoat-Ion) gilt:</p>
+  <span class="fml">K<sub>S</sub> · K<sub>B</sub> = K<sub>w</sub> = 1,0·10<sup>−14</sup> mol²/L²      pK<sub>S</sub> + pK<sub>B</sub> = 14</span>
+  <div class="gfig">${relSVG()}</div>
+  <p><b>Beispiel:</b> Ethansäure hat pK<sub>S</sub> = 4,76, also K<sub>S</sub> = 10<sup>−4,76</sup> = 1,7·10<sup>−5</sup> mol/L. Das Ethanoat-Ion (Acetat-Ion) hat pK<sub>B</sub> = 14 − 4,76 = 9,24 und K<sub>B</sub> = 10<sup>−9,24</sup> = 5,8·10<sup>−10</sup> mol/L.</p>`},
+ {t:'Starke Säuren und Basen',h:()=>`
+  <p>Starke Säuren (z. B. HCl, HNO₃) protolysieren in Wasser <b>vollständig</b>, starke Basen (z. B. NaOH, KOH) dissoziieren vollständig. Die Konzentration der Ionen ist dann gleich der Ausgangskonzentration c<sub>0</sub>.</p>
+  <span class="fml">pH-Wert bei vollständiger Protolyse:  pH ≈ −lg{c₀(HA)}</span>
+  <span class="fml">Starke Base:  c(OH⁻) = c₀(B)   →   pOH ≈ −lg{c₀(B)}   →   pH = 14 − pOH</span>
+  <p><b>Beispiel Salzsäure:</b> c₀ = 0,025 mol/L ergibt pH = −lg 0,025 = 1,60.</p>
+  <p><b>Beispiel Natronlauge:</b> c₀ = 0,0040 mol/L ergibt pOH = 2,40 und pH = 14 − 2,40 = 11,60.</p>
+  <p><b>Umgekehrt</b> erhältst du die Ausgangskonzentration aus dem pH-Wert: c₀ = c(H₃O⁺) = 10<sup>−pH</sup> (starke Säure) bzw. c₀ = c(OH⁻) = 10<sup>−pOH</sup> (starke Base). Beispiel: Salzsäure mit pH = 1,60 hat c₀ = 10<sup>−1,60</sup> = 0,025 mol/L.</p>
+  <p><b>Zweiwertige Hydroxide</b> wie Ca(OH)₂ liefern je Formeleinheit zwei OH⁻-Ionen: Ca(OH)₂ ⟶ Ca²⁺ + 2 OH⁻. Daher ist c(OH⁻) = 2 · c₀.</p>
+  <p><b>Beispiel:</b> c₀(Ca(OH)₂) = 0,0050 mol/L ergibt c(OH⁻) = 0,010 mol/L, pOH = 2,00 und pH = 12,00.</p>`},
+ {t:'Schwache Säuren und Basen: unvollständige Protolyse',h:()=>`
+  <p>Schwache Säuren protolysieren in Wasser nur zu einem kleinen Teil. Für HA + H₂O ⇌ A⁻ + H₃O⁺ gilt (Autoprotolyse des Wassers vernachlässigt) c(H₃O⁺) = c(A⁻). Von der Anfangskonzentration c₀(HA) bleibt fast alles übrig: c(HA) ≈ c₀(HA). Diese <b>Näherung</b> ist erlaubt, wenn weniger als etwa 5 % protolysieren.</p>
+  <div class="gfig">${barSVG()}</div>
+  <p>Eingesetzt in K<sub>S</sub> ergibt sich K<sub>S</sub> ≈ c(H₃O⁺)² / c₀(HA) und nach Logarithmieren die Formel für den <b>pH-Wert bei unvollständiger Protolyse</b>:</p>
+  <span class="fml">pH ≈ ½ · ( pK<sub>S</sub> − lg{c₀(HA)} )</span>
+  <span class="fml">umgestellt:  pK<sub>S</sub> ≈ 2 · pH + lg{c₀(HA)};  c₀(HA) ≈ 10<sup>(pK<sub>S</sub> − 2 · pH)</sup> mol/L</span>
+  <p>Für <b>schwache Basen</b> gilt entsprechend pOH ≈ ½ · (pK<sub>B</sub> − lg{c₀(B)}) und danach pH = 14 − pOH. Ist nur der pK<sub>S</sub>-Wert der korrespondierenden Säure bekannt (z. B. NH₄⁺ für Ammoniak), berechnest du zuerst pK<sub>B</sub> = 14 − pK<sub>S</sub>.</p>
+  <p><b>Beispiel:</b> Ethansäure, c₀(HA) = 0,10 mol/L, pK<sub>S</sub> = 4,76: pH ≈ ½ · (4,76 − lg 0,10) = ½ · (4,76 + 1) = 2,88.</p>
+  <p><b>Beispiel Base:</b> Ammoniak, c₀(B) = 0,10 mol/L, pK<sub>B</sub> = 4,75: pOH ≈ ½ · (4,75 + 1) = 2,88 und pH = 14 − 2,88 = 11,12.</p>`},
+ {t:'Schwache Säuren und Basen: Henderson-Hasselbalch-Gleichung',h:()=>`
+  <p>Enthält eine Lösung eine schwache Säure HA und ihre korrespondierende Base A⁻ in vergleichbaren Mengen (<b>Pufferlösung</b>, z. B. Ethansäure und Natriumethanoat), so folgt aus K<sub>S</sub> = c(H₃O⁺) · c(A⁻) / c(HA) durch Logarithmieren die <b>Henderson-Hasselbalch-Gleichung</b>. Weil die schwache Säure kaum protolysiert, setzt man die eingesetzten Konzentrationen ein.</p>
+  <div class="gfig">${hhSVG()}</div>
+  <span class="fml">Säure:  pH = pK<sub>S</sub> + lg ( c(A⁻) / c(HA) ) = pK<sub>S</sub> + lg ( c(Base) / c(Säure) )</span>
+  <span class="fml">Base:  pOH = pK<sub>B</sub> + lg ( c(HB⁺) / c(B) ) = pK<sub>B</sub> + lg ( c(Säure) / c(Base) )</span>
+  <p>Sind Säure und Base gleich konzentriert, ist der Logarithmus 0 und es gilt <b>pH = pK<sub>S</sub></b>. Ist mehr Base als Säure vorhanden, liegt der pH-Wert über dem pK<sub>S</sub>-Wert.</p>
+  <p><b>Beispiel Säure:</b> Ethansäure (pK<sub>S</sub> = 4,76), c(Ethansäure) = 0,10 mol/L, c(Ethanoat-Ion) = 0,20 mol/L: pH = 4,76 + lg(0,20 / 0,10) = 4,76 + 0,30 = 5,06.</p>
+  <p><b>Beispiel Base:</b> Ammoniak (pK<sub>B</sub> = 4,75), c(NH₃) = 0,10 mol/L, c(NH₄⁺) = 0,050 mol/L: pOH = 4,75 + lg(0,050 / 0,10) = 4,75 − 0,30 = 4,45 und pH = 14 − 4,45 = 9,55.</p>
+  <p><b>Umstellen:</b> pK<sub>S</sub> = pH − lg(c(Base) / c(Säure)) und c(Säure) = c(Base) · 10<sup>(pK<sub>S</sub> − pH)</sup> bzw. c(Base) = c(Säure) · 10<sup>(pH − pK<sub>S</sub>)</sup>. Beispiel: pH = 5,06, pK<sub>S</sub> = 4,76, c(Ethanoat-Ion) = 0,20 mol/L ergibt c(Ethansäure) = 0,20 · 10<sup>−0,30</sup> = 0,10 mol/L.</p>`},
+ {t:'Beispiele: pH, pOH und Konzentrationen',h:()=>`
+  <p>Alle Beispiele sind in die Schritte zerlegt, die du auch in den Aufgaben eingibst. Gerechnet wird immer mit dem Zahlenwert; pH, pOH und pK-Werte werden auf zwei Nachkommastellen, Konzentrationen und Konstanten auf zwei bis drei gültige Ziffern gerundet. Bei 25 °C gilt pH + pOH = 14.</p>
+  ${exB('Beispiel 1: pH und pOH aus c(H₃O⁺)','c(H₃O⁺) = 3,2·10<sup>−4</sup> mol/L','pH-Wert und pOH-Wert',[
+    exS('1. pH-Wert aus c(H₃O⁺) berechnen','pH = −lg{c(H₃O⁺)}','pH = −lg(3,2·10<sup>−4</sup>) = <b>3,49</b>'),
+    exS('2. pOH-Wert aus dem pH-Wert berechnen','pOH = 14 − pH','pOH = 14 − 3,49 = <b>10,51</b>')],
+    'pH = 3,49 (sauer) und pOH = 10,51.')}
+  ${exB('Beispiel 2: pH aus c(OH⁻)','c(OH⁻) = 4,5·10<sup>−3</sup> mol/L','pH-Wert',[
+    exS('1. pOH-Wert aus c(OH⁻) berechnen','pOH = −lg{c(OH⁻)}','pOH = −lg(4,5·10<sup>−3</sup>) = <b>2,35</b>'),
+    exS('2. pH-Wert aus dem pOH-Wert berechnen','pH = 14 − pOH','pH = 14 − 2,35 = <b>11,65</b>')],
+    'pH = 11,65 (basisch).','Typischer Fehler: Hier ist zuerst der <i>pOH</i>-Wert zu berechnen. Wer direkt −lg 0,0045 = 2,35 als pH notiert, hat den pOH-Wert erwischt.')}
+  ${exB('Beispiel 3: Konzentrationen aus dem pH-Wert','pH = 8,40','c(H₃O⁺), pOH und c(OH⁻)',[
+    exS('1. c(H₃O⁺) aus dem pH-Wert berechnen','c(H₃O⁺) = 10<sup>−pH</sup>','c(H₃O⁺) = 10<sup>−8,40</sup> = <b>4,0·10<sup>−9</sup></b> mol/L'),
+    exS('2. pOH-Wert aus dem pH-Wert berechnen','pOH = 14 − pH','pOH = 14 − 8,40 = <b>5,60</b>'),
+    exS('3. c(OH⁻) aus dem pOH-Wert berechnen','c(OH⁻) = 10<sup>−pOH</sup>','c(OH⁻) = 10<sup>−5,60</sup> = <b>2,5·10<sup>−6</sup></b> mol/L')],
+    'c(H₃O⁺) = 4,0·10<sup>−9</sup> mol/L und c(OH⁻) = 2,5·10<sup>−6</sup> mol/L.','Kontrolle: c(H₃O⁺) · c(OH⁻) = 4,0·10<sup>−9</sup> · 2,5·10<sup>−6</sup> = 1,0·10<sup>−14</sup> mol²/L² = K<sub>w</sub>.')}`},
+ {t:'Beispiele: K<sub>S</sub>, K<sub>B</sub>, pK<sub>S</sub> und pK<sub>B</sub>',h:()=>`
+  <p>Für ein korrespondierendes Säure-Base-Paar gilt pK<sub>S</sub> + pK<sub>B</sub> = 14 und K<sub>S</sub> · K<sub>B</sub> = K<sub>w</sub>. Dabei ist pK<sub>S</sub> der Wert der Säure, pK<sub>B</sub> der Wert der <i>korrespondierenden Base</i> desselben Paares.</p>
+  ${exB('Beispiel 1: K<sub>B</sub> der Base aus pK<sub>S</sub> der Säure','Ethansäure / Ethanoat-Ion, pK<sub>S</sub>(Ethansäure) = 4,76','K<sub>B</sub> des Ethanoat-Ions',[
+    exS('1. pK<sub>B</sub> der korrespondierenden Base aus pK<sub>S</sub> berechnen','pK<sub>B</sub> = 14 − pK<sub>S</sub>','pK<sub>B</sub> = 14 − 4,76 = <b>9,24</b>'),
+    exS('2. K<sub>B</sub> aus pK<sub>B</sub> berechnen','K<sub>B</sub> = 10<sup>−pK<sub>B</sub></sup>','K<sub>B</sub> = 10<sup>−9,24</sup> = <b>5,8·10<sup>−10</sup></b> mol/L')],
+    'K<sub>B</sub>(Ethanoat-Ion) = 5,8·10<sup>−10</sup> mol/L.','Probe über K<sub>S</sub>: K<sub>S</sub> = 10<sup>−4,76</sup> = 1,7·10<sup>−5</sup> mol/L; K<sub>w</sub> / K<sub>S</sub> = 1,0·10<sup>−14</sup> / 1,7·10<sup>−5</sup> = 5,9·10<sup>−10</sup> mol/L. Der kleine Unterschied entsteht durch das Runden von K<sub>S</sub>.')}
+  ${exB('Beispiel 2: pK<sub>B</sub> und K<sub>B</sub> aus K<sub>S</sub>','Cyanwasserstoff / Cyanid-Ion, K<sub>S</sub>(HCN) = 6,2·10<sup>−10</sup> mol/L','pK<sub>S</sub> und K<sub>B</sub> des Cyanid-Ions',[
+    exS('1. pK<sub>S</sub> aus K<sub>S</sub> berechnen','pK<sub>S</sub> = −lg{K<sub>S</sub>}','pK<sub>S</sub> = −lg(6,2·10<sup>−10</sup>) = <b>9,21</b>'),
+    exS('2. pK<sub>B</sub> aus pK<sub>S</sub> berechnen','pK<sub>B</sub> = 14 − pK<sub>S</sub>','pK<sub>B</sub> = 14 − 9,21 = <b>4,79</b>'),
+    exS('3. K<sub>B</sub> aus pK<sub>B</sub> berechnen','K<sub>B</sub> = 10<sup>−pK<sub>B</sub></sup>','K<sub>B</sub> = 10<sup>−4,79</sup> = <b>1,6·10<sup>−5</sup></b> mol/L')],
+    'pK<sub>S</sub>(HCN) = 9,21 und K<sub>B</sub>(CN⁻) = 1,6·10<sup>−5</sup> mol/L.','Kürzer: K<sub>B</sub> = K<sub>w</sub> / K<sub>S</sub> = 1,0·10<sup>−14</sup> / 6,2·10<sup>−10</sup> = 1,6·10<sup>−5</sup> mol/L.')}
+  ${exB('Beispiel 3: K<sub>S</sub> der Säure aus K<sub>B</sub> der Base','Ammoniak / Ammonium-Ion, K<sub>B</sub>(NH₃) = 1,8·10<sup>−5</sup> mol/L','pK<sub>B</sub>, pK<sub>S</sub> und K<sub>S</sub> des Ammonium-Ions',[
+    exS('1. pK<sub>B</sub> aus K<sub>B</sub> berechnen','pK<sub>B</sub> = −lg{K<sub>B</sub>}','pK<sub>B</sub> = −lg(1,8·10<sup>−5</sup>) = <b>4,74</b>'),
+    exS('2. pK<sub>S</sub> der korrespondierenden Säure aus pK<sub>B</sub> berechnen','pK<sub>S</sub> = 14 − pK<sub>B</sub>','pK<sub>S</sub> = 14 − 4,74 = <b>9,26</b>'),
+    exS('3. K<sub>S</sub> aus pK<sub>S</sub> berechnen','K<sub>S</sub> = 10<sup>−pK<sub>S</sub></sup>','K<sub>S</sub> = 10<sup>−9,26</sup> = <b>5,5·10<sup>−10</sup></b> mol/L')],
+    'pK<sub>S</sub>(NH₄⁺) = 9,26 und K<sub>S</sub>(NH₄⁺) = 5,5·10<sup>−10</sup> mol/L.','Tafelwert: pK<sub>S</sub>(NH₄⁺) = 9,25. Die Abweichung kommt vom gerundeten K<sub>B</sub>-Wert.')}`},
+ {t:'Beispiele: starke Säuren und Basen',h:()=>`
+  <p>Bei vollständiger Protolyse bzw. Dissoziation gilt c(H₃O⁺) = c₀(HA) bzw. c(OH⁻) = c₀(B) (bei zweiwertigen Hydroxiden c(OH⁻) = 2 · c₀).</p>
+  ${exB('Beispiel 1: pH einer starken Säure','Salzsäure, c₀(HCl) = 0,025 mol/L','pH-Wert',[
+    exS('1. pH-Wert bei vollständiger Protolyse berechnen','pH ≈ −lg{c₀(HA)}','pH = −lg(0,025) = <b>1,60</b>')],
+    'pH = 1,60.')}
+  ${exB('Beispiel 2: pH einer starken Base','Natronlauge, c₀(NaOH) = 0,0040 mol/L','pH-Wert',[
+    exS('1. pOH-Wert der starken Base berechnen','pOH ≈ −lg{c₀(B)}','pOH = −lg(0,0040) = <b>2,40</b>'),
+    exS('2. pH-Wert aus dem pOH-Wert berechnen','pH = 14 − pOH','pH = 14 − 2,40 = <b>11,60</b>')],
+    'pH = 11,60.')}
+  ${exB('Beispiel 3: zweiwertige Base','Bariumhydroxid-Lösung, c₀(Ba(OH)₂) = 0,0075 mol/L (Ba(OH)₂ ⟶ Ba²⁺ + 2 OH⁻)','pH-Wert',[
+    exS('1. c(OH⁻) der zweiwertigen Base berechnen','c(OH⁻) = 2 · c₀','c(OH⁻) = 2 · 0,0075 = <b>0,015</b> mol/L'),
+    exS('2. pOH-Wert aus c(OH⁻) berechnen','pOH = −lg{c(OH⁻)}','pOH = −lg(0,015) = <b>1,82</b>'),
+    exS('3. pH-Wert aus dem pOH-Wert berechnen','pH = 14 − pOH','pH = 14 − 1,82 = <b>12,18</b>')],
+    'pH = 12,18.','Typischer Fehler: den Faktor 2 vergessen. Dann ergäbe sich pOH = 2,12 und pH = 11,88.')}
+  ${exB('Beispiel 4: Ausgangskonzentration einer starken Säure aus dem pH-Wert','Salzsäure, pH = 2,30','c₀(HCl)',[
+    exS('1. c(H₃O⁺) aus dem pH-Wert berechnen','c(H₃O⁺) = 10<sup>−pH</sup>','c(H₃O⁺) = 10<sup>−2,30</sup> = <b>5,0·10<sup>−3</sup></b> mol/L'),
+    exS('2. c₀ der starken Säure bestimmen','c₀(HA) = c(H₃O⁺)','c₀(HCl) = <b>5,0·10<sup>−3</sup></b> mol/L')],
+    'c₀(HCl) = 5,0·10<sup>−3</sup> mol/L.')}
+  ${exB('Beispiel 5: Ausgangskonzentration einer zweiwertigen Base aus dem pH-Wert','Calciumhydroxid-Lösung, pH = 12,40','c₀(Ca(OH)₂)',[
+    exS('1. pOH-Wert aus dem pH-Wert berechnen','pOH = 14 − pH','pOH = 14 − 12,40 = <b>1,60</b>'),
+    exS('2. c(OH⁻) aus dem pOH-Wert berechnen','c(OH⁻) = 10<sup>−pOH</sup>','c(OH⁻) = 10<sup>−1,60</sup> = <b>2,5·10<sup>−2</sup></b> mol/L'),
+    exS('3. c₀ der zweiwertigen Base aus c(OH⁻) berechnen','c₀ = c(OH⁻) / 2','c₀(Ca(OH)₂) = 0,025 / 2 = <b>1,3·10<sup>−2</sup></b> mol/L')],
+    'c₀(Ca(OH)₂) = 1,3·10<sup>−2</sup> mol/L.','Es wird durch 2 geteilt, weil jede Formeleinheit zwei OH⁻-Ionen liefert.')}`},
+ {t:'Beispiele: unvollständige Protolyse',h:()=>`
+  <p>Für schwache Säuren (pH ≈ ½ · (pK<sub>S</sub> − lg{c₀(HA)})) bzw. schwache Basen (pOH ≈ ½ · (pK<sub>B</sub> − lg{c₀(B)})) gilt die Näherung c(HA) ≈ c₀(HA). Sie ist erlaubt, solange weniger als 5 % protolysieren; das prüfst du am Ende mit c(H₃O⁺) / c₀.</p>
+  ${exB('Beispiel 1: pH einer schwachen Säure aus K<sub>S</sub>','Ethansäure, K<sub>S</sub> = 1,8·10<sup>−5</sup> mol/L, c₀(HA) = 0,10 mol/L','pH-Wert',[
+    exS('1. pK<sub>S</sub> aus K<sub>S</sub> berechnen','pK<sub>S</sub> = −lg{K<sub>S</sub>}','pK<sub>S</sub> = −lg(1,8·10<sup>−5</sup>) = <b>4,74</b>'),
+    exS('2. pH-Wert bei unvollständiger Protolyse berechnen','pH ≈ ½ · (pK<sub>S</sub> − lg{c₀(HA)})','pH ≈ ½ · (4,74 − lg 0,10) = ½ · (4,74 + 1) = <b>2,87</b>')],
+    'pH = 2,87.','Kontrolle der Näherung: c(H₃O⁺) = 10<sup>−2,87</sup> = 1,3·10<sup>−3</sup> mol/L; 1,3·10<sup>−3</sup> / 0,10 = 1,3 % &lt; 5 % – die Näherung ist erlaubt.')}
+  ${exB('Beispiel 2: pH einer schwachen Base aus pK<sub>S</sub> der korrespondierenden Säure','Ammoniak, pK<sub>S</sub>(NH₄⁺) = 9,25, c₀(B) = 0,10 mol/L','pH-Wert',[
+    exS('1. pK<sub>B</sub> der Base aus pK<sub>S</sub> berechnen','pK<sub>B</sub> = 14 − pK<sub>S</sub>','pK<sub>B</sub> = 14 − 9,25 = <b>4,75</b>'),
+    exS('2. pOH-Wert der schwachen Base berechnen','pOH ≈ ½ · (pK<sub>B</sub> − lg{c₀(B)})','pOH ≈ ½ · (4,75 − lg 0,10) = ½ · (4,75 + 1) = <b>2,88</b>'),
+    exS('3. pH-Wert aus dem pOH-Wert berechnen','pH = 14 − pOH','pH = 14 − 2,88 = <b>11,12</b>')],
+    'pH = 11,12.','Bei Basen wird zuerst der pOH-Wert berechnet. Näherung: c(OH⁻) = 10<sup>−2,88</sup> = 1,3·10<sup>−3</sup> mol/L, das sind 1,3 % von c₀.')}
+  ${exB('Beispiel 3: pK<sub>S</sub> aus dem gemessenen pH-Wert','Ethansäure, c₀(HA) = 0,050 mol/L, pH = 3,03','pK<sub>S</sub> und K<sub>S</sub>',[
+    exS('1. pK<sub>S</sub> aus pH und c₀ berechnen','pK<sub>S</sub> ≈ 2 · pH + lg{c₀(HA)}','pK<sub>S</sub> ≈ 2 · 3,03 + lg 0,050 = 6,06 − 1,30 = <b>4,76</b>'),
+    exS('2. K<sub>S</sub> aus pK<sub>S</sub> berechnen','K<sub>S</sub> = 10<sup>−pK<sub>S</sub></sup>','K<sub>S</sub> = 10<sup>−4,76</sup> = <b>1,7·10<sup>−5</sup></b> mol/L')],
+    'pK<sub>S</sub> = 4,76 und K<sub>S</sub> = 1,7·10<sup>−5</sup> mol/L.','Das Vorzeichen: lg 0,050 ist negativ (−1,30), die Summe wird also kleiner als 2 · pH.')}
+  ${exB('Beispiel 4: Ausgangskonzentration aus pH und pK<sub>S</sub>','Ethansäure, pK<sub>S</sub> = 4,76, pH = 2,88','c₀(HA)',[
+    exS('1. c₀ der schwachen Säure aus pH und pK<sub>S</sub> berechnen','c₀(HA) ≈ 10<sup>(pK<sub>S</sub> − 2 · pH)</sup>','c₀(HA) ≈ 10<sup>(4,76 − 2 · 2,88)</sup> = 10<sup>−1,00</sup> = <b>0,10</b> mol/L')],
+    'c₀(HA) = 0,10 mol/L.','Kontrolle: c(H₃O⁺) = 10<sup>−2,88</sup> = 1,3·10<sup>−3</sup> mol/L, das sind 1,3 % von c₀.')}
+  ${exB('Beispiel 5: pK<sub>B</sub> einer schwachen Base aus dem pH-Wert','Ammoniak, c₀(B) = 0,10 mol/L, pH = 11,12','pK<sub>B</sub> und K<sub>B</sub>',[
+    exS('1. pOH-Wert aus dem pH-Wert berechnen','pOH = 14 − pH','pOH = 14 − 11,12 = <b>2,88</b>'),
+    exS('2. pK<sub>B</sub> aus pOH und c₀ berechnen','pK<sub>B</sub> ≈ 2 · pOH + lg{c₀(B)}','pK<sub>B</sub> ≈ 2 · 2,88 + lg 0,10 = 5,76 − 1 = <b>4,76</b>'),
+    exS('3. K<sub>B</sub> aus pK<sub>B</sub> berechnen','K<sub>B</sub> = 10<sup>−pK<sub>B</sub></sup>','K<sub>B</sub> = 10<sup>−4,76</sup> = <b>1,7·10<sup>−5</sup></b> mol/L')],
+    'pK<sub>B</sub> = 4,76 und K<sub>B</sub> = 1,7·10<sup>−5</sup> mol/L.')}`},
+ {t:'Beispiele: Pufferlösungen',h:()=>`
+  <p>In einer Pufferlösung liegen eine schwache Säure und ihre korrespondierende Base nebeneinander vor. Gerechnet wird mit pH = pK<sub>S</sub> + lg(c(Base) / c(Säure)) bzw. pOH = pK<sub>B</sub> + lg(c(Säure) / c(Base)). Merke: Bei der Säure steht die Base im Zähler, bei der Base die Säure.</p>
+  ${exB('Beispiel 1: pH eines Puffers','Ethansäure / Ethanoat-Ion, pK<sub>S</sub> = 4,76, c(HA) = 0,10 mol/L, c(A⁻) = 0,20 mol/L','pH-Wert',[
+    exS('1. pH-Wert mit der Henderson-Hasselbalch-Gleichung berechnen','pH = pK<sub>S</sub> + lg(c(Base) / c(Säure))','pH = 4,76 + lg(0,20 / 0,10) = 4,76 + lg 2,0 = 4,76 + 0,30 = <b>5,06</b>')],
+    'pH = 5,06.','Mehr Base als Säure, daher liegt der pH-Wert über dem pK<sub>S</sub>-Wert.')}
+  ${exB('Beispiel 2: pH eines Ammoniak-Puffers','Ammoniak / Ammonium-Ion, pK<sub>B</sub>(NH₃) = 4,75, c(NH₃) = 0,10 mol/L, c(NH₄⁺) = 0,050 mol/L','pH-Wert',[
+    exS('1. pOH-Wert mit der Henderson-Hasselbalch-Gleichung für die Base berechnen','pOH = pK<sub>B</sub> + lg(c(Säure) / c(Base))','pOH = 4,75 + lg(0,050 / 0,10) = 4,75 + lg 0,50 = 4,75 − 0,30 = <b>4,45</b>'),
+    exS('2. pH-Wert aus dem pOH-Wert berechnen','pH = 14 − pOH','pH = 14 − 4,45 = <b>9,55</b>')],
+    'pH = 9,55.')}
+  ${exB('Beispiel 3: pK<sub>S</sub> aus dem pH-Wert eines Puffers','Ethansäure / Ethanoat-Ion, c(HA) = 0,20 mol/L, c(A⁻) = 0,10 mol/L, pH = 4,46','pK<sub>S</sub>',[
+    exS('1. pK<sub>S</sub> mit der Henderson-Hasselbalch-Gleichung berechnen','pK<sub>S</sub> = pH − lg(c(Base) / c(Säure))','pK<sub>S</sub> = 4,46 − lg(0,10 / 0,20) = 4,46 − (−0,30) = <b>4,76</b>')],
+    'pK<sub>S</sub> = 4,76.','Umstellen heißt: Der Logarithmus wird <i>abgezogen</i>. Hier ist er negativ, daher wird addiert.')}
+  ${exB('Beispiel 4: Konzentration der Säure aus dem pH-Wert','Ethansäure / Ethanoat-Ion, pK<sub>S</sub> = 4,76, c(A⁻) = 0,20 mol/L, pH = 5,06','c(HA)',[
+    exS('1. c(Säure) mit der Henderson-Hasselbalch-Gleichung berechnen','c(Säure) = c(Base) · 10<sup>(pK<sub>S</sub> − pH)</sup>','c(HA) = 0,20 · 10<sup>(4,76 − 5,06)</sup> = 0,20 · 10<sup>−0,30</sup> = 0,20 · 0,50 = <b>0,10</b> mol/L')],
+    'c(HA) = 0,10 mol/L.')}
+  ${exB('Beispiel 5: Konzentration der Base eines Ammoniak-Puffers','Ammoniak / Ammonium-Ion, pK<sub>B</sub> = 4,75, c(NH₄⁺) = 0,050 mol/L, pOH = 4,45','c(NH₃)',[
+    exS('1. c(Base) mit der Henderson-Hasselbalch-Gleichung berechnen','c(Base) = c(Säure) · 10<sup>(pK<sub>B</sub> − pOH)</sup>','c(NH₃) = 0,050 · 10<sup>(4,75 − 4,45)</sup> = 0,050 · 10<sup>0,30</sup> = 0,050 · 2,0 = <b>0,10</b> mol/L')],
+    'c(NH₃) = 0,10 mol/L.')}`},
+ {t:'Taschenrechner und Eingabe',h:()=>`
+  <p>Für <b>lg</b> verwendest du die Taste „log“, für 10<sup>x</sup> die Taste „10<sup>x</sup>“ (meist zweite Funktion von „log“). Zehnerpotenzen gibst du mit der Taste „EXP“ bzw. „×10<sup>x</sup>“ ein.</p>
+  <p><b>Rundung:</b> pH-, pOH-, pK<sub>S</sub>- und pK<sub>B</sub>-Werte auf zwei Nachkommastellen; Konzentrationen sowie K<sub>S</sub>- und K<sub>B</sub>-Werte auf drei gültige Ziffern. Geprüft wird mit einer kleinen Toleranz (pH-Werte ±0,02; Konzentrationen und Konstanten ±3 %) und immer gegen deine eigenen vorherigen Werte.</p>
+  <p><b>Eingabeformat auf dieser Seite:</b></p>
+  <table><tr><th>Wert</th><th>mögliche Eingaben</th></tr>
+  <tr><td>3,49</td><td>3,49 &nbsp;·&nbsp; 3.49</td></tr>
+  <tr><td>7,14·10<sup>−4</sup></td><td>7,14·10^-4 &nbsp;·&nbsp; 7,14*10^-4 &nbsp;·&nbsp; 7,14e-4</td></tr>
+  <tr><td>10<sup>−5</sup></td><td>10^-5 &nbsp;·&nbsp; 1e-5</td></tr></table>
+  <p>Auf dem iPad helfen die Knöpfe „·10^“ und „−“ unter dem Eingabefeld.</p>`}
+];
+let gbI=0;
+$('#gbN').textContent=GB.length;
+$('#gbList').innerHTML=GB.map((g,i)=>`<button data-i="${i}">${i+1}. ${g.t}</button>`).join('');
+$('#gbBtn').addEventListener('click',()=>{const l=$('#gbList');l.hidden=!l.hidden;$('#gbBtn').setAttribute('aria-expanded',String(!l.hidden));$('#gbArr').textContent=l.hidden?'▸':'▾'});
+$('#gbList').addEventListener('click',ev=>{const b=ev.target.closest('button');if(!b)return;showGb(+b.dataset.i)});
+function showGb(i){gbI=(i+GB.length)%GB.length;$('#gbTitle').innerHTML=GB[gbI].t;$('#gbBody').innerHTML=GB[gbI].h();$('#gbBody').scrollTop=0;$('#gbPos').textContent=`Thema ${gbI+1} von ${GB.length}`;openM('#mGb')}
+$('#gbPrev').addEventListener('click',()=>showGb(gbI-1));
+$('#gbNext').addEventListener('click',()=>showGb(gbI+1));
+document.addEventListener('keydown',ev=>{
+  if(ev.key==='Escape')document.querySelectorAll('.modal').forEach(m=>m.hidden=true);
+  if(!$('#mGb').hidden){if(ev.key==='ArrowRight')showGb(gbI+1);if(ev.key==='ArrowLeft')showGb(gbI-1)}
+});
+
+/* ============ Zwischenstand ============ */
+function serRec(r){return{sp:r.sp,viewed:r.viewed,tip:r.tip,steps:r.steps.map(s=>({in:s.in,t:s.t,a:s.a,h:s.h}))}}
+function deserRec(o){
+  const rec=newRec(o.sp);const xs=Array.isArray(o.steps)?o.steps:[];
+  for(let i=0;i<rec.steps.length;i++){
+    const x=xs[i]||{},s=rec.steps[i],n=rec.T.nodes[i],e=n.calc(valuesBefore(rec,i));
+    s.t=Math.max(0,Math.min(99,parseInt(x.t)||0));s.h=!!x.h;
+    if(x.a){s.done=true;s.a=true;s.val=e;continue}
+    const raw=typeof x.in==='string'?x.in.slice(0,40):'';s.in=raw;
+    const v=parseNum(raw);
+    if(isFinite(v)&&judge(MODE(n.out),v,e)==='ok'){s.done=true;s.val=v;s.t=Math.max(1,s.t)}else break;
+  }
+  rec.viewed=!!o.viewed;rec.tip=!!o.tip;rec.ended=true;rec.fin=allDone(rec);
+  return rec;
+}
+$('#btnSave').addEventListener('click',()=>{
+  const data={app:'Saeure_Base_Berechnungen',version:'1.0',gespeichert:new Date().toISOString(),tg:[...st.tg],gv:[...st.gv],lvl:st.lvl,
+    hist:st.hist.filter(touched).map(serRec)};
+  const blob=new Blob([JSON.stringify(data)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Saeure_Base_Berechnungen_Zwischenstand.json';document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);
+  $('#ioMsg').textContent='Zwischenstand gespeichert (Ordner „Downloads“).';
+});
+$('#btnLoad').addEventListener('click',()=>$('#fileLoad').click());
+$('#fileLoad').addEventListener('change',ev=>{
+  const f=ev.target.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{try{
+    const d=JSON.parse(r.result);if(d.app!=='Saeure_Base_Berechnungen')throw new Error('Keine Datei dieser Übung');
+    const hist=(d.hist||[]).slice(0,300).map(deserRec).filter(touched);hist.forEach((h,i)=>{h.n=i+1});
+    st.hist=hist;st.cur=null;
+    st.tg=new Set((d.tg||[]).filter(k=>TARGETS.includes(k)));st.gv=new Set((d.gv||[]).filter(k=>GIVENS.includes(k)));
+    st.lvl=[1,2,3].includes(d.lvl)?d.lvl:1;
+    $('#ioMsg').textContent='Zwischenstand geladen – alle Werte wurden neu geprüft.';
+    if(selOK()&&eligible().length)newTask();else render();
+  }catch(err){$('#ioMsg').textContent='Die Datei konnte nicht geladen werden ('+err.message+').'}
+  ev.target.value=''};
+  r.readAsText(f);
+});
+
+/* ============ QR ============ */
+$('#qrSmall').innerHTML=QR.svg(PAGE_URL,{quiet:1});$('#qrBig').innerHTML=QR.svg(PAGE_URL,{quiet:4});
+const qrM=$('#qrModal'),qrOpen=()=>{qrM.classList.add('open');$('#qrClose').focus()},qrShut=()=>{qrM.classList.remove('open');$('#qrBtn').focus()};
+$('#qrBtn').addEventListener('click',qrOpen);$('#qrClose').addEventListener('click',qrShut);
+qrM.addEventListener('click',ev=>{if(ev.target===qrM)qrShut()});
+document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&qrM.classList.contains('open'))qrShut()});
+
+/* ============ PDF ============ */
+const pdfSel=()=>st.hist.filter(touched);
+function pdfStat(){
+  const s=calcStats(pdfSel());
+  $('#pdfStat').innerHTML=`<span>Aufgaben vollständig gelöst</span><span>${s.tasks}</span><span>Schritte abgeschlossen</span><span>${s.steps}</span><span>davon mit Hilfen gelöst</span><span>${s.helped}</span><span>Schritte im 1. Versuch ohne Hilfen</span><span>${s.first}</span><span>Lösung angesehen</span><span>${s.sol}</span><span><b>Erfolgsquote</b></span><span>${s.q===null?'–':s.q+' %'}</span>`;
+  $('#btnPrint').disabled=!s.tasks;
+}
+$('#btnPdf').addEventListener('click',()=>{pdfStat();openM('#mPdf')});
+function buildPrint(){
+  const list=pdfSel(),s=calcStats(list);
+  let h=`<h1>Säure-Base-Berechnungen – Zusammenfassung</h1>
+  <table class="meta"><tr><td>Name: <span class="line">${esc($('#pName').value)}&nbsp;</span></td><td>Kurs: <span class="line">${esc($('#pKurs').value)}&nbsp;</span></td><td>Datum: <span class="line">${new Date().toLocaleDateString('de-DE')}&nbsp;</span></td></tr></table>
+  <table class="sum"><tr><td>Aufgaben vollständig gelöst:</td><td><b>${s.tasks}</b></td><td>Schritte abgeschlossen:</td><td><b>${s.steps}</b></td></tr>
+  <tr><td>davon mit Hilfen gelöst:</td><td><b>${s.helped}</b></td><td>Schritte im 1. Versuch ohne Hilfen:</td><td><b>${s.first}</b></td></tr>
+  <tr><td>Lösung angesehen:</td><td><b>${s.sol}</b></td><td><b>Erfolgsquote:</b></td><td><b>${s.q===null?'–':s.q+' %'}</b></td></tr></table>
+  <p class="small">Erfolgsquote = Anteil der abgeschlossenen Schritte, die beim ersten Prüfen ohne Hilfen richtig waren. „mit Hilfen“ = beim Lösen des Schritts waren die Hilfen eingeblendet oder der Tipp geöffnet. * = Wert automatisch eingesetzt (zählt nicht als richtig).</p>`;
+  list.forEach((r,i)=>{
+    const T=r.T,sp=T.sp,stt=recStatus(r),all=allDone(r);
+    const col=r.viewed?'#b3452a':all&&stt.c==='ok'?'#2f8f3f':all?'#b87a14':'#888';
+    h+=`<div class="task" style="border-left:4px solid ${col};padding-left:8px;margin-bottom:10px"><h2>Aufgabe ${i+1} – ${shortTitle(T)} (${LVLTXT[sp.level]})</h2>
+    <div>${introHTML(T)}</div>${structList(T).length?`<div class="pfigs">${structList(T).map(x=>`<div class="pfig">${molSVG(STRUCT[x.s](),22)}<div>${esc(spName(x,true))}</div></div>`).join('')}</div>`:''}
+    <div class="pgiven"><b>Gegeben:</b> ${sp.givenKeys.map(k=>`${keyLabel(T,k)} = ${fGiven(k,T.v0[k])} ${UNIT(k)}`).join(' · ')}<br><b>Gesucht:</b> ${seekLabel(T,sp.target)}</div>
+    <table><tr><th style="width:26%">Schritt</th><th>Rechnung (richtige Lösung)</th><th style="width:14%">Deine Eingabe</th><th style="width:17%">Bewertung</th></tr>`;
+    T.nodes.forEach((n,k)=>{
+      const x=r.steps[k];
+      const bew=x.done?(x.a?'eingesetzt *':(x.t===1?'richtig (1. Versuch)':`richtig (nach ${x.t-1} Fehlversuch${x.t>2?'en':''})`)+(x.h?', mit Hilfen':'')):(x.t?`nicht gelöst (${x.t} Versuch${x.t>1?'e':''})`:'nicht bearbeitet');
+      h+=`<tr><td>${n.label}</td><td>${S[n.out]} = ${n.ex(T.snap[k])} = <b>${fRes(n.out,T.res[k])}</b> ${UNIT(n.out)}</td><td class="c">${x.done&&!x.a?esc(x.in):'–'}</td><td>${bew}</td></tr>`;
+    });
+    h+=`</table><div class="vm" style="border-left-color:${col}">${r.viewed?'✗ nicht selbst gelöst – Lösung angesehen':all?(stt.c==='ok'?'✓ richtig gelöst – im 1. Versuch':stt.t==='✓ mit Hilfen'?'✓ richtig gelöst – mit Hilfen':'✓ richtig gelöst – nach Fehlversuch'):'– nicht beendet'}</div></div>`;
+  });
+  h+=`<div class="pfoot">Übung „Säure-Base-Berechnungen“ V1.0 · Bastian Baumgart · chemie.mail-baumgart.de · Lizenz CC BY-NC-SA 4.0</div>`;
+  return h;
+}
+$('#btnPrint').addEventListener('click',()=>{
+  $('#print').innerHTML=buildPrint();$('#mPdf').hidden=true;
+  setTimeout(()=>window.print(),50);
+});
+
+render();
+
+</script>
+</body>
+</html>
