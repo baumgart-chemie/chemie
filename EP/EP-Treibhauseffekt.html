@@ -158,7 +158,7 @@ footer .footer-credit{margin-top:8px;color:var(--text-dim)}
 
     <div class="panel">
       <h2>Ausgangszustand</h2>
-      <label class="chk"><input type="radio" name="start" value="nat" checked><span>Natürlicher Treibhauseffekt<br><span class="hint">vor der Industrialisierung · 14,0 °C · 280 ppm CO₂ · alle Regler auf 0 %</span></span></label>
+      <label class="chk"><input type="radio" name="start" value="nat" checked><span>Vorindustrieller Zustand<br><span class="hint">nur natürlicher Treibhauseffekt · 14,0 °C · 280 ppm CO₂ · alle Regler auf 0 %</span></span></label>
       <label class="chk"><input type="radio" name="start" value="heute"><span>Heute (2025)<br><span class="hint">15,4 °C · 427 ppm CO₂ · alle Regler auf 100 %</span></span></label>
       <label class="chk" style="border-top:1px solid var(--line-soft);margin-top:6px;padding-top:10px"><input type="checkbox" id="explChk"><span>Erklärungen einblenden</span></label>
     </div>
@@ -192,7 +192,7 @@ footer .footer-credit{margin-top:8px;color:var(--text-dim)}
 
     <div class="tiles">
       <div class="tile big"><div class="k">Mittlere Temperatur der Erdoberfläche</div><div class="v" id="tT"></div></div>
-      <div class="tile big"><div class="k">Änderung gegenüber dem natürlichen Zustand</div><div class="v" id="tD"></div></div>
+      <div class="tile big"><div class="k">Änderung gegenüber dem vorindustriellen Zustand</div><div class="v" id="tD"></div></div>
       <div class="tile"><div class="k">Kohlenstoffdioxid CO₂</div><div class="v" id="tC"></div></div>
       <div class="tile"><div class="k">Methan CH₄</div><div class="v" id="tM"></div></div>
       <div class="tile"><div class="k">Distickstoffmonooxid N₂O</div><div class="v" id="tN"></div></div>
@@ -354,7 +354,7 @@ function logEvent(){if(!cur||S.t<=0||!cur.z0)return;const t=Math.round(S.t),l=cu
   if(l&&l.t===t)l.z=cloneSet(Z);else cur.events.push({t,z:cloneSet(Z)});
   const e=cur.events[cur.events.length-1],prev=cur.events.length>1?cur.events[cur.events.length-2].z:cur.z0;
   e.ch=diffSet(prev,e.z);e.text=desc(e.z);if(!e.ch.length)cur.events.pop();}
-const startName=s=>s==='heute'?'Start: heute (2025)':'Start: natürlicher Treibhauseffekt';
+const startName=s=>s==='heute'?'Start: heute (2025)':'Start: vorindustrieller Zustand';
 const runDesc=r=>'Lauf '+r.no+': '+startName(r.start).replace('Start: ','')+' · '+(r.desc0||desc(Z))+(r.events.length?' · '+r.events.length+' Änderung'+(r.events.length>1?'en':''):'');
 
 /* ===================== Quellen-Bedienung ===================== */
@@ -499,7 +499,7 @@ function renderExplain(){
   const e=emis(Z),C=conc(S),p=[];
   if(e.eq===0){
     p.push(C<281?'Es sind keine zusätzlichen Quellen aktiv. Wasserdampf, CO₂, CH₄ und N₂O der natürlichen Atmosphäre halten einen Teil der Wärmestrahlung zurück: Die Erde hat im Mittel <b>14 °C</b> statt etwa <b>−18 °C</b> ohne Treibhauseffekt. Aufnahme und Abgabe der Gase sind im Gleichgewicht, die Temperatur bleibt gleich.'
-      :'Alle Quellen sind abgeschaltet, trotzdem liegt die Temperatur weiter über dem natürlichen Wert: CO₂ wird nur sehr langsam von Ozeanen und Pflanzen aufgenommen (ein Teil bleibt Jahrhunderte in der Luft). Methan wird dagegen innerhalb von etwa zehn Jahren abgebaut.');
+      :'Alle Quellen sind abgeschaltet, trotzdem liegt die Temperatur weiter über dem vorindustriellen Wert: CO₂ wird nur sehr langsam von Ozeanen und Pflanzen aufgenommen (ein Teil bleibt Jahrhunderte in der Luft). Methan wird dagegen innerhalb von etwa zehn Jahren abgebaut.');
   }else{
     const top=SRC.map(s=>({s,a:e.per[s.id]})).sort((a,b)=>b.a.eq-a.a.eq)[0];
     p.push('Die aktiven Quellen stoßen zusammen <b>'+f(e.eq,1)+' Gt CO₂-Äquivalente</b> pro Jahr aus (CO₂ '+f(e.co2,1)+' Gt, CH₄ '+f(e.ch4)+' Mt, N₂O '+f(e.n2o,1)+' Mt). Größte Einzelquelle: <b>'+top.s.name+'</b> mit '+f(top.a.eq/e.eq*100)+' %.');
@@ -638,7 +638,7 @@ function loop(now){
 }
 function jump(y){setPlay(false);advance(y*4);refresh(true);}
 function applyStart(v){endRun();start=v;$$('input[name=start]').forEach(r=>r.checked=r.value===v);
-  Z=mkSet(v==='heute'?100:0);syncSrc();newRun();} // natürlich: alle Regler 0 %, heute: alle 100 %
+  Z=mkSet(v==='heute'?100:0);syncSrc();newRun();} // vorindustriell: alle Regler 0 %, heute: alle 100 %
 function initUI(){
   buildSrc();syncSrc();
   $('#btnPlay').addEventListener('click',()=>setPlay(!playing));
@@ -761,7 +761,7 @@ SRC.map(s=>'<tr><td>'+ico(s)+s.name+'</td><td>'+(s.co2?f(s.co2,1):'–')+'</td><
 <li>Rückkopplungen wie tauende Permafrostböden oder nachlassende Aufnahme durch Ozeane und Wälder sind nicht einzeln berechnet.</li>
 <li>Die Emissionswerte sind gerundete weltweite Werte; der Ausstoß bleibt im Modell so lange gleich, bis du ihn änderst.</li>
 <li>Klimasensitivität: 3 K je Verdopplung des CO₂-Gehalts (der wahrscheinliche Bereich liegt bei 2,5 bis 4 K).</li></ul>
-<p>Der Zustand „Heute (2025)“ startet mit den gemessenen Gehalten (427 ppm CO₂, 1 948 ppb CH₄, 339 ppb N₂O) und 15,4 °C, also etwa 1,4 K über dem natürlichen Zustand.</p>`}
+<p>Der Zustand „Heute (2025)“ startet mit den gemessenen Gehalten (427 ppm CO₂, 1 948 ppb CH₄, 339 ppb N₂O) und 15,4 °C, also etwa 1,4 K über dem vorindustriellen Zustand.</p>`}
 ];
 function openGL(i){
   const m=modal('',true),box=m.querySelector('.box');
@@ -781,7 +781,7 @@ function initGL(){
 const HELP=head('Anleitung')+`
 <p>Die Simulation zeigt, wie Treibhausgase die Temperatur der Erde bestimmen und wie einzelne Emissionsquellen sie verändern.</p>
 <h3>Ausgangszustand</h3>
-<p>Beim Öffnen siehst du den <b>natürlichen Treibhauseffekt</b>: 14,0 °C, alle Regler der Emissionsquellen stehen auf 0 %. Beim Zustand „Heute (2025)“ stehen alle Regler auf 100 %, also auf dem heutigen Umfang.</p>
+<p>Beim Öffnen siehst du den <b>vorindustriellen Zustand</b>, in dem nur der natürliche Treibhauseffekt wirkt: 14,0 °C, alle Regler der Emissionsquellen stehen auf 0 %. Beim Zustand „Heute (2025)“ stehen alle Regler auf 100 %, also auf dem heutigen Umfang.</p>
 <h3>Emissionsquellen</h3>
 <p>Jede Quelle hat einen Regler für ihren Umfang: 0 % bedeutet aus, 100 % ist der heutige Stand weltweit (z. B. 1,5 Mrd Pkw), 200 % das Doppelte. Die Regler lassen sich jederzeit verstellen. Bei den Pkw kannst du zusätzlich den Anteil der Elektroautos und die Art des Stroms wählen.</p>
 <h3>Zeit laufen lassen</h3>
@@ -796,8 +796,8 @@ const HELP=head('Anleitung')+`
 const VERS=head('Versionshinweise')+`
 <h3>Version 1.0 · 10.11.2026</h3>
 <ul><li>Erste Fassung der Simulation „Treibhauseffekt“.</li>
-<li>Ausgangszustand natürlicher Treibhauseffekt (14,0 °C) oder heutiger Zustand (2025).</li>
-<li>13 Emissionsquellen, jede mit eigenem Regler von 0 bis 200 % (natürlicher Zustand: alle 0 %, heute: alle 100 %); Pkw mit Anteil Elektroautos und Wahl des Stroms.</li>
+<li>Ausgangszustand „Vorindustrieller Zustand“ (nur natürlicher Treibhauseffekt, 14,0 °C) oder heutiger Zustand (2025).</li>
+<li>13 Emissionsquellen, jede mit eigenem Regler von 0 bis 200 % (vorindustrieller Zustand: alle 0 %, heute: alle 100 %); Pkw mit Anteil Elektroautos und Wahl des Stroms.</li>
 <li>Alle Piktogramme (Fahrzeuge, Kraftwerke, Gebäude usw.) sind selbst gezeichnet; es werden keine fremden Grafiken, Schriften oder Emoji verwendet.</li>
 <li>Bild mit Strahlung, Schicht der Treibhausgase (Moleküle werfen Wärmestrahlung zurück) und Quellen; Prognose für 100 Jahre mit Vergleich zum heutigen Ausstoß.</li>
 <li>Diagramm mit wählbarer Größe, Vergleich mehrerer Läufe, Beitrag der einzelnen Quellen, Messwerte mit CSV-Ausgabe.</li>
@@ -870,7 +870,7 @@ function buildPrint(sel){
   sel.forEach((l,i)=>{const r=l.r,last=r.rec[r.rec.length-1],tt=r===cur?'Aktueller Lauf':'Lauf '+r.no,col=PCOL[i%PCOL.length];
     h+='<div class="blk"><h2>'+tt+'</h2><h3>Versuchsbedingungen</h3><ul><li>'+startName(r.start)+' ('+f(T0+r.rec[0].T,1)+' °C, '+f(r.rec[0].C)+' ppm CO₂)</li><li>Quellen zu Beginn: '+(r.desc0||desc(Z))+'</li></ul>'+
       '<h3>Vorgenommene Veränderungen</h3><ul>'+(r.events.length?r.events.map(e=>'<li><b>Jahr '+e.t+':</b> '+e.ch.join('; ')+'<br>Danach aktiv: '+e.text+'</li>').join(''):'<li>keine – die Einstellungen blieben während des gesamten Laufs unverändert</li>')+'</ul>'+
-      '<h3>Ergebnis</h3><ul><li>Stand im Jahr '+last.t+': '+f(T0+last.T,2)+' °C ('+sg(last.T,2)+' K gegenüber dem natürlichen Zustand), CO₂ '+f(last.C)+' ppm, CH₄ '+f(last.M)+' ppb, N₂O '+f(last.N)+' ppb</li></ul></div>';
+      '<h3>Ergebnis</h3><ul><li>Stand im Jahr '+last.t+': '+f(T0+last.T,2)+' °C ('+sg(last.T,2)+' K gegenüber dem vorindustriellen Zustand), CO₂ '+f(last.C)+' ppm, CH₄ '+f(last.M)+' ppb, N₂O '+f(last.N)+' ppb</li></ul></div>';
     const ser=q=>chartImg([{pts:r.rec,color:col,w:2.5,marks:r.events.map(e=>e.t)}],q);
     h+='<div class="blk"><h3>Temperatur der Erdoberfläche'+(r.events.length?' (▼ = Veränderung)':'')+'</h3><img src="'+ser('T')+'" alt=""></div>';
     h+='<div class="blk"><h3>Messwerte</h3><table>'+valHTML(r,10)+'</table></div>';});
