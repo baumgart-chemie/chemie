@@ -491,6 +491,7 @@ header>.tag{flex:1 1 160px;min-width:0}
 .bk-sheet table.bk-meta{border-collapse:collapse;width:100%;margin:2pt 0 10pt}
 .bk-sheet table.bk-meta td{border:0!important;padding:3pt 10pt 3pt 0!important;font-size:11pt;background:none!important}
 .bk-sheet .bk-line{border-bottom:1px solid #000;min-width:120pt;display:inline-block}
+.bk-sheet .bk-run + .bk-run{break-before:page;page-break-before:always}
 .bk-sheet .bk-sec{margin:0 0 10pt;break-inside:avoid;page-break-inside:avoid}
 .bk-sheet .bk-sec.bk-long{break-inside:auto;page-break-inside:auto}
 .bk-sheet h2.bk-h2{font-size:12.5pt;margin:12pt 0 4pt;padding-bottom:2pt;border-bottom:1px solid #999;font-weight:700;color:#000;break-after:avoid;page-break-after:avoid}
@@ -603,6 +604,10 @@ header>.tag{flex:1 1 160px;min-width:0}
       <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.3</span><span class="d">11.11.2026</span></div>
+      <ul>
+        <li><strong>Auswertung als PDF:</strong> Jede gewählte Messreihe beginnt im PDF auf einer neuen Seite (mit Versuchsbedingungen, Ergebnissen, Diagramm und Messwerten). Auf Seite 1 steht optional (Häkchen im Dialog, standardmäßig an) eine Übersichtstabelle aller gewählten Messreihen.</li>
+      </ul>
       <div class="vh-ver"><span class="v">V1.2</span><span class="d">07.11.2026</span></div>
       <ul>
         <li><strong>Auswertung als PDF:</strong> einheitlicher Dialog „Auswertung als PDF“: Jeder abgeschlossene Lauf ist einzeln auswählbar, dazu optionale Felder für Name und Kurs. Das PDF enthält je Lauf Versuchsbedingungen, Diagramm (weißer Hintergrund) und Messwerte im druckfreundlichen A4-Layout.</li><li><strong>Übung:</strong> „Zusammenfassung als PDF“ öffnet denselben Dialog mit Statistik (Schritte, selbst ermittelte Werte, Lösung angesehen, Erfolgsquote); die bisherigen Felder Vorname/Name und die Häkchen für Versuchsbedingungen, Diagramm und Messwerte entfallen.</li><li><strong>QR-Code:</strong> Schaltfläche rechts in der Kopfzeile; Antippen vergrößert den QR-Code, mit dem sich diese Seite direkt auf dem Mobilgerät öffnen lässt.</li>
@@ -944,7 +949,7 @@ header>.tag{flex:1 1 160px;min-width:0}
 
 <footer>
   <p class="footer-note">Simulierte Daten zu Lehrzwecken · Geschwindigkeitsgesetze vereinfacht (Feststoffe: Oberfläche schrumpft mit dem Umsatz; Thiosulfat und H<sub>2</sub>O<sub>2</sub> 1. Ordnung; HI-Bildung 2. Ordnung mit Rückreaktion). Aktivierungsenergien und Geschwindigkeitskonstanten gerundet bzw. Modellwerte. Gasvolumen im Kolbenprober bei 25 °C und dem eingestellten Druck, ideales Gas; Löslichkeit der Gase vernachlässigt.</p>
-  <p class="footer-credit">Bastian Baumgart · Simulation „Reaktionsgeschwindigkeit“ V1.2 · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Simulation „Reaktionsgeschwindigkeit“ V1.3 · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <script>
@@ -2035,9 +2040,10 @@ function exBodyHTML(){
   box.querySelectorAll(".s-head,.s-fields,.s-foot").forEach(n=>n.remove());
   return box.innerHTML;
 }
+const ovCells=r=>[String(r.no)].concat(runRow(r).cells.slice(1));   // Zeile der Übersichtstabelle (ohne Farbpunkt)
 globalThis.__rg={
-  runs:()=>S.runs.map(r=>({id:"r"+r.no, label:runLabel(r), color:r.color, html:()=>simRunHTML(r)})),
-  live:()=>(S.started&&!S.finished&&!S.runs.includes(S.run)) ? {id:"live", label:runLabel(S.run).replace("Messreihe","Aktuelle Messung")+" (läuft noch)", color:"#9aa2a9", html:()=>simRunHTML(S.run)} : null,
+  runs:()=>S.runs.map(r=>({id:"r"+r.no, label:runLabel(r), color:r.color, ov:()=>ovCells(r), html:()=>simRunHTML(r)})),
+  live:()=>(S.started&&!S.finished&&!S.runs.includes(S.run)) ? {id:"live", label:runLabel(S.run).replace("Messreihe","Aktuelle Messung")+" (läuft noch)", color:"#9aa2a9", ov:()=>ovCells(S.run).map((c,i)=>i?c:"akt."), html:()=>simRunHTML(S.run)} : null,
   exStats:()=>{ const c=exCounts(), tot=c.own+c.auto, q=tot?Math.round(c.own/tot*100):null;
     return {ready:c.stepsDone>0||tot>0, items:[["Aufgaben vollständig gelöst",c.stepsDone>=9?1:0],["Schritte abgeschlossen",c.stepsDone+" von 9"],["selbst richtig ermittelte Werte",c.own],["Lösung angesehen (Werte mit *)",c.auto],["richtig gesetzte Diagrammpunkte",c.ptsOk+" von "+EXT.length*2],["<b>Erfolgsquote</b>",q===null?"–":q+" %"]],
       note:"Erfolgsquote = Anteil der selbst ermittelten und als richtig geprüften Werte an allen eingetragenen Werten. * = automatisch ergänzt („Wert anzeigen“, „Rest ausfüllen“ oder „Lösung zeigen“)."}; },
@@ -3258,6 +3264,7 @@ function ensure(){
     <div class="bk-dhead"><h2 id="bkDlgT">Auswertung als PDF</h2><button type="button" class="bk-x" aria-label="Schließen">×</button></div>
     <div class="bk-dh" id="bkSelH"></div>
     <div id="bkSel"></div>
+    <div class="bk-runs" id="bkOpts"></div>
     <div class="bk-dh">Angaben (optional)</div>
     <div class="bk-row"><input id="bkName" placeholder="Name" autocomplete="off" maxlength="60" aria-label="Name"><input id="bkKurs" placeholder="Kurs" autocomplete="off" maxlength="40" aria-label="Kurs"></div>
     <p class="bk-hint" id="bkHint"></p>
@@ -3277,6 +3284,8 @@ BK.open=over=>{
   const sel=dlg.querySelector('#bkSel'),btn=dlg.querySelector('#bkGo');
   dlg.querySelector('#bkSelH').textContent=C.sim?'Welche Läufe sollen ins PDF?':'Statistik';
   sel.className=C.sim?'bk-runs':'bk-stat';
+  const oe=dlg.querySelector('#bkOpts');
+  oe.innerHTML=C.sim&&C.opts?C.opts.map(o=>`<label><input type="checkbox" data-opt="${o.id}"${o.checked===false?'':' checked'}><span>${o.label}</span></label>`).join(''):'';
   dlg.querySelector('#bkHint').innerHTML=C.hint||'';
   if(C.sim){
     cur=runList();
@@ -3300,8 +3309,9 @@ async function go(){
     if(c.sim){
       const ids=[...dlg.querySelectorAll('#bkSel input:checked')].map(i=>i.value);
       const runs=cur.filter(r=>ids.includes(String(r.id)));
-      if(c.pre)body+=await c.pre(runs);
-      for(const r of runs){const h=await (typeof r.html==='function'?r.html():r.html);body+=`<h2 class="bk-h2">${r.label}</h2>${h||''}`}
+      const opts={};dlg.querySelectorAll('#bkOpts input').forEach(i=>{opts[i.dataset.opt]=i.checked});
+      if(c.pre)body+=await c.pre(runs,opts);
+      for(const r of runs){const h=await (typeof r.html==='function'?r.html():r.html);body+=`<div class="bk-run"><h2 class="bk-h2">${r.label}</h2>${h||''}</div>`}
       if(c.extra)body+=await c.extra(runs);
     }else{
       const s=c.stats();
@@ -3373,10 +3383,12 @@ BK.trainer=o=>{
 <script id="bk-page">
 (()=>{
 const G=globalThis.__rg;
-BK.setup({url:'https://chemie.mail-baumgart.de/Q1/1-Reaktionsgeschwindigkeit.html',sim:true,footName:'Simulation „Reaktionsgeschwindigkeit“',version:'1.2',printTitle:'Reaktionsgeschwindigkeit – Auswertung',
-  hint:'Die Auswertung enthält je gewählter Messreihe die Versuchsbedingungen, die Ergebnisse (t<sub>½</sub>, v<sub>0</sub>, Endwert), das Diagramm (weißer Hintergrund) und die Messwerte.',
+BK.setup({url:'https://chemie.mail-baumgart.de/Q1/1-Reaktionsgeschwindigkeit.html',sim:true,footName:'Simulation „Reaktionsgeschwindigkeit“',version:'1.3',printTitle:'Reaktionsgeschwindigkeit – Auswertung',
+  hint:'Die Auswertung enthält auf Wunsch eine Übersichtstabelle der Messreihen und je gewählter Messreihe die Versuchsbedingungen, die Ergebnisse (t<sub>½</sub>, v<sub>0</sub>, Endwert), das Diagramm (weißer Hintergrund) und die Messwerte.',
   noRuns:'Noch keine Messreihe abgeschlossen. Jede beendete Messung wird als Messreihe gespeichert.',
   runs:G.runs, live:G.live,
+  opts:[{id:'ov',label:'Übersichtstabelle der gewählten Messreihen (Seite 1)'}],
+  pre:(runs,o)=>{ if(!o.ov||!runs.length) return ''; return `<div class="bk-run"><h2 class="bk-h2">Übersicht der Messreihen</h2><table class="bk-t"><thead><tr><th>#</th><th>Reaktion</th><th>ϑ</th><th>p</th><th>c</th><th>Zerteilung / Katalysator</th><th>t<sub>½</sub> bzw. t(Kreuz)</th><th>v<sub>0</sub></th><th>Endwert bzw. 1/t</th></tr></thead><tbody>${runs.map(r=>'<tr>'+r.ov().map(x=>`<td>${x}</td>`).join('')+'</tr>').join('')}</tbody></table><p class="bk-small">t<sub>½</sub>: Zeit, bis die Hälfte des Umsatzes erreicht ist. v<sub>0</sub>: Anfangsgeschwindigkeit in der jeweils ersten Diagrammgröße.</p></div>`; },
   ex:{sim:false,simNote:true,kick:'Übung',printTitle:'Reaktionsgeschwindigkeit: Zink + Salzsäure – Protokoll',stats:G.exStats,build:G.exBody,
     hint:'Die Auswertung enthält Versuch, Messwerte und Berechnungen, das c-t-Diagramm, die Durchschnittsgeschwindigkeiten und den Bearbeitungsstand. Automatisch ergänzte Werte sind mit * gekennzeichnet.'}});
 })();
