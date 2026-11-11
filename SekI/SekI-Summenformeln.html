@@ -155,6 +155,21 @@ details.rules[open] summary{margin-bottom:12px;}
 .stage::before{content:""; position:absolute; inset:0; background:var(--screen); opacity:.72; pointer-events:none;}
 .stage svg{position:relative; display:block; width:100%; max-width:500px; height:auto; user-select:none; -webkit-user-select:none;}
 .stage .stylelbl{position:absolute; left:10px; top:8px; font-size:10.5px; color:var(--text-faint); z-index:1; letter-spacing:.3px;}
+.stage.blank .stylelbl,.stage.blank .formula,.stage.blank .result{display:none;}
+.stage .result .rn{font-size:15px; color:var(--text-dim); margin-left:8px; font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;}
+.vk{position:relative; z-index:1; width:100%; max-width:540px; text-align:center;}
+.vk-f{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:72px; line-height:1.15; font-weight:600; color:var(--text);}
+.vk-f sub{font-size:.55em;}
+.vk.done .vk-f{color:var(--teal);}
+.vk.bad .vk-f{color:var(--danger);}
+.vk-n{font-size:22px; margin-top:4px; color:var(--text);}
+.vk-note{font-size:12.5px; color:var(--text-dim); margin-top:10px;}
+.vk-tw{overflow-x:auto; margin-top:14px;}
+.vk table{border-collapse:collapse; font-size:12.5px; width:100%; text-align:left;}
+.vk th,.vk td{padding:5px 8px; border-bottom:1px solid var(--line-soft); vertical-align:top;}
+.vk th{color:var(--text-faint); font-weight:500; font-size:10.5px; text-transform:uppercase; letter-spacing:.3px;}
+.vk td.m{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; color:var(--text);}
+.vk-meta{font-size:12px; color:var(--text-dim); margin-top:8px;}
 .stage .formula{position:absolute; right:10px; bottom:8px; font-size:12px; color:var(--text-dim); z-index:1; text-align:right;}
 .stage .formula .ok{color:var(--good);} .stage .formula .no{color:var(--danger);}
 .stage .result{position:absolute; left:10px; bottom:8px; font-size:12px; color:var(--text-faint); z-index:1;}
@@ -412,6 +427,17 @@ header>.tag{flex:1 1 160px;min-width:0}
 .bk-sheet .bk-tnote{font-size:9pt;color:#333;margin-top:3pt}
 .bk-sheet .bk-foot{margin-top:14pt;border-top:1px solid #888;padding-top:4pt;font-size:8.5pt;color:#444;text-align:center}
 </style>
+<style>
+/* Nebengruppen im PSE, Eingabe ohne Vorgabe */
+.pse-ng{grid-template-columns:14px repeat(10,minmax(0,1fr));}
+.pse-ng-wrap{margin-top:12px;}
+.pse-ng-wrap .sub-label{font-size:12px; margin:0 0 6px;}
+.check-row small{color:var(--text-faint); font-size:11.5px;}
+.check-row.dis{opacity:.45; cursor:default;}
+.check-row.dis input{cursor:default;}
+svg .sym.bad{fill:var(--danger);}
+svg .sym.q{fill:var(--text-faint);}
+</style>
 </head>
 <body>
 
@@ -439,7 +465,7 @@ header>.tag{flex:1 1 160px;min-width:0}
         <li><strong>Metalle</strong> der I. bis III. Hauptgruppe: Wertigkeit = Nummer der Hauptgruppe.</li>
         <li><strong>Nichtmetalle</strong> der V. bis VII. Hauptgruppe, die im Namen hinten stehen (Endung -id): Wertigkeit = 8 − Nummer der Hauptgruppe. Kohlenstoff und Silicium sind vierwertig.</li>
         <li><strong>Wasserstoff</strong> ist immer einwertig, <strong>Sauerstoff</strong> fast immer zweiwertig.</li>
-        <li>Steht eine <strong>römische Zahl im Namen</strong>, z. B. Eisen(III)-oxid, ist das die Wertigkeit dieses Elements.</li>
+        <li>Steht in der Aufgabe eine Wertigkeit, z. B. „Eisen (III-wertig)“, nimmst du diese für das Element.</li>
       </ol>
       <p>Du kannst die Wertigkeit als Zahl (3) oder als römische Zahl (III) eingeben.</p>
 
@@ -454,7 +480,10 @@ header>.tag{flex:1 1 160px;min-width:0}
       <p>Die Anzahl der Atome stellst du mit <strong>+</strong> und <strong>−</strong> ein. Mit <strong>Enter</strong> in einem Eingabefeld prüfst du.</p>
 
       <h3>Einstellungen</h3>
-      <p><strong>Salze</strong> sind Verbindungen aus Metall und Nichtmetall, <strong>Wasserstoffverbindungen</strong> enthalten Wasserstoff, bei <strong>Röm. Zahl</strong> steht die Wertigkeit im Namen (z. B. Schwefel(VI)-oxid). Mit dem Häkchen bei den Nebengruppenmetallen kommen auch Eisen und Kupfer vor. Sie stehen nicht im PSE-Ausschnitt, ihre Wertigkeit ist immer im Namen angegeben.</p>
+      <p><strong>Salze</strong> sind Verbindungen aus Metall und Nichtmetall, bei <strong>Röm. Zahl</strong> ist die Wertigkeit des ersten Elements in der Aufgabe angegeben (z. B. Schwefel, VI-wertig). Mit dem Häkchen bei den Nebengruppenmetallen kommen auch Eisen und Kupfer vor. Dann zeigt das Periodensystem zusätzlich die <strong>Nebengruppen</strong> an. Ihre Wertigkeit ist immer in der Aufgabe angegeben.</p>
+      <p>Ist <strong>Elemente in der Summenformel vorgeben</strong> ausgeschaltet, nennt die Aufgabe nur die Namen der Elemente. Mit <strong>Elementsymbole selbst eingeben</strong> (Standard) trägst du zuerst in Schritt 1 die Symbole ein, z. B. Al und O. Sie werden danach automatisch in die Felder für Wertigkeit und Anzahl übernommen. Die Anzahl der Atome stellst du dann wie gewohnt mit + und − ein. Das Hauptfenster bleibt leer, bis die Aufgabe gelöst ist (oder du die Lösung zeigen lässt). Dann zeigt es die Verbindung groß mit Formel, Name und einer Übersicht mit Wertigkeit und Anzahl der Atome. Die Kreuzregel-Pfeile sind in diesem Modus nicht verfügbar.</p>
+      <p>Die Auswahl <strong>Leicht / Schwer</strong> setzt die Häkchen voreingestellt: Leicht = Elemente vorgeben und Wertigkeitssumme anzeigen. Schwer = Elementsymbole selbst eingeben und Namen der Verbindung bestimmen (Elemente nicht vorgegeben, ohne Wertigkeitssumme). Du kannst die Häkchen danach einzeln ändern.</p>
+      <p>Mit <strong>Namen der Verbindung mitbestimmen</strong> kommt ein dritter Schritt dazu: Du benennst die Verbindung, z. B. Aluminiumoxid oder Eisen(III)-chlorid. Ist die Option aus, steht der Name nach der Prüfung im Hauptfenster. Die Aufgabe nennt die Verbindung nie, sondern nur die beiden Elemente.</p>
       <p>Die <strong>Kreuzregel-Pfeile</strong> zeigen im Formel-Feld, welche Wertigkeit zu welchem Index wird. Die <strong>Wertigkeitssumme</strong> unten rechts dient als Kontrolle: Anzahl × Wertigkeit muss bei beiden Elementen gleich sein.</p>
 
       <h3>Tipp, Lösung, Auswertung</h3>
@@ -471,6 +500,16 @@ header>.tag{flex:1 1 160px;min-width:0}
       <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.3</span><span class="d">11.11.2026</span></div>
+      <ul>
+        <li><strong>Schwierigkeit:</strong> neue Auswahl „Leicht / Schwer“ über den Optionen. Leicht: Elemente vorgegeben, Wertigkeitssumme sichtbar. Schwer: Elementsymbole selbst eingeben, Namen der Verbindung bestimmen, keine Vorgaben.</li>
+        <li><strong>Elemente nicht vorgeben:</strong> Die Aufgabe nennt nur die Namen der Elemente. Die Symbole trägst du in einem eigenen ersten Schritt ein, sie werden danach in die Wertigkeitsfelder und die Zähler übernommen. Das Hauptfenster bleibt leer, bis die Aufgabe gelöst ist, und zeigt dann die Verbindung groß mit Name, Wertigkeiten und Anzahl der Atome.</li>
+        <li><strong>Name der Verbindung:</strong> Die Aufgabe nennt die Verbindung nicht mehr. Optional wird der Name als dritter Schritt mitbestimmt (auch mit Zahlwörtern wie Schwefeltrioxid), sonst erscheint er nach der Prüfung im Hauptfenster.</li>
+        <li><strong>Nebengruppen:</strong> Mit dem Häkchen für Nebengruppenmetalle zeigt das Periodensystem auch die Nebengruppen.</li>
+        <li><strong>Aufgabenarten:</strong> Die Aufgabenart Wasserstoff entfällt, Salze sind voreingestellt.</li>
+        <li><strong>Grundlagen:</strong> neues Thema mit einem Baustein-Modell zur Wertigkeit.</li>
+        <li><strong>Eingabeverhalten:</strong> Die Zähler werden nur dann als falsch markiert, wenn sie auch verstellt wurden.</li>
+      </ul>
       <div class="vh-ver"><span class="v">V1.2</span><span class="d">07.11.2026</span></div>
       <ul>
         <li><strong>Auswertung als PDF:</strong> neuer Knopf „Zusammenfassung als PDF“ unter den Zählern. Der einheitliche Dialog „Auswertung als PDF“ zeigt die Statistik mit Erfolgsquote und optionale Felder für Name und Kurs; das PDF enthält zu jeder Aufgabe aus dem Verlauf die richtige Lösung mit dem Vermerk, ob sie richtig gelöst wurde, die Statistik und das Datum (druckfreundliches A4-Layout).</li><li><strong>QR-Code:</strong> Schaltfläche rechts in der Kopfzeile; Antippen vergrößert den QR-Code, mit dem sich diese Seite direkt auf dem Mobilgerät öffnen lässt.</li>
@@ -508,19 +547,30 @@ header>.tag{flex:1 1 160px;min-width:0}
       <h2>Aufgabe</h2>
       <p class="sub-label">Art der Verbindung</p>
       <div class="mode-toggle big" id="modeToggle">
-        <button data-mode="salz">Salze</button>
-        <button data-mode="h">Wasserstoff</button>
+        <button data-mode="salz" class="active">Salze</button>
         <button data-mode="rom">Röm. Zahl</button>
-        <button data-mode="mix" class="active">Gemischt</button>
+        <button data-mode="mix">Gemischt</button>
+      </div>
+      <p class="sub-label">Schwierigkeit</p>
+      <div class="mode-toggle big" id="diffToggle">
+        <button data-d="leicht" class="active">Leicht</button>
+        <button data-d="schwer">Schwer</button>
       </div>
       <label class="check-row" for="chkNG"><input type="checkbox" id="chkNG"><span>Nebengruppenmetalle einbeziehen (Eisen, Kupfer, z. B. Eisen(III)-chlorid)</span></label>
-      <label class="check-row" for="chkCross"><input type="checkbox" id="chkCross"><span>Kreuzregel-Pfeile anzeigen</span></label>
+      <label class="check-row" for="chkGiven"><input type="checkbox" id="chkGiven" checked><span>Elemente in der Summenformel vorgeben <small>(aus: Die Aufgabe nennt keine Symbole)</small></span></label>
+      <label class="check-row" for="chkSym" id="rowSym"><input type="checkbox" id="chkSym"><span>Elementsymbole selbst eingeben <small>(Schritt 1, nur wenn Elemente nicht vorgegeben sind)</small></span></label>
+      <label class="check-row" for="chkName"><input type="checkbox" id="chkName"><span>Namen der Verbindung mitbestimmen <small>(aus: Der Name erscheint nach der Prüfung im Hauptfenster)</small></span></label>
+      <label class="check-row" for="chkCross" id="rowCross"><input type="checkbox" id="chkCross"><span>Kreuzregel-Pfeile anzeigen</span></label>
       <label class="check-row" for="chkSum"><input type="checkbox" id="chkSum" checked><span>Wertigkeitssumme zur Kontrolle anzeigen</span></label>
     </section>
 
     <section class="block">
-      <h2>Periodensystem (Hauptgruppen)</h2>
+      <h2 id="pseH">Periodensystem (Hauptgruppen)</h2>
       <div class="pse" id="pse"></div>
+      <div class="pse-ng-wrap" id="pseNGWrap" hidden>
+        <p class="sub-label">Nebengruppen (Übergangsmetalle, ohne Lanthanoide)</p>
+        <div class="pse pse-ng" id="pseNG"></div>
+      </div>
       <div class="pse-key">
         <span><i style="background:var(--panel-alt)"></i>Metall</span>
         <span><i style="background:#29251d"></i>Halbmetall</span>
@@ -541,13 +591,17 @@ header>.tag{flex:1 1 160px;min-width:0}
             <tr><td class="k">I–III</td><td>Metalle: Wertigkeit = Nummer der Hauptgruppe</td></tr>
             <tr><td class="k">IV</td><td>Kohlenstoff, Silicium: vierwertig (IV)</td></tr>
             <tr><td class="k">V–VII</td><td>Nichtmetall hinten im Namen (-id): 8 − Nummer der Hauptgruppe</td></tr>
-            <tr><td class="k">(III)</td><td>Römische Zahl im Namen = Wertigkeit dieses Elements</td></tr>
+            <tr><td class="k">III-wertig</td><td>Wertigkeit in der Aufgabe angegeben: diese Zahl nehmen</td></tr>
             <tr class="grp"><td colspan="2">Summenformel</td></tr>
             <tr><td class="k">kgV</td><td>kleinstes gemeinsames Vielfaches der Wertigkeiten</td></tr>
             <tr><td class="k">Index</td><td>kgV : Wertigkeit = Anzahl der Atome</td></tr>
             <tr><td class="k">✕</td><td>Kreuzregel: Wertigkeit des einen = Index des anderen, danach kürzen</td></tr>
             <tr><td class="k">1</td><td>Der Index 1 wird nicht geschrieben</td></tr>
             <tr><td class="k">Probe</td><td>Anzahl × Wertigkeit ist bei beiden Elementen gleich</td></tr>
+            <tr class="grp"><td colspan="2">Name der Verbindung</td></tr>
+            <tr><td class="k">Aufbau</td><td>Metall (bei wechselnder Wertigkeit mit römischer Zahl in Klammern) + Stamm des Nichtmetalls + Endung -id, z. B. Eisen(III)-chlorid</td></tr>
+            <tr><td class="k">-id</td><td>Fluor → fluorid, Chlor → chlorid, Brom → bromid, Iod → iodid, Sauerstoff → oxid, Schwefel → sulfid, Stickstoff → nitrid, Phosphor → phosphid</td></tr>
+            <tr><td class="k">mono, di, tri</td><td>Bei zwei Nichtmetallen sind auch Zahlwörter üblich: Schwefeltrioxid, Diphosphorpentoxid</td></tr>
           </tbody>
         </table>
       </div>
@@ -573,12 +627,18 @@ header>.tag{flex:1 1 160px;min-width:0}
 
       <div class="work-grid">
         <div class="stage" id="stage">
-          <span class="stylelbl">Formel-Baukasten</span>
+          <span class="stylelbl" id="stageLbl">Formel-Baukasten</span>
           <div id="formBox" style="width:100%;display:flex;justify-content:center;position:relative"></div>
           <span class="result mono" id="resLbl"></span>
           <span class="formula mono" id="sumLbl"></span>
         </div>
         <div class="inputs">
+          <div class="stepbox" id="box0" style="display:none">
+            <div class="sh"><span><span class="n">1</span>Elementsymbole eingeben</span><span class="st" id="st0">offen</span></div>
+            <div class="field"><label for="sA" id="lblSA">Symbol</label><input type="text" id="sA" class="num-in" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="3" placeholder="z. B. Al"></div>
+            <div class="field"><label for="sB" id="lblSB">Symbol</label><input type="text" id="sB" class="num-in" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="3" placeholder="z. B. O"></div>
+            <p class="stp-note">Die Symbole findest du im Periodensystem. Sie werden danach in die weiteren Felder übernommen.</p>
+          </div>
           <div class="stepbox" id="box1">
             <div class="sh"><span><span class="n">1</span>Wertigkeiten ermitteln</span><span class="st" id="st1">offen</span></div>
             <div class="field">
@@ -593,7 +653,21 @@ header>.tag{flex:1 1 160px;min-width:0}
           <div class="stepbox" id="box2">
             <div class="sh"><span><span class="n">2</span>Summenformel aufstellen</span><span class="st" id="st2">offen</span></div>
             <div class="stp-wrap" id="stpWrap"></div>
+            <div id="freeWrap" style="display:none">
+              <div class="field">
+                <label for="fIn">Summenformel (Symbol + Anzahl)</label>
+                <input type="text" id="fIn" class="num-in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="z. B. Ga2S3">
+              </div>
+            </div>
             <p class="stp-note" id="note2">Stelle die Anzahl der Atome ein. Der Index 1 wird in der Formel nicht geschrieben.</p>
+          </div>
+          <div class="stepbox" id="box3" style="display:none">
+            <div class="sh"><span><span class="n">3</span>Verbindung benennen</span><span class="st" id="st3">offen</span></div>
+            <div class="field">
+              <label for="nIn">Name der Verbindung</label>
+              <input type="text" id="nIn" class="num-in" style="font-size:15px" autocomplete="off" spellcheck="false" placeholder="z. B. Galliumsulfid">
+            </div>
+            <p class="stp-note">Bei Metallen mit wechselnder Wertigkeit steht die römische Zahl in Klammern im Namen.</p>
           </div>
           <button class="btn check-btn" id="btnCheck">Prüfen</button>
         </div>
@@ -629,7 +703,7 @@ header>.tag{flex:1 1 160px;min-width:0}
 
 <footer>
   <p class="footer-note">Summenformeln binärer Verbindungen über die stöchiometrische Wertigkeit (Kreuzregel). Vereinfachtes Schulmodell: Die Formel gibt das kleinste ganzzahlige Atomzahlverhältnis an.</p>
-  <p class="footer-credit">Bastian Baumgart · Summenformel-Trainer V1.2 · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Summenformel-Trainer V1.3 · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <script>
@@ -649,9 +723,14 @@ header>.tag{flex:1 1 160px;min-width:0}
   ];
   const EL = {};
   ROWS.forEach((row,pi)=>row.forEach((d,gi)=>{ if(d) EL[d[0]] = {s:d[0], z:d[1], n:d[2], c:d[3], g:gi+1, p:pi+1}; }));
-  // Nebengruppenmetalle (nicht im PSE-Ausschnitt)
-  EL.Fe = {s:"Fe", z:26, n:"Eisen", c:"m", g:null, p:4, ng:true};
-  EL.Cu = {s:"Cu", z:29, n:"Kupfer", c:"m", g:null, p:4, ng:true};
+  // Nebengruppenmetalle (Perioden 4–6, ohne Lanthanoide); ngr = Nebengruppe (römisch)
+  const NGROWS = [
+    [["Sc",21,"Scandium"],["Ti",22,"Titan"],["V",23,"Vanadium"],["Cr",24,"Chrom"],["Mn",25,"Mangan"],["Fe",26,"Eisen"],["Co",27,"Cobalt"],["Ni",28,"Nickel"],["Cu",29,"Kupfer"],["Zn",30,"Zink"]],
+    [["Y",39,"Yttrium"],["Zr",40,"Zirconium"],["Nb",41,"Niob"],["Mo",42,"Molybdän"],["Tc",43,"Technetium"],["Ru",44,"Ruthenium"],["Rh",45,"Rhodium"],["Pd",46,"Palladium"],["Ag",47,"Silber"],["Cd",48,"Cadmium"]],
+    [["La",57,"Lanthan"],["Hf",72,"Hafnium"],["Ta",73,"Tantal"],["W",74,"Wolfram"],["Re",75,"Rhenium"],["Os",76,"Osmium"],["Ir",77,"Iridium"],["Pt",78,"Platin"],["Au",79,"Gold"],["Hg",80,"Quecksilber"]]
+  ];
+  const NGR = [3,4,5,6,7,8,8,8,1,2];
+  NGROWS.forEach((row,pi)=>row.forEach((d,gi)=>{ EL[d[0]] = {s:d[0], z:d[1], n:d[2], c:"m", g:null, p:pi+4, ng:true, ngr:NGR[gi]}; }));
 
   const CLS = {m:"Metall", h:"Halbmetall", n:"Nichtmetall", e:"Edelgas"};
   const ROMAN = ["","I","II","III","IV","V","VI","VII","VIII"];
@@ -678,18 +757,13 @@ header>.tag{flex:1 1 160px;min-width:0}
     const L = lcm(va, vb);
     return {a, b, va, vb, ia:L/va, ib:L/vb, kind, name, given:!!given};
   }
-  const POOL = {salz:[], h:[], rom:[], ng:[]};
+  const POOL = {salz:[], rom:[], ng:[]};
   ["Li","Na","K","Mg","Ca","Ba","Al"].forEach(m=>{
     ["F","Cl","Br","I","O","S","N","P"].forEach(x=>{
       if(m==="K" && x==="N") return;
       POOL.salz.push(comp(m, x, "salz", EL[m].n + SUFFIX[x]));
     });
   });
-  [["H","F","Fluorwasserstoff"],["H","Cl","Chlorwasserstoff"],["H","Br","Bromwasserstoff"],["H","I","Iodwasserstoff"],
-   ["H","O","Wasser"],["H","S","Schwefelwasserstoff"],["N","H","Ammoniak"],["P","H","Phosphan (Phosphorwasserstoff)"],
-   ["C","H","Methan"],["Si","H","Silan (Siliciumwasserstoff)"],
-   ["Li","H","Lithiumhydrid"],["Na","H","Natriumhydrid"],["Mg","H","Magnesiumhydrid"],["Ca","H","Calciumhydrid"]
-  ].forEach(d=>POOL.h.push(comp(d[0], d[1], "h", d[2])));
   [["C",2,"O"],["C",4,"O"],["S",4,"O"],["S",6,"O"],["N",1,"O"],["N",2,"O"],["N",3,"O"],["N",4,"O"],["N",5,"O"],
    ["Cl",1,"O"],["Cl",4,"O"],["Cl",7,"O"],["Si",4,"O"],["P",3,"Cl"],["P",5,"Cl"],["S",6,"F"],["S",2,"Cl"],["C",4,"Cl"],
    ["Sn",2,"O"],["Sn",4,"O"],["Sn",2,"Cl"],["Sn",4,"Cl"],["Pb",2,"O"],["Pb",4,"O"],["Pb",2,"Cl"],["Pb",2,"S"]
@@ -698,7 +772,7 @@ header>.tag{flex:1 1 160px;min-width:0}
    ["Cu",1,"O"],["Cu",2,"O"],["Cu",1,"Cl"],["Cu",2,"Cl"],["Cu",1,"S"],["Cu",2,"S"]
   ].forEach(d=>POOL.ng.push(comp(d[0], d[2], "ng", `${EL[d[0]].n}(${ROMAN[d[1]]})-${SUFFIX[d[2]]}`, d[1])));
 
-  const KIND = {salz:["Salz","l1"], h:["Wasserstoffverbindung","l1"], rom:["Wertigkeit im Namen","l2"], ng:["Nebengruppenmetall","l3"]};
+  const KIND = {salz:["Salz","l1"], rom:["Wertigkeit vorgegeben","l2"], ng:["Nebengruppenmetall","l3"]};
 
   // ---------- Formel-Hilfen ----------
   const sub = n => n>1 ? `<sub>${n}</sub>` : "";
@@ -716,15 +790,24 @@ header>.tag{flex:1 1 160px;min-width:0}
       } else row.forEach(d=> h += cellHTML(EL[d[0]]));
     });
     $("pse").innerHTML = h;
+    let g = `<div></div>`;
+    ["III","IV","V","VI","VII"].forEach(r=> g += `<div class="hd">${r}</div>`);
+    g += `<div class="hd" style="grid-column:span 3">VIII</div><div class="hd">I</div><div class="hd">II</div>`;
+    NGROWS.forEach((row,pi)=>{ g += `<div class="rh">${pi+4}</div>` + row.map(d=>cellHTML(EL[d[0]])).join(""); });
+    $("pseNG").innerHTML = g;
+  }
+  function syncNG(){
+    $("pseNGWrap").hidden = !useNG;
+    $("pseH").textContent = useNG ? "Periodensystem (Haupt- und Nebengruppen)" : "Periodensystem (Hauptgruppen)";
   }
   function cellHTML(e){
     const k = {m:"", h:" hm", n:" nm", e:" eg"}[e.c];
-    return `<button class="cell${k}" data-s="${e.s}" title="${e.n}" aria-label="${e.n}, ${ROMAN[e.g]}. Hauptgruppe"><span class="z">${e.z}</span><span class="sy">${e.s}</span></button>`;
+    return `<button class="cell${k}" data-s="${e.s}" title="${e.n}" aria-label="${e.n}, ${e.ng ? ROMAN[e.ngr]+'. Nebengruppe' : ROMAN[e.g]+'. Hauptgruppe'}"><span class="z">${e.z}</span><span class="sy">${e.s}</span></button>`;
   }
   function showInfo(s){
     const e = EL[s];
     document.querySelectorAll(".pse .cell").forEach(c=>c.classList.toggle("sel", c.dataset.s===s));
-    if(e.ng){ $("pseInfo").innerHTML = `<b>${e.n}</b> (${e.s}) ist ein Nebengruppenmetall und steht nicht in diesem PSE-Ausschnitt. Seine Wertigkeit ist im Namen angegeben.`; return; }
+    if(e.ng){ $("pseInfo").innerHTML = `<b>${e.n}</b> (${e.s}) · Ordnungszahl <span class="a">${e.z}</span><br><span class="a">${ROMAN[e.ngr]}</span>. Nebengruppe · ${e.p}. Periode · Metall<br>Die Wertigkeit ist in der Aufgabe angegeben.`; return; }
     $("pseInfo").innerHTML = `<b>${e.n}</b> (${e.s}) · Ordnungszahl <span class="a">${e.z}</span><br><span class="a">${ROMAN[e.g]}</span>. Hauptgruppe · ${e.p}. Periode · ${CLS[e.c]}`;
   }
   function markHint(list){
@@ -732,7 +815,7 @@ header>.tag{flex:1 1 160px;min-width:0}
   }
 
   // ---------- Zustand ----------
-  let mode = "mix", useNG = false, showCross = false, showSum = true;
+  let mode = "salz", useNG = false, given = true, nameOpt = false, symEntry = false, showCross = false, showSum = true;
   let task = null, taskCounter = 0;
   const stats = {solved:0, first:0, streak:0, shown:0};
   const history = [];
@@ -740,12 +823,12 @@ header>.tag{flex:1 1 160px;min-width:0}
 
   function newTask(){
     if(task && !task.done && task.touched) logHistory(task, "open");
-    let kinds = mode==="mix" ? ["salz","h","rom"] : [mode];
+    let kinds = mode==="mix" ? ["salz","rom"] : [mode];
     if(useNG && (mode==="mix" || mode==="rom")) kinds = kinds.concat("ng");
     let c;
     for(let i=0;i<20;i++){ c = pick(POOL[pick(kinds)]); if(!task || c.name!==task.c.name) break; }
-    task = {num:++taskCounter, c, okV:false, okF:false, hint:0, wrong:false, done:false, shown:false, touched:false, ia:1, ib:1, badIdx:null};
-    ["vA","vB"].forEach(id=>{ $(id).value=""; $(id).readOnly=false; $(id).classList.remove("ok","bad"); });
+    task = {num:++taskCounter, c, okV:false, okF:false, fBad:false, hint:0, wrong:false, done:false, shown:false, touched:false, ia:1, ib:1, badIdx:null, idxTouched:false, okN:false, card:null, okS:!(!given && symEntry)};
+    ["vA","vB","fIn","nIn","sA","sB"].forEach(id=>{ $(id).value=""; $(id).readOnly=false; $(id).classList.remove("ok","bad"); });
     $("feedback").innerHTML = "";
     markHint(null);
     renderTask();
@@ -753,21 +836,39 @@ header>.tag{flex:1 1 160px;min-width:0}
     setTimeout(()=>$("vA").focus({preventScroll:true}), 0);
   }
 
+  const seOn = () => !given && symEntry;
+  function symShown(k){
+    const c = task.c;
+    if(seOn()){ const v = $(k==="a"?"sA":"sB").value.trim(); return v ? escH(v) : "?"; }
+    return c[k];
+  }
   function renderTask(){
     const t = task, c = t.c, A = EL[c.a], B = EL[c.b];
     $("taskNum").textContent = "Aufgabe " + t.num;
     $("taskLevel").textContent = KIND[c.kind][0];
     $("taskLevel").className = "chip " + KIND[c.kind][1];
-    $("taskCtx").textContent = t.done ? "Aufgabe abgeschlossen." : "Ermittle die Wertigkeiten und stelle die Summenformel auf.";
-    $("taskPrompt").innerHTML = `Verbindung: <b>${c.name}</b>`;
-    $("taskElems").innerHTML = `Elemente: ${A.n} (<span class="s">${A.s}</span>) und ${B.n} (<span class="s">${B.s}</span>)`;
-    $("lblA").innerHTML = `Wertigkeit von <span class="s">${A.s}</span> (${A.n})`;
-    $("lblB").innerHTML = `Wertigkeit von <span class="s">${B.s}</span> (${B.n})`;
+    $("taskCtx").textContent = t.done ? "Aufgabe abgeschlossen." : "Ermittle die Wertigkeiten, stelle die Summenformel auf" + (nameOpt ? " und benenne die Verbindung." : ".");
+    $("taskPrompt").innerHTML = `Verbindung aus <b>${A.n}</b>${c.given ? ` (${ROMAN[c.va]}-wertig)` : ""} und <b>${B.n}</b>`;
+    const free = !given;
+    const nm = e => free ? e.n : `${e.n} (<span class="s">${e.s}</span>)`;
+    $("taskElems").innerHTML = free ? "" : `Symbole: <span class="s">${A.s}</span> und <span class="s">${B.s}</span>`;
+    $("lblA").innerHTML = `Wertigkeit von <span class="s">${symShown("a")}</span> (${A.n})`;
+    $("lblB").innerHTML = `Wertigkeit von <span class="s">${symShown("b")}</span> (${B.n})`;
+    $("lblSA").textContent = `Symbol von ${A.n}`; $("lblSB").textContent = `Symbol von ${B.n}`;
+    $("stpWrap").style.display = ""; $("freeWrap").style.display = "none";
+    $("box0").style.display = seOn() ? "" : "none";
+    $("box0").classList.toggle("passed", t.okS && !t.shown && seOn());
+    $("st0").textContent = t.shown ? "Lösung" : t.okS ? "✓ richtig" : "offen";
+    { let i = 0; ["box0","box1","box2","box3"].forEach(id=>{ const el = $(id); if(el.style.display!=="none"){ el.querySelector(".sh .n").textContent = ++i; } }); }
+    $("note2").textContent = "Stelle die Anzahl der Atome ein. Der Index 1 wird in der Formel nicht geschrieben.";
     const st = ok => t.shown ? "Lösung" : ok ? "✓ richtig" : "offen";
     $("box1").classList.toggle("passed", t.okV && !t.shown);
     $("st1").textContent = st(t.okV);
     $("box2").classList.toggle("passed", t.okF && !t.shown);
     $("st2").textContent = st(t.okF);
+    $("box3").style.display = nameOpt ? "" : "none";
+    $("box3").classList.toggle("passed", t.okN && !t.shown);
+    $("st3").textContent = st(t.okN);
     renderSteppers();
     drawFormula();
     $("btnCheck").disabled = t.done;
@@ -788,7 +889,7 @@ header>.tag{flex:1 1 160px;min-width:0}
     const t = task, c = t.c, lock = t.done;
     let h = "";
     [["a","ia"],["b","ib"]].forEach(([k,ik])=>{
-      const s = c[k], v = t[ik];
+      const s = symShown(k), v = t[ik];
       h += `<div class="stp${t.badIdx && t.badIdx.includes(k) ? " bad" : ""}${t.done && !t.shown ? " ok" : ""}"><span class="l">Anzahl <b>${s}</b></span><span class="c">`+
            `<button data-k="${ik}" data-d="-1" aria-label="Weniger ${s}-Atome" ${lock||v<=1?"disabled":""}>−</button>`+
            `<span class="v mono">${v}</span>`+
@@ -799,7 +900,7 @@ header>.tag{flex:1 1 160px;min-width:0}
   function changeIdx(k, d){
     const t = task; if(t.done) return;
     const v = t[k] + d; if(v<1 || v>9) return;
-    t[k] = v; t.touched = true; t.badIdx = null; t.okF = false;
+    t[k] = v; t.touched = true; t.idxTouched = true; t.badIdx = null; t.okF = false;
     $("box2").classList.remove("passed"); $("st2").textContent = "offen";
     renderSteppers(); drawFormula();
   }
@@ -812,7 +913,81 @@ header>.tag{flex:1 1 160px;min-width:0}
     if(RVAL[s]) return RVAL[s];
     return NaN;
   }
+  const escH = s => String(s).replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+  const SUBD = "₀₁₂₃₄₅₆₇₈₉";
+  const solText = c => c.a + (c.ia>1 ? c.ia : "") + c.b + (c.ib>1 ? c.ib : "");
+  // Eingabe wie Al2O3 (auch tiefgestellte Ziffern) zerlegen
+  function parseFormula(raw){
+    const s = String(raw).replace(/[₀-₉]/g, ch => String(SUBD.indexOf(ch))).replace(/[\s_{}]/g, "");
+    if(s==="") return {empty:true, text:""};
+    const parts = []; let rest = s;
+    while(rest){
+      const m = /^([A-Z][a-z]?)(\d*)/.exec(rest);
+      if(!m) return {bad:true, text:s};
+      parts.push({s:m[1], d:m[2], n:m[2]==="" ? 1 : parseInt(m[2],10)});
+      rest = rest.slice(m[0].length);
+    }
+    return {parts, text:s};
+  }
+  const PRE = ["","mono","di","tri","tetra","penta","hexa","hepta"];
+  function greekNames(c){
+    const A = EL[c.a];
+    if(A.c==="m" || A.ng) return [];
+    const first = (c.ia>1 ? PRE[c.ia] : "") + A.n.toLowerCase();
+    const p2 = PRE[c.ib], suf = SUFFIX[c.b], out = [first + p2 + suf];
+    if(/^[aeiou]/.test(suf) && /[ao]$/.test(p2)) out.push(first + p2.slice(0,-1) + suf);
+    return out;
+  }
+  const normName = x => String(x).toLowerCase().replace(/\(\s*([1-8])\s*\)/g, (m,d)=>"("+ROMAN[+d].toLowerCase()+")").replace(/[\s\-–]/g,"").replace(/jod/g,"iod").replace(/silizium/g,"silicium");
+  function nameMsg(c, raw){
+    const n = normName(raw);
+    const acc = [c.name].concat(greekNames(c)).map(normName);
+    if(acc.includes(n)) return null;
+    const A = EL[c.a], B = EL[c.b], suf = SUFFIX[c.b];
+    const aN = normName(A.n), st = n.replace(/\([^)]*\)/g, "");
+    if(!st.includes(aN)) return `Der Name beginnt mit dem Element, das auch in der Formel zuerst steht: ${A.n}.`;
+    if(!st.endsWith(suf)) return `Die Endung stimmt nicht: ${B.n} bekommt in der Verbindung die Endung -id (${cap(suf)}).`;
+    if(!A.ng && A.c!=="m" && /(mono|di|tri|tetra|penta|hexa|hept)/.test(st.slice(0, st.length-suf.length).replace(aN,""))) return `Die Zahlwörter (mono, di, tri …) passen nicht zur Formel. Sie geben die Anzahl der Atome an: ${c.a} ${c.ia}, ${c.b} ${c.ib}.`;
+    const hasPar = /\(/.test(n);
+    if(c.given && !hasPar) return `Die Wertigkeit von ${A.n} steht als römische Zahl in Klammern im Namen.`;
+    if(c.given && hasPar) return `Die römische Zahl in Klammern stimmt nicht. Sie gibt die Wertigkeit von ${A.n} an.`;
+    if(!c.given && hasPar) return `Bei ${A.n} steht keine römische Zahl im Namen, weil seine Wertigkeit immer gleich ist.`;
+    return `Der Name stimmt noch nicht. Aufbau: ${A.n} + Stamm von ${B.n} mit der Endung -id.`;
+  }
+  const showName = t => t.done || (given ? t.okF : (t.card && t.card.ok)) && !nameOpt;
+  function drawFree(){
+    const t = task, c = t.c, K = t.card;
+    const blank = !K || !t.done;
+    $("stage").classList.toggle("blank", blank);
+    $("stageLbl").textContent = "Verbindung";
+    $("sumLbl").textContent = ""; $("resLbl").innerHTML = "";
+    if(blank){ $("formBox").innerHTML = ""; return; }
+    const A = EL[c.a], B = EL[c.b];
+    const good = t.done || K.ok;
+    const fh = good ? solHTML(c) : (K.parts ? K.parts.map(p=>escH(p.s) + (p.d!=="" ? `<sub>${escH(p.d)}</sub>` : "")).join("") : escH(K.text));
+    const cls = t.done && !t.shown ? "done" : (K.ok ? "" : "bad");
+    let h = `<div class="vk ${cls}"><div class="vk-f">${fh}</div>`;
+    if(showName(t)) h += `<div class="vk-n">${c.name}</div>`;
+    if(t.done){
+      const art = e => e.ng ? `${ROMAN[e.ngr]}. Nebengruppe, Metall` : `${ROMAN[e.g]}. Hauptgruppe, ${CLS[e.c]}`;
+      const row = (e, v, n) => `<tr><td>${e.n}</td><td class="m">${e.s}</td><td>${art(e)}</td><td class="m">${ROMAN[v]}</td><td class="m">${n}</td></tr>`;
+      h += `<div class="vk-tw"><table><thead><tr><th>Element</th><th>Symbol</th><th>Art</th><th>Wertigkeit</th><th>Anzahl der Atome</th></tr></thead><tbody>${row(A,c.va,c.ia)}${row(B,c.vb,c.ib)}</tbody></table></div>`;
+      const typ = (A.c==="m" || A.ng) ? "Salz (Metall und Nichtmetall)" : (A.c==="h" ? "Verbindung aus Halbmetall und Nichtmetall" : "Molekülverbindung (zwei Nichtmetalle)");
+      h += `<div class="vk-meta">${typ} · Atomzahlverhältnis ${c.a} : ${c.b} = ${c.ia} : ${c.ib}</div>`;
+      if(showSum) h += `<div class="vk-meta">Kontrolle: ${c.a}: ${c.ia} · ${c.va} = ${c.ia*c.va} und ${c.b}: ${c.ib} · ${c.vb} = ${c.ib*c.vb} ✓</div>`;
+    } else if(!K.ok){
+      h += `<div class="vk-note">Noch nicht richtig. Hinweise stehen unter dem Hauptfenster.</div>`;
+    } else {
+      let m = "Die Summenformel stimmt.";
+      if(!K.okV) m += " Bei den Wertigkeiten ist noch ein Fehler.";
+      if(nameOpt && !K.okN) m += " Benenne noch die Verbindung.";
+      h += `<div class="vk-note">${m}</div>`;
+    }
+    $("formBox").innerHTML = h + `</div>`;
+  }
   function drawFormula(){
+    if(!given) return drawFree();
+    $("stage").classList.remove("blank"); $("stageLbl").textContent = "Formel-Baukasten";
     const t = task, c = t.c;
     const va = parseVal($("vA").value), vb = parseVal($("vB").value);
     const W = 440, cw = 58*0.6;                 // Zeichenbreite der Monospace-Schrift
@@ -848,7 +1023,7 @@ header>.tag{flex:1 1 160px;min-width:0}
     } else if(showSum){
       $("sumLbl").textContent = "Σ Wertigkeit: Wertigkeiten eintragen";
     } else $("sumLbl").textContent = "";
-    $("resLbl").innerHTML = `Formel: <span class="rf">${fHTML(c, t.ia, t.ib)}</span>`;
+    $("resLbl").innerHTML = `Formel: <span class="rf">${fHTML(c, t.ia, t.ib)}</span>` + (showName(t) ? `<span class="rn">· ${c.name}</span>` : "");
   }
 
   // ---------- Begründungen ----------
@@ -856,7 +1031,7 @@ header>.tag{flex:1 1 160px;min-width:0}
     const c = t.c, e = EL[s];
     const A = x => html ? `<span class="a">${x}</span>` : x;
     const T = x => html ? `<span class="t">${x}</span>` : x;
-    if(s===c.a && c.given) return `römische Zahl im Namen: ${A("("+ROMAN[c.va]+")")} → ${T(ROMAN[c.va])}`;
+    if(s===c.a && c.given) return `in der Aufgabe angegeben: ${A(ROMAN[c.va]+"-wertig")} → ${T(ROMAN[c.va])}`;
     if(s==="H") return `Wasserstoff ist immer einwertig → ${T("I")}`;
     if(s==="O") return `Sauerstoff (${A("VI")}. HG) ist zweiwertig: 8 − 6 = ${T("II")}`;
     if(e.c==="m") return `Metall der ${A(ROMAN[e.g])}. Hauptgruppe → Wertigkeit = Gruppennummer = ${T(ROMAN[e.g])}`;
@@ -871,7 +1046,7 @@ header>.tag{flex:1 1 160px;min-width:0}
     const c = t.c, e = EL[s], sol = s===c.a ? c.va : c.vb;
     if(v===sol) return null;
     if(isNaN(v) || v<1 || v>8) return `Gib die Wertigkeit von ${e.n} als Zahl (1–8) oder römische Zahl (I–VIII) an.`;
-    if(s===c.a && c.given) return `Bei ${e.n} steht die Wertigkeit als römische Zahl im Namen: ${c.name}.`;
+    if(s===c.a && c.given) return `Bei ${e.n} ist die Wertigkeit in der Aufgabe angegeben (${ROMAN[c.va]}-wertig).`;
     if(s==="H") return "Wasserstoff ist immer einwertig.";
     if(s==="O"){
       if(v===6) return "Sauerstoff steht zwar in der VI. Hauptgruppe, ist als Nichtmetall aber zweiwertig: 8 − 6 = 2.";
@@ -902,32 +1077,79 @@ header>.tag{flex:1 1 160px;min-width:0}
     if(t.okV){ $("vA").value = ROMAN[c.va]; $("vB").value = ROMAN[c.vb]; }
 
     // --- Teil 2: Summenformel ---
-    t.okF = ia===c.ia && ib===c.ib;
     const bad = [];
-    if(!t.okF){
+    // Hinweise zu den Indizes (ia, ib = Anzahl von c.a bzw. c.b)
+    const idxMsgs = (ia, ib) => {
+      const out = [];
       const uva = okA ? c.va : va, uvb = okB ? c.vb : vb;
       const validU = uva>=1 && uva<=8 && uvb>=1 && uvb<=8;
       const uL = validU ? lcm(uva, uvb) : 0;
       if(!t.okV && validU && ia===uL/uva && ib===uL/uvb){
-        msgs.push(["bad", `Die Formel <span class="nm">${fHTML(c, ia, ib)}</span> passt zu deinen Wertigkeiten, das ist ein Folgefehler. Korrigiere zuerst die Wertigkeit, dann ändert sich auch die Formel.`]);
+        out.push(["bad", `Die Formel <span class="nm">${fHTML(c, ia, ib)}</span> passt zu deinen Wertigkeiten, das ist ein Folgefehler. Korrigiere zuerst die Wertigkeit, dann ändert sich auch die Formel.`]);
       } else if(ia*c.va === ib*c.vb){
         const k = gcd(ia, ib);
-        msgs.push(["bad", `Das Verhältnis stimmt, aber die Formel ist noch nicht gekürzt. <span class="nm">${fHTML(c, ia, ib)}</span> lässt sich durch ${k} teilen. Die Summenformel gibt das kleinste ganzzahlige Verhältnis an.`]);
+        out.push(["bad", `Das Verhältnis stimmt, aber die Formel ist noch nicht gekürzt. <span class="nm">${fHTML(c, ia, ib)}</span> lässt sich durch ${k} teilen. Die Summenformel gibt das kleinste ganzzahlige Verhältnis an.`]);
       } else if(ia===c.va && ib===c.vb && c.va!==c.vb){
-        msgs.push(["bad", `Die Indizes sind vertauscht. Kreuzregel: Die Wertigkeit von ${c.a} (${ROMAN[c.va]}) wird zum Index von ${c.b}, die Wertigkeit von ${c.b} (${ROMAN[c.vb]}) zum Index von ${c.a}.`]);
+        out.push(["bad", `Die Indizes sind vertauscht. Kreuzregel: Die Wertigkeit von ${c.a} (${ROMAN[c.va]}) wird zum Index von ${c.b}, die Wertigkeit von ${c.b} (${ROMAN[c.vb]}) zum Index von ${c.a}.`]);
       } else if(t.okV){
-        msgs.push(["bad", `Die Summenformel stimmt noch nicht. Wertigkeitssummen: ${c.a}: ${ia} · ${c.va} = ${ia*c.va}, ${c.b}: ${ib} · ${c.vb} = ${ib*c.vb}. Beide müssen gleich sein.`]);
-        if(ia===1 && ib===1) msgs.push(["hint", `Tipp: Das kgV von ${c.va} und ${c.vb} ist ${lcm(c.va, c.vb)}.`]);
+        out.push(["bad", `Die Summenformel stimmt noch nicht. Wertigkeitssummen: ${c.a}: ${ia} · ${c.va} = ${ia*c.va}, ${c.b}: ${ib} · ${c.vb} = ${ib*c.vb}. Beide müssen gleich sein.`]);
+        if(ia===1 && ib===1) out.push(["hint", `Tipp: Das kgV von ${c.va} und ${c.vb} ist ${lcm(c.va, c.vb)}.`]);
       } else {
-        msgs.push(["bad", "Die Summenformel stimmt noch nicht. Bestimme die Anzahl der Atome mit Hilfe der Wertigkeiten (kgV bzw. Kreuzregel)."]);
+        out.push(["bad", "Die Summenformel stimmt noch nicht. Bestimme die Anzahl der Atome mit Hilfe der Wertigkeiten (kgV bzw. Kreuzregel)."]);
       }
-      if(ia!==c.ia) bad.push("a"); if(ib!==c.ib) bad.push("b");
+      return out;
+    };
+    let freeCard = null;
+    const se = seOn(); let okS = true;
+    if(se){
+      const rA = $("sA").value.trim(), rB = $("sB").value.trim();
+      const symMsg = (raw, want, other, el) => {
+        if(raw==="") return ["info", `Trage das Symbol von ${EL[el].n} ein.`];
+        if(raw===want) return null;
+        if(raw.toLowerCase()===want.toLowerCase()) return ["bad", "Achte auf Groß- und Kleinschreibung: Ein Elementsymbol beginnt mit einem Großbuchstaben, ein zweiter Buchstabe ist klein."];
+        if(!EL[raw]) return ["bad", `„${escH(raw)}“ ist kein Elementsymbol. Suche das Symbol von ${EL[el].n} im Periodensystem.`];
+        return ["bad", `Das Symbol „${escH(raw)}“ gehört nicht zu ${EL[el].n}. Suche es im Periodensystem.`];
+      };
+      const mA = symMsg(rA, c.a, c.b, c.a), mB = symMsg(rB, c.b, c.a, c.b);
+      if(!mA && !mB){} else if(rA===c.b && rB===c.a) msgs.push(["bad", "Die Reihenfolge stimmt nicht: Das Element, das in der Aufgabe zuerst genannt wird, steht auch in der Formel zuerst."]);
+      else { if(mA) msgs.push(mA); if(mB) msgs.push(mB); }
+      okS = !mA && !mB;
+      $("sA").classList.toggle("ok", !mA); $("sA").classList.toggle("bad", !!mA && rA!=="");
+      $("sB").classList.toggle("ok", !mB); $("sB").classList.toggle("bad", !!mB && rB!=="");
+      if(okS){ $("sA").value = c.a; $("sB").value = c.b; }
+    }
+    t.okS = okS;
+    if(given || true){
+      t.okF = ia===c.ia && ib===c.ib;
+      if(!t.okF){
+        if(!t.idxTouched) msgs.push(["info", "Stelle noch die Anzahl der Atome mit + und − ein."]);
+        else {
+          if(okS) idxMsgs(ia, ib).forEach(m=>msgs.push(m));
+          if(ia!==c.ia) bad.push("a"); if(ib!==c.ib) bad.push("b");
+        }
+      }
     }
     t.badIdx = bad;
 
-    if(t.okV && t.okF){
+    // --- Teil 3: Name (optional) ---
+    if(nameOpt){
+      const raw = $("nIn").value.trim();
+      if(raw===""){ t.okN = false; $("nIn").classList.remove("ok","bad"); msgs.push(["info", "Trage den Namen der Verbindung ein."]); }
+      else {
+        const m = nameMsg(c, raw);
+        t.okN = !m;
+        $("nIn").classList.toggle("ok", !m); $("nIn").classList.toggle("bad", !!m);
+        if(m) msgs.push(["bad", m]);
+      }
+    }
+    if(!given){
+      const rs = k => se ? ($(k==="a"?"sA":"sB").value.trim() || "?") : c[k];
+      t.card = {text:"", parts:[{s:rs("a"), d:ia>1?String(ia):""}, {s:rs("b"), d:ib>1?String(ib):""}], ok:t.okF && okS, okV:t.okV, okN:t.okN};
+    }
+
+    if(t.okV && t.okF && okS && (!nameOpt || t.okN)){
       t.done = true;
-      $("vA").readOnly = true; $("vB").readOnly = true;
+      $("vA").readOnly = true; $("vB").readOnly = true; $("fIn").readOnly = true; $("nIn").readOnly = true; $("sA").readOnly = true; $("sB").readOnly = true;
       const firstTry = !t.wrong && t.hint===0;
       stats.solved++; if(firstTry) stats.first++; stats.streak++;
       $("feedback").innerHTML = fb("good", `Richtig${firstTry?" im ersten Versuch":""}! ${c.name}: <span class="nm">${solHTML(c)}</span> · Wertigkeiten ${c.a} ${ROMAN[c.va]}, ${c.b} ${ROMAN[c.vb]}`) +
@@ -939,7 +1161,9 @@ header>.tag{flex:1 1 160px;min-width:0}
     if(msgs.some(m=>m[0]==="bad")){ t.wrong = true; stats.streak = 0; }
     const good = [];
     if(t.okV) good.push("Die Wertigkeiten stimmen.");
-    if(t.okF && !t.okV) good.push("Die Summenformel stimmt, aber bei den Wertigkeiten ist noch ein Fehler.");
+    if(se && okS) good.push("Die Symbole stimmen.");
+    if(t.okF && okS && !t.okV) good.push("Die Summenformel stimmt, aber bei den Wertigkeiten ist noch ein Fehler.");
+    if(nameOpt && t.okN) good.push("Der Name stimmt.");
     $("feedback").innerHTML = good.map(m=>fb("good", m)).join("") + msgs.map(m=>fb(m[0], m[1])).join("");
     renderTask(); updateStats();
   }
@@ -947,12 +1171,12 @@ header>.tag{flex:1 1 160px;min-width:0}
   // ---------- Tipps ----------
   function hint(){
     const t = task; if(t.done) return;
-    t.hint = Math.min(t.hint+1, 4); t.touched = true;
+    t.hint = Math.min(t.hint+1, nameOpt ? 5 : 4); t.touched = true;
     const c = t.c, A = EL[c.a], B = EL[c.b], out = [];
-    const ngNote = [A,B].filter(e=>e.ng).map(e=>`${e.n} ist ein Nebengruppenmetall und fehlt im PSE-Ausschnitt; seine Wertigkeit steht im Namen.`).join(" ");
+    const ngNote = [A,B].filter(e=>e.ng).map(e=>`${e.n} ist ein Nebengruppenmetall (im Periodensystem bei den Nebengruppen); seine Wertigkeit ist in der Aufgabe angegeben.`).join(" ");
     if(t.hint>=1) out.push("Tipp 1: Suche beide Elemente im PSE. Die römische Zahl über der Spalte ist die Hauptgruppe, die Farbe zeigt Metall oder Nichtmetall." + (ngNote ? " " + ngNote : ""));
     if(t.hint>=2){
-      const d = e => e.ng ? `${e.n}: Nebengruppenmetall` : `${e.n}: ${ROMAN[e.g]}. Hauptgruppe, ${CLS[e.c]}`;
+      const d = e => e.ng ? `${e.n}: ${ROMAN[e.ngr]}. Nebengruppe, Metall` : `${e.n}: ${ROMAN[e.g]}. Hauptgruppe, ${CLS[e.c]}`;
       out.push(`Tipp 2: Die Elemente sind markiert. ${d(A)} · ${d(B)}.`);
       markHint([c.a, c.b]); showInfo(A.ng ? c.b : c.a);
     }
@@ -961,17 +1185,22 @@ header>.tag{flex:1 1 160px;min-width:0}
       const L = lcm(c.va, c.vb);
       out.push(`Tipp 4: kgV(${c.va}, ${c.vb}) = ${L}. Anzahl ${c.a} = ${L} : ${c.va} = ${c.ia}, Anzahl ${c.b} = ${L} : ${c.vb} = ${c.ib}.`);
     }
+    if(t.hint>=5){
+      const g = greekNames(c);
+      out.push(`Tipp 5: Name = ${A.n}${c.given ? `(${ROMAN[c.va]})` : ""} + Stamm von ${B.n} mit der Endung -id: ${c.name}.` + (g.length ? ` Bei zwei Nichtmetallen geht auch mit Zahlwörtern, z. B. ${cap(g[0])}.` : ""));
+    }
     $("feedback").innerHTML = out.map(m=>fb("hint", m)).join("");
   }
 
   function solve(){
     const t = task; if(t.done) return;
     const c = t.c;
-    t.done = true; t.shown = true; t.okV = true; t.okF = true;
+    t.done = true; t.shown = true; t.okV = true; t.okF = true; t.okN = true; t.okS = true;
     stats.shown++; stats.streak = 0;
     t.ia = c.ia; t.ib = c.ib; t.badIdx = null;
-    $("vA").value = ROMAN[c.va]; $("vB").value = ROMAN[c.vb];
-    ["vA","vB"].forEach(id=>{ $(id).readOnly = true; $(id).classList.remove("ok","bad"); });
+    $("vA").value = ROMAN[c.va]; $("vB").value = ROMAN[c.vb]; $("fIn").value = solText(c); t.fBad = false; $("nIn").value = c.name; $("sA").value = c.a; $("sB").value = c.b;
+    t.card = {text:"", parts:[{s:c.a,d:c.ia>1?String(c.ia):""},{s:c.b,d:c.ib>1?String(c.ib):""}], ok:true, okV:true, okN:true};
+    ["vA","vB","fIn","nIn","sA","sB"].forEach(id=>{ $(id).readOnly = true; $(id).classList.remove("ok","bad"); });
     $("feedback").innerHTML = fb("info", `Lösung: ${c.name} · Wertigkeiten ${c.a} ${ROMAN[c.va]}, ${c.b} ${ROMAN[c.vb]} · Formel <span class="nm">${solHTML(c)}</span>. Der Lösungsweg steht unten.`);
     markHint([c.a, c.b]);
     logHistory(t, "shown");
@@ -983,7 +1212,7 @@ header>.tag{flex:1 1 160px;min-width:0}
     const t = task;
     if(!t.done){ $("wayBox").innerHTML = `<div class="empty-hint">Der Lösungsweg erscheint, sobald die Aufgabe gelöst oder die Lösung angezeigt wurde.</div>`; return; }
     const c = t.c, A = EL[c.a], B = EL[c.b], L = lcm(c.va, c.vb);
-    const d = e => e.ng ? `<b>${e.n}</b> (${e.s}), Nebengruppenmetall` : `<b>${e.n}</b> (${e.s}), ${ROMAN[e.g]}. Hauptgruppe, ${CLS[e.c]}`;
+    const d = e => e.ng ? `<b>${e.n}</b> (${e.s}), ${ROMAN[e.ngr]}. Nebengruppe, Metall` : `<b>${e.n}</b> (${e.s}), ${ROMAN[e.g]}. Hauptgruppe, ${CLS[e.c]}`;
     const k = gcd(c.vb, c.va);
     const crossTxt = k>1 ? `über Kreuz: ${c.a}<sub>${c.vb}</sub>${c.b}<sub>${c.va}</sub> → durch ${k} kürzen → <span class="t">${solHTML(c)}</span>`
                          : `über Kreuz: <span class="t">${solHTML(c)}</span> (nicht kürzbar)`;
@@ -994,7 +1223,8 @@ header>.tag{flex:1 1 160px;min-width:0}
       ["kgV", `kgV(<span class="a">${c.va}</span>, <span class="a">${c.vb}</span>) = <span class="t">${L}</span>`],
       ["Anzahl der Atome", `${c.a}: ${L} : ${c.va} = <span class="t">${c.ia}</span> · ${c.b}: ${L} : ${c.vb} = <span class="t">${c.ib}</span>`],
       ["Kreuzregel", crossTxt],
-      ["Kontrolle", `${c.a}: ${c.ia} · ${c.va} = ${c.ia*c.va} &nbsp;und&nbsp; ${c.b}: ${c.ib} · ${c.vb} = ${c.ib*c.vb} ✓`]
+      ["Kontrolle", `${c.a}: ${c.ia} · ${c.va} = ${c.ia*c.va} &nbsp;und&nbsp; ${c.b}: ${c.ib} · ${c.vb} = ${c.ib*c.vb} ✓`],
+      ["Name", `${A.n}${c.given ? `(${ROMAN[c.va]})` : ""} + ${SUFFIX[c.b]} → <span class="t">${c.name}</span>` + (greekNames(c).length ? `<br>mit Zahlwörtern: ${greekNames(c).map(cap).join(" oder ")}` : "")]
     ];
     let h = `<div class="steps">`;
     rows.forEach((r,i)=>{ h += `<div class="step"><span class="n">${i+1}</span><span class="h">${r[0]}</span><span class="b">${r[1]}</span></div>`; });
@@ -1006,7 +1236,7 @@ header>.tag{flex:1 1 160px;min-width:0}
   function logHistory(t, status){
     if(t.logged) return; t.logged = true;
     const c = t.c;
-    history.unshift({num:t.num, name:c.name, val:`${c.a} ${ROMAN[c.va]} · ${c.b} ${ROMAN[c.vb]}`, f:solHTML(c), status});
+    history.unshift({num:t.num, name:c.name, els:`${EL[c.a].n}${c.given ? ` (${ROMAN[c.va]}-wertig)` : ""} und ${EL[c.b].n}`, nm:nameOpt, val:`${c.a} ${ROMAN[c.va]} · ${c.b} ${ROMAN[c.vb]}`, f:solHTML(c), status});
     const lbl = {first:["im 1. Versuch","s-first"], ok:["gelöst","s-ok"], help:["mit Hilfen gelöst","s-help"], shown:["Lösung angesehen","s-shown"], open:["abgebrochen","s-open"]};
     $("histBody").innerHTML = history.map(r=>`<tr><td class="mono">${r.num}</td><td>${r.name}</td><td class="mono">${r.val}</td><td class="mono">${r.f}</td><td class="${lbl[r.status][1]}">${lbl[r.status][0]}</td></tr>`).join("");
   }
@@ -1023,7 +1253,32 @@ header>.tag{flex:1 1 160px;min-width:0}
     $("modeToggle").querySelectorAll("button").forEach(x=>x.classList.toggle("active", x===b));
     mode = b.dataset.mode; newTask();
   });
-  $("chkNG").addEventListener("change", ev=>{ useNG = ev.target.checked; newTask(); });
+  function syncGiven(){
+    $("chkCross").disabled = !given;
+    $("rowCross").classList.toggle("dis", !given);
+    $("chkSym").disabled = given; $("rowSym").classList.toggle("dis", given);
+    $("rowCross").title = given ? "" : "Nur verfügbar, wenn die Elemente vorgegeben sind";
+  }
+  $("diffToggle").addEventListener("click", ev=>{
+    const b = ev.target.closest("button"); if(!b) return;
+    $("diffToggle").querySelectorAll("button").forEach(x=>x.classList.toggle("active", x===b));
+    const hard = b.dataset.d==="schwer";
+    given = !hard; symEntry = hard; nameOpt = hard; showSum = !hard;
+    $("chkGiven").checked = given; $("chkSym").checked = symEntry; $("chkName").checked = nameOpt; $("chkSum").checked = showSum;
+    syncGiven(); newTask();
+  });
+  $("chkName").addEventListener("change", ev=>{ nameOpt = ev.target.checked; newTask(); });
+  $("nIn").addEventListener("input", ()=>{ $("nIn").classList.remove("ok","bad"); task.touched = true; task.okN = false; $("box3").classList.remove("passed"); $("st3").textContent = "offen"; });
+  $("nIn").addEventListener("keydown", ev=>{ if(ev.key==="Enter") check(); });
+  $("chkNG").addEventListener("change", ev=>{ useNG = ev.target.checked; syncNG(); newTask(); });
+  $("chkGiven").addEventListener("change", ev=>{ given = ev.target.checked; syncGiven(); newTask(); });
+  $("pseNG").addEventListener("click", ev=>{ const c = ev.target.closest(".cell"); if(c) showInfo(c.dataset.s); });
+  ["sA","sB"].forEach(id=>{
+    $(id).addEventListener("input", ()=>{ $(id).classList.remove("ok","bad"); task.touched = true; task.okS = false; renderTask(); });
+    $(id).addEventListener("keydown", ev=>{ if(ev.key==="Enter") check(); });
+  });
+  $("chkSym").addEventListener("change", ev=>{ symEntry = ev.target.checked; newTask(); });
+  $("fIn").addEventListener("keydown", ev=>{ if(ev.key==="Enter") check(); });
   $("chkCross").addEventListener("change", ev=>{ showCross = ev.target.checked; drawFormula(); });
   $("chkSum").addEventListener("change", ev=>{ showSum = ev.target.checked; drawFormula(); });
 
@@ -1048,6 +1303,8 @@ header>.tag{flex:1 1 160px;min-width:0}
   document.addEventListener("keydown", ev=>{ if(ev.key==="Escape") $("guideBackdrop").classList.remove("open"); });
 
   buildPSE();
+  syncNG();
+  syncGiven();
   newTask();
   updateStats();
 })();
@@ -1408,9 +1665,9 @@ BK.trainer=o=>{
 
 </script>
 <script id="bk-page">
-BK.trainer({url:'https://chemie.mail-baumgart.de/SekI/SekI-Summenformeln.html',footName:'Summenformel-Trainer',version:'1.2',printTitle:'Summenformel-Trainer – Zusammenfassung',
+BK.trainer({url:'https://chemie.mail-baumgart.de/SekI/SekI-Summenformeln.html',footName:'Summenformel-Trainer',version:'1.3',printTitle:'Summenformel-Trainer – Zusammenfassung',
   hint:'Die Auswertung enthält jede bearbeitete Aufgabe mit der richtigen Lösung und dem Vermerk, ob sie richtig gelöst wurde, sowie die Statistik mit der Erfolgsquote.',
-  items:()=>globalThis.__H.map(h=>({no:h.num,st:h.status,task:`Stelle die Verhältnisformel von <b>${h.name}</b> auf (Wertigkeiten: ${h.val}).`,sol:`<b>${h.f}</b>`}))});
+  items:()=>globalThis.__H.map(h=>({no:h.num,st:h.status,task:`Stelle die Summenformel der Verbindung aus <b>${h.els}</b> auf${h.nm?' und benenne sie':''}.`,sol:`<b>${h.f}</b> · ${h.name} (Wertigkeiten: ${h.val})`}))});
 
 </script>
 </body>
