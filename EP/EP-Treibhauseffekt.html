@@ -146,7 +146,7 @@ footer .footer-credit{margin-top:8px;color:var(--text-dim)}
   <span class="tag">Vom natürlichen Treibhauseffekt zur Erwärmung durch Emissionsquellen</span>
   <button class="hlink" id="btnHelp">Anleitung</button>
   <button class="qr-btn" id="qrBtn" aria-label="QR-Code vergrößern"><span id="qrSmall"></span><span><b>Auf dem Mobilgerät öffnen</b>QR-Code antippen zum Vergrößern</span></button>
-  <span class="status" id="status">Jahr 0</span>
+  <span class="status" id="status">Jahr 1850</span>
 </header>
 
 <div class="layout">
@@ -158,8 +158,8 @@ footer .footer-credit{margin-top:8px;color:var(--text-dim)}
 
     <div class="panel">
       <h2>Ausgangszustand</h2>
-      <label class="chk"><input type="radio" name="start" value="nat" checked><span>Vorindustrieller Zustand<br><span class="hint">nur natürlicher Treibhauseffekt · 14,0 °C · 280 ppm CO₂ · alle Regler auf 0 %</span></span></label>
-      <label class="chk"><input type="radio" name="start" value="heute"><span>Heute (2025)<br><span class="hint">15,4 °C · 427 ppm CO₂ · alle Regler auf 100 %</span></span></label>
+      <label class="chk"><input type="radio" name="start" value="nat" checked><span>Vorindustrieller Zustand<br><span class="hint">Start im Jahr 1850 · nur natürlicher Treibhauseffekt · 14,0 °C · 280 ppm CO₂ · alle Regler auf 0 %</span></span></label>
+      <label class="chk"><input type="radio" name="start" value="heute"><span>Heute (2025)<br><span class="hint">Start im Jahr 2025 · 15,4 °C · 427 ppm CO₂ · alle Regler auf 100 %</span></span></label>
       <label class="chk" style="border-top:1px solid var(--line-soft);margin-top:6px;padding-top:10px"><input type="checkbox" id="explChk"><span>Erklärungen einblenden</span></label>
     </div>
 
@@ -184,7 +184,7 @@ footer .footer-credit{margin-top:8px;color:var(--text-dim)}
       <button class="btn small spd" data-s="6">×3</button>
       <button class="btn small spd" data-s="20">×10</button>
       <span class="sp"></span>
-      <span class="year" id="yearLbl">Jahr 0</span>
+      <span class="year" id="yearLbl">Jahr 1850</span>
       <button class="btn" id="btnReset">Zurücksetzen</button>
     </div>
 
@@ -202,8 +202,8 @@ footer .footer-credit{margin-top:8px;color:var(--text-dim)}
     <div class="panel">
       <h2>Prognose bei unveränderten Einstellungen</h2>
       <div class="fc">
-        <div class="tile"><div class="k">Temperatur in 100 Jahren</div><div class="v" id="f100"></div><div class="n" id="f100n"></div></div>
-        <div class="tile"><div class="k">Zum Vergleich in 100 Jahren: alle Quellen wie heute</div><div class="v" id="fRef"></div><div class="n" id="fRefn"></div></div>
+        <div class="tile"><div class="k">Temperatur im Jahr 2100</div><div class="v" id="f100"></div><div class="n" id="f100n"></div></div>
+        <div class="tile"><div class="k">Zum Vergleich im Jahr 2100: alle Quellen wie heute</div><div class="v" id="fRef"></div><div class="n" id="fRefn"></div></div>
         <div class="tile"><div class="k">Unterschied durch deine Einstellungen</div><div class="v" id="fDiff"></div><div class="n" id="fDiffn"></div></div>
       </div>
     </div>
@@ -233,7 +233,7 @@ footer .footer-credit{margin-top:8px;color:var(--text-dim)}
         <div class="legend" id="legend"></div>
       </div>
       <div id="tab-src" hidden>
-        <p class="hint" style="margin-top:0">Ausstoß der einzelnen Quellen pro Jahr, umgerechnet in CO₂-Äquivalente (Wirkung über 100 Jahre: 1 t CH₄ ≙ 28 t CO₂, 1 t N₂O ≙ 273 t CO₂), und Beitrag jeder Quelle zur Temperatur in 100 Jahren.</p>
+        <p class="hint" style="margin-top:0">Ausstoß der einzelnen Quellen pro Jahr, umgerechnet in CO₂-Äquivalente (Wirkung über 100 Jahre: 1 t CH₄ ≙ 28 t CO₂, 1 t N₂O ≙ 273 t CO₂), und Beitrag jeder Quelle zur Temperatur im Jahr 2100.</p>
         <div class="tw"><table id="srcTab"></table></div>
         <div class="legend"><span><i style="border-color:var(--amber)"></i>CO₂</span><span><i style="border-color:var(--teal)"></i>CH₄</span><span><i style="border-color:var(--violet)"></i>N₂O</span></div>
       </div>
@@ -242,7 +242,7 @@ footer .footer-credit{margin-top:8px;color:var(--text-dim)}
         <div class="tw"><table id="valTab"></table></div>
       </div>
       <div id="tab-runs" hidden>
-        <div class="row" style="margin-bottom:8px"><button class="btn small" id="btnPdf2">Ausgabe als PDF</button><span class="hint">Ein Lauf endet mit „Zurücksetzen“ oder einem neuen Ausgangszustand. Bis zu sechs Läufe bleiben zum Vergleich im Diagramm.</span></div>
+        <div class="row" style="margin-bottom:8px"><button class="btn small" id="btnPdf2">Ausgabe als PDF</button><span class="hint">Ein Lauf endet im Jahr 2100, mit „Zurücksetzen“ oder einem neuen Ausgangszustand. Bis zu sechs Läufe bleiben zum Vergleich im Diagramm.</span></div>
         <div id="runList"></div>
       </div>
     </div>
@@ -266,7 +266,8 @@ const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 const VERSION='1.0', TITLE='Treibhauseffekt', URL_SELF='https://chemie.mail-baumgart.de/EP/EP-Treibhauseffekt.html';
 
 /* ===================== Modell ===================== */
-const T0=14.0, TMAX=200;
+const T0=14.0, YEND=2100; // Zeitachse in Kalenderjahren: vorindustriell ab 1850, heute ab 2025, Ende 2100
+const y0Of=s=>s==='heute'?2025:1850;
 // CO2: vier Speicher (Impulsantwort nach dem Berner Kohlenstoffkreislauf-Modell)
 const A=[0.2173,0.2240,0.2824,0.2763], TAU=[Infinity,394.4,36.54,4.304];
 const P={ppmGt:7.81,ch4Mt:2.78,tauCH4:9.2,n2oMt:7.6,tauN2O:109,lam:3.7/3,gam:0.9,C1:8,C2:100,rest:0.93}; // rest: pauschaler Abzug für Aerosole und übrige Einflüsse
@@ -330,15 +331,16 @@ function desc(z){
 let Z=mkSet(0), S=natState(), start='nat', cur=null, runs=[], runNo=0;
 let playing=false, speed=2, acc=0, proj=[], ref=[], fc={};
 const RUNCOL=['#4fd1c5','#b79cf2','#7fd68a','#e4785b','#6fa8ff','#f08bd0'];
-const snap=(s,e)=>({t:Math.round(s.t),T:s.T,C:conc(s),M:s.M,N:s.N,F:forc(s),eq:e.eq});
+const Y0=()=>y0Of(start), LEN=()=>YEND-Y0(), yearNow=()=>Y0()+Math.round(S.t);
+const snap=(s,e)=>({t:Y0()+Math.round(s.t),T:s.T,C:conc(s),M:s.M,N:s.N,F:forc(s),eq:e.eq});
 function newRun(){S=start==='heute'?todayState():natState();runNo++;cur={no:runNo,start,rec:[],events:[],desc0:''};cur.rec.push(snap(S,emis(Z)));acc=0;setPlay(false);refresh(true);}
 function endRun(){if(cur&&cur.rec.length>1){cur.color=RUNCOL[(cur.no-1)%RUNCOL.length];runs.push(cur);if(runs.length>6)runs.shift();}else if(cur){runNo--;}cur=null;}
 function advance(q){ // q Viertelschritte
   const e=emis(Z); if(S.t===0&&!cur.z0){cur.desc0=desc(Z);cur.z0=cloneSet(Z);}
-  for(let i=0;i<q&&S.t<TMAX-1e-9;i++){step(S,e,0.25); if(Math.abs(S.t-Math.round(S.t))<1e-6){S.t=Math.round(S.t);cur.rec.push(snap(S,e));}}
-  if(S.t>=TMAX-1e-9) setPlay(false);
+  for(let i=0;i<q&&S.t<LEN()-1e-9;i++){step(S,e,0.25); if(Math.abs(S.t-Math.round(S.t))<1e-6){S.t=Math.round(S.t);cur.rec.push(snap(S,e));}}
+  if(S.t>=LEN()-1e-9) setPlay(false);
 }
-function setPlay(p){playing=p&&S.t<TMAX;$('#btnPlay').textContent=playing?'❚❚ Pause':'▶ Start';}
+function setPlay(p){playing=p&&S.t<LEN();$('#btnPlay').textContent=playing?'❚❚ Pause':'▶ Start';}
 function diffSet(a,b){ // welche Einstellungen wurden geändert?
   const d=[];
   SRC.forEach(s=>{const x=a.src[s.id],y=b.src[s.id],u=q=>s.unit?f(s.unit*q.lv/100,2)+' Mrd':q.lv+' %';
@@ -350,11 +352,11 @@ function diffSet(a,b){ // welche Einstellungen wurden geändert?
     if(a.strom!==b.strom&&b.share>0)d.push('Strom für die Elektroautos: '+STROM[b.strom].n+' statt '+STROM[a.strom].n);}
   return d;
 }
-function logEvent(){if(!cur||S.t<=0||!cur.z0)return;const t=Math.round(S.t),l=cur.events[cur.events.length-1];
+function logEvent(){if(!cur||S.t<=0||!cur.z0)return;const t=yearNow(),l=cur.events[cur.events.length-1];
   if(l&&l.t===t)l.z=cloneSet(Z);else cur.events.push({t,z:cloneSet(Z)});
   const e=cur.events[cur.events.length-1],prev=cur.events.length>1?cur.events[cur.events.length-2].z:cur.z0;
   e.ch=diffSet(prev,e.z);e.text=desc(e.z);if(!e.ch.length)cur.events.pop();}
-const startName=s=>s==='heute'?'Start: heute (2025)':'Start: vorindustrieller Zustand';
+const startName=s=>s==='heute'?'Start: heute (2025)':'Start: vorindustrieller Zustand (1850)';
 const runDesc=r=>'Lauf '+r.no+': '+startName(r.start).replace('Start: ','')+' · '+(r.desc0||desc(Z))+(r.events.length?' · '+r.events.length+' Änderung'+(r.events.length>1?'en':''):'');
 
 /* ===================== Quellen-Bedienung ===================== */
@@ -397,12 +399,12 @@ function changed(log){SRC.forEach(s=>{const q=Z.src[s.id];q.on=q.lv>0;});syncSrc
 /* ===================== Anzeige ===================== */
 function refresh(full){
   const e=emis(Z), eRef=emis(TODAY);
-  // Prognose bis zum Ende der Zeitachse und 100 Jahre voraus
+  // Prognose bis zum Jahr 2100
   proj=[];ref=[];
-  {const s=clone(S),r=clone(S),n=Math.max(TMAX-Math.round(S.t),100);
-   const add=y=>{const a=snap(s,e),b=snap(r,eRef);a.t=y;b.t=y;proj.push(a);ref.push(b);};add(0);
+  {const s=clone(S),r=clone(S),n=Math.max(0,Math.ceil(LEN()-S.t)),yb=Y0()+S.t;
+   const add=y=>{const a=snap(s,e),b=snap(r,eRef);a.t=yb+y;b.t=yb+y;proj.push(a);ref.push(b);};add(0);
    for(let y=1;y<=n;y++){for(let k=0;k<4;k++){step(s,e,0.25);step(r,eRef,0.25);}add(y);}}
-  fc={t100:proj[100].T,r100:ref[100].T,c100:proj[100].C};
+  {const a=proj[proj.length-1],b=ref[ref.length-1];fc={t100:a.T,r100:b.T,c100:a.C};}
   const Tn=T0+S.T;
   $('#tT').innerHTML=f(Tn,2)+' <small>°C</small>';
   const d=$('#tD');d.innerHTML=sg(S.T,2)+' <small>K</small>';d.className='v'+(S.T>0.005?' pos':'');
@@ -414,7 +416,7 @@ function refresh(full){
   $('#fRef').innerHTML=f(T0+fc.r100,2)+' °C';$('#fRefn').textContent='1,5 Mrd Pkw mit Verbrennungsmotor, alle Quellen 100 %';
   const df=fc.t100-fc.r100,el=$('#fDiff');el.innerHTML=sg(df,Math.abs(df)<0.095&&Math.abs(df)>=0.0005?3:2)+' K';el.className='v'+(df>0.0005?' pos':df<-0.0005?' neg':'');
   $('#fDiffn').textContent=Math.abs(df)<0.0005?'kein Unterschied zum heutigen Ausstoß':(df>0?'wärmer':'kühler')+' als mit dem heutigen Ausstoß';
-  const yt='Jahr '+Math.round(S.t)+(start==='heute'?' ('+(2025+Math.round(S.t))+')':'');
+  const yt='Jahr '+yearNow();
   $('#yearLbl').textContent=yt;$('#status').textContent=yt+' · '+f(Tn,1)+' °C';
   drawMain();
   if(full||Math.round(S.t)%5===0){ if(!$('#tab-src').hidden)renderSrcTab(); if(!$('#tab-val').hidden)renderVal(); if(!$('#tab-runs').hidden)renderRuns(); if(!$('#explBox').hidden)renderExplain(); }
@@ -431,26 +433,25 @@ function drawChart(c,W,H,o){
   x.fillStyle=p.bg;x.fillRect(0,0,W,H);
   let lo=q.lo,hi=q.hi;o.series.forEach(s=>s.pts.forEach(r=>{const v=q.get(r);if(v<lo)lo=v;if(v>hi)hi=v;}));
   const st=niceStep((hi-lo)/5);lo=Math.floor(lo/st+1e-9)*st;hi=Math.ceil(hi/st-1e-9)*st;
-  const L=58,R=14,Tp=14,B=40,pw=W-L-R,ph=H-Tp-B,X=t=>L+t/TMAX*pw,Y=v=>Tp+ph-(v-lo)/(hi-lo)*ph;
+  const L=58,R=14,Tp=14,B=40,pw=W-L-R,ph=H-Tp-B,xa=o.x0!==undefined?o.x0:Math.min(...o.series.filter(s=>s.pts.length).map(s=>Math.floor(s.pts[0].t))),X=t=>L+(t-xa)/(YEND-xa)*pw,Y=v=>Tp+ph-(v-lo)/(hi-lo)*ph;
   x.font='11.5px system-ui,sans-serif';x.lineWidth=1;
   x.textAlign='right';x.textBaseline='middle';
   for(let v=lo;v<=hi+st/2;v+=st){x.strokeStyle=p.grid;x.beginPath();x.moveTo(L,Y(v));x.lineTo(W-R,Y(v));x.stroke();x.fillStyle=p.tx;x.fillText(f(v,st<1?(st<0.1?2:1):0),L-7,Y(v));}
   x.textAlign='center';x.textBaseline='top';
-  for(let t=0;t<=TMAX;t+=25){x.strokeStyle=p.grid;x.beginPath();x.moveTo(X(t),Tp);x.lineTo(X(t),Tp+ph);x.stroke();x.fillStyle=p.tx;x.fillText(t,X(t),Tp+ph+6);}
+  for(let ts=YEND-xa>120?25:10,t=Math.ceil(xa/ts)*ts;t<=YEND;t+=ts){x.strokeStyle=p.grid;x.beginPath();x.moveTo(X(t),Tp);x.lineTo(X(t),Tp+ph);x.stroke();x.fillStyle=p.tx;x.fillText(t,X(t),Tp+ph+6);}
   x.strokeStyle=p.ax;x.strokeRect(L,Tp,pw,ph);
-  x.fillStyle=p.tx;x.fillText('Zeit in Jahren seit Beginn',L+pw/2,H-15);
+  x.fillStyle=p.tx;x.fillText('Jahr',L+pw/2,H-15);
   x.save();x.translate(13,Tp+ph/2);x.rotate(-Math.PI/2);x.textBaseline='middle';x.fillText(q.lab,0,0);x.restore();
   (o.marks||[]).forEach(t=>{x.strokeStyle=p.ax;x.setLineDash([3,4]);x.beginPath();x.moveTo(X(t),Tp);x.lineTo(X(t),Tp+ph);x.stroke();x.setLineDash([]);x.fillStyle=o.markCol||'#ffb454';x.beginPath();x.moveTo(X(t)-5,Tp);x.lineTo(X(t)+5,Tp);x.lineTo(X(t),Tp+8);x.fill();});
   o.series.forEach(s=>{if(s.pts.length<1)return;x.strokeStyle=s.color;x.lineWidth=s.w||2;x.setLineDash(s.dash||[]);x.lineJoin='round';x.beginPath();
-    s.pts.forEach((r,i)=>{const px=X(r.t+(s.off||0)),py=Y(q.get(r));i?x.lineTo(px,py):x.moveTo(px,py);});x.stroke();x.setLineDash([]);
-    if(s.dot){const r=s.pts[s.pts.length-1];x.fillStyle=s.color;x.beginPath();x.arc(X(r.t+(s.off||0)),Y(q.get(r)),4.5,0,7);x.fill();}});
+    s.pts.forEach((r,i)=>{const px=X(r.t),py=Y(q.get(r));i?x.lineTo(px,py):x.moveTo(px,py);});x.stroke();x.setLineDash([]);
+    if(s.dot){const r=s.pts[s.pts.length-1];x.fillStyle=s.color;x.beginPath();x.arc(X(r.t),Y(q.get(r)),4.5,0,7);x.fill();}});
 }
 function drawMain(){
-  const c=$('#chart'),W=Math.max(300,c.parentElement.clientWidth||900),H=Math.round(clamp(W*0.46,250,420)),q=$('#qSel').value,t0=S.t;
+  const c=$('#chart'),W=Math.max(300,c.parentElement.clientWidth||900),H=Math.round(clamp(W*0.46,250,420)),q=$('#qSel').value;
   const ser=runs.map(r=>({pts:r.rec,color:r.color,w:1.6}));
-  const cut=a=>a.filter(r=>r.t+t0<=TMAX);
-  ser.push({pts:cut(ref),color:'#7d858c',w:1.6,dash:[2,4],off:t0});
-  ser.push({pts:cut(proj),color:'#ffb454',w:2,dash:[7,5],off:t0});
+  ser.push({pts:ref,color:'#7d858c',w:1.6,dash:[2,4]});
+  ser.push({pts:proj,color:'#ffb454',w:2,dash:[7,5]});
   ser.push({pts:cur.rec,color:'#ffb454',w:3,dot:true});
   drawChart(c,W,H,{q,series:ser,marks:cur.events.map(e=>e.t)});
   let l='<span><i style="border-color:#ffb454"></i>aktueller Lauf</span><span><i class="da" style="border-color:#ffb454"></i>Prognose mit den aktuellen Einstellungen</span><span><i class="do" style="border-color:#7d858c"></i>Vergleich: alle Quellen wie heute</span>';
@@ -461,19 +462,19 @@ function drawMain(){
 
 /* ---------- Quellen-Tabelle ---------- */
 function renderSrcTab(){
-  const e=emis(Z),base=ahead(S,e,100).T;let mx=0.01;SRC.forEach(s=>mx=Math.max(mx,e.per[s.id].eq));
-  let h='<tr><th>Quelle</th><th>Umfang</th><th>Ausstoß in Gt CO₂-Äq./Jahr</th><th></th><th>Anteil</th><th>Beitrag zur Temperatur in 100 Jahren</th></tr>';
+  const e=emis(Z),yl=Math.max(0,LEN()-S.t),base=ahead(S,e,yl).T;let mx=0.01;SRC.forEach(s=>mx=Math.max(mx,e.per[s.id].eq));
+  let h='<tr><th>Quelle</th><th>Umfang</th><th>Ausstoß in Gt CO₂-Äq./Jahr</th><th></th><th>Anteil</th><th>Beitrag zur Temperatur im Jahr 2100</th></tr>';
   SRC.forEach(s=>{const a=e.per[s.id],q=Z.src[s.id];let dT=0;
-    if(q.on&&a.eq>0){const z2=cloneSet(Z);z2.src[s.id].on=false;dT=base-ahead(S,emis(z2),100).T;}
+    if(q.on&&a.eq>0){const z2=cloneSet(Z);z2.src[s.id].lv=0;z2.src[s.id].on=false;dT=base-ahead(S,emis(z2),yl).T;}
     const w=v=>(v/mx*100).toFixed(1)+'%';
     h+='<tr'+(q.on?'':' style="opacity:.45"')+'><td class="nm">'+ico(s)+s.name+'</td><td>'+(q.on?(s.unit?f(s.unit*q.lv/100,2)+' Mrd':q.lv+' %'):'aus')+'</td><td>'+f(a.eq,2)+'</td>'+
       '<td class="barc"><div class="bar"><span style="width:'+w(a.co2)+';background:var(--amber)"></span><span style="width:'+w(a.ch4*GWP.ch4/1000)+';background:var(--teal)"></span><span style="width:'+w(a.n2o*GWP.n2o/1000)+';background:var(--violet)"></span></div></td>'+
       '<td>'+(e.eq>0?f(a.eq/e.eq*100,1)+' %':'–')+'</td><td>'+(q.on&&a.eq>0?sg(dT,2)+' K':'–')+'</td></tr>';});
-  h+='<tr><td class="nm"><b>Summe</b></td><td></td><td><b>'+f(e.eq,2)+'</b></td><td class="nm" style="font-size:12px;color:var(--text-dim)">CO₂ '+f(e.co2,1)+' Gt · CH₄ '+f(e.ch4)+' Mt · N₂O '+f(e.n2o,1)+' Mt</td><td>'+(e.eq>0?'100 %':'–')+'</td><td>'+sg(base-ahead(S,emis(mkSet(0)),100).T,2)+' K</td></tr>';
+  h+='<tr><td class="nm"><b>Summe</b></td><td></td><td><b>'+f(e.eq,2)+'</b></td><td class="nm" style="font-size:12px;color:var(--text-dim)">CO₂ '+f(e.co2,1)+' Gt · CH₄ '+f(e.ch4)+' Mt · N₂O '+f(e.n2o,1)+' Mt</td><td>'+(e.eq>0?'100 %':'–')+'</td><td>'+sg(base-ahead(S,emis(mkSet(0)),yl).T,2)+' K</td></tr>';
   $('#srcTab').innerHTML=h;
 }
 /* ---------- Messwerte ---------- */
-function valRows(r,stepY){const a=r.rec.filter((x,i)=>x.t%stepY===0||i===r.rec.length-1);return a;}
+function valRows(r,stepY){const a=r.rec.filter((x,i)=>x.t%stepY===0||i===0||i===r.rec.length-1);return a;}
 function valHTML(r,stepY){
   let h='<tr><th>Jahr</th><th>Temperatur in °C</th><th>Änderung in K</th><th>CO₂ in ppm</th><th>CH₄ in ppb</th><th>N₂O in ppb</th><th>Ausstoß in Gt CO₂-Äq./Jahr</th></tr>';
   valRows(r,stepY).forEach(x=>h+='<tr><td>'+x.t+'</td><td>'+f(T0+x.T,2)+'</td><td>'+sg(x.T,2)+'</td><td>'+f(x.C)+'</td><td>'+f(x.M)+'</td><td>'+f(x.N)+'</td><td>'+f(x.eq,1)+'</td></tr>');
@@ -552,6 +553,7 @@ const sunP=Array.from({length:9},(_,i)=>({u:i/9,tx:rnd(120,820)}));
 const irP=Array.from({length:24},()=>({x:rnd(40,810),y:rnd(262,318),dir:-1,vx:0}));
 const BAND=[104,258]; // Treibhausgas-Schicht
 const mol={co2:[],ch4:[],n2o:[],h2o:[]};
+const FIGHT={bolts:[],hits:[],na:0,nb:0};
 function fitMol(a,n){while(a.length<n)a.push({x:rnd(20,805),y:rnd(BAND[0]+14,BAND[1]-12),ph:rnd(0,7),fl:0});while(a.length>n)a.pop();}
 function glyph(kind,x,y,al){
   const dot=(dx,dy,r,c)=>{cx.fillStyle=c;cx.beginPath();cx.arc(x+dx,y+dy,r,0,7);cx.fill();};
@@ -577,8 +579,16 @@ function drawScene(now,dt){
   cx.strokeStyle='#3a444b';cx.setLineDash([5,6]);cx.beginPath();cx.moveTo(0,70);cx.lineTo(900,70);cx.stroke();cx.setLineDash([]);
   cx.font='11px system-ui,sans-serif';cx.textAlign='right';cx.fillStyle='#5f6870';cx.fillText('Weltall',890,62);cx.fillStyle='#7d8b93';cx.fillText('Atmosphäre',812,86);cx.textAlign='left';cx.fillStyle='#b9dcea';cx.font='bold 11px system-ui,sans-serif';cx.fillText('Schicht der Treibhausgase',10,BAND[0]-6);cx.font='11px system-ui,sans-serif';cx.fillStyle='#7d8b93';cx.fillText('(Anzahl der Moleküle nicht maßstäblich)',160,BAND[0]-6);
   // Boden
-  cx.fillStyle='#24402b';cx.fillRect(0,318,700,102);cx.fillStyle='#17384f';cx.fillRect(700,318,200,102);
+  cx.fillStyle='#24402b';cx.fillRect(0,318,700,102);
+  // Meer: Farbverlauf, laufende Wellen und Lichtreflexe
+  g=cx.createLinearGradient(0,318,0,420);g.addColorStop(0,'#2d7393');g.addColorStop(.45,'#1b4f72');g.addColorStop(1,'#0e2c46');cx.fillStyle=g;cx.fillRect(694,318,206,102);
+  for(let r=0;r<8;r++){const yy=326+r*12.5,amp=1.1+r*.28;cx.strokeStyle='rgba(255,255,255,'+(0.09+r*0.02)+')';cx.lineWidth=1.3;cx.beginPath();
+    for(let xx=700;xx<=900;xx+=4){const y=yy+Math.sin(xx/(13+r*2)+now/(650+r*70)+r*1.7)*amp;xx===700?cx.moveTo(xx,y):cx.lineTo(xx,y);}cx.stroke();}
+  for(let k=0;k<12;k++){const xx=714+((k*53+now/110)%176),yy=323+((k*37)%92),a=.22+.22*Math.sin(now/320+k*2);cx.strokeStyle='rgba(205,238,255,'+a.toFixed(2)+')';cx.lineWidth=1.2;cx.beginPath();cx.moveTo(xx,yy);cx.lineTo(xx+6,yy);cx.stroke();}
   cx.fillStyle='#2a2e32';cx.fillRect(0,372,700,30);cx.strokeStyle='#59606a';cx.setLineDash([12,12]);cx.beginPath();cx.moveTo(0,387);cx.lineTo(700,387);cx.stroke();cx.setLineDash([]);
+  // Strand und Brandung
+  cx.fillStyle='#cdb98a';cx.beginPath();cx.moveTo(688,318);for(let yy=318;yy<=420;yy+=6)cx.lineTo(703+Math.sin(yy/13)*4,yy);cx.lineTo(688,420);cx.closePath();cx.fill();
+  for(let k=0;k<2;k++){cx.strokeStyle='rgba(255,255,255,'+(k?.35:.8)+')';cx.lineWidth=k?1.2:2;cx.beginPath();for(let yy=318;yy<=420;yy+=4){const x=706+k*6+Math.sin(yy/13)*4+Math.sin(now/800+yy/9+k)*(2.5+k);yy===318?cx.moveTo(x,yy):cx.lineTo(x,yy);}cx.stroke();}cx.lineWidth=1;
   // Sonne
   g=cx.createRadialGradient(52,40,6,52,40,44);g.addColorStop(0,'#ffe9a8');g.addColorStop(.5,'#ffb454');g.addColorStop(1,'rgba(255,180,84,0)');cx.fillStyle=g;cx.beginPath();cx.arc(52,40,44,0,7);cx.fill();
   // Legende im Weltall
@@ -587,6 +597,27 @@ function drawScene(now,dt){
   leg.forEach(([c,t])=>{cx.strokeStyle=c;cx.lineWidth=3;cx.beginPath();cx.moveTo(lx,18);cx.lineTo(lx+18,18);cx.stroke();cx.fillStyle='#9aa2a9';cx.fillText(t,lx+24,22);lx+=34+cx.measureText(t).width;});
   lx=112;[['co2','CO₂'],['ch4','CH₄'],['n2o','N₂O'],['h2o','H₂O (Wasserdampf)']].forEach(([k,t])=>{glyph(k,lx+8,44,1);cx.fillStyle='#9aa2a9';cx.font='11px system-ui,sans-serif';cx.textAlign='left';cx.fillText(t,lx+22,48);lx+=36+cx.measureText(t).width;});
   cx.lineWidth=1;
+  // Zwei frei erfundene Raumschiffe im Weltall (eigene Formen ohne Vorbild): unregelmäßige Flugbahnen, ungenaue Schüsse
+  {const t=now/1000,
+     ax=690+50*Math.sin(t*.9)+22*Math.sin(t*2.3+1),ay=45+11*Math.sin(t*1.7)+5*Math.sin(t*3.9+2),
+     bx=830+38*Math.sin(t*.7+2)+16*Math.sin(t*2.9),by=44+12*Math.cos(t*1.3+1)+5*Math.sin(t*4.3);
+   const fire=(x1,y1,x2,y2,col,to)=>{const a=Math.atan2(y2-y1,x2-x1)+(Math.random()-.5)*.6;FIGHT.bolts.push({x:x1,y:y1,vx:Math.cos(a)*200,vy:Math.sin(a)*200,col,to});};
+   if(now>FIGHT.na){fire(ax,ay,bx,by,'#7fd68a','b');FIGHT.na=now+(Math.random()<.3?140:350+Math.random()*900);}
+   if(now>FIGHT.nb){fire(bx,by,ax,ay,'#e4785b','a');FIGHT.nb=now+450+Math.random()*1300;}
+   cx.save();cx.beginPath();cx.rect(585,0,315,69);cx.clip();
+   FIGHT.bolts=FIGHT.bolts.filter(b=>{b.x+=b.vx*dt;b.y+=b.vy*dt;const tx=b.to==='b'?bx:ax,ty=b.to==='b'?by:ay;
+     if(Math.hypot(b.x-tx,b.y-ty)<8){FIGHT.hits.push({x:b.x,y:b.y,l:1,col:b.col});return false;}
+     if(b.x<585||b.x>905||b.y<-5||b.y>72)return false;
+     cx.strokeStyle=b.col;cx.lineWidth=2;cx.lineCap='round';cx.beginPath();cx.moveTo(b.x,b.y);cx.lineTo(b.x-b.vx*.05,b.y-b.vy*.05);cx.stroke();return true;});
+   FIGHT.hits=FIGHT.hits.filter(h=>{h.l-=dt*3.5;if(h.l<=0)return false;cx.globalAlpha=h.l;ci(cx,h.x,h.y,2+(1-h.l)*9,h.col);ci(cx,h.x,h.y,1.5+(1-h.l)*4,'#fff3c4');cx.globalAlpha=1;return true;});
+   // Pfeilgleiter: richtet sich auf den Gegner aus
+   cx.save();cx.translate(ax,ay);cx.rotate(Math.atan2(by-ay,bx-ax)+Math.sin(t*5)*.12);
+   ci(cx,-8,0,2.2+Math.sin(now/90)*.8,'#ffb454');pg(cx,[[15,0],[-10,-7],[-5,0],[-10,7]],'#4fd1c5');pg(cx,[[15,0],[-5,0],[-9,-4]],'#9aeae1');ci(cx,3,0,1.7,'#14171a');cx.restore();
+   // Scheibe mit Kuppel: kippt beim Ausweichen
+   cx.save();cx.translate(bx,by);cx.rotate(Math.sin(t*1.3+1)*.3);
+   cx.fillStyle='#cfeaf5';cx.beginPath();cx.arc(0,-2,5.5,Math.PI,0);cx.fill();cx.fillStyle='#b9bec4';cx.beginPath();cx.ellipse(0,0,13,4.2,0,0,7);cx.fill();
+   for(let k=-1;k<=1;k++)ci(cx,k*7,.6,1.2,(Math.floor(now/250)+k+3)%3?'#ffb454':'#fff3c4');cx.restore();
+   cx.restore();cx.lineWidth=1;}
   // Moleküle
   fitMol(mol.h2o,14);fitMol(mol.co2,clamp(Math.round(14+(conc(S)-280)/5),0,150));fitMol(mol.ch4,clamp(Math.round(3+(S.M-720)/100),0,40));fitMol(mol.n2o,clamp(Math.round(2+(S.N-270)/12),0,30));
   const allMol=[];
@@ -616,7 +647,12 @@ function drawScene(now,dt){
   {const n=nIcons('pkw',6,100/3),ne=Math.round(n*Z.share/100);for(let i=0;i<n;i++)place(i>=n-ne?'ecar':'car',1,44+i*64,44+i*64,398,1.45,now,i);
    const nl=nIcons('lkw',4,50);for(let i=0;i<nl;i++)place('truck',1,474+i*62,474+i*62,398,1.4,now,i+3);}
   // Schiffe, Flugzeuge
-  {const n=nIcons('schiff',3,70);for(let i=0;i<n;i++)place('ship',1,728+i*46,728+i*46,398,1.25,now,i+5);
+  {const n=nIcons('schiff',3,70);for(let i=0;i<n;i++){ // Schiffe schaukeln auf den Wellen, mit Kielwasser und Bugwelle
+     const x=738+i*46,ph=now/650+i*2.1,y=397+Math.sin(ph)*1.7;
+     PUFF.ship.forEach(q=>puffs(x+q[0]*1.25,y+q[1]*1.25,now,i+5,q[2]));
+     cx.strokeStyle='#fff';cx.lineWidth=1.4;for(let k=0;k<3;k++){const w=((now/900)+k/3)%1;cx.globalAlpha=(1-w)*.6;cx.beginPath();cx.moveTo(x-19-w*13,y-1.5+k*1.3);cx.lineTo(x-25-w*13,y-1.5+k*1.3);cx.stroke();}cx.globalAlpha=1;
+     cx.save();cx.translate(x,y);cx.rotate(Math.sin(ph+1.2)*.04);cx.scale(1.25,1.25);IC.ship(cx);cx.restore();
+     cx.strokeStyle='rgba(255,255,255,.75)';cx.lineWidth=1.5;cx.beginPath();cx.moveTo(x-17,y-.5);cx.quadraticCurveTo(x,y+2.6,x+18,y-1);cx.stroke();cx.lineWidth=1;}
    const nfl=nIcons('flug',4,50);for(let i=0;i<nfl;i++){const x=((now/45+i*235)%980)-40,y=280+(i%2)*21;cx.strokeStyle='rgba(230,230,230,.35)';cx.lineWidth=2;cx.beginPath();cx.moveTo(x-24,y);cx.lineTo(x-84,y);cx.stroke();drawIcon(cx,'plane',x,y,1.25);}}
   // Thermometer
   {const X0=862,top=98,bot=284,lo=13,hi=Math.max(18,Math.ceil(Tn)+1),Yv=v=>bot-(v-lo)/(hi-lo)*(bot-top),col=S.T>2?'#e4785b':'#ffb454';
@@ -759,6 +795,7 @@ SRC.map(s=>'<tr><td>'+ico(s)+s.name+'</td><td>'+(s.co2?f(s.co2,1):'–')+'</td><
 <ul><li>Es gibt nur eine mittlere Temperatur für die ganze Erde – keine Regionen, kein Wetter, keine Jahreszeiten.</li>
 <li>Betrachtet werden nur CO₂, CH₄ und N₂O. Kühlende Schwebteilchen (Aerosole, z. B. aus Schwefeldioxid), Ozon, fluorierte Gase und Kondensstreifen werden nur pauschal berücksichtigt: Die Heizleistung der drei Gase wird um 7 % verringert.</li>
 <li>Rückkopplungen wie tauende Permafrostböden oder nachlassende Aufnahme durch Ozeane und Wälder sind nicht einzeln berechnet.</li>
+<li>Die Jahreszahlen dienen der Orientierung: Der vorindustrielle Zustand startet 1850, „Heute“ 2025, verglichen wird im Jahr 2100. Ein Lauf ab 1850 bildet nicht die tatsächliche Geschichte nach, sondern die von dir eingestellten Quellen.</li>
 <li>Die Emissionswerte sind gerundete weltweite Werte; der Ausstoß bleibt im Modell so lange gleich, bis du ihn änderst.</li>
 <li>Klimasensitivität: 3 K je Verdopplung des CO₂-Gehalts (der wahrscheinliche Bereich liegt bei 2,5 bis 4 K).</li></ul>
 <p>Der Zustand „Heute (2025)“ startet mit den gemessenen Gehalten (427 ppm CO₂, 1 948 ppb CH₄, 339 ppb N₂O) und 15,4 °C, also etwa 1,4 K über dem vorindustriellen Zustand.</p>`}
@@ -785,12 +822,12 @@ const HELP=head('Anleitung')+`
 <h3>Emissionsquellen</h3>
 <p>Jede Quelle hat einen Regler für ihren Umfang: 0 % bedeutet aus, 100 % ist der heutige Stand weltweit (z. B. 1,5 Mrd Pkw), 200 % das Doppelte. Die Regler lassen sich jederzeit verstellen. Bei den Pkw kannst du zusätzlich den Anteil der Elektroautos und die Art des Stroms wählen.</p>
 <h3>Zeit laufen lassen</h3>
-<p>„▶ Start“ lässt die Jahre laufen, „+10 Jahre“ und „+50 Jahre“ springen vor, der Zeitraffer bestimmt das Tempo. Einstellungen dürfen jederzeit geändert werden – im Diagramm markiert ein Dreieck die Änderung. „Zurücksetzen“ beendet den Lauf und beginnt wieder im Jahr 0; der beendete Lauf bleibt zum Vergleich im Diagramm.</p>
+<p>„▶ Start“ lässt die Jahre laufen, „+10 Jahre“ und „+50 Jahre“ springen vor, der Zeitraffer bestimmt das Tempo. Einstellungen dürfen jederzeit geändert werden – im Diagramm markiert ein Dreieck die Änderung. Der vorindustrielle Zustand beginnt im Jahr 1850, „Heute“ im Jahr 2025; jeder Lauf endet im Jahr 2100. „Zurücksetzen“ beendet den Lauf und beginnt wieder im Startjahr; der beendete Lauf bleibt zum Vergleich im Diagramm.</p>
 <h3>Auswertung</h3>
 <ul><li><b>Bild:</b> Sonnenstrahlung durchquert die Schicht der Treibhausgase ungehindert. Wärmestrahlung der Erde wird zurückgeworfen, wenn sie auf ein Molekül trifft – je mehr Ausstoß, desto mehr Moleküle (Anzahl nicht maßstäblich). Dazu aktive Quellen und Thermometer.</li>
-<li><b>Prognose:</b> Temperatur in 100 Jahren, wenn die Einstellungen so bleiben – und der Unterschied zum heutigen Ausstoß. Hier liest du sofort ab, was z. B. doppelt so viele Pkw bewirken.</li>
+<li><b>Prognose:</b> Temperatur im Jahr 2100, wenn die Einstellungen so bleiben – und der Unterschied zum heutigen Ausstoß. Hier liest du sofort ab, was z. B. doppelt so viele Pkw bewirken.</li>
 <li><b>Diagramm:</b> Verlauf von Temperatur oder Gasgehalten; gestrichelt die Prognose, gepunktet der Vergleich „alle Quellen wie heute“.</li>
-<li><b>Quellen:</b> Ausstoß jeder Quelle und ihr Beitrag zur Temperatur in 100 Jahren.</li>
+<li><b>Quellen:</b> Ausstoß jeder Quelle und ihr Beitrag zur Temperatur im Jahr 2100.</li>
 <li><b>Messwerte, Läufe:</b> Tabelle (auch als CSV) und „Ausgabe als PDF“.</li></ul>
 <p>Es werden keine Daten gespeichert oder übertragen.</p>`;
 const VERS=head('Versionshinweise')+`
@@ -799,7 +836,8 @@ const VERS=head('Versionshinweise')+`
 <li>Ausgangszustand „Vorindustrieller Zustand“ (nur natürlicher Treibhauseffekt, 14,0 °C) oder heutiger Zustand (2025).</li>
 <li>13 Emissionsquellen, jede mit eigenem Regler von 0 bis 200 % (vorindustrieller Zustand: alle 0 %, heute: alle 100 %); Pkw mit Anteil Elektroautos und Wahl des Stroms.</li>
 <li>Alle Piktogramme (Fahrzeuge, Kraftwerke, Gebäude usw.) sind selbst gezeichnet; es werden keine fremden Grafiken, Schriften oder Emoji verwendet.</li>
-<li>Bild mit Strahlung, Schicht der Treibhausgase (Moleküle werfen Wärmestrahlung zurück) und Quellen; Prognose für 100 Jahre mit Vergleich zum heutigen Ausstoß.</li>
+<li>Bild mit Strahlung, Schicht der Treibhausgase (Moleküle werfen Wärmestrahlung zurück) und Quellen; Prognose für das Jahr 2100 mit Vergleich zum heutigen Ausstoß.</li>
+<li>Zeitachse in Kalenderjahren: vorindustrieller Zustand ab 1850, „Heute“ ab 2025, jeder Lauf endet im Jahr 2100.</li>
 <li>Diagramm mit wählbarer Größe, Vergleich mehrerer Läufe, Beitrag der einzelnen Quellen, Messwerte mit CSV-Ausgabe.</li>
 <li>Neun Grundlagen-Themen, Auswertung als PDF, QR-Code.</li></ul>`;
 
@@ -876,8 +914,8 @@ function buildPrint(sel){
     h+='<div class="blk"><h3>Messwerte</h3><table>'+valHTML(r,10)+'</table></div>';});
   if(sel.length>1){
     h+='<div class="blk"><h2>Vergleich der Läufe</h2><img src="'+chartImg(sel.map((l,i)=>({pts:l.r.rec,color:PCOL[i%PCOL.length],w:2.5})),'T')+'" alt=""><div class="pleg">'+sel.map((l,i)=>'<span><i style="border-color:'+PCOL[i%PCOL.length]+'"></i>'+(l.r===cur?'Aktueller Lauf':'Lauf '+l.r.no)+'</span>').join('')+'</div></div>';
-    h+='<div class="blk"><table><tr><th>Lauf</th><th>Quellen zu Beginn</th><th>Veränderungen</th><th>nach 50 Jahren</th><th>nach 100 Jahren</th><th>am Ende</th></tr>'+sel.map(l=>{const r=l.r,z=r.rec[r.rec.length-1];
-      return '<tr><td>'+(r===cur?'Aktuell':'Lauf '+r.no)+'</td><td style="text-align:left">'+(r.desc0||desc(Z))+'</td><td style="text-align:left">'+(r.events.length?r.events.map(e=>'Jahr '+e.t+': '+e.ch.join('; ')).join('<br>'):'keine')+'</td><td>'+at(r,50)+'</td><td>'+at(r,100)+'</td><td>'+f(T0+z.T,2)+' °C (Jahr '+z.t+')</td></tr>';}).join('')+'</table></div>';}
+    h+='<div class="blk"><table><tr><th>Lauf</th><th>Quellen zu Beginn</th><th>Veränderungen</th><th>im Jahr 2050</th><th>im Jahr 2100</th><th>am Ende</th></tr>'+sel.map(l=>{const r=l.r,z=r.rec[r.rec.length-1];
+      return '<tr><td>'+(r===cur?'Aktuell':'Lauf '+r.no)+'</td><td style="text-align:left">'+(r.desc0||desc(Z))+'</td><td style="text-align:left">'+(r.events.length?r.events.map(e=>'Jahr '+e.t+': '+e.ch.join('; ')).join('<br>'):'keine')+'</td><td>'+at(r,2050)+'</td><td>'+at(r,2100)+'</td><td>'+f(T0+z.T,2)+' °C (Jahr '+z.t+')</td></tr>';}).join('')+'</table></div>';}
   h+='<p class="pfoot">'+TITLE+' V'+VERSION+' · Bastian Baumgart · chemie.mail-baumgart.de · Lizenz CC BY-NC-SA 4.0 · Simulierte Daten zu Lehrzwecken (vereinfachtes Klimamodell, keine Klimavorhersage)</p>';
   $('#print').innerHTML=h;
 }
