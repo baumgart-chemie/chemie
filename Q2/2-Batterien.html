@@ -1,0 +1,2020 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulation „Batterien und Akkus“</title>
+<style>
+:root{
+  --bg:#14171a; --panel:#1b1f23; --panel-alt:#20252a; --line:#31383e; --line-soft:#262c31;
+  --text:#e7e4dd; --text-dim:#9aa2a9; --text-faint:#5f6870;
+  --amber:#ffb454; --teal:#4fd1c5; --good:#7fd68a; --danger:#e4785b; --screen:#0e1113;
+  --sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;
+}
+*{box-sizing:border-box;}
+[hidden]{display:none !important;}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.45;}
+a{color:var(--teal);}
+button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer;}
+sub,sup{font-size:.72em;line-height:0;}
+
+header{display:flex;align-items:baseline;gap:14px;padding:16px 28px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+header .back-btn{align-self:baseline;color:var(--text);text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:7px 12px;background:var(--panel);white-space:nowrap;font-size:14px;}
+header .back-btn:hover{border-color:var(--teal);color:var(--teal);}
+header h1{margin:0;font-size:21px;font-weight:650;white-space:nowrap;}
+header>.tag{flex:1 1 160px;min-width:0;color:var(--text-dim);font-size:13.5px;}
+header .hlink{font-size:14px;white-space:nowrap;}
+header .status{font-family:var(--mono);font-size:12.5px;color:var(--amber);border:1px solid var(--line);border-radius:999px;padding:4px 11px;white-space:nowrap;align-self:center;}
+.qr-btn{align-self:center;display:flex;align-items:center;gap:7px;padding:2px 8px 2px 2px;border:1px solid var(--line);border-radius:4px;background:var(--panel);text-align:left;font-size:10px;line-height:1.2;color:var(--text-dim);}
+.qr-btn:hover{border-color:var(--teal);}
+.qr-btn svg{width:30px;height:30px;display:block;border-radius:2px;}
+.qr-btn b{display:block;font-size:10.5px;color:var(--text);font-weight:600;}
+
+.layout{display:grid;grid-template-columns:330px minmax(0,1fr);gap:18px;padding:18px 28px;align-items:start;}
+aside{position:sticky;top:12px;display:flex;flex-direction:column;gap:14px;max-height:calc(100vh - 24px);overflow:auto;padding-right:2px;}
+main{display:flex;flex-direction:column;gap:16px;min-width:0;}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;}
+.panel h2{margin:0 0 10px;font-size:12.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--amber);font-weight:650;}
+.panel h3{margin:12px 0 6px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--text-dim);font-weight:600;}
+.panel h3:first-of-type{margin-top:0;}
+.hint{color:var(--text-dim);font-size:13px;margin:8px 0 0;}
+
+.gl-toggle{width:100%;display:flex;justify-content:space-between;align-items:center;background:var(--panel-alt);border:1px solid var(--line);border-radius:8px;padding:11px 13px;font-weight:600;}
+.gl-toggle:hover{border-color:var(--teal);}
+.gl-list{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
+.gl-list button{text-align:left;background:transparent;border:1px solid var(--line-soft);border-radius:7px;padding:9px 11px;color:var(--text);}
+.gl-list button:hover{border-color:var(--teal);color:var(--teal);}
+
+.bat-list{display:flex;flex-direction:column;gap:6px;}
+.bat-btn{display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;background:var(--panel-alt);border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-height:44px;}
+.bat-btn small{font-family:var(--mono);color:var(--text-dim);font-size:12px;white-space:nowrap;}
+.bat-btn:hover{border-color:var(--teal);}
+.bat-btn.on{border-color:var(--teal);background:#1d2f30;box-shadow:inset 3px 0 0 var(--teal);}
+.bat-btn.on small{color:var(--teal);}
+
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+.seg button{flex:1;background:var(--panel-alt);border:0;border-right:1px solid var(--line);padding:10px 6px;min-height:44px;}
+.seg button:last-child{border-right:0;}
+.seg button.on{background:#1d2f30;color:var(--teal);font-weight:650;}
+.seg button:disabled{color:var(--text-faint);cursor:not-allowed;}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+.btn{background:var(--panel-alt);border:1px solid var(--line);border-radius:8px;padding:10px 8px;min-height:44px;}
+.btn:hover:not(:disabled){border-color:var(--teal);}
+.btn:disabled{color:var(--text-faint);cursor:not-allowed;}
+.btn.primary{background:var(--teal);border-color:var(--teal);color:#0d1b1a;font-weight:700;grid-column:1 / -1;}
+#btnStep,#btnReset{grid-column:1 / -1;}
+.btn.primary:disabled{background:var(--panel-alt);border-color:var(--line);color:var(--text-faint);}
+.chk{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:14px;}
+.chk input{width:20px;height:20px;accent-color:var(--teal);}
+
+.read{display:grid;grid-template-columns:1fr auto;gap:5px 10px;font-size:14px;align-items:baseline;}
+.read span{color:var(--text-dim);}
+.read b{font-family:var(--mono);color:var(--amber);font-weight:600;}
+.soc{height:14px;border:1px solid var(--line);border-radius:999px;background:var(--screen);overflow:hidden;margin:8px 0 4px;}
+.soc i{display:block;height:100%;width:100%;background:var(--good);transition:width .3s,background .3s;}
+
+.stage{background:var(--screen);border:1px solid var(--line);border-radius:10px;padding:6px;}
+.view-seg{max-width:440px;margin:4px 4px 8px;}
+#sim{display:block;width:100%;aspect-ratio:900/560;}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;padding:8px 8px 4px;font-size:12.5px;color:var(--text-dim);}
+.legend span{display:inline-flex;align-items:center;gap:6px;}
+.legend em{font-style:normal;}
+.legend i{width:13px;height:13px;border-radius:50%;display:inline-block;}
+
+.grid2{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px;}
+.pill{font-family:var(--mono);font-size:11.5px;letter-spacing:0;text-transform:none;color:var(--teal);border:1px solid var(--line);border-radius:999px;padding:2px 9px;margin-left:8px;}
+.eq-row{border:1px solid var(--line-soft);border-left:3px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:10px;transition:border-color .25s,background .25s;}
+.eq-row.flash{border-color:var(--amber);background:#2a2518;}
+.eq-row:last-child{margin-bottom:0;}
+.eq-head{font-size:13px;color:var(--text-dim);margin-bottom:5px;}
+.eq-head b{color:var(--text);}
+.pole{display:inline-flex;width:20px;height:20px;border-radius:50%;align-items:center;justify-content:center;font-weight:700;font-size:14px;margin-right:6px;color:#101315;}
+.pole.neg{background:#7fb4ff;} .pole.pos{background:#ff8a80;}
+.eq{font-family:var(--mono);font-size:15.5px;color:var(--text);overflow-x:auto;white-space:nowrap;padding:2px 0;}
+.sf{vertical-align:middle;margin:0 1px;}
+.eq .arr{color:var(--amber);padding:0 4px;}
+.eq .mul{color:var(--text-dim);margin-left:10px;}
+.eq-oz{font-size:12.5px;color:var(--amber);margin-top:3px;font-family:var(--mono);}
+.eq-txt{margin:6px 0 0;font-size:13.5px;color:var(--text-dim);}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:14px;margin:0;}
+.facts dt{color:var(--text-dim);}
+.facts dd{margin:0;}
+#curve{display:block;width:100%;aspect-ratio:520/230;background:var(--screen);border:1px solid var(--line-soft);border-radius:8px;}
+.tbl-wrap{overflow-x:auto;}
+table{border-collapse:collapse;width:100%;font-size:13px;}
+th,td{border-bottom:1px solid var(--line-soft);padding:7px 7px;text-align:left;vertical-align:top;}
+th{color:var(--text-dim);font-weight:600;font-size:12px;letter-spacing:.04em;text-transform:uppercase;}
+td.num{font-family:var(--mono);white-space:nowrap;}
+tr.cur td{background:#1d2f30;}
+
+footer{padding:16px 28px 30px;color:var(--text-faint);font-size:11.5px;border-top:1px solid var(--line-soft);margin-top:10px;}
+footer p{margin:0;}
+footer a{color:var(--text-dim);text-decoration:none;border-bottom:1px solid var(--line);}
+footer a:hover{color:var(--text);border-bottom-color:var(--text-dim);}
+footer .footer-credit{margin-top:8px;color:var(--text-dim);}
+
+.modal{position:fixed;inset:0;background:rgba(5,7,9,.72);display:flex;align-items:flex-start;justify-content:center;padding:4vh 14px;overflow:auto;z-index:50;}
+.modal-box{background:var(--panel);border:1px solid var(--line);border-radius:12px;max-width:640px;width:100%;padding:20px 22px;}
+.modal-box.wide{max-width:900px;}
+.modal-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px;}
+.modal-head h2{margin:0;font-size:19px;}
+.x{background:transparent;border:1px solid var(--line);border-radius:6px;width:40px;height:40px;font-size:20px;}
+.modal-box h3{color:var(--amber);font-size:14px;margin:16px 0 4px;}
+.modal-box p,.modal-box li{color:var(--text);font-size:14.5px;}
+.modal-box ul{padding-left:20px;margin:6px 0;}
+.modal-box .f{font-family:var(--mono);background:var(--screen);border:1px solid var(--line-soft);border-radius:7px;padding:8px 11px;margin:8px 0;overflow-x:auto;white-space:nowrap;}
+.modal-box figure{margin:12px 0;background:var(--screen);border:1px solid var(--line-soft);border-radius:8px;padding:8px;}
+.modal-box figure svg{display:block;width:100%;height:auto;}
+.modal-box figcaption{font-size:12.5px;color:var(--text-dim);padding:4px 4px 0;}
+.modal-nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px;}
+.ver{border-left:3px solid var(--teal);padding-left:12px;margin:10px 0;}
+.ver b{font-family:var(--mono);color:var(--teal);}
+.flow{stroke-dasharray:7 6;animation:dash .9s linear infinite;}
+@keyframes dash{from{stroke-dashoffset:13;}to{stroke-dashoffset:0;}}
+@media (prefers-reduced-motion:reduce){.flow{animation:none;}}
+.pt-sub{margin:0 0 10px;color:var(--text-dim);font-size:13.5px;}
+.pt-seg{max-width:320px;margin:0 0 12px;}
+.pt-none{border-left:3px solid var(--text-faint);background:var(--panel-alt);border-radius:6px;padding:9px 12px;margin:10px 0;color:var(--text-dim);font-size:14px;}
+.pt-eq{border:1px solid var(--line-soft);border-left:3px solid var(--amber);border-radius:8px;padding:10px 12px;margin:10px 0;}
+.modal-box ol{padding-left:22px;margin:6px 0;} .modal-box ol li{margin:5px 0;}
+.qr-big{background:#fff;border-radius:10px;padding:14px;width:min(300px,80vw);margin:10px auto;}
+.qr-big svg{display:block;width:100%;height:auto;}
+.qr-url{font-family:var(--mono);font-size:12.5px;text-align:center;word-break:break-all;color:var(--text-dim);}
+
+@media (max-width:920px){
+  .layout{grid-template-columns:1fr;padding:14px 16px;}
+  aside{position:static;max-height:none;overflow:visible;}
+  .grid2{grid-template-columns:1fr;}
+}
+@media (max-width:600px){
+  header{padding:12px 16px;gap:10px;}
+  .qr-btn span{display:none;} .qr-btn{padding:2px;}
+  footer{padding:16px 16px 30px;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="back-btn" href="../index.html">← Zurück</a>
+  <h1>Batterien und Akkus</h1>
+  <span class="tag">Vorgänge auf Teilchenebene beim Entladen und Laden</span>
+  <a href="#" class="hlink" id="helpLink">Anleitung</a>
+  <button class="qr-btn" id="qrBtn" type="button" aria-label="QR-Code vergrößern"><i id="qrSmall"></i><span><b>Auf dem Mobilgerät öffnen</b>QR-Code antippen zum Vergrößern</span></button>
+  <span class="status" id="status">bereit</span>
+</header>
+
+<div class="layout">
+<aside>
+  <div>
+    <button class="gl-toggle" id="glToggle" type="button" aria-expanded="false"><span>Grundlagen · <span id="glCount"></span> Themen</span><span id="glArrow">▸</span></button>
+    <div class="gl-list" id="glList" hidden></div>
+  </div>
+
+  <section class="panel">
+    <h2>Batterietyp</h2>
+    <h3>Primärzellen (nicht aufladbar)</h3>
+    <div class="bat-list" id="listP"></div>
+    <h3>Akkumulatoren (aufladbar)</h3>
+    <div class="bat-list" id="listS"></div>
+    <h3>Brennstoffzellen</h3>
+    <div class="bat-list" id="listB"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Betrieb</h2>
+    <div class="seg" id="modeSeg">
+      <button type="button" data-mode="dis" class="on">Entladen</button>
+      <button type="button" data-mode="chg">Laden</button>
+    </div>
+    <p class="hint" id="modeHint"></p>
+    <div class="btn-row">
+      <button class="btn primary" id="btnRun" type="button">▶ Start</button>
+      <button class="btn" id="btnStep" type="button">Ein Reaktionsschritt</button>
+      <button class="btn" id="btnReset" type="button">Zurücksetzen</button>
+    </div>
+    <h3 style="margin-top:14px">Geschwindigkeit</h3>
+    <div class="seg" id="speedSeg">
+      <button type="button" data-s="0.5">×0,5</button>
+      <button type="button" data-s="1" class="on">×1</button>
+      <button type="button" data-s="2">×2</button>
+      <button type="button" data-s="4">×4</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Anzeige</h2>
+    <div class="read">
+      <span id="uLabel">Zellspannung (Modell)</span><b id="uVal">–</b>
+      <span>Übertragene Elektronen</span><b id="eVal">0</b>
+      <span>Ladezustand</span><b id="socVal">100 %</b>
+    </div>
+    <div class="soc"><i id="socBar"></i></div>
+    <label class="chk"><input type="checkbox" id="optLab" checked> Teilchen beschriften</label>
+    <label class="chk"><input type="checkbox" id="optSpect" checked> Zuschauer-Ionen anzeigen</label>
+    <label class="chk"><input type="checkbox" id="optWater" checked> Wasser-Moleküle anzeigen</label>
+  </section>
+</aside>
+
+<main>
+  <div class="stage">
+    <div class="seg view-seg" id="viewSeg">
+      <button type="button" data-v="teil" class="on">Teilchenebene</button>
+      <button type="button" data-v="bau">Bauform (Schnittbild)</button>
+    </div>
+    <canvas id="sim" aria-label="Teilchenmodell oder Schnittbild der gewählten Batterie"></canvas>
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <div class="grid2">
+    <section class="panel">
+      <h2>Reaktionsgleichungen <span class="pill" id="eqMode">Entladen</span></h2>
+      <div class="eq-row" id="eqNeg">
+        <div class="eq-head"><span class="pole neg">−</span>Minuspol · <b id="roleNeg"></b></div>
+        <div class="eq" id="eqNegF"></div><div class="eq-oz" id="ozNeg"></div><p class="eq-txt" id="txtNeg"></p>
+      </div>
+      <div class="eq-row" id="eqPos">
+        <div class="eq-head"><span class="pole pos">+</span>Pluspol · <b id="rolePos"></b></div>
+        <div class="eq" id="eqPosF"></div><div class="eq-oz" id="ozPos"></div><p class="eq-txt" id="txtPos"></p>
+      </div>
+      <div class="eq-row" id="eqBulk" hidden>
+        <div class="eq-head">Folgereaktion im Elektrolyten</div>
+        <div class="eq" id="eqBulkF"></div><p class="eq-txt" id="txtBulk"></p>
+      </div>
+      <div class="eq-row" id="eqGes">
+        <div class="eq-head"><b>Gesamtreaktion</b> <span id="gesInfo"></span></div>
+        <div class="eq" id="eqGesF"></div><p class="eq-txt" id="txtIon"></p>
+      </div>
+    </section>
+
+    <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+      <section class="panel">
+        <h2>Steckbrief</h2>
+        <dl class="facts" id="facts"></dl>
+        <p class="hint" id="factNote"></p>
+      </section>
+      <section class="panel">
+        <h2>Spannungsverlauf beim Entladen</h2>
+        <canvas id="curve" aria-label="Modellhafte Entladekurve"></canvas>
+        <label class="chk"><input type="checkbox" id="optAll"> alle Batterietypen vergleichen</label>
+      </section>
+    </div>
+  </div>
+
+  <section class="panel">
+    <h2>Vergleich der Batterietypen</h2>
+    <div class="tbl-wrap"><table id="cmp"></table></div>
+    <p class="hint">Energiedichten sind gerundete Richtwerte; sie hängen von Bauform und Belastung ab.</p>
+  </section>
+</main>
+</div>
+
+<footer>
+  <p class="footer-note">Simulierte Darstellung zu Lehrzwecken: Teilchenzahlen, Größen und Geschwindigkeiten sind nicht maßstäblich, es ist nur ein kleiner Teil der Teilchen dargestellt (Wasser-Moleküle in Auswahl, Lösemittel-Moleküle organischer Elektrolyte gar nicht). Spannungen, Entladekurven und Energiedichten sind gerundete Modell- bzw. Richtwerte. H⁺ steht vereinfacht für H₃O⁺. Die Elektrodenreaktionen sind auf Schulniveau vereinfacht.</p>
+  <p class="footer-credit">Bastian Baumgart · Batterien und Akkus V1.0 · <a href="#" id="verLink">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+</footer>
+
+<!-- Anleitung -->
+<div class="modal" id="mHelp" hidden><div class="modal-box">
+  <div class="modal-head"><h2>Anleitung</h2><button class="x" data-close type="button" aria-label="Schließen">×</button></div>
+  <p>Die Simulation zeigt für verschiedene Batterien und Akkus, was beim Entladen und Laden auf der Ebene der Teilchen geschieht, und stellt die zugehörigen Reaktionsgleichungen daneben.</p>
+  <h3>Bedienung</h3>
+  <ul>
+    <li><b>Batterietyp</b> in der linken Spalte wählen. Die Zelle ist zunächst vollständig geladen. Die Brennstoffzellen haben keinen Ladezustand: Sie arbeitet, solange Brennstoff und Luft zugeführt werden.</li>
+    <li><b>Start</b> lässt die Zelle entladen, <b>Pause</b> hält alles an. <b>Ein Reaktionsschritt</b> lässt genau einen Formelumsatz ablaufen und hält dann an – gut, um einen Vorgang in Ruhe zu verfolgen.</li>
+    <li>Bei Akkus lässt sich auf <b>Laden</b> umschalten: Statt des Verbrauchers ist dann ein Ladegerät angeschlossen, alle Vorgänge laufen umgekehrt ab. Ein laufender Vorgang wird vor dem Umschalten zu Ende geführt.</li>
+    <li><b>Geschwindigkeit</b> ×0,5 bis ×4; <b>Zurücksetzen</b> stellt die geladene Zelle wieder her.</li>
+    <li>Über der Grafik lässt sich zwischen <b>Teilchenebene</b> und <b>Bauform (Schnittbild)</b> umschalten. Beide Ansichten zeigen denselben Versuch: Start, Pause, Laden und Ladezustand gelten für beide.</li>
+    <li>Unter „Anzeige“ lassen sich Beschriftungen, Zuschauer-Ionen und Wasser-Moleküle ein- und ausblenden.</li>
+  </ul>
+  <h3>Was ist zu sehen?</h3>
+  <ul>
+    <li>Links der <b>Minuspol</b>, rechts der <b>Pluspol</b>, dazwischen der Elektrolyt mit Separator. Jedes Kästchen in einer Elektrode steht für eine Formeleinheit des Elektrodenmaterials; es ändert Farbe und Formel, wenn es reagiert hat.</li>
+    <li><b>Elektronen</b> (gelb) wandern durch den äußeren Stromkreis, <b>Ionen</b> durch den Elektrolyten.</li>
+    <li>Die Ansicht <b>Bauform</b> zeigt die Zelle im Schnitt, wie sie tatsächlich gebaut ist (Rundzelle, Knopfzelle, Plattenzelle, Wickelzelle). Elektronen laufen durch den äußeren Stromkreis, farbige Punkte zeigen die Ionenwanderung im Inneren, und die Elektroden ändern mit dem Ladezustand ihre Farbe.</li>
+    <li><b>Bauteile antippen:</b> In beiden Ansichten lassen sich die Bauteile (und in der Bauform auch ihre Beschriftungen) antippen. Ein Fenster zeigt dann in einem Bild mit Formeln, was an diesem Bauteil chemisch geschieht – bei Akkus umschaltbar zwischen Entladen und Laden. Bei Bauteilen ohne Reaktion steht dort ihre Aufgabe.</li>
+    <li>Die Gleichung des Pols, an dem gerade eine Reaktion abläuft, leuchtet kurz auf.</li>
+    <li>Das Diagramm zeigt modellhaft, wie sich die Spannung beim Entladen ändert.</li>
+  </ul>
+</div></div>
+
+<!-- Versionshinweise -->
+<div class="modal" id="mVer" hidden><div class="modal-box">
+  <div class="modal-head"><h2>Versionshinweise</h2><button class="x" data-close type="button" aria-label="Schließen">×</button></div>
+  <div class="ver"><b>V1.0 · 12.11.2026</b>
+    <ul>
+      <li>Erste Fassung mit dreizehn Typen: Zink-Kohle, Alkali-Mangan, Zink-Luft, Silberoxid-Zink, Lithium-Mangandioxid, Bleiakku, Nickel-Cadmium, Nickel-Metallhydrid, Lithium-Ionen, Lithium-Eisenphosphat, Redox-Flow-Batterie (Vanadium), Wasserstoff-Brennstoffzelle und Methan-Brennstoffzelle.</li>
+      <li>Teilchenmodell für Entladen und (bei Akkus) Laden, Einzelschritt, Zeitraffer.</li>
+      <li>Umschaltbare zweite Ansicht „Bauform“: animiertes Schnittbild der Zelle (Becherzelle, Rundzelle, Knopfzelle, Plattenzelle, Wickelzelle, Durchflusszelle mit Tanks, Membran-Brennstoffzelle).</li>
+      <li>Anklickbare Bauteile: Detailfenster mit Bild, Gleichungen und Ablauf der Vorgänge am jeweiligen Bauteil.</li>
+      <li>Reaktionsgleichungen mit Oxidationszahlen, Steckbrief, Entladekurve, Vergleichstabelle, Grundlagen.</li>
+    </ul>
+  </div>
+</div></div>
+
+<!-- Grundlagen -->
+<div class="modal" id="mGl" hidden><div class="modal-box wide">
+  <div class="modal-head"><h2 id="glTitle"></h2><button class="x" data-close type="button" aria-label="Schließen">×</button></div>
+  <div id="glBody"></div>
+  <div class="modal-nav"><button class="btn" id="glPrev" type="button">← Vorheriges Thema</button><button class="btn" id="glNext" type="button">Nächstes Thema →</button></div>
+</div></div>
+
+<!-- Bauteil-Details -->
+<div class="modal" id="mPart" hidden><div class="modal-box wide">
+  <div class="modal-head"><h2 id="ptTitle"></h2><button class="x" data-close type="button" aria-label="Schließen">×</button></div>
+  <p class="pt-sub" id="ptSub"></p>
+  <div class="seg pt-seg" id="ptSeg"><button type="button" data-c="0">Entladen</button><button type="button" data-c="1">Laden</button></div>
+  <div id="ptBody"></div>
+</div></div>
+
+<!-- QR -->
+<div class="modal" id="mQr" hidden><div class="modal-box" style="max-width:420px;text-align:center">
+  <div class="modal-head"><h2>Auf dem Mobilgerät öffnen</h2><button class="x" data-close type="button" aria-label="Schließen">×</button></div>
+  <div class="qr-big" id="qrBig"></div>
+  <p class="qr-url" id="qrUrl"></p>
+  <p style="color:var(--text-dim);font-size:13.5px">Mit der Kamera scannen, um diese Simulation auf dem eigenen Gerät zu öffnen.</p>
+  <button class="btn" data-close type="button" style="min-width:140px">Schließen</button>
+</div></div>
+
+<script>
+"use strict";
+/* =====================================================================
+   Formeln: Schreibweise  _  = tiefgestellt,  ^ = hochgestellt (Ladung)
+   ===================================================================== */
+/* Strukturformel Methan */
+const SF_CH4='<svg class="sf" viewBox="0 0 46 46" width="46" height="46" role="img" aria-label="Methan"><g stroke="currentColor" stroke-width="1.4"><line x1="23" y1="16" x2="23" y2="11"/><line x1="23" y1="29" x2="23" y2="34"/><line x1="16" y1="23" x2="11" y2="23"/><line x1="30" y1="23" x2="35" y2="23"/></g><g font-size="12" text-anchor="middle" fill="currentColor" font-family="system-ui,sans-serif"><text x="23" y="27.3">C</text><text x="23" y="9.6">H</text><text x="23" y="44.6">H</text><text x="5.5" y="27.3">H</text><text x="40.5" y="27.3">H</text></g></svg>';
+const PAGE_URL="https://chemie.mail-baumgart.de/Q2/2-Batterien.html";
+const $=id=>document.getElementById(id);
+const fCache=new Map();
+function fparse(s){
+  let r=fCache.get(s); if(r) return r;
+  r=[]; let buf="",i=0;
+  while(i<s.length){
+    const ch=s[i];
+    if(ch==="_"||ch==="^"){
+      if(buf){r.push({t:buf,m:0});buf="";}
+      i++; let t="";
+      while(i<s.length&&/[0-9+\-]/.test(s[i])){t+=s[i];i++;}
+      r.push({t:t.replace(/-/g,"−"),m:ch==="_"?1:2});
+    }else{buf+=ch;i++;}
+  }
+  if(buf) r.push({t:buf,m:0});
+  fCache.set(s,r); return r;
+}
+function fhtml(s){return fparse(s).map(g=>g.m===1?"<sub>"+g.t+"</sub>":g.m===2?"<sup>"+g.t+"</sup>":g.t).join("");}
+
+/* =====================================================================
+   Teilchenarten
+   ===================================================================== */
+const SP={
+  "OH^-":{c:"#e98a6c",r:11,n:"Hydroxid-Ion"},
+  "H_2O":{c:"#6fa8dc",r:11,n:"Wasser-Molekül"},
+  "K^+":{c:"#7b8591",r:9,n:"Kalium-Ion (Zuschauer-Ion)",spect:true},
+  "Zn^2+":{c:"#c3d0dc",r:11,n:"Zink-Ion"},
+  "NH_4^+":{c:"#7fd68a",r:11,n:"Ammonium-Ion"},
+  "NH_3":{c:"#4fd1c5",r:10,n:"Ammoniak-Molekül"},
+  "Cl^-":{c:"#7b8591",r:9,n:"Chlorid-Ion (Zuschauer-Ion)",spect:true},
+  "[Zn(NH_3)_2]^2+":{c:"#c9b6f2",r:11,n:"Diamminzink-Ion"},
+  "H^+":{c:"#ffb454",r:8,n:"H⁺-Ion (vereinfacht für H₃O⁺)"},
+  "SO_4^2-":{c:"#f0de7a",r:11,n:"Sulfat-Ion"},
+  "Li^+":{c:"#d39cf0",r:9,n:"Lithium-Ion"},
+  "PF_6^-":{c:"#7b8591",r:10,n:"Hexafluorophosphat-Ion (Zuschauer-Ion)",spect:true},
+  "ClO_4^-":{c:"#7b8591",r:10,n:"Perchlorat-Ion (Zuschauer-Ion)",spect:true},
+  "O_2":{c:"#ff8a80",r:10,n:"Sauerstoff-Molekül (aus der Luft)"},
+  "H_2":{c:"#e6edf3",r:9,n:"Wasserstoff-Molekül"},
+  "CH_4":{c:"#b7e36b",r:10,n:"Methan-Molekül"},
+  "CO_2":{c:"#aab4be",r:10,n:"Kohlenstoffdioxid-Molekül"},
+  "O^2-":{c:"#f078a8",r:10,n:"Oxid-Ion"},
+  "V^2+":{c:"#a78bfa",r:10,n:"Vanadium(II)-Ion (violett)",half:"L"},
+  "V^3+":{c:"#6fcf7f",r:10,n:"Vanadium(III)-Ion (grün)",half:"L"},
+  "VO^2+":{c:"#4f8fe8",r:10,n:"Oxidovanadium(IV)-Ion (blau)",half:"R"},
+  "VO_2^+":{c:"#f2df6b",r:10,n:"Dioxidovanadium(V)-Ion (gelb)",half:"R"}
+};
+
+/* =====================================================================
+   Batterietypen.  ox = Vorgang am Minuspol, red = Vorgang am Pluspol
+   (jeweils in Entladerichtung; beim Laden läuft alles umgekehrt).
+   sites = Formeleinheiten, die pro Vorgang umgewandelt werden,
+   e = übertragene Elektronen, take/give = Teilchen aus dem / in den Elektrolyten.
+   curve = [Startspannung, Plateau, Abfall über die Entladung, Einbruch am Ende]
+   ===================================================================== */
+const BAT=[
+{id:"zk",name:"Zink-Kohle-Batterie",alt:"Leclanché-Element",art:"P",U:"1,5",ed:"ca. 65",col:"#b98a5c",
+ use:"Geräte mit kleinem Strombedarf: Wanduhr, Fernbedienung",
+ neg:{mat:"Zinkbecher (zugleich Gehäuse)",short:"Zink",bg:"#39444e",cols:2,rows:3,a:"Zn",b:null,ca:"#a9bccf"},
+ pos:{mat:"Braunstein (MnO₂) mit Graphit, Kohlestab als Ableiter",short:"Braunstein + Graphit",bg:"#282320",cols:2,rows:6,a:"MnO_2",b:"MnO(OH)",ca:"#6d5847",cb:"#c49463"},
+ ely:{name:"eingedickte Ammoniumchlorid-Lösung",short:"NH₄Cl-Lösung (Paste)",bg:"rgba(127,214,138,.06)",pool:[["NH_4^+",14],["Cl^-",14]]},
+ ox:{sites:1,e:2,take:[],give:[["Zn^2+",1]]},
+ red:{sites:2,e:2,take:[["NH_4^+",2]],give:[["NH_3",2]]},
+ bulk:{take:[["Zn^2+",1],["NH_3",2]],give:"[Zn(NH_3)_2]^2+",eq:["Zn^2+ + 2 NH_3","[Zn(NH_3)_2]^2+"],
+   txt:"Zink-Ionen und Ammoniak-Moleküle bilden Diamminzink-Ionen, die mit Chlorid-Ionen als schwer lösliches Salz ausfallen. Dadurch steigt der Innenwiderstand der Zelle."},
+ eq:{neg:["Zn","Zn^2+ + 2 e^-"],pos:["2 MnO_2 + 2 NH_4^+ + 2 e^-","2 MnO(OH) + 2 NH_3"],ges:["Zn + 2 MnO_2 + 2 NH_4Cl","2 MnO(OH) + [Zn(NH_3)_2]Cl_2"]},
+ oz:{neg:["Zn","0","+II"],pos:["Mn","+IV","+III"]},
+ txt:{neg:["Zink-Atome des Bechers geben je zwei Elektronen ab und gehen als Zink-Ionen in den Elektrolyten über. Der Zinkbecher wird dabei immer dünner."],
+      pos:["Mangan(IV)-oxid nimmt Elektronen auf, Ammonium-Ionen liefern dazu Protonen. Es entstehen Manganoxidhydroxid MnO(OH) und Ammoniak."],
+      ion:["Ammonium-Ionen wandern zum Pluspol, Zink-Ionen vom Minuspol in den Elektrolyten."]},
+ note:"Preiswert, aber geringe Kapazität. Weil der Zinkbecher zugleich Gehäuse ist, können verbrauchte Zellen auslaufen.",
+ curve:[1.62,1.5,0.5,0.25]},
+
+{id:"al",name:"Alkali-Mangan-Zelle",alt:"„Alkaline“",art:"P",U:"1,5",ed:"ca. 120",col:"#ffb454",
+ use:"Spielzeug, Taschenlampe, Funkmaus – die häufigste Haushaltsbatterie",
+ neg:{mat:"Zinkpulver-Gel (große Oberfläche)",short:"Zinkpulver",bg:"#39444e",cols:2,rows:4,a:"Zn",b:"ZnO",ca:"#a9bccf",cb:"#ece7d8"},
+ pos:{mat:"Braunstein (MnO₂) mit Graphit",short:"Braunstein + Graphit",bg:"#282320",cols:2,rows:8,a:"MnO_2",b:"MnO(OH)",ca:"#6d5847",cb:"#c49463"},
+ ely:{name:"Kalilauge",short:"Kalilauge, KOH(aq)",bg:"rgba(111,168,220,.07)",pool:[["OH^-",10],["K^+",10],["H_2O",14]]},
+ ox:{sites:1,e:2,take:[["OH^-",2]],give:[["H_2O",1]]},
+ red:{sites:2,e:2,take:[["H_2O",2]],give:[["OH^-",2]]},
+ eq:{neg:["Zn + 2 OH^-","ZnO + H_2O + 2 e^-"],pos:["2 MnO_2 + 2 H_2O + 2 e^-","2 MnO(OH) + 2 OH^-"],ges:["Zn + 2 MnO_2 + H_2O","ZnO + 2 MnO(OH)"]},
+ oz:{neg:["Zn","0","+II"],pos:["Mn","+IV","+III"]},
+ txt:{neg:["Zink-Atome geben je zwei Elektronen ab und reagieren mit Hydroxid-Ionen zu Zinkoxid und Wasser."],
+      pos:["Mangan(IV)-oxid nimmt Elektronen auf und reagiert mit Wasser zu Manganoxidhydroxid MnO(OH); dabei werden Hydroxid-Ionen frei."],
+      ion:["Hydroxid-Ionen wandern vom Pluspol durch den Separator zum Minuspol und gleichen so die Ladung aus."]},
+ note:"Die Kalilauge wird nicht verbraucht (nur Wasser). Deshalb bleibt der Innenwiderstand klein, und die Zelle liefert mehr Ladung als die Zink-Kohle-Batterie.",
+ curve:[1.6,1.5,0.38,0.3]},
+
+{id:"zl",name:"Zink-Luft-Zelle",alt:"Knopfzelle",art:"P",U:"1,4",ed:"ca. 400",col:"#ff8a80",air:true,
+ use:"Hörgeräte",
+ neg:{mat:"Zinkpulver-Gel",short:"Zinkpulver",bg:"#39444e",cols:2,rows:6,a:"Zn",b:"ZnO",ca:"#a9bccf",cb:"#ece7d8"},
+ pos:{mat:"poröse Kohle-Elektrode mit Katalysator, Reaktionspartner ist Sauerstoff aus der Luft",short:"poröse Kohle + Katalysator",bg:"#2a2d31",cols:1,rows:4,inner:true,cat:true,porous:true,a:"C (Kat.)",b:"C (Kat.)",ca:"#5d646d",cb:"#5d646d"},
+ ely:{name:"Kalilauge",short:"Kalilauge, KOH(aq)",bg:"rgba(111,168,220,.07)",pool:[["OH^-",10],["K^+",10],["H_2O",10]]},
+ ox:{sites:1,e:2,take:[["OH^-",2]],give:[["H_2O",1]]},
+ red:{sites:0,e:4,take:[["O_2",1,"air"],["H_2O",2]],give:[["OH^-",4]]},
+ eq:{neg:["Zn + 2 OH^-","ZnO + H_2O + 2 e^-"],negMul:"| · 2",pos:["O_2 + 2 H_2O + 4 e^-","4 OH^-"],ges:["2 Zn + O_2","2 ZnO"]},
+ oz:{neg:["Zn","0","+II"],pos:["O","0","−II"]},
+ txt:{neg:["Zink-Atome geben je zwei Elektronen ab und reagieren mit Hydroxid-Ionen zu Zinkoxid und Wasser."],
+      pos:["Sauerstoff-Moleküle aus der Luft gelangen durch die poröse Kohle-Elektrode. Am Katalysator nehmen sie Elektronen auf und reagieren mit Wasser zu Hydroxid-Ionen."],
+      ion:["Hydroxid-Ionen wandern vom Pluspol zum Minuspol. Die Kohle-Elektrode selbst wird nicht verbraucht."]},
+ note:"Der Pluspol-Reaktionspartner muss nicht in der Zelle gespeichert werden – daher die sehr hohe Energiedichte. Die Zelle arbeitet erst, wenn die Schutzfolie über den Luftlöchern abgezogen ist.",
+ curve:[1.45,1.38,0.1,0.45]},
+
+{id:"ag",name:"Silberoxid-Zink-Zelle",alt:"Knopfzelle",art:"P",U:"1,55",ed:"ca. 130",col:"#dfe3e8",
+ use:"Armbanduhren, Messgeräte",
+ neg:{mat:"Zinkpulver-Gel",short:"Zinkpulver",bg:"#39444e",cols:2,rows:4,a:"Zn",b:"ZnO",ca:"#a9bccf",cb:"#ece7d8"},
+ pos:{mat:"Silber(I)-oxid",short:"Silber(I)-oxid",bg:"#2b2826",cols:2,rows:4,a:"Ag_2O",b:"2 Ag",ca:"#6a625d",cb:"#e3e7ec"},
+ ely:{name:"Kalilauge",short:"Kalilauge, KOH(aq)",bg:"rgba(111,168,220,.07)",pool:[["OH^-",10],["K^+",10],["H_2O",8]]},
+ ox:{sites:1,e:2,take:[["OH^-",2]],give:[["H_2O",1]]},
+ red:{sites:1,e:2,take:[["H_2O",1]],give:[["OH^-",2]]},
+ eq:{neg:["Zn + 2 OH^-","ZnO + H_2O + 2 e^-"],pos:["Ag_2O + H_2O + 2 e^-","2 Ag + 2 OH^-"],ges:["Zn + Ag_2O","ZnO + 2 Ag"]},
+ oz:{neg:["Zn","0","+II"],pos:["Ag","+I","0"]},
+ txt:{neg:["Zink-Atome geben je zwei Elektronen ab und reagieren mit Hydroxid-Ionen zu Zinkoxid und Wasser."],
+      pos:["Silber(I)-oxid nimmt Elektronen auf: Es entsteht elementares Silber, mit Wasser bilden sich Hydroxid-Ionen."],
+      ion:["Hydroxid-Ionen wandern vom Pluspol zum Minuspol. Weder Wasser noch Lauge werden insgesamt verbraucht."]},
+ note:"Sehr konstante Spannung bis kurz vor dem Ende – wichtig für Uhren. Wegen des Silbers teuer, deshalb nur in kleinen Knopfzellen.",
+ curve:[1.6,1.55,0.03,0.55]},
+
+{id:"lm",name:"Lithium-Mangandioxid-Zelle",alt:"z. B. CR2032",art:"P",U:"3,0",ed:"ca. 280",col:"#d39cf0",
+ use:"Autoschlüssel, Rauchmelder, Fahrradcomputer",
+ neg:{mat:"Lithium-Metall",short:"Lithium",bg:"#3c4046",cols:2,rows:6,a:"Li",b:null,ca:"#dfe3e8"},
+ pos:{mat:"Mangan(IV)-oxid mit Graphit",short:"Mangan(IV)-oxid",bg:"#282320",cols:2,rows:6,a:"MnO_2",b:"LiMnO_2",ca:"#6d5847",cb:"#b48fd2",host:true,guest:"b"},
+ ely:{name:"Lithiumsalz in organischem Lösemittel (wasserfrei)",short:"Li-Salz in organischem Lösemittel",bg:"rgba(211,156,240,.06)",pool:[["Li^+",8],["ClO_4^-",8]]},
+ ox:{sites:1,e:1,take:[],give:[["Li^+",1]]},
+ red:{sites:1,e:1,take:[["Li^+",1]],give:[]},
+ eq:{neg:["Li","Li^+ + e^-"],pos:["MnO_2 + Li^+ + e^-","LiMnO_2"],ges:["Li + MnO_2","LiMnO_2"]},
+ oz:{neg:["Li","0","+I"],pos:["Mn","+IV","+III"]},
+ txt:{neg:["Lithium-Atome geben je ein Elektron ab und gehen als Lithium-Ionen in den Elektrolyten über."],
+      pos:["Mangan(IV)-oxid nimmt Elektronen auf; zum Ladungsausgleich werden Lithium-Ionen in das Kristallgitter eingelagert."],
+      ion:["Lithium-Ionen wandern vom Minuspol zum Pluspol."]},
+ note:"Lithium ist das unedelste Metall und sehr leicht – daher 3 V Spannung und hohe Energiedichte. Lithium reagiert heftig mit Wasser, deshalb ist der Elektrolyt wasserfrei.",
+ curve:[3.25,3.0,0.25,0.9]},
+
+{id:"pb",name:"Bleiakkumulator",alt:"Autobatterie",art:"S",U:"2,0",ed:"ca. 35",col:"#8fa3c8",
+ use:"Starterbatterie im Auto (6 Zellen = 12 V), Notstromanlagen",
+ neg:{mat:"Blei (schwammartig)",short:"Blei",bg:"#3a3e47",cols:2,rows:4,a:"Pb",b:"PbSO_4",ca:"#8d98ad",cb:"#ebe8dc"},
+ pos:{mat:"Blei(IV)-oxid",short:"Blei(IV)-oxid",bg:"#33261f",cols:2,rows:4,a:"PbO_2",b:"PbSO_4",ca:"#80503a",cb:"#ebe8dc"},
+ ely:{name:"Schwefelsäure, w ≈ 37 %",short:"Schwefelsäure, H₂SO₄(aq)",bg:"rgba(240,222,122,.06)",pool:[["SO_4^2-",18],["H^+",36],["H_2O",4]]},
+ ox:{sites:1,e:2,take:[["SO_4^2-",1]],give:[]},
+ red:{sites:1,e:2,take:[["SO_4^2-",1],["H^+",4]],give:[["H_2O",2]]},
+ eq:{neg:["Pb + SO_4^2-","PbSO_4 + 2 e^-"],pos:["PbO_2 + SO_4^2- + 4 H^+ + 2 e^-","PbSO_4 + 2 H_2O"],ges:["Pb + PbO_2 + 2 H_2SO_4","2 PbSO_4 + 2 H_2O"]},
+ oz:{neg:["Pb","0","+II"],pos:["Pb","+IV","+II"]},
+ txt:{neg:["Blei-Atome geben je zwei Elektronen ab. Die Blei(II)-Ionen bilden mit Sulfat-Ionen sofort schwer lösliches Blei(II)-sulfat, das auf der Elektrode haftet.",
+           "Blei(II)-sulfat nimmt Elektronen auf: Es entsteht wieder Blei, die Sulfat-Ionen gehen zurück in die Lösung."],
+      pos:["Blei(IV)-oxid nimmt Elektronen auf und reagiert mit Sulfat-Ionen und H⁺-Ionen zu Blei(II)-sulfat und Wasser.",
+           "Blei(II)-sulfat gibt Elektronen ab und reagiert mit Wasser wieder zu Blei(IV)-oxid; Sulfat-Ionen und H⁺-Ionen gehen in die Lösung."],
+      ion:["Schwefelsäure wird verbraucht und Wasser entsteht: Die Säure wird verdünnt, ihre Dichte sinkt. Die Säuredichte zeigt deshalb den Ladezustand an.",
+           "Schwefelsäure wird zurückgebildet: Konzentration und Dichte der Säure steigen wieder."]},
+ note:"An beiden Polen entsteht beim Entladen derselbe Stoff (Blei(II)-sulfat) – eine Synproportionierung; das Laden ist die Disproportionierung. Schwer, aber billig und für sehr hohe Ströme geeignet.",
+ curve:[2.12,2.05,0.2,0.25]},
+
+{id:"nc",name:"Nickel-Cadmium-Akku",alt:"NiCd",art:"S",U:"1,2",ed:"ca. 50",col:"#7fd68a",
+ use:"früher Akkuwerkzeuge; heute nur noch Notbeleuchtung und Medizintechnik",
+ neg:{mat:"Cadmium",short:"Cadmium",bg:"#3a424a",cols:2,rows:4,a:"Cd",b:"Cd(OH)_2",ca:"#a9b8c4",cb:"#e2e8d4"},
+ pos:{mat:"Nickel(III)-oxidhydroxid",short:"Nickel(III)-oxidhydroxid",bg:"#1f2a25",cols:2,rows:8,a:"NiO(OH)",b:"Ni(OH)_2",ca:"#3f7d5a",cb:"#a5dcae"},
+ ely:{name:"Kalilauge",short:"Kalilauge, KOH(aq)",bg:"rgba(111,168,220,.07)",pool:[["OH^-",10],["K^+",10],["H_2O",20]]},
+ ox:{sites:1,e:2,take:[["OH^-",2]],give:[]},
+ red:{sites:2,e:2,take:[["H_2O",2]],give:[["OH^-",2]]},
+ eq:{neg:["Cd + 2 OH^-","Cd(OH)_2 + 2 e^-"],pos:["2 NiO(OH) + 2 H_2O + 2 e^-","2 Ni(OH)_2 + 2 OH^-"],ges:["Cd + 2 NiO(OH) + 2 H_2O","Cd(OH)_2 + 2 Ni(OH)_2"]},
+ oz:{neg:["Cd","0","+II"],pos:["Ni","+III","+II"]},
+ txt:{neg:["Cadmium-Atome geben je zwei Elektronen ab und bilden mit Hydroxid-Ionen festes Cadmiumhydroxid.",
+           "Cadmiumhydroxid nimmt Elektronen auf: Es entsteht wieder Cadmium, Hydroxid-Ionen gehen in die Lösung."],
+      pos:["Nickel(III)-oxidhydroxid nimmt Elektronen auf und reagiert mit Wasser zu Nickel(II)-hydroxid und Hydroxid-Ionen.",
+           "Nickel(II)-hydroxid gibt Elektronen ab und reagiert mit Hydroxid-Ionen wieder zu Nickel(III)-oxidhydroxid und Wasser."],
+      ion:["Hydroxid-Ionen wandern vom Pluspol zum Minuspol.","Hydroxid-Ionen wandern vom Minuspol zum Pluspol."]},
+ note:"Robust und für hohe Ströme geeignet, zeigt aber den Memory-Effekt. Cadmium ist giftig; NiCd-Akkus sind in der EU für die meisten Anwendungen verboten.",
+ curve:[1.35,1.25,0.1,0.3]},
+
+{id:"nm",name:"Nickel-Metallhydrid-Akku",alt:"NiMH",art:"S",U:"1,2",ed:"ca. 80",col:"#4fd1c5",
+ use:"aufladbare Mignon-Zellen, ältere Hybridautos",
+ neg:{mat:"Metalllegierung, die Wasserstoff einlagert (Metallhydrid MH)",short:"Metallhydrid",bg:"#333c48",cols:2,rows:6,a:"MH",b:"M",ca:"#8fb0d6",cb:"#66758a",host:true,guest:"a",gcol:"#ffffff"},
+ pos:{mat:"Nickel(III)-oxidhydroxid",short:"Nickel(III)-oxidhydroxid",bg:"#1f2a25",cols:2,rows:6,a:"NiO(OH)",b:"Ni(OH)_2",ca:"#3f7d5a",cb:"#a5dcae"},
+ ely:{name:"Kalilauge",short:"Kalilauge, KOH(aq)",bg:"rgba(111,168,220,.07)",pool:[["OH^-",8],["K^+",8],["H_2O",8]]},
+ ox:{sites:1,e:1,take:[["OH^-",1]],give:[["H_2O",1]]},
+ red:{sites:1,e:1,take:[["H_2O",1]],give:[["OH^-",1]]},
+ eq:{neg:["MH + OH^-","M + H_2O + e^-"],pos:["NiO(OH) + H_2O + e^-","Ni(OH)_2 + OH^-"],ges:["MH + NiO(OH)","M + Ni(OH)_2"]},
+ oz:{neg:["H","0","+I"],pos:["Ni","+III","+II"]},
+ txt:{neg:["Im Metallgitter eingelagerte Wasserstoff-Atome geben je ein Elektron ab und reagieren mit Hydroxid-Ionen zu Wasser. Das Metall M bleibt zurück.",
+           "Wasser-Moleküle nehmen Elektronen auf: Die Wasserstoff-Atome werden wieder im Metallgitter eingelagert, Hydroxid-Ionen gehen in die Lösung."],
+      pos:["Nickel(III)-oxidhydroxid nimmt Elektronen auf und reagiert mit Wasser zu Nickel(II)-hydroxid und Hydroxid-Ionen.",
+           "Nickel(II)-hydroxid gibt Elektronen ab und reagiert mit Hydroxid-Ionen wieder zu Nickel(III)-oxidhydroxid und Wasser."],
+      ion:["Hydroxid-Ionen wandern vom Pluspol zum Minuspol.","Hydroxid-Ionen wandern vom Minuspol zum Pluspol."]},
+ note:"Nachfolger des NiCd-Akkus ohne giftiges Cadmium und mit größerer Kapazität. M steht für eine Legierung, z. B. aus Lanthan und Nickel. Der eingelagerte Wasserstoff wird vereinfacht mit der Oxidationszahl 0 betrachtet.",
+ curve:[1.4,1.25,0.1,0.3]},
+
+{id:"li",name:"Lithium-Ionen-Akku",alt:"Li-Ion",art:"S",U:"3,7",ed:"ca. 200",col:"#6f9fe0",
+ use:"Smartphone, Laptop, E-Bike, Elektroauto",
+ neg:{mat:"Graphit mit eingelagertem Lithium (auf Kupferfolie)",short:"Graphit",bg:"#2a2d33",cols:2,rows:6,a:"LiC_6",b:"C_6",ca:"#c9a84f",cb:"#565c66",host:true,guest:"a"},
+ pos:{mat:"Lithium-Metalloxid, hier Lithiumcobaltoxid (auf Aluminiumfolie)",short:"Lithiumcobaltoxid",bg:"#1f2836",cols:2,rows:6,a:"CoO_2",b:"LiCoO_2",ca:"#3d5f8f",cb:"#7aa9e8",host:true,guest:"b"},
+ ely:{name:"Lithiumsalz (LiPF₆) in organischem Lösemittel (wasserfrei)",short:"LiPF₆ in organischem Lösemittel",bg:"rgba(211,156,240,.06)",pool:[["Li^+",8],["PF_6^-",8]]},
+ ox:{sites:1,e:1,take:[],give:[["Li^+",1]]},
+ red:{sites:1,e:1,take:[["Li^+",1]],give:[]},
+ eq:{neg:["LiC_6","C_6 + Li^+ + e^-"],pos:["CoO_2 + Li^+ + e^-","LiCoO_2"],ges:["LiC_6 + CoO_2","C_6 + LiCoO_2"]},
+ oz:{neg:["Li (vereinfacht)","0","+I"],pos:["Co","+IV","+III"]},
+ txt:{neg:["Zwischen den Graphitschichten eingelagertes Lithium gibt je ein Elektron ab; die Lithium-Ionen verlassen das Schichtgitter und gehen in den Elektrolyten über.",
+           "Lithium-Ionen wandern zwischen die Graphitschichten und werden dort unter Aufnahme von Elektronen eingelagert."],
+      pos:["Cobalt-Ionen im Metalloxid nehmen Elektronen auf; zum Ladungsausgleich werden Lithium-Ionen in das Schichtgitter eingelagert.",
+           "Cobalt-Ionen geben Elektronen ab; die Lithium-Ionen verlassen das Schichtgitter und gehen in den Elektrolyten über."],
+      ion:["Lithium-Ionen wandern vom Minuspol durch den Separator zum Pluspol. Die Elektrodengitter bleiben erhalten – es wird nur Lithium ein- und ausgelagert.",
+           "Lithium-Ionen wandern vom Pluspol zurück zum Minuspol („Schaukelstuhl-Prinzip“)."]},
+ note:"Kein metallisches Lithium in der Zelle. In der Praxis wird dem Lithiumcobaltoxid nur etwa die Hälfte der Lithium-Ionen entnommen (Li₁₋ₓCoO₂); die Gleichungen sind vereinfacht. Überladen, Tiefentladen und Beschädigung können zum Brand führen.",
+ curve:[4.2,3.9,0.5,0.6]},
+{id:"lf",name:"Lithium-Eisenphosphat-Akku",alt:"LFP",art:"S",U:"3,2",ed:"ca. 130",col:"#a9c9ae",
+ use:"Heimspeicher für Solarstrom, Elektroautos, Wohnmobile",
+ neg:{mat:"Graphit mit eingelagertem Lithium (auf Kupferfolie)",short:"Graphit",bg:"#2a2d33",cols:2,rows:6,a:"LiC_6",b:"C_6",ca:"#c9a84f",cb:"#565c66",host:true,guest:"a"},
+ pos:{mat:"Eisenphosphat / Lithiumeisenphosphat (auf Aluminiumfolie)",short:"Lithiumeisenphosphat",bg:"#222a24",cols:2,rows:6,a:"FePO_4",b:"LiFePO_4",ca:"#5c6f5f",cb:"#a9c9ae",host:true,guest:"b"},
+ ely:{name:"Lithiumsalz (LiPF₆) in organischem Lösemittel (wasserfrei)",short:"LiPF₆ in organischem Lösemittel",bg:"rgba(211,156,240,.06)",pool:[["Li^+",8],["PF_6^-",8]]},
+ ox:{sites:1,e:1,take:[],give:[["Li^+",1]]},
+ red:{sites:1,e:1,take:[["Li^+",1]],give:[]},
+ eq:{neg:["LiC_6","C_6 + Li^+ + e^-"],pos:["FePO_4 + Li^+ + e^-","LiFePO_4"],ges:["LiC_6 + FePO_4","C_6 + LiFePO_4"]},
+ oz:{neg:["Li (vereinfacht)","0","+I"],pos:["Fe","+III","+II"]},
+ txt:{neg:["Zwischen den Graphitschichten eingelagertes Lithium gibt je ein Elektron ab; die Lithium-Ionen verlassen das Schichtgitter und gehen in den Elektrolyten über.",
+           "Lithium-Ionen wandern zwischen die Graphitschichten und werden dort unter Aufnahme von Elektronen eingelagert."],
+      pos:["Eisen(III)-Ionen im Eisenphosphat nehmen Elektronen auf; zum Ladungsausgleich werden Lithium-Ionen in das Kristallgitter eingelagert.",
+           "Eisen(II)-Ionen geben Elektronen ab; die Lithium-Ionen verlassen das Kristallgitter und gehen in den Elektrolyten über."],
+      ion:["Lithium-Ionen wandern vom Minuspol durch den Separator zum Pluspol.","Lithium-Ionen wandern vom Pluspol zurück zum Minuspol."]},
+ note:"Enthält weder Cobalt noch Nickel, ist thermisch sehr stabil (kaum Brandgefahr) und übersteht mehrere tausend Ladezyklen. Dafür sind Spannung und Energiedichte kleiner als beim Akku mit Cobaltoxid. Die Spannung bleibt beim Entladen fast konstant.",
+ curve:[3.45,3.3,0.1,0.7]},
+
+{id:"rf",name:"Redox-Flow-Batterie",alt:"Vanadium",art:"S",U:"1,4",ed:"ca. 20",col:"#a78bfa",half:true,socSp:["V^2+","V^3+"],
+ use:"stationäre Großspeicher für Wind- und Solarstrom",
+ neg:{mat:"Graphitfilz (reagiert nicht selbst); Reaktionspartner sind gelöste Vanadium-Ionen im Anolyt",short:"Graphit · Anolyt",bg:"#2a2d31",cols:1,rows:4,inner:true,cat:true,porous:true,a:"Graphit",b:"Graphit",ca:"#5d646d",cb:"#5d646d"},
+ pos:{mat:"Graphitfilz (reagiert nicht selbst); Reaktionspartner sind gelöste Vanadium-Ionen im Katholyt",short:"Graphit · Katholyt",bg:"#2a2d31",cols:1,rows:4,inner:true,cat:true,porous:true,a:"Graphit",b:"Graphit",ca:"#5d646d",cb:"#5d646d"},
+ ely:{name:"Vanadiumsalze in verdünnter Schwefelsäure – zwei getrennte Lösungen (Anolyt und Katholyt)",short:"Vanadiumsalze in Schwefelsäure",bg:"rgba(255,255,255,.02)",sep:"Membran (lässt H⁺-Ionen durch)",pool:[["V^2+",10],["VO_2^+",10],["H^+",24],["H_2O",4]]},
+ ox:{sites:0,e:1,take:[["V^2+",1]],give:[["V^3+",1]]},
+ red:{sites:0,e:1,take:[["VO_2^+",1],["H^+",2]],give:[["VO^2+",1],["H_2O",1]]},
+ eq:{neg:["V^2+","V^3+ + e^-"],pos:["VO_2^+ + 2 H^+ + e^-","VO^2+ + H_2O"],ges:["V^2+ + VO_2^+ + 2 H^+","V^3+ + VO^2+ + H_2O"]},
+ oz:{neg:["V","+II","+III"],pos:["V","+V","+IV"]},
+ txt:{neg:["Gelöste Vanadium(II)-Ionen geben an der Graphit-Elektrode je ein Elektron ab und werden zu Vanadium(III)-Ionen. Die Lösung färbt sich von Violett nach Grün.",
+           "Vanadium(III)-Ionen nehmen an der Graphit-Elektrode je ein Elektron auf und werden wieder zu Vanadium(II)-Ionen (Grün nach Violett)."],
+      pos:["Dioxidovanadium(V)-Ionen nehmen je ein Elektron auf und reagieren mit H⁺-Ionen zu Oxidovanadium(IV)-Ionen und Wasser. Die Lösung färbt sich von Gelb nach Blau.",
+           "Oxidovanadium(IV)-Ionen geben je ein Elektron ab und reagieren mit Wasser wieder zu Dioxidovanadium(V)-Ionen und H⁺-Ionen (Blau nach Gelb)."],
+      ion:["H⁺-Ionen wandern durch die Membran in die Halbzelle des Pluspols. Die Vanadium-Ionen können die Membran nicht passieren.",
+           "H⁺-Ionen wandern durch die Membran zurück in die Halbzelle des Minuspols."]},
+ note:"Die Elektroden reagieren nicht selbst – die Energie steckt in den beiden Lösungen, die aus Tanks durch die Zelle gepumpt werden (siehe Ansicht „Bauform“). Auf beiden Seiten ist dasselbe Element Vanadium in vier Oxidationsstufen beteiligt; am Farbwechsel lässt sich der Ladezustand ablesen.",
+ curve:[1.6,1.42,0.25,0.4]},
+
+{id:"bz",name:"Wasserstoff-Brennstoffzelle",alt:"PEM",art:"B",U:"ca. 1,0",ed:"–",col:"#e6edf3",air:true,fuel:true,
+ use:"Busse, Züge und Lkw mit Brennstoffzellenantrieb, Notstromversorgung, Raumfahrt",
+ neg:{mat:"poröse Kohle-Elektrode mit Platin-Katalysator; Reaktionspartner ist Wasserstoff",short:"Kohle + Platin · H₂",bg:"#2a2d31",cols:1,rows:4,inner:true,cat:true,porous:true,a:"Pt (Kat.)",b:"Pt (Kat.)",ca:"#5d646d",cb:"#5d646d"},
+ pos:{mat:"poröse Kohle-Elektrode mit Platin-Katalysator; Reaktionspartner ist Sauerstoff aus der Luft",short:"Kohle + Platin · O₂",bg:"#2a2d31",cols:1,rows:4,inner:true,cat:true,porous:true,a:"Pt (Kat.)",b:"Pt (Kat.)",ca:"#5d646d",cb:"#5d646d"},
+ ely:{name:"Polymermembran (PEM), die nur H⁺-Ionen leitet",short:"Polymermembran (leitet nur H⁺)",bg:"rgba(255,180,84,.07)",noSep:true,pool:[["H^+",12]]},
+ ox:{sites:0,e:2,take:[["H_2",1,"fuel"]],give:[["H^+",2]]},
+ red:{sites:0,e:4,take:[["O_2",1,"air"],["H^+",4]],give:[["H_2O",2,"out"]]},
+ eq:{neg:["H_2","2 H^+ + 2 e^-"],negMul:"| · 2",pos:["O_2 + 4 H^+ + 4 e^-","2 H_2O"],ges:["2 H_2 + O_2","2 H_2O"]},
+ oz:{neg:["H","0","+I"],pos:["O","0","−II"]},
+ txt:{neg:["Wasserstoff-Moleküle gelangen durch die poröse Elektrode an den Platin-Katalysator. Dort geben sie je zwei Elektronen ab; es entstehen H⁺-Ionen, die in die Membran übergehen."],
+      pos:["Sauerstoff-Moleküle aus der Luft nehmen am Katalysator Elektronen auf und reagieren mit H⁺-Ionen aus der Membran zu Wasser, das mit der Abluft die Zelle verlässt."],
+      ion:["H⁺-Ionen wandern durch die Membran vom Minuspol zum Pluspol. Die Membran lässt weder Gase noch Elektronen durch."]},
+ note:"Die Reaktionspartner sind nicht in der Zelle gespeichert, sondern werden laufend zugeführt – deshalb gibt es keinen Ladezustand. Theoretisch liefert die Zelle 1,23 V, unter Last etwa 0,7 V. Die Umkehrung der Reaktion ist die Elektrolyse von Wasser; sie läuft in einem eigenen Gerät (Elektrolyseur) ab.",
+ curve:[1.0,1.0,0,0]},
+
+{id:"mz",name:"Methan-Brennstoffzelle",alt:"Festoxid, SOFC",art:"B",U:"ca. 1,0",ed:"–",edTxt:"hängt vom Gasvorrat ab (Methan: ca. 13 900 Wh/kg)",col:"#b7e36b",air:true,fuel:true,fuelSp:"CH_4",fuelName:"Methan",
+ use:"Brennstoffzellenheizung im Haus (Strom und Wärme aus Erdgas), Blockheizkraftwerke",
+ neg:{mat:"poröse Nickel-Keramik-Elektrode (Nickel als Katalysator); Reaktionspartner ist Methan",short:"Nickel-Keramik · CH₄",bg:"#2a2d31",cols:1,rows:4,inner:true,cat:true,porous:true,a:"Ni (Kat.)",b:"Ni (Kat.)",ca:"#5d646d",cb:"#5d646d"},
+ pos:{mat:"poröse Mischoxid-Elektrode (Katalysator); Reaktionspartner ist Sauerstoff aus der Luft",short:"Mischoxid · O₂",bg:"#2a2d31",cols:1,rows:4,inner:true,cat:true,porous:true,a:"Kat.",b:"Kat.",ca:"#5d646d",cb:"#5d646d"},
+ ely:{name:"Festelektrolyt: Keramik aus Zirconiumdioxid, die bei 600–1000 °C Oxid-Ionen leitet",short:"Keramik (leitet O²⁻-Ionen)",bg:"rgba(240,120,168,.07)",noSep:true,pool:[["O^2-",12]]},
+ ox:{sites:0,e:8,take:[["CH_4",1,"fuel"],["O^2-",4]],give:[["CO_2",1,"out"],["H_2O",2,"out"]]},
+ red:{sites:0,e:4,take:[["O_2",1,"air"]],give:[["O^2-",2]]},
+ eq:{neg:["CH_4 + 4 O^2-","CO_2 + 2 H_2O + 8 e^-"],pos:["O_2 + 4 e^-","2 O^2-"],posMul:"| · 2",ges:["CH_4 + 2 O_2","CO_2 + 2 H_2O"]},
+ oz:{neg:["C","−IV","+IV"],pos:["O","0","−II"]},
+ txt:{neg:["Methan-Moleküle gelangen durch die poröse Elektrode an den Nickel-Katalysator. Dort reagieren sie mit Oxid-Ionen aus dem Elektrolyten zu Kohlenstoffdioxid und Wasser; je Methan-Molekül werden acht Elektronen abgegeben."],
+      pos:["Sauerstoff-Moleküle aus der Luft nehmen am Katalysator je vier Elektronen auf. Die entstehenden Oxid-Ionen gehen in den Festelektrolyten über."],
+      ion:["Oxid-Ionen wandern durch die heiße Keramik vom Pluspol zum Minuspol. Der Festelektrolyt lässt weder Gase noch Elektronen durch."]},
+ note:"Methan (Erdgas, Biogas) wird ohne Flamme direkt in Strom umgewandelt; die Abwärme heizt das Haus. Anders als bei Wasserstoff entsteht Kohlenstoffdioxid. In Aufgaben wird oft die Variante mit saurem Elektrolyten formuliert – Minuspol: CH₄ + 2 H₂O ⟶ CO₂ + 8 H⁺ + 8 e⁻, Pluspol: 2 O₂ + 8 H⁺ + 8 e⁻ ⟶ 4 H₂O. Die Gesamtreaktion ist dieselbe.",
+ curve:[1.0,1.0,0,0]}
+];
+
+/* =====================================================================
+   Geometrie der Zeichenfläche (logische Koordinaten 900 × 560)
+   ===================================================================== */
+const W=900,H=560;
+const G={nx0:90,nx1:230,px0:670,px1:810,top:150,bot:500,wy:62,ncx:160,pcx:740};
+const ELY={x0:246,x1:654,y0:166,y1:484};
+const AIR={x0:832,x1:888,y0:170,y1:480};
+const FUEL={x0:12,x1:66,y0:170,y1:480};
+
+let bat=BAT[1], mode="dis", wantMode="dis", paused=true, finished=false, speed=1;
+let stepping=false, stepLeft=0, clock=0, lastSrc=-9, glow=0, lastBulk=0;
+let S={neg:[],pos:[]}, P=[], EL=[], EV=[], stat={e:0};
+const opt={lab:true,spect:true,water:true,all:false};
+let view="teil", bauPhase=0;
+
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+function buildSites(side){
+  const c=bat[side], out=[];
+  let xs;
+  if(side==="neg") xs=c.cols===2?[195,125]:[c.inner?195:160];
+  else xs=c.cols===2?[705,775]:[c.inner?705:740];
+  const span=(G.bot-G.top)/c.rows, h=Math.min(40,span-9);
+  for(let ci=0;ci<xs.length;ci++) for(let r=0;r<c.rows;r++)
+    out.push({x:xs[ci],y:G.top+(r+.5)*span,w:62,h:h,st:"a",res:false,fl:0});
+  return out;
+}
+function newP(sp,x,y,zone){return {sp:sp,x:x,y:y,vx:rnd(-18,18),vy:rnd(-18,18),st:"free",zone:zone||"ely",res:false,tx:0,ty:0,fol:null};}
+function resetSim(){
+  S.neg=buildSites("neg"); S.pos=buildSites("pos");
+  P=[]; EL=[]; EV=[]; stat.e=0; clock=0; lastSrc=-9; lastBulk=0; glow=0;
+  mode="dis"; wantMode="dis"; paused=true; finished=false; stepping=false; stepLeft=0;
+  bat.ely.pool.forEach(([sp,n])=>{const hf=SP[sp].half; for(let i=0;i<n;i++) P.push(newP(sp,rnd(hf==="R"?458:ELY.x0,hf==="L"?442:ELY.x1),rnd(ELY.y0,ELY.y1)));});
+  if(bat.fuel) for(let i=0;i<6;i++) P.push(newP(bat.fuelSp||"H_2",rnd(FUEL.x0,FUEL.x1),rnd(FUEL.y0,FUEL.y1),"fuel"));
+  if(bat.air) for(let i=0;i<6;i++) P.push(newP("O_2",rnd(AIR.x0,AIR.x1),rnd(AIR.y0,AIR.y1),"air"));
+}
+
+/* ---------- Vorgänge an den Elektroden ---------- */
+function procOf(side){return side==="neg"?bat.ox:bat.red;}
+function pickFree(sp,x,y,zone){
+  let best=null,bd=1e9;
+  for(const p of P){
+    if(p.sp!==sp||p.st!=="free"||p.res||p.zone!==zone) continue;
+    const d=(p.x-x)*(p.x-x)+(p.y-y)*(p.y-y);
+    if(d<bd){bd=d;best=p;}
+  }
+  return best;
+}
+function countFree(sp,zone){let n=0;for(const p of P) if(p.sp===sp&&p.st==="free"&&!p.res&&p.zone===zone) n++;return n;}
+
+function makeEvent(side,kind){
+  const pr=procOf(side), dir=mode==="dis"?1:-1;
+  const from=dir>0?"a":"b", to=dir>0?"b":"a";
+  const take=dir>0?pr.take:pr.give, give=dir>0?pr.give:pr.take;
+  let sites=[],ax,ay;
+  if(pr.sites>0){
+    const cand=S[side].filter(s=>s.st===from&&!s.res);
+    if(cand.length<pr.sites) return null;
+    sites=dir>0?cand.slice(0,pr.sites):cand.slice(-pr.sites);
+    ax=sites.reduce((a,s)=>a+s.x,0)/sites.length; ay=sites.reduce((a,s)=>a+s.y,0)/sites.length;
+  }else{
+    const c=S[side][Math.floor(Math.random()*S[side].length)]; ax=c.x; ay=c.y; c.fl=1;
+  }
+  if(kind==="src"){
+    for(const t of take) if(countFree(t[0],t[2]||"ely")<t[1]) return null;
+  }
+  sites.forEach(s=>s.res=true);
+  const toEly=side==="neg"?1:-1;
+  const pend=[]; let total=0; take.forEach(t=>total+=t[1]);
+  let j=0;
+  take.forEach(t=>{for(let k=0;k<t[1];k++){
+    const zone=t[2]||"ely";
+    pend.push({sp:t[0],zone:zone,x:ax+(zone!=="ely"?-toEly:toEly)*46,y:ay+(j-(total-1)/2)*21});
+    j++;
+  }});
+  const ev={side:side,kind:kind,sites:sites,to:to,give:give,pend:pend,need:[],eNeed:pr.e,eAss:0,eGot:0,ax:ax,ay:ay,gx:ax+toEly*46,t:0,toEly:toEly};
+  reserve(ev);
+  return ev;
+}
+function reserve(ev){
+  for(let i=ev.pend.length-1;i>=0;i--){
+    const q=ev.pend[i], p=pickFree(q.sp,q.x,q.y,q.zone);
+    if(p){p.res=true;p.st="go";p.tx=q.x;p.ty=q.y;p.zone="ely";ev.need.push(p);ev.pend.splice(i,1);
+      if(q.zone==="air") P.push(newP(q.sp,AIR.x1,rnd(AIR.y0,AIR.y1),"air"));
+      if(q.zone==="fuel") P.push(newP(q.sp,FUEL.x0,rnd(FUEL.y0,FUEL.y1),"fuel"));}
+  }
+}
+function fire(ev){
+  ev.need.forEach(p=>p.dead=true);
+  ev.sites.forEach(s=>{s.st=ev.to;s.res=false;s.fl=1;});
+  ev.give.forEach(g=>{for(let k=0;k<g[1];k++){
+    const p=newP(g[0],ev.gx,ev.ay+rnd(-14,14));
+    p.st="exit"; p.tx=ev.side==="neg"?ELY.x0+rnd(20,120):ELY.x1-rnd(20,120); p.ty=clamp(ev.ay+rnd(-70,70),ELY.y0,ELY.y1);
+    if(g[2]==="out"){p.out=true; p.tx=ev.side==="neg"?-20:W+20; p.ty=ev.ay+rnd(-40,40);}
+    P.push(p);
+  }});
+  if(ev.kind==="src"){
+    const fromNeg=ev.side==="neg";
+    for(let k=0;k<ev.eNeed;k++){
+      const sx=ev.ax+(k-(ev.eNeed-1)/2)*14;
+      const pts=fromNeg?[{x:sx,y:ev.ay},{x:G.ncx,y:ev.ay},{x:G.ncx,y:G.wy},{x:G.pcx,y:G.wy},{x:G.pcx,y:G.top+10}]
+                       :[{x:sx,y:ev.ay},{x:G.pcx,y:ev.ay},{x:G.pcx,y:G.wy},{x:G.ncx,y:G.wy},{x:G.ncx,y:G.top+10}];
+      EL.push({pts:pts,i:0,x:sx,y:ev.ay,delay:k*0.2,ev:null,st:"move",sink:fromNeg?"pos":"neg"});
+    }
+    stat.e+=ev.eNeed;
+  }else{
+    EL.forEach(e=>{if(e.ev===ev) e.dead=true;});
+  }
+  flash(ev.side==="neg"?"eqNeg":"eqPos");
+  ev.done=true;
+}
+function assignElectron(e){
+  const side=e.sink;
+  let ev=EV.find(v=>v.kind==="snk"&&!v.done&&v.eAss<v.eNeed);
+  if(!ev){ev=makeEvent(side,"snk"); if(!ev){e.dead=true;return;} EV.push(ev);}
+  const idx=ev.eAss++;
+  e.ev=ev;
+  const cx=side==="neg"?G.ncx:G.pcx;
+  e.pts.push({x:cx,y:ev.ay},{x:ev.ax+(idx-(ev.eNeed-1)/2)*14,y:ev.ay});
+}
+
+/* ---------- Folgereaktion im Elektrolyten (Zink-Kohle) ---------- */
+function tryBulk(){
+  const b=bat.bulk; if(!b||mode!=="dis") return;
+  if(EV.some(v=>v.kind==="bulk")||clock-lastBulk<0.8) return;
+  for(const t of b.take) if(countFree(t[0],"ely")<t[1]) return;
+  const first=b.take[0], anchor=pickFree(first[0],(ELY.x0+ELY.x1)/2,(ELY.y0+ELY.y1)/2,"ely");
+  anchor.res=true;
+  const ev={kind:"bulk",anchor:anchor,need:[],pend:[],t:0};
+  b.take.forEach((t,ti)=>{for(let k=0;k<t[1];k++){ if(ti===0&&k===0) continue;
+    const p=pickFree(t[0],anchor.x,anchor.y,"ely"); p.res=true; p.st="go"; p.fol=anchor; ev.need.push(p);}});
+  EV.push(ev); lastBulk=clock;
+}
+
+/* ---------- Zeitschritt ---------- */
+function schedule(){
+  if(finished||wantMode!==mode) return;
+  if(stepping&&stepLeft<=0) return;
+  if(EV.some(v=>v.kind==="src")) return;
+  if(clock-lastSrc<1.5) return;
+  const ev=makeEvent(mode==="dis"?"neg":"pos","src");
+  if(ev){EV.push(ev);lastSrc=clock;if(stepping) stepLeft--;}
+}
+function moveFree(p,dt){
+  let z=p.zone==="air"?AIR:p.zone==="fuel"?FUEL:ELY;
+  const hf=SP[p.sp].half;
+  if(hf&&z===ELY) z=hf==="L"?{x0:ELY.x0,x1:442,y0:ELY.y0,y1:ELY.y1}:{x0:458,x1:ELY.x1,y0:ELY.y0,y1:ELY.y1};
+  p.vx+=(Math.random()-.5)*70*dt; p.vy+=(Math.random()-.5)*70*dt;
+  const v=Math.hypot(p.vx,p.vy);
+  if(v>24){p.vx*=24/v;p.vy*=24/v;} else if(v<7){p.vx+=rnd(-4,4);p.vy+=rnd(-4,4);}
+  p.x+=p.vx*dt; p.y+=p.vy*dt;
+  if(p.x<z.x0){p.x=z.x0;p.vx=Math.abs(p.vx);} if(p.x>z.x1){p.x=z.x1;p.vx=-Math.abs(p.vx);}
+  if(p.y<z.y0){p.y=z.y0;p.vy=Math.abs(p.vy);} if(p.y>z.y1){p.y=z.y1;p.vy=-Math.abs(p.vy);}
+}
+function step(dt){
+  clock+=dt;
+  schedule(); tryBulk();
+  for(const ev of EV){ if(ev.kind!=="bulk"&&ev.pend.length) reserve(ev); ev.t+=dt; }
+  for(const p of P){
+    if(p.st==="free") moveFree(p,dt);
+    else if(p.st==="go"||p.st==="exit"){
+      if(p.fol){p.tx=p.fol.x;p.ty=p.fol.y;}
+      const dx=p.tx-p.x, dy=p.ty-p.y, d=Math.hypot(dx,dy), v=(p.st==="go"?125:85)*dt;
+      const stop=p.fol?16:0.5;
+      if(d<=Math.max(v,stop)){
+        if(!p.fol){p.x=p.tx;p.y=p.ty;}
+        if(p.st==="go") p.st="wait"; else {p.st="free";p.vx=rnd(-18,18);p.vy=rnd(-18,18);if(p.out) p.dead=true;}
+      }else{p.x+=dx/d*v;p.y+=dy/d*v;}
+    }else if(p.st==="wait"&&p.fol){
+      const dx=p.fol.x-p.x, dy=p.fol.y-p.y, d=Math.hypot(dx,dy);
+      if(d>17){p.x+=dx/d*(d-17);p.y+=dy/d*(d-17);}
+    }
+  }
+  for(const e of EL){
+    if(e.delay>0){e.delay-=dt;continue;}
+    if(e.st!=="move") continue;
+    let left=235*dt;
+    while(left>0&&e.st==="move"){
+      const t=e.pts[e.i+1];
+      if(!t){
+        if(!e.ev){assignElectron(e); if(e.dead) break; continue;}
+        e.st="park"; e.ev.eGot++; break;
+      }
+      const dx=t.x-e.x, dy=t.y-e.y, d=Math.hypot(dx,dy);
+      const px=e.x;
+      if(d<=left){e.x=t.x;e.y=t.y;e.i++;left-=d;}
+      else{e.x+=dx/d*left;e.y+=dy/d*left;left=0;}
+      if(Math.abs(e.y-G.wy)<0.5&&(px-450)*(e.x-450)<=0&&px!==e.x) glow=Math.min(1.4,glow+0.55);
+    }
+  }
+  for(const ev of EV){
+    if(ev.done) continue;
+    const ready=ev.need.every(p=>p.st==="wait");
+    if(ev.kind==="bulk"){
+      if(ready){
+        ev.need.forEach(p=>p.dead=true); ev.anchor.dead=true;
+        P.push(newP(bat.bulk.give,ev.anchor.x,ev.anchor.y));
+        flash("eqBulk"); ev.done=true;
+      }
+    }else if(ev.pend.length===0&&ready){
+      if(ev.kind==="src"? ev.t>0.4 : ev.eGot>=ev.eNeed) fire(ev);
+    }
+  }
+  P=P.filter(p=>!p.dead); EL=EL.filter(e=>!e.dead); EV=EV.filter(v=>!v.done);
+  for(const side of ["neg","pos"]) for(const s of S[side]) if(s.fl>0) s.fl=Math.max(0,s.fl-dt*1.3);
+  glow*=Math.exp(-dt*1.6);
+  checkEnd();
+}
+function idle(){return !EV.some(v=>v.kind!=="bulk")&&EL.length===0;}
+function canSource(m){
+  const side=m==="dis"?"neg":"pos", from=m==="dis"?"a":"b", pr=procOf(side);
+  if(pr.sites===0){
+    const take=m==="dis"?pr.take:pr.give;
+    return take.every(t=>(t[2]&&t[2]!=="ely")||P.filter(p=>p.sp===t[0]).length>=t[1]);
+  }
+  return S[side].filter(s=>s.st===from).length>=Math.max(1,pr.sites);
+}
+function checkEnd(){
+  const id=idle();
+  if(wantMode!==mode&&id){mode=wantMode;finished=false;lastSrc=clock-1.2;renderEq();}
+  const fin=id&&wantMode===mode&&!canSource(mode);
+  if(fin!==finished){finished=fin;}
+  if(stepping&&stepLeft<=0&&id){stepping=false;paused=true;}
+  if(finished&&stepping){stepping=false;paused=true;}
+}
+function soc(){
+  if(bat.socSp){let a=0,b=0; for(const p of P){ if(p.sp===bat.socSp[0]) a++; else if(p.sp===bat.socSp[1]) b++; } return a+b?a/(a+b):0;}
+  if(bat.art==="B") return 1;
+  const n=S.neg.length;return S.neg.filter(s=>s.st==="a").length/n;}
+function uModel(b,d){const c=b.curve;return c[1]-c[2]*d+(c[0]-c[1])*Math.exp(-d/0.05)-c[3]*Math.exp((d-1)/0.045);}
+
+/* =====================================================================
+   Zeichnen
+   ===================================================================== */
+const cv=$("sim"), ctx=cv.getContext("2d");
+let scale=1;
+function fit(){
+  const w=cv.clientWidth||900, dpr=Math.min(window.devicePixelRatio||1,2.5);
+  cv.width=Math.round(w*dpr); cv.height=Math.round(w*H/W*dpr); scale=cv.width/W;
+  const c2=$("curve"), w2=c2.clientWidth||520; c2.width=Math.round(w2*dpr); c2.height=Math.round(w2*230/520*dpr);
+  drawCurve();
+}
+const FONT="system-ui,-apple-system,'Segoe UI',Roboto,sans-serif";
+const wCache=new Map();
+function fw(c,s,size,bold){
+  const key=s+"|"+size+"|"+(bold?1:0); let w=wCache.get(key);
+  if(w===undefined){
+    w=0; for(const g of fparse(s)){c.font=(bold?"600 ":"")+(g.m?size*0.72:size)+"px "+FONT; w+=c.measureText(g.t).width;}
+    wCache.set(key,w);
+  }
+  return w;
+}
+function ftext(c,s,x,y,size,color,bold,align){
+  const w=fw(c,s,size,bold); let cx=align==="left"?x:align==="right"?x-w:x-w/2;
+  c.fillStyle=color; c.textAlign="left"; c.textBaseline="middle";
+  for(const g of fparse(s)){
+    const fs=g.m?size*0.72:size; c.font=(bold?"600 ":"")+fs+"px "+FONT;
+    c.fillText(g.t,cx,y+(g.m===1?size*0.3:g.m===2?-size*0.36:0)); cx+=c.measureText(g.t).width;
+  }
+}
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+function lum(hex){const n=parseInt(hex.slice(1),16);return (0.299*(n>>16)+0.587*((n>>8)&255)+0.114*(n&255))/255;}
+function txt(c,s,x,y,size,color,align,bold){c.font=(bold?"600 ":"")+size+"px "+FONT;c.fillStyle=color;c.textAlign=align||"center";c.textBaseline="middle";c.fillText(s,x,y);}
+
+function drawSite(s,c){
+  const lab=s.st==="a"?c.a:c.b, col=s.st==="a"?c.ca:c.cb;
+  const x=s.x-s.w/2, y=s.y-s.h/2;
+  if(lab==null){
+    ctx.setLineDash([4,4]); ctx.strokeStyle="rgba(255,255,255,.22)"; ctx.lineWidth=1; rr(ctx,x,y,s.w,s.h,6); ctx.stroke(); ctx.setLineDash([]);
+  }else{
+    ctx.fillStyle=col; rr(ctx,x,y,s.w,s.h,6); ctx.fill();
+    const dark=lum(col)>0.55, tc=dark?"#14171a":"#f3f0e8";
+    let tx=s.x;
+    if(c.host){
+      ctx.strokeStyle=dark?"rgba(0,0,0,.45)":"rgba(255,255,255,.4)"; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(x+4,y+3.5); ctx.lineTo(x+s.w-4,y+3.5); ctx.moveTo(x+4,y+s.h-3.5); ctx.lineTo(x+s.w-4,y+s.h-3.5); ctx.stroke();
+      if(s.st===c.guest){ctx.fillStyle=c.gcol||"#d39cf0"; ctx.beginPath(); ctx.arc(x+9,s.y,4.5,0,7); ctx.fill(); ctx.strokeStyle="rgba(0,0,0,.5)"; ctx.lineWidth=1; ctx.stroke(); tx+=5;}
+    }
+    ftext(ctx,lab,tx,s.y,lab.length>7?10.5:12,tc,true);
+  }
+  if(s.fl>0){ctx.strokeStyle="rgba(255,180,84,"+s.fl+")"; ctx.lineWidth=3; rr(ctx,x-2,y-2,s.w+4,s.h+4,8); ctx.stroke();}
+}
+function drawParticle(p){
+  const d=SP[p.sp];
+  if(d.spect&&!opt.spect) return;
+  if(p.sp==="H_2O"&&!opt.water) return;
+  const r=d.r; let w=2*r;
+  if(opt.lab) w=Math.max(w,fw(ctx,p.sp,9.5,true)+7);
+  ctx.globalAlpha=d.spect?0.6:1;
+  ctx.fillStyle=d.c; rr(ctx,p.x-w/2,p.y-r,w,2*r,r); ctx.fill();
+  if(p.st==="go"||p.st==="wait"){ctx.strokeStyle="#fff"; ctx.lineWidth=1.2; ctx.stroke();}
+  if(opt.lab) ftext(ctx,p.sp,p.x,p.y,9.5,"#14171a",true);
+  ctx.globalAlpha=1;
+}
+function draw(){
+  if(view==="bau"){drawBau();return;}
+  ctx.setTransform(scale,0,0,scale,0,0);
+  ctx.clearRect(0,0,W,H);
+  const dis=mode==="dis";
+  HITS=[]; PARTS={};
+  part("ely","ely","Elektrolyt: "+bat.ely.short,"",[[230,150,440,350]]);
+  part("neg","neg","Minuspol: "+bat.neg.short,"",[[90,150,140,350]]);
+  part("pos","pos","Pluspol: "+bat.pos.short,"",[[670,150,140,350]]);
+  part("load","load",dis?"Verbraucher":"Ladegerät","",[[dis?424:398,36,dis?52:104,52]]);
+  txt(ctx,"Elektrode, Elektrolyt oder Verbraucher antippen: Details",450,14,11.5,"#5f6870");
+  /* Gehäuse und Elektrolyt */
+  ctx.fillStyle="#171b1f"; rr(ctx,78,138,744,374,12); ctx.fill();
+  ctx.strokeStyle="#3a4249"; ctx.lineWidth=2; ctx.stroke();
+  ctx.fillStyle=bat.ely.bg; ctx.fillRect(G.nx1,G.top,G.px0-G.nx1,G.bot-G.top);
+  if(bat.half){
+    const sc=soc(); ctx.globalAlpha=0.13;
+    ctx.fillStyle=mix(SP["V^3+"].c,SP["V^2+"].c,sc); ctx.fillRect(G.nx1,G.top,450-G.nx1,G.bot-G.top);
+    ctx.fillStyle=mix(SP["VO^2+"].c,SP["VO_2^+"].c,sc); ctx.fillRect(450,G.top,G.px0-450,G.bot-G.top);
+    ctx.globalAlpha=1;
+  }
+  /* Separator */
+  if(!bat.ely.noSep){
+    ctx.setLineDash([7,6]); ctx.strokeStyle="rgba(255,255,255,.28)"; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(450,G.top+4); ctx.lineTo(450,G.bot-4); ctx.stroke(); ctx.setLineDash([]);
+  }
+  /* Elektroden */
+  for(const side of ["neg","pos"]){
+    const c=bat[side], x0=side==="neg"?G.nx0:G.px0;
+    ctx.fillStyle=c.bg; ctx.fillRect(x0,G.top,140,G.bot-G.top);
+    if(c.porous){ctx.fillStyle="rgba(255,255,255,.07)"; for(let i=0;i<70;i++){const a=(i*61)%140,b=(i*97)%350; ctx.beginPath(); ctx.arc(x0+a,G.top+b,2+(i%3),0,7); ctx.fill();}}
+    ctx.strokeStyle="rgba(255,255,255,.14)"; ctx.lineWidth=1; ctx.strokeRect(x0+.5,G.top+.5,139,G.bot-G.top-1);
+    /* Ableiter */
+    const cx=side==="neg"?G.ncx:G.pcx;
+    ctx.strokeStyle="#6b747c"; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(cx,G.top); ctx.lineTo(cx,G.bot-8); ctx.stroke();
+    for(const s of S[side]) drawSite(s,c);
+  }
+  /* Luftraum der Zink-Luft-Zelle */
+  if(bat.air){
+    ctx.fillStyle="#0e1113"; for(let i=0;i<4;i++) ctx.fillRect(811,196+i*72,12,30);
+    ctx.fillStyle="rgba(255,138,128,.05)"; ctx.fillRect(824,150,72,350);
+    txt(ctx,"Luft",860,160,12,"#9aa2a9");
+  }
+  if(bat.fuel){
+    ctx.fillStyle="#0e1113"; for(let i=0;i<4;i++) ctx.fillRect(77,196+i*72,12,30);
+    ctx.fillStyle="rgba(230,237,243,.05)"; ctx.fillRect(4,150,72,350);
+    txt(ctx,bat.fuelName||"Wasserstoff",40,160,12,"#9aa2a9");
+  }
+  /* Stromkreis */
+  ctx.strokeStyle="#8b949c"; ctx.lineWidth=3; ctx.lineJoin="round";
+  ctx.beginPath(); ctx.moveTo(G.ncx,G.top); ctx.lineTo(G.ncx,G.wy); ctx.lineTo(G.pcx,G.wy); ctx.lineTo(G.pcx,G.top); ctx.stroke();
+  if(dis){
+    const g=Math.min(1,glow);
+    if(g>0.02){const gr=ctx.createRadialGradient(450,G.wy,6,450,G.wy,62); gr.addColorStop(0,"rgba(255,214,110,"+(0.75*g)+")"); gr.addColorStop(1,"rgba(255,214,110,0)"); ctx.fillStyle=gr; ctx.beginPath(); ctx.arc(450,G.wy,62,0,7); ctx.fill();}
+    ctx.fillStyle=g>0.02?"rgb("+Math.round(60+195*g)+","+Math.round(55+160*g)+","+Math.round(40+60*g)+")":"#23282d";
+    ctx.beginPath(); ctx.arc(450,G.wy,21,0,7); ctx.fill(); ctx.strokeStyle="#c8cdd2"; ctx.lineWidth=2.5; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(435,G.wy-15); ctx.lineTo(465,G.wy+15); ctx.moveTo(465,G.wy-15); ctx.lineTo(435,G.wy+15); ctx.stroke();
+    txt(ctx,"Verbraucher",450,G.wy+38,12.5,"#9aa2a9");
+  }else{
+    ctx.fillStyle="#23282d"; rr(ctx,398,G.wy-22,104,44,8); ctx.fill(); ctx.strokeStyle="#4fd1c5"; ctx.lineWidth=2.5; ctx.stroke();
+    txt(ctx,"Ladegerät",450,G.wy,13.5,"#4fd1c5","center",true);
+    txt(ctx,"−",408,G.wy-32,15,"#7fb4ff","center",true); txt(ctx,"+",492,G.wy-32,15,"#ff8a80","center",true);
+    txt(ctx,"Spannungsquelle",450,G.wy+38,12.5,"#9aa2a9");
+  }
+  const arrow=dis?"e⁻  ⟶":"⟵  e⁻";
+  txt(ctx,arrow,290,G.wy-16,14,"#ffe14d","center",true); txt(ctx,arrow,610,G.wy-16,14,"#ffe14d","center",true);
+  /* Polbeschriftung */
+  ctx.fillStyle="#7fb4ff"; ctx.beginPath(); ctx.arc(30,92,11,0,7); ctx.fill(); txt(ctx,"−",30,91,17,"#101315","center",true);
+  txt(ctx,"Minuspol",48,92,15,"#e7e4dd","left",true);
+  txt(ctx,dis?"Anode · Oxidation":"Kathode · Reduktion",18,114,12.5,"#9aa2a9","left");
+  ctx.fillStyle="#ff8a80"; ctx.beginPath(); ctx.arc(870,92,11,0,7); ctx.fill(); txt(ctx,"+",870,92,16,"#101315","center",true);
+  txt(ctx,"Pluspol",852,92,15,"#e7e4dd","right",true);
+  txt(ctx,dis?"Kathode · Reduktion":"Anode · Oxidation",882,114,12.5,"#9aa2a9","right");
+  /* Materialbeschriftung */
+  txt(ctx,bat.neg.short,G.ncx,528,13,"#e7e4dd","center",true);
+  txt(ctx,bat.pos.short,G.pcx,528,13,"#e7e4dd","center",true);
+  txt(ctx,"Elektrolyt: "+bat.ely.short,450,528,13,"#e7e4dd","center");
+  if(!bat.ely.noSep) txt(ctx,bat.ely.sep||"Separator",450,546,11.5,"#5f6870");
+  /* Teilchen */
+  for(const p of P) if(SP[p.sp].spect) drawParticle(p);
+  for(const p of P) if(!SP[p.sp].spect) drawParticle(p);
+  for(const e of EL){
+    ctx.fillStyle="#ffe14d"; ctx.beginPath(); ctx.arc(e.x,e.y,6.5,0,7); ctx.fill(); ctx.strokeStyle="#14171a"; ctx.lineWidth=1; ctx.stroke();
+    if(opt.lab) ftext(ctx,"e^-",e.x,e.y,8.5,"#14171a",true);
+  }
+  if(finished){
+    const msg=dis?(bat.art==="S"?"Akku entladen":"Batterie entladen"):"Akku vollständig geladen";
+    ctx.font="600 15px "+FONT; const mw=ctx.measureText(msg).width+28;
+    ctx.fillStyle="rgba(14,17,19,.88)"; rr(ctx,450-mw/2,306,mw,36,8); ctx.fill(); ctx.strokeStyle="#ffb454"; ctx.lineWidth=1.5; ctx.stroke();
+    txt(ctx,msg,450,324,15,"#ffb454","center",true);
+  }
+  drawHover();
+}
+
+
+/* =====================================================================
+   Ansicht „Bauform“: animiertes Schnittbild der Zelle
+   ===================================================================== */
+const BI={
+  zk:{form:"becher",name:"Rundzelle (Becherzelle)",ion:["NH_4^+","n2p"]},
+  al:{form:"rund",name:"Rundzelle",ion:["OH^-","p2n"]},
+  zl:{form:"knopf",name:"Knopfzelle",ion:["OH^-","p2n"],neg:"Zinkpulver-Gel\n(Minuspol)",pos:"Luftelektrode: poröse Kohle\nmit Katalysator (Pluspol)"},
+  ag:{form:"knopf",name:"Knopfzelle",ion:["OH^-","p2n"],neg:"Zinkpulver-Gel\n(Minuspol)",pos:"Silber(I)-oxid\n(Pluspol)"},
+  lm:{form:"knopf",name:"Knopfzelle",ion:["Li^+","n2p"],neg:"Lithium-Metall\n(Minuspol)",pos:"Mangan(IV)-oxid\n(Pluspol)"},
+  pb:{form:"platten",name:"Plattenzelle",ion:["SO_4^2-","n2p"]},
+  nc:{form:"wickel",name:"Rundzelle mit Wickel",ion:["OH^-","p2n"],neg:"Cadmium-Elektrode\n(Minuspol)",pos:"Nickel-Elektrode\n(Pluspol)"},
+  nm:{form:"wickel",name:"Rundzelle mit Wickel",ion:["OH^-","p2n"],neg:"Metallhydrid-Elektrode\n(Minuspol)",pos:"Nickel-Elektrode\n(Pluspol)"},
+  li:{form:"wickel",name:"Rundzelle mit Wickel",ion:["Li^+","n2p"],neg:"Graphit auf Kupferfolie\n(Minuspol)",pos:"Lithiumcobaltoxid auf\nAluminiumfolie (Pluspol)"},
+  lf:{form:"wickel",name:"Rundzelle mit Wickel (auch als Flachzelle)",ion:["Li^+","n2p"],neg:"Graphit auf Kupferfolie\n(Minuspol)",pos:"Lithiumeisenphosphat auf\nAluminiumfolie (Pluspol)"},
+  rf:{form:"flow",name:"Durchflusszelle mit Tanks",ion:["H^+","n2p"]},
+  bz:{form:"pem",name:"Membran-Brennstoffzelle (Schichtaufbau)",ion:["H^+","n2p"]},
+  mz:{form:"pem",name:"Festoxid-Brennstoffzelle (Schichtaufbau)",ion:["O^2-","p2n"],
+      L:{fuel:"Methan (CH₄)",fuelCol:"#b7e36b",out1:"CO₂ + Wasser",out2:"Restluft",out2Col:"#9aa2a9",mem:"Festelektrolyt: Keramik\n(leitet O²⁻-Ionen)",memCol:"#8a5a70",
+         an:"Anode: poröse Keramik\nmit Nickel-Katalysator",ca:"Kathode: poröses\nMischoxid",pl1:"Verbindungsplatte mit\nGaskanal (Minuspol)",pl2:"Verbindungsplatte (Pluspol)",
+         gas:[[240,150,358,150,"CH_4"],[363,150,363,300,"CH_4"],[363,300,363,440,"CO_2"],[358,440,240,440,"CO_2"],[660,150,542,150,"O_2"],[537,150,537,440,"O_2"],[542,440,660,440,"O_2"]],
+         note:"Arbeitet bei 600–1000 °C: Erst dann leitet die Keramik Oxid-Ionen. Viele Zellen bilden einen Stapel (Stack)."}}
+};
+function mix(a,b,t){
+  const A=parseInt(a.slice(1),16),B=parseInt(b.slice(1),16), f=s=>Math.round(((A>>s)&255)*(1-t)+((B>>s)&255)*t);
+  return "rgb("+f(16)+","+f(8)+","+f(0)+")";
+}
+function box(col,x,y,w,h,r){ctx.fillStyle=col; if(r){rr(ctx,x,y,w,h,r);ctx.fill();} else ctx.fillRect(x,y,w,h);}
+let HITS=[], PARTS={}, hoverId=null;
+function part(id,role,title,text,rects,pole){
+  PARTS[id]={id:id,role:role,title:title.replace(/\n/g," "),text:text||"",pole:pole};
+  rects.forEach(r=>HITS.push({id:id,x:r[0],y:r[1],w:r[2],h:r[3]}));
+}
+function hitXY(x,y,pad){
+  for(let i=HITS.length-1;i>=0;i--){const h=HITS[i]; if(x>=h.x-pad&&x<=h.x+h.w+pad&&y>=h.y-pad&&y<=h.y+h.h+pad) return h.id;}
+  return null;
+}
+function drawHover(){
+  if(!hoverId) return;
+  ctx.strokeStyle="#ffb454"; ctx.lineWidth=2;
+  for(const h of HITS) if(h.id===hoverId){ if(h.lab){ctx.beginPath();ctx.moveTo(h.x+2,h.y+h.h);ctx.lineTo(h.x+h.w-2,h.y+h.h);ctx.stroke();} else ctx.strokeRect(h.x-1,h.y-1,h.w+2,h.h+2); }
+}
+function lead(px,py,tx,ty,text,align){
+  const pid=hitXY(px,py,0);
+  ctx.strokeStyle="rgba(231,228,221,.42)"; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(tx+(align==="right"?7:-7),ty); ctx.stroke();
+  ctx.fillStyle="#e7e4dd"; ctx.beginPath(); ctx.arc(px,py,2.6,0,7); ctx.fill();
+  const lines=text.split("\n");
+  lines.forEach((l,i)=>txt(ctx,l,tx,ty+(i-(lines.length-1)/2)*15,12.5,"#e7e4dd",align));
+  if(pid){ let w=0; lines.forEach(l=>w=Math.max(w,ctx.measureText(l).width));
+    HITS.push({id:pid,lab:true,x:align==="right"?tx-w:tx,y:ty-lines.length*7.5-3,w:w,h:lines.length*15+6}); }
+}
+const T_SEAL="Die Dichtung besteht aus Kunststoff. Sie verschließt die Zelle, damit kein Elektrolyt austritt und nichts eintrocknet, und sie isoliert die beiden Pole voneinander – sonst gäbe es einen Kurzschluss.";
+const SEPC="#d8d2c0", STEEL="#9aa3ab", CAP="#c8cdd2", SEAL="#3b6f8f";
+const BAU={
+  /* Zink-Kohle: Zinkbecher außen, Kohlestab in der Mitte */
+  becher(nc,pc,d){
+    const wt=14-7*d;
+    box("#2b3238",364,112,172,362,8);
+    box(bat.neg.ca,372,120,156,348);
+    box("#56735e",372+wt,120,156-2*wt,348-wt);
+    box("#8a8f96",372+wt,120,156-2*wt,30);
+    box(pc,398,156,104,286);
+    box("#15181b",440,104,20,332); ctx.strokeStyle="#4a535b"; ctx.lineWidth=1; ctx.strokeRect(440.5,104.5,19,331);
+    box(CAP,430,92,40,14,3); box(CAP,400,468,100,8);
+    part("case","none","Metallmantel","Der Mantel schützt die Zelle und hält Elektrolyt zurück, falls der Zinkbecher durchlöchert ist.",[[364,112,8,362],[528,112,8,362]]);
+    part("neg","neg","Zinkbecher (Minuspol)","Der Becher ist Reaktionspartner und Gefäß zugleich. Weil sich das Zink auflöst, wird die Wand dünner; bei verbrauchten Zellen kann deshalb Elektrolyt austreten.",[[372,120,wt,348],[528-wt,120,wt,348],[372,468-wt,156,wt]]);
+    part("ely","ely","Elektrolyt-Paste mit Separator","Die Ammoniumchlorid-Lösung ist mit Stärke eingedickt, damit sie nicht ausläuft („Trockenbatterie“). Eine Papierschicht trennt Zinkbecher und Braunstein-Masse.",[[372+wt,150,26-wt,292],[502,150,26-wt,292],[398,442,104,26-wt]]);
+    part("seal","none","Dichtung",T_SEAL,[[372+wt,120,156-2*wt,30]]);
+    part("pos","pos","Braunstein + Graphit (Pluspol)","Braunstein (Mangan(IV)-oxid) leitet den Strom schlecht. Deshalb ist Graphitpulver beigemischt: Es leitet die Elektronen vom Kohlestab bis zu den Braunstein-Körnern.",[[398,156,104,286]]);
+    part("rod","cond","Kohlestab (Ableiter)","Der Stab aus Graphit nimmt an der Reaktion nicht teil. Er leitet die Elektronen zwischen Metallkappe und Braunstein-Masse. Graphit eignet sich, weil er den Strom leitet und vom Elektrolyten nicht angegriffen wird.",[[440,104,20,332]],"pos");
+    part("cap","cond","Metallkappe (Pluspol-Kontakt)","Die Kappe ist der äußere Anschluss des Pluspols und sitzt auf dem Kohlestab.",[[430,92,40,14]],"pos");
+    part("bot","cond","Bodenkontakt (Minuspol)","Der Bodenkontakt ist der äußere Anschluss des Minuspols; er liegt am Zinkbecher an.",[[400,468,100,8]],"neg");
+    lead(372+wt/2,290,335,290,"Zinkbecher (Minuspol)","right");
+    lead(372+wt+5,380,335,380,"Elektrolyt-Paste (NH₄Cl)\nmit Separator","right");
+    lead(366,440,335,446,"Metallmantel","right");
+    lead(466,99,565,112,"Metallkappe (Pluspol-Kontakt)","left");
+    lead(496,134,565,152,"Dichtung","left");
+    lead(456,220,565,220,"Kohlestab (Ableiter)","left");
+    lead(490,320,565,320,"Braunstein + Graphit\n(Pluspol)","left");
+    lead(496,472,565,470,"Bodenkontakt (Minuspol)","left");
+    const lanes=[]; [200,280,360].forEach(y=>{lanes.push([386,y,420,y],[514,y,480,y]);});
+    return {path:[[450,476],[450,522],[850,522],[850,58],[450,58],[450,92]],cons:[850,290],lanes:lanes,nb:[410,498],pb:[410,82],
+      note:"Der Zinkbecher ist Minuspol und Gefäß zugleich – er wird beim Entladen dünner."};
+  },
+  /* Alkali-Mangan: Stahlbecher außen (Plus), Zinkgel innen */
+  rund(nc,pc,d){
+    box(STEEL,368,110,164,360,6); box(STEEL,432,96,36,16,3);
+    box(pc,378,122,144,320); box(SEPC,410,128,80,314); box(nc,416,134,68,308);
+    box(SEAL,370,442,160,30);
+    box("#c9a84f",446,180,8,292); box(CAP,402,468,96,10);
+    part("can","cond","Stahlbecher (Pluspol-Kontakt)","Der vernickelte Stahlbecher ist Gehäuse und Anschluss des Pluspols. Er reagiert selbst nicht – deshalb läuft eine Alkali-Mangan-Zelle viel seltener aus als eine Zink-Kohle-Batterie.",[[368,110,10,332],[522,110,10,332],[368,110,164,12],[432,96,36,16]],"pos");
+    part("pos","pos","Braunstein + Graphit (Pluspol)","Die Braunstein-Masse liegt als Ring innen am Stahlbecher. Graphitpulver ist beigemischt, weil Braunstein den Strom schlecht leitet.",[[378,122,32,320],[490,122,32,320]]);
+    part("ely","ely","Separator (mit Kalilauge getränkt)","Das Vlies trennt Zinkgel und Braunstein, lässt aber Hydroxid-Ionen hindurch. Die Kalilauge durchtränkt alle Schichten der Zelle.",[[409,128,8,314],[483,128,8,314]]);
+    part("neg","neg","Zinkpulver-Gel (Minuspol)","Zinkpulver hat eine viel größere Oberfläche als ein Zinkbecher. Dadurch können mehr Zink-Atome gleichzeitig reagieren – die Zelle liefert höhere Ströme.",[[417,134,66,308]]);
+    part("seal","none","Dichtung",T_SEAL,[[370,442,160,26]]);
+    part("nail","cond","Ableitnagel (Messing)","Der Nagel sammelt die Elektronen, die das Zinkpulver abgibt, und leitet sie zur Bodenkappe. Messing leitet gut und wird von der Lauge nicht angegriffen.",[[446,180,8,288]],"neg");
+    part("bot","cond","Bodenkappe (Minuspol-Kontakt)","Die Bodenkappe ist der äußere Anschluss des Minuspols. Die Dichtung isoliert sie vom Stahlbecher.",[[402,468,96,10]],"neg");
+    lead(371,200,335,200,"Stahlbecher\n(Pluspol-Kontakt)","right");
+    lead(394,290,335,290,"Braunstein + Graphit\n(Pluspol)","right");
+    lead(413,380,335,380,"Separator","right");
+    lead(475,240,565,240,"Zinkpulver-Gel (Minuspol)","left");
+    lead(452,340,565,340,"Ableitnagel (Messing)","left");
+    lead(516,455,565,430,"Dichtung","left");
+    lead(492,474,565,474,"Bodenkappe (Minuspol-Kontakt)","left");
+    const lanes=[]; [200,280,360].forEach(y=>{lanes.push([432,y,394,y],[468,y,506,y]);});
+    return {path:[[450,478],[450,522],[850,522],[850,58],[450,58],[450,96]],cons:[850,290],lanes:lanes,nb:[410,498],pb:[410,84],
+      note:"Umgekehrt gebaut wie die Zink-Kohle-Batterie: Zink innen, Braunstein außen. Kalilauge tränkt alle Schichten."};
+  },
+  /* Knopfzellen: Deckel = Minuspol, Becher = Pluspol */
+  knopf(nc,pc,d){
+    const zl=bat.id==="zl", bi=BI[bat.id];
+    box(STEEL,290,250,320,130,6);
+    box(SEAL,300,250,300,60);
+    box(CAP,312,198,276,104,10);
+    box(nc,322,210,256,92);
+    box(SEPC,300,302,300,8);
+    if(zl){
+      box(pc,300,310,300,18); box("#7f8a94",300,328,300,42);
+      ctx.fillStyle="rgba(14,17,19,.35)"; for(let i=0;i<40;i++){ctx.beginPath();ctx.arc(306+(i*53)%288,333+(i*17)%32,2.2,0,7);ctx.fill();}
+      box("#0e1113",373,370,14,11); box("#0e1113",513,370,14,11);
+      txt(ctx,"Luft (O₂)",380,462,12.5,"#ff8a80");
+    }else box(pc,300,310,300,60);
+    part("can","cond","Becher (Pluspol-Kontakt)","Der Metallbecher ist Gehäuse und Anschluss des Pluspols."+(zl?" In seinem Boden sitzen die Luftlöcher.":""),[[290,250,10,130],[600,250,10,130],[290,370,320,10]],"pos");
+    part("seal","none","Dichtung",T_SEAL,[[300,250,12,52],[588,250,12,52]]);
+    part("lid","cond","Deckel (Minuspol-Kontakt)","Der Metalldeckel ist der Anschluss des Minuspols. Er steht innen in direktem Kontakt mit dem Minuspol-Material.",[[312,198,276,12],[312,198,10,104],[578,198,10,104]],"neg");
+    part("neg","neg",bi.neg,"",[[322,210,256,92]]);
+    part("ely","ely","Separator (mit Elektrolyt getränkt)","Die dünne, poröse Schicht trennt die beiden Elektroden und ist mit dem Elektrolyten getränkt.",[[300,299,300,13]]);
+    if(zl){
+      part("pos","pos",bi.pos,"Die dünne Luftelektrode wird nicht verbraucht: An ihrem Katalysator reagiert der Sauerstoff aus der Luft.",[[300,312,300,16]]);
+      part("dist","pos","Luftverteiler","Die poröse, wasserabweisende Schicht verteilt den Sauerstoff gleichmäßig über die Luftelektrode. Gas kann hinein, die Kalilauge aber nicht hinaus. Die Reaktion des Sauerstoffs läuft an der Luftelektrode darüber ab:",[[300,328,300,42]]);
+      part("holes","pos","Luftlöcher","Durch die Löcher gelangt Luft in die Zelle. Vor dem Gebrauch sind sie mit einer Folie verschlossen; nach dem Abziehen dauert es kurz, bis genug Sauerstoff eingedrungen ist. Der Sauerstoff reagiert an der Luftelektrode:",[[368,366,24,18],[508,366,24,18]]);
+    }else part("pos","pos",bi.pos,"Das Pluspol-Material liegt als gepresste Schicht am Boden des Bechers.",[[300,312,300,58]]);
+    lead(330,203,262,186,"Deckel (Minuspol-Kontakt)","right");
+    lead(340,255,262,250,bi.neg,"right");
+    lead(306,285,262,318,"Dichtung (isoliert\nDeckel und Becher)","right");
+    lead(586,306,640,262,"Separator,\nmit Elektrolyt getränkt","left");
+    lead(578,zl?319:340,640,318,bi.pos,"left");
+    if(zl){ lead(578,350,640,368,"Luftverteiler","left"); lead(524,376,640,452,"Luftlöcher","left"); }
+    lead(606,362,640,410,"Becher (Pluspol-Kontakt)","left");
+    const lanes=[[360,282,360,330],[450,282,450,330],[540,282,540,330]];
+    return {path:[[450,198],[450,58],[850,58],[850,522],[450,522],[450,380]],cons:[850,290],lanes:lanes,nb:[410,176],pb:[410,404],
+      gas:zl?[[380,446,380,345],[520,446,520,345]]:null,
+      note:zl?"Der Sauerstoff kommt durch die Luftlöcher – die Zelle enthält fast nur Zink.":"Flache Bauform: Die Elektroden liegen als Schichten übereinander."};
+  },
+  /* Bleiakku: Platten in Schwefelsäure */
+  platten(nc,pc,d){
+    box("#23282d",280,150,340,322,8); ctx.strokeStyle="#4a535b"; ctx.lineWidth=2; rr(ctx,280,150,340,322,8); ctx.stroke();
+    box("rgba(240,222,122,"+(0.30-0.18*d)+")",290,205,320,257);
+    const xs=[306,358,410,462,514,566], NB="#7f8aa0", PB="#b08a78";
+    xs.forEach((x,i)=>{ if(i%2) box(PB,x+10,172,8,53); });
+    box(PB,372,168,234,8); box(PB,592,128,14,48);
+    ctx.strokeStyle="#14171a"; ctx.lineWidth=2; ctx.strokeRect(299,185,226,10);
+    box(NB,300,186,224,8); box(NB,294,128,14,66);
+    xs.forEach((x,i)=>{ if(i%2===0) box(NB,x+10,194,8,31); });
+    box("#2f363c",280,150,340,10);
+    box(NB,294,128,14,24); box(PB,592,128,14,24);
+    xs.forEach((x,i)=>{ box(i%2?pc:nc,x,225,28,220,3); });
+    ctx.setLineDash([5,5]); ctx.strokeStyle="rgba(255,255,255,.4)"; ctx.lineWidth=1.5;
+    for(let i=0;i<5;i++){const cx=xs[i]+40; ctx.beginPath(); ctx.moveTo(cx,215); ctx.lineTo(cx,455); ctx.stroke();}
+    ctx.setLineDash([]);
+    part("case","none","Kunststoffgehäuse","Das Gehäuse aus Polypropylen ist säurefest und isoliert. In der Autobatterie enthält es sechs voneinander getrennte Zellen, die in Reihe geschaltet sind.",[[280,150,340,10],[280,150,10,322],[610,150,10,322],[280,462,340,10]]);
+    part("ely","ely","Schwefelsäure (Elektrolyt)","Die Schwefelsäure ist hier nicht nur Ionenleiter, sondern Reaktionspartner: Beim Entladen werden Sulfat-Ionen und H⁺-Ionen verbraucht, und es entsteht Wasser. Die Dichte sinkt von etwa 1,28 g/cm³ auf etwa 1,10 g/cm³ – daran lässt sich der Ladezustand messen.",[[290,205,320,257]]);
+    for(let i=0;i<5;i++) part("sep","ely","Separator","Die porösen Trennwände aus Kunststoff verhindern, dass sich die eng stehenden Platten berühren. Die Säure und ihre Ionen können hindurch.",[[xs[i]+35,215,10,240]]);
+    part("brP","cond","Polbrücke (Pluspol)","Die Polbrücke aus Blei verbindet alle gleichartigen Platten einer Zelle. So wird die Plattenfläche groß, und die Zelle kann sehr hohe Ströme liefern – zum Beispiel für den Anlasser.",[[372,168,234,8]],"pos");
+    part("brN","cond","Polbrücke (Minuspol)","Die Polbrücke aus Blei verbindet alle gleichartigen Platten einer Zelle. So wird die Plattenfläche groß, und die Zelle kann sehr hohe Ströme liefern – zum Beispiel für den Anlasser.",[[300,186,224,8]],"neg");
+    part("postN","cond","Minuspol (Anschluss)","Über den Polbolzen aus Blei ist die Zelle mit dem Stromkreis verbunden.",[[294,128,14,58]],"neg");
+    part("postP","cond","Pluspol (Anschluss)","Über den Polbolzen aus Blei ist die Zelle mit dem Stromkreis verbunden.",[[592,128,14,40]],"pos");
+    xs.forEach((x,i)=>{ if(i%2) part("pos","pos","Blei(IV)-oxid-Platten (Pluspol)","Das braune Blei(IV)-oxid sitzt als poröse Masse in einem Bleigitter. Das entstehende Blei(II)-sulfat ist schwer löslich und bleibt auf der Platte haften.",[[x,225,28,220]]);
+      else part("neg","neg","Blei-Platten (Minuspol)","Das Blei ist schwammartig porös, damit die Schwefelsäure eine große Oberfläche erreicht. Das entstehende Blei(II)-sulfat ist schwer löslich und bleibt auf der Platte haften – nur deshalb lässt sich der Vorgang beim Laden umkehren.",[[x,225,28,220]]); });
+    lead(296,140,255,118,"Minuspol","right");
+    lead(312,300,255,300,"Blei-Platten\n(Minuspol)","right");
+    lead(346,390,255,390,"Separator","right");
+    lead(283,452,255,452,"Kunststoffgehäuse","right");
+    lead(604,140,645,118,"Pluspol","left");
+    lead(588,172,645,172,"Polbrücke (verbindet\ngleichartige Platten)","left");
+    lead(604,214,645,232,"Schwefelsäure","left");
+    lead(590,320,645,320,"Blei(IV)-oxid-Platten\n(Pluspol)","left");
+    const lanes=[]; for(let i=0;i<5;i++){const cx=xs[i]+40, y=255+(i%3)*45; lanes.push([cx,y,cx-22,y],[cx,y+85,cx+22,y+85]);}
+    return {path:[[301,128],[301,58],[599,58],[599,128]],cons:[450,58],lanes:lanes,nb:[268,84],pb:[632,84],
+      note:"Eine Zelle liefert 2 V; in der Autobatterie sind sechs Zellen in Reihe geschaltet (12 V)."};
+  },
+  /* Wickelzellen: NiCd, NiMH, Lithium-Ionen */
+  wickel(nc,pc,d){
+    const bi=BI[bat.id];
+    box(STEEL,368,112,164,360,6);
+    box("#1b1f23",378,126,144,334);
+    ctx.save(); ctx.beginPath(); ctx.rect(380,140,140,306); ctx.clip();
+    for(let k=0;k<6;k++){const s0=380+24*k; box(nc,s0,140,9,306); box(SEPC,s0+9,140,3,306); box(pc,s0+12,140,9,306); box(SEPC,s0+21,140,3,306);}
+    ctx.restore();
+    box(SEAL,370,112,160,14); box(CAP,428,96,44,20,4); box("#6b747c",444,100,12,4);
+    ctx.strokeStyle=CAP; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(468,140); ctx.lineTo(460,116); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(432,446); ctx.lineTo(432,461); ctx.stroke();
+    const TW=" Das Elektrodenmaterial ist als dünne Schicht auf ein langes Metallband aufgetragen und zusammen mit Separator und Gegenelektrode aufgewickelt – so entsteht eine große Fläche auf kleinem Raum.";
+    part("can","cond","Stahlbecher (Minuspol-Kontakt)","Der Becher ist Gehäuse und Anschluss des Minuspols; eine Ableiterfahne verbindet ihn am Boden mit dem Minuspol-Band.",[[368,112,10,360],[522,112,10,360],[368,460,164,12]],"neg");
+    for(let k=0;k<6;k++){const s0=380+24*k;
+      part("neg","neg",bi.neg,TW.trim(),[[s0,140,Math.min(9,520-s0),306]]);
+      if(s0+12<520) part("pos","pos",bi.pos,TW.trim(),[[s0+12,140,Math.min(9,508-s0),306]]);
+      part("ely","ely","Separator (mit Elektrolyt getränkt)","Die dünne, poröse Kunststofffolie liegt zwischen den beiden Elektrodenbändern. Sie verhindert einen Kurzschluss und ist mit dem Elektrolyten getränkt.",[[s0+9,140,3,306]].concat(s0+21<520?[[s0+21,140,3,306]]:[]));
+    }
+    part("seal","none","Dichtung",T_SEAL,[[370,112,160,14]]);
+    part("lid","cond","Deckel mit Sicherheitsventil (Pluspol-Kontakt)","Der Deckel ist der Anschluss des Pluspols. Das Sicherheitsventil öffnet bei Überdruck (Überladen, Kurzschluss, Überhitzung) und lässt Gas entweichen, bevor die Zelle platzt.",[[428,96,44,20]],"pos");
+    part("tab","cond","Ableiterfahne","Die dünne Metallfahne verbindet das aufgewickelte Pluspol-Band mit dem Deckel. Eine zweite Fahne verbindet das Minuspol-Band mit dem Becherboden.",[[456,116,16,26]],"pos");
+    lead(372,190,335,170,"Stahlbecher\n(Minuspol-Kontakt)","right");
+    lead(384,250,335,240,bi.neg,"right");
+    lead(390.5,310,335,310,"Separator,\nmit Elektrolyt getränkt","right");
+    lead(468,104,565,112,"Deckel mit Sicherheitsventil\n(Pluspol-Kontakt)","left");
+    lead(524,119,565,158,"Dichtung","left");
+    lead(516,240,565,240,bi.pos,"left");
+    lead(464,128,565,196,"Ableiterfahne","left");
+    /* Draufsicht */
+    const cx=170,cy=446;
+    txt(ctx,"Draufsicht: Die Schichten sind",cx,364,12.5,"#9aa2a9"); txt(ctx,"zu einem Wickel aufgerollt.",cx,380,12.5,"#9aa2a9");
+    ctx.fillStyle=STEEL; ctx.beginPath(); ctx.arc(cx,cy,56,0,7); ctx.fill();
+    ctx.fillStyle=SEPC; ctx.beginPath(); ctx.arc(cx,cy,51,0,7); ctx.fill();
+    [[nc,0],[pc,Math.PI]].forEach(q=>{
+      ctx.strokeStyle=q[0]; ctx.lineWidth=3; ctx.beginPath();
+      for(let i=0;i<=300;i++){const th=i/300*10*Math.PI, r=4+th*1.42; const x=cx+r*Math.cos(th+q[1]), y=cy+r*Math.sin(th+q[1]); if(i) ctx.lineTo(x,y); else ctx.moveTo(x,y);}
+      ctx.stroke();
+    });
+    const lanes=[]; for(let k=0;k<6;k++){const s0=380+24*k, y=190+(k%3)*90; lanes.push([s0+3,y,s0+18,y]); if(k<5) lanes.push([s0+27,y+45,s0+18,y+45]);}
+    return {path:[[450,472],[450,522],[850,522],[850,58],[450,58],[450,96]],cons:[850,290],lanes:lanes,nb:[410,498],pb:[410,84],small:true,
+      note:"Dünne, lange Elektrodenbänder ergeben eine große Oberfläche – das ermöglicht hohe Ströme."};
+  },
+  /* Redox-Flow: Zelle mit zwei Tanks und Pumpen */
+  flow(nc,pc,d){
+    const sc=1-d, ca=mix(SP["V^3+"].c,SP["V^2+"].c,sc), ck=mix(SP["VO^2+"].c,SP["VO_2^+"].c,sc);
+    const pipe=(col,q)=>{ [["#3a4249",14],[col,8]].forEach(st=>{ctx.strokeStyle=st[0];ctx.lineWidth=st[1];ctx.lineJoin="round";ctx.beginPath();q.forEach((a,i)=>{if(i)ctx.lineTo(a[0],a[1]);else ctx.moveTo(a[0],a[1]);});ctx.stroke();}); };
+    pipe(ca,[[310,440],[412,440],[412,380]]); pipe(ca,[[412,180],[412,150],[210,150],[210,252]]);
+    pipe(ck,[[590,440],[488,440],[488,380]]); pipe(ck,[[488,180],[488,150],[690,150],[690,252]]);
+    box("#23282d",110,250,200,220,8); box(ca,118,282,184,180,4);
+    box("#23282d",590,250,200,220,8); box(ck,598,282,184,180,4);
+    txt(ctx,"Tank: Anolyt",210,356,14,"#14171a","center",true); txt(ctx,"V²⁺ / V³⁺",210,378,13,"#14171a");
+    txt(ctx,"Tank: Katholyt",690,356,14,"#14171a","center",true); txt(ctx,"VO₂⁺ / VO²⁺",690,378,13,"#14171a");
+    box("#23282d",360,174,180,212,6);
+    box("#4a4f57",366,180,14,200); box("#4a4f57",520,180,14,200);
+    box(ca,380,180,65,200); box(ck,455,180,65,200); box(SEPC,445,180,10,200);
+    txt(ctx,"Anolyt",412,282,12,"#14171a","center",true); txt(ctx,"Katholyt",488,282,12,"#14171a","center",true);
+    [355,545].forEach((x,i)=>{
+      ctx.fillStyle="#14171a"; ctx.beginPath(); ctx.arc(x,440,13,0,7); ctx.fill(); ctx.strokeStyle=CAP; ctx.lineWidth=2; ctx.stroke();
+      const dx=i?-1:1; ctx.fillStyle=CAP; ctx.beginPath(); ctx.moveTo(x+7*dx,440); ctx.lineTo(x-5*dx,433); ctx.lineTo(x-5*dx,447); ctx.closePath(); ctx.fill();
+      txt(ctx,"Pumpe",x,466,12,"#9aa2a9");
+    });
+    part("neg","neg","Tank: Anolyt","Im Tank lagert die Lösung mit Vanadium(II)- und Vanadium(III)-Ionen. Die Reaktion läuft nicht im Tank ab, sondern an der Graphit-Elektrode in der Zelle – die Pumpe fördert ständig frische Lösung dorthin. Geladen ist die Lösung violett (V²⁺), entladen grün (V³⁺).",[[110,250,200,220]]);
+    part("pos","pos","Tank: Katholyt","Im Tank lagert die Lösung mit Vanadium(V)- und Vanadium(IV)-Ionen. Die Reaktion läuft nicht im Tank ab, sondern an der Graphit-Elektrode in der Zelle. Geladen ist die Lösung gelb (VO₂⁺), entladen blau (VO²⁺).",[[590,250,200,220]]);
+    part("hzN","neg","Halbzelle des Minuspols (Anolyt)","In der Halbzelle strömt der Anolyt an der Graphit-Elektrode vorbei. Dort findet der Elektronenübergang statt.",[[380,180,65,200]]);
+    part("hzP","pos","Halbzelle des Pluspols (Katholyt)","In der Halbzelle strömt der Katholyt an der Graphit-Elektrode vorbei. Dort findet der Elektronenübergang statt.",[[455,180,65,200]]);
+    part("elN","neg","Graphit-Elektrode (Minuspol)","Die Elektrode aus Graphitfilz reagiert nicht selbst. An ihrer großen Oberfläche geben die gelösten Vanadium-Ionen Elektronen ab oder nehmen sie auf.",[[366,180,14,200]]);
+    part("elP","pos","Graphit-Elektrode (Pluspol)","Die Elektrode aus Graphitfilz reagiert nicht selbst. An ihrer großen Oberfläche geben die gelösten Vanadium-Ionen Elektronen ab oder nehmen sie auf.",[[520,180,14,200]]);
+    part("ely","ely","Membran","Die Membran trennt die beiden Lösungen. Sie lässt H⁺-Ionen hindurch, hält die Vanadium-Ionen aber zurück – sonst würden sich die Lösungen direkt miteinander umsetzen (Selbstentladung).",[[441,180,18,200],[400,110,100,34]]);
+    part("pump","none","Pumpe","Die Pumpen fördern die Lösungen im Kreis durch die Zelle. Ohne Umpumpen wären die Ionen an der Elektrode schnell verbraucht, und die Spannung bräche ein. Die Pumpen benötigen selbst Strom – das senkt den Wirkungsgrad.",[[340,425,30,30],[530,425,30,30]]);
+    lead(369,200,345,106,"Graphit-Elektrode\n(Minuspol)","right");
+    lead(531,200,555,106,"Graphit-Elektrode\n(Pluspol)","left");
+    ctx.strokeStyle="rgba(231,228,221,.42)"; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(450,180); ctx.lineTo(450,144); ctx.stroke();
+    txt(ctx,"Membran",450,120,12.5,"#e7e4dd"); txt(ctx,"(lässt H⁺ durch)",450,135,12,"#e7e4dd");
+    const F="flow";
+    return {path:[[373,180],[373,58],[527,58],[527,180]],cons:[450,58],lanes:[[424,225,476,225],[424,335,476,335]],nb:[345,70],pb:[555,70],noConsLabel:true,
+      gas:[[310,440,412,440,F],[412,380,412,180,F],[412,150,210,150,F],[590,440,488,440,F],[488,380,488,180,F],[488,150,690,150,F]],
+      note:"Die Energie steckt in den Tanks: Größere Tanks speichern mehr, eine größere Zelle liefert mehr Leistung."};
+  },
+  /* PEM-Brennstoffzelle: Schichtaufbau mit Gaszufuhr */
+  pem(nc,pc,d){
+    const L=BI[bat.id].L||{};
+    [[236,143],[236,433],[564,143],[564,433]].forEach(q=>box("#3a4249",q[0],q[1],100,14));
+    box("#6b747c",330,120,40,340,4); box("#6b747c",530,120,40,340,4);
+    box("#23282d",356,136,14,308); box("#23282d",530,136,14,308);
+    box("#23282d",330,145,30,10); box("#23282d",330,435,30,10); box("#23282d",540,145,30,10); box("#23282d",540,435,30,10);
+    box("#4a4f57",370,120,25,340); box("#4a4f57",505,120,25,340);
+    ctx.fillStyle="#c8cdd2"; for(let i=0;i<34;i++){ctx.beginPath();ctx.arc(391,128+i*10,1.6,0,7);ctx.fill();ctx.beginPath();ctx.arc(509,128+i*10,1.6,0,7);ctx.fill();}
+    box(L.memCol||"#8a6f45",395,120,110,340);
+    txt(ctx,L.fuel||"Wasserstoff (H₂)",228,150,12.5,L.fuelCol||"#e6edf3","right"); txt(ctx,L.out1||"Restgas",228,440,12.5,"#9aa2a9","right");
+    txt(ctx,"Luft (O₂)",672,150,12.5,"#ff8a80","left"); txt(ctx,L.out2||"Wasser + Restluft",672,440,12.5,L.out2Col||"#6fa8dc","left");
+    const mzc=bat.id==="mz";
+    part("in1","neg","Brennstoffzufuhr",(mzc?"Methan":"Wasserstoff")+" wird laufend zugeführt und strömt durch den Gaskanal an der Anode entlang. Dort reagiert es:",[[236,140,100,20]]);
+    part("out1","neg",mzc?"Abgas der Anode":"Restgas",mzc?"Die Reaktionsprodukte Kohlenstoffdioxid und Wasserdampf verlassen die Zelle zusammen mit nicht umgesetztem Methan. Sie entstehen an der Anode:":"Nicht umgesetzter Wasserstoff verlässt die Zelle und wird meist zurückgeführt. Die Reaktion an der Anode:",[[236,430,100,20]]);
+    part("in2","pos","Luftzufuhr","Luft wird laufend zugeführt; ihr Sauerstoff reagiert an der Kathode:",[[564,140,100,20]]);
+    part("out2","pos",mzc?"Restluft":"Wasser und Restluft",mzc?"Die sauerstoffärmere Luft verlässt die Zelle. Die Reaktion an der Kathode:":"Das an der Kathode entstehende Wasser verlässt die Zelle zusammen mit der sauerstoffärmeren Luft:",[[564,430,100,20]]);
+    const TP="Die Platte leitet die Elektronen und verteilt über eingefräste Kanäle das Gas auf die Elektrode. Im Stapel verbindet sie den Minuspol einer Zelle mit dem Pluspol der nächsten (Reihenschaltung).";
+    part("pl1","cond",mzc?"Verbindungsplatte (Minuspol)":"Bipolarplatte (Minuspol)",TP,[[330,120,40,340]],"neg");
+    part("pl2","cond",mzc?"Verbindungsplatte (Pluspol)":"Bipolarplatte (Pluspol)",TP,[[530,120,40,340]],"pos");
+    part("neg","neg","Anode (Minuspol)","Die Elektrode ist porös, damit das Gas bis zum Katalysator gelangt. Die Reaktion läuft nur dort ab, wo Gas, Katalysator und Elektrolyt zusammentreffen.",[[370,120,25,340]]);
+    part("pos","pos","Kathode (Pluspol)","Die Elektrode ist porös, damit der Sauerstoff bis zum Katalysator gelangt. Die Reaktion läuft nur dort ab, wo Gas, Katalysator und Elektrolyt zusammentreffen.",[[505,120,25,340]]);
+    part("ely","ely",mzc?"Festelektrolyt (Keramik)":"Polymermembran",mzc?"Die Keramik aus Zirconiumdioxid leitet erst bei 600–1000 °C Oxid-Ionen. Sie ist gasdicht und leitet keine Elektronen.":"Die Kunststoffmembran leitet nur H⁺-Ionen, wenn sie feucht ist. Sie ist gasdicht und leitet keine Elektronen – sonst würden Wasserstoff und Sauerstoff direkt miteinander reagieren.",[[395,120,110,340]]);
+    lead(340,250,300,240,L.pl1||"Bipolarplatte mit\nGaskanal (Minuspol)","right");
+    lead(382,330,300,330,L.an||"Anode: poröse Kohle\nmit Platin-Katalysator","right");
+    lead(480,250,600,240,L.mem||"Polymermembran\n(leitet nur H⁺-Ionen)","left");
+    lead(517,330,600,330,L.ca||"Kathode: poröse Kohle\nmit Platin-Katalysator","left");
+    lead(560,395,600,395,L.pl2||"Bipolarplatte (Pluspol)","left");
+    const lanes=[180,260,340,420].map(y=>[400,y,500,y]);
+    return {path:[[350,120],[350,58],[550,58],[550,120]],cons:[450,58],lanes:lanes,nb:[318,84],pb:[582,84],
+      gas:L.gas||[[240,150,358,150,"H_2"],[363,150,363,440,"H_2"],[660,150,542,150,"O_2"],[537,150,537,300,"O_2"],[537,300,537,440,"H_2O"],[542,440,660,440,"H_2O"]],
+      note:L.note||"Eine Zelle liefert nur etwa 1 V – deshalb werden viele Zellen zu einem Stapel (Stack) in Reihe geschaltet."};
+  }
+};
+function drawBau(){
+  ctx.setTransform(scale,0,0,scale,0,0); ctx.clearRect(0,0,W,H);
+  const d=1-soc(), dis=mode==="dis", active=!paused&&!finished, bi=BI[bat.id];
+  HITS=[]; PARTS={};
+  txt(ctx,"Bauteil oder Beschriftung antippen: Details",W-16,22,11.5,"#5f6870","right");
+  const nc=mix(bat.neg.ca,bat.neg.cb||"#59636c",d), pc=mix(bat.pos.ca,bat.pos.cb,d);
+  txt(ctx,"Bauform: "+bi.name+" · Schnittbild",20,22,14,"#e7e4dd","left",true);
+  txt(ctx,bat.name+(bat.art==="B"?" · Betrieb":dis?" · Entladen":" · Laden"),20,42,12.5,"#9aa2a9","left");
+  /* Stromkreis zuerst (liegt hinter den Kontakten) */
+  const o=BAU[bi.form](nc,pc,d), pts=o.path;
+  [["#0e1113",8],["#8b949c",3]].forEach(st=>{ctx.strokeStyle=st[0]; ctx.lineWidth=st[1]; ctx.lineJoin="round";
+    ctx.beginPath(); pts.forEach((q,i)=>{if(i) ctx.lineTo(q[0],q[1]); else ctx.moveTo(q[0],q[1]);}); ctx.stroke();});
+  /* Weglängen */
+  const seg=[]; let L=0;
+  for(let i=0;i<pts.length-1;i++){const l=Math.hypot(pts[i+1][0]-pts[i][0],pts[i+1][1]-pts[i][1]); seg.push(l); L+=l;}
+  const at=s=>{let i=0; while(i<seg.length-1&&s>seg[i]){s-=seg[i];i++;} const t=s/seg[i]; return [pts[i][0]+(pts[i+1][0]-pts[i][0])*t, pts[i][1]+(pts[i+1][1]-pts[i][1])*t, i];};
+  const sgn=dis?1:-1;
+  /* Richtungspfeile */
+  ctx.fillStyle="#ffe14d";
+  seg.forEach((l,i)=>{ if(l<150) return;
+    const ux=(pts[i+1][0]-pts[i][0])/l*sgn, uy=(pts[i+1][1]-pts[i][1])/l*sgn, mx=pts[i][0]+(pts[i+1][0]-pts[i][0])*0.28, my=pts[i][1]+(pts[i+1][1]-pts[i][1])*0.28;
+    const ox=mx-uy*13, oy=my+ux*13;
+    ctx.beginPath(); ctx.moveTo(ox+ux*9,oy+uy*9); ctx.lineTo(ox-ux*6-uy*5,oy-uy*6+ux*5); ctx.lineTo(ox-ux*6+uy*5,oy-uy*6-ux*5); ctx.closePath(); ctx.fill();
+  });
+  /* Verbraucher bzw. Ladegerät */
+  const cx=o.cons[0], cy=o.cons[1];
+  part("load","load",dis?"Verbraucher":"Ladegerät","",[[cx-(dis?24:42),cy-24,dis?48:84,48]]);
+  if(dis){
+    if(active){const gr=ctx.createRadialGradient(cx,cy,6,cx,cy,58); gr.addColorStop(0,"rgba(255,214,110,.6)"); gr.addColorStop(1,"rgba(255,214,110,0)"); ctx.fillStyle=gr; ctx.beginPath(); ctx.arc(cx,cy,58,0,7); ctx.fill();}
+    ctx.fillStyle=active?"#f5cf6a":"#23282d"; ctx.beginPath(); ctx.arc(cx,cy,21,0,7); ctx.fill(); ctx.strokeStyle="#c8cdd2"; ctx.lineWidth=2.5; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx-15,cy-15); ctx.lineTo(cx+15,cy+15); ctx.moveTo(cx+15,cy-15); ctx.lineTo(cx-15,cy+15); ctx.stroke();
+    if(cx>800) txt(ctx,"Verbraucher",cx-32,cy,12.5,"#9aa2a9","right"); else txt(ctx,"Verbraucher",cx,o.noConsLabel?cy+33:cy+38,12.5,"#9aa2a9");
+  }else{
+    ctx.fillStyle="#23282d"; rr(ctx,cx-42,cy-20,84,40,8); ctx.fill(); ctx.strokeStyle="#4fd1c5"; ctx.lineWidth=2.5; ctx.stroke();
+    txt(ctx,"Ladegerät",cx,cy,13,"#4fd1c5","center",true);
+  }
+  /* Elektronen */
+  if(!finished){
+    const n=Math.floor(L/72);
+    for(let i=0;i<n;i++){
+      const s0=(((i*L/n+sgn*bauPhase*95)%L)+L)%L, q=at(s0);
+      if(Math.hypot(q[0]-cx,q[1]-cy)<(dis?26:46)) continue;
+      ctx.fillStyle="#ffe14d"; ctx.beginPath(); ctx.arc(q[0],q[1],6.5,0,7); ctx.fill(); ctx.strokeStyle="#14171a"; ctx.lineWidth=1; ctx.stroke();
+      if(opt.lab) ftext(ctx,"e^-",q[0],q[1],8.5,"#14171a",true);
+    }
+  }
+  /* Ionenwanderung */
+  const fwd=(bi.ion[1]==="n2p")===dis, col=SP[bi.ion[0]].c, r=o.small?2.6:4.2;
+  if(!finished) o.lanes.forEach((ln,i)=>{
+    for(let k=0;k<2;k++){
+      let t=(bauPhase*0.45+k/2+i*0.17)%1; if(!fwd) t=1-t;
+      const x=ln[0]+(ln[2]-ln[0])*t, y=ln[1]+(ln[3]-ln[1])*t;
+      ctx.globalAlpha=Math.min(1,4*Math.min(t,1-t)+0.15);
+      ctx.fillStyle=col; ctx.beginPath(); ctx.arc(x,y,r,0,7); ctx.fill(); ctx.strokeStyle="#14171a"; ctx.lineWidth=0.8; ctx.stroke();
+    }
+  });
+  if(o.gas&&!finished) o.gas.forEach((ln,i)=>{
+    const len=Math.hypot(ln[2]-ln[0],ln[3]-ln[1]), nn=Math.max(2,Math.round(len/60));
+    for(let k=0;k<nn;k++){
+      const t=(bauPhase*60/len+k/nn+i*0.2)%1, x=ln[0]+(ln[2]-ln[0])*t, y=ln[1]+(ln[3]-ln[1])*t;
+      ctx.globalAlpha=Math.min(1,4*Math.min(t,1-t)+0.15);
+      ctx.fillStyle=ln[4]==="flow"?"#ffffff":SP[ln[4]||"O_2"].c; ctx.beginPath(); ctx.arc(x,y,5,0,7); ctx.fill();
+    }
+  });
+  ctx.globalAlpha=1;
+  /* Polzeichen */
+  ctx.fillStyle="#7fb4ff"; ctx.beginPath(); ctx.arc(o.nb[0],o.nb[1],11,0,7); ctx.fill(); txt(ctx,"−",o.nb[0],o.nb[1]-1,17,"#101315","center",true);
+  ctx.fillStyle="#ff8a80"; ctx.beginPath(); ctx.arc(o.pb[0],o.pb[1],11,0,7); ctx.fill(); txt(ctx,"+",o.pb[0],o.pb[1],16,"#101315","center",true);
+  /* Hinweiszeile */
+  txt(ctx,o.note,20,547,12.5,"#9aa2a9","left");
+  if(finished) txt(ctx,dis?(bat.art==="S"?"Akku entladen":"Batterie entladen"):"Akku vollständig geladen",20,66,14,"#ffb454","left",true);
+  drawHover();
+}
+
+
+/* =====================================================================
+   Bauteile antippen: Detailfenster mit Bild, Gleichungen und Ablauf
+   ===================================================================== */
+let curPart=null, partChg=false;
+function fsvg(x){
+  let out="",sh=0;
+  for(const g of fparse(x)){const want=g.m===1?3.5:g.m===2?-5.5:0, dy=want-sh; sh=want;
+    out+="<tspan"+(dy?' dy="'+dy+'"':"")+(g.m?' font-size="72%"':"")+">"+g.t+"</tspan>";}
+  return out;
+}
+function fvis(x){let n=0; for(const g of fparse(x)) n+=g.t.length*(g.m?0.7:1); return n;}
+function sPill(sp,cx,cy,n){
+  const w=Math.max(32,fvis(sp)*8.4+16);
+  let o='<rect x="'+(cx-w/2)+'" y="'+(cy-13)+'" width="'+w+'" height="26" rx="13" fill="'+SP[sp].c+'"/><text x="'+cx+'" y="'+(cy+4.5)+'" text-anchor="middle" font-size="13" font-weight="600" fill="#14171a">'+fsvg(sp)+"</text>";
+  if(n>1) o+='<text x="'+(cx-w/2-6)+'" y="'+(cy+5)+'" text-anchor="end" font-size="14.5" font-weight="700" fill="#e7e4dd">'+n+"</text>";
+  return {o:o,w:w,pl:n>1?24:6};
+}
+function sArr(x1,y1,x2,y2,col){
+  const l=Math.hypot(x2-x1,y2-y1), ux=(x2-x1)/l, uy=(y2-y1)/l, bx=x2-ux*9, by=y2-uy*9;
+  return '<line class="flow" x1="'+x1+'" y1="'+y1+'" x2="'+bx+'" y2="'+by+'" stroke="'+col+'" stroke-width="2.6"/>'+
+    '<polygon points="'+x2+","+y2+" "+(bx-uy*5.5)+","+(by+ux*5.5)+" "+(bx+uy*5.5)+","+(by-ux*5.5)+'" fill="'+col+'"/>';
+}
+function sTxt(x,y,str,o){o=o||{}; return '<text x="'+x+'" y="'+y+'" text-anchor="'+(o.a||"middle")+'" font-size="'+(o.s||13)+'"'+(o.b?' font-weight="600"':"")+' fill="'+(o.c||"#e7e4dd")+'"'+(o.h?' stroke="#191d21" stroke-width="5" paint-order="stroke" stroke-linejoin="round"':"")+'>'+str+"</text>";}
+function sWrap(h,inner,label){return '<svg viewBox="0 0 700 '+h+'" role="img" aria-label="'+label+'" font-family="system-ui,-apple-system,\'Segoe UI\',Roboto,sans-serif">'+inner+"</svg>";}
+function sideData(side,chg){
+  const pr=procOf(side), dir=chg?-1:1;
+  return {pr:pr,dir:dir,take:dir>0?pr.take:pr.give,give:dir>0?pr.give:pr.take,from:dir>0?"a":"b",to:dir>0?"b":"a",isOx:(side==="neg")!==chg};
+}
+/* Bild: Vorgänge an einer Elektrode */
+function reactSvg(side,chg){
+  const c=bat[side], D=sideData(side,chg), flip=side==="pos";
+  const X=x=>flip?700-x:x, R=(x,w)=>flip?700-x-w:x, A=a=>flip?(a==="start"?"end":"start"):a;
+  const inE=D.take.filter(t=>!t[2]), inO=D.take.filter(t=>t[2]), outE=D.give.filter(t=>!t[2]), outO=D.give.filter(t=>t[2]);
+  let o="";
+  if(inO.length||outO.length){ o+='<rect x="'+R(8,104)+'" y="70" width="104" height="250" fill="#101315" stroke="#31383e" stroke-dasharray="5 4"/>'+sTxt(X(60),58,"außerhalb",{s:12,c:"#9aa2a9"}); }
+  o+='<rect x="'+R(120,190)+'" y="70" width="190" height="250" fill="'+c.bg+'" stroke="#4a535b"/>';
+  o+='<rect x="'+R(120,14)+'" y="70" width="14" height="250" fill="#6b747c"/>';
+  o+='<rect x="'+R(310,380)+'" y="70" width="380" height="250" fill="#171b1f" stroke="#31383e"/><rect x="'+R(310,380)+'" y="70" width="380" height="250" fill="'+bat.ely.bg+'"/>';
+  o+=sTxt(X(215),58,c.short,{b:1})+sTxt(X(500),58,"Elektrolyt",{b:1});
+  o+=sTxt(X(127),336,"Ableiter",{s:11.5,c:"#9aa2a9"});
+  /* Elektronen */
+  const dev=chg?"Ladegerät":"Verbraucher";
+  o+=D.isOx?sArr(X(127),312,X(127),20,"#ffe14d"):sArr(X(127),20,X(127),312,"#ffe14d");
+  o+=sTxt(X(142),30,D.pr.e+" e<tspan dy=\"-5\" font-size=\"72%\">−</tspan><tspan dy=\"5\"> "+(D.isOx?"⟶ zum "+dev:"⟵ vom "+dev)+"</tspan>",{a:A("start"),b:1,c:"#ffe14d",s:13.5});
+  /* Elektrodenmaterial */
+  const tile=(y,lab,col,k)=>{
+    if(lab==null) return '<rect x="'+R(160,130)+'" y="'+y+'" width="130" height="38" rx="7" fill="none" stroke="#9aa2a9" stroke-dasharray="5 4"/>'+sTxt(X(225),y+24,"geht in Lösung",{s:12,c:"#9aa2a9"});
+    return '<rect x="'+R(160,130)+'" y="'+y+'" width="130" height="38" rx="7" fill="'+col+'"/>'+sTxt(X(225),y+24,(k>1?k+" ":"")+fsvg(lab),{b:1,s:14,c:lum(col)>0.55?"#14171a":"#f3f0e8"});
+  };
+  const word=D.isOx?"Oxidation":"Reduktion";
+  if(D.pr.sites>0){
+    const la=D.from==="a"?c.a:c.b, lb=D.to==="a"?c.a:c.b, ca=D.from==="a"?c.ca:c.cb, cb=D.to==="a"?c.ca:c.cb;
+    o+=sTxt(X(225),94,"vorher",{s:11.5,c:"#9aa2a9"})+tile(100,la,ca,D.pr.sites);
+    o+=sArr(X(225),146,X(225),238,"#ffb454")+sTxt(X(238),197,word,{a:A("start"),c:"#ffb454",b:1});
+    o+=tile(244,lb,cb,D.pr.sites)+sTxt(X(225),300,"nachher",{s:11.5,c:"#9aa2a9"});
+  }else{
+    o+=sTxt(X(225),150,"Katalysator",{s:11.5,c:"#9aa2a9"})+tile(158,c.a,c.ca,1)+sTxt(X(225),214,"bleibt unverändert",{s:11.5,c:"#9aa2a9"});
+    o+=sTxt(X(225),250,word,{c:"#ffb454",b:1})+sTxt(X(225),268,"an der Oberfläche",{s:11.5,c:"#9aa2a9"});
+  }
+  /* Teilchen aus dem / in den Elektrolyten */
+  const rowsE=(arr,y0,cap,inward)=>{
+    if(!arr.length) return;
+    o+=sTxt(X(560),y0-24,cap,{s:11.5,c:"#9aa2a9"});
+    arr.forEach((t,i)=>{const y=y0+i*40, pl=sPill(t[0],X(560),y,t[1]); o+=pl.o;
+      const edge=flip?X(560)+pl.w/2+6:X(560)-pl.w/2-pl.pl-4, wall=X(318);
+      o+=inward?sArr(edge,y,wall,y,SP[t[0]].c):sArr(wall,y,edge,y,SP[t[0]].c);});
+  };
+  rowsE(inE,114,"wird aufgenommen",true);
+  rowsE(outE,244,"wird abgegeben",false);
+  const rowsO=(arr,y0,cap,inward)=>{
+    if(!arr.length) return;
+    o+=sTxt(X(60),y0-24,cap,{s:11.5,c:"#9aa2a9"});
+    arr.forEach((t,i)=>{const y=y0+i*40, pl=sPill(t[0],X(56),y,t[1]); o+=pl.o;
+      const edge=flip?X(56)-pl.w/2-pl.pl-4:X(56)+pl.w/2+5, wall=X(118);
+      o+=inward?sArr(edge,y,wall,y,SP[t[0]].c):sArr(wall,y,edge,y,SP[t[0]].c);});
+  };
+  rowsO(inO,134,inO.length&&inO[0][2]==="air"?"aus der Luft":"Brennstoff",true);
+  rowsO(outO,244,"verlässt die Zelle",false);
+  return sWrap(346,o,"Vorgänge an der Elektrode");
+}
+/* Bild: Ionenwanderung im Elektrolyten */
+function ionSvg(chg){
+  const N=sideData("neg",chg), Pd=sideData("pos",chg), has=(arr,sp)=>arr.some(t=>t[0]===sp&&!t[2]);
+  const set=[]; [N.take,N.give,Pd.take,Pd.give].forEach(a=>a.forEach(t=>{if(!t[2]&&set.indexOf(t[0])<0) set.push(t[0]);}));
+  const rows=[];
+  set.forEach(sp=>{
+    const nt=has(N.take,sp), ng=has(N.give,sp), pt=has(Pd.take,sp), pg=has(Pd.give,sp);
+    if(pg&&nt) rows.push({sp:sp,ar:[[570,130]],cap:"wandert vom Pluspol zum Minuspol"});
+    else if(ng&&pt) rows.push({sp:sp,ar:[[130,570]],cap:"wandert vom Minuspol zum Pluspol"});
+    else if(nt&&pt) rows.push({sp:sp,ar:[[300,130],[400,570]],cap:"wird an beiden Polen verbraucht"});
+    else if(ng&&pg) rows.push({sp:sp,ar:[[130,300],[570,400]],cap:"entsteht an beiden Polen"});
+    else if(nt) rows.push({sp:sp,ar:[[300,130]],cap:"wird am Minuspol verbraucht"});
+    else if(pt) rows.push({sp:sp,ar:[[400,570]],cap:"wird am Pluspol verbraucht"});
+    else if(ng) rows.push({sp:sp,ar:[[130,300]],cap:"entsteht am Minuspol"});
+    else if(pg) rows.push({sp:sp,ar:[[570,400]],cap:"entsteht am Pluspol"});
+  });
+  bat.ely.pool.forEach(q=>{ if(SP[q[0]].spect) rows.push({sp:q[0],ar:[],cap:"Zuschauer-Ion: reagiert nicht, gleicht Ladungen aus"}); });
+  const h=70+rows.length*54+16;
+  let o='<rect x="20" y="46" width="100" height="'+(h-62)+'" fill="'+bat.neg.bg+'" stroke="#4a535b"/><rect x="580" y="46" width="100" height="'+(h-62)+'" fill="'+bat.pos.bg+'" stroke="#4a535b"/>';
+  o+='<rect x="120" y="46" width="460" height="'+(h-62)+'" fill="#171b1f" stroke="#31383e"/><rect x="120" y="46" width="460" height="'+(h-62)+'" fill="'+bat.ely.bg+'"/>';
+  o+=sTxt(70,34,"− Minuspol",{b:1,c:"#7fb4ff"})+sTxt(630,34,"+ Pluspol",{b:1,c:"#ff8a80"})+sTxt(350,34,bat.ely.noSep?"Elektrolyt":"Elektrolyt mit "+(bat.ely.sep?"Membran":"Separator"),{b:1});
+  if(!bat.ely.noSep) o+='<line x1="350" y1="50" x2="350" y2="'+(h-20)+'" stroke="#9aa2a9" stroke-width="2" stroke-dasharray="6 5" opacity=".55"/>';
+  rows.forEach((r,i)=>{const y=82+i*54;
+    r.ar.forEach(a=>{o+=sArr(a[0],y,a[1],y,SP[r.sp].c);});
+    o+=sPill(r.sp,350,y,1).o+sTxt(350,y+31,r.cap,{s:11.5,c:"#9aa2a9",h:1});});
+  return sWrap(h,o,"Ionenwanderung im Elektrolyten");
+}
+/* Bild: Elektronenleitung in einem Leiter */
+function condSvg(outward){
+  let o='<rect x="60" y="26" width="580" height="104" rx="8" fill="#2b3238" stroke="#4a535b"/>';
+  for(let r=0;r<2;r++) for(let i=0;i<9;i++){const x=100+i*62.5, y=56+r*44;
+    o+='<circle cx="'+x+'" cy="'+y+'" r="13" fill="#8b949c"/>'+sTxt(x,y+5,"+",{s:15,b:1,c:"#14171a"});}
+  for(let i=0;i<8;i++){const x=131+i*62.5; o+='<circle cx="'+x+'" cy="78" r="7" fill="#ffe14d"/>'+sTxt(x,81.5,"e⁻",{s:8.5,b:1,c:"#14171a"});}
+  o+=outward?sArr(70,150,630,150,"#ffe14d"):sArr(630,150,70,150,"#ffe14d");
+  o+=sTxt(70,172,"Elektrodenmaterial",{a:"start",s:12,c:"#9aa2a9"})+sTxt(630,172,"äußerer Stromkreis",{a:"end",s:12,c:"#9aa2a9"});
+  o+=sTxt(350,16,"Atomrümpfe bleiben an ihrem Platz, Elektronen wandern",{s:12,c:"#9aa2a9"});
+  return sWrap(182,o,"Elektronenleitung");
+}
+function lst(arr){
+  const it=arr.map(t=>(t[1]>1?t[1]+" ":"")+fhtmlS(t[0]));
+  return it.length>1?it.slice(0,-1).join(", ")+" und "+it[it.length-1]:it[0];
+}
+function elecHtml(side,chg){
+  const c=bat[side], D=sideData(side,chg), b=bat, i=chg?1:0;
+  const pole=side==="neg"?"Minuspol":"Pluspol", role=D.isOx?"Anode · Oxidation":"Kathode · Reduktion";
+  const eq=b.eq[side], mul=side==="neg"?b.eq.negMul:b.eq.posMul, oz=b.oz[side];
+  let h='<figure>'+reactSvg(side,chg)+'<figcaption>'+(b.art==="S"?(chg?"Laden":"Entladen")+": ":"")+"Vorgänge am "+pole+" je Formelumsatz. Die gestrichelten Pfeile zeigen die Bewegungsrichtung der Teilchen.</figcaption></figure>";
+  h+='<div class="pt-eq"><div class="eq-head"><span class="pole '+side+'">'+(side==="neg"?"−":"+")+"</span>"+pole+" · <b>"+role+'</b></div><div class="eq">'+eqLine(eq,chg)+(mul?'<span class="mul">'+mul+"</span>":"")+'</div><div class="eq-oz">Oxidationszahl '+oz[0]+": "+(chg?oz[2]+" ⟶ "+oz[1]:oz[1]+" ⟶ "+oz[2])+"</div></div>";
+  h+="<h3>Was passiert genau?</h3><p>"+(b.txt[side][i]||b.txt[side][0])+"</p><ol>";
+  const inE=D.take.filter(t=>!t[2]), inO=D.take.filter(t=>t[2]), outE=D.give.filter(t=>!t[2]), outO=D.give.filter(t=>t[2]);
+  if(inO.length) h+="<li><b>Zufuhr von außen:</b> "+(inO[0][2]==="air"?"Aus der Luft":"Aus der Brennstoffzufuhr")+" gelangt durch die poröse Elektrode an den Katalysator: "+lst(inO)+".</li>";
+  if(inE.length) h+="<li><b>Antransport:</b> Aus dem Elektrolyten gelangen an die Elektrodenoberfläche: "+lst(inE)+".</li>";
+  h+="<li><b>"+(D.isOx?"Elektronenabgabe (Oxidation)":"Elektronenaufnahme (Reduktion)")+":</b> Je Formelumsatz "+(D.pr.e===1?"wird ein Elektron":"werden "+D.pr.e+" Elektronen")+(D.isOx?" an die Elektrode abgegeben":" aus der Elektrode aufgenommen")+". Die Oxidationszahl von "+oz[0]+" "+(D.isOx?"steigt":"sinkt")+" dabei von "+(chg?oz[2]:oz[1])+" auf "+(chg?oz[1]:oz[2])+".</li>";
+  if(D.pr.sites>0){
+    const la=D.from==="a"?c.a:c.b, lb=D.to==="a"?c.a:c.b, k=D.pr.sites>1?D.pr.sites+" ":"";
+    if(lb==null) h+="<li><b>Stoffumwandlung:</b> "+fhtmlS(la)+" geht als Ion in Lösung; das Elektrodenmaterial wird dabei abgetragen.</li>";
+    else if(la==null) h+="<li><b>Stoffumwandlung:</b> An der Elektrode scheidet sich "+fhtmlS(lb)+" ab.</li>";
+    else h+="<li><b>Stoffumwandlung:</b> Im Elektrodenmaterial wird "+k+fhtmlS(la)+" zu "+k+fhtmlS(lb)+".</li>";
+  }else h+="<li><b>Elektrode:</b> Das Elektrodenmaterial selbst bleibt unverändert. Es bietet die Oberfläche für die Reaktion"+(/Kat/.test(c.a)?", wirkt als Katalysator":"")+" und leitet die Elektronen.</li>";
+  if(outE.length) h+="<li><b>Abtransport:</b> In den Elektrolyten gehen über: "+lst(outE)+".</li>";
+  if(outO.length) h+="<li><b>Abtransport:</b> Die Zelle verlassen: "+lst(outO)+".</li>";
+  const dev=chg?"Ladegerät":"Verbraucher";
+  h+="<li><b>Elektronen:</b> "+(D.isOx?"Die abgegebenen Elektronen fließen über den Ableiter in den äußeren Stromkreis zum "+dev+".":"Die Elektronen kommen über den äußeren Stromkreis und den Ableiter vom "+dev+" – sie stammen vom anderen Pol.")+"</li></ol>";
+  return h;
+}
+function renderPart(){
+  const m=curPart, b=bat, chg=partChg&&b.art==="S", i=chg?1:0;
+  $("ptTitle").textContent=m.title;
+  $("ptSub").textContent=b.name+(b.art==="S"?(chg?" · Laden":" · Entladen"):b.art==="B"?" · Betrieb":" · Entladen");
+  const seg=$("ptSeg"); seg.hidden=b.art!=="S"||m.role==="none";
+  seg.querySelectorAll("button").forEach(x=>x.classList.toggle("on",(x.dataset.c==="1")===chg));
+  let h=m.text?"<p>"+m.text+"</p>":"";
+  if(m.role==="neg"||m.role==="pos") h+=elecHtml(m.role,chg);
+  else if(m.role==="ely"){
+    h+='<figure>'+ionSvg(chg)+'<figcaption>'+(b.art==="S"?(chg?"Laden":"Entladen")+": ":"")+"Teilchen im Elektrolyten und ihre Bewegungsrichtung.</figcaption></figure>";
+    h+="<h3>Was passiert genau?</h3><p>"+(b.txt.ion[i]||b.txt.ion[0])+"</p>";
+    h+="<ul><li><b>Zusammensetzung:</b> "+b.ely.name+".</li>";
+    h+="<li><b>Ladungsausgleich:</b> An den Elektroden werden Ionen verbraucht oder gebildet. Ohne Ionenwanderung würden sich die Elektrodenräume sofort elektrisch aufladen, und der Elektronenfluss käme zum Stillstand. Die Ionen schließen den Stromkreis im Inneren der Zelle.</li>";
+    if(!b.ely.noSep) h+="<li><b>"+(b.ely.sep?"Membran":"Separator")+":</b> Er"+(b.ely.sep?" bzw. sie":"")+" trennt die beiden Elektrodenräume, damit kein Kurzschluss entsteht, lässt aber die Ionen hindurch. Elektronen können den Elektrolyten nicht durchqueren.</li>";
+    else h+="<li><b>Trennung:</b> Der Elektrolyt ist gasdicht und leitet keine Elektronen. Deshalb müssen die Elektronen den Weg über den äußeren Stromkreis nehmen.</li>";
+    h+="</ul>";
+    if(b.bulk&&!chg) h+='<div class="pt-eq"><div class="eq-head"><b>Folgereaktion im Elektrolyten</b></div><div class="eq">'+eqLine(b.bulk.eq,false)+'</div><p class="eq-txt">'+b.bulk.txt+"</p></div>";
+  }else if(m.role==="cond"){
+    const outward=(m.pole==="neg")!==chg;
+    h+='<div class="pt-none">Hier läuft keine chemische Reaktion ab: Das Bauteil leitet nur Elektronen.</div>';
+    h+='<figure>'+condSvg(outward)+'<figcaption>Elektronenleitung im Metall bzw. Graphit – es findet keine Stoffumwandlung statt.</figcaption></figure>';
+    h+="<p>"+(chg?"Beim Laden":b.art==="B"?"Im Betrieb":"Beim Entladen")+" fließen die Elektronen "+(outward?"vom Elektrodenmaterial über dieses Bauteil in den äußeren Stromkreis.":"aus dem äußeren Stromkreis über dieses Bauteil zum Elektrodenmaterial.")+" Die eigentliche Reaktion läuft am "+(m.pole==="neg"?"Minuspol":"Pluspol")+" ab:</p>";
+    const sd=m.pole, D=sideData(sd,chg), mul=sd==="neg"?b.eq.negMul:b.eq.posMul;
+    h+='<div class="pt-eq"><div class="eq-head"><span class="pole '+sd+'">'+(sd==="neg"?"−":"+")+"</span>"+(sd==="neg"?"Minuspol":"Pluspol")+" · <b>"+(D.isOx?"Anode · Oxidation":"Kathode · Reduktion")+'</b></div><div class="eq">'+eqLine(b.eq[sd],chg)+(mul?'<span class="mul">'+mul+"</span>":"")+"</div></div>";
+  }else if(m.role==="load"){
+    const g=(x,y)=>y?g(y,x%y):x, n=b.ox.e*b.red.e/g(b.ox.e,b.red.e);
+    h+="<p>"+(chg?"Das Ladegerät ist eine Spannungsquelle. Es zwingt die Elektronen, vom Pluspol zum Minuspol zu fließen – entgegen der Richtung, in der sie freiwillig fließen würden. Dazu muss die Ladespannung größer sein als die Zellspannung. Elektrische Energie wird als chemische Energie gespeichert."
+      :"Im Verbraucher wird die elektrische Energie umgewandelt, zum Beispiel in Licht und Wärme. Die Elektronen fließen freiwillig vom Minuspol durch den Verbraucher zum Pluspol, weil sie am Pluspol stärker gebunden werden. Die Zelle wandelt dabei chemische Energie in elektrische Energie um.")+"</p>";
+    h+='<figure>'+condSvg(true)+'<figcaption>Im äußeren Stromkreis fließen nur Elektronen – keine Ionen.</figcaption></figure>';
+    h+='<div class="pt-eq"><div class="eq-head"><b>Gesamtreaktion</b></div><div class="eq">'+eqLine(b.eq.ges,chg)+'</div><div class="eq-oz">Je Formelumsatz '+(n===1?"wird ein Elektron":"werden "+n+" Elektronen")+" durch den äußeren Stromkreis übertragen.</div></div>";
+  }else{
+    h='<div class="pt-none">Hier läuft keine chemische Reaktion ab.</div><p>'+m.text+"</p>";
+  }
+  $("ptBody").innerHTML=h;
+}
+function openPart(id){
+  const m=PARTS[id]; if(!m) return;
+  curPart={role:m.role,title:m.title,text:m.text,pole:m.pole}; partChg=mode==="chg";
+  renderPart(); openModal("mPart"); $("mPart").scrollTop=0;
+}
+$("ptSeg").querySelectorAll("button").forEach(x=>x.addEventListener("click",()=>{partChg=x.dataset.c==="1";renderPart();}));
+function evXY(e){const r=cv.getBoundingClientRect(); return [(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H];}
+cv.addEventListener("pointermove",e=>{ if(e.pointerType!=="mouse") return; const q=evXY(e); hoverId=hitXY(q[0],q[1],2); cv.style.cursor=hoverId?"pointer":"default"; });
+cv.addEventListener("pointerleave",()=>{hoverId=null;});
+cv.addEventListener("click",e=>{const q=evXY(e), id=hitXY(q[0],q[1],4); if(id) openPart(id);});
+
+/* ---------- Entladekurve ---------- */
+function drawCurve(){
+  const c=$("curve"), k=c.getContext("2d"), sc=c.width/520;
+  k.setTransform(sc,0,0,sc,0,0); k.clearRect(0,0,520,230);
+  const L=48,R=506,T=14,B=190;
+  const list=opt.all?BAT:[bat];
+  let umax=0; list.forEach(b=>umax=Math.max(umax,b.curve[0]));
+  umax=Math.ceil(umax*2+0.2)/2;
+  const X=d=>L+d*(R-L), Y=u=>B-u/umax*(B-T);
+  k.strokeStyle="#262c31"; k.lineWidth=1; k.font="11px "+FONT; k.fillStyle="#9aa2a9"; k.textBaseline="middle";
+  const stepU=umax>2.6?1:0.5;
+  for(let u=0;u<=umax+1e-6;u+=stepU){k.beginPath();k.moveTo(L,Y(u));k.lineTo(R,Y(u));k.stroke();k.textAlign="right";k.fillText(u.toFixed(1).replace(".",","),L-6,Y(u));}
+  k.textAlign="center"; k.textBaseline="top";
+  for(let d=0;d<=1.001;d+=0.25){k.beginPath();k.moveTo(X(d),T);k.lineTo(X(d),B);k.stroke();k.fillText(Math.round(d*100)+" %",X(d),B+5);}
+  k.fillText("entnommene Ladung",(L+R)/2,B+21);
+  k.save(); k.translate(12,(T+B)/2); k.rotate(-Math.PI/2); k.textBaseline="middle"; k.fillText("U in V",0,0); k.restore();
+  list.forEach(b=>{
+    const cur=b===bat;
+    k.strokeStyle=opt.all?b.col:"#ffb454"; k.globalAlpha=opt.all&&!cur?0.55:1; k.lineWidth=cur?2.6:1.5;
+    k.beginPath(); for(let i=0;i<=100;i++){const d=i/100,u=Math.max(0,uModel(b,d)); if(i) k.lineTo(X(d),Y(u)); else k.moveTo(X(d),Y(u));} k.stroke();
+  });
+  k.globalAlpha=1;
+  const d=1-soc(), u=Math.max(0,uModel(bat,d));
+  k.fillStyle="#4fd1c5"; k.beginPath(); k.arc(X(d),Y(u),5.5,0,7); k.fill(); k.strokeStyle="#0e1113"; k.lineWidth=1.5; k.stroke();
+}
+
+/* =====================================================================
+   Oberfläche
+   ===================================================================== */
+function flash(id){const el=$(id); if(!el) return; el.classList.add("flash"); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove("flash"),650);}
+function fhtmlS(x){return fhtml(x).split("CH<sub>4</sub>").join(SF_CH4);}
+function eqLine(a,rev){return fhtmlS(rev?a[1]:a[0])+'<span class="arr">⟶</span>'+fhtmlS(rev?a[0]:a[1]);}
+function renderEq(){
+  const chg=mode==="chg", i=chg?1:0, b=bat;
+  $("eqMode").textContent=b.art==="B"?"Betrieb":chg?"Laden":"Entladen";
+  $("roleNeg").textContent=chg?"Kathode · Reduktion":"Anode · Oxidation";
+  $("rolePos").textContent=chg?"Anode · Oxidation":"Kathode · Reduktion";
+  $("eqNegF").innerHTML=eqLine(b.eq.neg,chg)+(b.eq.negMul?'<span class="mul">'+b.eq.negMul+"</span>":"");
+  $("eqPosF").innerHTML=eqLine(b.eq.pos,chg)+(b.eq.posMul?'<span class="mul">'+b.eq.posMul+"</span>":"");
+  const oz=(o)=>"Oxidationszahl "+o[0]+": "+(chg?o[2]+" ⟶ "+o[1]:o[1]+" ⟶ "+o[2]);
+  $("ozNeg").textContent=oz(b.oz.neg); $("ozPos").textContent=oz(b.oz.pos);
+  $("txtNeg").textContent=b.txt.neg[i]||b.txt.neg[0]; $("txtPos").textContent=b.txt.pos[i]||b.txt.pos[0]; $("txtIon").textContent=b.txt.ion[i]||b.txt.ion[0];
+  if(b.art==="S"){
+    $("eqGesF").innerHTML=fhtml(b.eq.ges[0])+'<span class="arr">⇌</span>'+fhtml(b.eq.ges[1]);
+    $("gesInfo").textContent=chg?"· Laden: von rechts nach links (⟵)":"· Entladen: von links nach rechts (⟶)";
+  }else{$("eqGesF").innerHTML=eqLine(b.eq.ges,false); $("gesInfo").textContent="";}
+  $("eqBulk").hidden=!b.bulk;
+  if(b.bulk){$("eqBulkF").innerHTML=eqLine(b.bulk.eq,false); $("txtBulk").textContent=b.bulk.txt;}
+  document.querySelectorAll("#modeSeg button").forEach(x=>x.classList.toggle("on",x.dataset.mode===wantMode));
+  $("uLabel").textContent=chg?"Ladespannung (Modell)":"Zellspannung (Modell)";
+}
+function renderStatic(){
+  const b=bat;
+  document.querySelectorAll(".bat-btn").forEach(x=>x.classList.toggle("on",x.dataset.id===b.id));
+  $("facts").innerHTML=
+    "<dt>Art</dt><dd>"+(b.art==="P"?"Primärzelle (nicht aufladbar)":b.art==="S"?"Akkumulator (Sekundärzelle, aufladbar)":"Brennstoffzelle (Reaktionspartner werden von außen zugeführt)")+"</dd>"+
+    "<dt>Bauform</dt><dd>"+BI[b.id].name+"</dd>"+
+    "<dt>Nennspannung</dt><dd>"+b.U+" V je Zelle</dd>"+
+    "<dt>Minuspol</dt><dd>"+b.neg.mat+"</dd>"+
+    "<dt>Pluspol</dt><dd>"+b.pos.mat+"</dd>"+
+    "<dt>Elektrolyt</dt><dd>"+b.ely.name+"</dd>"+
+    "<dt>Energiedichte</dt><dd>"+(b.ed==="–"?(b.edTxt||"hängt vom Tank ab (Wasserstoff: ca. 33 000 Wh/kg)"):b.ed+" Wh/kg")+"</dd>"+
+    "<dt>Verwendung</dt><dd>"+b.use+"</dd>";
+  $("factNote").textContent=b.note;
+  const chgBtn=document.querySelector('#modeSeg button[data-mode="chg"]');
+  chgBtn.disabled=b.art!=="S";
+  $("modeHint").textContent=HINT[b.art];
+  renderLegend();
+  document.querySelectorAll("#cmp tr[data-id]").forEach(tr=>tr.classList.toggle("cur",tr.dataset.id===b.id));
+  renderEq();
+}
+function renderLegend(){
+  const b=bat;
+  if(view==="bau"){
+    const io=BI[b.id].ion;
+    let h='<span><i style="background:#ffe14d"></i><em>e<sup>−</sup> Elektronen im äußeren Stromkreis</em></span>'+
+      '<span><i style="background:'+SP[io[0]].c+'"></i><em>'+fhtml(io[0])+' Ionenwanderung im Elektrolyten</em></span>';
+    if(b.air) h+='<span><i style="background:'+SP["O_2"].c+'"></i><em>O<sub>2</sub> Sauerstoff aus der Luft</em></span>';
+    if(b.fuel){ const fs=b.fuelSp||"H_2"; h+='<span><i style="background:'+SP[fs].c+'"></i><em>'+fhtml(fs)+" "+(b.fuelName||"Wasserstoff")+"</em></span>";
+      h+=fs==="CH_4"?'<span><i style="background:'+SP["CO_2"].c+'"></i><em>CO<sub>2</sub> und H<sub>2</sub>O (Abgas)</em></span>':'<span><i style="background:'+SP["H_2O"].c+'"></i><em>H<sub>2</sub>O Wasser</em></span>'; }
+    if(b.half) h+='<span><i style="background:#fff"></i><em>umgepumpte Lösung</em></span>';
+    if(b.half) h+='<span><em>Die Farbe der Lösungen zeigt den Ladezustand.</em></span>';
+    else if(b.art!=="B") h+='<span><em>Die Farbe der Elektroden ändert sich mit dem Ladezustand.</em></span>';
+    $("legend").innerHTML=h; return;
+  }
+  const set=new Set(); b.ely.pool.forEach(p=>set.add(p[0]));
+  [b.ox,b.red].forEach(pr=>{pr.take.forEach(t=>set.add(t[0])); pr.give.forEach(t=>set.add(t[0]));});
+  if(b.bulk) set.add(b.bulk.give);
+  let h='<span><i style="background:#ffe14d"></i><em>e<sup>−</sup> Elektron</em></span>';
+  set.forEach(sp=>{h+='<span><i style="background:'+SP[sp].c+'"></i><em>'+fhtml(sp)+" "+SP[sp].n+"</em></span>";});
+  $("legend").innerHTML=h;
+}
+const HINT={P:"Primärzelle: Die Zellreaktion lässt sich nicht gefahrlos umkehren – Laden ist nicht möglich.",
+  S:"Akku: Beim Laden erzwingt eine äußere Spannungsquelle die Umkehrung der Zellreaktion.",
+  B:"Brennstoffzelle: Sie wird nicht geladen, sondern laufend mit Brennstoff und Luft versorgt."};
+let lastUi="";
+function updateUi(){
+  const s=soc(), d=1-s;
+  let u=Math.max(0,uModel(bat,d)); if(mode==="chg") u*=1.08;
+  let st;
+  if(finished) st=mode==="dis"?"entladen":"vollständig geladen";
+  else if(paused) st=clock===0?"bereit":"pausiert";
+  else if(wantMode!==mode) st="Vorgang wird abgeschlossen …";
+  else st=bat.art==="B"?"in Betrieb …":mode==="dis"?"entlädt …":"lädt …";
+  const key=[st,stat.e,Math.round(s*1000),mode,paused,finished,wantMode].join("|");
+  if(key===lastUi) return; lastUi=key;
+  $("status").textContent=st;
+  $("uVal").textContent=u.toFixed(2).replace(".",",")+" V";
+  $("eVal").textContent=stat.e;
+  $("socVal").textContent=bat.art==="B"?"–":Math.round(s*100)+" %";
+  $("socBar").style.width=(s*100)+"%";
+  $("socBar").style.background=s>0.5?"var(--good)":s>0.2?"var(--amber)":"var(--danger)";
+  const done=finished&&wantMode===mode;
+  $("btnRun").textContent=paused?"▶ Start":"⏸ Pause";
+  $("btnRun").disabled=done; $("btnStep").disabled=done||(!paused&&!stepping)||stepping;
+  if(done&&mode==="dis") $("modeHint").textContent=bat.art==="S"?"Der Akku ist entladen. Wähle „Laden“, um ihn wieder aufzuladen.":"Die Batterie ist entladen und nicht wiederaufladbar. „Zurücksetzen“ setzt eine neue Zelle ein.";
+  else if(done) $("modeHint").textContent="Der Akku ist vollständig geladen. Wähle „Entladen“, um ihn wieder zu nutzen.";
+  else if(bat.art==="S") $("modeHint").textContent="Akku: Beim Laden erzwingt eine äußere Spannungsquelle die Umkehrung der Zellreaktion.";
+  document.querySelectorAll("#modeSeg button").forEach(x=>x.classList.toggle("on",x.dataset.mode===wantMode));
+  drawCurve();
+}
+function selectBat(id){bat=BAT.find(b=>b.id===id); resetSim(); lastUi=""; renderStatic(); updateUi();}
+
+/* Listen und Tabelle */
+BAT.forEach(b=>{
+  const btn=document.createElement("button"); btn.type="button"; btn.className="bat-btn"; btn.dataset.id=b.id;
+  btn.innerHTML="<span>"+b.name+"</span><small>"+b.U+" V</small>";
+  btn.addEventListener("click",()=>selectBat(b.id));
+  $(b.art==="P"?"listP":b.art==="S"?"listS":"listB").appendChild(btn);
+});
+$("cmp").innerHTML="<tr><th>Typ</th><th>Art</th><th>Spannung in V</th><th>Minuspol</th><th>Pluspol</th><th>Elektrolyt</th><th>Energiedichte in Wh/kg</th><th>Verwendung</th></tr>"+
+  BAT.map(b=>'<tr data-id="'+b.id+'"><td><b>'+b.name+"</b></td><td>"+(b.art==="P"?"Primärzelle":b.art==="S"?"Akku":"Brennstoffzelle")+'</td><td class="num">'+b.U+"</td><td>"+b.neg.short+"</td><td>"+b.pos.short+"</td><td>"+b.ely.short+'</td><td class="num">'+b.ed+"</td><td>"+b.use+"</td></tr>").join("");
+
+$("btnRun").addEventListener("click",()=>{paused=!paused;stepping=false;lastUi="";});
+$("btnStep").addEventListener("click",()=>{
+  const src=procOf(mode==="dis"?"neg":"pos"), snk=procOf(mode==="dis"?"pos":"neg");
+  stepLeft=Math.max(1,Math.round(snk.e/src.e)); stepping=true; paused=false; lastSrc=-9; lastUi="";
+});
+$("btnReset").addEventListener("click",()=>selectBat(bat.id));
+document.querySelectorAll("#modeSeg button").forEach(x=>x.addEventListener("click",()=>{
+  if(x.disabled) return; wantMode=x.dataset.mode; stepping=false; lastUi="";
+  if(idle()){mode=wantMode;finished=false;lastSrc=clock-1.2;renderEq();checkEnd();}
+}));
+document.querySelectorAll("#speedSeg button").forEach(x=>x.addEventListener("click",()=>{
+  speed=parseFloat(x.dataset.s); document.querySelectorAll("#speedSeg button").forEach(y=>y.classList.toggle("on",y===x));
+}));
+document.querySelectorAll("#viewSeg button").forEach(x=>x.addEventListener("click",()=>{
+  view=x.dataset.v; document.querySelectorAll("#viewSeg button").forEach(y=>y.classList.toggle("on",y===x)); renderLegend();
+}));
+$("optLab").addEventListener("change",e=>opt.lab=e.target.checked);
+$("optSpect").addEventListener("change",e=>opt.spect=e.target.checked);
+$("optWater").addEventListener("change",e=>opt.water=e.target.checked);
+$("optAll").addEventListener("change",e=>{opt.all=e.target.checked;drawCurve();});
+
+/* Animationsschleife */
+let lastT=0;
+function frame(t){
+  const dt=Math.min(0.05,(t-lastT)/1000||0); lastT=t;
+  if(!paused&&!finished) bauPhase+=dt*speed;
+  if(!paused){ let rest=dt*speed; while(rest>1e-6){const h=Math.min(0.025,rest); step(h); rest-=h;} }
+  draw(); updateUi();
+  requestAnimationFrame(frame);
+}
+
+/* =====================================================================
+   Grundlagen
+   ===================================================================== */
+const svgCell=`<svg viewBox="0 0 560 250" role="img" aria-label="Schema einer galvanischen Zelle">
+<rect x="90" y="80" width="380" height="150" rx="8" fill="#171b1f" stroke="#3a4249" stroke-width="2"/>
+<rect x="110" y="95" width="70" height="120" fill="#39444e"/><rect x="380" y="95" width="70" height="120" fill="#33261f"/>
+<line x1="280" y1="95" x2="280" y2="215" stroke="#5f6870" stroke-width="2" stroke-dasharray="6 5"/>
+<polyline points="145,95 145,35 415,35 415,95" fill="none" stroke="#8b949c" stroke-width="3"/>
+<circle cx="280" cy="35" r="16" fill="#23282d" stroke="#c8cdd2" stroke-width="2"/><path d="M269 24 L291 46 M291 24 L269 46" stroke="#c8cdd2" stroke-width="2"/>
+<text x="205" y="26" fill="#ffe14d" font-size="14" font-weight="600" text-anchor="middle">e⁻ ⟶</text><text x="355" y="26" fill="#ffe14d" font-size="14" font-weight="600" text-anchor="middle">e⁻ ⟶</text>
+<text x="145" y="150" fill="#e7e4dd" font-size="13" text-anchor="middle">Minuspol</text><text x="145" y="168" fill="#9aa2a9" font-size="11.5" text-anchor="middle">Oxidation</text>
+<text x="415" y="150" fill="#e7e4dd" font-size="13" text-anchor="middle">Pluspol</text><text x="415" y="168" fill="#9aa2a9" font-size="11.5" text-anchor="middle">Reduktion</text>
+<text x="280" y="130" fill="#9aa2a9" font-size="12" text-anchor="middle">Elektrolyt</text>
+<text x="280" y="180" fill="#e98a6c" font-size="13" text-anchor="middle">Ionen wandern</text>
+<path d="M215 195 H345" stroke="#e98a6c" stroke-width="2"/><path d="M215 195 l9 -5 v10 z M345 195 l-9 -5 v10 z" fill="#e98a6c"/>
+<text x="40" y="150" fill="#7fb4ff" font-size="26" font-weight="700" text-anchor="middle">−</text><text x="520" y="152" fill="#ff8a80" font-size="24" font-weight="700" text-anchor="middle">+</text>
+</svg>`;
+const svgLaden=`<svg viewBox="0 0 560 190" role="img" aria-label="Entladen und Laden im Vergleich">
+<g font-size="12.5" text-anchor="middle">
+<text x="140" y="18" fill="#ffb454" font-weight="600">Entladen (galvanische Zelle)</text><text x="420" y="18" fill="#4fd1c5" font-weight="600">Laden (Elektrolyse)</text>
+<rect x="40" y="70" width="200" height="100" rx="6" fill="#171b1f" stroke="#3a4249"/><rect x="320" y="70" width="200" height="100" rx="6" fill="#171b1f" stroke="#3a4249"/>
+<rect x="55" y="82" width="40" height="76" fill="#39444e"/><rect x="185" y="82" width="40" height="76" fill="#33261f"/>
+<rect x="335" y="82" width="40" height="76" fill="#39444e"/><rect x="465" y="82" width="40" height="76" fill="#33261f"/>
+<polyline points="75,82 75,45 205,45 205,82" fill="none" stroke="#8b949c" stroke-width="2.5"/><polyline points="355,82 355,45 485,45 485,82" fill="none" stroke="#8b949c" stroke-width="2.5"/>
+<circle cx="140" cy="45" r="11" fill="#23282d" stroke="#c8cdd2" stroke-width="2"/><rect x="392" y="33" width="56" height="24" rx="5" fill="#23282d" stroke="#4fd1c5" stroke-width="2"/>
+<text x="420" y="49" fill="#4fd1c5" font-size="10.5">Ladegerät</text>
+<text x="105" y="38" fill="#ffe14d" font-weight="600">e⁻⟶</text><text x="175" y="38" fill="#ffe14d" font-weight="600">e⁻⟶</text>
+<text x="373" y="28" fill="#ffe14d" font-weight="600">⟵e⁻</text><text x="467" y="28" fill="#ffe14d" font-weight="600">⟵e⁻</text>
+<text x="75" y="116" fill="#e7e4dd">−</text><text x="75" y="134" fill="#9aa2a9" font-size="10">Anode</text><text x="205" y="116" fill="#e7e4dd">+</text><text x="205" y="134" fill="#9aa2a9" font-size="10">Kathode</text>
+<text x="355" y="116" fill="#e7e4dd">−</text><text x="355" y="134" fill="#9aa2a9" font-size="10">Kathode</text><text x="485" y="116" fill="#e7e4dd">+</text><text x="485" y="134" fill="#9aa2a9" font-size="10">Anode</text>
+<text x="140" y="186" fill="#9aa2a9" font-size="11.5">chemische ⟶ elektrische Energie</text><text x="420" y="186" fill="#9aa2a9" font-size="11.5">elektrische ⟶ chemische Energie</text>
+</g></svg>`;
+const GL=[
+{t:"Die galvanische Zelle als Grundprinzip",h:`
+<p>Jede Batterie ist eine galvanische Zelle: Eine Redoxreaktion läuft so ab, dass Elektronenabgabe und Elektronenaufnahme <b>räumlich getrennt</b> stattfinden. Die Elektronen müssen deshalb den Umweg über den äußeren Stromkreis nehmen – und können dort einen Verbraucher betreiben.</p>
+<figure>${svgCell}<figcaption>Aufbau jeder Batterie: zwei Elektroden, ein Elektrolyt und ein Separator, der die Elektroden trennt, Ionen aber durchlässt.</figcaption></figure>
+<ul>
+<li><b>Minuspol (beim Entladen die Anode):</b> Hier findet die <b>Oxidation</b> statt. Der Stoff gibt Elektronen ab.</li>
+<li><b>Pluspol (beim Entladen die Kathode):</b> Hier findet die <b>Reduktion</b> statt. Der Stoff nimmt Elektronen auf.</li>
+<li><b>Elektrolyt:</b> Er leitet den Strom durch <b>Ionen</b>, nicht durch Elektronen. Die Ionenwanderung gleicht die Ladung aus und schließt den Stromkreis.</li>
+<li><b>Separator:</b> Er verhindert, dass sich die Elektroden berühren (Kurzschluss), lässt die Ionen aber hindurch.</li>
+</ul>
+<p>Merkhilfe: An der <b>A</b>node läuft immer die <b>O</b>xidation ab, an der Kathode immer die Reduktion – unabhängig davon, welcher Pol gerade Plus oder Minus ist.</p>`},
+{t:"Primärzelle, Akkumulator, Brennstoffzelle",h:`
+<p>Elektrochemische Spannungsquellen werden in drei Gruppen eingeteilt; die Redox-Flow-Batterie steht zwischen Akku und Brennstoffzelle:</p>
+<div class="tbl-wrap"><table>
+<tr><th>Gruppe</th><th>Merkmal</th><th>Beispiele</th></tr>
+<tr><td><b>Primärzelle</b> („Batterie“)</td><td>Die Zellreaktion lässt sich praktisch nicht umkehren. Sind die Stoffe verbraucht, ist die Zelle leer.</td><td>Zink-Kohle, Alkali-Mangan, Zink-Luft, Silberoxid, Lithium-Mangandioxid</td></tr>
+<tr><td><b>Sekundärzelle</b> (Akkumulator, „Akku“)</td><td>Die Zellreaktion ist umkehrbar. Beim Laden werden die Ausgangsstoffe zurückgebildet.</td><td>Bleiakku, Nickel-Cadmium, Nickel-Metallhydrid, Lithium-Ionen, Lithium-Eisenphosphat</td></tr>
+<tr><td><b>Brennstoffzelle</b></td><td>Die Reaktionspartner werden von außen ständig zugeführt.</td><td>Wasserstoff-Brennstoffzelle, Methan-Brennstoffzelle</td></tr>
+<tr><td><b>Redox-Flow-Batterie</b></td><td>Ein Akku, dessen Reaktionspartner als Lösungen in Tanks außerhalb der Zelle lagern.</td><td>Vanadium-Redox-Flow-Batterie</td></tr>
+</table></div>
+<p>Damit eine Zelle wiederaufladbar ist, müssen die Reaktionsprodukte <b>an der Elektrode bleiben</b> und sich dort wieder zurückverwandeln lassen. Beim Bleiakku haftet das schwer lösliche Blei(II)-sulfat auf den Platten; im Lithium-Ionen-Akku bleiben die Elektrodengitter ganz erhalten. In der Zink-Kohle-Batterie dagegen löst sich der Zinkbecher auf – das lässt sich nicht geordnet rückgängig machen.</p>
+<p>Primärzellen dürfen nicht geladen werden: Es können Gase entstehen, die Zelle kann auslaufen oder platzen.</p>`},
+{t:"Entladen und Laden",h:`
+<p>Beim <b>Entladen</b> läuft die Redoxreaktion freiwillig ab; chemische Energie wird in elektrische Energie umgewandelt. Beim <b>Laden</b> wird diese Reaktion durch eine äußere Spannungsquelle <b>erzwungen umgekehrt</b> – das ist eine Elektrolyse.</p>
+<figure>${svgLaden}<figcaption>Plus- und Minuspol bleiben, wo sie sind. Die Elektronen fließen beim Laden aber in die Gegenrichtung, und Oxidation und Reduktion tauschen die Elektroden.</figcaption></figure>
+<ul>
+<li>Der <b>Minuspol</b> bleibt Minuspol. Beim Entladen gibt er Elektronen ab (Oxidation, Anode), beim Laden werden ihm Elektronen aufgezwungen (Reduktion, Kathode).</li>
+<li>Der <b>Pluspol</b> bleibt Pluspol. Beim Entladen nimmt er Elektronen auf (Reduktion, Kathode), beim Laden werden ihm Elektronen entzogen (Oxidation, Anode).</li>
+<li>Die <b>Ladespannung</b> muss größer sein als die Zellspannung, sonst fließt kein Ladestrom.</li>
+</ul>
+<p>In der Simulation lässt sich das bei allen Akkus beobachten: Nach dem Umschalten auf „Laden“ wandern Elektronen und Ionen in die Gegenrichtung, und die Gleichungen werden von rechts nach links gelesen.</p>`},
+{t:"Spannung, Kapazität und Energiedichte",h:`
+<h3>Zellspannung</h3>
+<p>Die Spannung einer Zelle hängt nur von den <b>beteiligten Stoffen</b> ab, nicht von der Größe der Zelle. Sie ergibt sich aus der Differenz der Elektrodenpotentiale:</p>
+<div class="f">U = E(Kathode) − E(Anode) = E(Pluspol) − E(Minuspol)</div>
+<p>Je unedler das Metall am Minuspol und je stärker das Oxidationsmittel am Pluspol, desto größer die Spannung. Lithium ist das unedelste Metall (E° = −3,04 V) – deshalb liefern Lithium-Zellen 3 V und mehr. Für höhere Spannungen werden Zellen in Reihe geschaltet: Sechs Bleiakku-Zellen ergeben 12 V.</p>
+<h3>Kapazität</h3>
+<p>Die Kapazität gibt an, welche Ladung eine Zelle abgeben kann, meist in Milliamperestunden (mAh). Sie hängt von der <b>Stoffmenge</b> der Elektrodenmaterialien ab: Eine größere Zelle hat bei gleicher Spannung eine größere Kapazität. Nach Faraday gilt für die Ladung</p>
+<div class="f">Q = n · z · F &nbsp;&nbsp; (F = 96 485 C/mol)</div>
+<h3>Energiedichte</h3>
+<p>Die gespeicherte Energie ist W = U · Q. Bezogen auf die Masse erhält man die Energiedichte in Wh/kg. Sie ist hoch, wenn die Spannung groß und die Stoffe leicht sind – deshalb sind Lithium-Zellen den schweren Blei- und Cadmium-Zellen überlegen.</p>
+<h3>Entladekurve</h3>
+<p>Beim Entladen sinkt die Spannung. Bei manchen Zellen bleibt sie lange fast konstant und bricht am Ende plötzlich ein (Silberoxid, Nickel-Akkus), bei anderen fällt sie stetig ab (Zink-Kohle, Alkali-Mangan). Das Diagramm in der Simulation zeigt den Verlauf modellhaft.</p>`},
+{t:"Zink-Batterien",h:`
+<p>In den meisten Primärzellen ist <b>Zink</b> das Reduktionsmittel am Minuspol. Die Zellen unterscheiden sich im Elektrolyten und im Oxidationsmittel am Pluspol.</p>
+<h3>Zink-Kohle-Batterie (Leclanché-Element)</h3>
+<p>Ein Zinkbecher ist Minuspol und Gehäuse zugleich. Der Pluspol besteht aus Braunstein (Mangan(IV)-oxid) mit Graphit um einen Kohlestab. Der Elektrolyt ist eine eingedickte Ammoniumchlorid-Lösung („Trockenbatterie“).</p>
+<div class="f">Zn + 2 MnO<sub>2</sub> + 2 NH<sub>4</sub>Cl ⟶ 2 MnO(OH) + [Zn(NH<sub>3</sub>)<sub>2</sub>]Cl<sub>2</sub></div>
+<p>Der Kohlestab reagiert nicht, er leitet nur die Elektronen zum Braunstein. Nachteile: Der Elektrolyt wird verbraucht, schwer lösliche Salze erhöhen den Innenwiderstand, und der Zinkbecher kann durchlöchert werden.</p>
+<h3>Alkali-Mangan-Zelle</h3>
+<p>Dieselben Elektrodenstoffe, aber Kalilauge als Elektrolyt und Zink<b>pulver</b> im Inneren der Zelle (große Oberfläche, Stahlgehäuse außen).</p>
+<div class="f">Zn + 2 MnO<sub>2</sub> + H<sub>2</sub>O ⟶ ZnO + 2 MnO(OH)</div>
+<p>Die Hydroxid-Ionen, die am Pluspol entstehen, werden am Minuspol wieder verbraucht. Die Lauge bleibt erhalten – daher höhere Belastbarkeit und größere Kapazität.</p>
+<h3>Zink-Luft-Zelle</h3>
+<p>Das Oxidationsmittel ist <b>Sauerstoff aus der Luft</b>, der an einer porösen Kohle-Elektrode mit Katalysator reduziert wird. Die Zelle enthält fast nur Zink und erreicht deshalb die höchste Energiedichte.</p>
+<div class="f">2 Zn + O<sub>2</sub> ⟶ 2 ZnO</div>
+<h3>Silberoxid-Zink-Zelle</h3>
+<p>Silber(I)-oxid als Oxidationsmittel liefert eine besonders konstante Spannung.</p>
+<div class="f">Zn + Ag<sub>2</sub>O ⟶ ZnO + 2 Ag</div>`},
+{t:"Bleiakkumulator",h:`
+<p>Der Bleiakku ist der älteste Akku (1859) und bis heute die Starterbatterie im Auto. Beide Elektroden enthalten Blei – in unterschiedlichen Oxidationsstufen:</p>
+<ul><li>Minuspol: Blei, Pb (Oxidationszahl 0)</li><li>Pluspol: Blei(IV)-oxid, PbO<sub>2</sub> (Oxidationszahl +IV)</li><li>Elektrolyt: Schwefelsäure</li></ul>
+<div class="f">Minuspol: &nbsp;Pb + SO<sub>4</sub><sup>2−</sup> ⟶ PbSO<sub>4</sub> + 2 e<sup>−</sup><br>Pluspol: &nbsp;&nbsp;PbO<sub>2</sub> + SO<sub>4</sub><sup>2−</sup> + 4 H<sup>+</sup> + 2 e<sup>−</sup> ⟶ PbSO<sub>4</sub> + 2 H<sub>2</sub>O<br>Gesamt: &nbsp;&nbsp;&nbsp;Pb + PbO<sub>2</sub> + 2 H<sub>2</sub>SO<sub>4</sub> ⇌ 2 PbSO<sub>4</sub> + 2 H<sub>2</sub>O</div>
+<p>Beim Entladen entsteht an <b>beiden</b> Polen Blei(II)-sulfat: Aus Blei der Stufen 0 und +IV wird Blei der Stufe +II (<b>Synproportionierung</b>). Das Laden ist die Umkehrung (Disproportionierung).</p>
+<p>Die Schwefelsäure ist hier nicht nur Elektrolyt, sondern <b>Reaktionspartner</b>: Beim Entladen wird sie verbraucht, und es entsteht Wasser. Die Dichte der Säure sinkt von etwa 1,28 g/cm³ (geladen) auf etwa 1,10 g/cm³ (entladen) – so lässt sich der Ladezustand messen. In der Simulation ist das gut zu sehen: Die Zahl der Sulfat- und H⁺-Ionen nimmt ab.</p>
+<p>Beim Überladen wird Wasser elektrolysiert; es entsteht Knallgas. Bleibt der Akku lange entladen, bilden sich grobe Bleisulfat-Kristalle, die sich nicht mehr umwandeln lassen (Sulfatierung).</p>`},
+{t:"Nickel-Akkus",h:`
+<p>Beide Nickel-Akkus haben denselben Pluspol aus Nickel(III)-oxidhydroxid und Kalilauge als Elektrolyt. Sie unterscheiden sich im Minuspol.</p>
+<h3>Nickel-Cadmium-Akku (NiCd)</h3>
+<div class="f">Cd + 2 NiO(OH) + 2 H<sub>2</sub>O ⇌ Cd(OH)<sub>2</sub> + 2 Ni(OH)<sub>2</sub></div>
+<p>Robust, tiefentladefest und für hohe Ströme geeignet. Nachteile: Cadmium ist ein giftiges Schwermetall, und der Akku zeigt den <b>Memory-Effekt</b> – wird er häufig nur teilweise entladen, sinkt die nutzbare Kapazität. NiCd-Akkus dürfen in der EU nur noch für wenige Anwendungen verkauft werden.</p>
+<h3>Nickel-Metallhydrid-Akku (NiMH)</h3>
+<p>Der Minuspol ist eine Metalllegierung, die Wasserstoff-Atome in ihr Gitter einlagern kann (Metallhydrid, MH). Beim Entladen wird dieser Wasserstoff oxidiert.</p>
+<div class="f">MH + NiO(OH) ⇌ M + Ni(OH)<sub>2</sub></div>
+<p>Kein Cadmium, etwa die doppelte Kapazität bei gleicher Größe und nur ein schwacher Memory-Effekt. Mit 1,2 V ersetzt er in vielen Geräten die Alkali-Mangan-Zelle (1,5 V).</p>`},
+{t:"Lithium-Batterien",h:`
+<p>Lithium ist das leichteste Metall und zugleich das stärkste Reduktionsmittel. Weil es mit Wasser heftig reagiert, enthalten alle Lithium-Zellen <b>wasserfreie</b> Elektrolyte: ein Lithiumsalz in einem organischen Lösemittel.</p>
+<h3>Lithium-Mangandioxid-Zelle (Primärzelle)</h3>
+<p>Am Minuspol liegt metallisches Lithium vor.</p>
+<div class="f">Li + MnO<sub>2</sub> ⟶ LiMnO<sub>2</sub></div>
+<h3>Lithium-Ionen-Akku</h3>
+<p>Hier gibt es <b>kein metallisches Lithium</b>. Beide Elektroden sind Schichtgitter, in die Lithium ein- und ausgelagert wird (<b>Interkalation</b>): Graphit am Minuspol, ein Lithium-Metalloxid am Pluspol.</p>
+<div class="f">LiC<sub>6</sub> + CoO<sub>2</sub> ⇌ C<sub>6</sub> + LiCoO<sub>2</sub></div>
+<p>Beim Entladen verlassen Lithium-Ionen den Graphit, wandern durch den Elektrolyten und werden im Metalloxid eingelagert; die Elektronen fließen außen herum. Beim Laden wandern die Lithium-Ionen zurück („Schaukelstuhl-Prinzip“). Die Gitter selbst bleiben erhalten – deshalb sind viele hundert Ladezyklen möglich, und es gibt keinen Memory-Effekt.</p>
+<p>Statt Cobaltoxid werden heute oft Mischoxide (Nickel-Mangan-Cobalt, NMC) oder <b>Lithiumeisenphosphat</b> verwendet:</p>
+<div class="f">LiC<sub>6</sub> + FePO<sub>4</sub> ⇌ C<sub>6</sub> + LiFePO<sub>4</sub></div>
+<p>Der Lithium-Eisenphosphat-Akku enthält kein Cobalt und Nickel, ist thermisch sehr stabil und langlebig. Seine Spannung (3,2 V) und Energiedichte sind etwas kleiner; er wird vor allem in Heimspeichern und zunehmend in Elektroautos eingesetzt.</p>
+<h3>Sicherheit</h3>
+<p>Der organische Elektrolyt ist brennbar. Überladen, Tiefentladen, Kurzschluss oder mechanische Beschädigung können zu starker Erwärmung und zum Brand führen. Deshalb überwacht eine Schutzelektronik jede Zelle.</p>`},
+{t:"Redox-Flow-Batterie und Brennstoffzellen",h:`
+<p>Bei Batterien und Akkus sind die Reaktionspartner in den Elektroden gespeichert. Bei den beiden folgenden Systemen liegen sie <b>außerhalb der Zelle</b>; die Elektroden selbst reagieren nicht, sie nehmen nur Elektronen auf oder geben sie weiter.</p>
+<h3>Redox-Flow-Batterie (Vanadium)</h3>
+<p>Zwei Lösungen mit Vanadium-Ionen werden aus Tanks durch die beiden Halbzellen gepumpt. Eine Membran trennt die Lösungen und lässt nur H⁺-Ionen durch.</p>
+<div class="f">Minuspol: &nbsp;V<sup>2+</sup> ⇌ V<sup>3+</sup> + e<sup>−</sup><br>Pluspol: &nbsp;&nbsp;VO<sub>2</sub><sup>+</sup> + 2 H<sup>+</sup> + e<sup>−</sup> ⇌ VO<sup>2+</sup> + H<sub>2</sub>O</div>
+<p>Vanadium tritt in vier Oxidationsstufen mit vier Farben auf: +II violett, +III grün, +IV blau, +V gelb. Weil auf beiden Seiten dasselbe Element vorliegt, schadet es wenig, wenn Ionen durch die Membran gelangen.</p>
+<ul>
+<li><b>Kapazität</b> und <b>Leistung</b> lassen sich getrennt festlegen: Die Tankgröße bestimmt die gespeicherte Energie, die Größe der Zelle die Leistung.</li>
+<li>Sehr viele Ladezyklen, keine Brandgefahr – aber geringe Energiedichte. Deshalb nur als ortsfester Großspeicher sinnvoll.</li>
+</ul>
+<h3>Wasserstoff-Sauerstoff-Brennstoffzelle</h3>
+<p>Wasserstoff und Sauerstoff reagieren zu Wasser – wie bei der Knallgasreaktion, aber räumlich getrennt und ohne Flamme. In der Membran-Brennstoffzelle (PEM) trennt eine Polymermembran die Gase und leitet H⁺-Ionen.</p>
+<div class="f">Minuspol: &nbsp;2 H<sub>2</sub> ⟶ 4 H<sup>+</sup> + 4 e<sup>−</sup><br>Pluspol: &nbsp;&nbsp;O<sub>2</sub> + 4 H<sup>+</sup> + 4 e<sup>−</sup> ⟶ 2 H<sub>2</sub>O<br>Gesamt: &nbsp;&nbsp;&nbsp;2 H<sub>2</sub> + O<sub>2</sub> ⟶ 2 H<sub>2</sub>O</div>
+<p>H⁺ steht vereinfacht für H₃O⁺. Der Platin-Katalysator ist nötig, weil die Reaktionen an der Elektrodenoberfläche sonst zu langsam ablaufen.</p>
+<ul>
+<li>Die Zelle liefert Strom, <b>solange Brennstoff zugeführt wird</b>; sie wird nicht geladen. Einziges Produkt ist Wasser.</li>
+<li>Theoretische Spannung 1,23 V, unter Last etwa 0,7 V. Viele Zellen werden zu einem Stapel (Stack) in Reihe geschaltet.</li>
+<li>Der Wasserstoff muss erst hergestellt werden, zum Beispiel durch Elektrolyse von Wasser mit Strom aus Wind und Sonne. Über die ganze Kette geht dabei mehr Energie verloren als beim direkten Laden eines Akkus.</li>
+</ul>
+<h3>Methan-Brennstoffzelle</h3>
+<p>Auch Methan (Erdgas, Biogas) lässt sich in einer Brennstoffzelle umsetzen. Technisch geschieht das in der <b>Festoxid-Brennstoffzelle</b>: Der Elektrolyt ist eine Keramik, die bei 600–1000 °C Oxid-Ionen leitet.</p>
+<div class="f">Minuspol: &nbsp;${SF_CH4} + 4 O<sup>2−</sup> ⟶ CO<sub>2</sub> + 2 H<sub>2</sub>O + 8 e<sup>−</sup><br>Pluspol: &nbsp;&nbsp;2 O<sub>2</sub> + 8 e<sup>−</sup> ⟶ 4 O<sup>2−</sup><br>Gesamt: &nbsp;&nbsp;&nbsp;${SF_CH4} + 2 O<sub>2</sub> ⟶ CO<sub>2</sub> + 2 H<sub>2</sub>O</div>
+<p>Das Kohlenstoff-Atom wird von der Oxidationszahl −IV auf +IV oxidiert – deshalb werden je Methan-Molekül acht Elektronen übertragen. Die Gesamtreaktion entspricht der Verbrennung von Methan, läuft aber ohne Flamme ab.</p>
+<p>In Aufgaben wird die Methan-Brennstoffzelle oft mit <b>saurem Elektrolyten</b> formuliert. Dann wandern H⁺-Ionen vom Minuspol zum Pluspol:</p>
+<div class="f">Minuspol: &nbsp;${SF_CH4} + 2 H<sub>2</sub>O ⟶ CO<sub>2</sub> + 8 H<sup>+</sup> + 8 e<sup>−</sup><br>Pluspol: &nbsp;&nbsp;2 O<sub>2</sub> + 8 H<sup>+</sup> + 8 e<sup>−</sup> ⟶ 4 H<sub>2</sub>O</div>
+<ul>
+<li>Einsatz als Brennstoffzellenheizung: Die Zelle liefert Strom, die Abwärme heizt das Haus.</li>
+<li>Es entsteht Kohlenstoffdioxid; klimaneutral ist der Betrieb nur mit Biogas oder synthetisch hergestelltem Methan.</li>
+</ul>`},
+{t:"Umwelt und Entsorgung",h:`
+<p>Batterien und Akkus enthalten wertvolle und zum Teil giftige Stoffe. Sie gehören <b>nicht in den Hausmüll</b>, sondern in die Sammelboxen im Handel oder zum Wertstoffhof. Händler sind zur Rücknahme verpflichtet.</p>
+<div class="tbl-wrap"><table>
+<tr><th>Stoff</th><th>Vorkommen</th><th>Bedeutung</th></tr>
+<tr><td>Blei</td><td>Bleiakku</td><td>giftiges Schwermetall; wird fast vollständig recycelt</td></tr>
+<tr><td>Cadmium</td><td>NiCd-Akku</td><td>giftig, reichert sich im Körper an; weitgehend verboten</td></tr>
+<tr><td>Quecksilber</td><td>ältere Knopfzellen</td><td>giftig; in neuen Batterien verboten</td></tr>
+<tr><td>Cobalt, Nickel, Lithium</td><td>Lithium-Ionen-Akku</td><td>knappe Rohstoffe, Abbau teils unter problematischen Bedingungen; Recycling wird ausgebaut</td></tr>
+<tr><td>Zink, Mangan</td><td>Zink-Batterien</td><td>lassen sich zurückgewinnen</td></tr>
+</table></div>
+<ul>
+<li>Lithium-Zellen vor der Abgabe die <b>Pole abkleben</b>: Ein Kurzschluss kann einen Brand auslösen.</li>
+<li>Akkus ersetzen bei häufiger Nutzung viele hundert Primärzellen und sparen so Rohstoffe und Energie.</li>
+<li>Die Herstellung einer Primärzelle erfordert ein Vielfaches der Energie, die sie später abgibt.</li>
+</ul>`}
+];
+$("glCount").textContent=GL.length;
+let glIdx=0;
+function showGl(i){glIdx=(i+GL.length)%GL.length; $("glTitle").textContent=(glIdx+1)+" · "+GL[glIdx].t; $("glBody").innerHTML=GL[glIdx].h; openModal("mGl"); $("mGl").scrollTop=0;}
+GL.forEach((g,i)=>{const b=document.createElement("button"); b.type="button"; b.textContent=(i+1)+" · "+g.t; b.addEventListener("click",()=>showGl(i)); $("glList").appendChild(b);});
+$("glToggle").addEventListener("click",()=>{const l=$("glList"); l.hidden=!l.hidden; $("glArrow").textContent=l.hidden?"▸":"▾"; $("glToggle").setAttribute("aria-expanded",String(!l.hidden));});
+$("glPrev").addEventListener("click",()=>showGl(glIdx-1));
+$("glNext").addEventListener("click",()=>showGl(glIdx+1));
+
+/* Modalfenster */
+function openModal(id){$(id).hidden=false;}
+function closeModals(){document.querySelectorAll(".modal").forEach(m=>m.hidden=true);}
+document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m||e.target.closest("[data-close]")) m.hidden=true;}));
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape") closeModals();
+  if(!$("mGl").hidden){ if(e.key==="ArrowLeft") showGl(glIdx-1); if(e.key==="ArrowRight") showGl(glIdx+1); }
+});
+$("helpLink").addEventListener("click",e=>{e.preventDefault();openModal("mHelp");});
+$("verLink").addEventListener("click",e=>{e.preventDefault();openModal("mVer");});
+$("qrBtn").addEventListener("click",()=>openModal("mQr"));
+
+/* =====================================================================
+   QR-Code (Byte-Modus, Fehlerkorrektur L, Versionen 1–9, Ausgabe als SVG)
+   ===================================================================== */
+function qrMatrix(text){
+  const data=Array.from(new TextEncoder().encode(text));
+  const CAP=[0,17,32,53,78,106,134,154,192,230], ECW=[0,7,10,15,20,26,18,20,24,30], BLK=[0,1,1,1,1,1,2,2,2,2], DCW=[0,19,34,55,80,108,136,156,194,232];
+  const ALN=[[],[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46]];
+  let v=1; while(v<=9&&data.length>CAP[v]) v++;
+  if(v>9) throw new Error("Text zu lang für den QR-Code");
+  const bits=[]; const put=(val,n)=>{for(let i=n-1;i>=0;i--) bits.push((val>>>i)&1);};
+  put(4,4); put(data.length,8); data.forEach(b=>put(b,8));
+  const cap=DCW[v]*8; for(let i=0;i<4&&bits.length<cap;i++) bits.push(0);
+  while(bits.length%8) bits.push(0);
+  const cw=[]; for(let i=0;i<bits.length;i+=8){let b=0;for(let j=0;j<8;j++) b=(b<<1)|bits[i+j]; cw.push(b);}
+  for(let pad=0xEC;cw.length<DCW[v];pad^=0xEC^0x11) cw.push(pad);
+  /* Reed-Solomon über GF(256) */
+  const EXP=new Array(512),LOG=new Array(256); let x=1;
+  for(let i=0;i<255;i++){EXP[i]=x;LOG[x]=i;x<<=1;if(x&256) x^=0x11D;}
+  for(let i=255;i<512;i++) EXP[i]=EXP[i-255];
+  const mul=(a,b)=>a&&b?EXP[LOG[a]+LOG[b]]:0;
+  const ec=ECW[v]; let gen=[1];
+  for(let i=0;i<ec;i++){const ng=new Array(gen.length+1).fill(0); for(let j=0;j<gen.length;j++){ng[j]^=gen[j];ng[j+1]^=mul(gen[j],EXP[i]);} gen=ng;}
+  const nb=BLK[v], per=DCW[v]/nb, dBlocks=[], eBlocks=[];
+  for(let b=0;b<nb;b++){
+    const d=cw.slice(b*per,(b+1)*per), res=new Array(ec).fill(0);
+    for(const byte of d){const f=byte^res.shift(); res.push(0); for(let j=0;j<ec;j++) res[j]^=mul(gen[j+1],f);}
+    dBlocks.push(d); eBlocks.push(res);
+  }
+  const all=[];
+  for(let i=0;i<per;i++) for(let b=0;b<nb;b++) all.push(dBlocks[b][i]);
+  for(let i=0;i<ec;i++) for(let b=0;b<nb;b++) all.push(eBlocks[b][i]);
+  /* Matrix */
+  const n=17+4*v, M=[], F=[];
+  for(let i=0;i<n;i++){M.push(new Array(n).fill(0));F.push(new Array(n).fill(false));}
+  const set=(xx,yy,val)=>{M[yy][xx]=val?1:0;F[yy][xx]=true;};
+  const finder=(cx,cy)=>{for(let dy=-4;dy<=4;dy++) for(let dx=-4;dx<=4;dx++){const xx=cx+dx,yy=cy+dy; if(xx<0||yy<0||xx>=n||yy>=n) continue; const d=Math.max(Math.abs(dx),Math.abs(dy)); set(xx,yy,d!==2&&d!==4);}};
+  finder(3,3); finder(n-4,3); finder(3,n-4);
+  for(let i=8;i<n-8;i++){set(i,6,i%2===0);set(6,i,i%2===0);}
+  const al=ALN[v];
+  for(const ay of al) for(const ax of al){
+    if((ax===6&&ay===6)||(ax===6&&ay===n-7)||(ax===n-7&&ay===6)) continue;
+    for(let dy=-2;dy<=2;dy++) for(let dx=-2;dx<=2;dx++) set(ax+dx,ay+dy,Math.max(Math.abs(dx),Math.abs(dy))!==1);
+  }
+  const fmtCells=(bitsV)=>{
+    const bit=i=>(bitsV>>>i)&1;
+    for(let i=0;i<=5;i++) set(8,i,bit(i));
+    set(8,7,bit(6)); set(8,8,bit(7)); set(7,8,bit(8));
+    for(let i=9;i<15;i++) set(14-i,8,bit(i));
+    for(let i=0;i<8;i++) set(n-1-i,8,bit(i));
+    for(let i=8;i<15;i++) set(8,n-15+i,bit(i));
+    set(8,n-8,1);
+  };
+  fmtCells(0);
+  if(v>=7){let rem=v; for(let i=0;i<12;i++) rem=(rem<<1)^((rem>>>11)*0x1F25); const vb=(v<<12)|rem;
+    for(let i=0;i<18;i++){const bt=(vb>>>i)&1, a=n-11+i%3, b=Math.floor(i/3); set(a,b,bt); set(b,a,bt);}}
+  let k=0;
+  for(let right=n-1;right>=1;right-=2){
+    if(right===6) right=5;
+    for(let vert=0;vert<n;vert++) for(let j=0;j<2;j++){
+      const xx=right-j, up=((right+1)&2)===0, yy=up?n-1-vert:vert;
+      if(!F[yy][xx]){ if(k<all.length*8) M[yy][xx]=(all[k>>>3]>>>(7-(k&7)))&1; k++; }
+    }
+  }
+  const MASK=[(a,b)=>(a+b)%2===0,(a,b)=>b%2===0,(a,b)=>a%3===0,(a,b)=>(a+b)%3===0,(a,b)=>(Math.floor(a/3)+Math.floor(b/2))%2===0,
+              (a,b)=>a*b%2+a*b%3===0,(a,b)=>(a*b%2+a*b%3)%2===0,(a,b)=>((a+b)%2+a*b%3)%2===0];
+  const apply=m=>{for(let yy=0;yy<n;yy++) for(let xx=0;xx<n;xx++) if(!F[yy][xx]&&MASK[m](xx,yy)) M[yy][xx]^=1;};
+  const fmt=m=>{const d=(1<<3)|m; let rem=d; for(let i=0;i<10;i++) rem=(rem<<1)^((rem>>>9)*0x537); return ((d<<10)|rem)^0x5412;};
+  const penalty=()=>{
+    let p=0;
+    for(let pass=0;pass<2;pass++) for(let a=0;a<n;a++){
+      let run=1; const g=(i)=>pass?M[i][a]:M[a][i];
+      for(let i=1;i<n;i++){ if(g(i)===g(i-1)){run++; if(run===5) p+=3; else if(run>5) p++;} else run=1; }
+      for(let i=0;i+10<n;i++){
+        const s=[]; for(let j=0;j<11;j++) s.push(g(i+j));
+        const t=s.join("");
+        if(t==="10111010000"||t==="00001011101") p+=40;
+      }
+    }
+    for(let yy=0;yy<n-1;yy++) for(let xx=0;xx<n-1;xx++){const c=M[yy][xx]; if(c===M[yy][xx+1]&&c===M[yy+1][xx]&&c===M[yy+1][xx+1]) p+=3;}
+    let dark=0; for(let yy=0;yy<n;yy++) for(let xx=0;xx<n;xx++) dark+=M[yy][xx];
+    p+=Math.floor(Math.abs(dark*20-n*n*10)/(n*n))*10;
+    return p;
+  };
+  let best=0,bp=1e9;
+  for(let m=0;m<8;m++){apply(m);fmtCells(fmt(m));const p=penalty(); if(p<bp){bp=p;best=m;} apply(m);}
+  apply(best); fmtCells(fmt(best));
+  return M;
+}
+function qrSvg(text,quiet){
+  const M=qrMatrix(text), n=M.length, q=quiet, s=n+2*q; let d="";
+  for(let y=0;y<n;y++) for(let x=0;x<n;x++) if(M[y][x]) d+="M"+(x+q)+" "+(y+q)+"h1v1h-1z";
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+s+" "+s+'" shape-rendering="crispEdges"><rect width="'+s+'" height="'+s+'" fill="#fff"/><path d="'+d+'" fill="#000"/></svg>';
+}
+try{
+  $("qrSmall").outerHTML=qrSvg(PAGE_URL,2);
+  $("qrBig").innerHTML=qrSvg(PAGE_URL,4);
+  $("qrUrl").textContent=PAGE_URL;
+}catch(err){ $("qrBtn").hidden=true; }
+
+/* Start */
+window.addEventListener("resize",fit);
+selectBat("al");
+fit();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
