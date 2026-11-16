@@ -133,6 +133,9 @@ footer .footer-credit{margin-top:8px;color:var(--text-dim);}
 .flow{stroke-dasharray:7 6;animation:dash .9s linear infinite;}
 @keyframes dash{from{stroke-dashoffset:13;}to{stroke-dashoffset:0;}}
 @media (prefers-reduced-motion:reduce){.flow{animation:none;}}
+#ptCv{display:block;width:100%;aspect-ratio:700/410;}
+.pt-ctl{display:flex;gap:8px;align-items:center;padding:6px 4px 2px;flex-wrap:wrap;}
+.pt-ctl .btn{min-height:40px;padding:6px 14px;}
 .pt-sub{margin:0 0 10px;color:var(--text-dim);font-size:13.5px;}
 .pt-seg{max-width:320px;margin:0 0 12px;}
 .pt-none{border-left:3px solid var(--text-faint);background:var(--panel-alt);border-radius:6px;padding:9px 12px;margin:10px 0;color:var(--text-dim);font-size:14px;}
@@ -293,7 +296,7 @@ footer .footer-credit{margin-top:8px;color:var(--text-dim);}
     <li>Links der <b>Minuspol</b>, rechts der <b>Pluspol</b>, dazwischen der Elektrolyt mit Separator. Jedes Kästchen in einer Elektrode steht für eine Formeleinheit des Elektrodenmaterials; es ändert Farbe und Formel, wenn es reagiert hat.</li>
     <li><b>Elektronen</b> (gelb) wandern durch den äußeren Stromkreis, <b>Ionen</b> durch den Elektrolyten.</li>
     <li>Die Ansicht <b>Bauform</b> zeigt die Zelle im Schnitt, wie sie tatsächlich gebaut ist (Rundzelle, Knopfzelle, Plattenzelle, Wickelzelle). Elektronen laufen durch den äußeren Stromkreis, farbige Punkte zeigen die Ionenwanderung im Inneren, und die Elektroden ändern mit dem Ladezustand ihre Farbe.</li>
-    <li><b>Bauteile antippen:</b> In beiden Ansichten lassen sich die Bauteile (und in der Bauform auch ihre Beschriftungen) antippen. Ein Fenster zeigt dann in einem Bild mit Formeln, was an diesem Bauteil chemisch geschieht – bei Akkus umschaltbar zwischen Entladen und Laden. Bei Bauteilen ohne Reaktion steht dort ihre Aufgabe.</li>
+    <li><b>Bauteile antippen:</b> In beiden Ansichten lassen sich die Bauteile (und in der Bauform auch ihre Beschriftungen) antippen. Ein Fenster zeigt dann vergrößert, was an diesem Bauteil chemisch geschieht – bei Akkus umschaltbar zwischen Entladen und Laden. Bei den Elektroden läuft die Reaktion als kleiner Film mit den Formeln der Teilchen ab: Die Ausgangsstoffe kommen an, reagieren, und die Produkte verlassen die Elektrode; darüber steht die Gleichung aus denselben Teilchen. Bei Bauteilen ohne Reaktion steht dort ihre Aufgabe.</li>
     <li>Die Gleichung des Pols, an dem gerade eine Reaktion abläuft, leuchtet kurz auf.</li>
     <li>Das Diagramm zeigt modellhaft, wie sich die Spannung beim Entladen ändert.</li>
   </ul>
@@ -307,7 +310,7 @@ footer .footer-credit{margin-top:8px;color:var(--text-dim);}
       <li>Erste Fassung mit dreizehn Typen: Zink-Kohle, Alkali-Mangan, Zink-Luft, Silberoxid-Zink, Lithium-Mangandioxid, Bleiakku, Nickel-Cadmium, Nickel-Metallhydrid, Lithium-Ionen, Lithium-Eisenphosphat, Redox-Flow-Batterie (Vanadium), Wasserstoff-Brennstoffzelle und Methan-Brennstoffzelle.</li>
       <li>Teilchenmodell für Entladen und (bei Akkus) Laden, Einzelschritt, Zeitraffer.</li>
       <li>Umschaltbare zweite Ansicht „Bauform“: animiertes Schnittbild der Zelle (Becherzelle, Rundzelle, Knopfzelle, Plattenzelle, Wickelzelle, Durchflusszelle mit Tanks, Membran-Brennstoffzelle).</li>
-      <li>Anklickbare Bauteile: Detailfenster mit Bild, Gleichungen und Ablauf der Vorgänge am jeweiligen Bauteil.</li>
+      <li>Anklickbare Bauteile: Detailfenster mit Bild, Gleichungen und Ablauf der Vorgänge am jeweiligen Bauteil; an den Elektroden als animierter Reaktionsablauf mit Formeln.</li>
       <li>Reaktionsgleichungen mit Oxidationszahlen, Steckbrief, Entladekurve, Vergleichstabelle, Grundlagen.</li>
     </ul>
   </div>
@@ -1488,6 +1491,122 @@ function condSvg(outward){
   o+=sTxt(350,16,"Atomrümpfe bleiben an ihrem Platz, Elektronen wandern",{s:12,c:"#9aa2a9"});
   return sWrap(182,o,"Elektronenleitung");
 }
+
+/* ---------- Animierter Reaktionsablauf im Detailfenster ---------- */
+const RA={on:false,side:"neg",chg:false,t:0,paused:false,last:0,T:8};
+function raStart(side,chg){
+  RA.side=side; RA.chg=chg; RA.t=0; RA.paused=false; RA.last=0;
+  const cvs=$("ptCv"); if(!cvs) return;
+  $("ptPause").addEventListener("click",()=>{RA.paused=!RA.paused; $("ptPause").textContent=RA.paused?"▶ Weiter":"⏸ Pause";});
+  $("ptAgain").addEventListener("click",()=>{RA.t=0; if(RA.paused) raDraw();});
+  if(!RA.on){RA.on=true; requestAnimationFrame(raFrame);}
+}
+function raFrame(ts){
+  const cvs=$("ptCv");
+  if(!RA.on||!cvs||$("mPart").hidden){RA.on=false;return;}
+  const dt=Math.min(0.05,(ts-RA.last)/1000||0); RA.last=ts;
+  if(!RA.paused) RA.t=(RA.t+dt/RA.T)%1;
+  raDraw();
+  requestAnimationFrame(raFrame);
+}
+function raDraw(){
+  const cvs=$("ptCv"); if(!cvs) return;
+  const dpr=Math.min(window.devicePixelRatio||1,2.5), cw=cvs.clientWidth||700;
+  if(cvs.width!==Math.round(cw*dpr)){cvs.width=Math.round(cw*dpr); cvs.height=Math.round(cw*410/700*dpr);}
+  const c=cvs.getContext("2d"), sc=cvs.width/700;
+  c.setTransform(sc,0,0,sc,0,0); c.clearRect(0,0,700,410);
+  const side=RA.side, chg=RA.chg, el=bat[side], D=sideData(side,chg), flip=side==="pos", ph=RA.t;
+  const X=x=>flip?700-x:x, R=(x,w)=>flip?700-x-w:x;
+  const sm=u=>{u=clamp(u,0,1);return u*u*(3-2*u);};
+  const T=(str,x,y,size,col,al,bold)=>{c.font=(bold?"600 ":"")+size+"px "+FONT;c.fillStyle=col;c.textAlign=al||"center";c.textBaseline="middle";c.fillText(str,x,y);};
+  const inE=[],inO=[],outE=[],outO=[];
+  D.take.forEach(t=>{for(let i=0;i<t[1];i++)(t[2]?inO:inE).push(t);});
+  D.give.forEach(t=>{for(let i=0;i<t[1];i++)(t[2]?outO:outE).push(t);});
+  const k=D.pr.sites, la=k?(D.from==="a"?el.a:el.b):null, lb=k?(D.to==="a"?el.a:el.b):null, ca=D.from==="a"?el.ca:el.cb, cb=D.to==="a"?el.ca:el.cb;
+  /* Phasen: A Ankunft, B Reaktion, C Abtransport, D Halten */
+  const a=sm(ph/0.34), b=sm((ph-0.36)/0.14), cc=sm((ph-0.5)/0.34);
+  const fade=Math.min(1,ph/0.03,(1-ph)/0.04);
+  /* --- Gleichung aus Teilchen --- */
+  const Lt=[],Rt=[];
+  if(k&&la!=null) Lt.push({mat:1,lab:la,n:k,col:ca}); if(k&&lb!=null) Rt.push({mat:1,lab:lb,n:k,col:cb});
+  D.take.forEach(t=>Lt.push({lab:t[0],n:t[1],col:SP[t[0]].c}));
+  D.give.forEach(t=>Rt.push({lab:t[0],n:t[1],col:SP[t[0]].c}));
+  (D.isOx?Rt:Lt).push({e:1,lab:"e^-",n:D.pr.e,col:"#ffe14d"});
+  const tw=t=>{c.font="600 15px "+FONT; const nw=t.n>1?c.measureText(String(t.n)).width+6:0; return nw+Math.max(30,fw(c,t.lab,13.5,true)+16);};
+  const rowW=arr=>arr.reduce((q,t)=>q+tw(t),0)+Math.max(0,arr.length-1)*26;
+  const total=rowW(Lt)+rowW(Rt)+56, es=Math.min(1,676/total);
+  c.save(); c.translate(350,36); c.scale(es,es);
+  let x=-total/2;
+  const drawRow=(arr,alpha)=>{
+    const x0=x;
+    arr.forEach((t,i)=>{
+      c.globalAlpha=alpha;
+      if(i){T("+",x+13,0,16,"#e7e4dd","center",true); x+=26;}
+      if(t.n>1){c.font="600 15px "+FONT; const nw=c.measureText(String(t.n)).width; T(String(t.n),x,0,15,"#e7e4dd","left",true); x+=nw+6;}
+      const w=Math.max(30,fw(c,t.lab,13.5,true)+16);
+      c.fillStyle=t.col; rr(c,x,-14,w,28,t.mat?6:14); c.fill();
+      ftext(c,t.lab,x+w/2,0,13.5,lum(t.col.length===7?t.col:"#ffffff")>0.55?"#14171a":"#f3f0e8",true);
+      x+=w;
+    });
+    c.globalAlpha=1; return [x0,x];
+  };
+  const hiL=ph<0.5, hiR=ph>=0.43;
+  const l=drawRow(Lt,hiL?1:0.38);
+  T("⟶",x+28,0,20,"#ffb454","center",true); x+=56;
+  const r=drawRow(Rt,hiR?1:0.38);
+  c.strokeStyle="#ffb454"; c.lineWidth=2.5;
+  if(hiL){c.beginPath();c.moveTo(l[0],21);c.lineTo(l[1],21);c.stroke();}
+  if(hiR){c.beginPath();c.moveTo(r[0],21);c.lineTo(r[1],21);c.stroke();}
+  c.restore();
+  /* --- Bühne --- */
+  const hasO=inO.length||outO.length;
+  if(hasO){c.fillStyle="#101315";c.fillRect(R(8,104),90,104,290);c.setLineDash([5,4]);c.strokeStyle="#31383e";c.lineWidth=1;c.strokeRect(R(8,104)+.5,90.5,103,289);c.setLineDash([]);
+    T(inO.length&&inO[0][2]==="air"||(!inO.length&&side==="pos")?"Luft":inO.length?"Brennstoff":"außerhalb",X(60),106,12,"#9aa2a9");}
+  c.fillStyle=el.bg; c.fillRect(R(120,190),90,190,290); c.strokeStyle="#4a535b"; c.lineWidth=1; c.strokeRect(R(120,190)+.5,90.5,189,289);
+  c.fillStyle="#6b747c"; c.fillRect(R(120,14),90,14,290);
+  c.fillStyle="#171b1f"; c.fillRect(R(310,380),90,380,290); c.fillStyle=bat.ely.bg; c.fillRect(R(310,380),90,380,290); c.strokeStyle="#31383e"; c.strokeRect(R(310,380)+.5,90.5,379,289);
+  T(el.short,X(222),106,12,"#9aa2a9"); T("Elektrolyt",X(500),106,12,"#9aa2a9");
+  const dev=chg?"Ladegerät":"Verbraucher";
+  T(D.isOx?(flip?"zum "+dev+" ⟵":"⟶ zum "+dev):(flip?"vom "+dev+" ⟶":"⟵ vom "+dev),X(140),76,12.5,"#ffe14d",flip?"right":"left",true);
+  /* Elektrodenmaterial */
+  const tys=k>1?[204,246]:[225];
+  const tileAt=(y,lab,col,al)=>{
+    if(al<=0.01) return; c.globalAlpha=al*fade;
+    if(lab==null){c.setLineDash([5,4]);c.strokeStyle="#9aa2a9";c.lineWidth=1.2;rr(c,R(165,120),y,120,36,7);c.stroke();c.setLineDash([]);T("in Lösung gegangen",X(225),y+18,11,"#9aa2a9");}
+    else{c.fillStyle=col;rr(c,R(165,120),y,120,36,7);c.fill();ftext(c,lab,X(225),y+18,14,lum(col)>0.55?"#14171a":"#f3f0e8",true);}
+    c.globalAlpha=1;
+  };
+  if(k){ tys.forEach(y=>{tileAt(y,la,ca,1-b); tileAt(y,lb,cb,b);}); }
+  else { tileAt(225,el.a,el.ca,1); T("Katalysator – bleibt unverändert",X(222),278,11,"#9aa2a9"); }
+  if(b>0&&cc<1){ const g=Math.sin(Math.PI*clamp((ph-0.36)/0.3,0,1)); c.strokeStyle="rgba(255,180,84,"+(0.9*g)+")"; c.lineWidth=3;
+    rr(c,R(159,132),tys[0]-7,132,(tys[tys.length-1]-tys[0])+50,10); c.stroke();
+    c.globalAlpha=g; T(D.isOx?"Oxidation":"Reduktion",X(225),tys[0]-22,14,"#ffb454","center",true); c.globalAlpha=1; }
+  /* Teilchen */
+  const pillAt=(sp,px,py,al)=>{ if(al<=0.01) return; c.globalAlpha=al*fade; const w=Math.max(28,fw(c,sp,12.5,true)+12);
+    c.fillStyle=SP[sp].c; rr(c,px-w/2,py-13,w,26,13); c.fill(); c.strokeStyle="rgba(20,23,26,.6)"; c.lineWidth=1; c.stroke();
+    ftext(c,sp,px,py,12.5,"#14171a",true); c.globalAlpha=1; };
+  const elAt=(px,py,al)=>{ if(al<=0.01) return; c.globalAlpha=al*fade; c.fillStyle="#ffe14d"; c.beginPath(); c.arc(px,py,9,0,7); c.fill(); c.strokeStyle="#14171a"; c.lineWidth=1; c.stroke(); ftext(c,"e^-",px,py,10,"#14171a",true); c.globalAlpha=1; };
+  const mix1=(p,q,u)=>p+(q-p)*u;
+  const near=(i,m)=>{const col=Math.floor(i/4), row=i%4, rows=Math.min(m-col*4,4); return [X(312+col*44),235+(row-(rows-1)/2)*30];};
+  const far=(i,m)=>[X(610-(i%2)*70),m>1?140+i*200/(m-1):235];
+  const nearO=(i,m)=>[X(146),235+(i-(m-1)/2)*30], farO=(i,m)=>[X(58),m>1?170+i*150/(m-1):235];
+  inE.forEach((t,i)=>{const p0=far(i,inE.length),p1=near(i,inE.length),u=sm((ph-i*0.02)/0.32); pillAt(t[0],mix1(p0[0],p1[0],u),mix1(p0[1],p1[1],u),1-b);});
+  inO.forEach((t,i)=>{const p0=farO(i,inO.length),p1=nearO(i,inO.length),u=sm((ph-i*0.02)/0.32); pillAt(t[0],mix1(p0[0],p1[0],u),mix1(p0[1],p1[1],u),1-b);});
+  outE.forEach((t,i)=>{const p0=near(i,outE.length),p1=far(i,outE.length),u=sm((ph-0.5-i*0.02)/0.32); pillAt(t[0],mix1(p0[0],p1[0],u),mix1(p0[1],p1[1],u),b);});
+  outO.forEach((t,i)=>{const p0=nearO(i,outO.length),p1=farO(i,outO.length),u=sm((ph-0.5-i*0.02)/0.32); pillAt(t[0],mix1(p0[0],p1[0],u),mix1(p0[1],p1[1],u),b);});
+  /* Elektronen: Weg Ableiter (oben) <-> Elektrodenmaterial */
+  const n=D.pr.e, ey=i=>tys[0]+18+(tys.length>1?21:0)+(i-(n-1)/2)*Math.min(20,150/n);
+  for(let i=0;i<n;i++){
+    const yy=ey(i), pathPt=u=>{ /* u=0 am Material, u=1 oben am Ableiter */
+      const d1=Math.abs(X(160)-X(127)), d2=yy-70, tot=d1+d2, sdist=u*tot;
+      return sdist<=d1?[mix1(X(160),X(127),sdist/d1),yy]:[X(127),yy-(sdist-d1)];};
+    if(D.isOx){ const u=sm((ph-0.46-i*0.015)/0.36), q=pathPt(u); elAt(q[0],q[1],b*(u<1?1:0)); }
+    else{ const u=sm((ph-i*0.015)/0.32), q=pathPt(1-u); elAt(q[0],q[1],1-b); }
+  }
+  /* Phasenzeile */
+  const cap=ph<0.36?"1 · Die Ausgangsstoffe"+(D.isOx?"":" und die Elektronen")+" treffen an der Elektrode zusammen":ph<0.5?"2 · Elektronenübergang: "+(D.isOx?"Oxidation":"Reduktion"):ph<0.86?"3 · Die Produkte"+(D.isOx?" und die Elektronen":"")+" verlassen die Elektrode":"Ein Formelumsatz ist abgeschlossen";
+  T(cap,350,396,13,"#e7e4dd","center",true);
+}
 function lst(arr){
   const it=arr.map(t=>(t[1]>1?t[1]+" ":"")+fhtmlS(t[0]));
   return it.length>1?it.slice(0,-1).join(", ")+" und "+it[it.length-1]:it[0];
@@ -1496,7 +1615,7 @@ function elecHtml(side,chg){
   const c=bat[side], D=sideData(side,chg), b=bat, i=chg?1:0;
   const pole=side==="neg"?"Minuspol":"Pluspol", role=D.isOx?"Anode · Oxidation":"Kathode · Reduktion";
   const eq=b.eq[side], mul=side==="neg"?b.eq.negMul:b.eq.posMul, oz=b.oz[side];
-  let h='<figure>'+reactSvg(side,chg)+'<figcaption>'+(b.art==="S"?(chg?"Laden":"Entladen")+": ":"")+"Vorgänge am "+pole+" je Formelumsatz. Die gestrichelten Pfeile zeigen die Bewegungsrichtung der Teilchen.</figcaption></figure>";
+  let h='<figure><canvas id="ptCv" aria-label="Animierter Ablauf der Reaktion mit Formeln"></canvas><div class="pt-ctl"><button class="btn" id="ptPause" type="button">⏸ Pause</button><button class="btn" id="ptAgain" type="button">↺ Von vorn</button></div><figcaption>'+(b.art==="S"?(chg?"Laden":"Entladen")+": ":"")+"Ein Formelumsatz am "+pole+", der sich wiederholt. Oben steht die Reaktionsgleichung aus denselben Teilchen; hervorgehoben ist jeweils die Seite, die gerade zu sehen ist.</figcaption></figure>";
   h+='<div class="pt-eq"><div class="eq-head"><span class="pole '+side+'">'+(side==="neg"?"−":"+")+"</span>"+pole+" · <b>"+role+'</b></div><div class="eq">'+eqLine(eq,chg)+(mul?'<span class="mul">'+mul+"</span>":"")+'</div><div class="eq-oz">Oxidationszahl '+oz[0]+": "+(chg?oz[2]+" ⟶ "+oz[1]:oz[1]+" ⟶ "+oz[2])+"</div></div>";
   h+="<h3>Was passiert genau?</h3><p>"+(b.txt[side][i]||b.txt[side][0])+"</p><ol>";
   const inE=D.take.filter(t=>!t[2]), inO=D.take.filter(t=>t[2]), outE=D.give.filter(t=>!t[2]), outO=D.give.filter(t=>t[2]);
@@ -1549,6 +1668,7 @@ function renderPart(){
     h='<div class="pt-none">Hier läuft keine chemische Reaktion ab.</div><p>'+m.text+"</p>";
   }
   $("ptBody").innerHTML=h;
+  if(m.role==="neg"||m.role==="pos") raStart(m.role,chg); else RA.on=false;
 }
 function openPart(id){
   const m=PARTS[id]; if(!m) return;
