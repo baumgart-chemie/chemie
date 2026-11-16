@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulation „Kunststoffrecycling“</title>
+<style>
+:root{
+  --bg:#14171a; --panel:#1b1f23; --panel-alt:#20252a; --line:#31383e; --line-soft:#262c31;
+  --text:#e7e4dd; --text-dim:#9aa2a9; --text-faint:#5f6870;
+  --amber:#ffb454; --teal:#4fd1c5; --good:#7fd68a; --danger:#e4785b; --screen:#0e1113;
+  --sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.45}
+button,input,select{font:inherit;color:inherit}
+a{color:var(--teal)}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;padding:14px 28px;border-bottom:1px solid var(--line);background:var(--panel)}
+header .back-btn{align-self:baseline;text-decoration:none;color:var(--text);border:1px solid var(--line);border-radius:6px;padding:7px 12px;background:var(--panel-alt);white-space:nowrap}
+header .back-btn:hover{border-color:var(--teal)}
+header h1{margin:0;font-size:21px;font-weight:650;white-space:nowrap}
+header>.tag{flex:1 1 160px;min-width:0;color:var(--text-dim);font-size:13.5px}
+header .hlink{background:none;border:none;padding:6px 2px;color:var(--teal);cursor:pointer;text-decoration:underline;white-space:nowrap}
+header .status{font-family:var(--mono);font-size:12.5px;color:var(--amber);border:1px solid var(--line);border-radius:999px;padding:4px 11px;white-space:nowrap;align-self:center}
+.qr-btn{align-self:center;display:flex;align-items:center;gap:7px;padding:2px 8px 2px 2px;border:1px solid var(--line);border-radius:4px;background:var(--panel-alt);cursor:pointer;text-align:left}
+.qr-btn:hover{border-color:var(--teal)}
+.qr-btn .qr-s{width:30px;height:30px;background:#fff;display:block;flex:none}
+.qr-btn .qr-s svg{display:block;width:30px;height:30px}
+.qr-btn .qr-t{font-size:10px;line-height:1.2;color:var(--text-dim)}
+.qr-btn .qr-t b{display:block;font-size:10.5px;color:var(--text)}
+.wrap{display:grid;grid-template-columns:330px minmax(0,1fr);gap:18px;padding:18px 28px;align-items:start}
+aside{position:sticky;top:12px;display:flex;flex-direction:column;gap:12px;max-height:calc(100vh - 24px);overflow:auto;padding-right:2px}
+main{display:flex;flex-direction:column;gap:16px;min-width:0}
+.panel,.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
+.panel h2,.card h2{margin:0 0 10px;font-size:12.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--amber);font-weight:650}
+.card h2 small{color:var(--text-dim);text-transform:none;letter-spacing:0;font-weight:400;font-size:12.5px;margin-left:6px}
+.hint{color:var(--text-dim);font-size:13px;margin:6px 0 0}
+.btn{min-height:42px;padding:8px 13px;border:1px solid var(--line);border-radius:7px;background:var(--panel-alt);cursor:pointer;text-align:left}
+.btn:hover{border-color:var(--text-dim)}
+.btn.primary{background:var(--teal);border-color:var(--teal);color:#06221f;font-weight:650;text-align:center}
+.btn.wide{width:100%}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.gl-toggle{width:100%;display:flex;justify-content:space-between;align-items:center;font-weight:600}
+.gl-list{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.gl-list[hidden]{display:none}
+.gl-list button{min-height:38px;text-align:left;background:none;border:1px solid var(--line-soft);border-radius:6px;padding:6px 10px;cursor:pointer;color:var(--text)}
+.gl-list button:hover{border-color:var(--teal)}
+.chips{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.chip{min-height:46px;border:1px solid var(--line);border-radius:7px;background:var(--panel-alt);cursor:pointer;padding:4px 2px;text-align:center;font-weight:650;font-size:13.5px;line-height:1.15}
+.chip small{display:block;font-weight:400;font-size:9.5px;color:var(--text-dim);white-space:nowrap}
+.chip[aria-pressed="true"]{border-color:var(--pc,var(--teal));box-shadow:inset 0 0 0 1px var(--pc,var(--teal));background:#232a2f}
+.chip:disabled{opacity:.3;cursor:not-allowed}
+.check{display:flex;gap:9px;align-items:center;min-height:40px;cursor:pointer;margin-top:10px}
+.check input{width:20px;height:20px;accent-color:var(--teal);flex:none}
+.sub{margin:12px 0 6px;font-size:12.5px;color:var(--text-dim)}
+.proc-list{display:flex;flex-direction:column;gap:5px}
+.proc{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:40px;padding:6px 10px;border:1px solid var(--line);border-radius:7px;background:var(--panel-alt);cursor:pointer;text-align:left;font-size:13.5px}
+.proc[aria-pressed="true"]{border-color:var(--teal);box-shadow:inset 0 0 0 1px var(--teal)}
+.rate{font-size:11.5px;white-space:nowrap;display:flex;align-items:center;gap:5px;color:var(--text-dim)}
+.rate i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.r2 i{background:var(--good)} .r1 i{background:var(--amber)} .r0 i{background:var(--danger)}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg .btn{flex:1;text-align:center;min-width:52px}
+.seg .btn[aria-pressed="true"]{border-color:var(--teal);color:var(--teal)}
+.steck{display:flex;flex-direction:column;gap:8px}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.card-head h2{margin:0}
+.btn.small{min-height:36px;padding:4px 12px;font-size:13px}
+.st-head{display:flex;align-items:center;gap:12px;width:100%;min-height:44px;background:none;border:none;padding:0;cursor:pointer;text-align:left}
+.st-k{font-size:16px;font-weight:700;color:var(--pc);min-width:58px}
+.st-sum{flex:1;min-width:0;color:var(--text-dim);font-size:13.5px}
+.st-arr{color:var(--text-dim);font-size:15px;padding:0 4px}
+.st-body{margin-top:8px}
+.st-body .formel{max-width:520px}
+.st{border:1px solid var(--line-soft);border-radius:8px;padding:4px 12px;background:var(--panel-alt);border-left:4px solid var(--pc)}
+.st.open{padding-bottom:12px}
+.st h3{margin:0 0 2px;font-size:17px}
+.st .code{float:right;font-family:var(--mono);font-size:12px;color:var(--text-dim);border:1px solid var(--line);border-radius:5px;padding:2px 7px}
+.st .typ{color:var(--text-dim);font-size:13px;margin-bottom:8px}
+.st .formel{background:var(--screen);border-radius:6px;padding:6px;overflow-x:auto;text-align:center}
+.st dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:10px 0 0;font-size:13.5px}
+.st dt{color:var(--text-dim)} .st dd{margin:0}
+.st dd b{color:var(--amber);font-family:var(--mono);font-weight:600}
+.cvwrap{background:var(--screen);border-radius:8px;overflow-x:auto;border:1px solid var(--line-soft)}
+.cvwrap canvas{display:block;width:100%;min-width:680px;height:auto}
+.tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.tabs button{min-height:40px;padding:6px 14px;border:1px solid var(--line);border-radius:7px;background:var(--panel-alt);cursor:pointer}
+.tabs button[aria-pressed="true"]{border-color:var(--pc,var(--teal));color:var(--pc,var(--teal))}
+.warn{border:1px solid var(--danger);border-left-width:4px;border-radius:7px;padding:9px 12px;margin-bottom:10px;font-size:13.5px;background:#2a1f1c}
+.note{border:1px solid var(--line);border-left:4px solid var(--amber);border-radius:7px;padding:9px 12px;margin-bottom:10px;font-size:13.5px;background:var(--panel-alt)}
+.txt{font-size:14px;margin:10px 0 0}
+.txt p{margin:0 0 7px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{border-bottom:1px solid var(--line-soft);padding:7px 8px;text-align:left;vertical-align:top}
+th{color:var(--text-dim);font-weight:600;font-size:12.5px}
+td.num,th.num{text-align:right;font-family:var(--mono);white-space:nowrap}
+tr.sum td{border-top:2px solid var(--line);font-weight:650;color:var(--amber)}
+.tscroll{overflow-x:auto}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.haz{margin:6px 0 0;padding-left:18px;font-size:13.5px}
+.haz li{margin-bottom:3px}
+svg text{font-family:var(--sans)}
+.runs{display:flex;flex-direction:column;gap:6px}
+.run{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid var(--line-soft);border-radius:7px;padding:6px 10px;font-size:13.5px}
+.run button{min-height:34px;border:1px solid var(--line);background:none;border-radius:6px;cursor:pointer;padding:2px 10px}
+.modal{position:fixed;inset:0;background:rgba(5,7,9,.72);display:flex;align-items:flex-start;justify-content:center;padding:4vh 14px;z-index:50;overflow:auto}
+.modal[hidden]{display:none}
+.mbox{background:var(--panel);border:1px solid var(--line);border-radius:12px;max-width:640px;width:100%;padding:18px 20px}
+.mbox.widebox{max-width:940px}
+.mhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+.mhead h2{margin:0;font-size:19px}
+.x{min-width:42px;min-height:42px;border:1px solid var(--line);border-radius:7px;background:var(--panel-alt);cursor:pointer;font-size:18px}
+.mbox h3{color:var(--amber);font-size:13px;text-transform:uppercase;letter-spacing:.06em;margin:16px 0 6px}
+.mbox p,.mbox li{font-size:14.5px}
+.mbox .fig{background:var(--screen);border-radius:8px;padding:10px;margin:10px 0;overflow-x:auto;text-align:center}
+.mfoot{display:flex;justify-content:space-between;gap:10px;margin-top:14px;flex-wrap:wrap}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fields input{width:100%;min-height:42px;background:var(--screen);border:1px solid var(--line);border-radius:7px;padding:6px 10px}
+.pick{display:flex;flex-direction:column;gap:4px}
+.pick label{display:flex;gap:9px;align-items:center;min-height:38px;cursor:pointer;font-size:14px}
+.pick input{width:19px;height:19px;accent-color:var(--teal);flex:none}
+.pick i{width:18px;height:4px;border-radius:2px;flex:none}
+.qrbig{background:#fff;padding:14px;border-radius:8px;width:min(320px,80vw);margin:8px auto}
+.qrbig svg{display:block;width:100%;height:auto}
+.qrurl{font-family:var(--mono);font-size:12.5px;text-align:center;word-break:break-all;color:var(--text-dim)}
+footer{padding:16px 28px 30px;color:var(--text-faint);font-size:11.5px;border-top:1px solid var(--line-soft);margin-top:10px}
+footer p{margin:0}
+footer a,footer button.fl{color:var(--text-dim);text-decoration:none;border:none;border-bottom:1px solid var(--line);background:none;padding:0;cursor:pointer;font-size:inherit}
+footer a:hover,footer button.fl:hover{color:var(--text);border-bottom-color:var(--text-dim)}
+footer .footer-credit{margin-top:8px;color:var(--text-dim)}
+#print{display:none}
+@media (max-width:920px){
+  .wrap{grid-template-columns:1fr;padding:14px 16px}
+  aside{position:static;max-height:none;overflow:visible}
+  header{padding:12px 16px}
+}
+@media (max-width:600px){
+  footer{padding:16px 16px 30px}
+  .qr-btn .qr-t{display:none} .qr-btn{padding:2px}
+  header h1{white-space:normal}
+  .fields{grid-template-columns:1fr}
+}
+@page{size:A4;margin:14mm}
+@media print{
+  html,body{background:#fff;color:#000}
+  body>*:not(#print){display:none !important}
+  #print{display:block;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:10.5pt;color:#000}
+  #print h1{font-size:16pt;margin:0 0 2mm}
+  #print .phead{border-bottom:1.5pt solid #000;padding-bottom:2mm;margin-bottom:5mm}
+  #print .pmeta{font-size:9.5pt;color:#333}
+  #print h2{font-size:12.5pt;margin:0 0 3mm;text-transform:none;letter-spacing:0;color:#000}
+  #print h3{font-size:10.5pt;margin:4mm 0 1.5mm;color:#000}
+  #print .bk-run + .bk-run{break-before:page;page-break-before:always}
+  #print .pov{break-after:page;page-break-after:always}
+  #print table{font-size:9.5pt;break-inside:avoid;page-break-inside:avoid}
+  #print tr{break-inside:avoid;page-break-inside:avoid}
+  #print th,#print td{border-bottom:.5pt solid #999;color:#000}
+  #print th{color:#333}
+  #print tr.sum td{color:#000;border-top:1pt solid #000}
+  #print .blk{break-inside:avoid;page-break-inside:avoid}
+  #print .pform{max-height:40mm}
+  #print .pform svg{max-height:38mm;width:auto}
+  #print ul{margin:1mm 0 0;padding-left:5mm}
+  #print .pfoot{margin-top:8mm;border-top:.5pt solid #999;padding-top:2mm;font-size:8.5pt;color:#333}
+}
+.steps{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.stepbtn{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;min-height:44px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel-alt);cursor:pointer;text-align:left;font-size:13.5px}
+.stepbtn[aria-pressed="true"]{border-color:var(--teal);box-shadow:inset 0 0 0 1px var(--teal)}
+.stepbtn b{color:var(--amber);font-weight:650;white-space:nowrap}
+.stepbtn .lab{color:var(--text-dim);font-size:12px}
+.pc{display:inline-block;border:1px solid var(--pc);color:var(--pc);border-radius:999px;padding:1px 8px;font-weight:650;font-size:12.5px;white-space:nowrap}
+.vtabs{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.vtabs button{min-height:38px;padding:4px 11px;border:1px solid var(--line);border-radius:7px;background:var(--panel-alt);cursor:pointer;font-weight:650;font-size:13px}
+.vtabs button[aria-pressed="true"]{border-color:var(--pc);color:var(--pc);box-shadow:inset 0 0 0 1px var(--pc)}
+#cvProc{cursor:pointer}
+#detBox{margin:4px 0 14px;border:1px solid var(--teal);border-radius:10px;padding:10px;background:var(--panel-alt)}
+#detText h3{margin:8px 0 6px;font-size:15.5px;color:var(--teal)}
+#detText .eq{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;background:var(--screen);border-radius:8px;padding:8px 10px;margin:8px 0;overflow-x:auto;font-size:16px}
+#detText .eq svg{flex:none}
+#detText .meta{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:13.5px;margin:6px 0 0}
+#detText .meta dt{color:var(--text-dim)} #detText .meta dd{margin:0}
+#stBtns button[aria-pressed="true"]{border-color:var(--teal);color:var(--teal);box-shadow:inset 0 0 0 1px var(--teal)}
+#costSum{margin-bottom:14px}
+#costSum tr[data-view]{cursor:pointer}
+#costSum tr.act td{background:#232a2f}
+</style>
+</head>
+<body>
+<header>
+  <a class="back-btn" href="../index.html">← Zurück</a>
+  <h1>Kunststoffrecycling</h1>
+  <span class="tag">Kunststoffarten · Trennverfahren · Verwertungswege mit Kosten und Schadstoffen</span>
+  <button class="hlink" id="btnHelp" type="button">Anleitung</button>
+  <button class="qr-btn" id="qrBtn" type="button" aria-label="QR-Code vergrößern"><span class="qr-s" id="qrSmall"></span><span class="qr-t"><b>Auf dem Mobilgerät öffnen</b>QR-Code antippen zum Vergrößern</span></button>
+  <span class="status" id="status">–</span>
+</header>
+
+<div class="wrap">
+<aside>
+  <div class="panel">
+    <button class="btn gl-toggle" id="glToggle" type="button" aria-expanded="false"><span>Grundlagen · <span id="glCount"></span> Themen</span><span id="glArrow">▸</span></button>
+    <div class="gl-list" id="glList" hidden></div>
+  </div>
+  <div class="panel">
+    <h2>Kunststoffe wählen</h2>
+    <div class="chips" id="chips"></div>
+    <p class="hint">Mehrfachauswahl: Mehrere Kunststoffe ergeben ein Gemisch, das zuerst getrennt wird.</p>
+    <div class="seg" style="margin-top:8px"><button class="btn" id="btnAll" type="button">Alle wählen</button><button class="btn" id="btnOne" type="button">Nur einer</button></div>
+  </div>
+  <div class="panel">
+    <h2>Verwertungsverfahren</h2>
+    <div id="procBoxes"></div>
+    <p class="hint"><span class="rate r2"><i></i>gut geeignet</span> <span class="rate r1"><i></i>eingeschränkt</span> <span class="rate r0"><i></i>ungeeignet</span></p>
+  </div>
+  <div class="panel">
+    <h2>Animation</h2>
+    <div class="seg">
+      <button class="btn" id="btnRun" type="button">Pause</button>
+      <button class="btn" data-sp="0.5" type="button">×0,5</button>
+      <button class="btn" data-sp="1" type="button" aria-pressed="true">×1</button>
+      <button class="btn" data-sp="2" type="button">×2</button>
+    </div>
+  </div>
+  <div class="panel">
+    <h2>Auswertung</h2>
+    <button class="btn wide" id="btnSave" type="button">Auswahl als Lauf merken</button>
+    <button class="btn wide primary" id="btnPdf" type="button" style="margin-top:8px">Ausgabe als PDF</button>
+  </div>
+</aside>
+
+<main>
+  <section class="card"><div class="card-head"><h2>Steckbriefe <small>antippen zum Aufklappen</small></h2><button class="btn small" id="steckAll" type="button">Alle aufklappen</button></div><div class="steck" id="steck"></div></section>
+  <section class="card"><h2>Weltweite Produktion 2024 <small>in Millionen Tonnen pro Jahr</small></h2><div id="prodChart"></div>
+    <p class="hint">Gesamte Kunststoffproduktion weltweit 2024: 430,9 Mio. t. Die sieben Kunststoffe hier machen zusammen rund 74 % davon aus. PET ohne Textilfasern.</p></section>
+  <section class="card" id="cardSep" hidden><h2>Trennen des Gemischs <small id="sepTitle"></small></h2>
+    <div class="steps" id="sepSteps"></div>
+    <div class="cvwrap"><canvas id="cvSep" width="800" height="330" role="img" aria-label="Animation des Trennverfahrens"></canvas></div>
+    <div class="txt" id="sepText"></div></section>
+  <section class="card"><h2>Verwertung <small id="procTitle"></small></h2>
+    <div class="tabs" id="fracTabs" hidden></div>
+    <div id="procWarn"></div>
+    <div class="cvwrap"><canvas id="cvProc" width="800" height="432" role="img" aria-label="Animation des Verwertungsverfahrens"></canvas></div>
+    <p class="hint" style="margin:8px 0 6px"><b>Detailansicht:</b> Tippe eine Station in der Anlage oder hier an – sie wird vergrößert und auf Teilchenebene gezeigt.</p>
+    <div class="tabs" id="stBtns"></div>
+    <div id="detBox" hidden>
+      <div class="cvwrap"><canvas id="cvDet" width="800" height="310" role="img" aria-label="Detailansicht der gewählten Station auf Teilchenebene"></canvas></div>
+      <div class="txt" id="detText"></div>
+    </div>
+    <div class="txt" id="procText"></div></section>
+  <section class="card"><h2>Kosten und Schadstoffe</h2><div id="costSum"></div><div id="costBox"></div>
+    <p class="hint">Kosten je Tonne Kunststoffabfall, der in das Verfahren geht (ohne Sammlung und Transport; Erlöse für das Produkt nicht abgezogen). Gerundete Richtwerte für Europa, siehe Grundlagen „Kosten und Datenquellen“.</p></section>
+  <section class="card"><h2>Verfahren im Vergleich <small id="cmpTitle"></small></h2><div id="cmpChart"></div></section>
+  <section class="card"><h2>Gemerkte Läufe</h2><div class="runs" id="runList"></div></section>
+</main>
+</div>
+
+<footer>
+  <p class="footer-note">Vereinfachte Darstellung zu Lehrzwecken. Produktionsmengen: Plastics Europe, „Plastics – the Fast Facts 2025“ (Daten für 2024, gerundet). Kosten sind gerundete Richtwerte aus Studien (u. a. JRC 2026) und Modellwerte; sie schwanken stark mit Energiepreis, Anlagengröße und Reinheit des Abfalls. Heizwerte und Dichten sind gerundete Tafelwerte.</p>
+  <p class="footer-credit">Bastian Baumgart · Kunststoffrecycling V1.0 · <button class="fl" id="btnVer" type="button">Versionshinweise</button> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+</footer>
+
+<div class="modal" id="mHelp" hidden><div class="mbox" role="dialog" aria-modal="true" aria-labelledby="hHelp">
+  <div class="mhead"><h2 id="hHelp">Anleitung</h2><button class="x" data-close type="button" aria-label="Schließen">×</button></div>
+  <p>Die Simulation zeigt, wie sieben wichtige Kunststoffe nach dem Gebrauch verwertet werden können, was das kostet und welche Schadstoffe dabei eine Rolle spielen.</p>
+  <ol>
+    <li><b>Kunststoffe wählen:</b> Tippe links einen oder mehrere Kunststoffe an (Mehrfachauswahl). Die Steckbriefe sind zunächst eingeklappt; Antippen klappt sie auf und zeigt Strukturformel, Dichte, Produktionsmenge und Verwendung.</li>
+    <li><b>Gemisch trennen:</b> Sind mehrere Kunststoffe gewählt, bestimmt die Simulation die nötigen Trennschritte in sinnvoller Reihenfolge. Tippe einen Schritt an, um ihn als Animation zu sehen.</li>
+    <li><b>Verwertungsverfahren:</b> Wähle links für jeden Kunststoff ein Verfahren (oben den Kunststoff antippen, darunter das Verfahren). Die Farbpunkte zeigen, wie gut es sich eignet. Auch ungeeignete Verfahren lassen sich anwählen; dann steht dort, warum es nicht funktioniert.</li>
+    <li><b>Animation:</b> Oben läuft der Stoff durch die Anlage, unten siehst du, was dabei mit den Makromolekülen geschieht. Pause und Geschwindigkeit stellst du links ein.</li>
+    <li><b>Detailansicht:</b> Tippe eine Station der Anlage an (oder die Schaltfläche darunter). Die Station wird vergrößert gezeigt; eine Lupe zeigt, was genau dort mit den Teilchen geschieht, dazu eine Erklärung und bei wichtigen Schritten die Reaktionsgleichung. Erneutes Antippen schließt die Ansicht.</li>
+    <li><b>Auswertung:</b> Mit „Auswahl als Lauf merken“ hältst du eine Kombination fest. „Ausgabe als PDF“ fasst die gewählten Läufe zusammen.</li>
+  </ol>
+  <p class="hint">Unter „Grundlagen“ (links oben) findest du Erklärungen zu allen Verfahren.</p>
+</div></div>
+
+<div class="modal" id="mVer" hidden><div class="mbox" role="dialog" aria-modal="true" aria-labelledby="hVer">
+  <div class="mhead"><h2 id="hVer">Versionshinweise</h2><button class="x" data-close type="button" aria-label="Schließen">×</button></div>
+  <h3>Version 1.0 · 12.11.2026</h3>
+  <ul>
+    <li>Sieben Kunststoffe (PET, PE-HD, PVC, PE-LD, PP, PS, PUR) mit Steckbrief, Strukturformel, Produktionsmenge 2024 und Verwendung</li>
+    <li>Mehrfachauswahl: Gemische aus beliebig vielen Kunststoffen mit Trennkaskade (Windsichtung, Schwimm-Sink-Trennung in Wasser und Salzlösung, Nahinfrarot-Sortierung, Röntgen), jeder Schritt als Animation</li>
+    <li>Sechs Verwertungsverfahren als Animation mit Anlagen- und Teilchenebene; jede Station antippbar mit vergrößerter Detailansicht, eigener Teilchen-Animation und Erklärung</li>
+    <li>Teilchen-Animationen laufen in eine Richtung (Ausgangszustand, Vorgang, Endzustand, Neustart); Steckbriefe aufklappbar</li>
+    <li>Kosten je Tonne, Schadstoffe und Vergleich der Verfahren</li>
+    <li>Grundlagen, Ausgabe als PDF, QR-Code</li>
+  </ul>
+</div></div>
+
+<div class="modal" id="mGl" hidden><div class="mbox widebox" role="dialog" aria-modal="true" aria-labelledby="hGl">
+  <div class="mhead"><h2 id="hGl"></h2><button class="x" data-close type="button" aria-label="Schließen">×</button></div>
+  <div id="glBody"></div>
+  <div class="mfoot"><button class="btn" id="glPrev" type="button">← Vorheriges Thema</button><button class="btn" id="glNext" type="button">Nächstes Thema →</button></div>
+</div></div>
+
+<div class="modal" id="mQr" hidden><div class="mbox" role="dialog" aria-modal="true" aria-label="QR-Code">
+  <div class="qrbig" id="qrBig"></div>
+  <p class="qrurl" id="qrUrl"></p>
+  <p class="hint" style="text-align:center">Mit der Kamera scannen, um diese Simulation auf dem eigenen Gerät zu öffnen.</p>
+  <div style="text-align:center;margin-top:10px"><button class="btn" data-close type="button">Schließen</button></div>
+</div></div>
+
+<div class="modal" id="mPdf" hidden><div class="mbox" role="dialog" aria-modal="true" aria-labelledby="hPdf">
+  <div class="mhead"><h2 id="hPdf">Auswertung als PDF</h2><button class="x" data-close type="button" aria-label="Schließen">×</button></div>
+  <h3>Welche Läufe sollen ins PDF?</h3>
+  <div class="pick" id="pdfRuns"></div>
+  <div class="pick" id="bkOpts" style="margin-top:6px;border-top:1px solid var(--line-soft);padding-top:6px"><label><input type="checkbox" id="pdfOv" checked><span>Übersichtstabelle der gewählten Läufe (Seite 1)</span></label></div>
+  <h3>Angaben (optional)</h3>
+  <div class="fields"><input id="pdfName" placeholder="Name" autocomplete="off"><input id="pdfKurs" placeholder="Kurs" autocomplete="off"></div>
+  <p class="hint">Das PDF enthält je gewähltem Lauf die Steckbriefe mit Strukturformel, die Trennschritte, die Schritte der Verwertung, die Kosten je Tonne und die Schadstoffe. Jeder Lauf beginnt auf einer neuen Seite.</p>
+  <p class="hint"><b>So speicherst du das PDF:</b> Nach „PDF erstellen“ öffnet sich der Druckdialog des Browsers. Dort als Drucker bzw. Ziel „Als PDF speichern“ wählen und auf „Speichern“ tippen (am iPad: Teilen → „In Dateien sichern“). Es wird nichts gedruckt oder übertragen.</p>
+  <div class="mfoot" style="justify-content:flex-end"><button class="btn primary" id="pdfGo" type="button">PDF erstellen</button><button class="btn" data-close type="button">Abbrechen</button></div>
+</div></div>
+
+<div id="print"></div>
+<script>
+"use strict";
+/* ---------- Daten ---------- */
+const WELT=430.9; // Mio. t 2024
+const PAGE_URL="https://chemie.mail-baumgart.de/Q3/3-Kunststoffrecycling.html";
+const ORDER=["PET","PEHD","PVC","PELD","PP","PS","PUR"];
+
+function ring(cx,cy,r,rot,pre){ // Sechsring als Gerüst
+  const a=[],b=[];
+  for(let i=0;i<6;i++){const w=(rot+60*i)*Math.PI/180;a.push([pre+i,"",cx+r*Math.cos(w),cy+r*Math.sin(w)]);}
+  for(let i=0;i<6;i++)b.push([pre+i,pre+(i+1)%6,i%2?1:2]);
+  return {a,b};
+}
+function vinyl(sub){ // -[CH2-CHX]-
+  const d={a:[["c1","C",.9,1],["h1","H",.9,0],["h2","H",.9,2],["c2","C",2.3,1],["h3","H",2.3,0]],
+    b:[["c1","h1",1],["c1","h2",1],["c1","c2",1],["c2","h3",1]],lp:[],open:[["c1",-.2],["c2",3.8]],br:[.25,3.35,-.35,2.4],w:4.4,h:2.9};
+  if(sub==="H"){d.a.push(["x","H",2.3,2]);d.b.push(["c2","x",1]);}
+  if(sub==="Cl"){d.a.push(["x","Cl",2.3,2]);d.b.push(["c2","x",1]);d.lp.push(["x",[0,90,180]]);}
+  if(sub==="CH3"){d.a.push(["x","C",2.3,2],["m1","H",1.6,2],["m2","H",3,2],["m3","H",2.3,2.85]);
+    d.b.push(["c2","x",1],["x","m1",1],["x","m2",1],["x","m3",1]);d.br=[.25,3.4,-.35,3.2];d.h=3.6;}
+  if(sub==="Ph"){const r=ring(2.3,2.9,.75,-90,"r");d.a.push(...r.a);d.b.push(...r.b,["c2","r0",1]);d.br=[.25,3.35,-.35,3.95];d.h=4.4;}
+  return d;
+}
+const S_PET=(()=>{const r=ring(3.35,1.2,.7,0,"r");return {
+  a:[["o1","O",.9,1.2],["c1","C",1.9,1.2],["oa","O",1.9,.2],...r.a,["c2","C",4.8,1.2],["ob","O",4.8,.2],["o2","O",5.8,1.2],
+     ["c3","C",6.8,1.2],["h1","H",6.8,.2],["h2","H",6.8,2.2],["c4","C",7.8,1.2],["h3","H",7.8,.2],["h4","H",7.8,2.2]],
+  b:[["o1","c1",1],["c1","oa",2],["c1","r3",1],...r.b,["r0","c2",1],["c2","ob",2],["c2","o2",1],["o2","c3",1],["c3","h1",1],["c3","h2",1],["c3","c4",1],["c4","h3",1],["c4","h4",1]],
+  lp:[["o1",[-90,90]],["oa",[-150,-30]],["ob",[-150,-30]],["o2",[-90,90]]],
+  open:[["o1",-.15],["c4",8.9]],br:[.3,8.45,-.25,2.6],w:9.5,h:3.1};})();
+const S_PUR={
+  a:[["c1","C",.9,1.2],["oa","O",.9,.2],["n1","N",1.9,1.2],["h1","H",1.9,2.2],["r1","R¹",2.9,1.2],["n2","N",3.9,1.2],["h2","H",3.9,2.2],
+     ["c2","C",4.9,1.2],["ob","O",4.9,.2],["o1","O",5.9,1.2],["r2","R²",6.9,1.2],["o2","O",7.9,1.2]],
+  b:[["c1","oa",2],["c1","n1",1],["n1","h1",1],["n1","r1",1],["r1","n2",1],["n2","h2",1],["n2","c2",1],["c2","ob",2],["c2","o1",1],["o1","r2",1],["r2","o2",1]],
+  lp:[["oa",[-150,-30]],["ob",[-150,-30]],["n1",[-90]],["n2",[-90]],["o1",[-90,90]],["o2",[-90,90]]],
+  open:[["c1",-.15],["o2",8.9]],br:[.3,8.45,-.25,2.6],w:9.5,h:3.1};
+
+const POLY={
+ PET:{k:"PET",code:"01",name:"Polyethylenterephthalat",typ:"Thermoplast · Polyester (Polykondensation)",rho:1.38,rhoT:"1,38 g/cm³",share:6.2,hu:22,co2:2.29,col:"#4fd1c5",shape:"flake",fl:false,tm:"ca. 270 °C",
+   uses:["Getränkeflaschen","Lebensmittelschalen und Folien","Textilfasern („Polyester“, Fleece)","Blisterverpackungen"],
+   add:["Reste des Katalysators Antimon(III)-oxid","Acetaldehyd (entsteht beim Erhitzen, verändert den Geschmack)"],st:S_PET,
+   stNote:"Der Benzolring ist als Gerüst gezeichnet."},
+ PEHD:{k:"PE-HD",code:"02",name:"Polyethen hoher Dichte",typ:"Thermoplast · Polyolefin (Polymerisation), kaum verzweigte Ketten",rho:.95,rhoT:"0,94–0,97 g/cm³",share:12.1,hu:43,co2:3.14,col:"#ffb454",shape:"flake",fl:true,tm:"ca. 200 °C",
+   uses:["Flaschen für Wasch- und Reinigungsmittel","Kanister, Fässer, Kraftstofftanks","Rohre","Getränkekästen, Mülltonnen"],
+   add:["Additive (Antioxidantien, Farbpigmente)","aufgenommene Reste des Füllguts (Duftstoffe, Reiniger)"],st:vinyl("H")},
+ PVC:{k:"PVC",code:"03",name:"Polyvinylchlorid",typ:"Thermoplast · Polymerisation; hart oder mit Weichmachern weich",rho:1.38,rhoT:"1,38 g/cm³ (weich ab 1,2)",share:12.8,hu:18,co2:1.41,col:"#e4785b",shape:"flake",fl:false,tm:"ca. 180 °C",
+   uses:["Fensterprofile, Rohre","Bodenbeläge","Kabelisolierungen","Schläuche, Kunstleder (Weich-PVC)"],
+   add:["Weichmacher (Phthalate) in Weich-PVC","Blei- und Cadmium-Stabilisatoren in altem PVC"],st:vinyl("Cl")},
+ PELD:{k:"PE-LD",code:"04",name:"Polyethen niedriger Dichte",typ:"Thermoplast · Polyolefin (Polymerisation), stark verzweigte Ketten",rho:.92,rhoT:"0,91–0,93 g/cm³",share:13.9,hu:43,co2:3.14,col:"#e8d36a",shape:"film",fl:true,tm:"ca. 180 °C",
+   uses:["Folien, Tragetaschen, Müllsäcke","Beschichtung von Getränkekartons","Quetschflaschen, Tuben","Kabelummantelungen"],
+   add:["Druckfarben, Gleitmittel","Anhaftungen (Lebensmittelreste, Etiketten)"],st:vinyl("H")},
+ PP:{k:"PP",code:"05",name:"Polypropen",typ:"Thermoplast · Polyolefin (Polymerisation)",rho:.91,rhoT:"0,90–0,91 g/cm³",share:19.0,hu:44,co2:3.14,col:"#7fd68a",shape:"flake",fl:true,tm:"ca. 230 °C",
+   uses:["Lebensmittelbecher, Verschlüsse","Stoßfänger und Armaturen im Auto","Haushaltswaren, Gartenmöbel","Fasern, Vliese (z. B. Masken)"],
+   add:["Additive, Füllstoffe (Talkum, Glasfasern)","Gerüche aus dem Füllgut"],st:vinyl("CH3")},
+ PS:{k:"PS",code:"06",name:"Polystyrol",typ:"Thermoplast · Polymerisation; auch geschäumt (EPS, „Styropor“)",rho:1.05,rhoT:"1,05 g/cm³ (EPS-Schaum 0,02–0,05)",share:5.1,hu:40,co2:3.38,col:"#b79cf2",shape:"flake",fl:false,tm:"ca. 220 °C",
+   uses:["Joghurtbecher, Einweggeschirr","Gehäuse, CD-Hüllen","Dämmplatten (EPS/XPS)","Verpackungsformteile"],
+   add:["Rest-Styrol (Monomer)","Flammschutzmittel HBCD in alten Dämmplatten"],st:vinyl("Ph"),
+   stNote:"Der Benzolring ist als Gerüst gezeichnet."},
+ PUR:{k:"PUR",code:"07",name:"Polyurethan",typ:"meist Duroplast oder Elastomer · Polyaddition, vernetzt",rho:.05,rhoT:"Schaum 0,03–0,1 g/cm³ (massiv 1,1–1,25)",share:5.3,hu:26,co2:2.3,col:"#6fb1f5",shape:"foam",fl:true,tm:"nicht schmelzbar",
+   uses:["Matratzen, Polster, Autositze (Weichschaum)","Dämmplatten, Kühlgeräte (Hartschaum)","Schuhsohlen","Lacke, Klebstoffe, Montageschaum"],
+   add:["Flammschutzmittel (z. B. TCPP)","Reste von Isocyanaten; FCKW in sehr alten Dämmschäumen"],st:S_PUR,
+   stNote:"R¹, R²: organische Reste (aus Diisocyanat und Diol/Polyol). Recycling-Code 07 steht für „andere Kunststoffe“."}
+};
+ORDER.forEach(k=>{POLY[k].id=k;POLY[k].mt=WELT*POLY[k].share/100;});
+
+/* Verfahren */
+const PROC_ORDER=["mech","loes","solv","pyro","gas","energ"];
+const PROC={
+ mech:{name:"Werkstoffliches Recycling",kurz:"werkstofflich",grp:"werkstofflich",cost:[200,500],yield:"ca. 70–90 % des sortenreinen Abfalls",src:"Richtwert Recyclingbranche",mol:"keep"},
+ loes:{name:"Lösemittelbasiertes Recycling",kurz:"Lösemittel",grp:"werkstofflich",cost:[600,1200],yield:"ca. 80–95 %",src:"Modellwert (bisher nur Pilot- und Demonstrationsanlagen)",mol:"solvent"},
+ solv:{name:"Solvolyse (chemisch)",kurz:"Solvolyse",grp:"rohstofflich",cost:[900,2000],yield:"90 % und mehr",src:"JRC 2026: ca. 2 150 ± 500 € je Tonne neues PET",mol:"mono"},
+ pyro:{name:"Pyrolyse (chemisch)",kurz:"Pyrolyse",grp:"rohstofflich",cost:[800,1500],yield:"ca. 30–50 % werden wieder Kunststoff",src:"JRC 2026: ca. 3 000 € je Tonne neuer Kunststoff",mol:"frag"},
+ gas:{name:"Vergasung (chemisch)",kurz:"Vergasung",grp:"rohstofflich",cost:[180,270],yield:"gering (Synthesegas für Methanol)",src:"ältere Abschätzung (KIT, 2019)",mol:"gas"},
+ energ:{name:"Energetische Verwertung",kurz:"energetisch",grp:"energetisch",cost:[100,180],yield:"0 % (nur Strom und Wärme)",src:"Annahmepreis Verbrennung zzgl. CO₂-Preis 55–65 €/t CO₂ (2026)",mol:"burn"}
+};
+/* Eignung: [Stufe 0–2, Begründung] */
+const SUIT={
+ PET:{mech:[2,"Stand der Technik: Aus Pfandflaschen werden wieder Flaschen. Eine Nachkondensation im Vakuum verlängert die Ketten wieder."],
+      loes:[1,"Möglich, aber selten: Das werkstoffliche Recycling ist bei PET günstiger."],
+      solv:[2,"Die Esterbindungen lassen sich gezielt spalten (Glykolyse, Methanolyse, Hydrolyse). Es entstehen wieder Monomere, aus denen neues PET in Neuware-Qualität wird – auch aus farbigem PET und Textilien."],
+      pyro:[0,"PET enthält viel Sauerstoff. Statt Öl entstehen vor allem CO₂, CO und feste Säuren (Benzoesäure, Terephthalsäure), die Rohre verstopfen und korrodieren lassen."],
+      gas:[1,"Technisch möglich, aber der Kunststoff geht als Werkstoff verloren."],
+      energ:[1,"Möglich, aber der Heizwert ist niedrig (ca. 22 MJ/kg) und der Wertstoff geht verloren."]},
+ PEHD:{mech:[2,"Stand der Technik für sortenreine Flaschen und Kanister. Gerüche und Farbmischungen begrenzen die Qualität."],
+      loes:[1,"In Entwicklung: Lösen in heißen Kohlenwasserstoffen entfernt Farben und Additive."],
+      solv:[0,"Die Kette besteht nur aus C–C-Einfachbindungen. Es gibt keine funktionelle Gruppe (wie eine Estergruppe), die ein Lösemittel spalten könnte."],
+      pyro:[2,"Die Ketten zerfallen zu einem Öl aus Alkanen und Alkenen, das im Steamcracker wieder Ethen liefert."],
+      gas:[1,"Technisch möglich, aber hoher Energieaufwand."],
+      energ:[1,"Hoher Heizwert (ca. 43 MJ/kg, wie Heizöl), aber viel CO₂ und der Wertstoff geht verloren."]},
+ PVC:{mech:[2,"Für sortenreine Fensterprofile und Rohre etabliert. Alte Additive (Blei, Weichmacher) werden mit in das neue Produkt verschleppt."],
+      loes:[1,"Technisch erprobt (Lösen, Filtrieren, Ausfällen). Eine Großanlage wurde 2018 stillgelegt, weil verbotene Weichmacher im Produkt blieben."],
+      solv:[0,"Die Hauptkette besteht nur aus C–C-Bindungen und lässt sich nicht durch ein Lösemittel spalten."],
+      pyro:[0,"Schon ab etwa 250 °C spaltet PVC Chlorwasserstoff ab. Das Gas zerfrisst die Anlage, und chlorhaltiges Öl ist unbrauchbar. Schon wenig PVC stört die Pyrolyse anderer Kunststoffe."],
+      gas:[1,"Möglich, wenn der Chlorwasserstoff aus dem Gas gewaschen wird."],
+      energ:[1,"Möglich, aber niedriger Heizwert (ca. 18 MJ/kg). Je Tonne entstehen bis zu 0,58 t Chlorwasserstoff, die aus dem Rauchgas gewaschen werden müssen; es können Dioxine entstehen."]},
+ PELD:{mech:[2,"Etabliert für saubere Folien (z. B. aus dem Handel). Verschmutzte, bedruckte Haushaltsfolien ergeben nur graues Regranulat für Müllsäcke oder Rohre."],
+      loes:[1,"In Entwicklung, vor allem für mehrschichtige Folien."],
+      solv:[0,"Die Kette besteht nur aus C–C-Einfachbindungen. Es gibt keine spaltbare funktionelle Gruppe."],
+      pyro:[2,"Besonders sinnvoll für verschmutzte Folien, die werkstofflich kaum verwertbar sind."],
+      gas:[1,"Technisch möglich, aber hoher Energieaufwand."],
+      energ:[1,"Hoher Heizwert (ca. 43 MJ/kg), aber viel CO₂ und der Wertstoff geht verloren."]},
+ PP:{mech:[2,"Etabliert für Becher, Verschlüsse und Autoteile. Mit jeder Schmelze werden die Ketten kürzer."],
+      loes:[1,"Erste Großanlagen: Lösen unter Druck entfernt Farbe und Geruch."],
+      solv:[0,"Die Kette besteht nur aus C–C-Einfachbindungen. Es gibt keine spaltbare funktionelle Gruppe."],
+      pyro:[2,"Das Pyrolyseöl liefert im Steamcracker wieder Propen und Ethen."],
+      gas:[1,"Technisch möglich, aber hoher Energieaufwand."],
+      energ:[1,"Hoher Heizwert (ca. 44 MJ/kg), aber viel CO₂ und der Wertstoff geht verloren."]},
+ PS:{mech:[2,"Möglich für saubere Becher und Verpackungen. Geschäumtes PS muss wegen des großen Volumens erst verdichtet werden."],
+      loes:[2,"Sinnvoll für alte Dämmplatten: Das Polystyrol wird gelöst, das Flammschutzmittel HBCD abgetrennt und zerstört."],
+      solv:[0,"Die Hauptkette besteht nur aus C–C-Bindungen und lässt sich nicht durch ein Lösemittel spalten."],
+      pyro:[2,"Polystyrol zerfällt beim Erhitzen überwiegend wieder zum Monomer Styrol (Depolymerisation)."],
+      gas:[1,"Technisch möglich, aber hoher Energieaufwand."],
+      energ:[1,"Hoher Heizwert (ca. 40 MJ/kg). Brennt stark rußend; viel CO₂."]},
+ PUR:{mech:[1,"Vernetzte Makromoleküle schmelzen nicht. Möglich ist nur das Zerkleinern: Schaumflocken werden zu Verbundschaum verklebt oder als Füllstoff gemahlen."],
+      loes:[0,"Vernetzte Kunststoffe lösen sich nicht, sie quellen nur."],
+      solv:[2,"Die Urethangruppen lassen sich mit Diolen spalten (Glykolyse). Es entstehen Polyole für neues Polyurethan, z. B. aus alten Matratzen."],
+      pyro:[1,"Möglich, aber das Öl enthält Stickstoffverbindungen und muss aufwendig gereinigt werden."],
+      gas:[1,"Technisch möglich; Stickstoffverbindungen müssen aus dem Gas gewaschen werden."],
+      energ:[1,"Üblich für verschmutzte Schäume. Es können Cyanwasserstoff und Stickstoffoxide entstehen."]}
+};
+const RATE=["ungeeignet","eingeschränkt","gut geeignet"];
+
+/* Stationen der Anlage */
+function stations(p,pr){
+  const k=p.id;
+  const CUT="Rotierende Messer zerschneiden die Teile zu Flakes von etwa 1 cm Größe. Auf Teilchenebene ändert sich fast nichts: Ein Flake enthält noch immer unvorstellbar viele Makromoleküle. Nur an den Schnittflächen reißen einzelne Ketten.";
+  const REST="Im Abfall stecken neben den Makromolekülen auch Additive (z. B. Farbpigmente, Stabilisatoren) zwischen den Ketten und Anhaftungen auf der Oberfläche. Störstoffe werden aussortiert, der Abfall wird getrocknet.";
+  const SOLID="Der Kunststoff wird gekühlt und zu Körnern geformt. Die Ketten verlieren Bewegungsenergie und lagern sich wieder dicht aneinander – teils geordnet (kristalline Bereiche), teils ungeordnet. Die zwischenmolekularen Kräfte halten sie wieder fest.";
+  if(pr==="mech"){
+    if(k==="PUR")return [
+      {t:"Zerkleinern",s:"Schaum → Flocken",g:"shred",look:"flake",emit:"Staub",d:"cut",x:"Der Schaum wird zu Flocken gerissen. Dabei reißen an den Bruchflächen einzelne Bindungen; innerhalb jeder Flocke bleibt das Netzwerk aus Elektronenpaarbindungen erhalten."},
+      {t:"Mahlen / Sieben",s:"Flocken gleicher Größe",g:"filter",look:"clean",d:"net",x:"Siebe sortieren die Flocken nach Größe. Auf Teilchenebene geschieht nichts: Jede Flocke ist ein Stück eines vernetzten Riesenmoleküls. Weil die Ketten über Elektronenpaarbindungen fest verknüpft sind, können sie nicht aneinander vorbeigleiten – der Schaum schmilzt nicht."},
+      {t:"Binder zugeben",s:"Klebstoff (Isocyanat)",g:"tank",look:"clean",emit:"Isocyanate",d:"bind",v:"spray",x:"Ein Klebstoff, dessen Moleküle reaktive Isocyanatgruppen (–N=C=O) tragen, wird aufgesprüht und verteilt sich zwischen den Flocken. Noch sind die Flocken nicht verbunden."},
+      {t:"Pressen",s:"Dampf und Druck",g:"press",look:"melt",emit:"CO₂",d:"bind",x:"Unter Druck strömt Wasserdampf durch die Flocken. Eine Isocyanatgruppe des Binders reagiert mit Wasser zu einer Aminogruppe; dabei wird Kohlenstoffdioxid frei. Die Aminogruppe reagiert mit einer weiteren Isocyanatgruppe zu einer Harnstoffgruppe (–NH–CO–NH–). So entstehen Brücken, die die Flocken miteinander verkleben."},
+      {t:"Verbundschaum",s:"Matten, Trittschalldämmung",g:"silo",look:"pellet",d:"bind",v:"done",x:"Das Produkt besteht aus den alten Flocken, zusammengehalten von einer dünnen Klebstoffschicht. Die alten Makromoleküle sind unverändert – es ist kein neuer Schaum, sondern ein Verbund."}];
+    return [
+      {t:"Zerkleinern",s:"Schredder → Flakes",g:"shred",look:"flake",d:"cut",x:CUT},
+      {t:"Waschen",s:"Wasser, Lauge, Tenside",g:"wash",look:"clean",emit:"Abwasser, Mikroplastik",d:"wash",x:"Heißes Wasser mit Natronlauge und Tensiden löst Etiketten, Klebstoff und Reste des Füllguts. Tensid-Teilchen lagern sich mit ihrem unpolaren Ende an den Schmutz und umhüllen ihn; das polare Ende zeigt zum Wasser. So wird der Schmutz abgelöst und weggespült. Der Kunststoff selbst löst sich nicht in Wasser und bleibt zurück."},
+      {t:"Trocknen",s:"Warmluft",g:"dry",look:"clean",d:"dry",x:"Warmluft führt Energie zu. Die Wasser-Moleküle auf der Oberfläche bewegen sich schneller, überwinden die Wasserstoffbrücken untereinander und verdampfen."+(k==="PET"?" Bei PET ist das besonders wichtig: Restwasser würde in der heißen Schmelze Esterbindungen spalten (Hydrolyse) und die Ketten verkürzen.":"")},
+      {t:"Extrudieren",s:"Schmelzen bei "+p.tm,g:"extr",look:"melt",emit:k==="PET"?"Acetaldehyd":k==="PVC"?"HCl bei Überhitzung":k==="PS"?"Styrol":"flüchtige Abbauprodukte",d:"melt",
+        x:"Die Schnecke fördert und knetet die Flakes, Heizbänder erwärmen sie auf "+p.tm+". Die zwischenmolekularen Kräfte zwischen den Ketten werden überwunden: Die Ketten gleiten aneinander vorbei, der Kunststoff wird zähflüssig. Elektronenpaarbindungen in den Ketten bleiben fast alle erhalten – Hitze und Scherkräfte spalten aber einzelne Ketten (Kettenbruch)."+(k==="PVC"?" Wird PVC zu heiß, spaltet es Chlorwasserstoff ab.":k==="PET"?" Bei PET werden kurze Ketten anschließend im Vakuum wieder verknüpft (Nachkondensation).":"")},
+      {t:"Regranulat",s:k==="PET"?"neue Flaschen, Fasern":"neue Produkte",g:"silo",look:"pellet",d:"solid",x:SOLID}];
+  }
+  if(pr==="loes")return [
+      {t:"Zerkleinern",s:"Schredder → Flakes",g:"shred",look:"flake",d:"cut",x:CUT},
+      {t:"Lösen",s:"selektives Lösemittel",g:"tank",look:"sol",emit:"Lösemitteldämpfe",d:"dissolve",x:"Ein Lösemittel, das genau zu diesem Kunststoff passt („Ähnliches löst sich in Ähnlichem“), dringt zwischen die Ketten. Die Lösemittel-Teilchen umhüllen die Makromoleküle und drängen sie auseinander: Der Kunststoff löst sich, die Ketten selbst bleiben unverändert. Additive werden frei; Fremdkunststoffe und Pigmente lösen sich nicht."},
+      {t:"Filtrieren",s:"Störstoffe abtrennen",g:"filter",look:"sol",emit:"Pigmente, Fremdstoffe",d:"filter",x:"Die Lösung wird durch Filter gedrückt. Die gelösten, geknäuelten Makromoleküle passieren die Poren; ungelöste Teilchen wie Pigmente, Füllstoffe und Fremdkunststoffe bleiben hängen. Gelöste Additive passieren den Filter ebenfalls – sie werden erst beim Ausfällen abgetrennt."},
+      {t:"Ausfällen",s:"Lösemittel zurückgewinnen",g:"cryst",look:"clean",emit:k==="PS"?"HBCD → Sonderabfall":k==="PVC"?"Weichmacher, Blei":"Additive",d:"precip",x:"Ein Fällungsmittel (eine Flüssigkeit, in der sich der Kunststoff nicht löst) wird zugegeben. Die Ketten verlieren ihre Lösemittelhülle, knäueln sich zusammen, lagern sich aneinander und fallen als fester Kunststoff aus. Die gelösten Additive"+(k==="PS"?", z. B. das Flammschutzmittel HBCD,":"")+" bleiben in der Flüssigkeit und werden mit ihr abgetrennt. Lösemittel und Fällungsmittel werden destilliert und wiederverwendet."},
+      {t:"Regranulat",s:"fast wie Neuware",g:"silo",look:"pellet",d:"solid",x:SOLID}];
+  if(pr==="solv"){
+    if(k==="PUR")return [
+      {t:"Zerkleinern",s:"Schaum → Flocken",g:"shred",look:"flake",d:"cut",x:"Der Schaum wird zu Flocken gerissen, damit das Spaltmittel überall angreifen kann. Das Netzwerk bleibt in den Flocken erhalten."},
+      {t:"Glykolyse",s:"Diol, ca. 200 °C, Katalysator",g:"reactor",look:"sol",emit:"aromatische Amine",d:"glyco",x:"Ein Diol greift mit seiner Hydroxygruppe die Urethangruppen (–NH–CO–O–) an. Jede Urethangruppe verbindet einen Isocyanat-Baustein mit einem Polyol-Baustein. Bei der Spaltung (Umesterung) bindet sich das Diol an den Isocyanat-Baustein, der Polyol-Baustein wird mit seiner OH-Gruppe wieder frei. So zerfällt das Netzwerk: Die ursprünglichen Polyole werden zurückgewonnen, die Isocyanat-Bausteine bleiben als Carbamate mit dem Diol verbunden. In einer Nebenreaktion entstehen aus Harnstoffgruppen aromatische Amine."},
+      {t:"Trennen",s:"Phasen trennen, reinigen",g:"filter",look:"mono",emit:"Amine, Carbamate",d:"layers",x:"Lässt man das Gemisch stehen, trennt es sich in zwei flüssige Phasen, weil die Stoffe unterschiedlich polar sind und sich nicht mischen. Oben sammelt sich das unpolarere Recycling-Polyol, unten das polare Diol mit den Carbamaten und Aminen aus den Isocyanat-Bausteinen. Die obere Phase wird abgetrennt und gereinigt."},
+      {t:"Polyol",s:"Recycling-Polyol",g:"drum",look:"mono",d:"liquid",x:"Das Recycling-Polyol ist eine zähflüssige Flüssigkeit. Jedes Molekül ist eine Kette mit Hydroxygruppen (–OH) an den Enden. Zwischen den OH-Gruppen benachbarter Moleküle bilden sich ständig Wasserstoffbrücken und lösen sich wieder – deshalb fließt das Polyol zäh. Die OH-Gruppen sind auch die reaktiven Stellen für die spätere Polyaddition. Vor der Wiederverwendung wird ihr Anteil bestimmt (Hydroxylzahl), damit die passende Menge Diisocyanat zugegeben wird."},
+      {t:"Polyaddition",s:"+ Diisocyanat → neues PUR",g:"poly",look:"pellet",emit:"Isocyanate",d:"poly",v:"add",x:"Polyol und Diisocyanat reagieren zu neuem Polyurethan: Die Hydroxygruppe lagert sich an die Isocyanatgruppe an, es entsteht eine Urethangruppe. Dabei wird kein kleines Molekül abgespalten (Polyaddition)."}];
+    return [
+      {t:"Zerkleinern",s:"Schredder → Flakes",g:"shred",look:"flake",d:"cut",x:CUT},
+      {t:"Glykolyse",s:"Ethan-1,2-diol, 180–240 °C",g:"reactor",look:"sol",emit:"Glykoldämpfe",d:"glyco",eq:"glyco",x:"Ethan-1,2-diol greift mit einer Hydroxygruppe die Esterbindungen der Kette an (Umesterung, Katalysator z. B. Zinkacetat). Die Esterbindung zwischen zwei Wiederholeinheiten wird gespalten; das Diol-Molekül bleibt am Bruchstück gebunden. Aus der Kette entsteht das Monomer Bis(2-hydroxyethyl)terephthalat."},
+      {t:"Reinigen",s:"Filtrieren, Kristallisieren",g:"filter",look:"mono",emit:"Farbstoffe, Oligomere",d:"filter",v:"mono",x:"Die heiße Monomerlösung wird filtriert und mit Aktivkohle entfärbt. Die kleinen Monomer-Moleküle passieren den Filter; Farbpigmente, Fremdkunststoffe und nicht gespaltene Kettenstücke bleiben zurück."},
+      {t:"Monomer",s:"Terephthalsäure-Diester",g:"cryst",look:"mono",d:"cryst",x:"Beim Abkühlen kristallisiert das Monomer aus: Die Moleküle ordnen sich zu einem regelmäßigen Gitter. Verunreinigungen passen nicht ins Gitter und bleiben in der Lösung. So erreicht das Monomer die Reinheit von Neuware."},
+      {t:"Polykondensation",s:"neues PET",g:"poly",look:"pellet",emit:"Ethan-1,2-diol",d:"poly",v:"cond",x:"Bei etwa 280 °C im Vakuum reagieren die Monomere wieder miteinander. Bei jeder Verknüpfung wird ein Molekül Ethan-1,2-diol abgespalten und abgesaugt (Polykondensation) – genau die Umkehrung der Glykolyse. Es entsteht neues PET."}];
+  }
+  if(pr==="pyro"){
+    const e=k==="PVC"?"HCl (ätzend)":k==="PET"?"CO₂, Benzoesäure":k==="PUR"?"HCN, Amine":"Pyrolysegas";
+    const px=k==="PS"?"Bei 400–600 °C ohne Sauerstoff schwingen die Ketten so stark, dass C–C-Bindungen brechen. Bei Polystyrol löst sich vom Kettenende her ein Styrol-Molekül nach dem anderen ab (Depolymerisation) – die Umkehrung der Polymerisation.":
+      k==="PVC"?"Schon ab etwa 250 °C spaltet PVC Chlorwasserstoff ab. Zurück bleibt eine Kette mit vielen C=C-Doppelbindungen, die zu Koks verkohlt. Der Chlorwasserstoff zerfrisst die Anlage – deshalb ist PVC für die Pyrolyse ungeeignet.":
+      k==="PET"?"Beim Erhitzen brechen die Esterbindungen. Wegen des hohen Sauerstoffgehalts entstehen statt Öl vor allem CO₂, CO und feste Säuren (Benzoesäure, Terephthalsäure), die Rohre verstopfen.":
+      k==="PUR"?"Beim Erhitzen zerfallen zuerst die Urethangruppen. Es entstehen stickstoffhaltige Bruchstücke (Amine, Nitrile, Cyanwasserstoff), die das Öl verunreinigen.":
+      "Bei 400–600 °C ohne Sauerstoff schwingen die Ketten so stark, dass C–C-Bindungen an zufälligen Stellen brechen (thermisches Cracken). An den Bruchstellen entstehen kurzzeitig Teilchen mit ungepaarten Elektronen (Radikale), die weiter zerfallen. Kurze Bruchstücke sind gasförmig, mittlere bilden das Öl, lange das Wachs.";
+    const a=[{t:"Vorbehandeln",s:"Sortieren, Trocknen",g:"shred",look:"flake",d:"rest",x:REST},
+      {t:"Pyrolyse",s:"400–600 °C, ohne Sauerstoff",g:"reactor",look:"gas",emit:e,d:"crack",v:k==="PS"?"unzip":k==="PVC"?"hcl":"",eq:k==="PS"?"styrol":"",x:px},
+      {t:"Kondensieren",s:"Dämpfe abkühlen",g:"column",look:"drop",emit:"Koks, Gas",d:"condense",x:"Die heißen Dämpfe werden gekühlt. Zwischen langen Bruchstücken wirken stärkere zwischenmolekulare Kräfte: Sie kondensieren zuerst zu Öl und Wachs. Sehr kurze Bruchstücke (bis etwa vier C-Atome) bleiben gasförmig und heizen als Brenngas den Reaktor. Fester Koks bleibt zurück."}];
+    if(k==="PS")a.push({t:"Destillieren",s:"Styrol abtrennen",g:"column",look:"mono",emit:"Toluol, Ethylbenzol",d:"condense",v:"dist",x:"Das Kondensat wird destilliert, also nach Siedetemperaturen getrennt. Styrol (Siedetemperatur 145 °C) wird von den leichter siedenden Nebenprodukten Toluol und Ethylbenzol und von schwereren Bruchstücken abgetrennt."},
+      {t:"Styrol",s:"→ neues Polystyrol",g:"poly",look:"pellet",d:"poly",v:"add",eq:"styrolpoly",x:"Die Styrol-Moleküle werden wieder polymerisiert: Die C=C-Doppelbindung öffnet sich, ein Molekül nach dem anderen lagert sich an das wachsende Kettenende an. Es entsteht Polystyrol in Neuware-Qualität."});
+    else a.push({t:"Pyrolyseöl",s:"Reinigen, Hydrieren",g:"drum",look:"drop",emit:"PAK, Benzol",d:"hydro",x:"Das Öl enthält Alkene sowie Verbindungen mit Chlor-, Sauerstoff- und Stickstoffatomen. Mit Wasserstoff an einem Katalysator werden die C=C-Doppelbindungen abgesättigt und die Fremdatome als Chlorwasserstoff, Wasser oder Ammoniak entfernt (Hydrierung). Erst dann verträgt der Steamcracker das Öl."},
+      {t:"Steamcracker",s:"→ Ethen, Propen",g:"reactor",look:"mono",d:"crack",v:"mono",x:"Im Steamcracker (ca. 850 °C, mit Wasserdampf verdünnt) werden die Ketten des Öls in Sekundenbruchteilen zu kleinen Alkenen gespalten: Ethen und Propen. Das sind die Monomere für neues Polyethen und Polypropen."});
+    return a;
+  }
+  if(pr==="gas")return [
+      {t:"Vorbehandeln",s:"Zerkleinern, Trocknen",g:"shred",look:"flake",d:"rest",x:REST},
+      {t:"Vergasen",s:"> 1000 °C, wenig O₂, H₂O",g:"reactor",look:"gas",emit:"Schlacke",d:"react",v:"gas",x:"Bei über 1000 °C reagiert der Kunststoff mit wenig Sauerstoff und Wasserdampf. Für eine vollständige Verbrennung reicht der Sauerstoff nicht: Statt Kohlenstoffdioxid entsteht Kohlenstoffmonooxid, die Wasserstoff-Atome werden als H₂ frei (partielle Oxidation)."},
+      {t:"Gasreinigung",s:"Gaswäsche",g:"scrub",look:"gas",emit:k==="PVC"?"HCl":k==="PUR"?"NH₃, HCN":"H₂S, Teer",d:"scrub",v:"syn",x:"Das Rohgas strömt von unten durch den Wäscher, Waschflüssigkeit rieselt von oben entgegen. Die Tropfen lösen Schadgase wie "+(k==="PVC"?"Chlorwasserstoff":k==="PUR"?"Ammoniak und Cyanwasserstoff":"Schwefelwasserstoff")+" und nehmen Teer und Staub mit. CO und H₂ lösen sich kaum und strömen gereinigt weiter."},
+      {t:"Synthesegas",s:"CO + H₂",g:"sphere",look:"gas",emit:"CO (giftig)",d:"syngas",x:"Das gereinigte Synthesegas besteht aus Kohlenstoffmonooxid und Wasserstoff. Für die Methanol-Synthese wird ein Verhältnis von einem CO-Molekül zu zwei H₂-Molekülen eingestellt."},
+      {t:"Synthese",s:"→ Methanol",g:"poly",look:"drop",d:"synth",x:"An der Oberfläche eines Katalysators (Kupfer und Zinkoxid, ca. 250 °C, 50–100 bar) reagieren ein CO-Molekül und zwei H₂-Moleküle zu einem Methanol-Molekül. Methanol ist Ausgangsstoff für neue Chemikalien und Kunststoffe."}];
+  return [
+      {t:"Bunker",s:"Anlieferung, Mischen",g:"bunker",look:"flake",d:"rest",x:"Ein Kran mischt den Abfall, damit der Heizwert gleichmäßig ist. Im Abfall stecken neben den Makromolekülen auch Additive zwischen den Ketten und Anhaftungen auf der Oberfläche."},
+      {t:"Feuerung",s:"> 850 °C, Luftüberschuss",g:"reactor",look:"gas",emit:"Schlacke",d:"react",v:"burn",eq:"burn",x:"Auf dem Rost verbrennt der Kunststoff bei über 850 °C mit Luftüberschuss. Die Ketten zerfallen; die Kohlenstoff-Atome reagieren mit Sauerstoff zu Kohlenstoffdioxid, die Wasserstoff-Atome zu Wasser. Je Tonne "+p.k+" entstehen etwa "+fz(p.co2,2)+" t CO₂."+(k==="PVC"?" Das Chlor wird als Chlorwasserstoff frei.":k==="PUR"?" Der gebundene Stickstoff bildet Stickstoffoxide, bei Sauerstoffmangel auch Cyanwasserstoff.":"")},
+      {t:"Dampfkessel",s:"Dampf → Turbine",g:"turb",look:"gas",emit:"Strom, Fernwärme",d:"steam",x:"Das heiße Rauchgas strömt an Rohren vorbei und gibt Wärme an das Wasser darin ab. Die Wasser-Moleküle bewegen sich immer schneller, bis sie den Verband der Flüssigkeit verlassen: Es entsteht Dampf unter hohem Druck, der die Turbine antreibt. Der Generator wandelt die Bewegung in Strom um."},
+      {t:"Rauchgasreinigung",s:"Filter, Wäscher",g:"scrub",look:"gas",emit:k==="PVC"?"HCl, Dioxine":k==="PUR"?"NOₓ, HCN":"NOₓ, Feinstaub",d:"scrub",v:"flue",x:"Kalkmilch (Calciumhydroxid in Wasser) wird eingesprüht und neutralisiert saure Gase"+(k==="PVC"?": Aus Chlorwasserstoff entsteht Calciumchlorid":"")+". Gewebefilter halten Staub zurück, Aktivkohle bindet Dioxine und Schwermetalle; Stickstoffoxide werden mit Ammoniak zu Stickstoff reduziert."},
+      {t:"Schornstein",s:"gereinigtes Abgas",g:"stack",look:"gas",emit:fz(p.co2,2)+" t CO₂ je t",d:"stackgas",x:"Das gereinigte Abgas besteht vor allem aus Stickstoff (aus der Luft), Kohlenstoffdioxid und Wasserdampf. Das CO₂ stammt aus fossilem Kohlenstoff und wirkt als Treibhausgas; der Kohlenstoff ist für neue Kunststoffe verloren."}];
+}
+/* Strukturformeln für Reaktionsgleichungen */
+const S_DIOL={a:[["h1","H",.3,1.2],["o1","O",1.2,1.2],["c1","C",2.2,1.2],["a","H",2.2,.2],["b","H",2.2,2.2],["c2","C",3.2,1.2],["d","H",3.2,.2],["e","H",3.2,2.2],["o2","O",4.2,1.2],["h2","H",5.1,1.2]],
+  b:[["h1","o1",1],["o1","c1",1],["c1","a",1],["c1","b",1],["c1","c2",1],["c2","d",1],["c2","e",1],["c2","o2",1],["o2","h2",1]],lp:[["o1",[-90,90]],["o2",[-90,90]]],w:5.4,h:3.1};
+const S_BHET=(()=>{const r=ring(6.65,1.2,.7,0,"r");return {
+  a:[["h1","H",.3,1.2],["o1","O",1.2,1.2],["c1","C",2.2,1.2],["a","H",2.2,.2],["b","H",2.2,2.2],["c2","C",3.2,1.2],["d","H",3.2,.2],["e","H",3.2,2.2],["o2","O",4.2,1.2],["c3","C",5.2,1.2],["oa","O",5.2,.2],...r.a,
+     ["c4","C",8.1,1.2],["ob","O",8.1,.2],["o3","O",9.1,1.2],["c5","C",10.1,1.2],["f","H",10.1,.2],["g","H",10.1,2.2],["c6","C",11.1,1.2],["h","H",11.1,.2],["i","H",11.1,2.2],["o4","O",12.1,1.2],["h2","H",13,1.2]],
+  b:[["h1","o1",1],["o1","c1",1],["c1","a",1],["c1","b",1],["c1","c2",1],["c2","d",1],["c2","e",1],["c2","o2",1],["o2","c3",1],["c3","oa",2],["c3","r3",1],...r.b,["r0","c4",1],["c4","ob",2],["c4","o3",1],["o3","c5",1],["c5","f",1],["c5","g",1],["c5","c6",1],["c6","h",1],["c6","i",1],["c6","o4",1],["o4","h2",1]],
+  lp:[["o1",[-90,90]],["o2",[-90,90]],["oa",[-150,-30]],["ob",[-150,-30]],["o3",[-90,90]],["o4",[-90,90]]],w:13.3,h:3.1};})();
+const S_STYROL=(()=>{const r=ring(2.3,2.9,.75,-90,"r");return {
+  a:[["c1","C",.9,1],["h1","H",.9,0],["h2","H",.9,2],["c2","C",2.3,1],["h3","H",2.3,0],...r.a],
+  b:[["c1","h1",1],["c1","h2",1],["c1","c2",2],["c2","h3",1],["c2","r0",1],...r.b],lp:[],w:3.2,h:4.4};})();
+/* Was passiert mit den Makromolekülen? */
+function molText(p,pr){
+  const k=p.id;
+  if(pr==="mech")return k==="PUR"?"Die vernetzten Makromoleküle bleiben unverändert. Die Flocken werden nur miteinander verklebt.":"Die Makromoleküle bleiben erhalten. Beim Schmelzen brechen aber einzelne Ketten: Mit jedem Durchgang werden die Eigenschaften etwas schlechter (Downcycling).";
+  if(pr==="loes")return "Die Makromoleküle bleiben vollständig erhalten. Das Lösemittel schiebt sich zwischen die Ketten; Additive und Störstoffe (rot) werden abgetrennt.";
+  if(pr==="solv")return k==="PUR"?"Diol-Moleküle spalten die Urethangruppen. Das Netzwerk zerfällt: Die Polyol-Bausteine werden mit OH-Enden wieder frei, die Isocyanat-Bausteine bleiben mit dem Diol verbunden.":"Kleine Moleküle (z. B. Ethan-1,2-diol) spalten gezielt die Esterbindungen. Es entstehen wieder Monomere – die Umkehrung der Polykondensation.";
+  if(pr==="pyro")return k==="PS"?"Hitze ohne Sauerstoff spaltet die Ketten. Polystyrol zerfällt dabei überwiegend zum Monomer Styrol, daneben entstehen andere Bruchstücke.":"Hitze ohne Sauerstoff spaltet die C–C-Bindungen an zufälligen Stellen (Cracken). Es entsteht ein Gemisch verschieden langer Bruchstücke: Gas, Öl und Wachs.";
+  if(pr==="gas")return "Bei über 1000 °C und wenig Sauerstoff zerfallen die Makromoleküle vollständig zu Synthesegas: Kohlenstoffmonooxid und Wasserstoff.";
+  return "Die Makromoleküle verbrennen vollständig zu Kohlenstoffdioxid und Wasser"+(k==="PVC"?", dazu Chlorwasserstoff":k==="PUR"?", dazu Stickstoffverbindungen":"")+". Der Kohlenstoff ist für neue Kunststoffe verloren.";
+}
+function prodText(p,pr){
+  const k=p.id;
+  if(pr==="mech")return k==="PUR"?"Verbundschaum (Sportmatten, Trittschalldämmung), Füllstoff":k==="PET"?"Regranulat für Flaschen, Schalen, Fasern":k==="PVC"?"Regranulat für Fensterprofile, Rohre":"Regranulat für neue Kunststoffprodukte";
+  if(pr==="loes")return "gereinigter Kunststoff, fast Neuware-Qualität";
+  if(pr==="solv")return k==="PUR"?"Polyole für neues Polyurethan":"Monomere für neues PET in Neuware-Qualität";
+  if(pr==="pyro")return k==="PS"?"Styrol für neues Polystyrol":"Pyrolyseöl (ersetzt Rohbenzin im Steamcracker), Gas, Koks";
+  if(pr==="gas")return "Synthesegas (CO + H₂) für Methanol";
+  return "Strom und Fernwärme (Heizwert ca. "+p.hu+" MJ/kg)";
+}
+/* Schadstoffe: aus dem Kunststoff und aus dem Verfahren */
+function hazards(p,pr){
+  const k=p.id,h=[];
+  if(pr==="mech"){
+    h.push("Mikroplastik und Abrieb im Waschwasser","belastetes Abwasser (Tenside, Lauge, Klebstoffreste)");
+    if(k==="PET")h.push("Acetaldehyd beim Schmelzen");
+    else if(k==="PVC")h.push("Chlorwasserstoff (HCl) bei Überhitzung über ca. 200 °C");
+    else if(k==="PS")h.push("Styrol-Dämpfe beim Schmelzen");
+    else if(k==="PUR"){h.length=0;h.push("Staub beim Mahlen","Isocyanate aus dem Bindemittel (atemwegsreizend)");}
+    else h.push("flüchtige Abbauprodukte und Gerüche beim Schmelzen");
+    h.push("Additive und Fremdstoffe bleiben im Regranulat");
+  }
+  if(pr==="loes"){h.push("Lösemitteldämpfe (brennbar, teils gesundheitsschädlich)","abgetrennte Additive als Sonderabfall");
+    if(k==="PS")h.push("Flammschutzmittel HBCD (wird abgetrennt und zerstört)");
+    if(k==="PVC")h.push("Weichmacher (Phthalate), Blei-Stabilisatoren");}
+  if(pr==="solv"){
+    if(k==="PUR")h.push("aromatische Amine (krebserzeugend)","Glykole, Katalysatorreste","Isocyanate bei der neuen Polyaddition");
+    else h.push("Ethan-1,2-diol bzw. Methanol (giftig)","Katalysatorreste (z. B. Zinkverbindungen)","Rückstände aus Farbstoffen und Oligomeren");}
+  if(pr==="pyro"){
+    h.push("Pyrolysegas (brennbar, enthält CO)","Benzol und polycyclische aromatische Kohlenwasserstoffe (PAK) im Öl","Koks mit Schwermetallen und Additivresten");
+    if(k==="PVC")h.push("Chlorwasserstoff (HCl) und chlororganische Verbindungen");
+    if(k==="PET")h.push("Benzoesäure, Terephthalsäure (Verstopfung, Korrosion)");
+    if(k==="PUR")h.push("Cyanwasserstoff (HCN), Amine, Nitrile");
+    if(k==="PS")h.push("Styrol, Toluol, Ethylbenzol");}
+  if(pr==="gas"){h.push("Kohlenstoffmonooxid (giftig)","Teer, Schwefelwasserstoff","Schlacke");
+    if(k==="PVC")h.push("Chlorwasserstoff (HCl)");
+    if(k==="PUR")h.push("Ammoniak, Cyanwasserstoff (HCN)");}
+  if(pr==="energ"){h.push("Kohlenstoffdioxid: ca. "+fz(p.co2,2)+" t je Tonne Kunststoff","Stickstoffoxide, Kohlenstoffmonooxid, Feinstaub","Filterstäube und Schlacke (Sonderabfall bzw. Deponie)");
+    if(k==="PVC")h.push("Chlorwasserstoff: bis zu 0,58 t je Tonne PVC","Dioxine und Furane (bei schlechter Verbrennung)");
+    if(k==="PUR")h.push("Cyanwasserstoff (HCN)");
+    if(k==="PS")h.push("Ruß und PAK bei unvollständiger Verbrennung");}
+  return h;
+}
+/* Trennkaskade für ein Gemisch aus beliebig vielen Kunststoffen */
+const SHAPE={PET:"shard",PEHD:"chunk",PVC:"chip",PELD:"film",PP:"cap",PS:"tri",PUR:"foam"};
+function names(a){const n=a.map(k=>POLY[k].k);return n.length<2?n.join(""):n.slice(0,-1).join(", ")+" und "+n[n.length-1];}
+function cascade(sel){
+  const steps=[],add=o=>{o.no=steps.length+1;steps.push(o);},pl=(a,s,p)=>a.length>1?p:s;
+  (function split(G){
+    if(G.length<2)return;
+    const has=k=>G.includes(k),inter=a=>G.filter(k=>a.includes(k));
+    if(has("PELD")&&(has("PEHD")||has("PP"))){
+      const L=inter(["PELD","PUR"]),H=G.filter(k=>!L.includes(k));
+      add({anim:"wind",in:G,out1:L,out2:H,cost:[20,50],name:"Windsichtung (Trennung nach Form)",short:"Windsichtung",bin1:"Leichtgut",bin2:"Schwergut",
+        text:"<p><b>Prinzip Form und Masse:</b> PE-LD kommt meist als dünne Folie vor"+(L.includes("PUR")?", Polyurethan als sehr leichte Schaumflocke":"")+". Im Windsichter trägt ein Luftstrom diese leichten, flächigen Teile weit; die formstabilen, schwereren Teile ("+names(H)+") fallen nach unten.</p><p>Über die Dichte lässt sich PE-LD nicht von "+names(inter(["PEHD","PP"]))+" trennen, weil alle auf Wasser schwimmen. Die Infrarot-Spektren von PE-LD und PE-HD sind außerdem fast gleich (gleiche Bindungen). Folien aus PE-HD oder Tuben aus PE-LD werden falsch einsortiert; die Reinheit ist begrenzt.</p>"});
+      split(L);split(H);return;}
+    const F=inter(["PELD","PEHD","PP","PUR"]),K=inter(["PS","PVC","PET"]);
+    if(F.length&&K.length){
+      add({anim:"tank",in:G,out1:F,out2:K,medium:"Wasser",rhoM:1.00,cost:[30,60],name:"Schwimm-Sink-Trennung in Wasser",short:"Schwimm-Sink (Wasser)",bin1:"Schwimmfraktion",bin2:"Sinkfraktion",
+        text:"<p><b>Prinzip Dichte:</b> Die zerkleinerten Kunststoffe kommen in ein Becken mit Wasser (ρ = 1,00 g/cm³). "+names(F)+" "+pl(F,"hat","haben")+" eine kleinere Dichte als Wasser und "+pl(F,"schwimmt","schwimmen")+" auf. "+names(K)+" "+pl(K,"hat","haben")+" eine größere Dichte und "+pl(K,"sinkt","sinken")+" ab. Schaufelräder schieben die Schwimmfraktion über ein Wehr, eine Förderschnecke trägt die Sinkfraktion am Boden aus.</p>"+(F.includes("PUR")?"<p>Polyurethan-Schaum enthält viele Gasblasen und schwimmt deshalb, obwohl massives Polyurethan dichter als Wasser ist.</p>":"")+"<p>Das Verfahren ist einfach und günstig. Es trennt die Polyolefine (PE, PP) von den dichteren Kunststoffen PS, PVC und PET.</p>"});
+      split(F);split(K);return;}
+    if(!F.length){
+      if(has("PS")){const R=G.filter(k=>k!=="PS");
+        add({anim:"tank",in:G,out1:["PS"],out2:R,medium:"Salzlösung",rhoM:1.20,cost:[50,100],name:"Schwimm-Sink-Trennung in Salzlösung",short:"Schwimm-Sink (Salzlösung)",bin1:"Schwimmfraktion",bin2:"Sinkfraktion",
+          text:"<p><b>Prinzip Dichte:</b> In Wasser würden alle diese Kunststoffe absinken. Löst man Salz (z. B. Natriumchlorid oder Calciumchlorid) im Wasser, steigt die Dichte der Flüssigkeit auf etwa 1,20 g/cm³. Jetzt schwimmt Polystyrol (ρ = 1,05 g/cm³) auf, "+names(R)+" (ρ ≈ 1,38 g/cm³) "+pl(R,"sinkt","sinken")+" weiter ab.</p><p>Die Salzlösung muss im Kreislauf geführt und gereinigt werden.</p>"});
+        split(R);}
+      else add({anim:"nirx",in:G,out1:["PVC"],out2:["PET"],cost:[100,200],name:"Sensorsortierung: Nahinfrarot und Röntgen",short:"NIR + Röntgen",bin1:"ausgeblasen",bin2:"Durchlauf",
+          text:"<p><b>Prinzip Spektroskopie:</b> PVC und PET haben praktisch die gleiche Dichte (je ca. 1,38 g/cm³) – eine Schwimm-Sink-Trennung gelingt nicht. Ein Nahinfrarot-Sensor unterscheidet die Kunststoffe an ihren Spektren; ein Röntgensensor erkennt zusätzlich die Chloratome im PVC. Erkannte PVC-Teile bläst eine Druckluftdüse aus.</p><p><b>Warum so genau?</b> Schon weniger als 0,1 % PVC verderben eine PET-Schmelze: Bei 270 °C spaltet PVC Chlorwasserstoff ab, der die PET-Ketten spaltet und das Material verfärbt. Deshalb wird oft mehrfach sortiert.</p>"});
+      return;}
+    const tgt=has("PUR")?"PUR":"PP",R=G.filter(k=>k!==tgt);
+    add({anim:"nir",in:G,out1:[tgt],out2:R,cost:[60,120],name:"Nahinfrarot-Sortierung (NIR): "+POLY[tgt].k+" ausblasen",short:"NIR-Sortierung",bin1:"ausgeblasen",bin2:"Durchlauf",
+      text:"<p><b>Prinzip Spektroskopie:</b> "+names(G)+" schwimmen alle auf Wasser, eine Dichtetrennung gelingt nicht. Ein Sensor bestrahlt die Teile auf dem Förderband mit Nahinfrarot-Licht. Jeder Kunststoff reflektiert ein eigenes Spektrum, weil seine Bindungen unterschiedlich schwingen"+(tgt==="PUR"?" (im Polyurethan z. B. N–H und C=O)":" (PP besitzt Methylgruppen, Polyethen nur CH₂-Gruppen)")+". Erkennt der Sensor "+POLY[tgt].k+", bläst eine Druckluftdüse das Teil am Bandende aus.</p><p>Schwarze Kunststoffe (mit Ruß gefärbt) verschlucken das Infrarotlicht und werden nicht erkannt.</p>"});
+    split(R);
+  })(ORDER.filter(k=>sel.includes(k)));
+  return steps;
+}
+/* ---------- Hilfen ---------- */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+function fz(v,d){return v.toFixed(d).replace(".",",");}
+function eur(v){return String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g," ");}
+function rng(lo,hi){return eur(lo)+"–"+eur(hi)+" €";}
+function r5(v){return Math.round(v/5)*5;}
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+
+/* ---------- Strukturformeln (Valenzstrichformel als SVG) ---------- */
+function structSVG(d,ink,scale){
+  const u=30,px=22,py=16,A={},rad=l=>l===""?0:l.length>1?11:8;
+  d.a.forEach(([id,l,x,y])=>A[id]={l,x:px+x*u,y:py+(y+.35)*u});
+  const X=x=>px+x*u,Y=y=>py+(y+.35)*u;
+  let s="";
+  const ln=(x1,y1,x2,y2,w)=>{s+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${ink}" stroke-width="${w||1.6}" stroke-linecap="round"/>`;};
+  d.b.forEach(([a,b,o])=>{
+    const P=A[a],Q=A[b],dx=Q.x-P.x,dy=Q.y-P.y,L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L;
+    const x1=P.x+ux*rad(P.l),y1=P.y+uy*rad(P.l),x2=Q.x-ux*rad(Q.l),y2=Q.y-uy*rad(Q.l);
+    if(o===2){const nx=-uy*2.4,ny=ux*2.4;ln(x1+nx,y1+ny,x2+nx,y2+ny);ln(x1-nx,y1-ny,x2-nx,y2-ny);}
+    else ln(x1,y1,x2,y2);
+  });
+  (d.lp||[]).forEach(([id,angs])=>angs.forEach(w=>{
+    const P=A[id],r=w*Math.PI/180,cx=P.x+Math.cos(r)*(rad(P.l)+3.5),cy=P.y+Math.sin(r)*(rad(P.l)+3.5),tx=-Math.sin(r)*4.5,ty=Math.cos(r)*4.5;
+    ln(cx-tx,cy-ty,cx+tx,cy+ty,1.5);}));
+  (d.open||[]).forEach(([id,x])=>{const P=A[id],dir=X(x)<P.x?-1:1;ln(P.x+dir*rad(P.l),P.y,X(x),P.y);});
+  d.a.forEach(([id,l])=>{if(l)s+=`<text x="${A[id].x}" y="${A[id].y}" fill="${ink}" font-size="15" text-anchor="middle" dominant-baseline="central">${l}</text>`;});
+  if(d.br){const [xl,xr,yt,yb]=d.br,a=X(xl),b=X(xr),t=Y(yt),o=Y(yb);
+    s+=`<path d="M${a+7} ${t}H${a}V${o}H${a+7}M${b-7} ${t}H${b}V${o}H${b-7}" fill="none" stroke="${ink}" stroke-width="1.6"/>`;
+    s+=`<text x="${b+5}" y="${o+2}" fill="${ink}" font-size="13" font-style="italic">n</text>`;}
+  const W=px*2+d.w*u,H=py*2+d.h*u,k=scale||1;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W*k}" height="${H*k}" role="img" aria-label="Strukturformel">${s}</svg>`;
+}
+
+/* ---------- Zustand ---------- */
+const S={open:{},det:null,sel:["PET"],proc:{PET:"mech",PEHD:"mech",PVC:"mech",PELD:"mech",PP:"mech",PS:"mech",PUR:"solv"},view:"PET",step:0,run:true,speed:1};
+const runs=[];let runNo=0;
+let CAS=[];
+function cur(){return {p:POLY[S.view],pr:S.proc[S.view]};}
+function snapshot(){const proc={};S.sel.forEach(k=>proc[k]=S.proc[k]);return {sel:S.sel.slice(),proc};}
+function procCost(p,pr){
+  const P=PROC[pr],rows=[[P.name,P.cost[0],P.cost[1],P.src]];
+  if(pr==="energ")rows.push(["CO₂-Preis ("+fz(p.co2,2)+" t CO₂ je t)",r5(p.co2*55),r5(p.co2*65),"55–65 € je Tonne CO₂"]);
+  return {rows,lo:rows.reduce((s,r)=>s+r[1],0),hi:rows.reduce((s,r)=>s+r[2],0)};
+}
+function fullCost(r,k,cas){
+  const c=procCost(POLY[k],r.proc[k]),path=(cas||cascade(r.sel)).filter(s=>s.in.includes(k));
+  const rows=path.map(s=>["Trennschritt "+s.no+": "+s.short,s.cost[0],s.cost[1],"Modellwert"]).concat(c.rows);
+  return {rows,path,lo:rows.reduce((s,x)=>s+x[1],0),hi:rows.reduce((s,x)=>s+x[2],0)};
+}
+function runLabel(r){
+  if(r.sel.length===1)return POLY[r.sel[0]].k+" · "+PROC[r.proc[r.sel[0]]].kurz;
+  return r.sel.map(k=>POLY[k].k).join(" + ")+" · "+r.sel.map(k=>POLY[k].k+": "+PROC[r.proc[k]].kurz).join(" · ");
+}
+const pcs=a=>a.map(k=>`<span class="pc" style="--pc:${POLY[k].col}">${POLY[k].k}</span>`).join(" ");
+
+/* ---------- Aufbau der Seite ---------- */
+function renderLeft(){
+  $("#chips").innerHTML=ORDER.map(k=>{const p=POLY[k];return `<button class="chip" type="button" data-k="${k}" style="--pc:${p.col}" aria-pressed="${S.sel.includes(k)}">${p.k}<small>Recycling-Code ${p.code}</small></button>`;}).join("");
+  const k=S.view;
+  $("#procBoxes").innerHTML=(S.sel.length>1?`<div class="vtabs">${S.sel.map(x=>`<button type="button" data-view="${x}" style="--pc:${POLY[x].col}" aria-pressed="${x===k}">${POLY[x].k}</button>`).join("")}</div>`:"")+
+    `<p class="sub" style="margin-top:0">Für <b style="color:${POLY[k].col}">${POLY[k].k}</b>${S.sel.length>1?" nach dem Trennen":""}</p><div class="proc-list">`+
+    PROC_ORDER.map(id=>{const r=SUIT[k][id][0];return `<button class="proc" type="button" data-pr="${id}" aria-pressed="${S.proc[k]===id}"><span>${PROC[id].name}</span><span class="rate r${r}"><i></i>${RATE[r]}</span></button>`;}).join("")+`</div>`;
+}
+function steckHTML(p,ink,print){
+  const open=print||!!S.open[p.id];
+  const body=`<div class="typ">${p.name} · ${p.typ}</div>
+  <div class="formel${print?" pform":""}">${structSVG(p.st,ink)}</div>${p.stNote?`<p class="hint">${p.stNote}</p>`:""}
+  <dl><dt>Dichte</dt><dd>${p.rhoT}</dd>
+  <dt>Produktion 2024</dt><dd><b>${fz(p.mt,1)} Mio. t</b> weltweit (${fz(p.share,1)} % aller Kunststoffe)</dd>
+  <dt>Verwendung</dt><dd>${p.uses.join(", ")}</dd>
+  <dt>Verarbeitung</dt><dd>${p.id==="PUR"?"nicht schmelzbar (vernetzt)":"Schmelze bei "+p.tm}</dd>
+  <dt>Heizwert</dt><dd>ca. ${p.hu} MJ/kg</dd>
+  <dt>Begleitstoffe</dt><dd>${p.add.map(esc).join("; ")}</dd></dl>`;
+  return `<div class="st${open?" open":""}" style="--pc:${p.col}"><button class="st-head" type="button" data-steck="${p.id}" aria-expanded="${open}"><span class="st-k">${p.k}</span><span class="st-sum">${p.name} · Recycling-Code ${p.code} · ${fz(p.mt,1)} Mio. t pro Jahr</span><span class="st-arr">${open?"▾":"▸"}</span></button>${open?`<div class="st-body">${body}</div>`:""}</div>`;
+}
+function prodChart(){
+  const list=ORDER.slice().sort((x,y)=>POLY[y].mt-POLY[x].mt),W=720,rh=30,H=list.length*rh+6,max=90,x0=70,bw=520;
+  let s="";
+  list.forEach((k,i)=>{const p=POLY[k],sel=S.sel.includes(k),y=i*rh+4,w=p.mt/max*bw;
+    s+=`<text x="${x0-10}" y="${y+15}" text-anchor="end" font-size="13.5" font-weight="${sel?700:400}" fill="${sel?"#e7e4dd":"#9aa2a9"}">${p.k}</text>
+    <rect x="${x0}" y="${y+3}" width="${w.toFixed(1)}" height="${rh-10}" rx="3" fill="${sel?p.col:"#3a444c"}"/>
+    <text x="${(x0+w+8).toFixed(1)}" y="${y+15}" font-size="13" fill="${sel?"#e7e4dd":"#9aa2a9"}" font-family="ui-monospace,Consolas,monospace">${fz(p.mt,1)}</text>`;});
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Balkendiagramm der weltweiten Produktionsmengen 2024">${s}</svg>`;
+}
+function cmpChart(p,pr){
+  const W=760,rh=36,x0=215,bw=330,max=2000,H=PROC_ORDER.length*rh+30;const col=["#6b747c","#ffb454","#7fd68a"];
+  let s="";
+  [0,500,1000,1500,2000].forEach(v=>{const x=x0+v/max*bw;s+=`<line x1="${x}" y1="0" x2="${x}" y2="${H-24}" stroke="#262c31"/><text x="${x}" y="${H-8}" font-size="11.5" fill="#9aa2a9" text-anchor="middle">${eur(v)}</text>`;});
+  s+=`<text x="${x0+bw+26}" y="${H-8}" font-size="11.5" fill="#9aa2a9">€ je Tonne</text>`;
+  PROC_ORDER.forEach((id,i)=>{const c=procCost(p,id),r=SUIT[p.id][id][0],y=i*rh+6,xa=x0+c.lo/max*bw,xb=x0+c.hi/max*bw,sel=id===pr;
+    s+=`<text x="${x0-10}" y="${y+15}" text-anchor="end" font-size="13" font-weight="${sel?700:400}" fill="${sel?"#e7e4dd":"#9aa2a9"}">${PROC[id].name}</text>
+    <rect x="${xa.toFixed(1)}" y="${y+3}" width="${Math.max(4,xb-xa).toFixed(1)}" height="16" rx="3" fill="${col[r]}" opacity="${r?1:.55}" ${sel?'stroke="#e7e4dd" stroke-width="1.5"':""}/>
+    <text x="${x0+bw+12}" y="${y+15}" font-size="12" fill="${sel?"#e7e4dd":"#9aa2a9"}"><tspan font-family="ui-monospace,Consolas,monospace">${rng(c.lo,c.hi)}</tspan> · ${RATE[r]}</text>`;});
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="min-width:560px" role="img" aria-label="Kostenvergleich der Verfahren ohne Trennschritte">${s}</svg>`;
+}
+function costHTML(r,k,cas){
+  const p=POLY[k],pr=r.proc[k],c=fullCost(r,k,cas),su=SUIT[k][pr];
+  return `<div class="blk"><h3 style="margin:0 0 6px;font-size:15px;color:${p.col}">${p.k} · ${PROC[pr].name}</h3>
+  <div class="tscroll"><table><thead><tr><th>Schritt</th><th class="num">Kosten je Tonne</th><th>Grundlage</th></tr></thead><tbody>
+  ${c.rows.map(x=>`<tr><td>${x[0]}</td><td class="num">${rng(x[1],x[2])}</td><td>${x[3]}</td></tr>`).join("")}
+  <tr class="sum"><td>Summe</td><td class="num">${rng(c.lo,c.hi)}</td><td></td></tr></tbody></table></div>
+  <p class="hint"><b>Eignung:</b> ${RATE[su[0]]}. <b>Produkt:</b> ${prodText(p,pr)}. <b>Stoffliche Ausbeute:</b> ${PROC[pr].yield}.</p>
+  <p class="sub" style="margin-bottom:0">Schadstoffe und Problemstoffe</p>
+  <ul class="haz">${hazards(p,pr).map(h=>`<li>${h}</li>`).join("")}<li>aus dem Kunststoff selbst: ${p.add.join("; ")}</li></ul></div>`;
+}
+function sumTable(r,cas,click){
+  return `<div class="tscroll"><table><thead><tr><th>Kunststoff</th><th>Trennschritte</th><th>Verwertung</th><th>Eignung</th><th class="num">Kosten je Tonne</th></tr></thead><tbody>${
+   r.sel.map(k=>{const c=fullCost(r,k,cas),pr=r.proc[k];return `<tr ${click?`data-view="${k}" class="${k===S.view?"act":""}"`:""}><td style="font-weight:700;color:${click?POLY[k].col:"inherit"}">${POLY[k].k}</td><td>${c.path.length?c.path.map(s=>s.no+" "+s.short).join(" → "):"–"}</td><td>${PROC[pr].name}</td><td>${RATE[SUIT[k][pr][0]]}</td><td class="num">${rng(c.lo,c.hi)}</td></tr>`;}).join("")}</tbody></table></div>`;
+}
+function renderMain(){
+  const r=snapshot(),{p,pr}=cur(),multi=S.sel.length>1;
+  CAS=cascade(S.sel);if(S.step>=CAS.length)S.step=0;
+  $("#steck").innerHTML=S.sel.map(k=>steckHTML(POLY[k],"#e7e4dd")).join("");
+  const allOpen=S.sel.every(k=>S.open[k]);$("#steckAll").textContent=allOpen?"Alle zuklappen":"Alle aufklappen";$("#steckAll").hidden=S.sel.length<2;
+  $("#prodChart").innerHTML=prodChart();
+  $("#cardSep").hidden=!multi;
+  if(multi){const st=CAS[S.step];
+    $("#sepTitle").textContent=CAS.length+(CAS.length>1?" Trennschritte":" Trennschritt")+" für "+S.sel.length+" Kunststoffe";
+    $("#sepSteps").innerHTML=CAS.map((s,i)=>`<button class="stepbtn" type="button" data-step="${i}" aria-pressed="${i===S.step}"><b>Schritt ${s.no} · ${s.short}</b><span>${pcs(s.in)}</span><span class="lab">⟶ ${s.bin1}:</span><span>${pcs(s.out1)}</span><span class="lab">${s.bin2}:</span><span>${pcs(s.out2)}</span></button>`).join("");
+    $("#sepText").innerHTML=`<p><b>Schritt ${st.no}: ${st.name}</b></p>`+st.text+`<p><b>Kosten:</b> ca. ${rng(st.cost[0],st.cost[1])} je Tonne Gemisch (Modellwert).</p>`;}
+  const tabs=$("#fracTabs");tabs.hidden=!multi;
+  if(multi)tabs.innerHTML=S.sel.map(k=>`<button type="button" data-view="${k}" style="--pc:${POLY[k].col}" aria-pressed="${S.view===k}">${POLY[k].k}: ${PROC[S.proc[k]].kurz}</button>`).join("");
+  $("#procTitle").textContent=p.k+" · "+PROC[pr].name;
+  const su=SUIT[p.id][pr];
+  $("#procWarn").innerHTML=su[0]===0?`<div class="warn"><b>${PROC[pr].name} ist für ${p.k} ungeeignet.</b> ${su[1]}</div>`:`<div class="note"><b>${RATE[su[0]][0].toUpperCase()+RATE[su[0]].slice(1)}.</b> ${su[1]}</div>`;
+  ST=stations(p,pr);
+  $("#stBtns").innerHTML=ST.map((s,i)=>`<button type="button" data-det="${i}" aria-pressed="${S.det===i}">${i+1} ${s.t}</button>`).join("");
+  $("#detBox").hidden=S.det===null;
+  if(S.det!==null){const s=ST[S.det];
+    $("#detText").innerHTML=`<h3>Station ${S.det+1}: ${s.t} <span style="color:var(--text-dim);font-weight:400;font-size:13px">· ${p.k} · ${PROC[pr].name}</span></h3><p>${s.x}</p>${eqHTML(p,s,"#e7e4dd")}<dl class="meta"><dt>Bedingungen</dt><dd>${s.s}</dd><dt>Emissionen / Nebenprodukte</dt><dd>${s.emit||"–"}</dd></dl>`;}
+  $("#procText").innerHTML=`<p><b>Teilchenebene:</b> ${molText(p,pr)}</p><p><b>Produkt:</b> ${prodText(p,pr)}.</p>`;
+  $("#costSum").innerHTML=multi?sumTable(r,CAS,true):"";
+  $("#costBox").innerHTML=costHTML(r,S.view,CAS);
+  $("#cmpTitle").textContent="für "+p.k+" (ohne Trennschritte)";$("#cmpChart").innerHTML=`<div class="tscroll">${cmpChart(p,pr)}</div>`;
+  $("#status").textContent=multi?(S.sel.length<4?S.sel.map(k=>POLY[k].k).join(" + "):S.sel.length+" Kunststoffe"):p.k+" · "+PROC[pr].kurz;
+  $("#runList").innerHTML=runs.length?runs.map((x,i)=>`<div class="run"><span><b>Lauf ${x.no}:</b> ${runLabel(x)}</span><button type="button" data-del="${i}" aria-label="Lauf ${x.no} löschen">Löschen</button></div>`).join(""):`<p class="hint" style="margin:0">Noch kein Lauf gemerkt. Mit „Auswahl als Lauf merken“ hältst du die aktuelle Kombination für das PDF fest.</p>`;
+}
+function update(resetAnim){S.sel=ORDER.filter(k=>S.sel.includes(k));if(!S.sel.includes(S.view))S.view=S.sel[0];renderLeft();renderMain();if(resetAnim){resetSep();resetProc();}}
+function eqHTML(p,s,ink){
+  if(!s.eq)return "";
+  const k=p.id,sv=(d,sc)=>structSVG(d,ink,sc||.72),n="<i>n</i>";
+  if(s.eq==="glyco")return `<div class="eq">${sv(p.st)}<span>+ ${n}</span>${sv(S_DIOL)}<span>⟶ ${n}</span>${sv(S_BHET)}</div>`;
+  if(s.eq==="styrol")return `<div class="eq">${sv(p.st)}<span>⟶ ${n}</span>${sv(S_STYROL)}<span style="font-size:13px;color:#9aa2a9">(Styrol)</span></div>`;
+  if(s.eq==="styrolpoly")return `<div class="eq"><span>${n}</span>${sv(S_STYROL)}<span>⟶</span>${sv(p.st)}</div>`;
+  if(s.eq==="burn"){const r={PEHD:"+ 3"+n+" O₂ ⟶ 2"+n+" CO₂ + 2"+n+" H₂O",PELD:"+ 3"+n+" O₂ ⟶ 2"+n+" CO₂ + 2"+n+" H₂O",PP:"+ 4,5"+n+" O₂ ⟶ 3"+n+" CO₂ + 3"+n+" H₂O",PS:"+ 10"+n+" O₂ ⟶ 8"+n+" CO₂ + 4"+n+" H₂O",PET:"+ 10"+n+" O₂ ⟶ 10"+n+" CO₂ + 4"+n+" H₂O",PVC:"+ 2,5"+n+" O₂ ⟶ 2"+n+" CO₂ + "+n+" H₂O + "+n+" HCl"}[k];
+    return r?`<div class="eq">${sv(p.st)}<span>${r}</span></div>`:"";}
+  return "";
+}
+/* ---------- Animation: Zeichenhilfen ---------- */
+const cvS=$("#cvSep"),cvP=$("#cvProc");
+function fit(cv,w,h){const d=Math.min(2,window.devicePixelRatio||1);cv.width=w*d;cv.height=h*d;const c=cv.getContext("2d");c.setTransform(d,0,0,d,0,0);return c;}
+const cS=fit(cvS,800,330),cP=fit(cvP,800,432);
+const FONT="system-ui,-apple-system,'Segoe UI',Roboto,sans-serif";
+let T=0,last=0,ST=[];
+let sepP=[],sepSpawn=0,bins=[[],[]],scan=null,prP=[],prSpawn=0;
+function resetSep(){sepP=[];bins=[[],[]];sepSpawn=0;scan=null;}
+function resetProc(){prP=[];prSpawn=0;}
+function rnd(i){const x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x);}
+function lg(c,x0,y0,x1,y1,a,b){const g=c.createLinearGradient(x0,y0,x1,y1);g.addColorStop(0,a);g.addColorStop(1,b);return g;}
+function body(c,x,y,w,h,r,a,b){c.fillStyle=lg(c,x,y,x,y+h,a||"#4b565f",b||"#2a3238");c.strokeStyle="#6f7b84";c.lineWidth=1.2;c.beginPath();c.roundRect(x,y,w,h,r==null?4:r);c.fill();c.stroke();
+  c.strokeStyle="rgba(255,255,255,.13)";c.lineWidth=1;c.beginPath();c.moveTo(x+(r||4)+1,y+2);c.lineTo(x+w-(r||4)-1,y+2);c.stroke();}
+function win(c,x,y,w,h,r){c.fillStyle="#090c0e";c.strokeStyle="#85919a";c.lineWidth=1.2;c.beginPath();c.roundRect(x,y,w,h,r==null?3:r);c.fill();c.stroke();}
+function clipR(c,x,y,w,h,r){c.beginPath();c.roundRect(x,y,w,h,r==null?3:r);c.clip();}
+function legs(c,xs,y0,y1){c.strokeStyle="#59646d";c.lineWidth=4;c.lineCap="butt";xs.forEach(x=>{c.beginPath();c.moveTo(x,y0);c.lineTo(x,y1);c.stroke();c.fillStyle="#59646d";c.fillRect(x-6,y1-3,12,3);});}
+function flame(c,x,y,s){const f=1+Math.sin(T*11+x)*.14;c.fillStyle="#ff7a2e";c.beginPath();c.moveTo(x-6*s,y);c.quadraticCurveTo(x-8*s,y-9*s*f,x,y-18*s*f);c.quadraticCurveTo(x+8*s,y-9*s*f,x+6*s,y);c.closePath();c.fill();
+  c.fillStyle="#ffd27a";c.beginPath();c.moveTo(x-3*s,y);c.quadraticCurveTo(x-3.5*s,y-5*s,x,y-9*s*f);c.quadraticCurveTo(x+3.5*s,y-5*s,x+3*s,y);c.closePath();c.fill();}
+function lamp(c,x,y,col){c.fillStyle=col;c.globalAlpha=.25;c.beginPath();c.arc(x,y,6,0,7);c.fill();c.globalAlpha=1;c.beginPath();c.arc(x,y,2.6,0,7);c.fill();}
+function gauge(c,x,y,r,a){c.fillStyle="#e7e4dd";c.strokeStyle="#59646d";c.lineWidth=1.5;c.beginPath();c.arc(x,y,r,0,7);c.fill();c.stroke();c.strokeStyle="#e4604a";c.beginPath();c.moveTo(x,y);c.lineTo(x+Math.cos(a)*(r-2),y+Math.sin(a)*(r-2));c.stroke();}
+function label(c,t,x,y,col,size,align,bold){c.font=(bold?"600 ":"")+(size||12)+"px "+FONT;c.fillStyle=col||"#9aa2a9";c.textAlign=align||"left";c.textBaseline="middle";c.fillText(t,x,y);}
+function pill(c,t,x,y,col,size){c.font="600 "+(size||11)+"px "+FONT;const w=c.measureText(t).width+14;c.fillStyle="rgba(11,14,16,.88)";c.strokeStyle=col;c.lineWidth=1;c.beginPath();c.roundRect(x-w/2,y-9,w,18,9);c.fill();c.stroke();c.fillStyle=col;c.textAlign="center";c.textBaseline="middle";c.fillText(t,x,y+.5);}
+function wrap(c,t,x,y,w,lh){const words=t.split(" ");let line="";words.forEach(wd=>{const test=line?line+" "+wd:wd;if(c.measureText(test).width>w&&line){c.fillText(line,x,y);y+=lh;line=wd;}else line=test;});if(line)c.fillText(line,x,y);return y;}
+function ball(c,x,y,r,col){c.fillStyle=col;c.beginPath();c.arc(x,y,r,0,7);c.fill();const g=c.createRadialGradient(x-r*.35,y-r*.4,0,x,y,r);g.addColorStop(0,"rgba(255,255,255,.6)");g.addColorStop(.5,"rgba(255,255,255,0)");g.addColorStop(1,"rgba(0,0,0,.38)");c.fillStyle=g;c.beginPath();c.arc(x,y,r,0,7);c.fill();}
+function piece(c,x,y,rot,k,sz,dirty){
+  const col=POLY[k].col,sh=SHAPE[k];
+  c.save();c.translate(x,y);c.rotate(rot);c.fillStyle=col;c.strokeStyle="rgba(0,0,0,.55)";c.lineWidth=1;c.lineJoin="round";c.beginPath();
+  if(sh==="film"){c.moveTo(-sz*1.5,-1.6);c.quadraticCurveTo(-sz*.5,-5,sz*.3,-1.6);c.quadraticCurveTo(sz,1.4,sz*1.5,-1.6);c.lineTo(sz*1.5,1.4);c.quadraticCurveTo(sz,4.4,sz*.3,1.4);c.quadraticCurveTo(-sz*.5,-2,-sz*1.5,1.4);c.closePath();}
+  else if(sh==="foam")c.roundRect(-sz,-sz*.8,sz*2,sz*1.6,sz*.35);
+  else if(sh==="cap")c.arc(0,0,sz*.85,0,7);
+  else if(sh==="chip")c.rect(-sz*1.15,-sz*.5,sz*2.3,sz);
+  else if(sh==="tri"){c.moveTo(-sz,sz*.7);c.lineTo(-sz*.1,-sz*.9);c.lineTo(sz,sz*.6);c.closePath();}
+  else if(sh==="shard"){c.moveTo(-sz,-sz*.2);c.quadraticCurveTo(0,-sz*1.2,sz,-sz*.2);c.lineTo(sz*.7,sz*.7);c.quadraticCurveTo(0,-sz*.1,-sz*.7,sz*.7);c.closePath();}
+  else{c.moveTo(-sz,-sz*.5);c.lineTo(sz*.2,-sz*.9);c.lineTo(sz,-sz*.1);c.lineTo(sz*.5,sz*.8);c.lineTo(-sz*.7,sz*.6);c.closePath();}
+  if(sh==="shard")c.globalAlpha=.82;c.fill();c.globalAlpha=1;c.stroke();
+  c.strokeStyle="rgba(255,255,255,.5)";c.beginPath();
+  if(sh==="cap")c.arc(0,0,sz*.45,0,7);else{c.moveTo(-sz*.5,-sz*.2);c.lineTo(sz*.25,-sz*.42);}c.stroke();
+  if(sh==="foam"){c.fillStyle="rgba(0,0,0,.3)";[[-.45,-.2],[.3,.25],[.5,-.35],[-.1,.35]].forEach(([a,b])=>{c.beginPath();c.arc(a*sz,b*sz,sz*.16,0,7);c.fill();});}
+  if(dirty){c.fillStyle="#6b4a2a";[[-.3,.1],[.4,.25],[.1,-.45]].forEach(([a,b])=>{c.beginPath();c.arc(a*sz,b*sz,1.7,0,7);c.fill();});}
+  c.restore();
+}
+function coloredList(c,keys,cx,y,size){c.font="700 "+size+"px "+FONT;const parts=keys.map(k=>POLY[k].k),sw=c.measureText(" · ").width;let w=parts.reduce((s,t)=>s+c.measureText(t).width,0)+sw*(parts.length-1),x=cx-w/2;
+  c.textAlign="left";c.textBaseline="middle";parts.forEach((t,i)=>{c.fillStyle=POLY[keys[i]].col;c.fillText(t,x,y);x+=c.measureText(t).width;if(i<parts.length-1){c.fillStyle="#5f6870";c.fillText(" · ",x,y);x+=sw;}});}
+function binCap(b){return Math.max(1,Math.floor((b.w-14)/11))*Math.max(1,Math.floor((b.h-8)/8));}
+function container(c,b,title,keys,pile){
+  const {x,y,w,h}=b,per=Math.max(1,Math.floor((w-14)/11));
+  c.fillStyle=lg(c,x,y,x,y+h,"#0a0d0f","#14181b");c.fillRect(x,y,w,h);
+  pile.forEach((q,i)=>piece(c,x+10+(i%per)*11+(q.j-.5)*5,y+h-7-Math.floor(i/per)*8+(q.j2-.5)*3,q.rot,q.k,5));
+  c.fillStyle="rgba(75,86,95,.22)";c.fillRect(x,y+6,w,h-6);
+  c.strokeStyle="#7d8992";c.lineWidth=2.5;c.lineJoin="miter";c.beginPath();c.moveTo(x,y-2);c.lineTo(x,y+h);c.lineTo(x+w,y+h);c.lineTo(x+w,y-2);c.stroke();
+  c.strokeStyle="rgba(125,137,146,.35)";c.lineWidth=1;for(let i=1;i<Math.round(w/34);i++){const rx=x+i*w/Math.round(w/34);c.beginPath();c.moveTo(rx,y+4);c.lineTo(rx,y+h);c.stroke();}
+  c.fillStyle="#59646d";c.fillRect(x-4,y-4,8,4);c.fillRect(x+w-4,y-4,8,4);
+  label(c,title,x+w/2,y-27,"#9aa2a9",11,"center");coloredList(c,keys,x+w/2,y-13,keys.length>3?11:12.5);
+}
+function conveyor(c,x1,y1,x2,y2,speed){
+  const dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy),a=Math.atan2(dy,dx);
+  c.save();c.translate(x1,y1);c.rotate(a);
+  c.strokeStyle="#59646d";c.lineWidth=3;c.beginPath();c.moveTo(0,0);c.lineTo(L,0);c.stroke();
+  c.fillStyle="#1d2226";c.strokeStyle="#6f7b84";c.lineWidth=1.5;c.beginPath();c.roundRect(-8,-8,L+16,16,8);c.fill();c.stroke();
+  c.strokeStyle="#3d464d";c.lineWidth=1.5;const off=(T*speed)%14;for(let u=off-4;u<L+4;u+=14){if(u<0)continue;c.beginPath();c.moveTo(u,-8);c.lineTo(u,-4);c.stroke();c.beginPath();c.moveTo(L-u,8);c.lineTo(L-u,4);c.stroke();}
+  [0,L].forEach(u=>{c.save();c.translate(u,0);c.rotate(T*speed/8);c.fillStyle="#4b565f";c.strokeStyle="#85919a";c.lineWidth=1.2;c.beginPath();c.arc(0,0,6,0,7);c.fill();c.stroke();c.beginPath();c.moveTo(-6,0);c.lineTo(6,0);c.moveTo(0,-6);c.lineTo(0,6);c.stroke();c.restore();});
+  for(let u=24;u<L-12;u+=28){c.fillStyle="#3d464d";c.beginPath();c.arc(u,0,2.2,0,7);c.fill();}
+  c.restore();
+}
+function floor(c,y,h){c.fillStyle=lg(c,0,y,0,y+h,"#1a1f23","#0e1113");c.fillRect(0,y,800,h);c.strokeStyle="#39424a";c.lineWidth=1.5;c.beginPath();c.moveTo(0,y);c.lineTo(800,y);c.stroke();}
+function panel(c,x,y,w,h,title){c.fillStyle="rgba(11,14,16,.82)";c.strokeStyle="#31383e";c.lineWidth=1;c.beginPath();c.roundRect(x,y,w,h,7);c.fill();c.stroke();if(title)label(c,title,x+9,y+12,"#ffb454",10.5,"left",true);}
+
+/* ---------- Animation: Trennverfahren ---------- */
+const FORM={PET:"Flasche",PEHD:"Kanister",PVC:"Profil",PELD:"Folie",PP:"Becher",PS:"Becher",PUR:"Schaum"};
+const BINS={tank:[{x:606,y:228,w:178,h:70},{x:24,y:256,w:122,h:42}],nir:[{x:650,y:242,w:136,h:56},{x:524,y:242,w:100,h:56}],nirx:[{x:650,y:242,w:136,h:56},{x:524,y:242,w:100,h:56}],wind:[{x:420,y:248,w:350,h:50},{x:160,y:248,w:190,h:50}]};
+function land(p){const i=p.f?0:1,b=BINS[CAS[S.step].anim][i];if(bins[i].length>=binCap(b))bins[i]=[];bins[i].push({k:p.k,j:Math.random(),j2:Math.random(),rot:Math.random()*6});p.done=1;}
+function stepSep(dt){
+  const st=CAS[S.step];if(!st)return;const m=st.anim,B=BINS[m];
+  sepSpawn-=dt;
+  if(sepSpawn<=0){sepSpawn=m==="wind"?.45:m==="tank"?.4:.5;const k=st.in[Math.floor(Math.random()*st.in.length)];
+    const p={k,f:st.out1.includes(k),rot:Math.random()*6,vr:(Math.random()-.5)*3,st:0,j:Math.random(),fl:0,u:0,vx:0,vy:0};
+    if(m==="tank"){p.x=26;p.y=150;}else if(m==="wind"){p.x=222+Math.random()*12;p.y=64;p.vy=30;}else{p.x=58;p.y=164;}
+    sepP.push(p);}
+  sepP.forEach(p=>{
+    p.rot+=p.vr*dt;
+    if(m==="tank"){
+      if(p.st===0){p.u+=dt*.5;p.x=26+138*p.u+4;p.y=158-86*p.u-9;p.vr=0;if(p.u>=1){p.st=1;p.vx=58;p.vy=-12;p.vr=3;}}
+      else if(p.st===1){p.vy+=320*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;if(p.y>=100){p.st=2;p.vy=p.f?0:44;}}
+      else if(p.st===2){
+        if(p.f){p.y+=(98+p.j*5+Math.sin(T*3+p.j*9)*1.2-p.y)*Math.min(1,dt*4);p.x+=44*dt;if(p.x>566){p.st=3;p.vx=62;p.vy=-18;}}
+        else{p.y+=40*dt;p.x+=(14+p.j*56)*dt+Math.sin(T*2+p.j*9)*.2;if(p.y>=210){p.y=210;p.st=4;}}}
+      else if(p.st===3){p.vy+=300*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;if(p.y>=B[0].y+18)land(p);}
+      else if(p.st===4){p.x-=46*dt;p.y=209+Math.sin((p.x+T*46)/8)*2;if(p.x<=186){p.st=5;p.vx=-78;p.vy=0;}}
+      else{p.vy+=260*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;if(p.y>=B[1].y+18)land(p);}
+    }else if(m==="wind"){
+      const inAir=p.y>92&&p.y<216;
+      if(p.f){p.vy+=(72-p.vy)*Math.min(1,dt*4);if(inAir)p.vx+=(195-p.vx)*Math.min(1,dt*3);p.vr=3+p.j*3;}
+      else{p.vy+=260*dt;if(inAir)p.vx+=(26-p.vx)*Math.min(1,dt*2);}
+      p.x+=p.vx*dt;p.y+=p.vy*dt;if(p.y>=B[0].y+16)land(p);
+    }else{
+      if(p.st===0){const ox=p.x;p.x+=72*dt;p.vr=0;if(ox<290&&p.x>=290){scan={k:p.k,t:T,f:p.f};if(p.f)p.fl=.6;}
+        if(p.x>=506){p.st=1;p.vx=p.f?150:62;p.vy=p.f?-165:0;p.vr=p.f?6:2;p.age=0;}}
+      else{p.age+=dt;p.vy+=300*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;if(p.y>=B[0].y+16)land(p);}
+      if(p.fl>0)p.fl-=dt;
+    }});
+  sepP=sepP.filter(p=>!p.done);
+}
+function sceneTank(c,st){
+  const salt=st.rhoM>1,B=BINS.tank;
+  container(c,B[1],st.bin2,st.out2,bins[1]);container(c,B[0],st.bin1,st.out1,bins[0]);
+  legs(c,[14],162,300);legs(c,[158],78,300);conveyor(c,26,158,164,72,60);label(c,"Gemisch (zerkleinert)",14,60,"#9aa2a9",11);
+  legs(c,[192,372,552],228,300);
+  // Flüssigkeit
+  c.fillStyle=lg(c,0,100,0,222,salt?"rgba(126,214,196,.40)":"rgba(120,186,250,.36)",salt?"rgba(30,112,116,.62)":"rgba(32,84,170,.62)");c.fillRect(177,100,390,122);
+  c.strokeStyle="rgba(255,255,255,.28)";c.lineWidth=1;for(let i=0;i<12;i++){const bx=188+rnd(i)*368,by=220-((T*16*(.6+rnd(i+9))+rnd(i+3)*118)%118);c.beginPath();c.arc(bx+Math.sin(T*2+i)*2,by,1.2+rnd(i+5)*1.8,0,7);c.stroke();}
+  if(salt){c.fillStyle="rgba(255,255,255,.55)";for(let i=0;i<40;i++)c.fillRect(182+rnd(i+20)*380,200+rnd(i+70)*20,2,2);}
+  // Förderschnecke
+  c.strokeStyle="#59646d";c.lineWidth=2;c.beginPath();c.moveTo(180,216);c.lineTo(564,216);c.stroke();
+  [0,Math.PI].forEach((ph,j)=>{c.strokeStyle=j?"#4b565f":"#85919a";c.lineWidth=2;c.beginPath();for(let x=182;x<=562;x+=3)c.lineTo(x,216+Math.sin((x+T*46)/8+ph)*5);c.stroke();});
+  sepP.forEach(p=>{if(p.st===2||p.st===4)piece(c,p.x,p.y,p.rot,p.k,6.5);});
+  // Oberfläche
+  c.strokeStyle=salt?"#9ae6d6":"#a9d2ff";c.lineWidth=2;c.beginPath();for(let x=177;x<=567;x+=6)c.lineTo(x,100+Math.sin(x/17+T*2.2)*1.6);c.stroke();
+  // Schaufelräder
+  [300,440].forEach(px=>{c.save();c.translate(px,95);c.rotate(T*1.6);c.strokeStyle="#c3ccd3";c.lineWidth=2.5;for(let i=0;i<4;i++){c.rotate(Math.PI/2);c.beginPath();c.moveTo(3,0);c.lineTo(16,0);c.stroke();c.beginPath();c.moveTo(16,-4);c.lineTo(16,4);c.stroke();}c.fillStyle="#59646d";c.beginPath();c.arc(0,0,4,0,7);c.fill();c.restore();});
+  // Beckenwände
+  c.fillStyle=lg(c,172,0,178,0,"#85919a","#4b565f");c.fillRect(172,82,6,146);c.fillRect(566,106,6,122);c.fillStyle="#59646d";c.fillRect(172,222,400,7);
+  c.fillStyle="#85919a";c.fillRect(168,80,14,4);
+  c.strokeStyle="rgba(255,255,255,.07)";c.lineWidth=10;c.beginPath();c.moveTo(220,108);c.lineTo(196,214);c.moveTo(250,108);c.lineTo(232,190);c.stroke();
+  // Wehr und Austrag
+  c.strokeStyle="#85919a";c.lineWidth=3;c.beginPath();c.moveTo(572,106);c.lineTo(622,150);c.stroke();c.beginPath();c.moveTo(172,220);c.lineTo(150,238);c.stroke();
+  label(c,st.medium,372,150,salt?"#b5f0e4":"#cfe5ff",15,"center",true);label(c,"ρ = "+fz(st.rhoM,2)+" g/cm³",372,170,salt?"#b5f0e4":"#cfe5ff",12.5,"center");
+  label(c,"Schaufelräder",370,66,"#9aa2a9",10.5,"center");label(c,"Förderschnecke",480,240,"#9aa2a9",10.5,"center");label(c,"Wehr",600,116,"#9aa2a9",10.5,"left");
+  sepP.forEach(p=>{if(p.st!==2&&p.st!==4)piece(c,p.x,p.y,p.rot,p.k,6.5);});
+  // Dichtetafel
+  const n=st.in.length;panel(c,634,8,158,24+n*17,"DICHTE IN g/cm³");
+  st.in.slice().sort((a,b)=>POLY[a].rho-POLY[b].rho).forEach((k,i)=>{const y=32+i*17,f=st.out1.includes(k);piece(c,648,y,0,k,5);label(c,POLY[k].k,660,y,POLY[k].col,11.5,"left",true);
+    label(c,k==="PUR"?"< 0,1":fz(POLY[k].rho,2),738,y,"#e7e4dd",11.5,"right");label(c,f?"▲":"▼",782,y,f?"#7fd68a":"#e4785b",11,"right");});
+}
+function spectrum(c,k,x,y,w,h){const i=ORDER.indexOf(k),pk=[[.16+i*.05,.5+rnd(i)*.4],[.45+rnd(i+3)*.2,.4+rnd(i+7)*.5],[.78+rnd(i+11)*.14,.3+rnd(i+13)*.6]];
+  c.strokeStyle=POLY[k].col;c.lineWidth=1.8;c.beginPath();for(let s=0;s<=60;s++){const u=s/60;let v=.08+.03*Math.sin(u*40);pk.forEach(([m,a])=>v+=a*Math.exp(-Math.pow((u-m)/.05,2)));c.lineTo(x+u*w,y+h-Math.min(1,v)*h*.9);}c.stroke();}
+function sceneNir(c,st){
+  const B=BINS.nir,tk=st.out1[0],x2=st.anim==="nirx";
+  container(c,B[1],st.bin2,st.out2,bins[1]);container(c,B[0],st.bin1,st.out1,bins[0]);
+  c.fillStyle="#59646d";c.fillRect(634,184,4,116);
+  legs(c,[110,300,470],176,300);
+  // Aufgabetrichter
+  c.fillStyle=lg(c,0,92,0,150,"#56616a","#333b42");c.strokeStyle="#6f7b84";c.beginPath();c.moveTo(22,92);c.lineTo(96,92);c.lineTo(78,150);c.lineTo(40,150);c.closePath();c.fill();c.stroke();
+  st.in.forEach((k,i)=>piece(c,40+i*9%44,98+(i%2)*5,i,k,5));label(c,"Gemisch",59,80,"#9aa2a9",11,"center");
+  conveyor(c,44,174,506,174,72);
+  // Sensorbrücke
+  c.strokeStyle="#59646d";c.lineWidth=3;c.beginPath();c.moveTo(254,172);c.lineTo(254,58);c.moveTo(326,172);c.lineTo(326,58);c.stroke();
+  const hit=scan&&T-scan.t<.5;
+  const g=c.createLinearGradient(0,68,0,166);g.addColorStop(0,"rgba(255,180,84,.55)");g.addColorStop(1,"rgba(255,180,84,.04)");c.fillStyle=g;c.beginPath();c.moveTo(280,68);c.lineTo(300,68);c.lineTo(322,166);c.lineTo(258,166);c.closePath();c.fill();
+  c.strokeStyle="rgba(255,210,122,"+(.5+.4*Math.sin(T*30))+")";c.lineWidth=1.5;c.beginPath();c.moveTo(260,166);c.lineTo(320,166);c.stroke();
+  body(c,246,38,88,30,5);c.fillStyle="#ffb454";c.beginPath();c.roundRect(274,64,32,5,2);c.fill();lamp(c,258,53,hit?"#e4785b":"#7fd68a");label(c,"NIR-Sensor",296,53,"#e7e4dd",11,"center",true);
+  if(x2){const g2=c.createLinearGradient(0,74,0,166);g2.addColorStop(0,"rgba(127,214,138,.5)");g2.addColorStop(1,"rgba(127,214,138,.03)");c.fillStyle=g2;c.beginPath();c.moveTo(366,74);c.lineTo(380,74);c.lineTo(396,166);c.lineTo(350,166);c.closePath();c.fill();
+    body(c,340,48,66,26,5);label(c,"Röntgen",373,61,"#7fd68a",11,"center",true);}
+  // Bildschirm
+  body(c,416,6,188,98,8,"#333b42","#20262b");win(c,424,14,172,62,4);
+  c.strokeStyle="#262c31";c.lineWidth=1;for(let i=1;i<4;i++){c.beginPath();c.moveTo(424,14+i*15.5);c.lineTo(596,14+i*15.5);c.stroke();}
+  if(scan){spectrum(c,scan.k,428,16,164,56);label(c,"Spektrum",430,22,"#5f6870",9.5);
+    label(c,POLY[scan.k].k+(scan.f?(x2?" erkannt (Chlor) → ausblasen":" erkannt → ausblasen"):" → Durchlauf"),510,90,scan.f?"#e4785b":"#7fd68a",11.5,"center",true);}
+  else label(c,"wartet auf Messung …",510,90,"#9aa2a9",11.5,"center");
+  // Druckluft
+  body(c,462,262,44,36,8,"#3f5560","#27363d");label(c,"Druckluft",484,254,"#4fd1c5",10.5,"center");
+  c.strokeStyle="#4fd1c5";c.lineWidth=2.5;c.beginPath();c.moveTo(484,262);c.lineTo(484,214);c.lineTo(508,202);c.stroke();
+  c.fillStyle="#27363d";c.strokeStyle="#4fd1c5";c.lineWidth=1.5;c.beginPath();c.moveTo(504,206);c.lineTo(522,188);c.lineTo(530,196);c.lineTo(514,212);c.closePath();c.fill();c.stroke();
+  if(sepP.some(p=>p.f&&p.st===1&&p.age<.22)){const g3=c.createLinearGradient(526,192,560,150);g3.addColorStop(0,"rgba(79,209,197,.8)");g3.addColorStop(1,"rgba(79,209,197,0)");c.fillStyle=g3;c.beginPath();c.moveTo(524,190);c.lineTo(540,146);c.lineTo(572,160);c.lineTo(530,196);c.closePath();c.fill();}
+  sepP.forEach(p=>{piece(c,p.x,p.y,p.rot,p.k,6.5);if(p.fl>0){c.strokeStyle="#e4785b";c.lineWidth=1.8;c.beginPath();c.arc(p.x,p.y,11+Math.sin(T*20)*1.5,0,7);c.stroke();}});
+  label(c,"Trennblech",640,176,"#9aa2a9",10.5,"center");
+  label(c,"Ziel: "+POLY[tk].k+" ausblasen",700,130,POLY[tk].col,12,"center",true);
+}
+function sceneWind(c,st){
+  const B=BINS.wind;
+  container(c,B[1],st.bin2,st.out2,bins[1]);container(c,B[0],st.bin1,st.out1,bins[0]);
+  c.fillStyle="#59646d";c.fillRect(383,222,4,78);
+  // Sichterkanal
+  c.fillStyle="rgba(79,209,197,.05)";c.fillRect(150,96,640,124);c.strokeStyle="#4b565f";c.lineWidth=2.5;c.beginPath();c.moveTo(264,96);c.lineTo(790,96);c.moveTo(150,96);c.lineTo(190,96);c.stroke();
+  // Luftstrom
+  c.save();c.setLineDash([16,20]);c.lineDashOffset=-T*95;c.lineWidth=1.8;
+  for(let i=0;i<6;i++){c.strokeStyle="rgba(79,209,197,"+(.55-i*.05)+")";const y=112+i*19;c.beginPath();c.moveTo(152,y);c.bezierCurveTo(330,y-6,560,y+10-i*3,790,y-4-i*2);c.stroke();}
+  c.restore();
+  // Gebläse
+  legs(c,[60,108],206,300);body(c,112,112,42,102,4,"#3f5560","#27363d");for(let i=0;i<6;i++){c.strokeStyle="#6fb1f5";c.globalAlpha=.5;c.beginPath();c.moveTo(146,122+i*16);c.lineTo(154,126+i*16);c.stroke();c.globalAlpha=1;}
+  const rg=c.createRadialGradient(72,150,6,84,162,50);rg.addColorStop(0,"#5d6f7a");rg.addColorStop(1,"#26343b");c.fillStyle=rg;c.strokeStyle="#6f7b84";c.lineWidth=1.5;c.beginPath();c.arc(84,162,48,0,7);c.fill();c.stroke();
+  c.fillStyle="#0b0e10";c.beginPath();c.arc(84,162,33,0,7);c.fill();
+  c.save();c.translate(84,162);c.rotate(T*7);c.strokeStyle="#4fd1c5";c.lineWidth=3.5;c.lineCap="round";for(let i=0;i<6;i++){c.rotate(Math.PI/3);c.beginPath();c.moveTo(4,0);c.quadraticCurveTo(16,-12,30,-2);c.stroke();}c.fillStyle="#85919a";c.beginPath();c.arc(0,0,5,0,7);c.fill();c.restore();
+  label(c,"Gebläse",84,224,"#9aa2a9",11,"center");label(c,"Luftstrom",560,84,"#4fd1c5",11.5,"center",true);
+  // Aufgabe
+  const vib=Math.sin(T*40)*.8;c.fillStyle=lg(c,0,14,0,58,"#56616a","#333b42");c.strokeStyle="#6f7b84";c.lineWidth=1.2;c.beginPath();c.moveTo(190,14);c.lineTo(266,14);c.lineTo(240+vib,58);c.lineTo(216+vib,58);c.closePath();c.fill();c.stroke();
+  st.in.forEach((k,i)=>piece(c,206+(i*11)%46,20+(i%2)*5,i,k,5));label(c,"Gemisch",228,6,"#9aa2a9",11,"center");
+  sepP.forEach(p=>piece(c,p.x,p.y,p.rot,p.k,p.f?7:6.5));
+  const n=st.in.length;panel(c,612,8,180,24+n*17,"FORM DER TEILE");
+  st.in.forEach((k,i)=>{const y=32+i*17,f=st.out1.includes(k);piece(c,626,y,0,k,5);label(c,POLY[k].k,638,y,POLY[k].col,11.5,"left",true);label(c,FORM[k],686,y,"#e7e4dd",11,"left");label(c,f?"leicht":"schwer",784,y,f?"#7fd68a":"#e4785b",10.5,"right");});
+}
+function drawSep(){
+  const c=cS;c.clearRect(0,0,800,330);const st=CAS[S.step];if(!st||S.sel.length<2)return;
+  floor(c,300,30);
+  if(st.anim==="tank")sceneTank(c,st);else if(st.anim==="wind")sceneWind(c,st);else sceneNir(c,st);
+  pill(c,"Schritt "+st.no+" von "+CAS.length+": "+st.short,400,316,"#ffb454",11.5);
+}
+
+/* ---------- Animation: Verwertungsanlage ---------- */
+const FL=238,FY=176,SX=i=>84+i*158;
+const BLUE=["#46606d","#27363d"];
+const MACH={
+ shred(c,col){c.fillStyle=lg(c,0,-154,0,-118,"#5d6871","#3a434b");c.strokeStyle="#6f7b84";c.lineWidth=1.2;c.beginPath();c.moveTo(-38,-154);c.lineTo(38,-154);c.lineTo(22,-118);c.lineTo(-22,-118);c.closePath();c.fill();c.stroke();
+   body(c,-40,-120,80,72,5);win(c,-31,-111,62,46,4);
+   [-14,14].forEach((dx,i)=>{c.save();c.translate(dx,-88);c.rotate(T*3*(i?-1:1));c.fillStyle="#9aa6af";c.beginPath();for(let k=0;k<10;k++){const a=k*Math.PI/5;c.lineTo(Math.cos(a)*16,Math.sin(a)*16);c.lineTo(Math.cos(a+.32)*10.5,Math.sin(a+.32)*10.5);}c.closePath();c.fill();c.fillStyle="#2a3238";c.beginPath();c.arc(0,0,4,0,7);c.fill();c.restore();});
+   for(let i=0;i<5;i++){const u=(T*.9+i/5)%1;c.fillStyle=col;c.fillRect(-12+i*6,-78+u*11,3,3);}
+   body(c,-46,-48,92,48,3,"#363e45","#22282d");c.strokeStyle="#4b565f";for(let i=0;i<4;i++){c.beginPath();c.moveTo(-36,-38+i*8);c.lineTo(-10,-38+i*8);c.stroke();}lamp(c,30,-36,"#7fd68a");lamp(c,18,-36,"#ffb454");},
+ wash(c,col){legs(c,[-40,40],-30,0);c.strokeStyle="#85919a";c.lineWidth=3;c.beginPath();c.moveTo(-46,-134);c.lineTo(46,-134);c.stroke();
+   for(let i=0;i<5;i++){const nx=-36+i*18;c.fillStyle="#85919a";c.fillRect(nx-2,-134,4,6);for(let d=0;d<3;d++){const u=(T*1.6+d/3+i*.13)%1;c.fillStyle="rgba(140,200,255,"+(1-u)+")";c.beginPath();c.arc(nx+(d-1)*3*u,-126+u*22,1.4,0,7);c.fill();}}
+   win(c,-48,-110,96,82,6);c.save();clipR(c,-47,-109,94,80,5);c.fillStyle=lg(c,0,-98,0,-28,"rgba(120,186,250,.5)","rgba(32,84,170,.7)");c.fillRect(-48,-98,96,70);
+   [-22,22].forEach((px,i)=>{c.save();c.translate(px,-64);c.rotate(T*2.2*(i?1:-1));c.strokeStyle="#c3ccd3";c.lineWidth=2.5;for(let k=0;k<4;k++){c.rotate(Math.PI/2);c.beginPath();c.moveTo(3,0);c.lineTo(15,0);c.moveTo(15,-4);c.lineTo(15,4);c.stroke();}c.restore();});
+   for(let i=0;i<6;i++){const a=T*1.4+i*1.1;piece(c,Math.cos(a)*30*(.5+rnd(i)*.5),-62+Math.sin(a*1.3)*20,a,S.view,4);}
+   c.strokeStyle="rgba(255,255,255,.4)";c.lineWidth=1;for(let i=0;i<8;i++){c.beginPath();c.arc(-40+rnd(i)*80,-30-((T*14+rnd(i+4)*60)%64),1.5+rnd(i+8),0,7);c.stroke();}
+   c.strokeStyle="#cfe5ff";c.lineWidth=2;c.beginPath();for(let x=-48;x<=48;x+=6)c.lineTo(x,-98+Math.sin(x/9+T*3)*1.8);c.stroke();c.restore();
+   c.strokeStyle="#85919a";c.lineWidth=4;c.beginPath();c.moveTo(34,-28);c.lineTo(34,-10);c.stroke();const u=(T*1.2)%1;c.fillStyle="#8a6a3a";c.beginPath();c.arc(34,-8+u*7,2.2,0,7);c.fill();},
+ dry(c,col){legs(c,[-40,40],-18,0);body(c,-44,-50,88,34,4,"#4a3a34","#2b211e");c.strokeStyle="rgba(255,122,46,"+(.65+.3*Math.sin(T*5))+")";c.lineWidth=2.5;c.beginPath();for(let i=0;i<=12;i++)c.lineTo(-36+i*6,-33+(i%2?-8:8));c.stroke();
+   body(c,-50,-114,100,60,30,"#665445","#372c22");win(c,-36,-104,72,40,20);c.save();clipR(c,-35,-103,70,38,19);const rg=c.createRadialGradient(0,-84,2,0,-84,36);rg.addColorStop(0,"rgba(255,150,60,.55)");rg.addColorStop(1,"rgba(255,150,60,0)");c.fillStyle=rg;c.fillRect(-36,-104,72,40);
+   for(let i=0;i<7;i++){const a=T*2+i*.9;piece(c,Math.cos(a)*24,-84+Math.sin(a)*12,a*2,S.view,4);}c.restore();
+   c.strokeStyle="rgba(255,150,60,.55)";c.lineWidth=1.8;[-22,0,22].forEach((dx,i)=>{const o=(T*18+i*9)%22;c.globalAlpha=1-o/22;c.beginPath();c.moveTo(dx,-118-o);c.bezierCurveTo(dx-6,-124-o,dx+6,-130-o,dx,-136-o);c.stroke();});c.globalAlpha=1;},
+ extr(c,col){body(c,-54,-40,108,40,3,"#363e45","#22282d");body(c,-56,-96,32,56,4,BLUE[0],BLUE[1]);c.strokeStyle="rgba(255,255,255,.15)";for(let i=0;i<5;i++){c.beginPath();c.moveTo(-52,-88+i*9);c.lineTo(-28,-88+i*9);c.stroke();}
+   c.fillStyle=lg(c,0,-134,0,-90,"#5d6871","#3a434b");c.strokeStyle="#6f7b84";c.beginPath();c.moveTo(-22,-134);c.lineTo(10,-134);c.lineTo(0,-90);c.lineTo(-12,-90);c.closePath();c.fill();c.stroke();for(let i=0;i<3;i++)piece(c,-12+i*7,-128+(i%2)*3,i,S.view,3.5);
+   body(c,-24,-92,74,28,5);win(c,-20,-87,64,18,3);c.save();clipR(c,-19,-86,62,16,2);const g=c.createLinearGradient(-20,0,44,0);g.addColorStop(0,col);g.addColorStop(1,"#ff8a3c");c.fillStyle=g;c.globalAlpha=.5;c.fillRect(-20,-87,64,18);c.globalAlpha=1;
+   c.strokeStyle="#dfe5ea";c.lineWidth=2;c.beginPath();for(let x=-20;x<=44;x+=2)c.lineTo(x,-78+Math.sin((x-T*34)/4)*6);c.stroke();c.restore();
+   for(let i=0;i<4;i++){c.fillStyle="rgba(255,122,46,"+(.6+.3*Math.sin(T*4+i))+")";c.fillRect(-14+i*15,-96,9,4);c.fillRect(-14+i*15,-64,9,4);}
+   body(c,50,-86,8,16,2);c.strokeStyle=col;c.lineWidth=3;c.beginPath();c.moveTo(58,-78);c.lineTo(66,-78+Math.sin(T*10)*1);c.stroke();gauge(c,36,-106,7,-1+Math.sin(T)*.2);},
+ silo(c,col){legs(c,[-24,24],-40,0);c.fillStyle=lg(c,0,-58,0,-26,"#3f4850","#2a3238");c.strokeStyle="#6f7b84";c.lineWidth=1.2;c.beginPath();c.moveTo(-30,-58);c.lineTo(30,-58);c.lineTo(8,-26);c.lineTo(-8,-26);c.closePath();c.fill();c.stroke();
+   body(c,-30,-162,60,106,10);c.strokeStyle="rgba(255,255,255,.08)";for(let i=1;i<4;i++){c.beginPath();c.moveTo(-30,-162+i*26);c.lineTo(30,-162+i*26);c.stroke();}
+   win(c,-7,-150,14,86,6);c.save();clipR(c,-6,-149,12,84,5);const lv=30+((T*5)%46);for(let y=0;y<lv;y+=6)for(let x=0;x<2;x++){c.fillStyle=col;c.beginPath();c.arc(-3+x*6+(y%12?1:-1),-68-y,2.8,0,7);c.fill();}c.restore();
+   c.fillStyle=col;c.fillRect(-20,-76,10,7);c.fillStyle="#59646d";c.fillRect(-5,-26,10,8);for(let i=0;i<3;i++){const u=(T*1.5+i/3)%1;c.fillStyle=col;c.beginPath();c.arc(0,-16+u*14,2.4,0,7);c.fill();}
+   [[-9,-3],[0,-3],[9,-3],[-4.5,-9],[4.5,-9]].forEach(([a,b])=>ball(c,a,b,3.6,col));},
+ tank(c,col){legs(c,[-26,26],-44,0);body(c,-9,-168,18,22,3,BLUE[0],BLUE[1]);body(c,-36,-148,72,106,18);win(c,-25,-132,50,76,10);c.save();clipR(c,-24,-131,48,74,9);
+   c.fillStyle=lg(c,0,-116,0,-56,"rgba(111,177,245,.55)","rgba(40,90,170,.75)");c.fillRect(-25,-116,50,60);
+   for(let i=0;i<8;i++){const a=T*2.4+i*.8,r=6+rnd(i)*14;c.fillStyle=col;c.beginPath();c.arc(Math.cos(a)*r,-84+Math.sin(a)*r*.6,2.2,0,7);c.fill();}
+   c.strokeStyle="#dfe5ea";c.lineWidth=2.5;c.beginPath();c.moveTo(0,-132);c.lineTo(0,-70);c.stroke();const sc=Math.cos(T*6);c.beginPath();c.moveTo(-15*sc,-74);c.lineTo(15*sc,-66);c.moveTo(-15*sc,-66);c.lineTo(15*sc,-74);c.stroke();
+   c.strokeStyle="#cfe5ff";c.lineWidth=1.5;c.beginPath();for(let x=-25;x<=25;x+=5)c.lineTo(x,-116+Math.sin(x/6+T*3)*1.5);c.stroke();c.restore();
+   c.strokeStyle="#85919a";c.lineWidth=4;c.beginPath();c.moveTo(-36,-128);c.lineTo(-46,-128);c.lineTo(-46,-150);c.stroke();gauge(c,30,-152,6,-.8);},
+ filter(c,col){legs(c,[-18,18],-42,0);body(c,-26,-150,52,108,10);win(c,-17,-138,34,84,6);c.save();clipR(c,-16,-137,32,82,5);c.fillStyle="rgba(111,177,245,.3)";c.fillRect(-17,-138,34,84);
+   c.strokeStyle="#c3ccd3";c.lineWidth=1.3;for(let x=-4;x<=14;x+=3.5){c.beginPath();for(let y=0;y<=11;y++)c.lineTo(x+(y%2?1.6:-1.6),-132+y*7);c.stroke();}
+   for(let i=0;i<9;i++){const u=Math.min(1,((T*.5+rnd(i))%1.4));c.fillStyle="#e4604a";c.beginPath();c.arc(-15+u*9,-128+rnd(i+5)*66,1.9,0,7);c.fill();}c.restore();
+   c.fillStyle="#85919a";c.fillRect(-4,-160,8,10);body(c,32,-30,24,30,3,"#4a3a34","#2b211e");[[38,-33],[44,-35],[50,-33],[44,-31]].forEach(([a,b])=>{c.fillStyle="#e4604a";c.beginPath();c.arc(a,b,2.4,0,7);c.fill();});
+   c.strokeStyle="#85919a";c.lineWidth=3;c.beginPath();c.moveTo(22,-48);c.lineTo(44,-48);c.lineTo(44,-36);c.stroke();},
+ press(c,col){body(c,-48,-16,96,16,2,"#363e45","#22282d");c.fillStyle=lg(c,-42,0,-34,0,"#85919a","#4b565f");c.fillRect(-42,-150,8,134);c.fillRect(34,-150,8,134);body(c,-48,-164,96,16,3);body(c,-11,-148,22,30,3,BLUE[0],BLUE[1]);
+   const o=(Math.sin(T*2)+1)/2*24;c.strokeStyle="#dfe5ea";c.lineWidth=5;c.beginPath();c.moveTo(0,-118);c.lineTo(0,-96+o);c.stroke();body(c,-34,-96+o,68,10,2);
+   c.fillStyle=col;c.strokeStyle="rgba(0,0,0,.5)";c.beginPath();c.roundRect(-28,-86+o,56,70-o,4);c.fill();c.stroke();c.fillStyle="rgba(0,0,0,.28)";for(let i=0;i<9;i++){c.beginPath();c.arc(-22+rnd(i)*44,-82+o+rnd(i+3)*(62-o),1.6,0,7);c.fill();}
+   c.strokeStyle="rgba(255,255,255,.5)";c.lineWidth=1.5;[-40,40].forEach(dx=>{for(let i=0;i<2;i++){const u=(T*.8+i*.5)%1;c.globalAlpha=(1-u)*(o/24);c.beginPath();c.moveTo(dx*.8,-30-u*20);c.quadraticCurveTo(dx*.8+(dx>0?8:-8),-40-u*20,dx*.8,-50-u*20);c.stroke();}});c.globalAlpha=1;gauge(c,26,-134,6,-2.2+o/20);},
+ cryst(c,col){legs(c,[-24,24],-60,0);c.fillStyle=lg(c,0,-64,0,-28,"#3f4850","#2a3238");c.strokeStyle="#6f7b84";c.lineWidth=1.2;c.beginPath();c.moveTo(-34,-64);c.lineTo(34,-64);c.lineTo(7,-28);c.lineTo(-7,-28);c.closePath();c.fill();c.stroke();
+   body(c,-34,-150,68,88,14);win(c,-24,-138,48,66,8);c.save();clipR(c,-23,-137,46,64,7);c.fillStyle=lg(c,0,-130,0,-72,"rgba(79,209,197,.35)","rgba(30,112,116,.6)");c.fillRect(-24,-130,48,58);
+   for(let i=0;i<16;i++){const u=(T*.35+rnd(i))%1;c.fillStyle=col;c.fillRect(-20+rnd(i+4)*40,-128+u*46,3,3);}c.fillStyle=col;c.fillRect(-24,-84,48,12);c.restore();
+   c.fillStyle="#85919a";c.fillRect(-4,-162,8,12);c.fillStyle="#59646d";c.fillRect(-5,-28,10,8);gauge(c,28,-152,6,-1.2);},
+ reactor(c,col){body(c,-42,-56,84,56,4,"#54423b","#2b211e");win(c,-31,-46,62,36,4);c.save();clipR(c,-30,-45,60,34,3);c.fillStyle="rgba(255,122,46,.18)";c.fillRect(-31,-46,62,36);[-18,0,18].forEach((dx,i)=>flame(c,dx,-10,1+.15*Math.sin(T*6+i)));c.restore();
+   body(c,-35,-152,70,98,16,"#6a5248","#3a2c28");c.strokeStyle="rgba(0,0,0,.25)";c.lineWidth=1;for(let i=1;i<4;i++){c.beginPath();c.moveTo(-35,-152+i*24);c.lineTo(35,-152+i*24);c.stroke();}
+   c.fillStyle="#090c0e";c.strokeStyle="#c3ccd3";c.lineWidth=2;c.beginPath();c.arc(0,-104,21,0,7);c.fill();c.stroke();c.save();c.beginPath();c.arc(0,-104,20,0,7);c.clip();
+   const rg=c.createRadialGradient(0,-98,2,0,-104,22);rg.addColorStop(0,"rgba(255,210,122,"+(.8+.15*Math.sin(T*7))+")");rg.addColorStop(1,"rgba(255,90,30,.35)");c.fillStyle=rg;c.fillRect(-22,-126,44,44);
+   for(let i=0;i<5;i++){const a=T*1.8+i*1.3;piece(c,Math.cos(a)*11,-104+Math.sin(a)*9,a,S.view,3.5);}c.restore();
+   for(let i=0;i<8;i++){const a=i*Math.PI/4;c.fillStyle="#c3ccd3";c.beginPath();c.arc(Math.cos(a)*25,-104+Math.sin(a)*25,1.3,0,7);c.fill();}
+   c.fillStyle="#85919a";c.fillRect(-5,-164,10,12);gauge(c,26,-142,7,-.3+Math.sin(T*2)*.1);},
+ column(c,col){body(c,-26,-14,52,14,2,"#363e45","#22282d");body(c,-17,-168,34,154,9);c.strokeStyle="rgba(255,255,255,.14)";c.lineWidth=1;for(let y=-146;y<=-34;y+=22){c.beginPath();c.moveTo(-17,y);c.lineTo(17,y);c.stroke();}
+   [-128,-84,-40].forEach((y,i)=>{c.fillStyle="#090c0e";c.strokeStyle="#c3ccd3";c.lineWidth=1.5;c.beginPath();c.arc(0,y,6.5,0,7);c.fill();c.stroke();c.save();c.beginPath();c.arc(0,y,5.5,0,7);c.clip();c.fillStyle="#c98a3a";c.fillRect(-6,y+1+Math.sin(T*3+i)*1.2,12,8);const u=(T*1.2+i*.3)%1;c.beginPath();c.arc(0,y-6+u*8,1.2,0,7);c.fill();c.restore();});
+   c.strokeStyle="#85919a";c.lineWidth=3;c.beginPath();c.moveTo(0,-168);c.lineTo(0,-174);c.lineTo(30,-174);c.lineTo(30,-160);c.stroke();body(c,20,-160,22,30,6,BLUE[0],BLUE[1]);c.strokeStyle="#cfe5ff";c.lineWidth=1.2;c.beginPath();for(let i=0;i<=6;i++)c.lineTo(31+(i%2?6:-6),-156+i*4);c.stroke();
+   c.strokeStyle="#85919a";c.lineWidth=3;c.beginPath();c.moveTo(31,-130);c.lineTo(31,-112);c.lineTo(17,-112);c.stroke();
+   c.strokeStyle="#59646d";c.lineWidth=1.2;c.beginPath();c.moveTo(-26,-150);c.lineTo(-26,-14);c.moveTo(-20,-150);c.lineTo(-20,-14);for(let y=-144;y<-16;y+=9){c.moveTo(-26,y);c.lineTo(-20,y);}c.stroke();},
+ drum(c,col){body(c,-36,-30,14,30,2,"#363e45","#22282d");body(c,22,-30,14,30,2,"#363e45","#22282d");body(c,-52,-108,104,82,34);c.strokeStyle="rgba(255,255,255,.1)";c.lineWidth=1;[-26,26].forEach(x=>{c.beginPath();c.moveTo(x,-108);c.lineTo(x,-26);c.stroke();});
+   body(c,-10,-118,20,12,3);win(c,-36,-92,10,50,5);c.save();clipR(c,-35,-91,8,48,4);const lv=20+((T*4)%24);c.fillStyle="#c98a3a";c.fillRect(-36,-42-lv,10,lv+2);c.restore();
+   c.save();c.translate(12,-66);c.rotate(Math.PI/4);c.fillStyle="#ffb454";c.strokeStyle="#22282d";c.lineWidth=1.5;c.beginPath();c.rect(-11,-11,22,22);c.fill();c.stroke();c.restore();flame(c,12,-58,.7);
+   c.strokeStyle="#85919a";c.lineWidth=3;c.beginPath();c.moveTo(0,-118);c.lineTo(0,-128);c.stroke();},
+ sphere(c,col){c.strokeStyle="#59646d";c.lineWidth=4;[[-30,-66,-38,0],[30,-66,38,0],[0,-52,0,0]].forEach(([a,b,d,e])=>{c.beginPath();c.moveTo(a,b);c.lineTo(d,e);c.stroke();});
+   const rg=c.createRadialGradient(-14,-112,4,0,-96,46);rg.addColorStop(0,"#8d99a2");rg.addColorStop(.6,"#4b565f");rg.addColorStop(1,"#252c31");c.fillStyle=rg;c.strokeStyle="#6f7b84";c.lineWidth=1.2;c.beginPath();c.arc(0,-96,45,0,7);c.fill();c.stroke();
+   c.strokeStyle="rgba(0,0,0,.3)";c.lineWidth=2;c.beginPath();c.ellipse(0,-96,45,9,0,0,Math.PI);c.stroke();c.beginPath();c.ellipse(0,-96,18,45,0,-Math.PI/2,Math.PI/2);c.stroke();
+   c.fillStyle="#85919a";c.fillRect(-3,-150,6,10);gauge(c,0,-156,7,-1.6+Math.sin(T*1.5)*.25);
+   [["C",-9,-98],["O",-1,-98],["H",9,-92],["H",15,-92]].forEach(([a,x,y])=>ball(c,x,y,a==="H"?3:4.5,ATOM[a]));},
+ scrub(c,col){body(c,-28,-32,56,32,3,"#363e45","#22282d");win(c,-20,-24,26,16,2);c.fillStyle="rgba(111,177,245,.6)";c.fillRect(-19,-16+Math.sin(T*2),24,8);
+   c.save();c.translate(18,-14);c.rotate(T*6);c.strokeStyle="#85919a";c.lineWidth=2;c.beginPath();c.arc(0,0,7,0,7);c.moveTo(-7,0);c.lineTo(7,0);c.stroke();c.restore();
+   body(c,-20,-168,40,138,10);win(c,-12,-154,24,100,6);c.save();clipR(c,-11,-153,22,98,5);
+   c.strokeStyle="#59646d";c.lineWidth=1;for(let i=-30;i<30;i+=5){c.beginPath();c.moveTo(i,-58);c.lineTo(i+14,-78);c.moveTo(i+14,-58);c.lineTo(i,-78);c.stroke();}
+   for(let i=0;i<12;i++){const u=(T*.9+rnd(i))%1;c.fillStyle="rgba(140,200,255,.9)";c.beginPath();c.arc(-9+rnd(i+3)*18,-146+u*66,1.5,0,7);c.fill();}
+   for(let i=0;i<7;i++){const u=(T*.5+rnd(i+20))%1;c.fillStyle="rgba(184,192,198,"+(.8*(1-u))+")";c.beginPath();c.arc(-8+rnd(i+9)*16,-60-u*90,2.4,0,7);c.fill();}
+   [-146,-112].forEach(y=>{c.strokeStyle="#c3ccd3";c.lineWidth=2;c.beginPath();c.moveTo(-12,y);c.lineTo(12,y);c.stroke();});c.restore();
+   c.strokeStyle="#6fb1f5";c.lineWidth=2.5;c.beginPath();c.moveTo(25,-14);c.lineTo(30,-14);c.lineTo(30,-146);c.lineTo(20,-146);c.stroke();c.fillStyle="#85919a";c.fillRect(-4,-178,8,10);},
+ turb(c,col){body(c,-54,-134,46,134,4,"#54423b","#2b211e");win(c,-48,-124,34,76,3);c.save();clipR(c,-47,-123,32,74,2);c.fillStyle="rgba(255,122,46,.2)";c.fillRect(-48,-124,34,76);
+   c.strokeStyle="#ffb089";c.lineWidth=2.2;c.beginPath();for(let i=0;i<=9;i++)c.lineTo(-31+(i%2?11:-11),-118+i*6);c.stroke();[-40,-31,-22].forEach(x=>flame(c,x,-50,.75));c.restore();
+   c.strokeStyle="#c3ccd3";c.lineWidth=4;c.beginPath();c.moveTo(-31,-134);c.lineTo(-31,-146);c.lineTo(10,-146);c.lineTo(10,-104);c.stroke();
+   for(let i=0;i<3;i++){const u=(T*.8+i/3)%1;c.fillStyle="rgba(255,255,255,"+(.7*(1-u))+")";c.beginPath();c.arc(-31+u*41,-146,2,0,7);c.fill();}
+   body(c,-6,-52,62,52,3,"#363e45","#22282d");c.fillStyle=lg(c,0,-106,0,-54,"#85919a","#3a434b");c.strokeStyle="#6f7b84";c.lineWidth=1.2;c.beginPath();c.moveTo(-4,-92);c.lineTo(26,-106);c.lineTo(26,-54);c.lineTo(-4,-68);c.closePath();c.fill();c.stroke();
+   c.strokeStyle="rgba(0,0,0,.4)";c.lineWidth=1.5;for(let i=0;i<5;i++){const x=-2+((T*14+i*6)%28);c.beginPath();c.moveTo(x,-80-(x+4)*.45);c.lineTo(x,-80+(x+4)*.45);c.stroke();}
+   body(c,28,-96,26,32,8,BLUE[0],BLUE[1]);c.fillStyle="#ffd27a";c.beginPath();c.moveTo(44,-128);c.lineTo(35,-110);c.lineTo(41,-110);c.lineTo(37,-98);c.lineTo(50,-116);c.lineTo(44,-116);c.lineTo(49,-128);c.closePath();c.fill();},
+ stack(c,col){body(c,-34,-44,68,44,3,"#363e45","#22282d");c.fillStyle="#22282d";c.fillRect(-26,-26,14,26);lamp(c,20,-30,"#7fd68a");
+   const g=c.createLinearGradient(-12,0,12,0);g.addColorStop(0,"#9aa6af");g.addColorStop(1,"#4b565f");c.fillStyle=g;c.strokeStyle="#6f7b84";c.lineWidth=1.2;c.beginPath();c.moveTo(-13,-44);c.lineTo(-8,-176);c.lineTo(8,-176);c.lineTo(13,-44);c.closePath();c.fill();c.stroke();
+   c.fillStyle="#d2553f";[[-176,-164],[-152,-140]].forEach(([a,b])=>{c.beginPath();c.moveTo(-8-(a+176)*.038,a);c.lineTo(8+(a+176)*.038,a);c.lineTo(8+(b+176)*.038,b);c.lineTo(-8-(b+176)*.038,b);c.closePath();c.fill();});
+   c.strokeStyle="#59646d";c.lineWidth=2;c.beginPath();c.moveTo(-16,-106);c.lineTo(16,-106);c.stroke();
+   for(let i=0;i<6;i++){const u=(T*.35+i/6)%1;c.fillStyle="rgba(210,216,222,"+(.55*(1-u))+")";c.beginPath();c.arc(u*30+Math.sin(T+i)*3,-180-u*28,4+u*11,0,7);c.fill();}
+   if(Math.sin(T*4)>0)lamp(c,0,-180,"#e4604a");},
+ bunker(c,col){body(c,-54,-74,108,74,2,"#3f4449","#26292c");win(c,-48,-66,96,62,2);c.save();clipR(c,-47,-65,94,60,1);for(let i=0;i<34;i++){const x=-44+rnd(i)*88,h=10+26*Math.exp(-Math.pow(x/34,2));piece(c,x,-6-rnd(i+7)*h,i,i%4===0?S.view:S.view,4.5,i%3===0);}c.restore();
+   c.fillStyle="#59646d";c.fillRect(-52,-160,5,86);c.fillRect(47,-160,5,86);body(c,-56,-166,112,8,2);
+   const tx=Math.sin(T*.6)*26,gy=-112+Math.sin(T*1.2)*16;body(c,tx-9,-158,18,10,2,BLUE[0],BLUE[1]);c.strokeStyle="#c3ccd3";c.lineWidth=1.2;c.beginPath();c.moveTo(tx,-148);c.lineTo(tx,gy);c.stroke();
+   c.strokeStyle="#c3ccd3";c.lineWidth=2.5;c.beginPath();c.moveTo(tx,gy);c.quadraticCurveTo(tx-12,gy+4,tx-7,gy+14);c.moveTo(tx,gy);c.quadraticCurveTo(tx+12,gy+4,tx+7,gy+14);c.stroke();piece(c,tx,gy+10,T,S.view,4.5,true);},
+ poly(c,col){legs(c,[-20,20],-40,0);body(c,-8,-172,16,20,3,BLUE[0],BLUE[1]);body(c,-29,-154,58,116,20);win(c,-19,-138,38,84,10);c.save();clipR(c,-18,-137,36,82,9);
+   c.fillStyle=col;c.globalAlpha=.3;c.fillRect(-19,-124,38,70);c.globalAlpha=1;
+   c.strokeStyle="#dfe5ea";c.lineWidth=2.2;c.beginPath();c.moveTo(0,-138);c.lineTo(0,-66);c.stroke();const sc=Math.cos(T*4);c.beginPath();c.moveTo(-13*sc,-110);c.lineTo(-13*sc,-68);c.lineTo(13*sc,-68);c.lineTo(13*sc,-110);c.stroke();
+   for(let j=0;j<2;j++){const y0=-76-((T*9+j*30)%44);c.strokeStyle=col;c.lineWidth=1.5;c.beginPath();for(let i=0;i<5;i++)c.lineTo(-10+j*8+i*5,y0+(i%2?-3:3));c.stroke();for(let i=0;i<5;i++)ball(c,-10+j*8+i*5,y0+(i%2?-3:3),2.4,col);}c.restore();
+   c.strokeStyle="#85919a";c.lineWidth=4;c.beginPath();c.moveTo(-29,-130);c.lineTo(-40,-130);c.lineTo(-40,-150);c.moveTo(29,-120);c.lineTo(40,-120);c.lineTo(40,-140);c.stroke();c.fillStyle="#59646d";c.fillRect(-5,-40,10,10);gauge(c,24,-158,6,-1);}
+};
+function stepProc(dt){
+  const {p,pr}=cur();if(SUIT[p.id][pr][0]===0){prP=[];return;}
+  prSpawn-=dt;if(prSpawn<=0){prSpawn=.5;prP.push({seg:0,u:0,j:(Math.random()-.5)*8,rot:Math.random()*6});}
+  prP.forEach(q=>{const len=q.seg===0?SX(0)+10:q.seg===5?810-SX(4):158;q.u+=dt*80/len;q.rot+=dt*1.5;if(q.u>=1){q.u=0;q.seg++;}});
+  prP=prP.filter(q=>q.seg<6);
+}
+const SOLID=l=>l==="raw"||l==="flake"||l==="clean"||l==="pellet";
+function lookDraw(c,look,x,y,q,p){
+  const k=p.id;
+  if(look==="raw")piece(c,x,y-9,q.rot*.2,k,7,true);
+  else if(look==="flake")piece(c,x,y-7,q.rot*.3,k,4.6);
+  else if(look==="clean"){piece(c,x,y-7,q.rot*.3,k,4.6);c.strokeStyle="rgba(255,255,255,.6)";c.lineWidth=1;c.beginPath();c.moveTo(x+5,y-13);c.lineTo(x+8,y-16);c.moveTo(x+6.5,y-16.5);c.lineTo(x+6.5,y-12.5);c.stroke();}
+  else if(look==="pellet")ball(c,x,y-7,4,p.col);
+  else if(look==="melt"){const g=c.createRadialGradient(x,y,1,x,y,9);g.addColorStop(0,"#ffd27a");g.addColorStop(1,"#ff6a2a");c.fillStyle=g;c.beginPath();c.ellipse(x,y,9,5,0,0,7);c.fill();}
+  else if(look==="sol"){c.fillStyle="rgba(111,177,245,.75)";c.beginPath();c.ellipse(x,y,9,5.5,0,0,7);c.fill();ball(c,x,y,2.6,p.col);}
+  else if(look==="mono"){ball(c,x-3.5,y,3.3,p.col);ball(c,x+3.5,y,3.3,"#e7e4dd");}
+  else if(look==="drop"){c.fillStyle="#c98a3a";c.beginPath();c.ellipse(x,y,8,5,0,0,7);c.fill();c.fillStyle="rgba(255,255,255,.4)";c.beginPath();c.ellipse(x-2,y-2,3,1.4,0,0,7);c.fill();}
+  else{[[-5,2],[4,-3],[1,4]].forEach(([a,b],i)=>ball(c,x+a,y+b+Math.sin(T*5+a)*1.2,2.3,"#b8c0c6"));}
+}
+function drawProc(){
+  const c=cP,{p,pr}=cur();c.clearRect(0,0,800,432);
+  const bad=SUIT[p.id][pr][0]===0;
+  floor(c,FL,44);
+  // Förderbänder und Rohre
+  for(let s=0;s<6;s++){const a=s===0?0:SX(s-1)+44,b=s===5?800:SX(s)-44,look=s===0?"raw":ST[s-1].look;
+    if(SOLID(look)){c.fillStyle="#1d2226";c.strokeStyle="#6f7b84";c.lineWidth=1.2;c.beginPath();c.roundRect(a,FY-2,b-a,8,4);c.fill();c.stroke();
+      c.strokeStyle="#3d464d";const off=(T*80)%12;for(let x=a+off;x<b;x+=12){c.beginPath();c.moveTo(x,FY-2);c.lineTo(x,FY+1);c.stroke();}
+      c.strokeStyle="#59646d";c.lineWidth=2;for(let x=a+10;x<b-4;x+=26){c.beginPath();c.moveTo(x,FY+6);c.lineTo(x,FL);c.stroke();}}
+    else{c.fillStyle=lg(c,0,FY-9,0,FY+9,"rgba(160,172,182,.5)","rgba(60,70,78,.5)");c.strokeStyle="#85919a";c.lineWidth=1;c.fillRect(a,FY-9,b-a,18);c.strokeRect(a,FY-9,b-a,18);
+      c.fillStyle="#85919a";[a+6,b-10].forEach(x=>c.fillRect(x,FY-12,4,24));c.strokeStyle="rgba(255,255,255,.22)";c.beginPath();c.moveTo(a,FY-5);c.lineTo(b,FY-5);c.stroke();}}
+  prP.forEach(q=>{const a=q.seg===0?-10:SX(q.seg-1),b=q.seg===5?810:SX(q.seg),x=a+(b-a)*q.u,look=q.seg===0?"raw":ST[q.seg-1].look;lookDraw(c,look,x,FY+(SOLID(look)?0:q.j*.5),q,p);});
+  ST.forEach((st,i)=>{const x=SX(i);
+    c.fillStyle="rgba(0,0,0,.35)";c.beginPath();c.ellipse(x,FL+3,56,5,0,0,7);c.fill();
+    if(S.det===i){c.fillStyle="rgba(79,209,197,.10)";c.strokeStyle="#4fd1c5";c.lineWidth=1.5;c.setLineDash([5,4]);c.beginPath();c.roundRect(x-66,48,132,FL-44,10);c.fill();c.stroke();c.setLineDash([]);}
+    c.save();c.translate(x,FL);if(bad)c.globalAlpha=.55;(MACH[st.g]||MACH.tank)(c,p.col);c.restore();c.globalAlpha=1;
+    label(c,(i+1)+"  "+st.t,x,FL+17,"#e7e4dd",12.5,"center",true);label(c,st.s,x,FL+33,"#9aa2a9",10.6,"center");
+    if(st.emit&&!bad){for(let k=0;k<3;k++){const u=(T*.6+k/3)%1;c.fillStyle="rgba(228,120,91,"+(.5*(1-u))+")";c.beginPath();c.arc(x+Math.sin(T*2+k)*4,62-u*16,2.5+u*3,0,7);c.fill();}pill(c,st.emit,x,30,"#e4785b",10.6);}
+  });
+  pill(c,p.k+"-Abfall",46,62,p.col,11);
+  if(S.det===null&&!bad){c.globalAlpha=.75+.25*Math.sin(T*3);label(c,"Station antippen für Detailansicht",792,12,"#4fd1c5",11,"right",true);c.globalAlpha=1;}
+  drawMol(c,p,pr);
+  if(bad){c.fillStyle="rgba(14,17,19,.6)";c.fillRect(0,0,800,282);pill(c,"Für "+p.k+" ungeeignet – siehe Hinweis oben",400,120,"#e4785b",15);}
+}
+
+/* ---------- Animation: Teilchenebene ---------- */
+const ATOM={C:"#59636b",O:"#e4604a",H:"#eef1f3",Cl:"#58c96b",N:"#5b8df0"};
+const MOLS={CO2:[["O",-8.5,0,4.6],["C",0,0,4.8],["O",8.5,0,4.6]],H2O:[["H",-4.6,3.6,2.8],["H",4.6,3.6,2.8],["O",0,0,4.6]],CO:[["C",-4.2,0,4.8],["O",4.2,0,4.6]],H2:[["H",-2.8,0,3],["H",2.8,0,3]],HCl:[["H",-5.4,0,2.8],["Cl",1.2,0,5.6]],NO:[["N",-4.2,0,4.6],["O",4.2,0,4.6]]};
+function molecule(c,t,x,y){MOLS[t].forEach(a=>ball(c,x+a[1],y+a[2],a[3],ATOM[a[0]]));}
+const FRAG=[[3,5,2,6],[4,2,7,3],[6,3,5,2]];
+const BURN={PEHD:["CO2","H2O"],PELD:["CO2","H2O"],PP:["CO2","H2O"],PS:["CO2","CO2","H2O"],PET:["CO2","CO2","H2O","CO2","CO2","H2O","CO2"],PVC:["CO2","H2O","CO2","HCl"],PUR:["CO2","H2O","CO2","CO2","H2O","NO"]};
+function burnProd(id,k){const a=BURN[id];return a[k%a.length];}
+function drawMol(c,p,pr){
+  const type=PROC[pr].mol,N=16,s=phase(11),fade=PH.f,pu=PH.u;
+  c.fillStyle="#0a0d0f";c.strokeStyle="#262c31";c.lineWidth=1;c.beginPath();c.roundRect(8,286,784,138,10);c.fill();c.stroke();
+  label(c,"TEILCHENEBENE",22,302,"#ffb454",11,"left",true);
+  const x0=44,sp=15,ys=[334,362,390],psMono=type==="frag"&&p.id==="PS",net=p.id==="PUR",light="#e7e4dd",pos=[];
+  for(let r=0;r<3;r++){let fi=0,cnt=0;
+    for(let i=0;i<N;i++){let f=0,gap=0,dy=0;
+      if(type==="keep"){f=(!net&&r===1&&i>=9)?1:0;gap=12;}
+      else if(type==="mono"){f=net?i:i>>1;gap=net?11:9;}
+      else if(psMono){f=i;gap=4.5;dy=3;}
+      else if(type==="frag"){if(cnt>=FRAG[r][fi]){fi++;cnt=0;}cnt++;f=fi;gap=13;dy=5;}
+      let x=x0+i*sp+f*gap*s,y=ys[r]+(f%2?1:-1)*dy*s+Math.sin(T*2+i*.7+r)*1.5;if(type==="mono"&&net&&i%2)y-=9*s;
+      if(type==="gas"||type==="burn"){const k=r*N+i,tx=48+rnd(k)*360,ty=318+rnd(k+99)*88+Math.sin(T*1.5+k)*3;x+=(tx-x)*s;y+=(ty-y)*s;}
+      pos.push({x,y,f,r,i});}}
+  const solid=type!=="gas"&&type!=="burn";
+  if((type==="frag"||type==="gas"||type==="burn")&&s>0){const g=c.createLinearGradient(0,424,0,330);g.addColorStop(0,"rgba(255,106,42,"+(.28*s)+")");g.addColorStop(1,"rgba(255,106,42,0)");c.fillStyle=g;c.fillRect(9,330,430,93);}
+  c.lineCap="round";c.lineWidth=3.2;
+  pos.forEach((q,k)=>{if(q.i===0)return;const o=pos[k-1],cut=o.f!==q.f,a=solid?(cut?1-s:1):1-s;if(a<=.02)return;c.globalAlpha=a*.8;c.strokeStyle=p.col;c.beginPath();c.moveTo(o.x,o.y);c.lineTo(q.x,q.y);c.stroke();});
+  if(net){const a=(type==="keep"||type==="solvent")?1:1-s;c.globalAlpha=Math.max(0,a)*.8;c.strokeStyle=p.col;c.lineWidth=2.6;[3,8,13].forEach(i=>{for(let r=0;r<2;r++){const u=pos[r*N+i+(r?-1:0)],v=pos[(r+1)*N+i+(r?-1:0)];c.beginPath();c.moveTo(u.x,u.y);c.lineTo(v.x,v.y);c.stroke();}});}
+  c.globalAlpha=1;
+  pos.forEach((q,k)=>{
+    if(solid)ball(c,q.x,q.y,5.6,(type==="mono"&&q.i%2)?light:p.col);
+    else{if(s<.98){c.globalAlpha=1-s;ball(c,q.x,q.y,5.6,p.col);}
+      if(s>.02&&k%2===0){c.globalAlpha=s;const t=type==="gas"?((k/2)%3===0?"CO":"H2"):burnProd(p.id,k/2);molecule(c,t,q.x,q.y);}
+      c.globalAlpha=1;}});
+  if(type==="solvent"){for(let k=0;k<30;k++){const tx=48+rnd(k)*320,ty=320+rnd(k+50)*84;c.globalAlpha=s;ball(c,tx+Math.sin(T*2+k)*3,ty+Math.cos(T*2+k)*3,2.5,"#6fb1f5");}
+    c.globalAlpha=1;for(let k=0;k<6;k++){const sx=70+k*38,sy=ys[k%3]+10,tx=396+(k%3)*12,ty=404-(k>>1)*10;ball(c,sx+(tx-sx)*s,sy+(ty-sy)*s,3.4,"#e4604a");}}
+  if(type==="mono"&&net){c.globalAlpha=s;pos.forEach(q=>{if(q.i%2===0){[-1,1].forEach(dr=>{if(q.i===0&&dr<0)return;ball(c,q.x+dr*8,q.y-7,2.4,"#4fd1c5");});}else{ball(c,q.x-6.5,q.y,2.2,"#e4604a");ball(c,q.x+6.5,q.y,2.2,"#e4604a");}});c.globalAlpha=1;}
+  else if(type==="mono"){c.globalAlpha=s;pos.forEach((q,k)=>{if(q.i&&pos[k-1].f!==q.f){const mx=(q.x+pos[k-1].x)/2,my=q.y-10+Math.sin(T*3+k)*1.5;ball(c,mx-2,my,2.3,"#4fd1c5");ball(c,mx+2,my,2.3,"#4fd1c5");}});c.globalAlpha=1;}
+  if(type==="keep"&&!net&&s>.5){c.globalAlpha=(s-.5)*2;label(c,"Kettenbruch",x0+9*sp+6,ys[1]-13,"#e4785b",10,"center",true);c.globalAlpha=1;}
+  c.globalAlpha=1;if(fade>0){c.fillStyle="rgba(10,13,15,"+fade+")";c.fillRect(10,308,440,114);}
+  PH.u=pu;loopBar(c,150,302,90);
+  // Erklärung und Legende
+  c.font="13px "+FONT;c.fillStyle="#e7e4dd";c.textAlign="left";c.textBaseline="middle";
+  wrap(c,molText(p,pr),462,310,316,17.5);
+  let lx=462;const leg=(col,t)=>{ball(c,lx+5,412,4.2,col);label(c,t,lx+13,412,"#9aa2a9",10.5);lx+=c.measureText(t).width+26;};
+  if(solid){const pur=p.id==="PUR";leg(p.col,type==="mono"?(pur?"Isocyanat-Baustein":"Säure-Baustein"):"Monomer-Baustein");if(type==="mono"){leg(light,pur?"Polyol-Baustein":"Diol-Baustein");leg("#4fd1c5",pur?"Diol":"Diol (Spaltmittel)");}if(type==="solvent"){leg("#6fb1f5","Lösemittel");leg("#e4604a","Additiv");}}
+  else{leg(ATOM.C,"C");leg(ATOM.O,"O");leg(ATOM.H,"H");if(type==="burn"&&p.id==="PVC")leg(ATOM.Cl,"Cl");if(type==="burn"&&p.id==="PUR")leg(ATOM.N,"N");}
+}
+function loop(ts){
+  const dt=Math.min(.05,(ts-last)/1000)||0;last=ts;
+  if(S.run){const d=dt*S.speed;T+=d;if(S.sel.length>1)stepSep(d);stepProc(d);}
+  drawSep();drawProc();if(S.det!==null)drawDet();requestAnimationFrame(loop);
+}
+
+/* ---------- Detailansicht einer Station: vergrößerte Maschine und Teilchenebene ---------- */
+const cvD=$("#cvDet"),cD=fit(cvD,800,310);
+const smo=x=>x<=0?0:x>=1?1:x*x*(3-2*x),ramp=(u,a,b)=>smo((u-a)/(b-a)),mix=(a,b,t)=>a+(b-a)*t;
+/* Ablauf in eine Richtung: Start – Vorgang – Endzustand halten – ausblenden – Neustart (kein Rücklauf) */
+const PH={f:0,u:-1};
+function phase(per){const u=(T%per)/per;PH.u=u;PH.f=u>.94?(u-.94)/.06:u<.04?1-u/.04:0;return u<.05?0:u<.62?smo((u-.05)/.57):1;}
+function loopBar(c,x,y,w){if(PH.u<0)return;c.fillStyle="#262c31";c.beginPath();c.roundRect(x,y,w,4,2);c.fill();c.fillStyle="#4fd1c5";c.beginPath();c.roundRect(x,y,Math.max(4,w*Math.min(1,PH.u/.94)),4,2);c.fill();
+  label(c,PH.u<.05?"Ausgangszustand":PH.u<.62?"Vorgang läuft":PH.u<.94?"Endzustand":"Neustart",x+w+8,y+2,"#9aa2a9",10);}
+Object.assign(ATOM,{S:"#e8d36a",Cu:"#c9783a",M:"#8d99a2"});
+Object.assign(MOLS,{O2:[["O",-4.3,0,4.6],["O",4.3,0,4.6]],N2:[["N",-4.1,0,4.4],["N",4.1,0,4.4]],MeOH:[["H",-10,-3.5,2.6],["H",-10,4,2.6],["H",-4,-8,2.6],["C",-4,0,4.8],["O",4.6,0,4.6],["H",9,3.5,2.6]],
+  DIOL:[["O",-9.5,0,4.2],["C",-3.2,0,4.4],["C",3.2,0,4.4],["O",9.5,0,4.2]],HCN:[["H",-7.6,0,2.6],["C",-2,0,4.6],["N",6,0,4.4]],H2S:[["H",-5,3.4,2.6],["H",5,3.4,2.6],["S",0,0,5.2]]});
+function wander(i,W,H,sp){return [((rnd(i)*W+Math.sin(T*sp*(.6+rnd(i+1))+i)*26+Math.sin(T*sp*.37+i*2.1)*18)%W+W)%W,((rnd(i+7)*H+Math.cos(T*sp*(.5+rnd(i+3))+i*1.3)*22+Math.sin(T*sp*.29+i)*14)%H+H)%H];}
+function chainPts(n,x0,y0,sp,amp,seed,f){const a=[];for(let i=0;i<n;i++)a.push([x0+i*sp,y0+Math.sin(T*(f||2)+i*.8+seed)*amp+Math.sin(T*1.3+i*1.7+seed*2)*amp*.5]);return a;}
+function drawChain(c,pts,col,r,o){o=o||{};c.lineCap="round";
+  pts.forEach((q,i)=>{if(!i)return;const a=o.bond?o.bond(i):1;if(a<=.02)return;c.globalAlpha=a*.85;c.strokeStyle=o.bcol?o.bcol(i):col;c.lineWidth=r*.6;c.beginPath();c.moveTo(pts[i-1][0],pts[i-1][1]);c.lineTo(q[0],q[1]);c.stroke();});
+  c.globalAlpha=1;pts.forEach((q,i)=>ball(c,q[0],q[1],o.r?o.r(i):r,o.col?o.col(i):col));}
+const two=p=>p.id==="PET"||p.id==="PUR";
+const bcol=(p,i)=>two(p)&&i%2?"#e7e4dd":p.col;
+function tenside(c,x,y,a){c.save();c.translate(x,y);c.rotate(a);c.strokeStyle="#b8c0c6";c.lineWidth=1.8;c.beginPath();c.moveTo(4,0);for(let i=1;i<=4;i++)c.lineTo(4+i*4,(i%2?-2.5:2.5));c.stroke();c.restore();ball(c,x,y,3.8,"#6fb1f5");}
+function dirt(c,x,y,r){c.fillStyle="#7a5630";c.strokeStyle="#4a3118";c.lineWidth=1;c.beginPath();for(let i=0;i<8;i++){const a=i*Math.PI/4,rr=r*(.8+rnd(i+x)*.35);c.lineTo(x+Math.cos(a)*rr,y+Math.sin(a)*rr);}c.closePath();c.fill();c.stroke();}
+function heatGlow(c,W,H,a){const g=c.createLinearGradient(0,H,0,H*.35);g.addColorStop(0,"rgba(255,106,42,"+a+")");g.addColorStop(1,"rgba(255,106,42,0)");c.fillStyle=g;c.fillRect(0,0,W,H);}
+function tag(c,t,x,y,col,al){c.font="600 10.5px "+FONT;const w=c.measureText(t).width+10,a=al||"left",bx=a==="left"?x-5:a==="right"?x-w+5:x-w/2,ga=c.globalAlpha;c.globalAlpha=ga*.78;c.fillStyle="#090c0e";c.beginPath();c.roundRect(bx,y-8,w,16,5);c.fill();c.globalAlpha=ga;label(c,t,x,y,col||"#9aa2a9",10.5,a,true);}
+function lattice(c,p,x0,y0,cols,rows,sp){const P=[];for(let r=0;r<rows;r++)P.push(chainPts(cols,x0,y0+r*sp,sp,1.2,r*2+x0,3));
+  c.strokeStyle=p.col;c.lineWidth=3;c.globalAlpha=.8;for(let r=0;r<rows-1;r++)for(let i=(r%2?1:2);i<cols;i+=3){c.beginPath();c.moveTo(P[r][i][0],P[r][i][1]);c.lineTo(P[r+1][i][0],P[r+1][i][1]);c.stroke();}c.globalAlpha=1;
+  P.forEach(pts=>drawChain(c,pts,p.col,5.2,{col:i=>bcol(p,i)}));return P;}
+const SC={
+ rest(c,p,W,H){for(let r=0;r<6;r++)drawChain(c,chainPts(22,18+(r%2)*9,54+r*26,19.5,2.4,r*3),p.col,5.6,{col:i=>bcol(p,i)});
+   [[70,67],[190,93],[330,67],[120,145],[270,119],[390,171]].forEach(([x,y],i)=>ball(c,x+Math.sin(T*2+i)*1.5,y+Math.cos(T*2+i)*1.5,4.4,"#e4604a"));
+   [80,230,360].forEach((x,i)=>dirt(c,x,30+Math.sin(i)*3,9));tag(c,"Anhaftungen",250,14);},
+ cut(c,p,W,H){const s=phase(8),gap=s*44,mid=18+10.5*17.5;
+   for(let r=0;r<6;r++){const pts=chainPts(22,18,48+r*26,17.5,2,r*3).map((q,i)=>[q[0]+(i>=11?gap:0),q[1]]);const whole=r%2===1;
+     drawChain(c,pts,p.col,5.6,{col:i=>bcol(p,i),bond:i=>i===11?(whole?1-ramp(s,.15,.5):0):1});
+     if(whole&&s>.3&&s<.95){c.globalAlpha=1-Math.abs(s-.6)*2.2>0?1-Math.abs(s-.6)*2.2:0;tag(c,"✕",pts[10][0]+9+gap/2,pts[10][1],"#e4785b","center");c.globalAlpha=1;}}
+   c.fillStyle=lg(c,0,-10,0,40,"#c3ccd3","#59646d");c.beginPath();c.moveTo(mid+gap/2-9,-6);c.lineTo(mid+gap/2+9,-6);c.lineTo(mid+gap/2,-6+s*46);c.closePath();c.fill();
+   if(s>.5){c.globalAlpha=(s-.5)*2;tag(c,"Schnittfläche",mid+gap/2,H-8,"#9aa2a9","center");c.globalAlpha=1;}},
+ net(c,p,W,H){lattice(c,p,26,46,20,6,21);c.strokeStyle="#ffb454";c.lineWidth=1.2;c.beginPath();c.moveTo(250,22);c.lineTo(213,54);c.stroke();tag(c,"Vernetzung: Elektronenpaarbindung zwischen den Ketten",W-6,14,"#ffb454","right");},
+ wash(c,p,W,H){const s=phase(10);
+   for(let i=0;i<16;i++){const q=wander(i,W,138,1.2);molecule(c,"H2O",q[0],q[1]+4);}
+   [0,1].forEach(r=>drawChain(c,chainPts(23,14,172+r*24,19.5,1.2,r),p.col,5.8,{col:i=>bcol(p,i)}));
+   [90,226,362].forEach((bx,j)=>{const lift=ramp(s,.5+j*.06,.95),x=bx+lift*34,y=153-lift*118,R=14+(1-ramp(s,j*.05,.45))*64;
+     c.globalAlpha=1-ramp(lift,.75,1);dirt(c,x,y,9);for(let k=0;k<7;k++){const a=-Math.PI+k*Math.PI/6+(lift>0?k*.52*lift:0);tenside(c,x+Math.cos(a)*R,y+Math.sin(a)*R*(lift>0?1:.9),a+Math.PI);}c.globalAlpha=1;});
+   tag(c,"Kunststoff-Oberfläche",8,H-4);},
+ dry(c,p,W,H){const s=phase(8);heatGlow(c,W,H,.22);
+   [0,1].forEach(r=>drawChain(c,chainPts(23,14,166+r*24,19.5,1.2+s,r),p.col,5.8,{col:i=>bcol(p,i)}));
+   for(let i=0;i<13;i++){const u=ramp(s,i/13*.55,i/13*.55+.4),x=26+i*32+Math.sin(T*3+i)*3*(1+u*4),y=146-u*150;c.globalAlpha=1-ramp(u,.7,1);molecule(c,"H2O",x,y);}c.globalAlpha=1;
+   c.strokeStyle="rgba(255,150,60,.6)";c.lineWidth=2;for(let i=0;i<5;i++){const x=50+i*88,o=(T*26+i*14)%60;c.globalAlpha=1-o/60;c.beginPath();c.moveTo(x,H-2-o);c.bezierCurveTo(x-7,H-10-o,x+7,H-18-o,x,H-26-o);c.stroke();}c.globalAlpha=1;
+   tag(c,"Wärme",W-8,H-8,"#ff8a3c","right");tag(c,"Wasserdampf",W-8,14,"#6fb1f5","right");},
+ melt(c,p,W,H,v){let s=phase(10);const rev=v==="rev";if(rev)s=1-s;heatGlow(c,W,H,.3*s);
+   for(let r=0;r<6;r++){const y=H/2+(r-2.5)*(19+9*s),sh=Math.sin(T*.9+r*2.1)*24*s,brk=!rev&&r===3&&s>.8;
+     const pts=chainPts(20,30+sh,y,19.5,1+7*s,r*3,2+2*s).map((q,i)=>[q[0]+(brk&&i>=10?9:0),q[1]]);
+     drawChain(c,pts,p.col,5.6,{col:i=>bcol(p,i),bond:i=>brk&&i===10?0:1});
+     if(brk)tag(c,"Kettenbruch",pts[10][0]-4,pts[10][1]-14,"#e4785b","center");
+     if(!rev&&p.id==="PVC"&&r===1&&s>.6){const u=ramp(s,.6,1);c.globalAlpha=1-u*.3;molecule(c,"HCl",pts[6][0],pts[6][1]-12-u*30);molecule(c,"HCl",pts[13][0],pts[13][1]-12-u*38);c.globalAlpha=1;}}
+   c.fillStyle="#22282d";c.fillRect(W-13,14,7,H-28);c.fillStyle=lg(c,0,H-14,0,14,"#ffb454","#e4604a");c.fillRect(W-13,H-14-(H-28)*(.15+.8*s),7,(H-28)*(.15+.8*s));
+   tag(c,s<.3?"fest: Ketten dicht gepackt":s>.7?"Schmelze: Ketten gleiten":(rev?"Abkühlen …":"Erwärmen …"),8,12,s>.7?"#ff8a3c":"#9aa2a9");},
+ solid(c,p,W,H){SC.melt(c,p,W,H,"rev");},
+ dissolve(c,p,W,H){const s=phase(10);
+   for(let i=0;i<50;i++){const q=wander(i,W,H,1.1),sy=q[1]<H/2?q[1]*.3:H-(H-q[1])*.3;ball(c,q[0],mix(sy,q[1],s),3.3,"#6fb1f5");}
+   for(let r=0;r<5;r++)drawChain(c,chainPts(20,34,H/2+(r-2)*(13+23*s),19.5,1+6*s,r*3,2+s),p.col,5.6,{col:i=>bcol(p,i)});
+   for(let i=0;i<5;i++){const q=wander(i+60,W,H,.9),x0=70+i*78,y0=H/2+(i%2?6.5:-6.5);ball(c,mix(x0,q[0],s),mix(y0,q[1],s),4.4,"#e4604a");}
+   tag(c,s<.3?"fester Kunststoff":s>.7?"gelöst: jede Kette von Lösemittel umhüllt":"Lösemittel dringt ein …",8,10);},
+ filter(c,p,W,H,v){const mx=W*.58,mono=v==="mono";
+   c.strokeStyle="rgba(79,209,197,.35)";c.lineWidth=1.5;for(let i=0;i<4;i++){const y=30+i*52,o=(T*40)%40;c.setLineDash([10,30]);c.lineDashOffset=-o;c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke();}c.setLineDash([]);
+   for(let i=0;i<16;i++){const x=((T*34+i*(W+60)/16)%(W+60))-30,py=22+(i%8)*26,d=Math.abs(x-mx),y=py+(d<40?0:Math.sin(T*2+i)*5);
+     if(mono){ball(c,x-8,y,3.6,"#e7e4dd");ball(c,x,y,5,p.col);ball(c,x+8,y,3.6,"#e7e4dd");}
+     else{const squeeze=d<30?.55:1;for(let k=0;k<6;k++)ball(c,x+Math.cos(k*1.05+i)*7*squeeze+(k-2.5)*2.4*(1-squeeze)*3,y+Math.sin(k*1.05+i)*7*squeeze,3.2,bcol(p,k));}}
+   for(let i=0;i<9;i++){const u=Math.min(1,((T*.07+i/9)%1)*2.4),sx=mx-14-(i%3)*19,y=9+(i%8)*26+((i*7)%3)*2;const x=mix(-20,sx,smo(u))+Math.sin(T*3+i)*.8;
+     if(i%3===0)dirt(c,x,y,8);else ball(c,x,y,8,i%3===1?"#e4604a":"#59646d");}
+   c.fillStyle="#85919a";for(let y=-4;y<H;y+=26)c.fillRect(mx-4,y,8,17);c.fillStyle="rgba(133,145,154,.25)";c.fillRect(mx-4,0,8,H);
+   tag(c,"Filter",mx,H-4,"#c3ccd3","center");tag(c,"Rückstand",mx-60,H-4,"#e4785b","center");tag(c,"Filtrat",W-8,H-4,"#7fd68a","right");},
+ precip(c,p,W,H){const s=phase(10);
+   for(let i=0;i<30;i++){const q=wander(i,W,H,1.1);ball(c,q[0],q[1],3.3,"#6fb1f5");}for(let i=0;i<6;i++){const q=wander(i+80,W,H,1.3);ball(c,q[0],q[1],4.2,"#e4604a");}
+   for(let i=0;i<18;i++){const q=wander(i+40,W,H,1.2);c.globalAlpha=s;ball(c,q[0],mix(-10,q[1],s),3.3,"#4fd1c5");}c.globalAlpha=1;
+   for(let r=0;r<4;r++){const sp=mix(19,6.5,s),x0=mix(26+r*14,W/2-58+(r%2)*6,s),y=mix(H/2+(r-1.5)*40,H*.6+(r-1.5)*10,s);drawChain(c,chainPts(18,x0,y,sp,mix(6,1.5,s),r*3,2.5),p.col,5.4,{col:i=>bcol(p,i)});}
+   tag(c,s<.3?"gelöste Ketten":s>.7?"Ketten fallen aus – Additive (rot) bleiben gelöst":"Fällungsmittel kommt hinzu …",8,10);},
+ glyco(c,p,W,H,v){if(p.id==="PUR"&&v!=="rev")return SC.glycoPUR(c,p,W,H);let s=phase(11);if(v==="rev")s=1-s;const y0=H*.64,U=56,G=25,x0=34,pur=p.id==="PUR";
+   for(let j=0;j<5;j++){const ax=x0+j*U+j*G*s,bx=ax+25;
+     if(j>0){const pbx=x0+(j-1)*U+(j-1)*G*s+25,a=1-ramp(s,.38,.58);if(a>.02){c.globalAlpha=a;c.strokeStyle="#ffb454";c.lineWidth=4.5;c.lineCap="round";c.beginPath();c.moveTo(pbx,y0);c.lineTo(ax,y0);c.stroke();c.globalAlpha=1;}
+       if(s>.38&&s<.62){c.globalAlpha=1-Math.abs(s-.5)*8;c.strokeStyle="#fff3c4";c.lineWidth=1.5;for(let k=0;k<6;k++){const a2=k*1.05;c.beginPath();c.moveTo(ax-15+Math.cos(a2)*5,y0+Math.sin(a2)*5);c.lineTo(ax-15+Math.cos(a2)*11,y0+Math.sin(a2)*11);c.stroke();}c.globalAlpha=1;}}
+     c.strokeStyle="#9aa2a9";c.lineWidth=4;c.beginPath();c.moveTo(ax,y0);c.lineTo(bx,y0);c.stroke();
+     const u=ramp(s,.08+j*.03,.55),gx=mix(ax-30+rnd(j)*40,ax-22,u),gy=mix(22+rnd(j+5)*26+Math.sin(T*2+j)*4,y0,u);
+     const ba=ramp(s,.5,.68);if(ba>.02){c.globalAlpha=ba;c.strokeStyle="#4fd1c5";c.lineWidth=4;c.beginPath();c.moveTo(gx,gy);c.lineTo(ax,y0);c.stroke();c.globalAlpha=1;}
+     ball(c,gx,gy,6.6,"#e7e4dd");c.strokeStyle="#4fd1c5";c.lineWidth=2;c.beginPath();c.arc(gx,gy,8.2,0,7);c.stroke();
+     ball(c,ax,y0,9.5,p.col);ball(c,bx,y0,6.6,"#e7e4dd");}
+   if(s<.3&&v!=="rev"){c.strokeStyle="#ffb454";c.lineWidth=1.2;const ex=x0+U-15;c.beginPath();c.moveTo(ex,y0+10);c.lineTo(ex+26,y0+34);c.stroke();tag(c,pur?"Urethangruppe (wird gespalten)":"Esterbindung (wird gespalten)",ex+30,y0+38,"#ffb454");}
+   tag(c,v==="rev"?(s>.6?"Monomere":"Verknüpfung, Diol wird frei"):(s<.3?"Diol-Moleküle greifen an":s>.7?(pur?"kurze Bruchstücke mit OH-Enden":"Monomere: Diol – Säurebaustein – Diol"):"Spaltung …"),8,10);},
+ poly(c,p,W,H,v){if(v==="cond")return SC.glyco(c,p,W,H,"rev");const s=phase(11),N=20,ps=p.id==="PS";let prev=null;
+   for(let i=0;i<N;i++){const u=ramp(s*N*1.06,i,i+1.6),q=wander(i+3,W,H,1.1),x=mix(q[0],26+i*21,u),y=mix(q[1],H/2+Math.sin(T*2+i*.8)*4,u);
+     if(prev&&u>.05){c.globalAlpha=u*.85;c.strokeStyle=p.col;c.lineWidth=3.6;c.lineCap="round";c.beginPath();c.moveTo(prev[0],prev[1]);c.lineTo(x,y);c.stroke();c.globalAlpha=1;}
+     ball(c,x,y,6,bcol(p,i));if(ps&&u<.6){c.globalAlpha=1-u/.6;c.strokeStyle="#ffb454";c.lineWidth=1.6;c.beginPath();c.moveTo(x-4,y-9);c.lineTo(x+4,y-9);c.moveTo(x-4,y-12);c.lineTo(x+4,y-12);c.stroke();c.globalAlpha=1;}
+     prev=[x,y];}
+   tag(c,ps?"Monomere mit C=C-Doppelbindung lagern sich an das Kettenende an":"Bausteine lagern sich aneinander – ohne Abspaltung",8,10);},
+ crack(c,p,W,H,v){const s=phase(11);heatGlow(c,W,H,.32);const brown="#8a5a3a";
+   if(v==="unzip"){for(let r=0;r<3;r++){const pts=chainPts(18,26,54+r*52,21,3+3*s,r*3,3);pts.forEach((q,i)=>{const u=ramp(s,(17-i)/18*.8+r*.03,(17-i)/18*.8+.14+r*.03);if(u>0){const w=wander(r*18+i,W,H,1.3);q[0]=mix(q[0],w[0],u);q[1]=mix(q[1],w[1],u);q.u=u;}});
+       drawChain(c,pts,p.col,6,{bond:i=>1-Math.max(pts[i].u||0,pts[i-1].u||0)*3});}
+     tag(c,"vom Kettenende lösen sich Styrol-Moleküle",8,10,"#ff8a3c");return;}
+   if(v==="hcl"){for(let r=0;r<3;r++){const pts=chainPts(18,30,74+r*50,21,2+2*s,r*3,3);
+       pts.forEach((q,i)=>{if(i%2)return;const u=ramp(s,i/18*.6,i/18*.6+.3);q.u=u;if(u>0&&u<1){c.globalAlpha=1-ramp(u,.7,1);molecule(c,"HCl",q[0]+Math.sin(T*3+i)*3,q[1]-12-u*52);c.globalAlpha=1;}});
+       drawChain(c,pts,p.col,6,{col:i=>(pts[i-(i%2)].u||0)>.5?brown:p.col,bcol:i=>(pts[i-(i%2)].u||0)>.5?"#ffb454":p.col});}
+     tag(c,"HCl wird abgespalten – zurück bleibt eine Kette mit C=C-Doppelbindungen",8,10,"#ff8a3c");return;}
+   const mono=v==="mono",n=mono?8:20,rows=4,FR=[[4,6,3,7],[5,3,8,4],[7,5,2,6],[3,7,6,4]];
+   for(let r=0;r<rows;r++){let fi=0,cnt=0;const fa=[];const pts=chainPts(n,mono?40+r*14:22,40+r*44,mono?20:19,3+4*s,r*3,3+3*s).map((q,i)=>{let f;if(mono)f=i;else{if(cnt>=FR[r][fi]){fi++;cnt=0;}cnt++;f=fi;}fa.push(f);return [q[0]+f*(mono?24:15)*s,q[1]+((f%2)?1:-1)*(mono?5:7+f*2)*s];});
+     drawChain(c,pts,p.col,5.8,{col:i=>bcol(p,i),bond:i=>fa[i]!==fa[i-1]?1-ramp(s,.2,.5):1});
+     if(mono&&s>.5){c.globalAlpha=ramp(s,.5,.7);c.strokeStyle="#ffb454";c.lineWidth=1.6;pts.forEach(q=>{c.beginPath();c.moveTo(q[0]-4,q[1]-9);c.lineTo(q[0]+4,q[1]-9);c.moveTo(q[0]-4,q[1]-12);c.lineTo(q[0]+4,q[1]-12);c.stroke();});c.globalAlpha=1;}
+     if(s>.25&&s<.8)pts.forEach((q,i)=>{if(i&&fa[i]!==fa[i-1]){c.globalAlpha=1-Math.abs(s-.5)*3.4>0?1-Math.abs(s-.5)*3.4:0;ball(c,q[0]-8,q[1]-7,1.8,"#fff");ball(c,pts[i-1][0]+8,pts[i-1][1]-7,1.8,"#fff");c.globalAlpha=1;}});
+     if(s>.5&&(p.id==="PET"||p.id==="PUR")&&!mono){c.globalAlpha=(s-.5)*2;molecule(c,p.id==="PET"?"CO2":"HCN",120+r*90+Math.sin(T+r)*6,22+r*46+Math.cos(T+r)*5);c.globalAlpha=1;}}
+   tag(c,mono?(s>.7?"Ethen und Propen mit C=C-Doppelbindung (gelb)":"Ölmoleküle zerfallen in kleinste Bruchstücke"):(s<.25?"Ketten schwingen immer stärker":s>.7?"Bruchstücke: Gas, Öl, Wachs":"C–C-Bindungen brechen (weiße Punkte: Radikale)"),8,10,"#ff8a3c");},
+ condense(c,p,W,H,v){const dist=v==="dist",pool=H-44;
+   c.fillStyle=lg(c,W*.45,0,W,0,"rgba(111,177,245,0)","rgba(111,177,245,.22)");c.fillRect(0,0,W,pool);
+   c.fillStyle="rgba(201,138,58,.28)";c.fillRect(0,pool,W,44);c.strokeStyle="#c98a3a";c.lineWidth=1.5;c.beginPath();for(let x=0;x<=W;x+=8)c.lineTo(x,pool+Math.sin(x/14+T*2)*1.5);c.stroke();
+   for(let i=0;i<18;i++){const L=1+Math.floor(rnd(i+2)*7),u=(T*.07+rnd(i))%1,x=14+u*(W-28),yg=28+rnd(i+9)*(pool-70),heavy=L>=4,f=heavy?ramp(u,.3,.62):0,y=mix(yg+Math.sin(T*3+i)*8,pool+14+rnd(i+4)*20,f),a=Math.sin(T*(heavy?1.2:2.5)*(1-f*.8)+i)*.8;
+     c.globalAlpha=u<.05?u*20:u>.95?(1-u)*20:1;const pts=[];for(let k=0;k<L;k++)pts.push([x+(k-(L-1)/2)*8.5*Math.cos(a),y+(k-(L-1)/2)*8.5*Math.sin(a)+(k%2?2:-2)]);drawChain(c,pts,p.col,4.2);}
+   c.globalAlpha=1;if(!dist)for(let i=0;i<5;i++)ball(c,30+i*17+rnd(i)*8,H-6,3.6,"#22282d");
+   tag(c,dist?"leicht siedende Nebenprodukte bleiben Dampf":"kurze Bruchstücke bleiben Gas",W-8,12,"#b8c0c6","right");tag(c,"Kühlung",W-8,pool-10,"#6fb1f5","right");tag(c,dist?"Styrol kondensiert":"lange Bruchstücke kondensieren: Öl",W-8,H-8,"#c98a3a","right");if(!dist)tag(c,"Koks",8,H-20,"#9aa2a9");},
+ hydro(c,p,W,H){const s=phase(12),surf=H-22,ys=H-36;
+   for(let i=0;i<23;i++)ball(c,6+i*20,H-8,9,i%2?ATOM.Cu:ATOM.M);tag(c,"Katalysator",W-8,H-30,"#c9783a","right");
+   for(let r=0;r<4;r++){const o=r*.07,x0=14+r*110,y0=40+(r%2)*40,dn=ramp(s,.03+o,.25+o),up=ramp(s,.52+o,.74+o),y=mix(mix(y0,ys,dn),y0,up);
+     const pts=chainPts(5,x0,y,19,1.4,r*3),a=pts[1],b=pts[2],sx=(a[0]+b[0])/2;
+     const h=ramp(s,o,.24+o),sp=ramp(s,.26+o,.32+o),at=ramp(s,.32+o,.4+o);
+     let h1=null,h2=null;
+     if(sp<=0)molecule(c,"H2",mix(x0+30+Math.sin(T+r)*14,sx,h),mix(14,surf,h));
+     else{h1=[mix(sx-8*sp,a[0],at),mix(surf,a[1]+10,at)];h2=[mix(sx+8*sp,b[0],at),mix(surf,b[1]+10,at)];}
+     let cl=null,hc=null,hcl=null;
+     if(r===1){const q=pts[3],h2b=ramp(s,.05+o,.27+o),spb=ramp(s,.28+o,.33+o),go=ramp(s,.42+o,.8+o);
+       if(spb<=0){molecule(c,"H2",mix(x0+86,q[0]+10,h2b),mix(20,surf,h2b));cl=[q[0],q[1]+11];}
+       else{hc=[mix(q[0]+10-8*spb,q[0],ramp(s,.33+o,.41+o)),mix(surf,q[1]+10,ramp(s,.33+o,.41+o))];
+         if(go<=0)cl=[q[0],q[1]+11+ramp(s,.33+o,.41+o)*(surf-q[1]-11)];
+         hcl=[mix(q[0]+6,q[0]+70,go),mix(surf-4,8,go)];}}
+     drawChain(c,pts,p.col,5.4);
+     const dbl=1-ramp(s,.36+o,.42+o);if(dbl>.02){c.globalAlpha=dbl;c.strokeStyle="#ffb454";c.lineWidth=2.2;c.beginPath();c.moveTo(a[0]+5,a[1]-8);c.lineTo(b[0]-5,b[1]-8);c.stroke();c.globalAlpha=1;}
+     if(h1){ball(c,h1[0],h1[1],2.8,ATOM.H);ball(c,h2[0],h2[1],2.8,ATOM.H);}
+     if(cl)ball(c,cl[0],cl[1],5.4,ATOM.Cl);if(hc)ball(c,hc[0],hc[1],2.8,ATOM.H);
+     if(hcl&&!cl){c.globalAlpha=1-ramp(s,.75+o,.8+o);molecule(c,"HCl",hcl[0],hcl[1]);c.globalAlpha=1;}}
+   tag(c,s<.22?"Bruchstücke mit C=C (gelb) und Chlor-Atom (grün) wandern zum Katalysator":s<.48?"H₂ wird an der Oberfläche in H-Atome gespalten, diese binden an die Kette":"gesättigte Ketten lösen sich ab, HCl entweicht",8,10);},
+ react(c,p,W,H,v){const s=phase(11),gas=v==="gas",N=16;heatGlow(c,W,H,.35);
+   const re=[];if(gas){for(let i=0;i<5;i++)re.push("O2");for(let i=0;i<7;i++)re.push("H2O");}else for(let i=0;i<18;i++)re.push("O2");
+   re.forEach((t,i)=>{const w=wander(i+5,W,H,1.3),u=ramp(s,.02,.45),tx=40+(i*53)%(W-80),ty=H/2+(i%2?14:-14);c.globalAlpha=1-ramp(s,.36,.5);molecule(c,t,mix(w[0],tx,u),mix(w[1]<H/2?w[1]*.5:H-(H-w[1])*.5,ty,u));});c.globalAlpha=1;
+   const f=ramp(s,.4,.85);
+   for(let r=0;r<2;r++){const pts=chainPts(N,40,H/2-14+r*28,24.5,2+3*s,r*3,3);
+     if(f<1){c.globalAlpha=1-f;drawChain(c,pts,p.col,5.8,{col:i=>bcol(p,i)});c.globalAlpha=1;}
+     if(f>0)pts.forEach((q,i)=>{const k=r*N+i,w=wander(k+50,W,H,1.2);const t=gas?(k%3===0?"CO":"H2"):burnProd(p.id,k);c.globalAlpha=f;molecule(c,t,mix(q[0],w[0],f),mix(q[1],w[1],f));});c.globalAlpha=1;}
+   tag(c,gas?(s<.4?"wenig Sauerstoff und Wasserdampf treffen auf die Ketten":"Synthesegas: CO und H₂"):(s<.4?"Sauerstoff-Moleküle treffen auf die Ketten":"Verbrennungsprodukte: CO₂ und H₂O"+(p.id==="PVC"?", dazu HCl":p.id==="PUR"?", dazu Stickstoffoxide":"")),8,10,"#ff8a3c");},
+ scrub(c,p,W,H,v){const syn=v==="syn",bad=p.id==="PVC"?"HCl":syn?(p.id==="PUR"?"HCN":"H2S"):"dust";
+   c.fillStyle="#85919a";c.fillRect(0,2,W,5);for(let i=0;i<6;i++)c.fillRect(34+i*76,7,6,6);
+   for(let i=0;i<16;i++){const x=20+rnd(i)*(W-40),y=H+12-((T*24+rnd(i+3)*(H+30))%(H+30)),t=syn?(i%3?"H2":"CO"):(i%3===0?"CO2":i%3===1?"N2":"H2O");molecule(c,t,x+Math.sin(T+i)*5,y);}
+   for(let i=0;i<8;i++){const u=(T*.09+rnd(i+20))%1,x=30+i*((W-60)/7),yc=H*.42+rnd(i+11)*46;let py,dy;if(u<.5){py=H+12-u*2*(H+12-yc);dy=-12+u*2*(yc+12);}else{py=dy=yc+(u-.5)*2*(H+16-yc);}
+     c.fillStyle="rgba(111,177,245,.5)";c.strokeStyle="#a9d2ff";c.lineWidth=1.2;c.beginPath();c.moveTo(x,dy-17);c.quadraticCurveTo(x+13,dy+3,x,dy+12);c.quadraticCurveTo(x-13,dy+3,x,dy-17);c.fill();c.stroke();
+     if(bad==="dust")ball(c,x,py,3.8,"#59646d");else molecule(c,bad,x,py);}
+   tag(c,"gereinigtes Gas ↑",W-8,22,"#7fd68a","right");tag(c,syn?"Waschflüssigkeit ↓":"Kalkmilch ↓",8,22,"#6fb1f5");tag(c,"Rohgas ↑",W-8,H-6,"#e4785b","right");if(!syn)tag(c,p.id==="PVC"?"Ca(OH)₂ + 2 HCl ⟶ CaCl₂ + 2 H₂O":"Tropfen binden Staub · NOₓ: getrennt mit NH₃ zu N₂",8,H-6,"#9aa2a9");},
+ syngas(c,p,W,H){for(let i=0;i<30;i++){const q=wander(i,W,H,2.4);molecule(c,i%3===0?"CO":"H2",q[0],q[1]);}tag(c,"Verhältnis 1 CO : 2 H₂",8,10);},
+ synth(c,p,W,H){for(let i=0;i<23;i++)ball(c,6+i*20,H-10,10,i%2?ATOM.Cu:ATOM.M);tag(c,"Katalysator-Oberfläche (Kupfer / Zinkoxid)",8,H-30,"#c9783a");
+   for(let i=0;i<8;i++){const q=wander(i,W,H*.5,1.8);c.globalAlpha=.45;molecule(c,i%3===0?"CO":"H2",q[0],q[1]);}c.globalAlpha=1;
+   for(let k=0;k<4;k++){const u=(T*.1+k*.25)%1,x=62+k*108,ys=H-30;
+     if(u<.5){const d=ramp(u,0,.4),a=1-ramp(u,.4,.5);c.globalAlpha=a;molecule(c,"CO",x,mix(18,ys,d));molecule(c,"H2",mix(x-46,x-13,d),mix(26,ys,d));molecule(c,"H2",mix(x+46,x+13,d),mix(12,ys,d));}
+     if(u>.4){const d=ramp(u,.5,1);c.globalAlpha=ramp(u,.4,.5)*(1-ramp(u,.9,1));molecule(c,"MeOH",x,mix(ys,16,d));}c.globalAlpha=1;}
+   tag(c,"1 CO + 2 H₂ ⟶ 1 Methanol-Molekül",W-8,10,"#e7e4dd","right");},
+ steam(c,p,W,H){const y1=54,y2=122;heatGlow(c,W,H,.4);
+   for(let i=0;i<12;i++){const x=((T*70*(.6+rnd(i))+rnd(i+2)*W)%(W+40))-20;molecule(c,i%3===0?"CO2":i%3===1?"N2":"H2O",x,y2+22+rnd(i+5)*(H-y2-34));}
+   c.strokeStyle="rgba(255,150,60,.7)";c.lineWidth=2;for(let i=0;i<7;i++){const x=40+i*62,o=(T*18+i*5)%14;c.beginPath();c.moveTo(x,y2+16-o);c.lineTo(x,y2+4-o);c.moveTo(x-4,y2+9-o);c.lineTo(x,y2+3-o);c.lineTo(x+4,y2+9-o);c.stroke();}
+   c.fillStyle=lg(c,0,0,W,0,"rgba(60,120,210,.5)","rgba(200,220,240,.12)");c.fillRect(0,y1,W,y2-y1);
+   for(let i=0;i<30;i++){const col=i%10,row=i%3;molecule(c,"H2O",12+col*15+Math.sin(T*6+i)*1.5+(row%2)*7,y1+14+row*20+Math.cos(T*6+i)*1.5);}
+   for(let i=0;i<12;i++){const x=170+((T*110*(.6+rnd(i+30))+rnd(i+40)*300)%300);molecule(c,"H2O",x,y1+12+rnd(i+50)*(y2-y1-24)+Math.sin(T*8+i)*4);}
+   c.fillStyle="#85919a";c.fillRect(0,y1-6,W,6);c.fillRect(0,y2,W,6);
+   tag(c,"Wasser (flüssig)",8,y1-16,"#6fb1f5");tag(c,"Dampf → Turbine",W-8,y1-16,"#e7e4dd","right");tag(c,"heißes Rauchgas",W-8,H-8,"#ff8a3c","right");tag(c,"Rohrwand",W/2,y2+16,"#c3ccd3","center");},
+ stackgas(c,p,W,H){for(let i=0;i<26;i++){const u=((T*.07*(.7+rnd(i))+rnd(i+2))%1),x=W/2+(rnd(i+4)-.5)*(60+u*(W-80)),y=H+10-u*(H+24);c.globalAlpha=u>.85?(1-u)/.15:1;molecule(c,i%4===0?"CO2":i%4===3?"H2O":"N2",x+Math.sin(T+i)*5,y);}c.globalAlpha=1;
+   c.fillStyle="#59646d";c.fillRect(W/2-40,H-8,80,8);tag(c,"Schornsteinmündung",W/2,H-16,"#9aa2a9","center");tag(c,"N₂ aus der Luft · CO₂ · H₂O",8,10);},
+ bind(c,p,W,H,v){const s=v==="done"?1:v==="spray"?phase(9)*.4:phase(10);
+   lattice(c,p,14,36,8,7,21);lattice(c,p,W-14-7*21,36,8,7,21);
+   const xl=14+7*21,xr=W-14-7*21;
+   for(let j=0;j<16;j++){const row=j>>2,m=j&3,bx=xl+(xr-xl)*(m+1)/5,by=47+row*40,w=wander(j+9,xr-xl-30,H-20,1.4),u=ramp(s,.3,.9),x=mix(xl+15+w[0],bx,u),y=mix(v==="spray"?mix(-20,10+w[1],ramp(s,0,.3)/1||0):10+w[1],by,u);
+     const a=ramp(s,.72,1);if(a>.02){c.globalAlpha=a;c.strokeStyle="#ff8a3c";c.lineWidth=3;c.beginPath();c.moveTo(m===0?xl:xl+(xr-xl)*m/5,by);c.lineTo(bx,by);if(m===3)c.lineTo(xr,by);c.stroke();c.globalAlpha=1;}
+     ball(c,x,y,5,"#ff8a3c");ball(c,x+5.5,y-2,2.8,ATOM.N);}
+   if(v!=="done")for(let i=0;i<5;i++){const w=wander(i+70,xr-xl-20,H,1.5);c.globalAlpha=.8*(1-ramp(s,.6,1));molecule(c,"H2O",xl+10+w[0],w[1]);}c.globalAlpha=1;
+   if(!v)for(let i=0;i<4;i++){const u=ramp(s,.62+i*.04,1);if(u>0){c.globalAlpha=Math.min(1,u*3)*(1-ramp(u,.7,1));molecule(c,"CO2",xl+22+i*26+Math.sin(T*2+i)*4,H-30-u*150);}}c.globalAlpha=1;
+   tag(c,"Flocke",xl/2+7,12,p.col,"center");tag(c,"Flocke",(xr+W)/2-7,12,p.col,"center");tag(c,s>.8?"Binder-Brücken":"Binder",W/2,12,"#ff8a3c","center");},
+ cryst(c,p,W,H){const s=phase(10);
+   for(let i=0;i<15;i++){const w=wander(i+3,W,H,1.2),col=i%5,row=Math.floor(i/5),u=ramp(s,.1+i*.02,.8),x=mix(w[0],70+col*78+(row%2)*14,u),y=mix(w[1],46+row*46,u),a=mix(Math.sin(T+i)*1.2,0,u),dx=Math.cos(a)*11,dy=Math.sin(a)*11;
+     c.strokeStyle="#9aa2a9";c.lineWidth=3;c.beginPath();c.moveTo(x-dx,y-dy);c.lineTo(x+dx,y+dy);c.stroke();ball(c,x-dx,y-dy,4.6,"#e7e4dd");ball(c,x+dx,y+dy,4.6,"#e7e4dd");ball(c,x,y,7,p.col);}
+   for(let i=0;i<6;i++){const w=wander(i+40,W,H,1.3);ball(c,w[0],mix(w[1],H-12-rnd(i)*20,s*.7),4,"#e4604a");}
+   tag(c,s>.7?"Kristallgitter aus Monomer-Molekülen":"Monomere in Lösung",8,10);},
+ liquid(c,p,W,H){
+   for(let j=0;j<6;j++){const col=j%3,row=j/3|0,cx=80+col*146+Math.sin(T*.35+j)*8,cy=52+row*102+Math.cos(T*.3+j*1.3)*8,dd=22+14*Math.sin(T*.8+j*1.9),aa=Math.sin(T*.5+j)*.35,ab=Math.cos(T*.45+j)*.35;
+     const A=[],B=[];for(let i=0;i<5;i++){A.push([cx-dd/2-(4-i)*10*Math.cos(aa),cy-(4-i)*10*Math.sin(aa)+Math.sin(T*1.5+i+j)*1.2]);B.push([cx+dd/2+i*10*Math.cos(ab),cy+i*10*Math.sin(ab)+Math.sin(T*1.4+i+j)*1.2]);}
+     const e1=A[4],e2=B[0],hb=dd<31;
+     if(hb){c.globalAlpha=Math.min(1,(31-dd)/4);c.strokeStyle="#ffb454";c.lineWidth=1.8;c.setLineDash([3,3]);c.beginPath();c.moveTo(e1[0]+6,e1[1]);c.lineTo(e2[0]-5,e2[1]);c.stroke();c.setLineDash([]);c.globalAlpha=1;}
+     const oh=i=>i===0||i===4?"#e4604a":"#e7e4dd";
+     drawChain(c,A,"#e7e4dd",4.6,{col:oh});drawChain(c,B,"#e7e4dd",4.6,{col:oh});
+     ball(c,e1[0]+6,e1[1]-1,2.3,ATOM.H);ball(c,A[0][0]-6,A[0][1]-1,2.3,ATOM.H);ball(c,B[4][0]+6,B[4][1]-1,2.3,ATOM.H);ball(c,e2[0]-1,e2[1]-6.5,2.3,ATOM.H);}
+   tag(c,"OH-Gruppen bilden Wasserstoffbrücken (gestrichelt) – das Polyol ist zähflüssig",8,10);}
+};
+Object.assign(SC,{
+ glycoPUR(c,p,W,H){const s=phase(11),y0=H*.62,D=29,G=15,x0=26,N=10,X=i=>x0+i*D+i*G*s,Y=i=>y0-(i%2?36*ramp(s,.55,1):0)+Math.sin(T*2+i)*1.4;
+   for(let i=1;i<N;i++){const a=1-ramp(s,.36,.56),mx=(X(i-1)+X(i))/2,my=(Y(i-1)+Y(i))/2;
+     if(a>.02){c.globalAlpha=a;c.strokeStyle="#ffb454";c.lineWidth=4.5;c.lineCap="round";c.beginPath();c.moveTo(X(i-1),Y(i-1));c.lineTo(X(i),Y(i));c.stroke();c.globalAlpha=1;}
+     if(s>.38&&s<.6){c.globalAlpha=1-Math.abs(s-.49)*9>0?1-Math.abs(s-.49)*9:0;c.strokeStyle="#fff3c4";c.lineWidth=1.5;for(let k=0;k<6;k++){const w=k*1.05;c.beginPath();c.moveTo(mx+Math.cos(w)*4,my+Math.sin(w)*4);c.lineTo(mx+Math.cos(w)*9,my+Math.sin(w)*9);c.stroke();}c.globalAlpha=1;}}
+   let j=0;for(let i=0;i<N;i+=2)[-1,1].forEach(dir=>{if(i===0&&dir<0)return;const u=ramp(s,.06+j*.025,.5),tx=X(i)+dir*14,ty=Y(i),gx=mix(X(i)+dir*18+(rnd(j)-.5)*26,tx,u),gy=mix(16+rnd(j+5)*30+Math.sin(T*2+j)*4,ty,u),ba=ramp(s,.5,.66);
+     if(ba>.02){c.globalAlpha=ba;c.strokeStyle="#4fd1c5";c.lineWidth=4;c.beginPath();c.moveTo(gx,gy);c.lineTo(X(i),Y(i));c.stroke();c.globalAlpha=1;}
+     ball(c,gx,gy,5.4,"#e7e4dd");c.strokeStyle="#4fd1c5";c.lineWidth=2;c.beginPath();c.arc(gx,gy,7,0,7);c.stroke();j++;});
+   for(let i=0;i<N;i++){if(i%2===0)ball(c,X(i),Y(i),9.5,p.col);else{ball(c,X(i),Y(i),6.6,"#e7e4dd");const a=ramp(s,.55,.75);if(a>0){c.globalAlpha=a;ball(c,X(i)-8,Y(i),2.8,"#e4604a");ball(c,X(i)+8,Y(i),2.8,"#e4604a");c.globalAlpha=1;}}}
+   if(s<.3){const ex=(X(0)+X(1))/2;c.strokeStyle="#ffb454";c.lineWidth=1.2;c.beginPath();c.moveTo(ex,y0+8);c.lineTo(ex+22,y0+34);c.stroke();tag(c,"Urethangruppe (wird gespalten)",ex+26,y0+38,"#ffb454");}
+   tag(c,s<.3?"Diol-Moleküle greifen die Urethangruppen an":s>.7?"Polyol wird mit OH-Enden frei (oben) · Isocyanat-Bausteine mit Diol (unten)":"Spaltung …",8,10);},
+ layers(c,p,W,H){const s=phase(10),yb=H*.5,a=ramp(s,.35,.8);
+   c.fillStyle="rgba(201,138,58,"+(.05+.13*a)+")";c.fillRect(0,0,W,yb);c.fillStyle="rgba(111,177,245,"+(.05+.13*a)+")";c.fillRect(0,yb,W,H-yb);
+   if(a>0){c.globalAlpha=a;c.strokeStyle="#c3ccd3";c.lineWidth=1.5;c.beginPath();for(let x=0;x<=W;x+=6)c.lineTo(x,yb+Math.sin(x/16+T*1.5)*1.2);c.stroke();c.globalAlpha=1;}
+   for(let j=0;j<7;j++){const w=wander(j,W,H,.9),u=ramp(s,.05+j*.03,.75),cx=mix(w[0],34+j*62,u),cy=mix(w[1],32+(j%3)*34,u),ang=Math.sin(T*.6+j)*.5,pts=[];
+     for(let i=0;i<5;i++)pts.push([cx+(i-2)*9*Math.cos(ang),cy+(i-2)*9*Math.sin(ang)+Math.sin(T*1.4+i+j)*1.2]);drawChain(c,pts,"#e7e4dd",4.4,{col:i=>i===0||i===4?"#e4604a":"#e7e4dd"});}
+   for(let j=0;j<10;j++){const w=wander(j+20,W,H,1.2),u=ramp(s,.08+j*.025,.78),x=mix(w[0],26+j*43,u),y=mix(w[1],yb+30+(j%3)*30,u),k=j%3;
+     if(k===0)molecule(c,"DIOL",x,y);
+     else if(k===1){[-1,1].forEach(dir=>{c.strokeStyle="#4fd1c5";c.lineWidth=3;c.beginPath();c.moveTo(x,y);c.lineTo(x+dir*11,y);c.stroke();ball(c,x+dir*11,y,4.2,"#e7e4dd");c.strokeStyle="#4fd1c5";c.lineWidth=1.5;c.beginPath();c.arc(x+dir*11,y,5.6,0,7);c.stroke();});ball(c,x,y,6.5,p.col);}
+     else{ball(c,x-9,y,3.8,ATOM.N);ball(c,x+9,y,3.8,ATOM.N);ball(c,x,y,6.5,p.col);}}
+   tag(c,a>.5?"obere Phase: Recycling-Polyol":"Gemisch nach der Glykolyse",8,10,a>.5?"#c98a3a":"#9aa2a9");if(a>.5)tag(c,"untere Phase: Diol, Carbamate, Amine",8,H-8,"#6fb1f5");}
+});
+function detLegend(st,p){
+  const nm=p.id==="PET"?["Säure-Baustein","Diol-Baustein"]:p.id==="PUR"?["Isocyanat-Baustein","Polyol-Baustein"]:["Monomer-Baustein"];
+  const A=[[p.col,nm[0]]];if(two(p))A.push(["#e7e4dd",nm[1]]);
+  if(st.d==="liquid")return [["#e7e4dd","Polyol-Kette"],["#e4604a","O der OH-Gruppe"],[ATOM.H,"H"],["#ffb454","Wasserstoffbrücke"]];
+  if(st.d==="layers")return [["#e7e4dd","Polyol"],["#e4604a","OH-Gruppe"],[p.col,"Isocyanat-Baustein"],["#4fd1c5","Diol"],[ATOM.N,"N (Amin)"]];
+  const pur=p.id==="PUR";
+  const add={rest:[["#e4604a","Additiv"],["#7a5630","Schmutz"]],wash:[["#6fb1f5","Tensid"],["#7a5630","Schmutz"]],dissolve:[["#6fb1f5","Lösemittel"],["#e4604a","Additiv"]],
+    filter:st.v==="mono"?[["#e4604a","Farbstoff"],["#59646d","Fremdstoff"],["#7a5630","Schmutz"]]:[["#e4604a","Pigment"],["#59646d","Fremdkunststoff"],["#7a5630","Schmutz"]],
+    precip:[["#6fb1f5","Lösemittel"],["#4fd1c5","Fällungsmittel"],["#e4604a","Additiv"]],
+    glyco:pur?[["#4fd1c5","Diol"],["#e4604a","OH"],["#ffb454","Urethangruppe"]]:[["#4fd1c5","Ethan-1,2-diol"],["#ffb454","Esterbindung"]],
+    cryst:[["#e4604a","Verunreinigung"]],bind:[["#ff8a3c","Binder"],[ATOM.N,"N"]],hydro:[[ATOM.H,"H"],[ATOM.Cl,"Cl"],["#ffb454","C=C"]],
+    react:[[ATOM.C,"C"],[ATOM.O,"O"],[ATOM.H,"H"]],scrub:[[ATOM.C,"C"],[ATOM.O,"O"],[ATOM.H,"H"],[ATOM.N,"N"]],syngas:[[ATOM.C,"C"],[ATOM.O,"O"],[ATOM.H,"H"]],synth:[[ATOM.C,"C"],[ATOM.O,"O"],[ATOM.H,"H"]],
+    steam:[[ATOM.O,"O"],[ATOM.H,"H"],[ATOM.C,"C"],[ATOM.N,"N"]],stackgas:[[ATOM.N,"N"],[ATOM.C,"C"],[ATOM.O,"O"],[ATOM.H,"H"]],dry:[[ATOM.O,"O"],[ATOM.H,"H"]]}[st.d]||[];
+  if(st.d==="poly"&&st.v==="cond")add.push(["#4fd1c5","Ethan-1,2-diol"]);
+  if(st.d==="crack"&&st.v==="mono")add.push(["#ffb454","C=C-Doppelbindung"]);
+  if(st.d==="crack"&&st.v==="hcl")add.push([ATOM.H,"H"],[ATOM.Cl,"Cl"]);
+  if(st.d==="bind"&&!st.v)add.push([ATOM.C,"C"],[ATOM.O,"O"]);
+  if((st.d==="react"||st.d==="scrub")&&p.id==="PVC")add.push([ATOM.Cl,"Cl"]);if(st.d==="scrub"&&st.v==="syn"&&!["PVC","PUR"].includes(p.id))add.push([ATOM.S,"S"]);if(st.d==="scrub"&&st.v==="flue"&&p.id!=="PVC")add.push(["#59646d","Staub"]);if(st.d==="react"&&p.id==="PUR")add.push([ATOM.N,"N"]);
+  if(st.d==="melt"&&p.id==="PVC")add.push([ATOM.H,"H"],[ATOM.Cl,"Cl"]);
+  const gasOnly=["syngas","synth","steam","stackgas","scrub"].includes(st.d);
+  return (gasOnly?[]:A).concat(add);
+}
+function drawDet(){
+  const c=cD,{p,pr}=cur(),st=ST[S.det];c.clearRect(0,0,800,310);if(!st)return;
+  // links: vergrößerte Maschine
+  c.save();c.beginPath();c.roundRect(8,8,284,294,10);c.clip();c.fillStyle=lg(c,0,8,0,302,"#11161a","#0b0e10");c.fillRect(8,8,284,294);
+  c.fillStyle=lg(c,0,282,0,302,"#1a1f23","#0e1113");c.fillRect(8,282,284,20);c.strokeStyle="#39424a";c.lineWidth=1.5;c.beginPath();c.moveTo(8,282);c.lineTo(292,282);c.stroke();
+  c.fillStyle="rgba(0,0,0,.4)";c.beginPath();c.ellipse(150,286,86,7,0,0,7);c.fill();
+  c.translate(150,282);c.scale(1.42,1.42);(MACH[st.g]||MACH.tank)(c,p.col);c.restore();
+  c.strokeStyle="#31383e";c.lineWidth=1;c.beginPath();c.roundRect(8,8,284,294,10);c.stroke();
+  pill(c,"Station "+(S.det+1)+": "+st.t,150,24,"#4fd1c5",11.5);
+  // Lupe
+  const lx=150,ly=282-92*1.42;
+  c.fillStyle="rgba(79,209,197,.10)";c.beginPath();c.moveTo(lx+20,ly-20);c.lineTo(304,10);c.lineTo(304,300);c.lineTo(lx+20,ly+20);c.closePath();c.fill();
+  c.strokeStyle="#4fd1c5";c.lineWidth=2.5;c.beginPath();c.arc(lx,ly,28,0,7);c.stroke();c.lineWidth=5;c.lineCap="round";c.beginPath();c.moveTo(lx-20,ly+20);c.lineTo(lx-34,ly+34);c.stroke();
+  // rechts: Teilchenebene
+  c.fillStyle="#090c0e";c.strokeStyle="#4fd1c5";c.lineWidth=1.5;c.beginPath();c.roundRect(304,8,488,294,12);c.fill();c.stroke();
+  label(c,"TEILCHENEBENE · "+st.t.toUpperCase(),320,25,"#ffb454",11,"left",true);label(c,st.s,776,25,"#9aa2a9",11,"right");
+  PH.f=0;PH.u=-1;c.save();c.translate(322,40);c.beginPath();c.rect(-6,0,464,222);c.clip();c.translate(0,4);(SC[st.d]||SC.rest)(c,p,452,214,st.v);c.globalAlpha=1;
+  if(PH.f>0){c.fillStyle="rgba(9,12,14,"+PH.f+")";c.fillRect(-6,-4,464,222);}c.restore();c.globalAlpha=1;
+  c.strokeStyle="#262c31";c.lineWidth=1;c.beginPath();c.moveTo(316,268);c.lineTo(780,268);c.stroke();
+  loopBar(c,24,292,110);
+  let x=322;detLegend(st,p).forEach(([col,t])=>{ball(c,x+5,285,4.4,col);label(c,t,x+13,285,"#9aa2a9",10.5);x+=c.measureText(t).width+27;});
+}
+/* ---------- Grundlagen ---------- */
+function densityFig(){
+  const W=700,H=150,x=v=>40+(v-.85)/(1.45-.85)*620;let s=`<line x1="40" y1="92" x2="660" y2="92" stroke="#9aa2a9"/>`;
+  [.9,1.0,1.1,1.2,1.3,1.4].forEach(v=>{s+=`<line x1="${x(v)}" y1="88" x2="${x(v)}" y2="96" stroke="#9aa2a9"/><text x="${x(v)}" y="112" font-size="11.5" fill="#9aa2a9" text-anchor="middle">${fz(v,1)}</text>`;});
+  s+=`<text x="660" y="130" font-size="11.5" fill="#9aa2a9" text-anchor="end">Dichte in g/cm³</text>`;
+  [[1.0,"Wasser"],[1.2,"Salzlösung"]].forEach(([v,t])=>{s+=`<line x1="${x(v)}" y1="14" x2="${x(v)}" y2="92" stroke="#6fb1f5" stroke-dasharray="4 3"/><text x="${x(v)+5}" y="20" font-size="11.5" fill="#6fb1f5">${t}</text>`;});
+  [["PP",.905,60],["PE-LD",.92,40],["PE-HD",.955,76],["PS",1.05,60],["PVC",1.38,44],["PET",1.385,72]].forEach(([k,v,y])=>{const id=k.replace("-","");s+=`<circle cx="${x(v)}" cy="92" r="5" fill="${POLY[id].col}"/><line x1="${x(v)}" y1="${y+5}" x2="${x(v)}" y2="87" stroke="${POLY[id].col}"/><text x="${x(v)}" y="${y}" font-size="12.5" font-weight="700" fill="${POLY[id].col}" text-anchor="middle">${k}</text>`;});
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:700px" role="img" aria-label="Dichteskala der Kunststoffe">${s}</svg>`;
+}
+function hierFig(){
+  const rows=[["Vermeiden und Wiederverwenden","#7fd68a"],["Werkstoffliches Recycling (Makromoleküle bleiben erhalten)","#4fd1c5"],["Chemisches Recycling (Makromoleküle werden gespalten)","#ffb454"],["Energetische Verwertung (Verbrennen mit Energienutzung)","#e4785b"],["Deponie","#5f6870"]];
+  let s="";rows.forEach(([t,c],i)=>{const w=640-i*90,x=(680-w)/2;s+=`<rect x="${x}" y="${6+i*34}" width="${w}" height="28" rx="4" fill="${c}" opacity=".9"/><text x="340" y="${25+i*34}" font-size="${i>3?12:13}" fill="#101315" text-anchor="middle" font-weight="600">${i>0&&w<400?t.replace(/ \(.*/,""):t}</text>`;});
+  return `<svg viewBox="0 0 680 180" width="100%" style="max-width:680px" role="img" aria-label="Abfallhierarchie">${s}</svg>`;
+}
+const GL=[
+ {t:"Kunststoffarten und Recycling-Codes",h:()=>`<p>Kunststoffe bestehen aus Makromolekülen: Viele kleine Bausteine (Monomere) sind zu langen Ketten oder Netzen verknüpft. Auf Verpackungen zeigt ein Dreieck aus Pfeilen mit einer Nummer, um welchen Kunststoff es sich handelt.</p>
+  <div class="tscroll"><table><thead><tr><th>Code</th><th>Kürzel</th><th>Name</th><th>Dichte</th><th class="num">Produktion 2024</th></tr></thead><tbody>${ORDER.map(k=>{const p=POLY[k];return `<tr><td>${p.code}</td><td style="color:${p.col};font-weight:700">${p.k}</td><td>${p.name}</td><td>${p.rhoT}</td><td class="num">${fz(p.mt,1)} Mio. t</td></tr>`;}).join("")}</tbody></table></div>
+  <p>Weltweit wurden 2024 rund 431 Millionen Tonnen Kunststoff hergestellt. Nur etwa 10 % davon stammten aus Recycling oder aus nachwachsenden Rohstoffen; rund 90 % wurden neu aus Erdöl, Erdgas und Kohle hergestellt.</p>
+  <h3>Beispiel: Wiederholeinheit von Polypropen</h3><div class="fig">${structSVG(POLY.PP.st,"#e7e4dd")}</div>`},
+ {t:"Thermoplaste, Duroplaste, Elastomere",h:()=>`<p>Ob sich ein Kunststoff einschmelzen lässt, hängt vom Bau seiner Makromoleküle ab.</p>
+  <ul><li><b>Thermoplaste</b> (PE, PP, PS, PVC, PET) bestehen aus einzelnen Ketten, die nur durch zwischenmolekulare Kräfte zusammenhalten. Beim Erwärmen gleiten die Ketten aneinander vorbei: Der Kunststoff wird weich und schmilzt. Er lässt sich neu formen – die Grundlage des werkstofflichen Recyclings.</li>
+  <li><b>Duroplaste</b> (z. B. viele Polyurethane, Epoxidharze) sind engmaschig über Elektronenpaarbindungen vernetzt. Sie schmelzen nicht, sondern zersetzen sich beim Erhitzen. Einschmelzen ist unmöglich.</li>
+  <li><b>Elastomere</b> (z. B. Gummi, Weichschaum) sind weitmaschig vernetzt und dehnbar. Auch sie schmelzen nicht.</li></ul>
+  <p>Vernetzte Kunststoffe lösen sich außerdem in keinem Lösemittel. Für sie bleiben das Zerkleinern, die chemische Spaltung oder die Verbrennung.</p>`},
+ {t:"Verwertungswege im Überblick",h:()=>`<p>Das Kreislaufwirtschaftsgesetz gibt eine Rangfolge vor. Je weiter oben, desto mehr vom Wert des Kunststoffs bleibt erhalten.</p><div class="fig">${hierFig()}</div>
+  <ul><li><b>Werkstofflich:</b> Der Kunststoff wird gereinigt und umgeschmolzen oder gelöst. Die Makromoleküle bleiben erhalten.</li>
+  <li><b>Chemisch (rohstofflich):</b> Die Makromoleküle werden in kleine Moleküle zerlegt (Monomere, Öl, Synthesegas), aus denen neue Kunststoffe hergestellt werden können.</li>
+  <li><b>Energetisch:</b> Der Kunststoff wird verbrannt; genutzt wird nur die Energie.</li></ul>
+  <p>In Europa wurden 2024 etwa 7,7 Mio. t Kunststoff durch werkstoffliches Recycling gewonnen, aber nur etwa 0,1 Mio. t durch chemisches Recycling.</p>`},
+ {t:"Sortieren und Trennen",h:()=>`<p>Fast alle Verfahren brauchen sortenreinen Kunststoff. Verschiedene Kunststoffe mischen sich in der Schmelze nicht; schon kleine Fremdanteile machen das Produkt spröde.</p>
+  <h3>Dichtetrennung (Schwimm-Sink-Verfahren)</h3><p>Ein Körper schwimmt, wenn seine Dichte kleiner ist als die der Flüssigkeit. In Wasser schwimmen PP und PE auf; PS, PVC und PET sinken. In einer Salzlösung mit ρ = 1,20 g/cm³ schwimmt zusätzlich PS.</p><div class="fig">${densityFig()}</div>
+  <h3>Nahinfrarot-Sortierung (NIR)</h3><p>Infrarotlicht regt Bindungen in den Molekülen zu Schwingungen an. Jede Art von Bindung nimmt dabei Licht bestimmter Wellenlängen auf. Das reflektierte Licht ergibt ein Spektrum, das für jeden Kunststoff typisch ist. Ein Sensor über dem Förderband erkennt so die Kunststoffart; Druckluftdüsen blasen die erkannten Teile aus. Mit Ruß schwarz gefärbte Teile werden nicht erkannt.</p>
+  <h3>Röntgensensoren</h3><p>Röntgenstrahlung erkennt schwere Atome wie Chlor. So lässt sich PVC aus PET entfernen, obwohl beide die gleiche Dichte haben.</p>
+  <h3>Windsichtung</h3><p>Ein Luftstrom trägt leichte, flächige Teile (Folien) weiter als schwere, kompakte Teile (Flaschen).</p>`},
+ {t:"Werkstoffliches Recycling",h:()=>`<p>Der sortenreine Kunststoff wird zerkleinert, gewaschen, getrocknet, im Extruder geschmolzen und zu Regranulat geformt. Die Makromoleküle bleiben erhalten; der Energieaufwand ist gering.</p>
+  <h3>Grenzen</h3><ul><li>Hitze und Scherkräfte im Extruder spalten einzelne Ketten. Kürzere Ketten bedeuten geringere Festigkeit – nach einigen Durchgängen reicht die Qualität nur noch für einfachere Produkte (<b>Downcycling</b>).</li>
+  <li>Additive, Farben, Gerüche und Schadstoffe bleiben im Material. Für Lebensmittelverpackungen ist Regranulat deshalb fast nur bei PET aus Pfandflaschen zugelassen.</li>
+  <li>Vernetzte Kunststoffe lassen sich nicht schmelzen.</li></ul>
+  <h3>Lösemittelbasiertes Recycling</h3><p>Ein Lösemittel löst gezielt nur einen Kunststoff. Ungelöste Fremdstoffe und Additive werden abfiltriert, danach wird der Kunststoff wieder ausgefällt. Die Makromoleküle bleiben auch hier erhalten, das Produkt ist aber deutlich reiner. Nachteil: großer Aufwand für die Rückgewinnung des Lösemittels.</p>`},
+ {t:"Chemisches Recycling",h:()=>`<p>Beim chemischen Recycling werden die Makromoleküle gespalten.</p>
+  <h3>Solvolyse</h3><p>Kunststoffe aus Polykondensation oder Polyaddition (PET, Polyamide, Polyurethane) enthalten funktionelle Gruppen in der Kette, z. B. die Estergruppe im PET:</p><div class="fig">${structSVG(POLY.PET.st,"#e7e4dd")}</div>
+  <p>Diese Bindungen lassen sich durch kleine Moleküle gezielt spalten – mit Wasser (Hydrolyse), Methanol (Methanolyse) oder Ethan-1,2-diol (Glykolyse). Das ist die Umkehrung der Polykondensation. Es entstehen Monomere, die gereinigt und wieder zu Kunststoff in Neuware-Qualität verknüpft werden. Bei PE, PP, PS und PVC funktioniert das nicht: Ihre Ketten bestehen nur aus C–C-Bindungen.</p>
+  <h3>Pyrolyse</h3><p>Bei 400–600 °C unter Luftausschluss brechen die C–C-Bindungen an zufälligen Stellen (Cracken). Aus PE und PP entsteht ein Öl aus Alkanen und Alkenen, das im Steamcracker Rohbenzin ersetzt. Polystyrol zerfällt überwiegend zum Monomer Styrol. Nur etwa 30–50 % des Abfalls werden am Ende wieder Kunststoff; ein Teil wird als Gas verbrannt, um den Reaktor zu heizen. PVC und PET stören (Chlorwasserstoff bzw. Säuren).</p>
+  <h3>Vergasung</h3><p>Bei über 1000 °C und wenig Sauerstoff entsteht Synthesegas (CO und H₂), aus dem z. B. Methanol hergestellt wird. Das Verfahren verträgt gemischte Abfälle, braucht aber viel Energie.</p>`},
+ {t:"Energetische Verwertung und Schadstoffe",h:()=>`<p>Kunststoffe aus Kohlenstoff und Wasserstoff haben einen Heizwert wie Heizöl (PE, PP: ca. 43 MJ/kg). In Müllheizkraftwerken und Zementwerken ersetzen sie fossile Brennstoffe. Der Kohlenstoff wird dabei vollständig zu Kohlenstoffdioxid.</p>
+  <h3>Verbrennung von Polyethen</h3><div class="fig" style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">${structSVG(POLY.PEHD.st,"#e7e4dd",.8)}<span style="font-size:17px">+ 3<i>n</i> O₂ ⟶ 2<i>n</i> CO₂ + 2<i>n</i> H₂O</span></div>
+  <p>Aus 28 g Wiederholeinheit entstehen 88 g CO₂: Eine Tonne Polyethen ergibt 3,14 t CO₂.</p>
+  <div class="tscroll"><table><thead><tr><th>Kunststoff</th><th class="num">Heizwert</th><th class="num">CO₂ je Tonne</th><th>Besondere Schadstoffe</th></tr></thead><tbody>
+  ${ORDER.map(k=>{const p=POLY[k];return `<tr><td style="color:${p.col};font-weight:700">${p.k}</td><td class="num">ca. ${p.hu} MJ/kg</td><td class="num">${fz(p.co2,2)} t</td><td>${k==="PVC"?"Chlorwasserstoff (0,58 t je t), Dioxine":k==="PUR"?"Cyanwasserstoff, Stickstoffoxide":k==="PS"?"Ruß, PAK":k==="PET"?"–":"–"}</td></tr>`;}).join("")}</tbody></table></div>
+  <h3>PVC</h3><p>PVC besteht zu 57 % der Masse aus Chlor. Beim Erhitzen entsteht Chlorwasserstoff, der mit Wasser Salzsäure bildet und Anlagen zerstört. Bei schlechter Verbrennung können sich hochgiftige Dioxine bilden. Moderne Anlagen verbrennen deshalb bei über 850 °C und waschen das Rauchgas.</p>
+  <h3>Additive</h3><p>Viele Schadstoffe stammen nicht aus dem Kunststoff selbst, sondern aus Zusätzen: Weichmacher, Flammschutzmittel, Stabilisatoren mit Schwermetallen, Farbpigmente. Beim werkstofflichen Recycling bleiben sie im Material.</p>`},
+ {t:"Kosten und Datenquellen",h:()=>`<p>Die Kosten gelten je Tonne Kunststoffabfall, die in das Verfahren geht. Es sind gerundete Richtwerte für Europa; echte Werte schwanken stark mit Energiepreis, Anlagengröße und Reinheit des Abfalls. Sammlung und Transport sind nicht enthalten, Erlöse für die Produkte nicht abgezogen.</p>
+  <div class="tscroll"><table><thead><tr><th>Verfahren</th><th class="num">Kosten je Tonne</th><th>Grundlage</th></tr></thead><tbody>
+  ${PROC_ORDER.map(id=>`<tr><td>${PROC[id].name}</td><td class="num">${rng(PROC[id].cost[0],PROC[id].cost[1])}</td><td>${PROC[id].src}</td></tr>`).join("")}
+  <tr><td>Trennverfahren (Schwimm-Sink, NIR, Windsichtung)</td><td class="num">20–200 €</td><td>Modellwerte (grobe Schätzung)</td></tr></tbody></table></div>
+  <h3>Einordnung</h3><ul><li>Neuer Kunststoff aus Erdöl kostete 2023/24 etwa 1 000–1 700 € je Tonne (PET).</li>
+  <li>Kunststoff aus Pyrolyseöl kostet nach einer Studie der EU-Kommission (JRC, 2026) etwa 3 000 € je Tonne – das 1,4- bis 3,7-Fache von Neuware. Ein Grund: Nur rund 30 % des gemischten Abfalls werden am Ende wieder Kunststoff.</li>
+  <li>PET aus Solvolyse kostet etwa 2 150 € je Tonne (± 500 €).</li>
+  <li>Verbrennen wird teurer: Seit 2024 zahlen Müllverbrennungsanlagen in Deutschland einen CO₂-Preis (2026: 55–65 € je Tonne CO₂).</li></ul>
+  <h3>Quellen</h3><ul><li>Plastics Europe: Plastics – the Fast Facts 2025 (Produktion 2024)</li><li>Europäische Kommission, Joint Research Centre: Economic viability of chemical recycling (2026)</li><li>Karlsruher Institut für Technologie (KIT): Abschätzungen zum chemischen Recycling</li><li>Dichten, Heizwerte: gerundete Tafelwerte; CO₂-Mengen aus der Reaktionsgleichung berechnet</li></ul>`}
+];
+let glIdx=0;
+function showGl(i){glIdx=(i+GL.length)%GL.length;$("#hGl").textContent=GL[glIdx].t;$("#glBody").innerHTML=GL[glIdx].h();openM("#mGl");$("#mGl").scrollTop=0;}
+
+/* ---------- QR-Code (Byte-Modus, Fehlerkorrektur L, Version 1–5) ---------- */
+function qrMatrix(text){
+  const bytes=[...new TextEncoder().encode(text)],DC=[0,19,34,55,80,108],ECN=[0,7,10,15,20,26];
+  let v=1;while(v<=5&&bytes.length>DC[v]-2)v++;if(v>5)return null;
+  const n=17+4*v,bits=[],push=(val,len)=>{for(let i=len-1;i>=0;i--)bits.push(val>>i&1);};
+  push(4,4);push(bytes.length,8);bytes.forEach(b=>push(b,8));push(0,Math.min(4,DC[v]*8-bits.length));while(bits.length%8)bits.push(0);
+  const data=[];for(let i=0;i<bits.length;i+=8){let b=0;for(let j=0;j<8;j++)b=b<<1|bits[i+j];data.push(b);}
+  for(let pad=0xEC;data.length<DC[v];pad^=0xFD)data.push(pad);
+  const exp=[],log=[];let x=1;for(let i=0;i<255;i++){exp[i]=x;log[x]=i;x<<=1;if(x&256)x^=0x11d;}
+  const mul=(a,b)=>a&&b?exp[(log[a]+log[b])%255]:0,ec=ECN[v];
+  let gen=[1];for(let i=0;i<ec;i++){const g=new Array(gen.length+1).fill(0);gen.forEach((c,j)=>{g[j]^=c;g[j+1]^=mul(c,exp[i]);});gen=g;}
+  const rem=new Array(ec).fill(0);data.forEach(d=>{const f=d^rem.shift();rem.push(0);for(let j=0;j<ec;j++)rem[j]^=mul(gen[j+1],f);});
+  const cw=data.concat(rem),m=[],fn=[];for(let r=0;r<n;r++){m.push(new Array(n).fill(0));fn.push(new Array(n).fill(false));}
+  const set=(r,c,val)=>{if(r>=0&&r<n&&c>=0&&c<n){m[r][c]=val?1:0;fn[r][c]=true;}};
+  const finder=(r0,c0)=>{for(let r=-1;r<=7;r++)for(let c=-1;c<=7;c++){const d=Math.max(Math.abs(r-3),Math.abs(c-3));set(r0+r,c0+c,d!==2&&d!==4);}};
+  finder(0,0);finder(0,n-7);finder(n-7,0);
+  for(let i=8;i<n-8;i++){set(6,i,i%2===0);set(i,6,i%2===0);}
+  if(v>1){const a=n-7;for(let r=-2;r<=2;r++)for(let c=-2;c<=2;c++)set(a+r,a+c,Math.max(Math.abs(r),Math.abs(c))!==1);}
+  const mask=0,fd=(1<<3)|mask;let fr=fd;for(let i=0;i<10;i++)fr=(fr<<1)^((fr>>9)*0x537);const fb=((fd<<10)|fr)^0x5412,bit=i=>fb>>i&1;
+  for(let i=0;i<6;i++)set(i,8,bit(i));set(7,8,bit(6));set(8,8,bit(7));set(8,7,bit(8));for(let i=9;i<15;i++)set(8,14-i,bit(i));
+  for(let i=0;i<8;i++)set(8,n-1-i,bit(i));for(let i=8;i<15;i++)set(n-15+i,8,bit(i));set(n-8,8,1);
+  let k=0;const tb=cw.length*8;
+  for(let right=n-1;right>=1;right-=2){if(right===6)right=5;
+    for(let vv=0;vv<n;vv++)for(let j=0;j<2;j++){const c=right-j,up=((right+1)&2)===0,r=up?n-1-vv:vv;
+      if(fn[r][c])continue;let b=k<tb?(cw[k>>3]>>(7-(k&7))&1):0;k++;if((r+c)%2===0)b^=1;m[r][c]=b;}}
+  return m;
+}
+function qrSVG(text){const m=qrMatrix(text);if(!m)return "";const n=m.length,q=2;let d="";
+  for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(m[r][c])d+=`M${c+q} ${r+q}h1v1h-1z`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${n+2*q} ${n+2*q}" shape-rendering="crispEdges" role="img" aria-label="QR-Code"><rect width="100%" height="100%" fill="#fff"/><path d="${d}" fill="#000"/></svg>`;}
+
+/* ---------- PDF ---------- */
+function runPrintHTML(r,title){
+  const ink="#111",cas=cascade(r.sel);
+  let h=`<section class="bk-run"><h2>${title}: ${runLabel(r)}</h2>`;
+  r.sel.forEach(k=>{const p=POLY[k];h+=`<div class="blk"><h3>Steckbrief ${p.k} – ${p.name} (Recycling-Code ${p.code})</h3><div class="pform">${structSVG(p.st,ink,.8)}</div>
+    <table><tbody><tr><th>Typ</th><td>${p.typ}</td></tr><tr><th>Dichte</th><td>${p.rhoT}</td></tr><tr><th>Produktion 2024</th><td>${fz(p.mt,1)} Mio. t weltweit (${fz(p.share,1)} %)</td></tr><tr><th>Verwendung</th><td>${p.uses.join(", ")}</td></tr><tr><th>Heizwert</th><td>ca. ${p.hu} MJ/kg</td></tr></tbody></table></div>`;});
+  if(cas.length){
+    h+=`<div class="blk"><h3>Trennen des Gemischs: ${cas.length} ${cas.length>1?"Schritte":"Schritt"}</h3><table><thead><tr><th>Nr.</th><th>Verfahren</th><th>Eingang</th><th>Fraktion 1</th><th>Fraktion 2</th><th>Kosten je Tonne</th></tr></thead><tbody>${cas.map(s=>`<tr><td>${s.no}</td><td>${s.name}</td><td>${names(s.in)}</td><td>${s.bin1}: ${names(s.out1)}</td><td>${s.bin2}: ${names(s.out2)}</td><td>${rng(s.cost[0],s.cost[1])}</td></tr>`).join("")}</tbody></table></div>`;
+    cas.forEach(s=>{h+=`<div class="blk"><h3>Trennschritt ${s.no}: ${s.name}</h3>${s.text}</div>`;});
+    h+=`<div class="blk"><h3>Übersicht der Fraktionen</h3>${sumTable(r,cas,false)}</div>`;
+  }
+  r.sel.forEach(k=>{const p=POLY[k],pr=r.proc[k],su=SUIT[k][pr];
+    h+=`<div class="blk"><h3>Verwertung ${p.k}: ${PROC[pr].name}</h3><p><b>Eignung: ${RATE[su[0]]}.</b> ${su[1]}</p>
+    <table><thead><tr><th>Nr.</th><th>Schritt</th><th>Bedingungen</th><th>Vorgang auf Teilchenebene</th><th>Emissionen</th></tr></thead><tbody>${stations(p,pr).map((s,i)=>`<tr><td>${i+1}</td><td>${s.t}</td><td>${s.s}</td><td>${s.x}</td><td>${s.emit||"–"}</td></tr>`).join("")}</tbody></table>
+    <p><b>Teilchenebene:</b> ${molText(p,pr)}</p></div><div class="blk">${costHTML(r,k,cas).replace(/style="[^"]*"/g,"")}</div>`;});
+  return h+`</section>`;
+}
+function overviewHTML(list){
+  return `<section class="pov"><h2>Übersicht der gewählten Läufe</h2><table><thead><tr><th>Nr.</th><th>Kunststoff</th><th>Trennschritte</th><th>Verwertung</th><th>Kosten je Tonne</th><th>Produkt</th></tr></thead><tbody>${
+   list.map(({r,t})=>{const cas=cascade(r.sel);return r.sel.map(k=>{const p=POLY[k],pr=r.proc[k],c=fullCost(r,k,cas);
+     return `<tr><td>${t}</td><td>${p.k}</td><td>${c.path.length?c.path.map(s=>s.short).join(" → "):"–"}</td><td>${PROC[pr].name} (${RATE[SUIT[k][pr][0]]})</td><td>${rng(c.lo,c.hi)}</td><td>${prodText(p,pr)}</td></tr>`;}).join("");}).join("")}</tbody></table></section>`;
+}
+function openPdf(){
+  const live=snapshot();
+  $("#pdfRuns").innerHTML=runs.map((r,i)=>`<label><input type="checkbox" data-run="${i}" checked><i style="background:${POLY[r.sel[0]].col}"></i><span>Lauf ${r.no}: ${runLabel(r)}</span></label>`).join("")+
+    `<label><input type="checkbox" data-run="live" ${runs.length?"":"checked"}><i style="background:${POLY[live.sel[0]].col}"></i><span>Aktuelle Auswahl: ${runLabel(live)}</span></label>`;
+  openM("#mPdf");
+}
+function makePdf(){
+  const list=[];$$("#pdfRuns input:checked").forEach(el=>{const v=el.dataset.run;if(v==="live")list.push({r:snapshot(),t:"akt."});else list.push({r:runs[+v],t:String(runs[+v].no)});});
+  if(!list.length){alert("Bitte mindestens einen Lauf auswählen.");return;}
+  const name=$("#pdfName").value.trim(),kurs=$("#pdfKurs").value.trim(),dat=new Date().toLocaleDateString("de-DE");
+  let h=`<div class="phead"><h1>Kunststoffrecycling – Auswertung</h1><div class="pmeta">${name?"Name: "+esc(name)+" · ":""}${kurs?"Kurs: "+esc(kurs)+" · ":""}Datum: ${dat}</div></div>`;
+  if($("#pdfOv").checked)h+=overviewHTML(list);
+  h+=list.map(({r,t})=>runPrintHTML(r,t==="akt."?"Aktuelle Auswahl":"Lauf "+t)).join("");
+  h+=`<div class="pfoot">Kunststoffrecycling V1.0 · Bastian Baumgart · chemie.mail-baumgart.de · Lizenz CC BY-NC-SA 4.0 · Simulierte Daten zu Lehrzwecken; Kosten sind gerundete Richtwerte.</div>`;
+  $("#print").innerHTML=h;closeM();setTimeout(()=>window.print(),60);
+}
+
+/* ---------- Bedienung ---------- */
+function openM(sel){$$(".modal").forEach(m=>m.hidden=true);$(sel).hidden=false;}
+function closeM(){$$(".modal").forEach(m=>m.hidden=true);}
+document.addEventListener("click",e=>{
+  const t=e.target.closest("button,a,tr[data-view],.modal");if(!t)return;
+  if(t.classList.contains("modal")){if(e.target===t)closeM();return;}
+  if(t.hasAttribute("data-close")){closeM();return;}
+  if(t.classList.contains("chip")){const k=t.dataset.k,i=S.sel.indexOf(k);
+    if(i>=0){if(S.sel.length===1)return;S.sel.splice(i,1);}else{S.sel.push(k);S.view=k;}
+    S.step=0;update(true);return;}
+  if(t.classList.contains("proc")){S.proc[S.view]=t.dataset.pr;update(false);resetProc();return;}
+  if(t.dataset.view){S.view=t.dataset.view;update(false);resetProc();return;}
+  if(t.dataset.steck){S.open[t.dataset.steck]=!S.open[t.dataset.steck];renderMain();return;}
+  if(t.id==="steckAll"){const all=S.sel.every(k=>S.open[k]);S.sel.forEach(k=>S.open[k]=!all);renderMain();return;}
+  if(t.dataset.det!==undefined){const i=+t.dataset.det;S.det=S.det===i?null:i;update(false);return;}
+  if(t.dataset.step!==undefined){S.step=+t.dataset.step;update(false);resetSep();return;}
+  if(t.dataset.sp){S.speed=+t.dataset.sp;$$("[data-sp]").forEach(b=>b.setAttribute("aria-pressed",b===t));return;}
+  if(t.dataset.del!==undefined){runs.splice(+t.dataset.del,1);renderMain();return;}
+  if(t.dataset.gl!==undefined){showGl(+t.dataset.gl);return;}
+});
+function stationAt(ev){const r=cvP.getBoundingClientRect(),x=(ev.clientX-r.left)*800/r.width,y=(ev.clientY-r.top)*432/r.height;if(y>284)return -1;for(let i=0;i<5;i++)if(Math.abs(x-SX(i))<72)return i;return -1;}
+cvP.addEventListener("click",ev=>{const i=stationAt(ev);if(i<0)return;S.det=S.det===i?null:i;update(false);if(S.det!==null)$("#detBox").scrollIntoView({block:"nearest",behavior:"smooth"});});
+$("#btnAll").addEventListener("click",()=>{S.sel=ORDER.slice();S.step=0;update(true);});
+$("#btnOne").addEventListener("click",()=>{S.sel=[S.view];S.step=0;update(true);});
+$("#btnRun").addEventListener("click",()=>{S.run=!S.run;$("#btnRun").textContent=S.run?"Pause":"Start";});
+$("#btnSave").addEventListener("click",()=>{const r=snapshot();r.no=++runNo;runs.push(r);renderMain();});
+$("#btnPdf").addEventListener("click",openPdf);$("#pdfGo").addEventListener("click",makePdf);
+$("#btnHelp").addEventListener("click",()=>openM("#mHelp"));$("#btnVer").addEventListener("click",()=>openM("#mVer"));
+$("#qrBtn").addEventListener("click",()=>openM("#mQr"));
+$("#glToggle").addEventListener("click",()=>{const l=$("#glList"),o=l.hidden;l.hidden=!o;$("#glToggle").setAttribute("aria-expanded",o);$("#glArrow").textContent=o?"▾":"▸";});
+$("#glPrev").addEventListener("click",()=>showGl(glIdx-1));$("#glNext").addEventListener("click",()=>showGl(glIdx+1));
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape")closeM();
+  if(!$("#mGl").hidden){if(e.key==="ArrowLeft")showGl(glIdx-1);if(e.key==="ArrowRight")showGl(glIdx+1);}
+});
+$("#glCount").textContent=GL.length;
+$("#glList").innerHTML=GL.map((g,i)=>`<button type="button" data-gl="${i}">${i+1}. ${g.t}</button>`).join("");
+$("#qrSmall").innerHTML=qrSVG(PAGE_URL);$("#qrBig").innerHTML=qrSVG(PAGE_URL);$("#qrUrl").textContent=PAGE_URL;
+update(true);requestAnimationFrame(loop);
+</script>
+</body>
+</html>
