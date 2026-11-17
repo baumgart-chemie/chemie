@@ -372,7 +372,7 @@ footer sub{font-size:.75em;}
 .col-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px;}
 @media (max-width:920px){.col-grid{grid-template-columns:1fr;}}
 canvas#colCanvas{border-radius:3px; touch-action:manipulation;}
-canvas#colPlot,canvas#colHist{height:280px;}
+canvas#colPlot{height:300px;}
 .col-expl{margin-top:16px; border:1px solid var(--line); background:var(--panel); border-radius:4px; padding:16px 20px; color:var(--text-dim); font-size:13.5px; line-height:1.6;}
 .col-expl h2{font-size:15px; color:var(--text); margin-bottom:8px;}
 .col-expl p{margin:0 0 8px;}
@@ -581,7 +581,7 @@ header>.tag{flex:1 1 160px;min-width:0}
       <p>Ist „Bedingungen variieren“ angehakt, lassen sich mit „Erklärungen anzeigen“ unter der Reaktionsgleichung die Definition der Reaktionsgeschwindigkeit, die Stoßtheorie und eine Deutung der gewählten Bedingungen einblenden.</p>
 
       <h3>Simulation Stoßtheorie</h3>
-      <p>Diese Simulation zeigt auf Teilchenebene, wann Zusammenstöße wirksam sind. In einem <strong>geschlossenen Gefäß</strong> bewegen sich die Teilchen A (blau) und B (orange) und stoßen zusammen. Nur wenn ein Zusammenstoß von A und B mindestens die <strong>Aktivierungsenergie</strong> hat, erscheint ein weißer Blitz und beide Teilchen wandeln sich in ein Teilchen C (grün) um (A + B → C). Bei allen anderen Stößen prallen die Teilchen ab (grauer Ring). Du wählst eine von vier allgemeinen Reaktionen (A + B → C, A + B + C → D + E + F, A + B → C + D, A + B + C → A + B). Bei Reaktionen mit drei Ausgangsstoffen müssen drei Teilchen gleichzeitig zusammentreffen (Dreierstoß). Die <strong>Temperatur</strong> und die <strong>Konzentrationen</strong> der Ausgangsstoffe stellst du jederzeit mit den Reglern ein („Standardbedingungen“ setzt sie zurück). Die Geschwindigkeit der Simulation (×0,5 voreingestellt, ×1, ×10) wählst du über die Knöpfe oben. Die Temperatur wirkt sofort; bei einer Änderung der Konzentration beginnt die Simulation neu. Das Diagramm zeigt die Teilchenzahlen N(A), N(B) und N(C) über der Zeit, das zweite Diagramm die Energie der bisherigen Zusammenstöße mit der Aktivierungsenergie als rote Linie. Jeder beendete Lauf wird als Messreihe gespeichert; „Ausgabe als PDF“ fasst die gewählten Messreihen zusammen.</p>
+      <p>Diese Simulation zeigt auf Teilchenebene, wann Zusammenstöße wirksam sind. In einem <strong>geschlossenen Gefäß</strong> bewegen sich die Teilchen A (blau) und B (orange) und stoßen zusammen. Nur wenn ein Zusammenstoß von A und B mindestens die <strong>Aktivierungsenergie</strong> hat, erscheint ein weißer Blitz und beide Teilchen wandeln sich in ein Teilchen C (grün) um (A + B → C). Bei allen anderen Stößen prallen die Teilchen ab (grauer Ring). Du wählst eine von vier allgemeinen Reaktionen (A + B → C, A + B + C → D + E + F, A + B → C + D, A + B + C → A + B). Bei Reaktionen mit drei Ausgangsstoffen müssen drei Teilchen gleichzeitig zusammentreffen (Dreierstoß). Die <strong>Temperatur</strong> und die <strong>Konzentrationen</strong> der Ausgangsstoffe stellst du jederzeit mit den Reglern ein („Standardbedingungen“ setzt sie zurück). Die Geschwindigkeit der Simulation (×0,5 voreingestellt, ×1, ×10) wählst du über die Knöpfe oben. Die Temperatur wirkt sofort; bei einer Änderung der Konzentration beginnt die Simulation neu. Das Diagramm zeigt die Teilchenzahlen N(A), N(B) und N(C) über der Zeit. Jeder beendete Lauf wird als Messreihe gespeichert; „Ausgabe als PDF“ fasst die gewählten Messreihen zusammen.</p>
 
       <h3>Messwerte aufnehmen und Reaktionsgeschwindigkeit berechnen (Zink + Salzsäure)</h3>
       <p>In der linken Spalte wählst du direkt unter „Grundlagen“, welche Aufgabenart du bearbeitest – die <strong>Simulation Stoßtheorie</strong>, die <strong>Simulation Geschwindigkeit chemischer Reaktionen</strong> oder die <strong>Übung zum Aufnehmen von Messwerten</strong>; die übrigen Bedienelemente erscheinen erst nach dieser Auswahl. Du kannst jederzeit wechseln. In der Übung nimmst du am Kolbenprober Messwerte zu festen Zeitpunkten auf, berechnest Schritt für Schritt V in Litern, n(H<sub>2</sub>), n(Zn<sup>2+</sup>), c(Zn<sup>2+</sup>), n(H<sup>+</sup>) und c(H<sup>+</sup>), zeichnest das c-t-Diagramm für Zn<sup>2+</sup> und H<sup>+</sup> und bestimmst Durchschnittsgeschwindigkeiten. Jeder Wert wird sofort geprüft; „Tipp“ zeigt eine Beispielrechnung, „Rest ausfüllen“ ergänzt eine Spalte, sobald zwei Werte selbst richtig berechnet sind. Im letzten Schritt entsteht eine <strong>Zusammenfassung als PDF</strong> (mit Name und Kurs, die nicht gespeichert werden). Mit „Zwischenstand speichern“ lassen sich alle Eingaben jederzeit als Datei auf dem Gerät sichern und mit „Zwischenstand laden“ wieder einlesen; dabei werden keine Daten ins Internet übertragen.</p>
@@ -621,7 +621,7 @@ header>.tag{flex:1 1 160px;min-width:0}
     <div class="modal-body">
       <div class="vh-ver"><span class="v">V1.4</span><span class="d">16.11.2026</span></div>
       <ul>
-        <li><strong>Neue Kachel „Simulation Stoßtheorie“:</strong> Teilchenmodell allgemeiner Reaktionen in einem geschlossenen Gefäß (A + B → C, A + B + C → D + E + F, A + B → C + D, A + B + C → A + B). Wirksame Zusammenstöße (genügend Energie) wandeln die Teilchen sichtbar um, unwirksame Stöße prallen ab. Temperatur und Konzentrationen der Ausgangsstoffe sind variierbar; Geschwindigkeit ×0,5 (Standard), ×1, ×10; Reaktionsbedingungen jederzeit einstellbar. Die bisherige „Simulation“ heißt jetzt „Simulation Geschwindigkeit chemischer Reaktionen“, die Übung „Aufnehmen von Messwerten und Berechnung der Reaktionsgeschwindigkeit am Beispiel der Reaktion von Zink mit Salzsäure“; die Stoßtheorie steht an erster Stelle der Auswahl. Dazu Diagramme der Teilchenzahlen und der Stoßenergien (mit Aktivierungsenergie), Messreihen und Ausgabe als PDF.</li>
+        <li><strong>Neue Kachel „Simulation Stoßtheorie“:</strong> Teilchenmodell allgemeiner Reaktionen in einem geschlossenen Gefäß (A + B → C, A + B + C → D + E + F, A + B → C + D, A + B + C → A + B). Wirksame Zusammenstöße (genügend Energie) wandeln die Teilchen sichtbar um, unwirksame Stöße prallen ab. Temperatur und Konzentrationen der Ausgangsstoffe sind variierbar; Geschwindigkeit ×0,5 (Standard), ×1, ×10; Reaktionsbedingungen jederzeit einstellbar. Die bisherige „Simulation“ heißt jetzt „Simulation Geschwindigkeit chemischer Reaktionen“, die Übung „Aufnehmen von Messwerten und Berechnung der Reaktionsgeschwindigkeit am Beispiel der Reaktion von Zink mit Salzsäure“; die Stoßtheorie steht an erster Stelle der Auswahl. Dazu ein Diagramm der Teilchenzahlen, Messreihen und Ausgabe als PDF.</li>
       </ul>
       <div class="vh-ver"><span class="v">V1.3</span><span class="d">11.11.2026</span></div>
       <ul>
@@ -646,7 +646,7 @@ header>.tag{flex:1 1 160px;min-width:0}
         <li>Erklärungen zu Reaktionsgeschwindigkeit, Stoßtheorie und Einflussfaktoren zuschaltbar, sobald „Bedingungen variieren“ gewählt ist.</li>
         <li>Messreihen vergleichen, Durchschnitts- und Momentangeschwindigkeit, Messwerttabelle mit CSV-Export, Temperaturabhängigkeit (RGT-Regel, Arrhenius-Darstellung).</li>
         <li><strong>Übung „Aufnehmen von Messwerten und Berechnung der Reaktionsgeschwindigkeit am Beispiel der Reaktion von Zink mit Salzsäure“</strong>: Messwerte am Kolbenprober zu festen Zeitpunkten ablesen (mit Lupe), Protokoll Schritt für Schritt berechnen (V in L, n(H<sub>2</sub>), n(Zn<sup>2+</sup>), c(Zn<sup>2+</sup>), n(H<sup>+</sup>), c(H<sup>+</sup>)), c-t-Diagramm für Zn<sup>2+</sup> und H<sup>+</sup> in zwei Farben mit dem Stift eintragen (Option „Nur mit Stift zeichnen“ ist standardmäßig an; „Punkte löschen“ für einzelne Punkte; die Kurve erscheint automatisch, sobald die Punkte stimmen), Durchschnittsgeschwindigkeiten berechnen, Zusammenfassung als PDF; Zwischenstand als Datei speichern und wieder laden.</li>
-        <li><strong>Simulation Stoßtheorie</strong> (A + B → C): wirksame Zusammenstöße auf Teilchenebene, Temperatur und Konzentrationen variierbar, Diagramme zu Teilchenzahlen und Stoßenergien, Ausgabe als PDF.</li>
+        <li><strong>Simulation Stoßtheorie</strong> (A + B → C): wirksame Zusammenstöße auf Teilchenebene, Temperatur und Konzentrationen variierbar, Diagramm der Teilchenzahlen, Ausgabe als PDF.</li>
         <li>Auswahl <strong>Simulation Stoßtheorie, Simulation Geschwindigkeit chemischer Reaktionen oder Übung</strong> in der linken Spalte direkt unter „Grundlagen“; alle weiteren Inhalte erscheinen erst nach der Auswahl.</li>
         <li><strong>Rubrik „Grundlagen“</strong> (über den Knopf „Grundlagen“ in der linken Spalte aufklappbar) mit neun Themen, Grafiken und Erklärtext. Bedienbar mit iPad und Stift.</li>
       </ul>
@@ -1056,15 +1056,9 @@ header>.tag{flex:1 1 160px;min-width:0}
       </div>
     </div>
 
-    <div class="col-grid">
-      <div class="screen-card">
-        <div class="screen-top"><b style="font-size:13px;color:var(--text)">Teilchenzahl in Abhängigkeit von der Zeit</b></div>
-        <canvas id="colPlot" aria-label="Diagramm: Teilchenzahlen N(A), N(B), N(C) gegen die Zeit"></canvas>
-      </div>
-      <div class="screen-card">
-        <div class="screen-top"><b style="font-size:13px;color:var(--text)" id="colHistT">Energie der Zusammenstöße</b></div>
-        <canvas id="colHist" aria-label="Häufigkeit der Stoßenergien mit Aktivierungsenergie"></canvas>
-      </div>
+    <div class="screen-card" style="margin-top:16px">
+      <div class="screen-top"><b style="font-size:13px;color:var(--text)">Teilchenzahl in Abhängigkeit von der Zeit</b></div>
+      <canvas id="colPlot" aria-label="Diagramm: Teilchenzahlen N(A), N(B), N(C) gegen die Zeit"></canvas>
     </div>
 
     <div class="col-expl" id="colExplBox" hidden>
@@ -1075,7 +1069,7 @@ header>.tag{flex:1 1 160px;min-width:0}
         <li><strong>Genügend Energie:</strong> Die Energie des Zusammenstoßes muss mindestens so groß sein wie die <strong>Aktivierungsenergie E<sub>A</sub></strong>. Sonst prallen die Teilchen unverändert ab (unwirksamer Stoß).</li>
       </ol>
       <p>In der Realität kommt oft noch die richtige Orientierung der Teilchen hinzu; dieses Modell berücksichtigt nur die Energie.</p>
-      <p><strong>Temperatur:</strong> Bei höherer Temperatur bewegen sich die Teilchen im Mittel schneller. Es gibt mehr Stöße <em>und</em> ein größerer Anteil der Stöße hat eine Energie von mindestens E<sub>A</sub> (im Diagramm rechts: mehr Stöße rechts von der roten Linie). Die Reaktion läuft schneller.</p>
+      <p><strong>Temperatur:</strong> Bei höherer Temperatur bewegen sich die Teilchen im Mittel schneller. Es gibt mehr Stöße <em>und</em> ein größerer Anteil der Stöße hat eine Energie von mindestens E<sub>A</sub>. Die Reaktion läuft schneller.</p>
       <p id="colTerNote" hidden><strong>Dreierstöße:</strong> Bei drei Ausgangsstoffen müssen drei Teilchen praktisch gleichzeitig zusammentreffen. Das ist viel seltener als ein Zweierstoß, deshalb sind solche Reaktionen langsam. Die Energie wird für alle drei Teilchen gemeinsam betrachtet (Energie relativ zum gemeinsamen Schwerpunkt).</p>
       <p id="colRegenNote" hidden><strong>A + B + C → A + B:</strong> Hier werden A und B bei der Reaktion nicht verbraucht, sondern wieder zurückgebildet; nur C verschwindet. Die Zahlen N(A) und N(B) bleiben deshalb gleich, N(C) nimmt ab.</p>
       <p><strong>Konzentration:</strong> Mehr Teilchen je Volumen bedeuten mehr Zusammenstöße je Sekunde; der <em>Anteil</em> wirksamer Stöße bleibt gleich, die Zahl der wirksamen Stöße je Sekunde steigt.</p>
@@ -3041,7 +3035,7 @@ function sumHTML(forPrint){
   const url = /^https?:/.test(location.protocol) ? location.host+location.pathname.replace(/\/[^/]*$/,"/") : "chemie.mail-baumgart.de";
   return `<div class="sheet">
   <div class="s-head">
-    <div><div class="s-kick">Protokoll</div><h1>Reaktionsgeschwindigkeit: Zink + Salzsäure</h1></div>
+    <div><div class="s-kick">Protokoll</div><h1>Aufnehmen von Messwerten und Berechnung der Reaktionsgeschwindigkeit am Beispiel der Reaktion von Zink mit Salzsäure</h1></div>
   </div>
   <div class="s-fields">${fld("Name",pdfName())}${fld("Kurs",PDF.kurs)}${fld("Datum",date)}</div>
 
@@ -3222,7 +3216,7 @@ const COL={
   RUNCOL:["#4fd1c5","#ffb454","#8fb4ff","#e4785b","#7fd68a","#c79bff","#ffd166","#f08fc0"],
   rx:0, cfg:{T:25,n:{A:20,B:20,C:20}}, vary:true, speed:0.5, label:true,
   P:[], t:0, running:false, finished:false, started:false, saved:false, ff:false,
-  series:[], hist:new Array(16).fill(0), nTot:0, nEff:0, effT:[], fx:[], nextSample:0, acc:0, plotAcc:99,
+  series:[], nTot:0, nEff:0, effT:[], fx:[], nextSample:0, acc:0, plotAcc:99,
   init:{T:25,n:{A:20,B:20,C:20},rx:0}, tmin:25, tmax:25, runs:[], runNo:0
 };
 const colRx=(i)=>COL.RX[i===undefined?COL.rx:i];
@@ -3237,7 +3231,7 @@ function colInit(){
   const c=COL, R=c.R, sg=colSig(c.cfg.T), rx=colRx();
   c.init={T:c.cfg.T,n:Object.assign({},c.cfg.n),rx:c.rx}; c.tmin=c.tmax=c.cfg.T;
   c.P=[]; c.t=0; c.running=false; c.finished=false; c.started=false; c.saved=false; c.ff=false;
-  c.series=[]; c.hist=new Array(16).fill(0); c.nTot=0; c.nEff=0; c.effT=[]; c.fx=[]; c.nextSample=0; c.acc=0; c.plotAcc=99;
+  c.series=[]; c.nTot=0; c.nEff=0; c.effT=[]; c.fx=[]; c.nextSample=0; c.acc=0; c.plotAcc=99;
   const add=k=>{
     for(let tries=0;tries<400;tries++){
       const x=R+Math.random()*(c.W-2*R), y=R+Math.random()*(c.H-2*R);
@@ -3289,7 +3283,7 @@ function colStep(h){
           }
         }
         if(grp){
-          c.nTot++; c.hist[Math.min(15,Math.floor(E/EA*4))]++;
+          c.nTot++;
           if(E>=EA){ grp.forEach(p=>p.dead=true); react.push([grp,grp.reduce((s,p)=>s+p.x,0)/grp.length,grp.reduce((s,p)=>s+p.y,0)/grp.length]); continue; }
           c.fx.push({x:mx,y:my,age:0,eff:false});
         }
@@ -3333,7 +3327,7 @@ function colRunData(){
   for(const s of ser){ if(s[7]>=half){ t12=s[0]; break; } }
   const t5=ser.find(s=>s[0]>=5), v0=t5?t5[7]/t5[0]:null;
   const done=cons.some(k=>colCount(k)===0);
-  return {rx:c.init.rx, T:c.init.T, tmin:c.tmin, tmax:c.tmax, n:Object.assign({},c.init.n), ser, hist:c.hist.slice(), nTot:c.nTot, nEff:c.nEff,
+  return {rx:c.init.rx, T:c.init.T, tmin:c.tmin, tmax:c.tmax, n:Object.assign({},c.init.n), ser, nTot:c.nTot, nEff:c.nEff,
     tEnd:c.t, t12, v0, vm:c.t>0?c.nEff/c.t:0, fin:SP_FIN(c.finished,done)};
 }
 const SP_FIN=(fin,done)=>fin?(done?"Reaktion beendet (ein Ausgangsstoff verbraucht)":"Zeitlimit erreicht"):"abgebrochen bzw. noch nicht beendet";
@@ -3411,31 +3405,11 @@ function colDrawPlot(ctx,w,h,ser,sp){
     ctx.fillStyle="#e7e4dd"; ctx.fillText("N("+q+")",lx+32*k,ly+i*16*k);
   });
 }
-function colDrawHist(ctx,w,h,hist,ter){
-  const k=w/700, fs=Math.max(10,12*k), ml=52*k, mr=14*k, mt=22*k, mb=40*k, nb=hist.length;
-  const mx=Math.max(5,...hist), ym=mx<=12?Math.ceil(mx/4)*4:Math.ceil(mx/20)*20;
-  const X=e=>ml+e/4*(w-ml-mr), Y=v=>h-mb-v/ym*(h-mt-mb);
-  ctx.setTransform(1,0,0,1,0,0); ctx.fillStyle="#0e1113"; ctx.fillRect(0,0,w,h);
-  ctx.font=fs+"px system-ui,sans-serif"; ctx.textBaseline="middle"; ctx.strokeStyle="#233029"; ctx.lineWidth=1; ctx.fillStyle="#9aa2a9"; ctx.textAlign="right";
-  for(let i=0;i<=4;i++){ const v=ym*i/4; ctx.beginPath(); ctx.moveTo(ml,Y(v)); ctx.lineTo(w-mr,Y(v)); ctx.stroke(); ctx.fillText(String(Math.round(v)),ml-6*k,Y(v)); }
-  for(let i=0;i<nb;i++){
-    const x0=X(i/4), x1=X((i+1)/4), eff=(i/4)>=1;
-    ctx.fillStyle=eff?COL.COLORS.C:"#6f7f93"; ctx.fillRect(x0+1,Y(hist[i]),Math.max(1,x1-x0-2),h-mb-Y(hist[i]));
-  }
-  ctx.strokeStyle="#9aa2a9"; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(ml,mt); ctx.lineTo(ml,h-mb); ctx.lineTo(w-mr,h-mb); ctx.stroke();
-  ctx.textAlign="center"; ctx.fillStyle="#9aa2a9";
-  for(let e=0;e<=4;e++) ctx.fillText(String(e),X(e),h-mb+14*k);
-  ctx.fillText("Stoßenergie E / Eₐ  ("+(ter?"Dreierstöße":"Zusammenstöße")+", bisher)",ml+(w-ml-mr)/2,h-8*k);
-  ctx.save(); ctx.translate(13*k,mt+(h-mt-mb)/2); ctx.rotate(-Math.PI/2); ctx.fillText("Anzahl der Stöße",0,0); ctx.restore();
-  ctx.setLineDash([6*k,4*k]); ctx.strokeStyle="#ff6b6b"; ctx.lineWidth=2*k; ctx.beginPath(); ctx.moveTo(X(1),mt-6*k); ctx.lineTo(X(1),h-mb); ctx.stroke(); ctx.setLineDash([]);
-  ctx.fillStyle="#ff6b6b"; ctx.textAlign="left"; ctx.fillText("Eₐ (Aktivierungsenergie)",X(1)+6*k,mt+2*k);
-  ctx.textAlign="right"; ctx.fillStyle="#6f7f93"; ctx.fillText("unwirksam",X(1)-8*k,Y(ym)+14*k); ctx.fillStyle=COL.COLORS.C; ctx.textAlign="left"; ctx.fillText("wirksam",X(1)+8*k,Y(ym)+24*k);
-}
 function colSizeCanvases(){
   const dpr=Math.min(2,window.devicePixelRatio||1), cv=$("colCanvas"), w=cv.clientWidth;
   if(!w) return;
   cv.style.height=Math.round(w*COL.H/COL.W)+"px"; cv.width=Math.round(w*dpr); cv.height=Math.round(w*COL.H/COL.W*dpr);
-  [$("colPlot"),$("colHist")].forEach(e=>{ e.width=Math.round(e.clientWidth*dpr); e.height=Math.round(280*dpr); });
+  { const e=$("colPlot"); e.width=Math.round(e.clientWidth*dpr); e.height=Math.round(300*dpr); }
   COL.plotAcc=99; colRedraw(0);
 }
 function colRedraw(dt){
@@ -3444,9 +3418,8 @@ function colRedraw(dt){
   COL.plotAcc+=dt;
   if(COL.plotAcc>0.15){
     COL.plotAcc=0;
-    const p=$("colPlot"), h=$("colHist"), rx=colRx();
+    const p=$("colPlot"), rx=colRx();
     colDrawPlot(p.getContext("2d"),p.width,p.height,COL.series,colSpecies(rx));
-    colDrawHist(h.getContext("2d"),h.width,h.height,COL.hist,rx.re.length===3);
     colReadouts();
   }
 }
@@ -3472,7 +3445,6 @@ function colBuildRx(){
   $("coNk").textContent=ter?"Dreierstöße "+rx.re.join(" + "):"Zusammenstöße "+rx.re.join(" + ");
   $("colLegend").innerHTML=sp.map(k=>`<span><i class="sw-col" style="background:${COL.COLORS[k]}"></i>Teilchen ${k}${rx.pr.includes(k)&&!rx.re.includes(k)?" (Produkt)":""}</span>`).join("")
     +`<span style="color:var(--text-faint)">weißer Blitz: wirksamer Zusammenstoß · grauer Ring: unwirksam, Teilchen prallen ab</span>`;
-  $("colHistT").textContent=ter?"Energie der Dreierstöße "+rx.re.join(" + "):"Energie der Zusammenstöße "+rx.re.join(" + ");
   $("colTerNote").hidden=!ter;
   $("colRegenNote").hidden=COL.rx!==3;
 }
@@ -3523,10 +3495,10 @@ $("colSpeed").addEventListener("click",e=>{ const b=e.target.closest("button"); 
 $("colClear").addEventListener("click",()=>{ COL.runs=[]; colRunsInfo(); });
 window.addEventListener("resize",()=>{ if(MODE==="col") colSizeCanvases(); });
 /* PDF: Messreihen dieser Simulation */
-function colPlotImg(d,which){
-  const cv=document.createElement("canvas"); cv.width=1100; cv.height=which==="plot"?480:420;
+function colPlotImg(d){
+  const cv=document.createElement("canvas"); cv.width=1100; cv.height=480;
   const x=cv.getContext("2d"), rx=colRx(d.rx);
-  if(which==="plot") colDrawPlot(x,cv.width,cv.height,d.ser,colSpecies(rx)); else colDrawHist(x,cv.width,cv.height,d.hist,rx.re.length===3);
+  colDrawPlot(x,cv.width,cv.height,d.ser,colSpecies(rx));
   return window.BK?BK.cimg(cv):"";
 }
 function colRunHTML(d){
@@ -3534,13 +3506,12 @@ function colRunHTML(d){
   const tr=(k,v)=>`<tr><th style="width:46%">${k}</th><td>${v}</td></tr>`;
   const pct=d.nTot?fmt(d.nEff/d.nTot*100,1)+" %":"–";
   const step=Math.max(1,Math.ceil(d.ser.length/30)), rows=d.ser.filter((s,i)=>i%step===0||i===d.ser.length-1);
-  const i1=colPlotImg(d,"plot"), i2=colPlotImg(d,"hist");
+  const i1=colPlotImg(d);
   const leg=window.BK?BK.leg(sp.map(k=>[BK.ink(COL.COLORS[k]),"N("+k+")"+(COL.DASH[k].length?" (gestrichelt)":"")])):"";
   const last=d.ser[d.ser.length-1]||[];
   return `<div class="bk-sec"><h3 class="bk-h3">Versuchsbedingungen</h3><table class="bk-t"><tbody>${tr("Reaktion",rx.eq+" (geschlossenes Gefäß)")}${tr("Temperatur",colTLabel(d))}${rx.re.map(k=>tr("Konzentration c("+k+")",fmtC(d.n[k])+" mol/L ("+d.n[k]+" Teilchen)")).join("")}${tr("Aktivierungsenergie (Modell)","E<sub>A</sub> = 3 · k·T(25 °C)")}</tbody></table></div>
   <div class="bk-sec"><h3 class="bk-h3">Ergebnisse</h3><table class="bk-t"><tbody>${tr("Dauer",fmt(d.tEnd,1)+" s")}${tr(ter?"Dreierstöße "+rx.re.join(" + "):"Zusammenstöße "+rx.re.join(" + "),d.nTot)}${tr("davon wirksam (Reaktionen)",d.nEff+" ("+pct+")")}${tr("Teilchenzahlen am Ende",sp.map(k=>"N("+k+") = "+last[1+COL.SP.indexOf(k)]).join(", "))}${tr("Reaktionsgeschwindigkeit v<sub>0</sub> (erste 5 s)",d.v0===null?"–":fmt(d.v0,2)+" Reaktionen/s")}${tr("mittlere Reaktionsgeschwindigkeit",fmt(d.vm,2)+" Reaktionen/s")}${tr("Zeit bis zum halben Umsatz",d.t12===null?"nicht erreicht":fmt(d.t12,1)+" s")}${tr("Ende",esc(d.fin))}</tbody></table></div>
   <div class="bk-sec"><h3 class="bk-h3">Diagramm: Teilchenzahlen</h3>${BK.imgTag(i1,"Teilchenzahlen gegen Zeit")}${leg}</div>
-  <div class="bk-sec"><h3 class="bk-h3">Energie der ${ter?"Dreierstöße":"Zusammenstöße"}</h3>${BK.imgTag(i2,"Stoßenergien")}<p class="bk-small">Rot gestrichelt: Aktivierungsenergie E<sub>A</sub>. Nur Stöße rechts davon sind wirksam.</p></div>
   <div class="bk-sec bk-long"><h3 class="bk-h3">Messwerte</h3><table class="bk-t"><thead><tr><th>t (s)</th>${sp.map(k=>`<th>N(${k})</th>`).join("")}</tr></thead><tbody>${rows.map(s=>`<tr><td>${fmt(s[0],1)}</td>${sp.map(k=>`<td>${s[1+COL.SP.indexOf(k)]}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
 }
 const colMakeLive=()=>{ const c=COL; if(!c.started||c.saved||c.t<=0) return null; const d=colRunData(); d.no=c.runNo+1; return {id:"live",label:colRunLabel(d,true),color:c.RUNCOL[c.runNo%c.RUNCOL.length],html:()=>colRunHTML(d)}; };
@@ -3548,7 +3519,7 @@ $("colPdf").addEventListener("click",()=>window.BK&&BK.open({
   runs:()=>COL.runs.map(d=>({id:"c"+d.no,label:colRunLabel(d),color:d.color,html:()=>colRunHTML(d)})), live:colMakeLive,
   opts:[], pre:null, kick:"Simulation", printTitle:"Stoßtheorie – Auswertung", footName:"Simulation „Stoßtheorie“",
   noRuns:"Noch keine Messreihe vorhanden. Starte die Simulation; jeder Lauf wird beim Beenden oder Zurücksetzen als Messreihe gespeichert.",
-  hint:"Die Auswertung enthält je gewählter Messreihe die Versuchsbedingungen, die Ergebnisse (Stoßzahlen, Anteil wirksamer Stöße, Reaktionsgeschwindigkeit), das Diagramm der Teilchenzahlen (weißer Hintergrund), die Verteilung der Stoßenergien und die Messwerte."
+  hint:"Die Auswertung enthält je gewählter Messreihe die Versuchsbedingungen, die Ergebnisse (Stoßzahlen, Anteil wirksamer Stöße, Reaktionsgeschwindigkeit), das Diagramm der Teilchenzahlen (weißer Hintergrund) und die Messwerte."
 }));
 colInit(); colBuildRx();
 
@@ -3874,7 +3845,7 @@ BK.setup({url:'https://chemie.mail-baumgart.de/Q1/1-Reaktionsgeschwindigkeit.htm
   runs:G.runs, live:G.live,
   opts:[{id:'ov',label:'Übersichtstabelle der gewählten Messreihen (Seite 1)'}],
   pre:(runs,o)=>{ if(!o.ov||!runs.length) return ''; return `<div class="bk-run"><h2 class="bk-h2">Übersicht der Messreihen</h2><table class="bk-t"><thead><tr><th>#</th><th>Reaktion</th><th>ϑ</th><th>p</th><th>c</th><th>Zerteilung / Katalysator</th><th>t<sub>½</sub> bzw. t(Kreuz)</th><th>v<sub>0</sub></th><th>Endwert bzw. 1/t</th></tr></thead><tbody>${runs.map(r=>'<tr>'+r.ov().map(x=>`<td>${x}</td>`).join('')+'</tr>').join('')}</tbody></table><p class="bk-small">t<sub>½</sub>: Zeit, bis die Hälfte des Umsatzes erreicht ist. v<sub>0</sub>: Anfangsgeschwindigkeit in der jeweils ersten Diagrammgröße.</p></div>`; },
-  ex:{sim:false,simNote:true,kick:'Übung',printTitle:'Reaktionsgeschwindigkeit: Zink + Salzsäure – Protokoll',stats:G.exStats,build:G.exBody,
+  ex:{sim:false,simNote:true,kick:'Übung',printTitle:'Aufnehmen von Messwerten und Berechnung der Reaktionsgeschwindigkeit am Beispiel der Reaktion von Zink mit Salzsäure',stats:G.exStats,build:G.exBody,
     hint:'Die Auswertung enthält Versuch, Messwerte und Berechnungen, das c-t-Diagramm, die Durchschnittsgeschwindigkeiten und den Bearbeitungsstand. Automatisch ergänzte Werte sind mit * gekennzeichnet.'}});
 })();
 
