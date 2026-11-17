@@ -66,6 +66,8 @@ canvas{display:block;width:100%;height:auto}
 .tile .v{font-family:var(--mono);font-size:19px;color:var(--amber);margin-top:2px}
 .tile .v small{font-size:12px;color:var(--text-dim)}
 .tile.big .v{font-size:25px}
+.tile.temp .tdl{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:2px 10px;margin-top:6px;padding-top:5px;border-top:1px solid var(--line-soft);font-size:12px;color:var(--text-dim)}
+.tile.temp .tdl b{font-family:var(--mono);font-size:17px;color:var(--amber);font-weight:500;white-space:nowrap}
 .tile.gas{grid-column:span 2}
 .tile.gas .grow{display:grid;grid-template-columns:1fr auto 64px;gap:10px;align-items:baseline;padding:3px 0;border-top:1px solid var(--line-soft);font-size:12.5px}
 .tile.gas .grow:first-of-type{margin-top:4px}
@@ -200,8 +202,8 @@ footer .footer-credit{margin-top:8px;color:var(--text-dim)}
     <div class="screen"><canvas id="scene" width="900" height="466" aria-label="Darstellung der Erde mit Sonnenstrahlung, Wärmestrahlung, Treibhausgasen, Emissionsquellen und Klimaschutzmaßnahmen"></canvas></div>
 
     <div class="tiles">
-      <div class="tile big"><div class="k">Mittlere Temperatur der Erdoberfläche</div><div class="v" id="tT"></div></div>
-      <div class="tile big"><div class="k">Änderung gegenüber dem vorindustriellen Zustand</div><div class="v" id="tD"></div></div>
+      <div class="tile big temp"><div class="k">Mittlere Temperatur der Erdoberfläche</div><div class="v" id="tT"></div>
+        <div class="tdl"><span>gegenüber vorindustriell</span><b id="tD"></b></div></div>
       <div class="tile gas"><div class="k">Treibhausgase in der Atmosphäre <span style="color:var(--text-faint)">(Änderung gegenüber vorindustriell)</span></div>
         <div class="grow"><span>Kohlenstoffdioxid CO₂</span><b id="tC"></b><i id="tCd"></i></div>
         <div class="grow"><span>Methan CH₄</span><b id="tM"></b><i id="tMd"></i></div>
@@ -507,7 +509,7 @@ function refresh(full){
   {const a=proj[proj.length-1],b=ref[ref.length-1];fc={t100:a.T,r100:b.T,c100:a.C};}
   const Tn=T0+S.T;
   $('#tT').innerHTML=f(Tn,2)+' <small>°C</small>';
-  const d=$('#tD');d.innerHTML=sg(S.T,2)+' <small>K</small>';d.className='v'+(S.T>0.005?' pos':'');
+  const d=$('#tD');d.textContent=sg(S.T,2)+' K';d.className=S.T>0.005?'pos':S.T<-0.005?'neg':''; // Änderung in derselben Kachel wie die Temperatur
   // Treibhausgase in einer Kachel, mit Änderung gegenüber dem vorindustriellen Gehalt
   [['tC',conc(S),280,'ppm'],['tM',S.M,720,'ppb'],['tN',S.N,270,'ppb']].forEach(([id,v,v0,u])=>{const d=(v/v0-1)*100;
     $('#'+id).innerHTML=f(v)+' <small>'+u+'</small>';const el=$('#'+id+'d');el.textContent=Math.abs(d)<0.5?'±0 %':(d>0?'+':'−')+f(Math.abs(d))+' %';el.style.color=d>0.5?'var(--danger)':d<-0.5?'var(--good)':'';});
