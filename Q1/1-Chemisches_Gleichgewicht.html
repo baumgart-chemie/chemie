@@ -297,6 +297,104 @@ footer .footer-credit{margin-top:8px; color:var(--text-dim);}
 .gl-box small{color:var(--text-faint); font-size:12px;}
 .gl-nav{display:flex; align-items:center; gap:10px; border-top:1px solid var(--line-soft); padding-top:14px; margin-top:16px;}
 .gl-nav .sp{flex:1; text-align:center; font-size:12px; color:var(--text-faint);}
+
+/* ===== Bereichsauswahl ===== */
+.modepick{display:flex; flex-direction:column; gap:6px;}
+.modebtn{display:flex; gap:10px; align-items:center; width:100%; text-align:left; padding:9px 11px; min-height:46px; cursor:pointer;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel); color:var(--text); font:inherit; font-size:13px; font-weight:500; line-height:1.35; touch-action:manipulation;}
+.modebtn:hover{border-color:var(--text-faint); background:var(--panel-alt);}
+.modebtn .nr{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--amber); min-width:14px;}
+.modebtn.active{border-color:var(--teal); background:var(--teal-dim);}
+.modebtn.active .nr{color:var(--text);}
+.start-intro h2{font-size:17px; margin:0 0 6px;}
+.start-intro p{font-size:13.5px; color:var(--text-dim); margin:0 0 18px; line-height:1.55;}
+.start-cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px;}
+.start-card{display:flex; flex-direction:column; gap:8px; text-align:left; cursor:pointer; padding:16px 18px 14px; min-height:150px;
+  border:1px solid var(--line); border-radius:5px; background:var(--panel); color:var(--text); font:inherit; touch-action:manipulation;}
+.start-card:hover{border-color:var(--teal); background:var(--panel-alt);}
+.start-card .sc-nr{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace; font-size:11.5px; color:var(--amber); border:1px solid var(--amber-dim); border-radius:3px; padding:1px 7px; align-self:flex-start;}
+.start-card h3{font-size:15px; line-height:1.35;}
+.start-card p{margin:0; font-size:13px; color:var(--text-dim); line-height:1.55; flex:1;}
+.start-card .go{font-size:12.5px; color:var(--teal);}
+.screen-top .sp{flex:1;}
+.screen-top .btn{min-height:36px;}
+/* Segmentauswahl wie beim GC-Simulator */
+.seg{display:flex; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; margin-bottom:12px;}
+.seg button{flex:1; background:var(--panel-alt); color:var(--text-dim); border:none; border-left:1px solid var(--line); padding:9px 6px; min-height:40px; font:inherit; font-size:12.5px; cursor:pointer; touch-action:manipulation;}
+.seg button:first-child{border-left:none;}
+.seg button.active{background:var(--teal-dim); color:var(--text);}
+/* Haber-Bosch */
+canvas#hbPlant{height:310px; min-width:760px;}
+.hb-plantwrap{overflow-x:auto; overscroll-behavior-x:contain;}
+.modal-box.hbz{max-width:1180px; max-height:92vh;}
+.hbz-grid{display:grid; grid-template-columns:1.1fr 1fr; gap:14px;}
+@media (max-width:900px){ .hbz-grid{grid-template-columns:1fr;} }
+canvas#hbZoom{height:440px;} canvas#hbZoomSurf{height:440px;}
+canvas#hbPart{height:290px;}
+canvas#hbEq{height:290px;}
+canvas#hbEnergy{height:270px;}
+.hb-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:10px;}
+@media (max-width:1100px){ .hb-grid{grid-template-columns:1fr;} }
+.subt{font-size:12px; color:var(--text-dim); font-weight:600; margin:2px 0 6px;}
+.hb-ul{margin:4px 0 0; padding-left:18px;}
+.hb-ul li{margin:0 0 4px;}
+/* Aufgaben */
+.ex-eq{font-size:18px; text-align:center; margin:4px 0 10px; color:var(--text);}
+.ex-eq .ph{font-size:.6em; color:var(--text-faint); vertical-align:sub;}
+.ex-text{font-size:14px; color:var(--text); line-height:1.6; margin:0 0 10px;}
+.ex-gg{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:6px;}
+@media (max-width:700px){ .ex-gg{grid-template-columns:1fr;} }
+.ex-gg>div{border:1px solid var(--line-soft); background:var(--panel); border-radius:4px; padding:9px 12px;}
+.ex-gg ul{margin:4px 0 0; padding-left:18px; font-size:13.5px; color:var(--text); line-height:1.7;}
+.ex-gg p{margin:4px 0 0; font-size:13.5px; color:var(--text);}
+.ex-l{font-size:11px; color:var(--amber); text-transform:uppercase; letter-spacing:.05em;}
+.ex-step{border:1px solid var(--line); border-left:3px solid var(--teal-dim); border-radius:4px; background:var(--panel); padding:12px 14px; margin-top:12px;}
+.ex-step.locked{opacity:.4; pointer-events:none;}
+.ex-step.done{border-left-color:var(--good);}
+.ex-sh{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+.ex-num{width:22px; height:22px; border-radius:50%; border:1px solid var(--teal-dim); color:var(--teal); font-size:11.5px; display:inline-flex; align-items:center; justify-content:center; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.ex-st{font-size:14px; font-weight:600;}
+.ex-badge{margin-left:auto; font-size:11.5px; padding:2px 8px; border-radius:10px; border:1px solid;}
+.ex-badge.ok{color:var(--good); border-color:var(--good);} .ex-badge.bad{color:var(--danger); border-color:var(--danger);}
+.ex-desc{font-size:13px; color:var(--text-dim); line-height:1.55; margin:6px 0 10px;}
+.ex-opts{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px;}
+@media (max-width:700px){ .ex-opts{grid-template-columns:1fr;} }
+.ex-opt{display:flex; align-items:center; gap:10px; border:1px solid var(--line); border-radius:4px; padding:8px 12px; min-height:52px; cursor:pointer; background:var(--panel-alt); font-size:14px;}
+.ex-opt input{width:20px; height:20px; accent-color:var(--teal); flex:none; margin:0;}
+.ex-opt.ok{border-color:var(--good);}
+.ex-fields{display:flex; flex-wrap:wrap; gap:10px 22px;}
+.ex-field{display:flex; align-items:center; gap:8px; font-size:14px;}
+.ex-field input{width:150px; font:inherit; font-size:15px; color:var(--text); background:var(--screen,#0e1113); border:1px solid var(--line); border-radius:4px; padding:8px 10px; min-height:42px; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.ex-field input.ok{border-color:var(--good); color:var(--good);}
+.ex-field input.bad{border-color:var(--danger);}
+.ex-field .u{font-size:13px; color:var(--text-dim);}
+.ex-auto{color:var(--amber); font-weight:700;}
+.ex-fb{font-size:13px; margin-top:8px; line-height:1.5;}
+.ex-fb.bad{color:var(--danger);} .ex-fb.ok{color:var(--good);}
+.ex-tip{margin-top:10px; border-left:2px solid var(--amber); background:var(--panel-alt); padding:8px 12px; font-size:13.5px; color:var(--text); line-height:1.7;}
+.ex-act{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+.ex-act .btn{min-height:40px;}
+.ex-done{margin-top:14px; border-radius:4px; padding:10px 14px; font-size:14px; line-height:1.6;}
+.ex-done.ok{border:1px solid var(--good); background:rgba(127,214,138,.08);}
+.ex-done.bad{border:1px solid var(--danger); background:rgba(228,120,91,.08);}
+.ex-small{font-size:12.5px; color:var(--text-dim);}
+.ex-ice{border-collapse:collapse; margin:6px 0 2px; font-size:13px;}
+.ex-ice th,.ex-ice td{border:1px solid var(--line); padding:3px 9px; white-space:nowrap;}
+.ex-screen .frac>span:first-child{border-bottom-color:var(--text);}
+.ex-mwg{font-size:16px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:4px 0 2px;}
+.ex-fr>span{padding:6px 8px !important; display:flex; align-items:center; justify-content:center; gap:6px; flex-wrap:wrap;}
+.ex-slot{display:inline-flex; align-items:center; gap:1px; white-space:nowrap;}
+.ex-slot input{font:inherit; color:var(--text); background:var(--screen,#0e1113); border:1px solid var(--line); border-radius:4px; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.ex-slot .ex-sp{width:118px; font-size:15px; padding:6px 8px; min-height:40px; margin:0 1px;}
+.ex-slot .ex-exp{width:28px; font-size:12px; padding:2px 3px; min-height:26px; text-align:center; align-self:flex-start; margin-top:-4px;}
+.ex-slot input.ok{border-color:var(--good); color:var(--good);}
+.ex-slot input.bad{border-color:var(--danger);}
+.ex-dot{color:var(--text-dim);}
+.ex-uf{display:inline-flex; align-items:center; gap:2px; font-size:17px;}
+.ex-uf .ex-ue{width:38px; font-size:13px; padding:2px 3px; min-height:28px; text-align:center; align-self:flex-start; margin-top:-6px; font:inherit; font-size:13px; color:var(--text); background:var(--screen,#0e1113); border:1px solid var(--line); border-radius:4px; font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;}
+.ex-uf .ex-ue.ok{border-color:var(--good); color:var(--good);} .ex-uf .ex-ue.bad{border-color:var(--danger);}
+.ex-us{margin:0 6px; color:var(--text-dim);}
+.sec-h{font-size:12.5px; color:var(--text-dim); font-weight:600; margin:26px 0 10px; padding-bottom:8px; border-bottom:1px solid var(--line);}
 </style>
 <style id="bk-style">
 /* ===== Baustein QR-Code + Auswertung als PDF (einheitlich nach Leitfaden) ===== */
@@ -396,7 +494,7 @@ header>.tag{flex:1 1 160px;min-width:0}
 <header>
   <a href="../index.html" class="back-btn" title="Zur Übersicht aller Simulationen"><span class="ar" aria-hidden="true">←</span>Zurück</a>
   <h1>Simulation „Chemisches Gleichgewicht“</h1>
-  <span class="tag">Chemisches Gleichgewicht – Prinzip von Le Chatelier & Massenwirkungsgesetz</span>
+  <span class="tag">Le Chatelier, Haber-Bosch-Verfahren & Massenwirkungsgesetz</span>
   <a href="#" class="guide-link" id="btnGuide">Anleitung</a>
   <span class="status" id="statusBadge"><span class="dot"></span><span id="statusText">bereit</span></span>
 </header>
@@ -408,30 +506,27 @@ header>.tag{flex:1 1 160px;min-width:0}
       <button class="modal-close" id="closeGuide" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
-      <h3>Reaktion auswählen</h3>
-      <p>Im Dropdown „Reaktion" stehen acht Gleichgewichtsreaktionen zur Auswahl – fünf Gasreaktionen (z. B. Ammoniak-Synthese, NO₂/N₂O₄) und drei Reaktionen in Lösung (Veresterung, Eisen-thiocyanat, Cobalt-Komplex). Nach dem Laden liegen nur die Edukte vor. Temperatur, Druck und Konzentrationen lassen sich jetzt als Startbedingungen einstellen; mit <strong>„Reaktion starten“</strong> beginnt die Reaktion und die Simulation zeigt, wie sich das Gleichgewicht einstellt.</p>
+      <h3>Bereich wählen</h3>
+      <p>Beim Öffnen der Seite wählst du einen von drei Bereichen – über die Karten im Hauptfenster oder unter „Bereich wählen“ in der linken Spalte. Dort lässt sich jederzeit wechseln: <strong>1</strong> Simulation des Gleichgewichts spezifischer chemischer Reaktionen, <strong>2</strong> Simulation Haber-Bosch-Synthese, <strong>3</strong> Aufgaben zum Massenwirkungsgesetz.</p>
 
-      <h3>Temperatur</h3>
-      <p>Die Temperatur verändert die <strong>Gleichgewichtskonstante K<sub>c</sub></strong>. Bei einer exothermen Hinreaktion sinkt K<sub>c</sub> mit steigender Temperatur, bei einer endothermen steigt es. Wärmezufuhr begünstigt immer die endotherme Teilreaktion. Der Verlauf von K<sub>c</sub> ist im Reiter „Temperaturabhängigkeit" dargestellt.</p>
+      <h3>1 · Gleichgewicht spezifischer Reaktionen</h3>
+      <p>Im Dropdown „Reaktion“ stehen acht Gleichgewichtsreaktionen zur Auswahl – fünf Gasreaktionen (z. B. Ammoniak-Synthese, NO₂/N₂O₄) und drei Reaktionen in Lösung (Veresterung, Eisen-thiocyanat, Cobalt-Komplex). Nach dem Laden liegen nur die Edukte vor; nichts bewegt sich. Temperatur, Druck und Konzentrationen lassen sich jetzt als Startbedingungen einstellen. Über dem Reaktionsgefäß stehen die Knöpfe <strong>Start/Pause</strong>, <strong>Katalysator</strong> und <strong>Zurücksetzen</strong>.</p>
+      <p><strong>Temperatur:</strong> verändert K<sub>c</sub> (exotherme Hinreaktion: K<sub>c</sub> sinkt beim Erwärmen, endotherme: K<sub>c</sub> steigt). <strong>Druck:</strong> Kolben verschieben – bei unterschiedlicher Gasteilchenzahl verschiebt sich das Gleichgewicht zur Seite mit weniger Teilchen, der Druck geht teilweise zurück. <strong>Konzentrationen:</strong> + gibt einen Stoff zu, − halbiert seine Stoffmenge; K<sub>c</sub> bleibt gleich, nur Q<sub>c</sub> ändert sich. <strong>Katalysator:</strong> Das Gleichgewicht stellt sich schneller ein, seine Lage bleibt gleich.</p>
+      <p>Das Reaktionsgefäß zeigt die Teilchen, das c-t-Diagramm die Konzentrationen (Störungen gestrichelt; Klick auf einen Stoff in der Legende blendet ihn aus). Jede Störung steht im Reiter „Protokoll“; der Reiter „Temperaturabhängigkeit“ zeigt K<sub>c</sub>(ϑ).</p>
 
-      <h3>Druck</h3>
-      <p>Bei Gasreaktionen wird der Druck durch Verschieben des Kolbens verändert. Alle Gaskonzentrationen ändern sich dabei um denselben Faktor. Stehen auf beiden Seiten unterschiedlich viele Gasteilchen, gilt anschließend <strong>Q<sub>c</sub> ≠ K<sub>c</sub></strong>: Das Gleichgewicht verschiebt sich bei Druckerhöhung zur Seite mit weniger Teilchen, und der Druck geht teilweise wieder zurück. K<sub>c</sub> bleibt dabei unverändert. Bei gleicher Teilchenzahl (z. B. HI-Gleichgewicht) und bei Reaktionen in Lösung hat der Druck keinen Einfluss.</p>
+      <h3>2 · Haber-Bosch-Synthese</h3>
+      <p>Das Anlagenbild zeigt den Weg des Gases: Frischgas (N₂ aus Luft, H₂ aus Erdgas) → Mischer → Verdichter → Vorwärmer → Reaktor mit Katalysatorschichten → Kühler → Abscheider (flüssiges NH₃) und den Kreislauf des nicht umgesetzten Gases. Mit <strong>Start/Pause</strong> läuft die Anlage, mit <strong>Katalysator</strong> wird der Eisen-Katalysator zu- oder abgeschaltet.</p>
+      <p>In der linken Spalte stellst du <strong>Druck</strong>, <strong>Temperatur</strong>, das <strong>Verhältnis H₂ : N₂</strong> und den <strong>Inertgasanteil</strong> ein. Alle Bewegungen hängen von den Einstellungen ab: Bei höherer Temperatur bewegen sich die Teilchen schneller, bei höherem Druck ist das Gas dichter, und das Tempo der Oberflächenreaktion folgt der Reaktionsgeschwindigkeit. <strong>Antippen des Reaktors</strong> (oder der Knopf „Reaktor vergrößern“) öffnet das Teilchenmodell: Gasteilchen strömen durch die Katalysatorschicht, an den Körnern entsteht NH₃; daneben zeigt eine weitere Vergrößerung die Reaktion an der Eisenoberfläche Schritt für Schritt (ohne Katalysator: keine Reaktion). Das <strong>Diagramm</strong> zeigt den NH₃-Anteil im Gleichgewicht für verschiedene Drücke und – mit Katalysator – den tatsächlich erreichten Anteil am Reaktorausgang. Daran lässt sich der technische Kompromiss aus Lage des Gleichgewichts und Reaktionsgeschwindigkeit ablesen. Der Reiter „Energiediagramm“ vergleicht den Verlauf mit und ohne Katalysator.</p>
 
-      <h3>Konzentrationen</h3>
-      <p>Mit <strong>+</strong> wird ein Stoff zugegeben, mit <strong>−</strong> wird seine Stoffmenge halbiert (Entzug). Die Zugabe eines Edukts oder der Entzug eines Produkts verschiebt das Gleichgewicht nach rechts, umgekehrt nach links. K<sub>c</sub> bleibt konstant, nur der Reaktionsquotient Q<sub>c</sub> ändert sich.</p>
+      <h3>3 · Aufgaben zum Massenwirkungsgesetz</h3>
+      <p>Wähle links die <strong>Aufgabenart</strong> (Gleichgewichtskonstante berechnen oder Konzentration berechnen) und die <strong>Schwierigkeit</strong> (Leicht, Mittel, Schwer). Voreingestellt sind „Gleichgewichtskonstante berechnen“ und „Leicht“. Jede Aufgabe ist in Schritte gegliedert, die nacheinander freigeschaltet werden; jeder Wert wird sofort geprüft. Im ersten Schritt trägst du die Formeln der Stoffe und die Exponenten in das vorgegebene Gerüst des Massenwirkungsgesetzes ein. Als Hilfe lässt sich stattdessen eine <strong>Auswahl</strong> von vier Ausdrücken anzeigen; die Aufgabe zählt dann als „mit Hilfe“ gelöst. „Tipp“ zeigt den Rechenweg mit deinen Zahlen, „Lösung zeigen“ setzt die Lösung ein (gekennzeichnet mit *). „Neue Aufgabe“ steht oben im Hauptfenster. Rechenbeispiele zu allen Aufgabenarten findest du unter „Grundlagen“.</p>
+      <p><strong>Eingabe:</strong> Dezimalkomma oder -punkt, Zehnerpotenzen als 7,14·10^-4 oder 7,14e-4; geprüft wird auf drei gültige Ziffern (±3 %).</p>
 
-      <h3>Katalysator</h3>
-      <p>Der Katalysator beschleunigt Hin- und Rückreaktion gleichermaßen. Das Gleichgewicht stellt sich schneller ein, seine Lage bleibt gleich.</p>
-
-      <h3>Anzeige</h3>
-      <p>Das <strong>Reaktionsgefäß</strong> zeigt die Teilchen der Stoffe (Anzahl proportional zur Stoffmenge); farbige Stoffe (NO₂, I₂, Eisen-thiocyanat, Cobalt-Komplexe) färben den Inhalt. Das <strong>c-t-Diagramm</strong> zeichnet die Konzentrationen fortlaufend auf, Störungen sind als gestrichelte Linien markiert. Ein Klick auf einen Stoff in der Legende blendet ihn aus.</p>
-      <p>Der Statusanzeiger oben rechts vergleicht Q<sub>c</sub> mit K<sub>c</sub>: Q<sub>c</sub> &lt; K<sub>c</sub> → Hinreaktion überwiegt, Q<sub>c</sub> &gt; K<sub>c</sub> → Rückreaktion überwiegt, Q<sub>c</sub> = K<sub>c</sub> → Gleichgewicht.</p>
-
-      <h3>Protokoll</h3>
-      <p>Jede Störung wird im Reiter „Protokoll" mit Zeitpunkt, K<sub>c</sub>, Q<sub>c</sub> direkt nach der Störung und der Verschiebungsrichtung festgehalten. Das Protokoll lässt sich als CSV-Datei exportieren.</p>
+      <h3>Auswertung als PDF</h3>
+      <p>In den Simulationen erstellt „Ausgabe als PDF“ (in den Reitern „Protokoll“) eine Auswertung der gewählten Läufe. Ein Lauf endet mit „Zurücksetzen“ oder dem Wechsel der Reaktion. Bei den Aufgaben erstellt „Zusammenfassung als PDF“ eine Übersicht aller bearbeiteten Aufgaben mit Lösung und Statistik.</p>
 
       <h3>Ideen zum Ausprobieren</h3>
-      <p>Ammoniak-Synthese: Welche Bedingungen liefern die höchste NH₃-Konzentration – und warum arbeitet die Technik trotzdem bei 450 °C? NO₂/N₂O₄: Farbänderung beim Erwärmen und beim Komprimieren beobachten. HI-Gleichgewicht: Warum verschiebt eine Druckänderung hier nichts?</p>
+      <p>Haber-Bosch: Bei welcher Temperatur ist die Produktionsleistung mit Katalysator am größten – und warum nicht bei der niedrigsten Temperatur? NO₂/N₂O₄: Farbänderung beim Erwärmen und beim Komprimieren beobachten. HI-Gleichgewicht: Warum verschiebt eine Druckänderung hier nichts?</p>
     </div>
   </div>
 </div>
@@ -443,6 +538,15 @@ header>.tag{flex:1 1 160px;min-width:0}
       <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.3</span><span class="d">18.11.2026</span></div>
+      <ul>
+        <li><strong>Startauswahl:</strong> Beim Öffnen wählt man einen von drei Bereichen (Karten im Hauptfenster, „Bereich wählen“ in der linken Spalte). Die bisherige Simulation heißt jetzt „Simulation des Gleichgewichts spezifischer chemischer Reaktionen“.</li>
+        <li><strong>Neu – Simulation Haber-Bosch-Synthese:</strong> Anlagenschema mit Verdichter, Reaktor, Kühler, Abscheider und Kreislauf, Teilchenmodell im Reaktor (Vergrößerung durch Antippen), Gleichgewichtsdiagramm (NH₃-Anteil gegen Temperatur für verschiedene Drücke), Energiediagramm; Druck, Temperatur, Verhältnis H₂ : N₂, Inertgasanteil und Katalysator einstellbar.</li>
+        <li><strong>Neu – Aufgaben zum Massenwirkungsgesetz:</strong> „Gleichgewichtskonstante berechnen“ oder „Konzentration berechnen“ in den Stufen Leicht, Mittel und Schwer (Standard: Gleichgewichtskonstante berechnen, Leicht); das Massenwirkungsgesetz wird in ein vorgegebenes Gerüst eingetragen, eine Auswahl von Ausdrücken ist als Hilfe zuschaltbar; bei der Einheit der Gleichgewichtskonstante steht mol/L vorgegeben, nur die Exponenten werden eingetragen; schrittweise Prüfung, Tipps, Lösung zeigen, Verlauf und Zusammenfassung als PDF.</li>
+        <li><strong>Haber-Bosch – Teilchenbewegung:</strong> Die Bewegungen hängen von den Einstellungen ab: Temperatur → Geschwindigkeit der Teilchen, Druck → Teilchendichte und Drehzahl des Verdichters, Verhältnis H₂ : N₂ und Inertgas → Zusammensetzung, Temperatur, Druck und Katalysator → Tempo der Oberflächenreaktion. Im Reaktor strömen Teilchen durch die Katalysatorschichten; Antippen des Reaktors (oder „Reaktor vergrößern“) zeigt eine Vergrößerung mit Katalysatorkörnern und der Kornoberfläche.</li>
+        <li><strong>Bedienung:</strong> Knöpfe Start/Pause, Katalysator und Zurücksetzen über dem Hauptfenster. Die Reaktion startet erst auf Knopfdruck; vorher ruhen auch die Teilchen.</li>
+        <li><strong>Grundlagen:</strong> sechs neue Themen (Haber-Bosch-Verfahren, Reaktion am Eisen-Katalysator, vier Rechenbeispiele zum Massenwirkungsgesetz).</li>
+      </ul>
       <div class="vh-ver"><span class="v">V1.2</span><span class="d">07.11.2026</span></div>
       <ul>
         <li><strong>Auswertung als PDF:</strong> einheitlicher Dialog „Auswertung als PDF“: Jeder abgeschlossene Lauf ist einzeln auswählbar, dazu optionale Felder für Name und Kurs. Das PDF enthält je Lauf Versuchsbedingungen, Diagramm (weißer Hintergrund) und Messwerte im druckfreundlichen A4-Layout.</li><li><strong>QR-Code:</strong> Schaltfläche rechts in der Kopfzeile; Antippen vergrößert den QR-Code, mit dem sich diese Seite direkt auf dem Mobilgerät öffnen lässt.</li>
@@ -468,7 +572,7 @@ header>.tag{flex:1 1 160px;min-width:0}
 
     <section class="block">
       <button type="button" class="gl-toggle" id="glToggle" aria-expanded="false" aria-controls="glPanel">
-        <span>Grundlagen</span><span class="gl-n">5 Themen</span><span class="gl-ch" aria-hidden="true"></span>
+        <span>Grundlagen</span><span class="gl-n">11 Themen</span><span class="gl-ch" aria-hidden="true"></span>
       </button>
       <div class="gl-panel" id="glPanel" hidden>
         <div class="gl-list" id="glList"></div>
@@ -476,6 +580,17 @@ header>.tag{flex:1 1 160px;min-width:0}
       </div>
     </section>
 
+
+    <section class="block">
+      <h2>Bereich wählen</h2>
+      <div class="modepick">
+        <button type="button" class="modebtn" data-mode="sim"><span class="nr">1</span><span>Simulation des Gleichgewichts spezifischer chemischer Reaktionen</span></button>
+        <button type="button" class="modebtn" data-mode="hb"><span class="nr">2</span><span>Simulation Haber-Bosch-Synthese</span></button>
+        <button type="button" class="modebtn" data-mode="ex"><span class="nr">3</span><span>Aufgaben zum Massenwirkungsgesetz</span></button>
+      </div>
+    </section>
+
+    <div id="side-sim" hidden>
     <section class="block">
       <h2>Reaktion</h2>
       <div class="field-full">
@@ -500,21 +615,70 @@ header>.tag{flex:1 1 160px;min-width:0}
       <p class="hint">+ gibt eine feste Stoffmenge zu, − halbiert die Stoffmenge (Entzug).</p>
     </section>
 
+    </div>
+
+    <div id="side-hb" hidden>
     <section class="block">
-      <h2>Steuerung</h2>
-      <div class="btn-row">
-        <button class="btn" id="bCat" title="Katalysator beschleunigt die Einstellung des Gleichgewichts">Katalysator</button>
-        <button class="btn" id="bPause">Pause</button>
-        <button class="btn ghost" id="bReset">Zurücksetzen</button>
-      </div>
+      <h2>Bedingungen im Reaktor</h2>
+      <div class="row"><label for="hbP">Druck p</label><span class="val mono" id="hbPv"></span></div>
+      <input type="range" id="hbP" min="50" max="400" step="10">
+      <div class="row" style="margin-top:8px"><label for="hbT">Temperatur ϑ</label><span class="val mono" id="hbTv"></span></div>
+      <input type="range" id="hbT" min="300" max="600" step="5">
+      <p class="hint">Technisch üblich: 150–300 bar und 400–500 °C.</p>
     </section>
+    <section class="block">
+      <h2>Zusammensetzung des Frischgases</h2>
+      <div class="row"><label for="hbR">Verhältnis H₂ : N₂</label><span class="val mono" id="hbRv"></span></div>
+      <input type="range" id="hbR" min="1" max="5" step="0.1">
+      <div class="row" style="margin-top:8px"><label for="hbI">Inertgasanteil (Ar, CH₄)</label><span class="val mono" id="hbIv"></span></div>
+      <input type="range" id="hbI" min="0" max="20" step="1">
+      <p class="hint">Das Verhältnis legt die Konzentrationen von N₂ und H₂ im Synthesegas fest. Inertgase reagieren nicht und verdünnen das Gemisch.</p>
+    </section>
+    <section class="block">
+      <h2>Hinweis</h2>
+      <p class="hint" style="margin:0">Start/Pause, Katalysator und Zurücksetzen findest du über dem Anlagenbild. Die Bedingungen lassen sich vor dem Start und während des Betriebs verändern.</p>
+    </section>
+    </div>
+
+    <div id="side-ex" hidden>
+    <section class="block">
+      <h2>Aufgabenart</h2>
+      <div class="seg" id="exArt"><button type="button" data-v="K" class="active">Gleichgewichts­konstante berechnen</button><button type="button" data-v="C">Konzentration berechnen</button></div>
+      <p class="hint" style="margin:0">„Gleichgewichtskonstante berechnen“: aus den Konzentrationen. „Konzentration berechnen“: eine Gleichgewichtskonzentration aus der Gleichgewichtskonstante und den übrigen Angaben.</p>
+    </section>
+    <section class="block">
+      <h2>Schwierigkeit</h2>
+      <div class="seg" id="exLv"><button type="button" data-v="L" class="active">Leicht</button><button type="button" data-v="M">Mittel</button><button type="button" data-v="S">Schwer</button></div>
+      <p class="hint" style="margin:0"><b>Leicht:</b> alle Faktoren 1, Werte direkt einsetzen. <b>Mittel:</b> Faktoren 2 (Exponenten, Wurzel). <b>Schwer:</b> Umsatztabelle aus Anfangskonzentrationen bzw. Stoffmengen oder quadratische Gleichung.</p>
+    </section>
+    <section class="block">
+      <h2>Eingabe</h2>
+      <p class="hint" style="margin:0">Dezimalkomma oder -punkt; Zehnerpotenzen als 7,14·10^-4 oder 7,14e-4. Geprüft wird auf drei gültige Ziffern (±3 %).</p>
+    </section>
+    </div>
   </div>
 
   <!-- MAIN -->
   <div class="main">
+
+    <div id="main-start">
+      <div class="start-intro">
+        <h2>Was möchtest du bearbeiten?</h2>
+        <p>Wähle einen der drei Bereiche. Du kannst jederzeit über „Bereich wählen“ in der linken Spalte wechseln.</p>
+      </div>
+      <div class="start-cards">
+        <button type="button" class="start-card" data-mode="sim"><span class="sc-nr">1</span><h3>Simulation des Gleichgewichts spezifischer chemischer Reaktionen</h3><p>Acht Gleichgewichtsreaktionen: Temperatur, Druck und Konzentrationen verändern, Verschiebung nach Le Chatelier, K<sub>c</sub> und Q<sub>c</sub> verfolgen.</p><span class="go">Öffnen →</span></button>
+        <button type="button" class="start-card" data-mode="hb"><span class="sc-nr">2</span><h3>Simulation Haber-Bosch-Synthese</h3><p>Ammoniakanlage mit Verdichter, Reaktor, Kühler und Kreislauf; Reaktion am Eisen-Katalysator im Teilchenmodell; Druck, Temperatur, Zusammensetzung und Katalysator variieren.</p><span class="go">Öffnen →</span></button>
+        <button type="button" class="start-card" data-mode="ex"><span class="sc-nr">3</span><h3>Aufgaben zum Massenwirkungsgesetz</h3><p>Gleichgewichtskonstante oder Gleichgewichtskonzentrationen berechnen – in den Stufen Leicht, Mittel und Schwer mit Tipps und sofortiger Prüfung.</p><span class="go">Öffnen →</span></button>
+      </div>
+    </div>
+
+    <div id="main-sim" hidden>
     <div class="screen-card">
       <div class="screen-top">
-        <button class="btn primary" id="bStart">Reaktion starten</button>
+        <button class="btn primary" id="bStart">Start</button>
+        <button class="btn" id="bCat" title="Katalysator beschleunigt die Einstellung des Gleichgewichts">Katalysator: aus</button>
+        <button class="btn ghost" id="bReset">Zurücksetzen</button>
         <span class="title">Reaktionsgefäß &amp; Konzentrations-Zeit-Diagramm</span>
         <div class="speed-group">
           <button data-speed="0.5">×0,5</button>
@@ -598,12 +762,114 @@ header>.tag{flex:1 1 160px;min-width:0}
         </div>
       </div>
     </div>
+    </div>
+
+    <div id="main-hb" hidden>
+    <div class="screen-card">
+      <div class="screen-top">
+        <button class="btn primary" id="hbStart">Start</button>
+        <button class="btn" id="hbCat" title="Eisen-Katalysator zu- oder abschalten">Katalysator: aus</button>
+        <button class="btn ghost" id="hbReset">Zurücksetzen</button>
+        <button class="btn" id="hbZoomBtn" title="Teilchenmodell im Reaktor vergrößert anzeigen">Reaktor vergrößern</button>
+        <span class="title">Ammoniakanlage (Haber-Bosch-Verfahren)</span>
+        <div class="speed-group">
+          <button data-speed="0.5">×0,5</button>
+          <button data-speed="1" class="active">×1</button>
+          <button data-speed="3">×3</button>
+        </div>
+      </div>
+      <div class="hb-plantwrap"><canvas id="hbPlant"></canvas></div>
+      <div style="margin-top:10px"><div class="subt">NH₃-Anteil im Gleichgewicht und am Reaktorausgang · Teilchenmodell: Reaktor antippen oder „Reaktor vergrößern“</div><canvas id="hbEq"></canvas></div>
+      <div class="readout-bar">
+        <div class="readout"><span class="k">Druck</span><span class="v mono" id="hbRoP">–</span></div>
+        <div class="readout"><span class="k">Temperatur</span><span class="v mono" id="hbRoT">–</span></div>
+        <div class="readout"><span class="k">K<sub>p</sub>(ϑ)</span><span class="v mono" id="hbRoK">–</span></div>
+        <div class="readout"><span class="k">x(NH₃) am Reaktorausgang</span><span class="v mono" id="hbRoXe">–</span></div>
+        <div class="readout"><span class="k">x(NH₃) im Gleichgewicht (ohne Einfluss des Katalysators)</span><span class="v mono" id="hbRoX">–</span></div>
+        <div class="readout"><span class="k">Umsatz pro Durchgang</span><span class="v mono" id="hbRoU">–</span></div>
+        <div class="readout"><span class="k">Produktionsleistung (rel.)</span><span class="v mono" id="hbRoRel">–</span></div>
+      </div>
+    </div>
+
+    <div class="eq-card">
+      <div class="eq">N<sub>2</sub><sub style="font-size:.55em;color:var(--text-faint)">(g)</sub> + 3 H<sub>2</sub><sub style="font-size:.55em;color:var(--text-faint)">(g)</sub><span class="arr">⇌</span>2 NH<sub>3</sub><sub style="font-size:.55em;color:var(--text-faint)">(g)</sub></div>
+      <div class="meta"><span>Δ<sub>R</sub>H<sub>m</sub> = −92 kJ/mol · Hinreaktion exotherm</span><span>Gasteilchen: 4 → 2</span><span>K<sub>p</sub> = p<sup>2</sup>(NH<sub>3</sub>) / (p(N<sub>2</sub>) · p<sup>3</sup>(H<sub>2</sub>))</span></div>
+      <div class="explain" id="hbExplain"></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tabbtn active" data-tab="hblog">Protokoll</button>
+      <button class="tabbtn" data-tab="hben">Energiediagramm</button>
+    </div>
+    <div class="tabpanel active" id="tab-hblog">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>t (s)</th><th>Änderung</th><th>p</th><th>ϑ</th><th>H₂ : N₂ · Inertgas</th><th>Kat.</th><th>x(NH₃) GG</th><th>x(NH₃) Ausgang</th></tr></thead>
+          <tbody id="hbLog"></tbody>
+        </table>
+      </div>
+      <div class="btn-row" style="margin-top:12px;">
+        <button class="btn ghost" id="hbCsv">Protokoll als CSV exportieren</button>
+      </div>
+    </div>
+    <div class="tabpanel" id="tab-hben">
+      <div class="kgrid">
+        <canvas id="hbEnergy"></canvas>
+        <div>
+          <p class="note" style="margin-top:0">Ohne Katalysator müsste die sehr stabile N≡N-Dreifachbindung in der Gasphase gespalten werden – die Aktivierungsenergie ist so hoch, dass praktisch keine Reaktion stattfindet.</p>
+          <p class="note">Am Eisen-Katalysator verläuft die Reaktion über mehrere Teilschritte an der Oberfläche (Adsorption, Spaltung, schrittweise Hydrierung, Desorption) mit jeweils kleinen Energiebarrieren. Δ<sub>R</sub>H<sub>m</sub> bleibt gleich.</p>
+          <p class="note">Schematische Darstellung, Barrieren nicht maßstäblich.</p>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <div id="main-ex" hidden>
+    <div class="screen-card ex-screen">
+      <div class="screen-top">
+        <button class="btn primary" id="exNew">Neue Aufgabe</button>
+        <span class="title" id="exTitle">Aufgabe</span>
+      </div>
+      <div id="exTask"></div>
+      <div id="exSteps"></div>
+      <div id="exDone" class="ex-done" hidden></div>
+      <div class="readout-bar">
+        <div class="readout"><span class="k">gelöst</span><span class="v mono" id="exSolved">0</span></div>
+        <div class="readout"><span class="k">beim 1. Versuch richtig</span><span class="v mono" id="exFirst">0</span></div>
+        <div class="readout"><span class="k">Serie</span><span class="v mono" id="exStreak">0</span></div>
+        <div class="readout"><span class="k">Lösung angesehen</span><span class="v mono" id="exShown">0</span></div>
+        <div class="readout"><span class="k">Erfolgsquote</span><span class="v mono" id="exQuote">–</span></div>
+      </div>
+      <div class="bk-pdfrow" id="exPdfRow"></div>
+    </div>
+    <div class="sec-h">Verlauf</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Aufgabenart · Stufe</th><th>Reaktion</th><th>Ergebnis</th></tr></thead>
+        <tbody id="exHist"></tbody>
+      </table>
+    </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="hbZoomBd">
+  <div class="modal-box hbz" role="dialog" aria-modal="true" aria-labelledby="hbZoomT">
+    <div class="modal-head">
+      <h2 id="hbZoomT">Blick in den Reaktor – Teilchenmodell</h2>
+      <button class="modal-close" id="hbZoomClose" aria-label="Schließen">×</button>
+    </div>
+    <div class="hbz-grid">
+      <div style="min-width:0"><div class="subt">Ausschnitt einer Katalysatorschicht</div><canvas id="hbZoom"></canvas></div>
+      <div style="min-width:0"><div class="subt">Weitere Vergrößerung: Oberfläche eines Katalysatorkorns</div><canvas id="hbZoomSurf"></canvas></div>
+    </div>
+    <p class="note" id="hbZoomInfo" style="max-width:none"></p>
   </div>
 </div>
 
 <footer>
-  <p class="footer-note">Simulierte Daten zu Lehrzwecken · Gasreaktionen im Zylinder mit arretiertem Kolben (konstantes Volumen, ideales Gas); Temperaturabhängigkeit nach Van ’t Hoff mit konstantem ΔH<sub>r</sub>. K<sub>c</sub>- und ΔH<sub>r</sub>-Werte gerundet, bei Eisen-thiocyanat und Cobalt-Komplex Modellwerte. Die Geschwindigkeit der Gleichgewichtseinstellung ist rein illustrativ.</p>
-  <p class="footer-credit">Bastian Baumgart · Simulation „Chemisches Gleichgewicht“ V1.2 · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-note">Simulierte Daten zu Lehrzwecken · Gasreaktionen im Zylinder mit arretiertem Kolben (konstantes Volumen, ideales Gas); Temperaturabhängigkeit nach Van ’t Hoff mit konstantem ΔH<sub>r</sub>. K<sub>c</sub>- und ΔH<sub>r</sub>-Werte gerundet, bei Eisen-thiocyanat und Cobalt-Komplex Modellwerte. Die Geschwindigkeit der Gleichgewichtseinstellung ist rein illustrativ. Haber-Bosch: K<sub>p</sub> nach Gillespie/Beattie für ideale Gase (Druck in bar ≈ atm); Annäherung an das Gleichgewicht im Reaktor und Produktionsleistung sind Modellwerte.</p>
+  <p class="footer-credit">Bastian Baumgart · Simulation „Chemisches Gleichgewicht“ V1.3 · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <script>
@@ -816,8 +1082,7 @@ function load(idx){
     sP.disabled=true; sP.min=0; sP.max=2; sP.value=1;
     $("hintP").textContent = "Reaktion in flüssiger Phase – der Druck hat praktisch keinen Einfluss auf das Gleichgewicht.";
   }
-  $("bCat").classList.remove("on"); $("bPause").textContent="Pause"; $("bPause").classList.remove("on"); $("bPause").disabled=true;
-  $("bStart").disabled=false; $("bStart").textContent="Reaktion starten";
+  $("bCat").classList.remove("on"); $("bCat").textContent="Katalysator: aus"; simBtn();
   $("kinfo").innerHTML = exo ? "Exotherme Hinreaktion: K<sub>c</sub> sinkt mit steigender Temperatur – die Ausbeute an Produkten nimmt ab." : "Endotherme Hinreaktion: K<sub>c</sub> steigt mit steigender Temperatur – die Ausbeute an Produkten nimmt zu.";
   setExplain(START_HINT);
   renderLog();
@@ -826,8 +1091,9 @@ function load(idx){
 }
 
 /* ---------- Störungen ---------- */
-const START_HINT = `<p><b>Bereit:</b> Im Gefäß liegen nur die Edukte vor. Wähle die Startbedingungen (Temperatur, Druck, Konzentrationen) und klicke auf <b>„Reaktion starten“</b>.</p>`;
-function preStart(what){ syncParticles(false); setExplain(`<p><b>Startbedingung geändert:</b> ${what}. Die Reaktion läuft noch nicht – klicke auf <b>„Reaktion starten“</b>.</p>`); }
+const START_HINT = `<p><b>Bereit:</b> Im Gefäß liegen nur die Edukte vor. Wähle die Startbedingungen (Temperatur, Druck, Konzentrationen) und klicke über dem Reaktionsgefäß auf <b>„Start“</b>.</p>`;
+function preStart(what){ syncParticles(false); setExplain(`<p><b>Startbedingung geändert:</b> ${what}. Die Reaktion läuft noch nicht – klicke auf <b>„Start“</b>.</p>`); }
+function simBtn(){ const b=$("bStart"); b.textContent=!S.started?"Start":(S.paused?"Weiter":"Pause"); b.classList.toggle("primary",!S.started||S.paused); }
 function setExplain(h){ $("explain").innerHTML=h; }
 function shiftDir(){ const d=lnQ(conc())-lnK(S.T); return Math.abs(d)<0.005 ? 0 : (d<0?1:-1); }
 function addEvent(label, desc, Kbefore){
@@ -901,17 +1167,15 @@ function syncPSlider(){ if(isGas() && !S.dragP) $("sP").value = Math.min(rx.p[1]
 $("sT").addEventListener("input",onTInput); $("sT").addEventListener("change",onTChange);
 $("sP").addEventListener("input",onPInput); $("sP").addEventListener("change",onPChange);
 $("bCat").addEventListener("click",()=>{
-  S.cat=!S.cat; $("bCat").classList.toggle("on",S.cat);
+  S.cat=!S.cat; $("bCat").classList.toggle("on",S.cat); $("bCat").textContent=S.cat?"Katalysator: an":"Katalysator: aus";
   if(!S.started){ preStart(S.cat?"Katalysator zugesetzt":"Katalysator entfernt"); return; }
   addEvent(S.cat?"Kat.+":"Kat.−", S.cat?"Katalysator zugesetzt":"Katalysator entfernt", Kof(S.T));
   setExplain(`<p><b>Katalysator ${S.cat?"zugesetzt":"entfernt"}:</b> Ein Katalysator senkt die Aktivierungsenergie für Hin- <i>und</i> Rückreaktion gleichermaßen. Das Gleichgewicht stellt sich ${S.cat?"schneller":"langsamer"} ein, seine <b>Lage und K<sub>c</sub> bleiben unverändert</b>.</p>`);
 });
-$("bPause").addEventListener("click",()=>{ S.paused=!S.paused; $("bPause").textContent=S.paused?"Weiter":"Pause"; $("bPause").classList.toggle("on",S.paused); });
 $("bReset").addEventListener("click",()=>load(+$("rxSelect").value));
 $("bStart").addEventListener("click",()=>{
-  if(S.started) return;
-  S.started=true; S.t=0; S.hist=[{t:0,c:conc()}]; S.lastSample=0;
-  $("bStart").disabled=true; $("bStart").textContent="Reaktion läuft"; $("bPause").disabled=false;
+  if(S.started){ S.paused=!S.paused; simBtn(); return; }
+  S.started=true; S.paused=false; S.t=0; S.hist=[{t:0,c:conc()}]; S.lastSample=0; simBtn();
   setExplain(`<p><b>Start:</b> Zu Beginn liegen nur die Edukte vor (Q<sub>c</sub> = 0 &lt; K<sub>c</sub>). Die Hinreaktion überwiegt, bis Hin- und Rückreaktion gleich schnell ablaufen und Q<sub>c</sub> = K<sub>c</sub> gilt – das dynamische Gleichgewicht ist erreicht.</p><p>Verändere nun Temperatur, Druck oder Konzentrationen in der linken Spalte.</p>`);
 });
 $("logScale").addEventListener("change",()=>{S.yMax=null;});
@@ -920,10 +1184,12 @@ document.querySelectorAll(".speed-group button").forEach(b=>b.addEventListener("
   b.classList.add("active"); speed=+b.dataset.speed;
 }));
 document.querySelectorAll(".tabbtn").forEach(b=>b.addEventListener("click",()=>{
-  document.querySelectorAll(".tabbtn").forEach(x=>x.classList.remove("active"));
-  document.querySelectorAll(".tabpanel").forEach(x=>x.classList.remove("active"));
-  b.classList.add("active"); $("tab-"+b.dataset.tab).classList.add("active"); sizeCanvases();
+  const root=b.closest(".tabs").parentElement;
+  root.querySelectorAll(":scope > .tabs .tabbtn").forEach(x=>x.classList.remove("active"));
+  root.querySelectorAll(":scope > .tabpanel").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active"); $("tab-"+b.dataset.tab).classList.add("active"); sizeCanvases(); window.dispatchEvent(new Event("resize"));
 }));
+window.addEventListener("modechange",e=>{ if(e.detail==="sim"){ sizeCanvases(); } });
 const guideBackdrop=$("guideBackdrop");
 $("btnGuide").addEventListener("click",e=>{ e.preventDefault(); guideBackdrop.classList.add("open"); });
 $("closeGuide").addEventListener("click",()=>guideBackdrop.classList.remove("open"));
@@ -1062,7 +1328,7 @@ function drawChart(){
   });
   c.restore();
   c.strokeStyle=C.grid; c.strokeRect(L,T,pw,ph);
-  if(!S.started){ c.fillStyle=C.faint; c.font="13px system-ui, 'Segoe UI', Roboto, sans-serif"; c.textAlign="left"; c.textBaseline="middle"; c.fillText("Bereit – Startbedingungen einstellen und „Reaktion starten“ klicken.", L+14, T+ph/2); }
+  if(!S.started){ c.fillStyle=C.faint; c.font="13px system-ui, 'Segoe UI', Roboto, sans-serif"; c.textAlign="left"; c.textBaseline="middle"; c.fillText("Bereit – Startbedingungen einstellen und „Start“ klicken.", L+14, T+ph/2); }
 }
 
 function drawK(){
@@ -1113,7 +1379,8 @@ function updateUI(){
 let last=performance.now();
 function frame(now){
   const dtReal=Math.min(0.05,(now-last)/1000); last=now;
-  if(!S.paused){
+  if(window.__mode!=="sim"){ requestAnimationFrame(frame); return; }
+  if(!S.paused&&S.started){
     if(S.started){
       const dt=dtReal*speed;
       S.t+=dt;
@@ -1124,7 +1391,7 @@ function frame(now){
       syncParticles(false);
     }
     const sp=(isGas()?0.35:0.12)*Math.sqrt(S.T/300);
-    S.particles.forEach(p=>{
+    S.particles.forEach(p=>{ /* Teilchen bewegen sich erst nach dem Start */
       p.vx+=(Math.random()-.5)*0.6*dtReal; p.vy+=(Math.random()-.5)*0.6*dtReal;
       const v=Math.hypot(p.vx,p.vy)||1; p.vx/=v; p.vy/=v;
       p.x+=p.vx*sp*dtReal; p.y+=p.vy*sp*dtReal*1.3;
@@ -1177,6 +1444,7 @@ requestAnimationFrame(frame);
 /* Rubrik Grundlagen */
 (function(){
   const GL = [{"t": "Umkehrbare Reaktionen und dynamisches Gleichgewicht", "h": "<p>Viele Reaktionen laufen nicht vollständig ab: Die Produkte reagieren teilweise wieder zu den Edukten zurück. Man schreibt dann einen Doppelpfeil: A + B ⇌ C + D.<\/p> <div class=\"gl-row\"><figure class=\"gl-fig\"><svg viewBox=\"0 0 330 200\" width=\"330\" style=\"max-width:330px;width:100%;height:auto;color:var(--text-dim);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif\" role=\"img\"><defs><marker id=\"ax64268\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\" fill=\"var(--text-dim)\"/><\/marker><\/defs><line x1=\"208.0\" y1=\"14\" x2=\"208.0\" y2=\"164\" stroke=\"var(--text-faint)\" stroke-width=\"1\" stroke-dasharray=\"4 3\"/><text x=\"211.0\" y=\"24\" font-size=\"10.5\" fill=\"var(--text-faint)\" text-anchor=\"start\" font-weight=\"400\" >Gleichgewicht<\/text><path d=\"M46.0 21.1 L46.9 23.2 L47.8 25.2 L48.7 27.2 L49.6 29.1 L50.5 31.0 L51.4 32.9 L52.3 34.7 L53.2 36.5 L54.1 38.2 L55.0 39.9 L55.9 41.6 L56.8 43.3 L57.7 44.9 L58.6 46.4 L59.5 48.0 L60.4 49.5 L61.3 51.0 L62.2 52.4 L63.1 53.8 L64.0 55.2 L64.9 56.6 L65.8 57.9 L66.7 59.2 L67.6 60.5 L68.5 61.7 L69.4 63.0 L70.3 64.2 L71.2 65.3 L72.1 66.5 L73.0 67.6 L73.9 68.7 L74.8 69.8 L75.7 70.9 L76.6 71.9 L77.5 72.9 L78.4 73.9 L79.3 74.9 L80.2 75.8 L81.1 76.8 L82.0 77.7 L82.9 78.6 L83.8 79.5 L84.7 80.3 L85.6 81.2 L86.5 82.0 L87.4 82.8 L88.3 83.6 L89.2 84.4 L90.1 85.1 L91.0 85.9 L91.9 86.6 L92.8 87.3 L93.7 88.0 L94.6 88.7 L95.5 89.3 L96.4 90.0 L97.3 90.6 L98.2 91.3 L99.1 91.9 L100.0 92.5 L100.9 93.1 L101.8 93.7 L102.7 94.2 L103.6 94.8 L104.5 95.3 L105.4 95.9 L106.3 96.4 L107.2 96.9 L108.1 97.4 L109.0 97.9 L109.9 98.4 L110.8 98.8 L111.7 99.3 L112.6 99.7 L113.5 100.2 L114.4 100.6 L115.3 101.0 L116.2 101.5 L117.1 101.9 L118.0 102.3 L118.9 102.6 L119.8 103.0 L120.7 103.4 L121.6 103.8 L122.5 104.1 L123.4 104.5 L124.3 104.8 L125.2 105.2 L126.1 105.5 L127.0 105.8 L127.9 106.1 L128.8 106.4 L129.7 106.7 L130.6 107.0 L131.5 107.3 L132.4 107.6 L133.3 107.9 L134.2 108.2 L135.1 108.4 L136.0 108.7 L136.9 108.9 L137.8 109.2 L138.7 109.4 L139.6 109.7 L140.5 109.9 L141.4 110.2 L142.3 110.4 L143.2 110.6 L144.1 110.8 L145.0 111.0 L145.9 111.2 L146.8 111.4 L147.7 111.6 L148.6 111.8 L149.5 112.0 L150.4 112.2 L151.3 112.4 L152.2 112.6 L153.1 112.8 L154.0 112.9 L154.9 113.1 L155.8 113.3 L156.7 113.4 L157.6 113.6 L158.5 113.7 L159.4 113.9 L160.3 114.0 L161.2 114.2 L162.1 114.3 L163.0 114.5 L163.9 114.6 L164.8 114.8 L165.7 114.9 L166.6 115.0 L167.5 115.1 L168.4 115.3 L169.3 115.4 L170.2 115.5 L171.1 115.6 L172.0 115.7 L172.9 115.8 L173.8 116.0 L174.7 116.1 L175.6 116.2 L176.5 116.3 L177.4 116.4 L178.3 116.5 L179.2 116.6 L180.1 116.7 L181.0 116.7 L181.9 116.8 L182.8 116.9 L183.7 117.0 L184.6 117.1 L185.5 117.2 L186.4 117.3 L187.3 117.3 L188.2 117.4 L189.1 117.5 L190.0 117.6 L190.9 117.6 L191.8 117.7 L192.7 117.8 L193.6 117.9 L194.5 117.9 L195.4 118.0 L196.3 118.1 L197.2 118.1 L198.1 118.2 L199.0 118.2 L199.9 118.3 L200.8 118.4 L201.7 118.4 L202.6 118.5 L203.5 118.5 L204.4 118.6 L205.3 118.6 L206.2 118.7 L207.1 118.7 L208.0 118.8 L208.9 118.8 L209.8 118.9 L210.7 118.9 L211.6 119.0 L212.5 119.0 L213.4 119.1 L214.3 119.1 L215.2 119.2 L216.1 119.2 L217.0 119.2 L217.9 119.3 L218.8 119.3 L219.7 119.3 L220.6 119.4 L221.5 119.4 L222.4 119.5 L223.3 119.5 L224.2 119.5 L225.1 119.6 L226.0 119.6 L226.9 119.6 L227.8 119.7 L228.7 119.7 L229.6 119.7 L230.5 119.7 L231.4 119.8 L232.3 119.8 L233.2 119.8 L234.1 119.9 L235.0 119.9 L235.9 119.9 L236.8 119.9 L237.7 120.0 L238.6 120.0 L239.5 120.0 L240.4 120.0 L241.3 120.1 L242.2 120.1 L243.1 120.1 L244.0 120.1 L244.9 120.1 L245.8 120.2 L246.7 120.2 L247.6 120.2 L248.5 120.2 L249.4 120.2 L250.3 120.3 L251.2 120.3 L252.1 120.3 L253.0 120.3 L253.9 120.3 L254.8 120.3 L255.7 120.4 L256.6 120.4 L257.5 120.4 L258.4 120.4 L259.3 120.4 L260.2 120.4 L261.1 120.5 L262.0 120.5 L262.9 120.5 L263.8 120.5 L264.7 120.5 L265.6 120.5 L266.5 120.5 L267.4 120.5 L268.3 120.6 L269.2 120.6 L270.1 120.6 L271.0 120.6 L271.9 120.6 L272.8 120.6 L273.7 120.6 L274.6 120.6 L275.5 120.6 L276.4 120.7 L277.3 120.7 L278.2 120.7 L279.1 120.7 L280.0 120.7 L280.9 120.7 L281.8 120.7 L282.7 120.7 L283.6 120.7 L284.5 120.7 L285.4 120.8 L286.3 120.8 L287.2 120.8 L288.1 120.8 L289.0 120.8 L289.9 120.8 L290.8 120.8 L291.7 120.8 L292.6 120.8 L293.5 120.8 L294.4 120.8 L295.3 120.8 L296.2 120.8 L297.1 120.8 L298.0 120.9 L298.9 120.9 L299.8 120.9 L300.7 120.9 L301.6 120.9 L302.5 120.9 L303.4 120.9 L304.3 120.9 L305.2 120.9 L306.1 120.9 L307.0 120.9 L307.9 120.9 L308.8 120.9 L309.7 120.9 L310.6 120.9 L311.5 120.9 L312.4 120.9 L313.3 120.9 L314.2 120.9 L315.1 120.9 L316.0 120.9\" stroke=\"var(--teal)\" stroke-width=\"2\" fill=\"none\" /><path d=\"M46.0 164.0 L46.9 161.9 L47.8 159.9 L48.7 157.9 L49.6 156.0 L50.5 154.1 L51.4 152.2 L52.3 150.4 L53.2 148.6 L54.1 146.9 L55.0 145.2 L55.9 143.5 L56.8 141.9 L57.7 140.3 L58.6 138.7 L59.5 137.2 L60.4 135.7 L61.3 134.2 L62.2 132.7 L63.1 131.3 L64.0 129.9 L64.9 128.6 L65.8 127.2 L66.7 125.9 L67.6 124.7 L68.5 123.4 L69.4 122.2 L70.3 121.0 L71.2 119.8 L72.1 118.7 L73.0 117.5 L73.9 116.4 L74.8 115.3 L75.7 114.3 L76.6 113.2 L77.5 112.2 L78.4 111.2 L79.3 110.3 L80.2 109.3 L81.1 108.4 L82.0 107.5 L82.9 106.6 L83.8 105.7 L84.7 104.8 L85.6 104.0 L86.5 103.2 L87.4 102.4 L88.3 101.6 L89.2 100.8 L90.1 100.0 L91.0 99.3 L91.9 98.6 L92.8 97.8 L93.7 97.1 L94.6 96.5 L95.5 95.8 L96.4 95.1 L97.3 94.5 L98.2 93.9 L99.1 93.3 L100.0 92.7 L100.9 92.1 L101.8 91.5 L102.7 90.9 L103.6 90.4 L104.5 89.8 L105.4 89.3 L106.3 88.8 L107.2 88.3 L108.1 87.8 L109.0 87.3 L109.9 86.8 L110.8 86.3 L111.7 85.9 L112.6 85.4 L113.5 85.0 L114.4 84.5 L115.3 84.1 L116.2 83.7 L117.1 83.3 L118.0 82.9 L118.9 82.5 L119.8 82.1 L120.7 81.7 L121.6 81.4 L122.5 81.0 L123.4 80.7 L124.3 80.3 L125.2 80.0 L126.1 79.7 L127.0 79.3 L127.9 79.0 L128.8 78.7 L129.7 78.4 L130.6 78.1 L131.5 77.8 L132.4 77.5 L133.3 77.3 L134.2 77.0 L135.1 76.7 L136.0 76.5 L136.9 76.2 L137.8 75.9 L138.7 75.7 L139.6 75.5 L140.5 75.2 L141.4 75.0 L142.3 74.8 L143.2 74.5 L144.1 74.3 L145.0 74.1 L145.9 73.9 L146.8 73.7 L147.7 73.5 L148.6 73.3 L149.5 73.1 L150.4 72.9 L151.3 72.7 L152.2 72.6 L153.1 72.4 L154.0 72.2 L154.9 72.0 L155.8 71.9 L156.7 71.7 L157.6 71.6 L158.5 71.4 L159.4 71.2 L160.3 71.1 L161.2 70.9 L162.1 70.8 L163.0 70.7 L163.9 70.5 L164.8 70.4 L165.7 70.3 L166.6 70.1 L167.5 70.0 L168.4 69.9 L169.3 69.8 L170.2 69.6 L171.1 69.5 L172.0 69.4 L172.9 69.3 L173.8 69.2 L174.7 69.1 L175.6 69.0 L176.5 68.9 L177.4 68.8 L178.3 68.7 L179.2 68.6 L180.1 68.5 L181.0 68.4 L181.9 68.3 L182.8 68.2 L183.7 68.1 L184.6 68.0 L185.5 68.0 L186.4 67.9 L187.3 67.8 L188.2 67.7 L189.1 67.6 L190.0 67.6 L190.9 67.5 L191.8 67.4 L192.7 67.4 L193.6 67.3 L194.5 67.2 L195.4 67.1 L196.3 67.1 L197.2 67.0 L198.1 67.0 L199.0 66.9 L199.9 66.8 L200.8 66.8 L201.7 66.7 L202.6 66.7 L203.5 66.6 L204.4 66.6 L205.3 66.5 L206.2 66.5 L207.1 66.4 L208.0 66.4 L208.9 66.3 L209.8 66.3 L210.7 66.2 L211.6 66.2 L212.5 66.1 L213.4 66.1 L214.3 66.0 L215.2 66.0 L216.1 65.9 L217.0 65.9 L217.9 65.9 L218.8 65.8 L219.7 65.8 L220.6 65.8 L221.5 65.7 L222.4 65.7 L223.3 65.7 L224.2 65.6 L225.1 65.6 L226.0 65.6 L226.9 65.5 L227.8 65.5 L228.7 65.5 L229.6 65.4 L230.5 65.4 L231.4 65.4 L232.3 65.3 L233.2 65.3 L234.1 65.3 L235.0 65.3 L235.9 65.2 L236.8 65.2 L237.7 65.2 L238.6 65.2 L239.5 65.1 L240.4 65.1 L241.3 65.1 L242.2 65.1 L243.1 65.0 L244.0 65.0 L244.9 65.0 L245.8 65.0 L246.7 65.0 L247.6 64.9 L248.5 64.9 L249.4 64.9 L250.3 64.9 L251.2 64.9 L252.1 64.8 L253.0 64.8 L253.9 64.8 L254.8 64.8 L255.7 64.8 L256.6 64.8 L257.5 64.7 L258.4 64.7 L259.3 64.7 L260.2 64.7 L261.1 64.7 L262.0 64.7 L262.9 64.7 L263.8 64.6 L264.7 64.6 L265.6 64.6 L266.5 64.6 L267.4 64.6 L268.3 64.6 L269.2 64.6 L270.1 64.6 L271.0 64.5 L271.9 64.5 L272.8 64.5 L273.7 64.5 L274.6 64.5 L275.5 64.5 L276.4 64.5 L277.3 64.5 L278.2 64.5 L279.1 64.5 L280.0 64.4 L280.9 64.4 L281.8 64.4 L282.7 64.4 L283.6 64.4 L284.5 64.4 L285.4 64.4 L286.3 64.4 L287.2 64.4 L288.1 64.4 L289.0 64.4 L289.9 64.4 L290.8 64.3 L291.7 64.3 L292.6 64.3 L293.5 64.3 L294.4 64.3 L295.3 64.3 L296.2 64.3 L297.1 64.3 L298.0 64.3 L298.9 64.3 L299.8 64.3 L300.7 64.3 L301.6 64.3 L302.5 64.3 L303.4 64.3 L304.3 64.3 L305.2 64.2 L306.1 64.2 L307.0 64.2 L307.9 64.2 L308.8 64.2 L309.7 64.2 L310.6 64.2 L311.5 64.2 L312.4 64.2 L313.3 64.2 L314.2 64.2 L315.1 64.2 L316.0 64.2\" stroke=\"var(--amber)\" stroke-width=\"2\" fill=\"none\" /><text x=\"78.4\" y=\"41.14285714285715\" font-size=\"10.5\" fill=\"var(--teal)\" text-anchor=\"start\" font-weight=\"400\" >Edukte<\/text><text x=\"78.4\" y=\"138.28571428571428\" font-size=\"10.5\" fill=\"var(--amber)\" text-anchor=\"start\" font-weight=\"400\" >Produkte<\/text><line x1=\"46\" y1=\"164\" x2=\"322\" y2=\"164\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" marker-end=\"url(#ax64268)\"/><line x1=\"46\" y1=\"164\" x2=\"46\" y2=\"8\" stroke=\"var(--text-dim)\" stroke-width=\"1.3\" marker-end=\"url(#ax64268)\"/><text x=\"181.0\" y=\"196\" font-size=\"11\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" >Zeit<\/text><text x=\"13\" y=\"89.0\" font-size=\"11\" fill=\"var(--text-dim)\" text-anchor=\"middle\" font-weight=\"400\" transform=\"rotate(-90 13 89.0)\">Konzentration<\/text><\/svg><figcaption>Die Konzentrationen ändern sich, bis sie konstant bleiben.<\/figcaption><\/figure><\/div> <p>Zu Beginn ist die Hinreaktion schnell, die Rückreaktion langsam. Mit der Zeit gleichen sich die Geschwindigkeiten an. Im <strong>chemischen Gleichgewicht<\/strong> laufen Hin- und Rückreaktion <strong>gleich schnell<\/strong> ab – die Konzentrationen bleiben konstant, obwohl ständig weiter reagiert wird (<strong>dynamisches Gleichgewicht<\/strong>).<\/p> <p>Das Gleichgewicht stellt sich nur in einem <strong>geschlossenen System<\/strong> ein, und zwar von beiden Seiten her gleich.<\/p>"}, {"t": "Massenwirkungsgesetz", "h": "<p>Im Gleichgewicht ist das Verhältnis der Konzentrationen bei gegebener Temperatur konstant. Für a A + b B ⇌ c C + d D gilt das <strong>Massenwirkungsgesetz<\/strong>:<\/p> <div class=\"gl-box gl-info\">K<sub>c<\/sub> = c(C)<sup>c<\/sup> · c(D)<sup>d<\/sup> / ( c(A)<sup>a<\/sup> · c(B)<sup>b<\/sup> )<\/div> <ul><li>Produkte stehen im Zähler, Edukte im Nenner; die Koeffizienten werden zu Exponenten.<\/li> <li><strong>K &gt;&gt; 1:<\/strong> Gleichgewicht liegt auf der Seite der Produkte; <strong>K &lt;&lt; 1:<\/strong> auf der Seite der Edukte.<\/li> <li>K hängt nur von der <strong>Temperatur<\/strong> ab, nicht von den Anfangskonzentrationen.<\/li><\/ul> <p>Setzt man aktuelle, noch nicht gleichgewichtige Konzentrationen in denselben Ausdruck ein, erhält man den <strong>Reaktionsquotienten Q<\/strong>. Ist Q &lt; K, reagiert das System weiter zu den Produkten; ist Q &gt; K, zu den Edukten.<\/p>"}, {"t": "Prinzip von Le Chatelier", "h": "<p>Wird ein System im Gleichgewicht durch einen äußeren Zwang gestört, verschiebt sich das Gleichgewicht so, dass die Wirkung des Zwangs <strong>verringert<\/strong> wird (Prinzip vom kleinsten Zwang).<\/p> <div class=\"gl-tw\"><table class=\"gl-table\"><thead><tr><th>Zwang<\/th><th>Wirkung<\/th><\/tr><\/thead><tbody><tr><td>Edukt zugeben / Produkt entfernen<\/td><td>Verschiebung zu den Produkten<\/td><\/tr><tr><td>Druck erhöhen (Gase)<\/td><td>Verschiebung zur Seite mit <strong>weniger<\/strong> Gasteilchen<\/td><\/tr><tr><td>Temperatur erhöhen<\/td><td>Verschiebung in Richtung der <strong>endothermen<\/strong> Reaktion<\/td><\/tr><tr><td>Katalysator<\/td><td>keine Verschiebung – das Gleichgewicht stellt sich nur schneller ein<\/td><\/tr><\/tbody><\/table><\/div>"}, {"t": "Konzentration und Druck", "h": "<p>Gibt man ein Edukt hinzu, ist Q kleiner als K. Die Hinreaktion läuft so lange schneller, bis wieder Q = K gilt. <strong>K bleibt dabei unverändert<\/strong>; nur die Lage der Konzentrationen ändert sich.<\/p> <p>Bei Gasreaktionen wirkt eine <strong>Druckerhöhung<\/strong> (Volumenverkleinerung) wie eine Konzentrationserhöhung aller Gase. Das Gleichgewicht weicht zur Seite mit der kleineren Zahl an Gasteilchen aus.<\/p> <div class=\"gl-box gl-info\">N<sub>2<\/sub> + 3 H<sub>2<\/sub> ⇌ 2 NH<sub>3<\/sub>: links 4, rechts 2 Gasteilchen → hoher Druck begünstigt Ammoniak.<br>H<sub>2<\/sub> + I<sub>2<\/sub> ⇌ 2 HI: links 2, rechts 2 → der Druck hat keinen Einfluss auf die Lage.<\/div>"}, {"t": "Temperatur und Katalysator", "h": "<p>Die Temperatur ist der einzige Faktor, der den <strong>Wert von K<\/strong> ändert:<\/p> <ul><li>Ist die Hinreaktion <strong>exotherm<\/strong> (Δ<sub>r<\/sub>H &lt; 0), wird K mit steigender Temperatur kleiner – weniger Produkt.<\/li> <li>Ist die Hinreaktion <strong>endotherm<\/strong> (Δ<sub>r<\/sub>H &gt; 0), wird K mit steigender Temperatur größer.<\/li><\/ul> <p>Eine höhere Temperatur beschleunigt aber beide Reaktionen; das Gleichgewicht stellt sich schneller ein. In der Technik muss man deshalb einen Kompromiss finden (Haber-Bosch: etwa 450 °C, hoher Druck, Katalysator).<\/p> <div class=\"gl-box gl-info\">Ein <strong>Katalysator<\/strong> senkt die Aktivierungsenergie von Hin- und Rückreaktion gleichermaßen. Er verkürzt die Zeit bis zum Gleichgewicht, verändert aber weder K noch die Gleichgewichtskonzentrationen.<\/div>"}];
+  GL.push(...[{"t": "Haber-Bosch-Verfahren: Anlage und Kompromiss", "h": "<p>Ammoniak wird technisch nach dem <strong>Haber-Bosch-Verfahren</strong> aus Stickstoff und Wasserstoff hergestellt: N<sub>2</sub> + 3 H<sub>2</sub> ⇌ 2 NH<sub>3</sub>, Δ<sub>R</sub>H<sub>m</sub> = −92 kJ/mol.</p><ol class=\"gl-steps\"><li><strong>Synthesegas:</strong> Stickstoff stammt aus der Luft, Wasserstoff aus Erdgas (Dampfreformierung). Das Gemisch wird im Verhältnis H<sub>2</sub> : N<sub>2</sub> = 3 : 1 eingestellt.</li><li><strong>Verdichter:</strong> Das Gas wird auf 150–300 bar verdichtet.</li><li><strong>Reaktor:</strong> Das vorgewärmte Gas strömt bei 400–500 °C durch mehrere Schichten des Eisen-Katalysators.</li><li><strong>Kühler und Abscheider:</strong> Ammoniak wird verflüssigt und abgetrennt – das Produkt wird dem Gleichgewicht entzogen.</li><li><strong>Kreislauf:</strong> Nicht umgesetztes N<sub>2</sub> und H<sub>2</sub> werden mit frischem Gas gemischt und zurückgeführt. Pro Durchgang reagieren nur etwa 15–20 %, im Kreislauf aber fast alles.</li></ol><p>Gleichgewichtsanteil von NH<sub>3</sub> (Stoffmengenanteil in %, Gemisch 3 : 1, ideales Gas):</p><div class=\"gl-tw\"><table class=\"gl-table\"><thead><tr><th>Druck</th><th>300 °C</th><th>400 °C</th><th>450 °C</th><th>500 °C</th><th>600 °C</th></tr></thead><tbody><tr><td>100 bar</td><td>50</td><td>24</td><td>15</td><td>10</td><td>4</td></tr><tr><td>200 bar</td><td>61</td><td>35</td><td>25</td><td>17</td><td>8</td></tr><tr><td>300 bar</td><td>67</td><td>42</td><td>31</td><td>22</td><td>11</td></tr><tr><td>400 bar</td><td>70</td><td>47</td><td>36</td><td>26</td><td>14</td></tr></tbody></table></div><div class=\"gl-box gl-warn\"><strong>Kompromiss:</strong> Hoher Druck und niedrige Temperatur verschieben das Gleichgewicht zum Ammoniak. Bei niedriger Temperatur stellt sich das Gleichgewicht aber zu langsam ein, und sehr hoher Druck ist teuer. Man arbeitet deshalb bei mittlerer Temperatur mit Katalysator und hohem, aber nicht extremem Druck.</div>"}, {"t": "Reaktion am Eisen-Katalysator (Teilchenebene)", "h": "<p>Der Katalysator besteht aus Eisen mit Zusätzen (Promotoren) wie K<sub>2</sub>O, Al<sub>2</sub>O<sub>3</sub> und CaO. Die Reaktion läuft in Teilschritten an seiner Oberfläche ab:</p><ol class=\"gl-steps\"><li><strong>Anströmen:</strong> N<sub>2</sub>- und H<sub>2</sub>-Moleküle gelangen an die Oberfläche.</li><li><strong>Adsorption:</strong> Die Moleküle werden an Eisenatome gebunden.</li><li><strong>Spaltung (Dissoziation):</strong> N<sub>2</sub> zerfällt in zwei N-Atome, H<sub>2</sub> in zwei H-Atome. Die Spaltung der N≡N-Dreifachbindung ist der <strong>langsamste Schritt</strong>.</li><li><strong>Hydrierung:</strong> Die Atome reagieren schrittweise: N + H → NH, NH + H → NH<sub>2</sub>, NH<sub>2</sub> + H → NH<sub>3</sub>.</li><li><strong>Desorption:</strong> NH<sub>3</sub> löst sich von der Oberfläche.</li><li><strong>Abtransport:</strong> NH<sub>3</sub> wird mit dem Gasstrom fortgetragen, die Oberfläche ist wieder frei.</li></ol><div class=\"gl-box\">Ohne Katalysator müsste die N≡N-Bindung (Bindungsenergie 945 kJ/mol) beim Zusammenstoß zweier Moleküle gespalten werden – das geschieht praktisch nie. Der Katalysator senkt die Aktivierungsenergie, ändert aber weder Δ<sub>R</sub>H<sub>m</sub> noch K.</div>"}, {"t": "Beispiel: Gleichgewichtskonstante aus Gleichgewichtskonzentrationen", "h": "<p><strong>Aufgabe:</strong> Für H<sub>2</sub>(g) + I<sub>2</sub>(g) ⇌ 2 HI(g) wurden im Gleichgewicht gemessen: c(H<sub>2</sub>) = 0,10 mol/L, c(I<sub>2</sub>) = 0,10 mol/L, c(HI) = 0,74 mol/L. Berechne die Gleichgewichtskonstante.</p><ol class=\"gl-steps\"><li><strong>Massenwirkungsgesetz aufstellen:</strong> K<sub>c</sub> = <span class=\"frac\"><span>c<sup>2</sup>(HI)</span><span>c(H<sub>2</sub>) · c(I<sub>2</sub>)</span></span></li><li><strong>Gleichgewichtskonstante berechnen:</strong> K<sub>c</sub> = <span class=\"frac\"><span>(0,74)<sup>2</sup></span><span>0,10 · 0,10</span></span> = <span class=\"frac\"><span>0,5476</span><span>0,0100</span></span> = <strong>54,8</strong></li><li><strong>Einheit der Gleichgewichtskonstante:</strong> <span class=\"frac\"><span>(mol/L)<sup>2</sup></span><span>(mol/L) · (mol/L)</span></span> → die Einheiten kürzen sich, die Gleichgewichtskonstante ist hier <strong>ohne Einheit</strong>.</li></ol><div class=\"gl-box gl-warn\"><strong>Typische Fehler:</strong> Exponent 2 bei c(HI) vergessen (ergibt 74), Zähler und Nenner vertauscht (ergibt 0,0183).<br><small>Allgemein: Einheit = (mol/L)<sup>Δν</sup> mit Δν = Summe der Faktoren rechts − Summe der Faktoren links. Beispiel N<sub>2</sub> + 3 H<sub>2</sub> ⇌ 2 NH<sub>3</sub>: Δν = 2 − 4 = −2 → L<sup>2</sup>/mol<sup>2</sup>.</small></div>"}, {"t": "Beispiel: Gleichgewichtskonstante mit Umsatztabelle", "h": "<p><strong>Aufgabe:</strong> Ein Gemisch mit c<sub>0</sub>(N<sub>2</sub>) = 1,0 mol/L und c<sub>0</sub>(H<sub>2</sub>) = 3,0 mol/L reagiert bis zum Gleichgewicht. Dann gilt c(NH<sub>3</sub>) = 0,40 mol/L. Berechne die Gleichgewichtskonstante.</p><ol class=\"gl-steps\"><li><strong>Massenwirkungsgesetz:</strong> K<sub>c</sub> = <span class=\"frac\"><span>c<sup>2</sup>(NH<sub>3</sub>)</span><span>c(N<sub>2</sub>) · c<sup>3</sup>(H<sub>2</sub>)</span></span></li><li><strong>Umsatz x bestimmen:</strong> Pro Formelumsatz entstehen 2 NH<sub>3</sub>: 2 · x = 0,40 mol/L → x = 0,20 mol/L.</li><li><strong>Umsatztabelle:</strong><div class=\"gl-tw\"><table class=\"gl-table\"><thead><tr><th></th><th>N<sub>2</sub></th><th>H<sub>2</sub></th><th>NH<sub>3</sub></th></tr></thead><tbody><tr><td>Anfang c<sub>0</sub> in mol/L</td><td>1,0</td><td>3,0</td><td>0</td></tr><tr><td>Änderung</td><td>− x</td><td>− 3x</td><td>+ 2x</td></tr><tr><td>Gleichgewicht in mol/L</td><td>0,80</td><td>2,40</td><td>0,40</td></tr></tbody></table></div></li><li><strong>Gleichgewichtskonstante berechnen:</strong> K<sub>c</sub> = <span class=\"frac\"><span>(0,40)<sup>2</sup></span><span>0,80 · (2,40)<sup>3</sup></span></span> = <span class=\"frac\"><span>0,16</span><span>11,06</span></span> = <strong>1,45·10<sup>−2</sup> L<sup>2</sup>/mol<sup>2</sup></strong></li></ol><div class=\"gl-box gl-warn\"><strong>Typische Fehler:</strong> Anfangs- statt Gleichgewichtskonzentrationen einsetzen; den Faktor 3 bei H<sub>2</sub> vergessen (c(H<sub>2</sub>) = 3,0 − 0,20 statt 3,0 − 0,60).<br><small>Sind Stoffmengen gegeben, zuerst mit c = n / V in Konzentrationen umrechnen.</small></div>"}, {"t": "Beispiel: Konzentration aus der Gleichgewichtskonstante berechnen", "h": "<p><strong>Aufgabe 1:</strong> Für CO + H<sub>2</sub>O ⇌ CO<sub>2</sub> + H<sub>2</sub> gilt K<sub>c</sub> = 1,6. Im Gleichgewicht sind c(CO) = 0,20 mol/L, c(H<sub>2</sub>O) = 0,50 mol/L und c(CO<sub>2</sub>) = 0,40 mol/L. Berechne c(H<sub>2</sub>).</p><ol class=\"gl-steps\"><li><strong>Massenwirkungsgesetz:</strong> K<sub>c</sub> = <span class=\"frac\"><span>c(CO<sub>2</sub>) · c(H<sub>2</sub>)</span><span>c(CO) · c(H<sub>2</sub>O)</span></span></li><li><strong>Umstellen:</strong> c(H<sub>2</sub>) = <span class=\"frac\"><span>K<sub>c</sub> · c(CO) · c(H<sub>2</sub>O)</span><span>c(CO<sub>2</sub>)</span></span> = <span class=\"frac\"><span>1,6 · 0,20 · 0,50</span><span>0,40</span></span> = <strong>0,40 mol/L</strong></li></ol><p><strong>Aufgabe 2 (mit Exponent):</strong> Für H<sub>2</sub> + I<sub>2</sub> ⇌ 2 HI gilt K<sub>c</sub> = 50. Im Gleichgewicht sind c(H<sub>2</sub>) = 0,20 mol/L und c(I<sub>2</sub>) = 0,40 mol/L. Berechne c(HI).</p><ol class=\"gl-steps\"><li><strong>Umstellen:</strong> c<sup>2</sup>(HI) = K<sub>c</sub> · c(H<sub>2</sub>) · c(I<sub>2</sub>) = 50 · 0,20 · 0,40 = 4,0 mol<sup>2</sup>/L<sup>2</sup></li><li><strong>Wurzel ziehen:</strong> c(HI) = √4,0 mol/L = <strong>2,0 mol/L</strong></li></ol><div class=\"gl-box gl-warn\"><strong>Typischer Fehler:</strong> Die Wurzel vergessen (Ergebnis 4,0) oder falsch umgestellt (Stoff im Nenner statt im Zähler).</div>"}, {"t": "Beispiel: Gleichgewichtskonzentration mit quadratischer Gleichung", "h": "<p><strong>Aufgabe:</strong> Für H<sub>2</sub> + I<sub>2</sub> ⇌ 2 HI gilt K<sub>c</sub> = 49. Man setzt c<sub>0</sub>(H<sub>2</sub>) = 1,0 mol/L und c<sub>0</sub>(I<sub>2</sub>) = 2,0 mol/L ein. Berechne die Gleichgewichtskonzentrationen.</p><ol class=\"gl-steps\"><li><strong>Konzentrationen durch x ausdrücken:</strong> c(H<sub>2</sub>) = 1,0 − x; c(I<sub>2</sub>) = 2,0 − x; c(HI) = 2x</li><li><strong>In das MWG einsetzen:</strong> <span class=\"frac\"><span>(2x)<sup>2</sup></span><span>(1,0 − x)(2,0 − x)</span></span> = 49 → 4x<sup>2</sup> = 49 · (x<sup>2</sup> − 3,0x + 2,0)</li><li><strong>Ordnen:</strong> 45x<sup>2</sup> − 147x + 98 = 0 → Normalform: x<sup>2</sup> − 3,267x + 2,178 = 0</li><li><strong>p-q-Formel:</strong> x = 1,633 ± √(1,633<sup>2</sup> − 2,178) = 1,633 ± √0,490 = 1,633 ± 0,700<br>x<sub>1</sub> = 0,933 mol/L; x<sub>2</sub> = 2,33 mol/L (nicht sinnvoll, da c(H<sub>2</sub>) negativ würde)</li><li><strong>Gleichgewichtskonzentrationen:</strong> c(HI) = 2 · 0,933 = <strong>1,87 mol/L</strong>; c(H<sub>2</sub>) = 1,0 − 0,933 = <strong>0,067 mol/L</strong>; c(I<sub>2</sub>) = 2,0 − 0,933 = <strong>1,07 mol/L</strong></li></ol><div class=\"gl-box\"><strong>Kontrolle:</strong> <span class=\"frac\"><span>(1,867)<sup>2</sup></span><span>0,0667 · 1,067</span></span> = <span class=\"frac\"><span>3,484</span><span>0,0711</span></span> ≈ 49 ✓</div>"}]);
   const g = id => document.getElementById(id);
   const bd = g("glBackdrop"), box = bd.querySelector(".modal-box");
   let idx = 0;
@@ -1210,6 +1478,1008 @@ requestAnimationFrame(frame);
   });
 })();
 </script>
+<script>
+/* ===== Bereichsauswahl (Startauswahl) ===== */
+(function(){
+  "use strict";
+  const $=id=>document.getElementById(id);
+  window.__mode="start";
+  const MODES={sim:"Simulation des Gleichgewichts spezifischer chemischer Reaktionen",hb:"Simulation Haber-Bosch-Synthese",ex:"Aufgaben zum Massenwirkungsgesetz"};
+  function setMode(m){
+    if(!MODES[m]) return;
+    window.__mode=m;
+    $("main-start").hidden=true;
+    ["sim","hb","ex"].forEach(k=>{ $("main-"+k).hidden=(k!==m); $("side-"+k).hidden=(k!==m); });
+    document.querySelectorAll(".modebtn").forEach(b=>b.classList.toggle("active",b.dataset.mode===m));
+    window.dispatchEvent(new CustomEvent("modechange",{detail:m}));
+    window.dispatchEvent(new Event("resize"));
+    if(innerWidth<=920) $("main-"+m).scrollIntoView({block:"start"});
+  }
+  window.setMode=setMode;
+  document.querySelectorAll(".modebtn,.start-card").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
+})();
+</script>
+
+<script>
+/* ===== Simulation Haber-Bosch-Synthese ===== */
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const RJ=8.314;
+const fmtNum=(x,d)=>x.toFixed(d).replace(".",",");
+const pct=(x,d=1)=>fmtNum(100*x,d)+" %";
+function fmtE(x){ if(!isFinite(x)) return "–"; const e=Math.floor(Math.log10(Math.abs(x))); let m=x/Math.pow(10,e); return m.toFixed(2).replace(".",",")+"·10<sup>"+e+"</sup>"; }
+
+/* --- Modell ---
+   Kₐ (½ N₂ + ³⁄₂ H₂ ⇌ NH₃) nach Gillespie/Beattie, ideales Gas;
+   Kₚ (N₂ + 3 H₂ ⇌ 2 NH₃) = Kₐ², Druck in bar ≈ atm. */
+const log10=x=>Math.log(x)/Math.LN10;
+function Ka(Tk){ return Math.pow(10,-2.691122*log10(Tk)-5.519265e-5*Tk+1.848863e-7*Tk*Tk+2001.6/Tk+2.6899); }
+function Kp(Tk){ const k=Ka(Tk); return k*k; }
+function eqState(p,Tc,r,inert){
+  const K=Kp(Tc+273.15), nI=inert/(1-inert)*(1+r);
+  let lo=0, hi=Math.min(1,r/3)*(1-1e-12);
+  const f=xi=>{const nN=1-xi,nH=r-3*xi,nA=2*xi,nt=1+r+nI-2*xi; return Math.log(nA*nA*nt*nt/(nN*nH*nH*nH*p*p))-Math.log(K);};
+  for(let i=0;i<120;i++){ const m=(lo+hi)/2; if(f(m)>0) hi=m; else lo=m; }
+  const xi=(lo+hi)/2, nt=1+r+nI-2*xi, lim=Math.min(1,r/3);
+  return {x:2*xi/nt, conv:xi/lim, xN:(1-xi)/nt, xH:(r-3*xi)/nt, xI:nI/nt};
+}
+/* Annäherung an das Gleichgewicht im Reaktor (Modell): Anteil a = 1 − e^(−k),
+   k nach Arrhenius; mit Fe-Katalysator Eₐ ≈ 80 kJ/mol, ohne Katalysator praktisch keine Reaktion. */
+function approach(Tc,p,cat){
+  const Tk=Tc+273.15, Ea=cat?80000:230000, k0=cat?2.0:1e-6;
+  const k=k0*Math.exp(-Ea/RJ*(1/Tk-1/723.15))*Math.sqrt(p/200);
+  return 1-Math.exp(-k);
+}
+function rateFactor(Tc,p,cat){ return cat? Math.exp(-80000/RJ*(1/(Tc+273.15)-1/723.15))*Math.sqrt(p/200) : 0; }
+const REF=(()=>{ const e=eqState(200,450,3,0); return e.x*approach(450,200,true); })();
+
+/* --- Zustand --- */
+const DEF={p:200,T:450,r:3,inert:0};
+const H={p:200,T:450,r:3,inert:0,cat:false,running:false,paused:false,t:0,xExit:0,tank:0,prod:0,log:[],last:null,flowPh:0,part:{ph:0,gas:[]},speed:1};
+window.__hb=H;
+function calc(){
+  const e=eqState(H.p,H.T,H.r,H.inert/100), a=approach(H.T,H.p,H.cat);
+  return {e, a, target:e.x*a, conv:e.conv*a, rel:(e.x*a)/REF, Kp:Kp(H.T+273.15)};
+}
+
+/* --- Bedienung --- */
+const ctrl=[["hbP","p",v=>v+" bar"],["hbT","T",v=>v+" °C"],["hbR","r",v=>fmtNum(+v,1)+" : 1"],["hbI","inert",v=>v+" %"]];
+const NAMES={p:"Druck",T:"Temperatur",r:"Verhältnis H₂ : N₂",inert:"Inertgasanteil"};
+const FMT={p:v=>v+" bar",T:v=>v+" °C",r:v=>fmtNum(+v,1)+" : 1",inert:v=>v+" %"};
+let dragFrom={};
+ctrl.forEach(([id,key,f])=>{
+  const el=$(id);
+  el.addEventListener("input",()=>{ if(dragFrom[key]==null) dragFrom[key]=H[key]; H[key]=+el.value; $(id+"v").textContent=f(el.value); });
+  el.addEventListener("change",()=>{ const from=dragFrom[key]; dragFrom[key]=null; if(from==null||from===H[key]) return; changed(key,from,H[key]); });
+});
+function syncCtrls(){ ctrl.forEach(([id,key,f])=>{ $(id).value=H[key]; $(id+"v").textContent=f(H[key]); }); }
+
+$("hbStart").addEventListener("click",()=>{
+  if(!H.running){ H.running=true; H.paused=false; H.t=0; H.xExit=0; logEvent("Start der Anlage"); setExplain(null); }
+  else H.paused=!H.paused;
+  btns();
+});
+$("hbCat").addEventListener("click",()=>{ const from=H.cat; H.cat=!H.cat; btns(); changed("cat",from,H.cat); });
+$("hbReset").addEventListener("click",()=>reset());
+document.querySelectorAll("#main-hb .speed-group button").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll("#main-hb .speed-group button").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active"); H.speed=+b.dataset.speed;
+}));
+function btns(){
+  const s=$("hbStart");
+  s.textContent=!H.running?"Start":(H.paused?"Weiter":"Pause");
+  s.classList.toggle("primary",!H.running||H.paused);
+  $("hbCat").classList.toggle("on",H.cat);
+  $("hbCat").textContent=H.cat?"Katalysator: an":"Katalysator: aus";
+}
+function reset(){
+  if(window.BK&&BK.cfg&&H.running&&H.t>0&&window.__hbSnap) BK.addRun(window.__hbSnap());
+  Object.assign(H,DEF,{cat:false,running:false,paused:false,t:0,xExit:0,tank:0,prod:0,log:[],last:null});
+  H.part.ph=0; Z.flash=[];
+  syncCtrls(); btns(); renderLog(); setExplain(null);
+}
+
+/* --- Erklärungen --- */
+function changed(key,from,to){
+  const c=calc();
+  let h="";
+  if(key==="p"){
+    const up=to>from;
+    h=`<p><b>Druck${up?"erhöhung":"senkung"}</b> (${from} → ${to} bar): Links stehen 4 Gasteilchen (1 N₂ + 3 H₂), rechts nur 2 (2 NH₃). ${up?"Höherer Druck begünstigt die Seite mit weniger Gasteilchen – das Gleichgewicht verschiebt sich nach <b>rechts</b>, der NH₃-Anteil im Gleichgewicht steigt":"Niedrigerer Druck begünstigt die Seite mit mehr Gasteilchen – das Gleichgewicht verschiebt sich nach <b>links</b>, der NH₃-Anteil im Gleichgewicht sinkt"} auf ${pct(c.e.x)}. K<sub>p</sub> bleibt gleich. ${up?"Nachteil: Verdichter und druckfeste Reaktoren sind teuer und brauchen viel Energie – technisch üblich sind 150–300 bar.":""}</p>`;
+  } else if(key==="T"){
+    const up=to>from;
+    h=`<p><b>Temperatur${up?"erhöhung":"senkung"}</b> (${from} → ${to} °C): Die Ammoniaksynthese ist <b>exotherm</b> (Δ<sub>R</sub>H = −92 kJ/mol). ${up?"Wärmezufuhr begünstigt die endotherme Rückreaktion: K<sub>p</sub> wird kleiner, der NH₃-Anteil im Gleichgewicht sinkt":"Wärmeentzug begünstigt die exotherme Hinreaktion: K<sub>p</sub> wird größer, der NH₃-Anteil im Gleichgewicht steigt"} auf ${pct(c.e.x)}.</p>
+      <p>${H.cat?`Gleichzeitig ${up?"steigt":"sinkt"} die Reaktionsgeschwindigkeit: Im Reaktor werden jetzt ${pct(c.a,0)} des Gleichgewichtsanteils erreicht. ${up?"Bei hoher Temperatur stellt sich das Gleichgewicht schnell ein, liegt aber ungünstig.":"Bei niedriger Temperatur liegt das Gleichgewicht günstig, stellt sich aber sehr langsam ein."} Der technische Kompromiss liegt bei etwa 400–500 °C.`:"Ohne Katalysator reagiert das Gasgemisch bei keiner dieser Temperaturen merklich."}</p>`;
+  } else if(key==="cat"){
+    h=to?`<p><b>Katalysator zugeschaltet:</b> Am Eisen-Katalysator (Fe mit Zusätzen von K₂O, Al₂O₃, CaO) werden N₂- und H₂-Moleküle adsorbiert und in Atome gespalten. Die Aktivierungsenergie sinkt stark, die Reaktion läuft bei ${H.T} °C ausreichend schnell. Die <b>Lage des Gleichgewichts ändert sich nicht</b> (NH₃-Anteil im Gleichgewicht weiterhin ${pct(c.e.x)}), es wird nur schneller erreicht.</p>`
+          :`<p><b>Katalysator entfernt:</b> Die N≡N-Dreifachbindung (Bindungsenergie 945 kJ/mol) wird ohne Katalysator praktisch nicht gespalten – es entsteht kaum noch Ammoniak, obwohl das Gleichgewicht weiterhin bei ${pct(c.e.x)} NH₃ läge.</p>`;
+  } else if(key==="r"){
+    h=`<p><b>Zusammensetzung des Frischgases</b> (H₂ : N₂ = ${fmtNum(from,1)} → ${fmtNum(to,1)} : 1): ${Math.abs(to-3)<0.05?"Das stöchiometrische Verhältnis 3 : 1 liefert den höchsten NH₃-Anteil.":to>3?"Wasserstoff liegt im Überschuss vor. Der Umsatz des Stickstoffs steigt, der NH₃-Anteil im Gasgemisch sinkt aber, weil viel unverbrauchter Wasserstoff im Gemisch bleibt.":"Stickstoff liegt im Überschuss vor. Der Wasserstoff wird besser ausgenutzt, der NH₃-Anteil im Gasgemisch sinkt aber."} NH₃-Anteil im Gleichgewicht: ${pct(c.e.x)}.</p>`;
+  } else if(key==="inert"){
+    h=`<p><b>Inertgasanteil</b> ${from} → ${to} %: Inertgase (Argon aus der Luft, Methan aus dem Synthesegas) reagieren nicht mit. Sie verringern die Partialdrücke von N₂ und H₂ – das wirkt wie eine Druckabsenkung, der NH₃-Anteil im Gleichgewicht ${to>from?"sinkt":"steigt"} auf ${pct(c.e.x)}. Weil sich Inertgase im Kreislauf anreichern, wird ständig ein kleiner Teil des Kreislaufgases abgelassen („Purge“).</p>`;
+  }
+  if(H.running) logEvent(key==="cat"?(to?"Katalysator an":"Katalysator aus"):NAMES[key]+" "+FMT[key](from)+" → "+FMT[key](to));
+  setExplain(h);
+}
+function summary(){
+  const c=calc();
+  const rows=[];
+  rows.push(`NH₃-Anteil im Gleichgewicht bei ${H.p} bar und ${H.T} °C: <b>${pct(c.e.x)}</b>`);
+  rows.push(H.cat?`Im Reaktor erreicht das Gas ${pct(c.a,0)} dieses Werts → NH₃-Anteil am Reaktorausgang ≈ <b>${pct(c.target)}</b>`:`Ohne Katalysator entsteht praktisch kein Ammoniak (NH₃-Anteil am Reaktorausgang ≈ ${pct(c.target,2)}).`);
+  rows.push(`Im Kühler wird das Ammoniak verflüssigt und im Abscheider abgetrennt (Entzug des Produkts). Nicht umgesetztes N₂ und H₂ werden zurückgeführt – so wird im <b>Kreislauf</b> fast alles Gas zu NH₃ umgesetzt.`);
+  return `<p><b>Aktueller Zustand:</b></p><ul class="hb-ul">${rows.map(r=>"<li>"+r+"</li>").join("")}</ul>`;
+}
+let lastExplain=null;
+function setExplain(h){ if(h!==null) lastExplain=h; else lastExplain=null; renderExplain(); }
+function renderExplain(){
+  const start=!H.running?`<p><b>Bereit:</b> Stelle Druck, Temperatur und Zusammensetzung des Frischgases ein, schalte bei Bedarf den Katalysator zu und starte die Anlage mit <b>„Start“</b>.</p>`:"";
+  $("hbExplain").innerHTML=start+(lastExplain||"")+summary();
+}
+
+/* --- Protokoll --- */
+function logEvent(what){
+  const c=calc();
+  H.log.push({t:H.t,what,p:H.p,T:H.T,r:H.r,inert:H.inert,cat:H.cat,x:c.e.x,xe:c.target,rel:c.rel});
+  renderLog();
+}
+function renderLog(){
+  const b=$("hbLog");
+  if(!H.log.length){ b.innerHTML=`<tr><td colspan="9" class="empty-hint">Noch keine Einträge – starte die Anlage und verändere die Bedingungen.</td></tr>`; return; }
+  b.innerHTML=H.log.map((e,i)=>`<tr><td class="mono">${i+1}</td><td class="mono">${fmtNum(e.t,1)}</td><td>${e.what}</td><td class="mono">${e.p} bar</td><td class="mono">${e.T} °C</td><td class="mono">${fmtNum(e.r,1)} : 1 · ${e.inert} %</td><td>${e.cat?"ja":"nein"}</td><td class="mono">${pct(e.x)}</td><td class="mono">${pct(e.xe)}</td></tr>`).join("");
+}
+$("hbCsv").addEventListener("click",()=>{
+  const rows=[["Nr","t (s)","Änderung","p (bar)","Temperatur (°C)","H2:N2","Inertgas (%)","Katalysator","x(NH3) GG (%)","x(NH3) Reaktorausgang (%)"]];
+  H.log.forEach((e,i)=>rows.push([i+1,fmtNum(e.t,1),e.what,e.p,e.T,fmtNum(e.r,1),e.inert,e.cat?"ja":"nein",fmtNum(100*e.x,1),fmtNum(100*e.xe,1)]));
+  const csv="﻿"+rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(";")).join("\n");
+  const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
+  a.download="haber_bosch_protokoll.csv"; document.body.appendChild(a); a.click(); a.remove();
+});
+
+/* --- Zeichnen: gemeinsame Hilfen --- */
+const C={bg:"#0e1113",grid:"#233029",faint:"#5f6870",dim:"#9aa2a9",text:"#e7e4dd",line:"#3a434b",teal:"#4fd1c5",amber:"#ffb454",good:"#7fd68a",danger:"#e4785b",N:"#6fb7ff",Hc:"#e7e4dd",A:"#7fd68a",Fe:"#8a8f96"};
+const FONT="system-ui,-apple-system,'Segoe UI',Roboto,sans-serif", MONO="ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace";
+let dpr=1;
+function prep(cv){
+  const W=cv.clientWidth, Hh=cv.clientHeight; if(!W) return null;
+  dpr=window.devicePixelRatio||1;
+  if(cv.width!==Math.round(W*dpr)||cv.height!==Math.round(Hh*dpr)){ cv.width=Math.round(W*dpr); cv.height=Math.round(Hh*dpr); }
+  const c=cv.getContext("2d"); c.setTransform(dpr,0,0,dpr,0,0); c.fillStyle=C.bg; c.fillRect(0,0,W,Hh);
+  return {c,W,H:Hh};
+}
+function rr(c,x,y,w,h,r){ c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); }
+function label(c,t,x,y,opt={}){ c.font=(opt.b?"600 ":"")+(opt.s||11)+"px "+(opt.m?MONO:FONT); c.fillStyle=opt.col||C.dim; c.textAlign=opt.a||"center"; c.textBaseline=opt.bl||"middle"; c.fillText(t,x,y); }
+function tempColor(Tc,a=1){ const f=Math.min(1,Math.max(0,(Tc-300)/300)); return `hsla(${40-35*f},85%,${45+8*f}%,${a})`; }
+
+/* --- Anlage --- */
+function pathLen(p){ let L=0; for(let i=1;i<p.length;i++) L+=Math.hypot(p[i][0]-p[i-1][0],p[i][1]-p[i-1][1]); return L; }
+function pathAt(p,s){ for(let i=1;i<p.length;i++){ const d=Math.hypot(p[i][0]-p[i-1][0],p[i][1]-p[i-1][1]); if(s<=d){ const f=d?s/d:0; return [p[i-1][0]+(p[i][0]-p[i-1][0])*f,p[i-1][1]+(p[i][1]-p[i-1][1])*f]; } s-=d; } return p[p.length-1]; }
+function drawPath(c,p,col,w){ c.strokeStyle=col; c.lineWidth=w; c.lineJoin="round"; c.beginPath(); p.forEach((q,i)=>i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1])); c.stroke(); }
+const hash=n=>{ const x=Math.sin(n*12.9898)*43758.5453; return x-Math.floor(x); };
+
+function drawPlant(){
+  const g=prep($("hbPlant")); if(!g) return; const {c,W}=g, Hh=g.H;
+  const cc=calc(), run=H.running&&!H.paused, on=H.running;
+  const X=f=>f*W, sy=f=>f*Hh;
+  // Positionen
+  const yMain=sy(0.50), yTop=sy(0.11);
+  const mix=[X(0.18),yMain], comp=[X(0.29),yMain], hx=[X(0.405),yMain];
+  const rx={x:X(0.47),y:sy(0.17),w:Math.max(56,X(0.09)),h:sy(0.68)};
+  const cool={x:X(0.62),y:yMain-sy(0.09),w:Math.max(54,X(0.08)),h:sy(0.18)};
+  const sep={x:X(0.775),y:sy(0.30),w:Math.max(44,X(0.065)),h:sy(0.44)};
+  const tank={x:X(0.885),y:sy(0.70),w:Math.max(56,X(0.09)),h:sy(0.20)};
+  const n2=[X(0.03),sy(0.30)], h2=[X(0.03),sy(0.72)];
+  const rxIn=[rx.x+rx.w/2,rx.y], rxOut=[rx.x+rx.w/2,rx.y+rx.h];
+  // Rohrleitungen
+  const P={
+    n2:[[n2[0]+X(0.07),n2[1]],[mix[0]-14,n2[1]],[mix[0]-14,mix[1]-6]],
+    h2:[[h2[0]+X(0.07),h2[1]],[mix[0]-14,h2[1]],[mix[0]-14,mix[1]+6]],
+    feed:[[mix[0],mix[1]],[comp[0]-18,mix[1]],[comp[0]+18,mix[1]],[hx[0]-16,mix[1]],[hx[0]+16,mix[1]],[hx[0]+28,mix[1]],[hx[0]+28,yTop+sy(0.03)],[rxIn[0],yTop+sy(0.03)],[rxIn[0],rx.y]],
+    prod:[[rxOut[0],rxOut[1]],[rxOut[0],sy(0.93)],[cool.x-18,sy(0.93)],[cool.x-18,yMain],[cool.x,yMain],[cool.x+cool.w,yMain],[sep.x,yMain]],
+    rec:[[sep.x+sep.w/2,sep.y],[sep.x+sep.w/2,yTop-sy(0.06)],[mix[0],yTop-sy(0.06)],[mix[0],mix[1]-10]],
+    liq:[[sep.x+sep.w/2,sep.y+sep.h],[sep.x+sep.w/2,sy(0.96)],[tank.x+tank.w*0.3,sy(0.96)],[tank.x+tank.w*0.3,tank.y+4]]
+  };
+  const pipeCol=on?"#4a545d":"#353d44";
+  Object.values(P).forEach(p=>drawPath(c,p,pipeCol,6));
+  Object.values(P).forEach(p=>drawPath(c,p,"#1a2025",2));
+  // Fließende Teilchen
+  const dots=(p,n,colFn,speed,r=3)=>{
+    const L=pathLen(p); if(!on) return;
+    n=Math.max(2,Math.round(n*fP()));
+    for(let i=0;i<n;i++){ const s=((i/n)*L+H.flowPh*speed)%L; const q=pathAt(p,s); c.beginPath(); c.arc(q[0],q[1],r,0,Math.PI*2); c.fillStyle=colFn(i); c.fill(); }
+  };
+  const xN=1/(1+H.r);
+  const mixCol=i=>{ const h=hash(i+1); return h<xN?C.N:(h<xN+H.inert/100*0.9?"#b79cf2":C.Hc); };
+  const prodCol=i=>{ const h=hash(i+7.3); const xa=H.xExit; return h<xa?C.A:(h<xa+(1-xa)*xN?C.N:C.Hc); };
+  dots(P.n2,7,()=>C.N,32); dots(P.h2,7,()=>C.Hc,32);
+  dots(P.feed,22,mixCol,46); dots(P.prod,20,prodCol,46);
+  dots(P.rec,20,mixCol,46);
+  if(H.xExit>0.005) dots(P.liq,Math.max(2,Math.round(14*H.xExit/0.25)),()=>C.A,18,2.6);
+  // Quellen
+  const src=(pt,t1,t2,col)=>{ rr(c,pt[0],pt[1]-20,X(0.07),40,5); c.fillStyle="#1b2126"; c.fill(); c.strokeStyle=col; c.lineWidth=1.5; c.stroke(); label(c,t1,pt[0]+X(0.035),pt[1]-6,{b:1,col:C.text,s:12}); label(c,t2,pt[0]+X(0.035),pt[1]+9,{s:9.5,col:C.faint}); };
+  src(n2,"N₂","aus Luft",C.N); src(h2,"H₂","aus Erdgas",C.Hc);
+  // Mischer
+  c.beginPath(); c.arc(mix[0],mix[1],9,0,Math.PI*2); c.fillStyle="#1b2126"; c.fill(); c.strokeStyle=C.dim; c.lineWidth=1.5; c.stroke();
+  label(c,"Mischer",mix[0]+4,mix[1]+16,{s:10,a:"left"});
+  // Verdichter
+  c.beginPath(); c.arc(comp[0],comp[1],18,0,Math.PI*2); c.fillStyle="#1b2126"; c.fill(); c.strokeStyle=C.teal; c.lineWidth=2; c.stroke();
+  c.save(); c.translate(comp[0],comp[1]); c.rotate(H.compPh||0);
+  for(let k=0;k<3;k++){ c.rotate(Math.PI*2/3); c.beginPath(); c.moveTo(0,0); c.lineTo(13,-4); c.lineTo(13,4); c.closePath(); c.fillStyle=C.teal; c.globalAlpha=.7; c.fill(); c.globalAlpha=1; }
+  c.restore();
+  label(c,"Verdichter",comp[0],comp[1]+30,{s:10}); label(c,H.p+" bar",comp[0],comp[1]-29,{m:1,col:C.amber,s:11,b:1});
+  // Wärmetauscher
+  rr(c,hx[0]-16,hx[1]-16,32,32,4); c.fillStyle="#1b2126"; c.fill(); c.strokeStyle=C.amber; c.lineWidth=1.5; c.stroke();
+  c.strokeStyle=tempColor(H.T); c.lineWidth=1.5; c.beginPath(); for(let k=0;k<4;k++){ c.moveTo(hx[0]-10,hx[1]-9+k*6); c.lineTo(hx[0]+10,hx[1]-9+k*6); } c.stroke();
+  label(c,"Vorwärmer",hx[0],hx[1]+28,{s:10});
+  // Reaktor
+  rr(c,rx.x,rx.y,rx.w,rx.h,rx.w/2.6); c.fillStyle="#161b20"; c.fill();
+  const beds=3;
+  for(let b=0;b<beds;b++){
+    const by=rx.y+rx.h*(0.15+b*0.27), bh=rx.h*0.17;
+    c.fillStyle=H.cat?tempColor(H.T,on?0.55:0.3):"#1d2328"; c.fillRect(rx.x+5,by,rx.w-10,bh);
+    if(H.cat){ c.fillStyle="rgba(20,22,25,.55)"; for(let k=0;k<14;k++){ const px=rx.x+8+hash(b*31+k)*(rx.w-16), py=by+3+hash(b*17+k*3)*(bh-6); c.beginPath(); c.arc(px,py,2.2,0,Math.PI*2); c.fill(); } }
+    else { c.strokeStyle="#3a434b"; c.setLineDash([3,3]); c.strokeRect(rx.x+5,by,rx.w-10,bh); c.setLineDash([]); }
+  }
+  // Teilchen im Reaktor (gleiche Teilchen wie in der Vergrößerung)
+  if(on){ c.save(); rr(c,rx.x+3,rx.y+3,rx.w-6,rx.h-6,rx.w/2.8); c.clip();
+    Z.p.forEach(q=>{ const px=rx.x+6+q.x*(rx.w-12), py=rx.y+8+q.y*(rx.h-16); c.beginPath(); c.arc(px,py,q.t==="A"?2.4:2,0,Math.PI*2); c.fillStyle=q.t==="A"?C.A:q.t==="N"?C.N:q.t==="I"?"#b79cf2":C.Hc; c.fill(); });
+    c.restore(); }
+  rr(c,rx.x,rx.y,rx.w,rx.h,rx.w/2.6); c.strokeStyle=on?tempColor(H.T):C.faint; c.lineWidth=2.5; c.stroke();
+  H._rx={x:rx.x-4,y:rx.y-4,w:rx.w+8,h:rx.h+8};
+  // Lupe: Vergrößerung durch Antippen
+  const lx=rx.x+rx.w+14, ly=rx.y+30;
+  c.strokeStyle=C.teal; c.lineWidth=2; c.beginPath(); c.arc(lx,ly,6,0,Math.PI*2); c.stroke(); c.beginPath(); c.moveTo(lx+4.5,ly+4.5); c.lineTo(lx+10,ly+10); c.stroke();
+  label(c,"antippen",lx+14,ly-3,{a:"left",s:9.5,col:C.teal}); label(c,"= Vergrößerung",lx+14,ly+9,{a:"left",s:9.5,col:C.teal});
+  label(c,"Reaktor",rx.x+rx.w+6,rx.y+6,{a:"left",b:1,col:C.text,s:12});
+  c.fillStyle="rgba(14,17,19,.85)"; rr(c,rx.x+rx.w/2-26,rx.y+rx.h*0.075-9,52,18,4); c.fill(); rr(c,rx.x+rx.w/2-30,rx.y+rx.h*0.93-9,60,18,4); c.fill();
+  label(c,H.T+" °C",rx.x+rx.w/2,rx.y+rx.h*0.075,{m:1,col:C.amber,b:1});
+  label(c,H.cat?"Fe-Kat.":"ohne Kat.",rx.x+rx.w/2,rx.y+rx.h*0.93,{s:10,col:H.cat?C.teal:C.danger,b:1});
+  // Kühler
+  rr(c,cool.x,cool.y,cool.w,cool.h,5); c.fillStyle="#14202a"; c.fill(); c.strokeStyle=C.N; c.lineWidth=1.5; c.stroke();
+  c.strokeStyle="rgba(111,183,255,.7)"; c.lineWidth=1.3; c.beginPath();
+  for(let k=0;k<3;k++){ const yy=cool.y+cool.h*(0.28+k*0.22); for(let s=0;s<=20;s++){ const xx=cool.x+6+s*(cool.w-12)/20, w=Math.sin(s*0.9+(run?H.flowPh*3:0))*2.5; s?c.lineTo(xx,yy+w):c.moveTo(xx,yy+w); } }
+  c.stroke();
+  label(c,"Kühler",cool.x+cool.w/2,cool.y+cool.h+13,{s:10}); label(c,"NH₃ wird flüssig",cool.x+cool.w/2,cool.y+cool.h+25,{s:9,col:C.faint});
+  // Abscheider
+  rr(c,sep.x,sep.y,sep.w,sep.h,8); c.fillStyle="#161b20"; c.fill();
+  const lvl=on?Math.min(0.45,0.08+H.xExit*0.9):0;
+  c.fillStyle="rgba(127,214,138,.45)"; c.fillRect(sep.x+3,sep.y+sep.h*(1-lvl),sep.w-6,sep.h*lvl-3);
+  rr(c,sep.x,sep.y,sep.w,sep.h,8); c.strokeStyle=C.dim; c.lineWidth=1.5; c.stroke();
+  label(c,"Abscheider",sep.x+sep.w+6,sep.y+10,{s:10,a:"left"});
+  // Tank
+  rr(c,tank.x,tank.y,tank.w,tank.h,5); c.fillStyle="#161b20"; c.fill();
+  const tl=Math.min(1,H.tank); c.fillStyle="rgba(127,214,138,.55)"; c.fillRect(tank.x+2,tank.y+tank.h*(1-tl)+1,tank.w-4,tank.h*tl-3);
+  rr(c,tank.x,tank.y,tank.w,tank.h,5); c.strokeStyle=C.good; c.lineWidth=1.5; c.stroke();
+  label(c,"NH₃ (flüssig)",tank.x+tank.w/2,tank.y-10,{s:10,col:C.good});
+  // Beschriftung Kreislauf
+  label(c,"Kreislaufgas: nicht umgesetztes N₂ und H₂ wird zurückgeführt",(mix[0]+sep.x)/2,yTop-sy(0.06)-10,{s:10,col:C.faint});
+  label(c,"N₂ + H₂ + NH₃",(cool.x+rxOut[0])/2+10,sy(0.93)+12,{s:9.5,col:C.faint});
+  if(!on) label(c,"Anlage steht – „Start“ drücken",W/2,Hh-10,{s:11,col:C.faint});
+  // Legende
+  const lg=[[C.N,"N₂"],[C.Hc,"H₂"],[C.A,"NH₃"],["#b79cf2","Inertgas"]];
+  lg.forEach(([col,t],i)=>{ const lx=W-80, ly=14+i*14; c.beginPath(); c.arc(lx,ly,3.5,0,Math.PI*2); c.fillStyle=col; c.fill(); label(c,t,lx+9,ly,{a:"left",s:10}); });
+}
+
+/* --- Bewegung abhängig von den Bedingungen ---
+   Temperatur → Geschwindigkeit der Teilchen, Druck → Teilchendichte,
+   Verhältnis H₂ : N₂ und Inertgas → Zusammensetzung, NH₃-Anteil → Produktteilchen,
+   Reaktionsgeschwindigkeit (Temperatur, Druck, Katalysator) → Tempo der Oberflächenreaktion */
+const fT=()=>Math.pow((H.T+273.15)/723.15,1.5);            // Temperaturfaktor der Teilchenbewegung
+const fP=()=>0.55+0.45*H.p/200;                              // Dichtefaktor (Druck)
+function molType(u,xA){ const xI=H.inert/100, rest=1-xA-xI, xN=rest/(1+H.r);
+  return u<xA?"A":(u<xA+xI?"I":(u<xA+xI+xN?"N":"H")); }
+function drawMol(c,px,py,t,rot,sc=1,alpha=1){
+  const dx=Math.cos(rot)*7*sc, dy=Math.sin(rot)*7*sc;
+  if(t==="N"){ bond(c,px-dx,py-dy,px+dx,py+dy,3,alpha); atom(c,px-dx,py-dy,7.5*sc,C.N,sc>0.8?"N":"",alpha); atom(c,px+dx,py+dy,7.5*sc,C.N,sc>0.8?"N":"",alpha); }
+  else if(t==="H"){ const ex=dx*0.75, ey=dy*0.75; bond(c,px-ex,py-ey,px+ex,py+ey,1,alpha); atom(c,px-ex,py-ey,5*sc,C.Hc,"",alpha); atom(c,px+ex,py+ey,5*sc,C.Hc,"",alpha); }
+  else if(t==="A"){ for(let k=0;k<3;k++){ const a=rot+k*2.094, hx=px+Math.cos(a)*11*sc, hy=py+Math.sin(a)*11*sc; bond(c,px,py,hx,hy,1,alpha); atom(c,hx,hy,4.5*sc,C.Hc,"",alpha); } atom(c,px,py,7.5*sc,C.A,sc>0.8?"N":"",alpha); }
+  else { atom(c,px,py,7*sc,"#b79cf2",sc>0.8?"Ar":"",alpha); }
+}
+/* Gas über der Katalysatoroberfläche (beide Darstellungen) */
+function gasStep(d){
+  const gs=H.part.gas, n=Math.round(4+H.p/25);
+  while(gs.length<n) gs.push({x:Math.random(),y:Math.random(),a:Math.random()*6.3,u:Math.random(),rot:Math.random()*6.3});
+  if(gs.length>n) gs.length=n;
+  const sp=0.16*fT()*d;
+  gs.forEach(q=>{ q.x+=Math.cos(q.a)*sp; q.y+=Math.sin(q.a)*sp*1.4; q.rot+=1.8*fT()*d;
+    if(q.x<0||q.x>1){q.a=Math.PI-q.a; q.x=Math.min(1,Math.max(0,q.x));} if(q.y<0||q.y>1){q.a=-q.a; q.y=Math.min(1,Math.max(0,q.y));} });
+}
+function cycleSpeed(){ return H.cat?Math.max(0.04,Math.min(4,Math.pow(rateFactor(H.T,H.p,true),0.8))):0; }
+/* Reaktorausschnitt: Gasteilchen strömen durch die Katalysatorschicht nach unten */
+const Z={p:[],flash:[]};
+function zoomStep(d){
+  const n=Math.round(30+H.p*0.2);
+  while(Z.p.length<n) Z.p.push({x:Math.random(),y:Math.random(),u:Math.random(),rot:Math.random()*6.3,t:null});
+  if(Z.p.length>n) Z.p.length=n;
+  const vy=0.07*fT()*d, jit=0.10*fT()*d;
+  Z.p.forEach(q=>{
+    q.y+=vy*(0.7+0.6*q.u); q.x+=(Math.random()-0.5)*jit*2; q.rot+=2*fT()*d;
+    if(q.x<0) q.x=-q.x; if(q.x>1) q.x=2-q.x;
+    if(q.y>1){ q.y-=1; q.x=Math.random(); q.t=null; }
+    const xA=H.cat?H.xExit*Math.min(1,q.y*1.15):0, t=molType(q.u,xA);
+    if(q.t&&q.t!=="A"&&t==="A") Z.flash.push({x:q.x,y:q.y,a:0});
+    q.t=t;
+  });
+  Z.flash.forEach(f=>f.a+=d*1.6); Z.flash=Z.flash.filter(f=>f.a<1);
+}
+
+/* --- Teilchenmodell am Katalysator --- */
+const STEPS=["Anströmen","Adsorption","Spaltung in Atome","Hydrierung zu NH₃","Desorption von NH₃","Abtransport"];
+const lerp=(a,b,f)=>a+(b-a)*f;
+const ease=f=>f<0?0:f>1?1:f*f*(3-2*f);
+function seg(ph,a,b){ return ease((ph-a)/(b-a)); }
+function atom(c,x,y,r,col,t,alpha=1){ c.globalAlpha=alpha; c.beginPath(); c.arc(x,y,r,0,Math.PI*2); c.fillStyle=col; c.fill(); c.strokeStyle="rgba(0,0,0,.35)"; c.lineWidth=1; c.stroke(); if(t){ c.font="600 "+(r>7?10:8)+"px "+FONT; c.fillStyle="#0e1113"; c.textAlign="center"; c.textBaseline="middle"; c.fillText(t,x,y+0.5); } c.globalAlpha=1; }
+function bond(c,x1,y1,x2,y2,n=1,alpha=1){ c.globalAlpha=alpha; c.strokeStyle="#c9ced4"; c.lineWidth=1.6; const dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy)||1,ox=-dy/L*3,oy=dx/L*3; for(let k=0;k<n;k++){ const o=(k-(n-1)/2); c.beginPath(); c.moveTo(x1+ox*o,y1+oy*o); c.lineTo(x2+ox*o,y2+oy*o); c.stroke(); } c.globalAlpha=1; }
+function drawParticles(cvId){
+  const g=prep($(cvId||"hbPart")); if(!g) return; const {c,W}=g, Hh=g.H;
+  const stepW=Math.min(190,W*0.36), L=W-stepW-6;  // Zeichenbereich links
+  const ys=Hh-50;             // Oberfläche
+  // Fe-Oberfläche
+  const n=Math.max(8,Math.floor(L/24));
+  if(H.cat){ for(let i=0;i<n;i++){ const x=12+i*(L-24)/(n-1); atom(c,x,ys+12,11,C.Fe,"Fe"); } }
+  else { c.strokeStyle="#3a434b"; c.lineWidth=2; c.beginPath(); c.moveTo(8,ys+6); c.lineTo(W-8,ys+6); c.stroke(); label(c,"Reaktorwand – kein Katalysator",W/2,ys+20,{s:10,col:C.faint}); }
+  const active=H.running&&!H.paused;
+  const xAg=H.cat?H.xExit:0;
+  const info=`${H.p} bar · ${H.T} °C: ${H.part.gas.length} Moleküle im Ausschnitt, Bewegung ×${fmtNum(fT(),2).replace(/,?0+$/,"")}`;
+  if(!H.cat){
+    // freie Gasteilchen, die nicht reagieren
+    H.part.gas.forEach(q=>{ const px=24+q.x*(W-48), py=48+q.y*(ys-86); drawMol(c,px,py,molType(q.u,0),q.rot,1); });
+    label(c,"Ohne Katalysator: Die Moleküle stoßen zusammen,",W/2,12,{s:10.5,col:C.amber}); label(c,"die N≡N-Bindung bleibt aber erhalten – keine Reaktion.",W/2,26,{s:10.5,col:C.amber});
+    label(c,info,8,ys-4,{a:"left",s:9.5,col:C.faint});
+  } else {
+    // Gas im Hintergrund (Dichte ∝ Druck, Tempo ∝ Temperatur, Anteile nach Zusammensetzung)
+    H.part.gas.forEach(q=>{ const px=16+q.x*(L-32), py=40+q.y*(ys-110); drawMol(c,px,py,molType(q.u,xAg),q.rot,0.62,0.38); });
+    label(c,"Reaktionsgeschwindigkeit ×"+fmtNum(cycleSpeed(),2)+" (bezogen auf 450 °C, 200 bar)",8,Hh-6,{a:"left",s:9.5,col:C.faint,bl:"bottom"});
+    const ph=H.part.ph;
+    const cx=L*0.5, sY=ys-11;               // Adsorptionshöhe
+    const nA=[cx-L*0.17,sY], nB=[cx+L*0.17,sY];
+    const hSites=[[cx-L*0.40,sY+3],[cx-L*0.30,sY+3],[cx-L*0.05,sY+3],[cx+L*0.05,sY+3],[cx+L*0.30,sY+3],[cx+L*0.40,sY+3]];
+    const hStart=[[L*0.12,26],[L*0.12,26],[L*0.5,18],[L*0.5,18],[L*0.88,26],[L*0.88,26]];
+    const hAds=[[cx-L*0.36,sY-4],[cx-L*0.34,sY-4],[cx-L*0.01,sY-4],[cx+L*0.01,sY-4],[cx+L*0.34,sY-4],[cx+L*0.36,sY-4]];
+    let step=0;
+    // Phasen: 0–.14 Anströmen · .14–.22 Adsorption · .22–.38 Spaltung · .38–.74 Hydrierung · .74–.92 Desorption · .92–1 frei
+    if(ph<.14) step=0; else if(ph<.22) step=1; else if(ph<.38) step=2; else if(ph<.74) step=3; else if(ph<.92) step=4; else step=5;
+    const fIn=seg(ph,0,.14), fSplit=seg(ph,.22,.38), fUp=seg(ph,.74,.92);
+    const fade=ph>=.92?0:1;
+    // N-Atome
+    const nPos=k=>{ const tgt=k?nB:nA; const ad=[cx+(k?9:-9),sY-6]; const st=[cx+(k?9:-9),30];
+      let x=lerp(st[0],ad[0],fIn), y=lerp(st[1],ad[1],fIn);
+      x=lerp(x,tgt[0],fSplit); y=lerp(y,tgt[1],fSplit);
+      y=lerp(y,24,fUp); return [x,y]; };
+    // H-Atome
+    const hPos=j=>{ const pair=Math.floor(j/2), off=(j%2)?6:-6;
+      const st=[hStart[j][0]+off,hStart[j][1]], ad=[hAds[j][0],hAds[j][1]];
+      let x=lerp(st[0],ad[0],fIn), y=lerp(st[1],ad[1],fIn);
+      x=lerp(x,hSites[j][0],fSplit); y=lerp(y,hSites[j][1],fSplit);
+      // Hydrierung: H-Atom j wandert in Teilschritt s zu seinem N
+      const N=j<3?0:1, s=j%3, sub=seg(ph,.38+s*.12,.38+s*.12+.10);
+      const ang=[-2.5,-0.64,-1.57][s], np=nPos(N), tx=np[0]+Math.cos(ang)*14, ty=np[1]+Math.sin(ang)*14;
+      x=lerp(x,tx,sub); y=lerp(y,ty,sub);
+      if(fUp>0){ x=np[0]+Math.cos(ang)*14; y=np[1]+Math.sin(ang)*14; }
+      return [x,y,sub];
+    };
+    // H-Zuordnung: Atome 0,1,2 → N₀; 3,4,5 → N₁ (Paare 0-1, 2-3, 4-5 sind die H₂-Moleküle)
+    const hp=[0,1,2,3,4,5].map(hPos), na=nPos(0), nb=nPos(1);
+    const al=fade*(ph>=.74?1-0.6*fUp:1);
+    // Bindungen
+    if(fSplit<1){ const a=1-fSplit; bond(c,na[0],na[1],nb[0],nb[1],3,a*fade); for(let k=0;k<3;k++) bond(c,hp[2*k][0],hp[2*k][1],hp[2*k+1][0],hp[2*k+1][1],1,a*fade); }
+    hp.forEach((q,j)=>{ if(q[2]>0.98){ const np=j<3?na:nb; bond(c,np[0],np[1],q[0],q[1],1,al); } });
+    if(ph>=.14&&ph<.74){ c.globalAlpha=.35; c.strokeStyle=C.teal; c.setLineDash([2,3]); c.lineWidth=1; [na,nb].forEach(p=>{ c.beginPath(); c.moveTo(p[0],p[1]+8); c.lineTo(p[0],ys+2); c.stroke(); }); c.setLineDash([]); c.globalAlpha=1; }
+    hp.forEach(q=>atom(c,q[0],q[1],5.5,C.Hc,"",al));
+    atom(c,na[0],na[1],8.5,ph>=.74?C.A:C.N,"N",al); atom(c,nb[0],nb[1],8.5,ph>=.74?C.A:C.N,"N",al);
+    if(step===2) label(c,"N≡N wird gespalten – der langsamste Schritt",L/2,12,{s:10,col:C.amber});
+    else if(step===3) label(c,["N + H → NH","NH + H → NH₂","NH₂ + H → NH₃"][Math.min(2,Math.floor((ph-.38)/.12))],L/2,12,{s:10.5,col:C.teal,b:1});
+    else if(step===4) label(c,"2 NH₃ lösen sich von der Oberfläche",L/2,12,{s:10,col:C.good});
+    // Schrittliste
+    const sx=L+8;
+    STEPS.forEach((t,i)=>{
+      const y=16+i*((Hh-24)/STEPS.length), on=i===step;
+      rr(c,sx,y-11,stepW-10,24,4); c.fillStyle=on?"rgba(79,209,197,.16)":"#14191d"; c.fill(); c.strokeStyle=on?C.teal:"#262c31"; c.lineWidth=1; c.stroke();
+      label(c,String(i+1),sx+11,y+1,{m:1,col:on?C.teal:C.amber,s:10.5});
+      c.save(); c.beginPath(); c.rect(sx+20,y-11,stepW-32,24); c.clip();
+      label(c,t,sx+22,y+1,{a:"left",s:10,col:on?C.text:C.dim}); c.restore();
+    });
+    return;
+  }
+}
+
+/* --- Vergrößerung: Blick in den Reaktor --- */
+let zoomOpen=false;
+const GRAINS=(()=>{ const g=[]; const rows=4, cols=5; for(let r=0;r<rows;r++) for(let k=0;k<cols;k++){ g.push({x:(k+0.5+(r%2?0.5:0))/(cols+0.5), y:(r+0.62)/(rows+0.25), r:0.07+0.02*hash(r*7+k)}); } return g; })();
+function drawZoom(){
+  const g=prep($("hbZoom")); if(!g) return; const {c,W}=g, Hh=g.H;
+  const L=44, R=W-14, T=40, B=Hh-34, w=R-L, h=B-T;
+  c.fillStyle=H.cat?tempColor(H.T,0.07):"#12171b"; c.fillRect(L,T,w,h);
+  c.strokeStyle=tempColor(H.T,0.8); c.lineWidth=2; c.strokeRect(L,T,w,h);
+  // Katalysatorkörner
+  if(H.cat) GRAINS.forEach((k,i)=>{ const x=L+k.x*w, y=T+k.y*h, r=k.r*Math.min(w,h)*1.5;
+    const gr=c.createRadialGradient(x-r*0.3,y-r*0.3,r*0.2,x,y,r); gr.addColorStop(0,"#9a8f84"); gr.addColorStop(1,"#4d4740");
+    c.beginPath(); c.arc(x,y,r,0,Math.PI*2); c.fillStyle=gr; c.fill();
+    c.fillStyle="rgba(20,20,20,.45)"; for(let m=0;m<7;m++){ c.beginPath(); c.arc(x+(hash(i*13+m)-0.5)*r*1.2,y+(hash(i*29+m*3)-0.5)*r*1.2,r*0.09,0,Math.PI*2); c.fill(); } });
+  // Moleküle
+  c.save(); c.beginPath(); c.rect(L,T,w,h); c.clip();
+  Z.p.forEach(q=>{ let x=L+q.x*w, y=T+q.y*h;
+    if(H.cat) GRAINS.forEach(k=>{ const gx=L+k.x*w, gy=T+k.y*h, r=k.r*Math.min(w,h)*1.5+8, dx=x-gx, dy=y-gy, dd=Math.hypot(dx,dy); if(dd<r&&dd>0){ x=gx+dx/dd*r; y=gy+dy/dd*r; } });
+    drawMol(c,x,y,q.t||"H",q.rot,0.8); });
+  Z.flash.forEach(f=>{ const x=L+f.x*w, y=T+f.y*h; c.strokeStyle=`rgba(127,214,138,${1-f.a})`; c.lineWidth=2; c.beginPath(); c.arc(x,y,6+f.a*18,0,Math.PI*2); c.stroke(); });
+  c.restore();
+  if(!H.cat){ c.fillStyle="rgba(14,17,19,.85)"; rr(c,L+w/2-130,T+h/2-14,260,28,5); c.fill(); label(c,"leere Schicht – kein Katalysator",L+w/2,T+h/2,{s:12,col:C.danger}); }
+  // Beschriftung
+  label(c,"Gaseintritt: N₂ + H₂"+(H.inert?" + Inertgas":"")+" ↓",L+w/2,T-12,{s:11,col:C.dim});
+  label(c,"↓ zum Kühler: N₂ + H₂ + NH₃ ("+pct(H.cat?H.xExit:0)+" NH₃)",L+w/2,B+14,{s:11,col:C.dim});
+  c.save(); c.translate(16,T+h/2); c.rotate(-Math.PI/2); label(c,"Strömungsrichtung →",0,0,{s:10,col:C.faint}); c.restore();
+  const lg=[["N","N₂"],["H","H₂"],["A","NH₃"],["I","Inertgas"]];
+  lg.forEach(([t,tx],i)=>{ const x=L+10+i*80, y=T+14; c.fillStyle="rgba(14,17,19,.8)"; c.fillRect(x-8,y-11,76,22); drawMol(c,x+6,y,t,0,0.55); label(c,tx,x+22,y,{a:"left",s:10.5,col:C.text}); });
+}
+function zoomInfo(){
+  const c=calc();
+  $("hbZoomInfo").innerHTML=`<b>${H.p} bar</b>: ${Z.p.length} Moleküle im Ausschnitt – je höher der Druck, desto dichter das Gas. <b>${H.T} °C</b>: Die Teilchen bewegen sich ${fT()>1.05?"schneller":fT()<0.95?"langsamer":"etwa so schnell"} als bei 450 °C. `+
+    (H.cat?`An den Katalysatorkörnern entsteht NH₃ (grüne Ringe); Reaktionsgeschwindigkeit ×${fmtNum(cycleSpeed(),2)} gegenüber 450 °C und 200 bar. Nach unten nimmt der NH₃-Anteil bis auf ${pct(H.xExit)} zu (Gleichgewicht: ${pct(c.e.x)}).`:`Ohne Katalysator strömt das Gas unverändert durch den Reaktor – es bildet sich kein NH₃.`)+(H.running?"":" <i>Die Anlage steht – starte sie mit „Start“.</i>");
+}
+function openZoom(){ zoomOpen=true; $("hbZoomBd").classList.add("open"); if(!Z.p.length) zoomStep(0); }
+function closeZoom(){ zoomOpen=false; $("hbZoomBd").classList.remove("open"); }
+$("hbPlant").addEventListener("click",e=>{ const r=H._rx; if(r&&e.offsetX>=r.x&&e.offsetX<=r.x+r.w+90&&e.offsetY>=r.y&&e.offsetY<=r.y+r.h) openZoom(); });
+$("hbPlant").addEventListener("pointermove",e=>{ const r=H._rx; $("hbPlant").style.cursor=(r&&e.offsetX>=r.x&&e.offsetX<=r.x+r.w+90&&e.offsetY>=r.y&&e.offsetY<=r.y+r.h)?"zoom-in":"default"; });
+$("hbZoomBtn").addEventListener("click",openZoom);
+$("hbZoomClose").addEventListener("click",closeZoom);
+$("hbZoomBd").addEventListener("click",e=>{ if(e.target===$("hbZoomBd")) closeZoom(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&zoomOpen) closeZoom(); });
+
+/* --- Gleichgewichtsdiagramm --- */
+function drawEq(){
+  const g=prep($("hbEq")); if(!g) return; const {c,W}=g, Hh=g.H;
+  const L=46,R=12,T=14,B=34,pw=W-L-R,ph=Hh-T-B, T0=300,T1=600;
+  const X=t=>L+(t-T0)/(T1-T0)*pw, Y=v=>T+ph-v*ph;
+  c.strokeStyle=C.grid; c.lineWidth=1; c.font="10.5px "+MONO; c.fillStyle=C.faint;
+  c.textAlign="right"; c.textBaseline="middle";
+  for(let v=0;v<=1.0001;v+=0.2){ const y=Y(v); c.beginPath(); c.moveTo(L,y); c.lineTo(L+pw,y); c.stroke(); c.fillText(Math.round(v*100)+"",L-5,y); }
+  c.textAlign="center"; c.textBaseline="top";
+  for(let t=T0;t<=T1;t+=50){ const x=X(t); c.beginPath(); c.moveTo(x,T); c.lineTo(x,T+ph); c.stroke(); c.fillText(String(t),x,T+ph+5); }
+  label(c,"Temperatur (°C)",L+pw/2,T+ph+24,{s:11});
+  c.save(); c.translate(11,T+ph/2); c.rotate(-Math.PI/2); label(c,"x(NH₃) in %",0,0,{s:11}); c.restore();
+  const curve=(p,col,w,dash,fn)=>{ c.strokeStyle=col; c.lineWidth=w; c.setLineDash(dash||[]); c.beginPath(); for(let k=0;k<=60;k++){ const t=T0+(T1-T0)*k/60, v=fn(t); k?c.lineTo(X(t),Y(v)):c.moveTo(X(t),Y(v)); } c.stroke(); c.setLineDash([]); };
+  const LT={50:330,100:370,200:410,300:450,400:490};
+  [50,100,200,300,400].forEach(p=>{ if(p===H.p) return; curve(p,"#3d4851",1.2,null,t=>eqState(p,t,H.r,H.inert/100).x); const v=eqState(p,LT[p],H.r,H.inert/100).x; label(c,p+" bar",X(LT[p]),Y(v)-8,{s:9,col:C.faint}); });
+  curve(H.p,C.teal,2.2,null,t=>eqState(H.p,t,H.r,H.inert/100).x);
+  curve(H.p,H.cat?C.amber:C.danger,1.8,[5,4],t=>eqState(H.p,t,H.r,H.inert/100).x*approach(t,H.p,H.cat));
+  const cc=calc();
+  c.beginPath(); c.arc(X(H.T),Y(cc.e.x),5,0,Math.PI*2); c.fillStyle=C.teal; c.fill();
+  c.beginPath(); c.arc(X(H.T),Y(cc.target),4.5,0,Math.PI*2); c.fillStyle=H.cat?C.amber:C.danger; c.fill();
+  c.setLineDash([2,3]); c.strokeStyle=C.faint; c.lineWidth=1; c.beginPath(); c.moveTo(X(H.T),Y(cc.e.x)+6); c.lineTo(X(H.T),Y(cc.target)-6); c.stroke(); c.setLineDash([]);
+  c.strokeStyle=C.grid; c.strokeRect(L,T,pw,ph);
+  // Legende
+  const lx=L+pw-188, ly=T+10;
+  c.fillStyle="rgba(14,17,19,.85)"; c.fillRect(lx-6,ly-8,190,48);
+  c.strokeStyle=C.teal; c.lineWidth=2.2; c.beginPath(); c.moveTo(lx,ly); c.lineTo(lx+18,ly); c.stroke(); label(c,"Gleichgewicht bei "+H.p+" bar",lx+24,ly,{a:"left",s:9.5});
+  c.strokeStyle=H.cat?C.amber:C.danger; c.lineWidth=1.8; c.setLineDash([5,4]); c.beginPath(); c.moveTo(lx,ly+14); c.lineTo(lx+18,ly+14); c.stroke(); c.setLineDash([]); label(c,"Reaktorausgang "+(H.cat?"mit":"ohne")+" Katalysator",lx+24,ly+14,{a:"left",s:9.5});
+  label(c,"Katalysator ändert nur den Ausgang",lx,ly+29,{a:"left",s:9,col:C.faint});
+}
+
+/* --- Energiediagramm --- */
+function drawEnergy(){
+  const g=prep($("hbEnergy")); if(!g) return; const {c,W}=g, Hh=g.H;
+  const L=56,R=20,T=18,B=34,pw=W-L-R,ph=Hh-T-B;
+  const E0=0,E1=-92, Emax=330, Emin=-130;
+  const Y=e=>T+(Emax-e)/(Emax-Emin)*ph, X=f=>L+f*pw;
+  c.strokeStyle=C.dim; c.lineWidth=1.2; c.beginPath(); c.moveTo(L,T); c.lineTo(L,T+ph); c.lineTo(L+pw,T+ph); c.stroke();
+  label(c,"Reaktionsverlauf",L+pw/2,T+ph+18,{s:11});
+  c.save(); c.translate(14,T+ph/2); c.rotate(-Math.PI/2); label(c,"Energie",0,0,{s:11}); c.restore();
+  // ohne Kat
+  c.strokeStyle=C.danger; c.lineWidth=2; c.beginPath();
+  for(let k=0;k<=100;k++){ const f=k/100; let e; if(f<0.15) e=E0; else if(f>0.85) e=E1; else { const u=(f-0.15)/0.7; e=E0+(E1-E0)*ease(u)+ (300)*Math.sin(Math.PI*u); } k?c.lineTo(X(f),Y(e)):c.moveTo(X(f),Y(e)); }
+  c.stroke();
+  // mit Kat (mehrere Stufen)
+  c.strokeStyle=C.teal; c.lineWidth=2; c.beginPath();
+  const pts=[[0,0],[0.15,0],[0.22,45],[0.29,-40],[0.37,40],[0.45,-20],[0.53,35],[0.61,-30],[0.69,20],[0.77,-60],[0.85,-92],[1,-92]];
+  for(let k=0;k<=200;k++){ const f=k/200; let i=1; while(i<pts.length-1&&f>pts[i][0]) i++; const a=pts[i-1],b=pts[i]; const u=(f-a[0])/(b[0]-a[0]||1); const e=a[1]+(b[1]-a[1])*ease(u); k?c.lineTo(X(f),Y(e)):c.moveTo(X(f),Y(e)); }
+  c.stroke();
+  c.setLineDash([3,3]); c.strokeStyle=C.faint; c.lineWidth=1;
+  c.beginPath(); c.moveTo(X(0.05),Y(E0)); c.lineTo(X(0.97),Y(E0)); c.stroke();
+  c.beginPath(); c.moveTo(X(0.6),Y(E1)); c.lineTo(X(0.97),Y(E1)); c.stroke(); c.setLineDash([]);
+  // ΔH-Pfeil
+  const ax=X(0.94); c.strokeStyle=C.amber; c.lineWidth=1.5; c.beginPath(); c.moveTo(ax,Y(E0)); c.lineTo(ax,Y(E1)-2); c.stroke();
+  c.beginPath(); c.moveTo(ax-4,Y(E1)-8); c.lineTo(ax,Y(E1)-1); c.lineTo(ax+4,Y(E1)-8); c.stroke();
+  label(c,"ΔH = −92 kJ/mol",ax-6,Y(E1)+14,{a:"right",col:C.amber,s:10.5});
+  label(c,"N₂ + 3 H₂",X(0.07),Y(E0)-12,{s:11,col:C.text});
+  label(c,"2 NH₃",X(0.72),Y(E1)+14,{s:11,col:C.text});
+  label(c,"ohne Katalysator: sehr hohe Aktivierungsenergie",X(0.5),Y(310)-4,{s:10,col:C.danger});
+  label(c,"mit Fe-Katalysator: Teilschritte an der Oberfläche, niedrige Barrieren",X(0.38),Y(-112),{s:10,col:C.teal});
+}
+
+/* --- Anzeige --- */
+function updateUI(){
+  const c=calc();
+  $("hbRoP").textContent=H.p+" bar"; $("hbRoT").textContent=H.T+" °C";
+  $("hbRoK").innerHTML=fmtE(c.Kp)+" bar<sup>−2</sup>";
+  const xo=H.running?H.xExit:c.target;   // vor dem Start: Wert, der sich einstellen wird
+  $("hbRoX").textContent=pct(c.e.x); $("hbRoXe").textContent=pct(xo);
+  $("hbRoU").textContent=pct(xo/(c.e.x||1)*c.e.conv);
+  $("hbRoRel").textContent=fmtNum(100*xo/REF,0)+" %";
+  if(window.__mode==="hb"){
+    const b=$("statusBadge");
+    if(!H.running){ b.className="status"; $("statusText").textContent="Anlage bereit"; }
+    else if(H.paused){ b.className="status shift"; $("statusText").textContent="pausiert"; }
+    else { b.className="status eq"; $("statusText").textContent="Anlage läuft"; }
+  }
+}
+let last=performance.now(), tick=0;
+function frame(now){
+  const dt=Math.min(0.05,(now-last)/1000); last=now;
+  if(window.__mode==="hb"){
+    if(H.running&&!H.paused){
+      const d=dt*H.speed; H.t+=d; H.flowPh+=d*fT();   /* Fließweg in s; Tempo ∝ Temperatur */ H.compPh=(H.compPh||0)+d*4*(H.p/200);
+      gasStep(d); zoomStep(d);
+      if(H.cat) H.part.ph=(H.part.ph+d*0.16*cycleSpeed())%1;
+      const target=calc().target;
+      H.xExit+=(target-H.xExit)*(1-Math.exp(-d/1.6));
+      H.tank+=H.xExit*d*0.02; if(H.tank>1) H.tank=0.15; H.prod+=H.xExit*d;
+    }
+    if(!(H.running&&!H.paused)){ gasStep(0); zoomStep(0); }
+    updateUI(); drawPlant(); drawEq();
+    if(zoomOpen){ drawZoom(); drawParticles("hbZoomSurf"); zoomInfo(); }
+    if((tick++%30)===0) renderExplain();
+    if(!$("tab-hben").hidden&&$("tab-hben").classList.contains("active")) drawEnergy();
+  }
+  requestAnimationFrame(frame);
+}
+window.addEventListener("modechange",e=>{ if(e.detail==="hb"){ renderExplain(); drawEnergy(); } });
+window.addEventListener("resize",()=>{ if(window.__mode==="hb") drawEnergy(); });
+
+/* Lauf für die PDF-Auswertung */
+window.__hbSnap=function(lbl){
+  const c=calc();
+  const BKr=window.BK, n=BKr.runs.length+1;
+  const cond=[["Druck p",H.p+" bar"],["Temperatur ϑ",H.T+" °C"],["Frischgas H₂ : N₂",fmtNum(H.r,1)+" : 1"],["Inertgasanteil",H.inert+" %"],["Katalysator",H.cat?"Fe-Katalysator":"ohne"],["Laufzeit",fmtNum(H.t,1)+" s"]];
+  const res=[["K<sub>p</sub>(ϑ)",fmtE(c.Kp)+" bar<sup>−2</sup>"],["x(NH₃) im Gleichgewicht",pct(c.e.x)],["x(NH₃) am Reaktorausgang",pct(H.xExit)],["Umsatz pro Durchgang",pct(H.xExit/(c.e.x||1)*c.e.conv)],["Produktionsleistung (relativ zu 450 °C, 200 bar, Kat.)",fmtNum(100*H.xExit/REF,0)+" %"]];
+  const html=BKr.sec("Reaktionsgleichung","<p class=\"bk-cond\">N<sub>2</sub>(g) + 3 H<sub>2</sub>(g) ⇌ 2 NH<sub>3</sub>(g) · Δ<sub>R</sub>H = −92 kJ/mol</p>")
+    +BKr.sec("Bedingungen (Endstand)",BKr.condRows(cond))
+    +BKr.sec("Ergebnisse",BKr.condRows(res))
+    +BKr.sec("NH₃-Anteil im Gleichgewicht in Abhängigkeit von der Temperatur",BKr.imgTag(BKr.cimg($("hbEq")),"Gleichgewichtsdiagramm")+BKr.leg([["#0f766e","Gleichgewicht bei "+H.p+" bar"],["#9a5b00","Reaktorausgang mit Katalysator"],["#666","andere Drücke (50–400 bar)"]]))
+    +BKr.sec("Protokoll der Änderungen",BKr.tbl($("hbLog").closest("table"),{emptyText:"Keine Änderungen vorgenommen."}),true);
+  return {label:(lbl||"Lauf "+n)+": Haber-Bosch · "+H.p+" bar · "+H.T+" °C · "+(H.cat?"mit":"ohne")+" Katalysator",color:BKr.COL[(n-1)%BKr.COL.length],html,ov:null};
+};
+
+syncCtrls(); btns(); renderLog(); renderExplain();
+requestAnimationFrame(frame);
+})();
+</script>
+
+<script>
+/* ===== Aufgaben zum Massenwirkungsgesetz ===== */
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const TOL=0.03;
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const sig=(x,n)=>{ if(x===0) return 0; const e=Math.floor(Math.log10(Math.abs(x)))-n+1; return Math.round(x/Math.pow(10,e))*Math.pow(10,e); };
+const round12=x=>+x.toPrecision(12);
+/* Zahlformat: Dezimalkomma, große/kleine Werte in Zehnerpotenz */
+function fz(x,n=3){
+  if(!isFinite(x)) return "–"; if(x===0) return "0";
+  const a=Math.abs(x);
+  if(a>=0.001&&a<1000){ const t=x.toPrecision(n); if(!/e/.test(t)) return t.replace(".",","); }
+  let e=Math.floor(Math.log10(a)), ms=(x/Math.pow(10,e)).toFixed(n-1);
+  if(Math.abs(+ms)>=10){ e++; ms=(x/Math.pow(10,e)).toFixed(n-1); }
+  return ms.replace(".",",")+"·10<sup>"+e+"</sup>";
+}
+/* gegebene Werte genau so, wie sie erzeugt wurden (2 gültige Ziffern) */
+const fg=x=>fz(x,2);
+/* Zwischenwerte ohne überflüssige Nullen */
+const fr=x=>{ const a=Math.abs(x); if(a>=0.001&&a<1000) return String(Number(x.toPrecision(3))).replace(".",","); return fz(x,3); };
+const SUPM={"⁰":"0","¹":"1","²":"2","³":"3","⁴":"4","⁵":"5","⁶":"6","⁷":"7","⁸":"8","⁹":"9","⁻":"-","⁺":"+"};
+function parseNum(s){
+  if(s==null) return NaN; s=String(s).trim(); if(!s) return NaN;
+  s=s.replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺]+/g,m=>"^"+[...m].map(ch=>SUPM[ch]).join(""));
+  s=s.replace(/\s+/g,"").replace(/,/g,".").replace(/[·×xX*]/g,"*").replace(/[−–]/g,"-");
+  s=s.replace(/(mol|l\/).*$/i,"");
+  let m=s.match(/^([+-]?(?:\d+\.?\d*|\.\d+))(?:\*10\^?\(?([+-]?\d+)\)?|e([+-]?\d+))?$/i);
+  if(m){ const b=parseFloat(m[1]), e=m[2]!=null?+m[2]:(m[3]!=null?+m[3]:0); return b*Math.pow(10,e); }
+  m=s.match(/^10\^\(?([+-]?\d+)\)?$/); if(m) return Math.pow(10,+m[1]);
+  return NaN;
+}
+const near=(a,b,t=TOL)=>isFinite(a)&&isFinite(b)&&(b===0?Math.abs(a)<1e-12:Math.abs(a-b)<=t*Math.abs(b));
+
+/* ---------- Reaktionen ---------- */
+const S=(f,nu,ph="g")=>({f,nu,ph});
+const RX={
+  co:{eq:[S("CO",-1),S("H<sub>2</sub>O",-1),S("CO<sub>2</sub>",1),S("H<sub>2</sub>",1)],quad:"ab"},
+  pcl5:{eq:[S("PCl<sub>5</sub>",-1),S("PCl<sub>3</sub>",1),S("Cl<sub>2</sub>",1)],quad:"a1"},
+  cocl2:{eq:[S("CO",-1),S("Cl<sub>2</sub>",-1),S("COCl<sub>2</sub>",1)]},
+  fescn:{eq:[S("Fe<sup>3+</sup>",-1,"aq"),S("SCN<sup>−</sup>",-1,"aq"),S("[Fe(SCN)]<sup>2+</sup>",1,"aq")],small:true},
+  so2no2:{eq:[S("SO<sub>2</sub>",-1),S("NO<sub>2</sub>",-1),S("SO<sub>3</sub>",1),S("NO",1)]},
+  hi:{eq:[S("H<sub>2</sub>",-1),S("I<sub>2</sub>",-1),S("HI",2)],quad:"hi"},
+  n2o4:{eq:[S("N<sub>2</sub>O<sub>4</sub>",-1),S("NO<sub>2</sub>",2)],quad:"n2o4"},
+  no2:{eq:[S("NO",-2),S("O<sub>2</sub>",-1),S("NO<sub>2</sub>",2)]},
+  no:{eq:[S("N<sub>2</sub>",-1),S("O<sub>2</sub>",-1),S("NO",2)]},
+  so3:{eq:[S("SO<sub>2</sub>",-2),S("O<sub>2</sub>",-1),S("SO<sub>3</sub>",2)]},
+  nh3:{eq:[S("N<sub>2</sub>",-1),S("H<sub>2</sub>",-3),S("NH<sub>3</sub>",2)]},
+  hi2:{eq:[S("HI",-2),S("H<sub>2</sub>",1),S("I<sub>2</sub>",1)]},
+  deacon:{eq:[S("HCl",-4),S("O<sub>2</sub>",-1),S("Cl<sub>2</sub>",2),S("H<sub>2</sub>O",2)]}
+};
+const POOL={
+  K:{L:["co","pcl5","cocl2","fescn","so2no2"],M:["hi","n2o4","no2","no","so3","hi2"],S:["nh3","so3","hi","n2o4","pcl5","co","no2"]},
+  C:{L:["co","pcl5","cocl2","fescn","so2no2"],M:["hi","n2o4","no2","no","so3","hi2"],S:["co","pcl5","hi","n2o4"]}
+};
+const LV={L:"Leicht",M:"Mittel",S:"Schwer"};
+const ART={K:"Gleichgewichtskonstante berechnen",C:"Konzentration berechnen"};
+function eqHTML(r){
+  const st=s=>(Math.abs(s.nu)>1?Math.abs(s.nu)+" ":"")+s.f+"<span class=\"ph\">("+s.ph+")</span>";
+  return r.eq.filter(s=>s.nu<0).map(st).join(" + ")+" ⇌ "+r.eq.filter(s=>s.nu>0).map(st).join(" + ");
+}
+const cc=s=>"c("+s.f+")";
+function dnu(r){ return r.eq.reduce((a,s)=>a+s.nu,0); }
+function unitTxt(d){ if(d===0) return "ohne Einheit"; const a=Math.abs(d), sp=a>1?"<sup>"+a+"</sup>":""; return d>0?"mol"+sp+"/L"+sp:"L"+sp+"/mol"+sp; }
+function Kfrom(r,c){ return r.eq.reduce((p,s,i)=>p*Math.pow(c[i],s.nu),1); }
+
+/* MWG-Terme */
+function term(s,mode){ const a=Math.abs(s.nu); if(a===1||mode==="noexp") return cc(s); if(mode==="factor") return a+"·"+cc(s); return "c<sup>"+a+"</sup>("+s.f+")"; }
+function frac(num,den){ return `<span class="frac"><span>${num}</span><span>${den}</span></span>`; }
+function mwg(r,v="ok"){
+  const P=r.eq.filter(s=>s.nu>0), E=r.eq.filter(s=>s.nu<0), j=(a,m,sep=" · ")=>a.map(s=>term(s,m)).join(sep);
+  let n,d;
+  switch(v){
+    case "swap": n=j(E,"exp"); d=j(P,"exp"); break;
+    case "noexp": n=j(P,"noexp"); d=j(E,"noexp"); break;
+    case "factor": n=j(P,"factor"); d=j(E,"factor"); break;
+    case "sum": n=j(P,"exp"," + "); d=j(E,"exp"," + "); break;
+    case "mix": if(P.length>1){ n=j(P.slice(0,-1),"exp"); d=j(E.concat(P.slice(-1)),"exp"); } else { n=j(P.concat(E.slice(0,1)),"exp"); d=E.length>1?j(E.slice(1),"exp"):"1"; } break;
+    default: n=j(P,"exp"); d=j(E,"exp");
+  }
+  return "K<sub>c</sub> = "+frac(n,d);
+}
+function mwgOptions(r){
+  const out=[], seen=new Set();
+  ["ok","swap","noexp","factor","sum","mix"].forEach(v=>{ const h=mwg(r,v); if(!seen.has(h)&&out.length<4){ seen.add(h); out.push({v,h}); } });
+  return shuffle(out);
+}
+
+/* ---------- Aufgabe erzeugen ---------- */
+const st={art:"K",lv:"L",task:null,no:0,solved:0,first:0,streak:0,shown:0,items:[]};
+function genConcs(r){ return r.eq.map(()=>r.small?sig(rnd(0.001,0.02),2):sig(rnd(0.05,2.0),2)); }
+function makeTask(){
+  const id=pick(POOL[st.art][st.lv]), r=RX[id];
+  const T={id,r,art:st.art,lv:st.lv,steps:[],given:[],asked:"",sol:[]};
+  const mwgStep=()=>{ const opts=mwgOptions(r); return {kind:"mwg",mc:false,helped:false,title:"Massenwirkungsgesetz aufstellen",
+      desc:"Trage die Formeln der Stoffe in das Gerüst ein: Produkte in den Zähler, Edukte in den Nenner. Die stöchiometrischen Faktoren werden zu Exponenten (bei Faktor 1 das kleine Feld leer lassen oder 1 eintragen).",
+      descMc:"Wähle den richtigen Ausdruck: Produkte im Zähler, Edukte im Nenner, die stöchiometrischen Faktoren werden zu Exponenten.",
+      opts,correct:opts.findIndex(o=>o.v==="ok"),
+      tip:()=>`Für a A + b B ⇌ c C + d D gilt K<sub>c</sub> = ${frac("c<sup>c</sup>(C) · c<sup>d</sup>(D)","c<sup>a</sup>(A) · c<sup>b</sup>(B)")}. Hier stehen ${r.eq.filter(s=>s.nu>0).map(s=>s.f).join(" und ")} im Zähler.`,
+      solHTML:()=>mwg(r)}; };
+  const unitStep=()=>{ const d=dnu(r), np=r.eq.filter(s=>s.nu>0).reduce((a,s)=>a+s.nu,0), ne=-r.eq.filter(s=>s.nu<0).reduce((a,s)=>a+s.nu,0);
+    return {kind:"unit",d,np,ne,title:"Einheit der Gleichgewichtskonstante",
+      desc:"Jede Konzentration hat die Einheit mol/L. Setze sie in das Massenwirkungsgesetz ein, kürze und trage die Exponenten ein (positiv oder negativ; 0, wenn sich die Einheiten wegkürzen).",
+      tip:()=>`Im Zähler steht (mol/L)<sup>${np}</sup>, im Nenner (mol/L)<sup>${ne}</sup>. Exponent: ${np} − ${ne} = ${d}, also mol<sup>${d}</sup>/L<sup>${d}</sup>.`,
+      solHTML:()=>`mol<sup>${d}</sup>/L<sup>${d}</sup>`+(d===0?" → ohne Einheit":(d<0?" = "+unitTxt(d):""))}; };
+
+  if(st.art==="K"&&(st.lv==="L"||st.lv==="M")){
+    const c=genConcs(r), K=Kfrom(r,c);
+    T.given=r.eq.map((s,i)=>cc(s)+" = "+fg(c[i])+" mol/L");
+    T.text="Im Gleichgewicht wurden folgende Konzentrationen gemessen:";
+    T.asked="Gleichgewichtskonstante mit Einheit";
+    const inv=1/K, noexp=r.eq.reduce((p,s,i)=>p*Math.pow(c[i],Math.sign(s.nu)),1), fac=r.eq.reduce((p,s,i)=>p*Math.pow(Math.abs(s.nu)*c[i],Math.sign(s.nu)),1);
+    T.steps=[mwgStep(),
+      {kind:"vals",title:"Gleichgewichtskonstante berechnen",desc:"Setze die Gleichgewichtskonzentrationen in das Massenwirkungsgesetz ein (ohne Einheit, drei gültige Ziffern).",
+       fields:[{lab:"K<sub>c</sub> =",exp:()=>K,alt:[[inv,"Das ist der Kehrwert – die Produkte gehören in den Zähler."],[noexp,"Die Exponenten (stöchiometrische Faktoren) fehlen."],[fac,"Die Faktoren sind Exponenten, keine Vorfaktoren."]]}],
+       tip:()=>`K<sub>c</sub> = ${frac(r.eq.filter(s=>s.nu>0).map(s=>"("+fg(c[r.eq.indexOf(s)])+")"+(s.nu>1?"<sup>"+s.nu+"</sup>":"")).join(" · "),r.eq.filter(s=>s.nu<0).map(s=>"("+fg(c[r.eq.indexOf(s)])+")"+(-s.nu>1?"<sup>"+(-s.nu)+"</sup>":"")).join(" · "))}`,
+       solHTML:()=>"K<sub>c</sub> = "+fz(K)},
+      unitStep()];
+    T.result="K<sub>c</sub> = "+fz(K)+" "+(dnu(r)?unitTxt(dnu(r)):"(ohne Einheit)");
+  }
+  else if(st.art==="K"&&st.lv==="S"){
+    // Umsatztabelle: Anfangskonzentrationen (oder Stoffmengen + Volumen) und eine Gleichgewichtsangabe
+    const E=r.eq.map((s,i)=>i).filter(i=>r.eq[i].nu<0), P=r.eq.map((s,i)=>i).filter(i=>r.eq[i].nu>0);
+    const useN=Math.random()<0.5, V=useN?pick([0.5,2.0,2.5,4.0,5.0]):1;
+    let n0, c0, x, gi;
+    for(let tries=0;tries<200;tries++){
+      n0=r.eq.map(s=>s.nu<0?sig(rnd(0.6,3.0)*Math.max(1,-s.nu/1.5)*V,2):0);
+      c0=n0.map(n=>n/V);
+      gi=pick(P);
+      const xmax=Math.min(...E.map(i=>c0[i]/(-r.eq[i].nu)));
+      const ng=sig(rnd(0.2,0.7)*xmax*r.eq[gi].nu*V,2);
+      x=ng/V/r.eq[gi].nu;
+      if(x>0&&x<0.85*xmax) break;
+    }
+    const ceq=c0.map((c,i)=>round12(c+r.eq[i].nu*x)), K=Kfrom(r,ceq);
+    if(useN){
+      T.text=`In einem geschlossenen Gefäß mit dem Volumen V = ${fz(V,2)} L werden ${E.map(i=>"n<sub>0</sub>("+r.eq[i].f+") = "+fg(n0[i])+" mol").join(" und ")} gegeben. Im Gleichgewicht liegen n(${r.eq[gi].f}) = ${fg(round12(x*r.eq[gi].nu*V))} mol vor.`;
+      T.given=[ "V = "+fz(V,2)+" L" ].concat(E.map(i=>"n<sub>0</sub>("+r.eq[i].f+") = "+fg(n0[i])+" mol"),["n("+r.eq[gi].f+") im Gleichgewicht = "+fg(round12(x*r.eq[gi].nu*V))+" mol"]);
+    } else {
+      T.text=`Ein Gemisch mit ${E.map(i=>"c<sub>0</sub>("+r.eq[i].f+") = "+fg(c0[i])+" mol/L").join(" und ")} reagiert, bis sich das Gleichgewicht eingestellt hat. Dann gilt c(${r.eq[gi].f}) = ${fg(ceq[gi])} mol/L.`;
+      T.given=E.map(i=>"c<sub>0</sub>("+r.eq[i].f+") = "+fg(c0[i])+" mol/L").concat(["c("+r.eq[gi].f+") im Gleichgewicht = "+fg(ceq[gi])+" mol/L"]);
+    }
+    T.asked="Gleichgewichtskonzentrationen aller Stoffe und Gleichgewichtskonstante mit Einheit";
+    const fields=r.eq.map((s,i)=>({lab:cc(s)+" =",unit:"mol/L",exp:()=>ceq[i],
+      alt:[[c0[i]+Math.sign(s.nu)*x,"Beachte den stöchiometrischen Faktor: Die Konzentration ändert sich um "+Math.abs(s.nu)+" · x."],
+           ...(useN?[[ceq[i]*V,"Das ist die Stoffmenge – teile durch das Volumen V."]]:[]),
+           ...(s.nu<0?[[c0[i],"Das ist die Anfangskonzentration; im Gleichgewicht ist ein Teil umgesetzt."]]:[])]}));
+    const kStep={kind:"vals",title:"Gleichgewichtskonstante berechnen",desc:"Setze deine Gleichgewichtskonzentrationen in das Massenwirkungsgesetz ein.",
+      fields:[{lab:"K<sub>c</sub> =",exp:()=>{ const own=T.steps[1].fields.map(f=>f.val); return own.every(v=>isFinite(v))?Kfrom(r,own):K; },expAlt:()=>K,
+        alt:[[1/K,"Das ist der Kehrwert – die Produkte gehören in den Zähler."]]}],
+      tip:()=>{ const own=T.steps[1].fields.map(f=>f.val); return "K<sub>c</sub> = "+frac(r.eq.filter(s=>s.nu>0).map(s=>"("+fz(own[r.eq.indexOf(s)])+")"+(s.nu>1?"<sup>"+s.nu+"</sup>":"")).join(" · "),r.eq.filter(s=>s.nu<0).map(s=>"("+fz(own[r.eq.indexOf(s)])+")"+(-s.nu>1?"<sup>"+(-s.nu)+"</sup>":"")).join(" · ")); },
+      solHTML:()=>"K<sub>c</sub> = "+fz(K)};
+    T.steps=[mwgStep(),
+      {kind:"vals",title:"Gleichgewichtskonzentrationen (Umsatztabelle)",desc:(useN?"Rechne zuerst alle Stoffmengen in Konzentrationen um (c = n / V). ":"")+"Bestimme aus der Gleichgewichtsangabe den Umsatz x und damit die Konzentrationen im Gleichgewicht: c = c<sub>0</sub> + ν · x (Edukte nehmen ab, Produkte zu).",
+       fields,
+       tip:()=>{ const rows=r.eq.map((s,i)=>`<tr><td>${s.f}</td><td>${fr(c0[i])}</td><td>${s.nu<0?"− ":"+ "}${Math.abs(s.nu)>1?Math.abs(s.nu)+"·":""}x</td></tr>`).join("");
+         return `${useN?"c<sub>0</sub> = n<sub>0</sub> / V. ":""}Aus der Angabe zu ${r.eq[gi].f}: ${r.eq[gi].nu>1?r.eq[gi].nu+" · ":""}x = ${fr(ceq[gi])} mol/L → x = ${fr(x)} mol/L.<table class="ex-ice"><tr><th>Stoff</th><th>c<sub>0</sub> in mol/L</th><th>Änderung</th></tr>${rows}</table>`; },
+       solHTML:()=>r.eq.map((s,i)=>cc(s)+" = "+fz(ceq[i])+" mol/L").join("; ")},
+      kStep, unitStep()];
+    T.result="K<sub>c</sub> = "+fz(K)+" "+(dnu(r)?unitTxt(dnu(r)):"(ohne Einheit)");
+  }
+  else if(st.art==="C"&&(st.lv==="L"||st.lv==="M")){
+    let c, K, mi;
+    c=genConcs(r); K=sig(Kfrom(r,c),2);
+    mi=st.lv==="M"&&r.eq.some(s=>Math.abs(s.nu)>1)&&Math.random()<0.7 ? pick(r.eq.map((s,i)=>i).filter(i=>Math.abs(r.eq[i].nu)>1)) : Math.floor(Math.random()*r.eq.length);
+    const s=r.eq[mi], others=r.eq.reduce((p,q,i)=>i===mi?p:p*Math.pow(c[i],q.nu),1);
+    const val=Math.pow(K/others,1/s.nu);
+    const d=dnu(r);
+    T.text=`Bei einer bestimmten Temperatur gilt K<sub>c</sub> = ${fg(K)}${d?" "+unitTxt(d):""}. Im Gleichgewicht wurden gemessen:`;
+    T.given=["K<sub>c</sub> = "+fg(K)+(d?" "+unitTxt(d):"")].concat(r.eq.map((q,i)=>i===mi?null:cc(q)+" = "+fg(c[i])+" mol/L").filter(Boolean));
+    T.asked="Gleichgewichtskonzentration "+cc(s);
+    const a=Math.abs(s.nu);
+    T.steps=[mwgStep(),
+      {kind:"vals",title:"Nach "+cc(s)+" umstellen und berechnen",desc:"Stelle das Massenwirkungsgesetz nach der gesuchten Konzentration um"+(a>1?" (der Exponent "+a+" erfordert am Ende eine Wurzel)":"")+" und setze die Werte ein.",
+       fields:[{lab:cc(s)+" =",unit:"mol/L",exp:()=>val,alt:[[Math.pow(val,a),"Du hast "+term(s,"exp")+" berechnet – zieh noch die "+(a===2?"Quadrat":a===3?"dritte ":"")+"wurzel."],[Math.pow(others/K,1/s.nu),"Prüfe die Umstellung: Steht der Stoff im Zähler oder im Nenner?"],[Math.pow(K*others,1/s.nu),"Prüfe die Umstellung: Steht der Stoff im Zähler oder im Nenner?"]].filter(q=>!near(q[0],val))}],
+       tip:()=>{ const rest=r.eq.map((q,i)=>i===mi?null:q).filter(Boolean);
+         const num=rest.filter(q=>q.nu<0).map(q=>term(q,"exp")), den=rest.filter(q=>q.nu>0).map(q=>term(q,"exp"));
+         const lhs=term(s,"exp");
+         const rhs=s.nu>0? frac(["K<sub>c</sub>"].concat(num).join(" · "),den.join(" · ")||"1") : frac(den.join(" · ")||"1",["K<sub>c</sub>"].concat(num).join(" · "));
+         return `${lhs} = ${rhs}${a>1?" → anschließend die "+(a===2?"Quadratwurzel":a+". Wurzel")+" ziehen.":""}`; },
+       solHTML:()=>cc(s)+" = "+fz(val)+" mol/L"}];
+    T.result=cc(s)+" = "+fz(val)+" mol/L";
+  }
+  else { // C, Schwer: aus K und Anfangskonzentrationen über quadratische Gleichung
+    const q=r.quad; let K,a,b=0,xs,asked;
+    for(let tries=0;tries<300;tries++){
+      if(q==="ab"){ K=sig(pick([rnd(0.3,0.8),rnd(1.5,9)]),2); a=sig(rnd(0.2,2),2); b=sig(rnd(0.2,2),2); }
+      else if(q==="a1"){ K=sig(rnd(0.02,1.5),2); a=sig(rnd(0.2,2),2); }
+      else if(q==="hi"){ K=sig(pick([rnd(10,60),rnd(1.2,3)]),2); a=sig(rnd(0.2,2),2); b=sig(rnd(0.2,2),2); }
+      else { K=sig(rnd(0.005,0.5),2); a=sig(rnd(0.05,1),2); }
+      if((q==="ab"&&Math.abs(K-1)<0.15)||(q==="hi"&&Math.abs(K-4)<0.6)) continue;
+      break;
+    }
+    // Koeffizienten A x² + B x + C = 0
+    let A,B,Cc;
+    if(q==="ab"){ A=1-K; B=K*(a+b); Cc=-K*a*b; }
+    else if(q==="hi"){ A=4-K; B=K*(a+b); Cc=-K*a*b; }
+    else if(q==="a1"){ A=1; B=K; Cc=-K*a; }
+    else { A=4; B=K; Cc=-K*a; }
+    const xmax=q==="ab"||q==="hi"?Math.min(a,b):a;
+    const disc=Math.sqrt(B*B-4*A*Cc), r1=(-B+disc)/(2*A), r2=(-B-disc)/(2*A);
+    xs=[r1,r2].find(v=>v>0&&v<xmax); const xo=[r1,r2].find(v=>v!==xs);
+    const c0=r.eq.map((s,i)=>s.nu<0?(i===0?a:b):0);
+    const ceq=r.eq.map((s,i)=>c0[i]+s.nu*xs);
+    const ai=pick(r.eq.map((s,i)=>i)); asked=r.eq[ai];
+    const d=dnu(r);
+    T.text=`Bei einer bestimmten Temperatur gilt K<sub>c</sub> = ${fg(K)}${d?" "+unitTxt(d):""}. Man setzt ${r.eq.filter(s=>s.nu<0).map((s,i)=>"c<sub>0</sub>("+s.f+") = "+fg(i===0?a:b)+" mol/L").join(" und ")} ein; Produkte sind anfangs nicht vorhanden.`;
+    T.given=["K<sub>c</sub> = "+fg(K)+(d?" "+unitTxt(d):"")].concat(r.eq.filter(s=>s.nu<0).map((s,i)=>"c<sub>0</sub>("+s.f+") = "+fg(i===0?a:b)+" mol/L"));
+    T.asked="Gleichgewichtskonzentration "+cc(asked);
+    const ice=r.eq.map((s,i)=>`${cc(s)} = ${s.nu<0?fr(c0[i])+" − ":""}${Math.abs(s.nu)>1?Math.abs(s.nu):""}x`).join("; ");
+    const pqP=B/A, pqQ=Cc/A;
+    T.steps=[mwgStep(),
+      {kind:"vals",title:"Umsatz x berechnen",desc:"Drücke alle Gleichgewichtskonzentrationen durch x aus ("+ice+"), setze sie in das Massenwirkungsgesetz ein und löse die entstehende quadratische Gleichung. Nur eine Lösung ist chemisch sinnvoll (0 < x < "+fr(xmax)+" mol/L).",
+       fields:[{lab:"x =",unit:"mol/L",exp:()=>xs,alt:(xo!=null?[[xo,"Diese Lösung der quadratischen Gleichung ist chemisch nicht sinnvoll (negative Konzentration)."]]:[])}],
+       tip:()=>{ const eqs={ab:`x<sup>2</sup> / ((${fr(a)} − x)(${fr(b)} − x)) = ${fr(K)}`,hi:`(2x)<sup>2</sup> / ((${fr(a)} − x)(${fr(b)} − x)) = ${fr(K)}`,a1:`x<sup>2</sup> / (${fr(a)} − x) = ${fr(K)}`,n2o4:`(2x)<sup>2</sup> / (${fr(a)} − x) = ${fr(K)}`}[q];
+         const sg=v=>(v<0?"− ":"+ ")+fz(Math.abs(v));
+         const sg2=v=>(v<0?"− ":"+ ")+fr(Math.abs(v));
+         return `${eqs}<br>Ausmultipliziert und geordnet: ${A===1?"":fr(A)+"·"}x<sup>2</sup> ${sg2(B)}·x ${sg2(Cc)} = 0`+(A===1?"":`<br>Normalform (durch ${fr(A)} teilen): x<sup>2</sup> ${sg2(pqP)}·x ${sg2(pqQ)} = 0`)+`<br>p-q-Formel: x = −p/2 ± √((p/2)<sup>2</sup> − q) mit p = ${fr(pqP)} und q = ${fr(pqQ)}`; },
+       solHTML:()=>"x = "+fz(xs)+" mol/L"+(xo!=null?" (die zweite Lösung x = "+fz(xo)+" mol/L ist chemisch nicht sinnvoll)":"")},
+      {kind:"vals",title:cc(asked)+" im Gleichgewicht",desc:"Berechne die gesuchte Konzentration mit deinem x.",
+       fields:[{lab:cc(asked)+" =",unit:"mol/L",exp:()=>{ const own=T.steps[1].fields[0].val; const xx=isFinite(own)?own:xs; return c0[ai]+asked.nu*xx; },expAlt:()=>ceq[ai],
+         alt:[[xs,"Das ist x – beachte, wie sich die Konzentration aus x ergibt ("+cc(asked)+" = "+(asked.nu<0?fr(c0[ai])+" − ":"")+(Math.abs(asked.nu)>1?Math.abs(asked.nu):"")+"x)."]].filter(q=>!near(q[0],ceq[ai]))}],
+       tip:()=>`${cc(asked)} = ${asked.nu<0?fr(c0[ai])+" − ":""}${Math.abs(asked.nu)>1?Math.abs(asked.nu)+" · ":""}x`,
+       solHTML:()=>cc(asked)+" = "+fz(ceq[ai])+" mol/L"}];
+    T.result=cc(asked)+" = "+fz(ceq[ai])+" mol/L";
+    T.allEq=r.eq.map((s,i)=>cc(s)+" = "+fz(ceq[i])+" mol/L").join("; ");
+  }
+  T.steps.forEach(s=>{ s.done=false; s.tries=0; s.shown=false; s.touched=false; s.vals={n:[],d:[]}; s.okSlots={}; if(s.fields) s.fields.forEach(f=>{f.val=NaN;f.ok=false;}); });
+  return T;
+}
+
+/* ---------- Formeln im Gerüst vergleichen ---------- */
+const SUBD={"₀":"0","₁":"1","₂":"2","₃":"3","₄":"4","₅":"5","₆":"6","₇":"7","₈":"8","₉":"9"};
+function canon(t){
+  t=String(t||"").replace(/[₀-₉]/g,ch=>SUBD[ch]).replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻]/g,ch=>SUPM[ch]).replace(/<[^>]+>/g,"")
+    .replace(/[\s^_]/g,"").replace(/[−–]/g,"-").replace(/[\[\]]/g,"");
+  t=t.replace(/^c\((.*)\)$/i,"$1");
+  return t.replace(/([+-])(\d)$/,"$2$1");   // Ladung „+3“ → „3+“
+}
+const spCanon=s=>canon(s.f);
+function slotsHTML(s,side,list,dis){
+  return list.map((q,i)=>{ const v=(s.vals[side][i]||{}), ok=s.okSlots[side+i];
+    return `<span class="ex-slot" data-side="${side}" data-i="${i}">c<input class="ex-exp${ok?" ok":""}" maxlength="1" inputmode="numeric" autocomplete="off" aria-label="Exponent" value="${v.ex||""}" ${dis||ok?"disabled":""}>(<input class="ex-sp${ok?" ok":""}" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Formel" value="${(v.sp||"").replace(/"/g,"&quot;")}" ${dis||ok?"disabled":""}>)</span>`; }).join(' <span class="ex-dot">·</span> ');
+}
+function readSlots(s,el){
+  ["n","d"].forEach(side=>el.querySelectorAll(`.ex-slot[data-side="${side}"]`).forEach(sl=>{ const i=+sl.dataset.i; s.vals[side][i]={sp:sl.querySelector(".ex-sp").value,ex:sl.querySelector(".ex-exp").value}; }));
+}
+
+/* ---------- Darstellung ---------- */
+function taskHTML(T){
+  return `<div class="ex-eq">${eqHTML(T.r)}</div><p class="ex-text">${T.text}</p>
+    <div class="ex-gg"><div><span class="ex-l">Gegeben</span><ul>${T.given.map(g=>"<li>"+g+"</li>").join("")}</ul></div><div><span class="ex-l">Gesucht</span><p>${T.asked}</p></div></div>`;
+}
+function render(){
+  const T=st.task;
+  $("exTitle").innerHTML=`Aufgabe ${st.no} · ${ART[T.art]} · ${LV[T.lv]}`;
+  $("exTask").innerHTML=taskHTML(T);
+  const box=$("exSteps"); box.innerHTML="";
+  T.steps.forEach((s,k)=>{
+    const unlocked=k===0||T.steps[k-1].done;
+    const d=document.createElement("div"); d.className="ex-step"+(s.done?" done":"")+(unlocked?"":" locked"); d.dataset.k=k;
+    let body="";
+    if(s.kind==="unit"){
+      const v=s.uv||{m:"",l:""}, dis=s.done?"disabled":"", cls=s.done?" ok":"";
+      body=`<div class="ex-mwg ex-unit"><span>Einheit:</span><span class="ex-uf">mol<input class="ex-exp ex-ue${cls}" data-u="m" inputmode="numeric" maxlength="3" autocomplete="off" aria-label="Exponent bei mol" value="${v.m}" ${dis}><span class="ex-us">/</span>L<input class="ex-exp ex-ue${cls}" data-u="l" inputmode="numeric" maxlength="3" autocomplete="off" aria-label="Exponent bei L" value="${v.l}" ${dis}></span>${s.done?`<span class="ex-small">${s.d===0?"→ ohne Einheit":(s.d<0?"= "+unitTxt(s.d):"")}</span>`:""}</div>`;
+    } else if(s.kind==="mwg"&&!s.mc){
+      const r=T.r, P=r.eq.filter(q=>q.nu>0), E=r.eq.filter(q=>q.nu<0);
+      body=`<div class="ex-mwg"><span style="white-space:nowrap">K<sub>c</sub> =</span><span class="frac ex-fr"><span>${slotsHTML(s,"n",P,s.done)}</span><span>${slotsHTML(s,"d",E,s.done)}</span></span></div>`;
+    } else if(s.kind==="choice"||s.kind==="mwg"){
+      body=`<div class="ex-opts">${s.opts.map((o,i)=>`<label class="ex-opt${s.done&&i===s.correct?" ok":""}"><input type="radio" name="o${st.no}_${k}" value="${i}" ${s.done?"disabled":""} ${s.done&&i===s.correct?"checked":""}><span>${o.h}</span></label>`).join("")}</div>`;
+    } else {
+      body=`<div class="ex-fields">${s.fields.map((f,i)=>`<div class="ex-field"><label>${f.lab}</label><input type="text" inputmode="decimal" autocomplete="off" data-i="${i}" class="${f.ok?"ok":""}" value="${isFinite(f.val)?String(+f.val.toPrecision(6)).replace(".",","):""}" ${f.ok?"disabled":""}>${f.unit?`<span class="u">${f.unit}</span>`:""}${f.auto?'<span class="ex-auto" title="per „Lösung zeigen“ eingesetzt">*</span>':""}</div>`).join("")}</div>`;
+    }
+    d.innerHTML=`<div class="ex-sh"><span class="ex-num">${k+1}</span><span class="ex-st">${s.title}</span>${s.done?`<span class="ex-badge ${s.shown?"bad":"ok"}">${s.shown?"Lösung angesehen":"✓ richtig"}</span>`:""}</div>
+      <p class="ex-desc">${s.kind==="mwg"&&s.mc?s.descMc:s.desc}</p>${body}
+      <div class="ex-fb" id="fb${k}"></div>
+      <div class="ex-tip" id="tip${k}" hidden></div>
+      ${s.done?"":`<div class="ex-act"><button class="btn primary" data-a="check">Prüfen</button><button class="btn" data-a="tip">Tipp</button><button class="btn ghost" data-a="show">Lösung zeigen</button>${s.kind==="mwg"?`<button class="btn ghost" data-a="mc">${s.mc?"Formeln selbst eintragen":"Hilfe: Auswahl anzeigen"}</button>`:""}</div>`}${s.kind==="mwg"&&s.helped&&!s.shown?'<p class="ex-small" style="margin:8px 0 0">Hilfe „Auswahl“ genutzt.</p>':""}`;
+    box.appendChild(d);
+    if(!s.done&&unlocked){
+      d.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>act(k,b.dataset.a)));
+      d.querySelectorAll(".ex-field input,.ex-slot input,.ex-ue").forEach(inp=>inp.addEventListener("keydown",e=>{ if(e.key==="Enter") act(k,"check"); }));
+    }
+  });
+  const fin=T.steps.every(s=>s.done);
+  $("exDone").hidden=!fin;
+  if(fin){ const any=T.steps.some(s=>s.shown); $("exDone").innerHTML=`<b>${any?"Aufgabe abgeschlossen (mit angesehener Lösung).":"Aufgabe richtig gelöst!"}</b> Ergebnis: ${T.result}${T.allEq?"<br><span class=\"ex-small\">Alle Gleichgewichtskonzentrationen: "+T.allEq+"</span>":""}<br><span class="ex-small">Mit „Neue Aufgabe“ geht es weiter.</span>`; $("exDone").className="ex-done "+(any?"bad":"ok"); }
+  status();
+}
+function status(){
+  if(window.__mode!=="ex"||!st.task) return;
+  const T=st.task, k=T.steps.findIndex(s=>!s.done);
+  $("statusBadge").className="status"+(k<0?" eq":"");
+  $("statusText").textContent=k<0?"Aufgabe "+st.no+" abgeschlossen":"Aufgabe "+st.no+" · Schritt "+(k+1)+"/"+T.steps.length;
+}
+function fb(k,html,ok){ const e=$("fb"+k); if(e){ e.innerHTML=html; e.className="ex-fb "+(ok?"ok":"bad"); } }
+function act(k,a){
+  const T=st.task, s=T.steps[k], el=$("exSteps").children[k];
+  if(a==="tip"){ const t=$("tip"+k); t.hidden=!t.hidden; t.innerHTML="<b>Tipp:</b> "+s.tip(); s.touched=true; return; }
+  if(a==="mc"){ if(!s.mc){ readSlots(s,el); s.helped=true; } s.mc=!s.mc; s.touched=true; render(); return; }
+  if(a==="show"){
+    s.shown=true; s.done=true; s.touched=true;
+    if(s.kind==="unit") s.uv={m:String(s.d),l:String(s.d)};
+    if(s.kind==="mwg"){ const P=T.r.eq.filter(q=>q.nu>0), E=T.r.eq.filter(q=>q.nu<0);
+      const plain=q=>q.f.replace(/<[^>]+>/g,"").replace(/−/g,"-");
+      s.vals={n:P.map(q=>({sp:plain(q),ex:Math.abs(q.nu)>1?String(Math.abs(q.nu)):""})),d:E.map(q=>({sp:plain(q),ex:Math.abs(q.nu)>1?String(Math.abs(q.nu)):""}))};
+      P.forEach((q,i)=>s.okSlots["n"+i]=true); E.forEach((q,i)=>s.okSlots["d"+i]=true); }
+    if(s.fields) s.fields.forEach(f=>{ if(!f.ok){ const v=f.expAlt?f.expAlt():f.exp(); f.val=+v.toPrecision(3); f.ok=true; f.auto=true; } });
+    finishStep(); return;
+  }
+  // Prüfen
+  s.touched=true;
+  if(s.kind==="unit"){
+    const im=el.querySelector('.ex-ue[data-u="m"]'), il=el.querySelector('.ex-ue[data-u="l"]');
+    s.uv={m:im.value.trim(),l:il.value.trim()};
+    const pi=t=>{ t=t.replace(/[−–]/g,"-").replace(/^\+/,""); return /^-?\d+$/.test(t)?parseInt(t,10):NaN; };
+    const m=pi(s.uv.m), l=pi(s.uv.l);
+    if(s.uv.m===""&&s.uv.l===""){ fb(k,"Trage zuerst die Exponenten ein.",false); return; }
+    s.tries++;
+    if(m===s.d&&l===s.d){ s.done=true; finishStep(); return; }
+    im.className="ex-exp ex-ue "+(m===s.d?"ok":"bad"); il.className="ex-exp ex-ue "+(l===s.d?"ok":"bad");
+    let msg;
+    if(isNaN(m)||isNaN(l)) msg="Trage ganze Zahlen ein (z. B. 2, −1 oder 0).";
+    else if(m!==l) msg="Bei mol und L muss derselbe Exponent stehen, denn jede Konzentration hat die Einheit mol/L.";
+    else if(m===-s.d) msg="Das Vorzeichen stimmt nicht: Exponent = Summe der Faktoren der Produkte − Summe der Faktoren der Edukte.";
+    else if(m===s.np||m===s.ne) msg="Berücksichtige Zähler und Nenner: Die Exponenten werden subtrahiert ("+s.np+" − "+s.ne+").";
+    else msg="Nicht richtig. Zähle die stöchiometrischen Faktoren im Zähler und im Nenner.";
+    fb(k,"✗ "+msg,false); return;
+  }
+  if(s.kind==="mwg"&&!s.mc){
+    readSlots(s,el);
+    const P=T.r.eq.filter(q=>q.nu>0), E=T.r.eq.filter(q=>q.nu<0), msgs=[];
+    if(["n","d"].every(side=>(side==="n"?P:E).every((q,i)=>!(s.vals[side][i]&&s.vals[side][i].sp.trim())))){ fb(k,"Trage zuerst die Formeln ein.",false); return; }
+    s.tries++;
+    let allOk=true;
+    [["n",P,E,"Zähler"],["d",E,P,"Nenner"]].forEach(([side,want,other,nm])=>{
+      const used=new Set();
+      // zuerst bereits richtige Felder festhalten
+      want.forEach((q,i)=>{ if(s.okSlots[side+i]){ const j=want.findIndex((w,jj)=>!used.has(jj)&&spCanon(w)===canon(s.vals[side][i].sp)); if(j>=0) used.add(j); } });
+      want.forEach((q,i)=>{
+        if(s.okSlots[side+i]) return;
+        const v=s.vals[side][i]||{sp:"",ex:""}, cn=canon(v.sp), sl=el.querySelector(`.ex-slot[data-side="${side}"][data-i="${i}"]`);
+        const mark=(ok,spOk)=>{ sl.querySelector(".ex-sp").className="ex-sp "+(spOk?"ok":"bad"); sl.querySelector(".ex-exp").className="ex-exp "+(ok?"ok":(spOk?"bad":"")); };
+        if(!cn){ allOk=false; mark(false,false); msgs.push(nm+": Ein Feld ist noch leer."); return; }
+        const j=want.findIndex((w,jj)=>!used.has(jj)&&spCanon(w)===cn);
+        if(j<0){
+          allOk=false; mark(false,false);
+          if(other.some(o=>spCanon(o)===cn)) msgs.push(`${v.sp} steht auf der falschen Seite – ${side==="n"?"Edukte gehören in den Nenner":"Produkte gehören in den Zähler"}.`);
+          else if(want.concat(other).some(o=>spCanon(o).toLowerCase()===cn.toLowerCase())) msgs.push(`${v.sp}: Achte auf Groß- und Kleinschreibung.`);
+          else if(want.some((w,jj)=>used.has(jj)&&spCanon(w)===cn)) msgs.push(`${v.sp} steht doppelt im ${nm}.`);
+          else msgs.push(`„${v.sp}“ kommt in der Reaktionsgleichung nicht vor (Schreibweise wie in der Gleichung, z. B. H2O, Fe3+).`);
+          return;
+        }
+        const ex=v.ex.trim()===""?1:parseInt(v.ex,10), need=Math.abs(want[j].nu);
+        if(ex===need){ used.add(j); s.okSlots[side+i]=true; mark(true,true); sl.querySelectorAll("input").forEach(x=>x.disabled=true); }
+        else { allOk=false; mark(false,true); msgs.push(`${v.sp}: Der Exponent entspricht dem stöchiometrischen Faktor in der Gleichung (${need}).`); }
+      });
+    });
+    if(allOk){ s.done=true; finishStep(); } else fb(k,"✗ "+msgs.join("<br>"),false);
+    return;
+  }
+  if(s.kind==="choice"||s.kind==="mwg"){
+    const sel=el.querySelector("input:checked");
+    if(!sel){ fb(k,"Wähle zuerst eine Antwort aus.",false); return; }
+    s.tries++;
+    if(+sel.value===s.correct){ s.done=true; finishStep(); }
+    else {
+      const v=s.opts[+sel.value].v;
+      const msg={swap:"Zähler und Nenner sind vertauscht – die Produkte gehören in den Zähler.",noexp:"Die stöchiometrischen Faktoren fehlen als Exponenten.",factor:"Die Faktoren werden zu Exponenten, nicht zu Vorfaktoren.",sum:"Die Konzentrationen werden multipliziert, nicht addiert.",mix:"Alle Produkte stehen im Zähler, alle Edukte im Nenner."}[v]||"Das ist nicht richtig.";
+      fb(k,"✗ "+msg,false);
+    }
+    return;
+  }
+  let allOk=true, msgs=[], anyInput=false;
+  el.querySelectorAll(".ex-field input").forEach(inp=>{
+    const f=s.fields[+inp.dataset.i]; if(f.ok) return;
+    const v=parseNum(inp.value);
+    if(!inp.value.trim()){ allOk=false; return; }
+    anyInput=true;
+    if(!isFinite(v)){ allOk=false; inp.className="bad"; msgs.push("„"+inp.value+"“ ist keine Zahl (Beispiele: 0,25 oder 7,14·10^-4)."); return; }
+    f.val=v;
+    if(near(v,f.exp())||(f.expAlt&&near(v,f.expAlt()))){ f.ok=true; inp.className="ok"; inp.disabled=true; }
+    else { allOk=false; inp.className="bad"; const al=(f.alt||[]).find(q=>near(v,q[0])); msgs.push(f.lab.replace(/ =$/,"")+": "+(al?al[1]:"nicht richtig.")); }
+  });
+  if(!anyInput&&!allOk){ fb(k,"Trage zuerst einen Wert ein.",false); return; }
+  s.tries++;
+  if(s.fields.every(f=>f.ok)){ s.done=true; finishStep(); }
+  else fb(k,"✗ "+(msgs.length?msgs.join("<br>"):"Es fehlen noch Werte."),false);
+}
+function finishStep(){
+  const T=st.task;
+  if(T.steps.every(s=>s.done)){
+    const any=T.steps.some(s=>s.shown), helped=T.steps.some(s=>s.helped), first=!any&&!helped&&T.steps.every(s=>s.tries<=1);
+    if(any){ st.shown++; st.streak=0; } else { st.solved++; if(first){ st.first++; st.streak++; } else st.streak=0; }
+    T.verdict=any?"shown":(first?"first":(helped?"help":"ok")); T.maxTries=Math.max(...T.steps.map(s=>s.tries||1));
+    record(T);
+  }
+  render(); counters();
+  const nx=$("exSteps").querySelector(".ex-step:not(.done):not(.locked) input");
+  if(nx&&nx.type==="text") nx.focus();
+}
+function solHTML(T){ return T.steps.map((s,k)=>`<p><b>${k+1}. ${s.title}:</b> ${s.solHTML()}${s.shown?" <i>(Lösung angesehen)</i>":""}</p>`).join(""); }
+function record(T){
+  st.items=st.items.filter(i=>i.no!==st.no);
+  st.items.push({no:st.no,kind:ART[T.art]+" · "+LV[T.lv],task:taskHTML(T),sol:solHTML(T),st:T.verdict,tries:T.maxTries});
+  histRows();
+}
+function histRows(){
+  const hb=$("exHist");
+  if(!st.items.length){ hb.innerHTML=`<tr><td colspan="4" class="empty-hint">Noch keine Aufgaben bearbeitet.</td></tr>`; return; }
+  const txt={help:'<span class="res-good">✓ mit Hilfe (Auswahl)</span>',first:'<span class="res-good">✓ im 1. Versuch</span>',ok:'<span class="res-good">✓ nach Fehlversuch</span>',shown:'<span class="res-bad">Lösung angesehen</span>',open:'<span class="res-mid">nicht beendet</span>'};
+  hb.innerHTML=st.items.slice().reverse().map(i=>`<tr><td class="mono">${i.no}</td><td>${i.kind}</td><td>${i.task.match(/<div class="ex-eq">(.*?)<\/div>/)[1]}</td><td>${txt[i.st]}</td></tr>`).join("");
+}
+function counters(){
+  $("exSolved").textContent=st.solved; $("exFirst").textContent=st.first; $("exStreak").textContent=st.streak; $("exShown").textContent=st.shown;
+  const done=st.solved+st.shown; $("exQuote").textContent=done?Math.round(st.first/done*100)+" %":"–";
+}
+function newTask(){
+  const T=st.task;
+  if(T&&!T.steps.every(s=>s.done)&&T.steps.some(s=>s.touched)){ T.verdict="open"; st.items=st.items.filter(i=>i.no!==st.no); st.items.push({no:st.no,kind:ART[T.art]+" · "+LV[T.lv],task:taskHTML(T),sol:solHTML(T),st:"open",tries:1}); histRows(); }
+  st.no++; st.task=makeTask(); render();
+}
+$("exNew").addEventListener("click",newTask);
+function seg(id,key){ document.querySelectorAll("#"+id+" button").forEach(b=>b.addEventListener("click",()=>{ document.querySelectorAll("#"+id+" button").forEach(x=>x.classList.toggle("active",x===b)); st[key]=b.dataset.v; newTask(); })); }
+seg("exArt","art"); seg("exLv","lv");
+window.addEventListener("modechange",e=>{ if(e.detail==="ex"){ if(!st.task){ st.no=1; st.task=makeTask(); render(); } status(); } });
+window.__ex={st,stats:()=>{ const done=st.solved+st.shown; return {ready:st.items.some(i=>i.st!=="open")||st.items.length>0,items:[["Aufgaben gelöst",st.solved],["beim 1. Versuch richtig",st.first],["Serie",st.streak],["Lösung angesehen",st.shown],["<b>Erfolgsquote</b>",done?Math.round(st.first/done*100)+" %":"–"]],
+  note:"Erfolgsquote = Anteil der abgeschlossenen Aufgaben (gelöst oder Lösung angesehen), die in allen Schritten beim ersten Prüfen und ohne Hilfe richtig waren. Aufgaben mit „Lösung zeigen“ zählen nicht als richtig, Aufgaben mit der Hilfe „Auswahl“ nicht als „beim 1. Versuch richtig“."}; },
+  items:()=>st.items.slice()};
+histRows(); counters();
+})();
+</script>
+
 <script id="bk-kit">
 /* ===== Baustein QR-Code + Auswertung als PDF (einheitlich nach Leitfaden, keine Bibliotheken) ===== */
 (()=>{
@@ -1507,12 +2777,19 @@ function snap(label){
     +BK.sec('Protokoll der Änderungen',BK.tbl($('logBody').closest('table'),{emptyText:'Keine Änderungen vorgenommen.'}),true);
   return {label:(label||'Lauf '+n)+': '+G.rx.name+' · '+$('lT').textContent+($('lP').textContent!=='–'?' · '+$('lP').textContent:''),color:BK.COL[(n-1)%BK.COL.length],html};
 }
-BK.setup({url:'https://chemie.mail-baumgart.de/Q1/1-Chemisches_Gleichgewicht.html',sim:true,footName:'Simulation „Chemisches Gleichgewicht“',version:'1.2',printTitle:'Chemisches Gleichgewicht – Auswertung',
-  hint:'Die Auswertung enthält je gewähltem Lauf die Reaktionsgleichung, die Versuchsbedingungen, die Konzentrationen mit K<sub>c</sub> und Q<sub>c</sub>, das Konzentrations-Zeit-Diagramm und das Protokoll der Änderungen. Ein Lauf endet mit „Zurücksetzen“ oder dem Wechsel der Reaktion; der laufende Versuch steht als „aktueller Lauf“ zur Wahl.',
-  noRuns:'Noch kein Lauf vorhanden. Starte die Reaktion.',
-  buttons:[{ref:'#btnExport',pos:'afterend'}],btnClass:'btn ghost',
+BK.setup({url:'https://chemie.mail-baumgart.de/Q1/1-Chemisches_Gleichgewicht.html',sim:true,footName:'Simulation „Chemisches Gleichgewicht“',version:'1.3',printTitle:'Chemisches Gleichgewicht – Auswertung',
+  hint:'Die Auswertung enthält je gewähltem Lauf die Reaktionsgleichung, die Bedingungen, die Ergebnisse (Konzentrationen mit K<sub>c</sub> und Q<sub>c</sub> bzw. NH₃-Anteile bei der Haber-Bosch-Synthese), das Diagramm und das Protokoll der Änderungen. Ein Lauf endet mit „Zurücksetzen“ oder dem Wechsel der Reaktion; der laufende Versuch des geöffneten Bereichs steht als „aktueller Lauf“ zur Wahl.',
+  noRuns:'Noch kein Lauf vorhanden. Starte die Reaktion bzw. die Anlage.',
+  buttons:[{ref:'#btnExport',pos:'afterend'},{ref:'#hbCsv',pos:'afterend'}],btnClass:'btn ghost',
   snap,
-  live:()=>{if(!G.S.started||!(G.S.t>0))return null;const r=snap('Aktueller Lauf');r.color='#9aa2a9';return r}});
+  live:()=>{
+    if(window.__mode==='hb'){const H=window.__hb;if(!H.running||!(H.t>0))return null;const r=window.__hbSnap('Aktueller Lauf');r.color='#9aa2a9';return r}
+    if(!G.S.started||!(G.S.t>0))return null;const r=snap('Aktueller Lauf');r.color='#9aa2a9';return r}});
+/* Aufgaben zum Massenwirkungsgesetz: Zusammenfassung als PDF */
+BK.button({ref:'#exPdfRow',pos:'beforeend',label:'Zusammenfassung als PDF',cls:'btn'},
+  {sim:false,kick:'Übung',printTitle:'Aufgaben zum Massenwirkungsgesetz – Zusammenfassung',
+   hint:'Die Zusammenfassung enthält alle bearbeiteten Aufgaben mit Aufgabenstellung, richtiger Lösung aller Schritte und Vermerk sowie die Statistik mit der Erfolgsquote.',
+   stats:()=>window.__ex.stats(),build:()=>BK.tasks(window.__ex.items())});
 })();
 
 </script>
