@@ -76,6 +76,21 @@ header .status.done{color:var(--teal); border-color:var(--teal-dim);}
 .modal-head h2{font-size:17px;}
 .modal-close{background:none; border:none; color:var(--text-dim); font-size:22px; line-height:1; cursor:pointer; padding:2px 6px;}
 .modal-close:hover{color:var(--text);}
+.modal-box.zoom-box{max-width:1240px; max-height:94vh; padding-bottom:18px;}
+.zoom-grid{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.8fr); gap:12px; align-items:start;}
+@media (max-width:820px){ .zoom-grid{grid-template-columns:1fr;} }
+.zoom-ph{font-size:11.5px; color:var(--text-faint); margin:0 0 5px; font-weight:600; letter-spacing:.2px;}
+.zoom-cv{width:100%; display:block; border:1px solid var(--line-soft); border-radius:4px; background:#0e1113; touch-action:manipulation;}
+.zoom-eq{font-family:ui-monospace,"Cascadia Mono",Consolas,"SF Mono",Menlo,monospace; font-size:13px; color:var(--text); background:#0e1113; border:1px solid var(--line-soft); border-radius:3px; padding:7px 10px; margin:10px 0 0;}
+.zoom-text{font-size:13.5px; line-height:1.6; color:var(--text-dim); margin:10px 0 0;}
+.zoom-text strong{color:var(--text); font-weight:600;}
+.zoom-info{margin:12px 0 0; padding:10px 12px; border:1px solid var(--line-soft); border-left:3px solid var(--teal-dim); border-radius:3px; background:var(--panel-alt); font-size:13.5px; line-height:1.6; color:var(--text-dim);}
+.zoom-info strong{color:var(--text); font-weight:600;}
+.zoom-box.info-only{max-width:620px;}
+.zoom-box.info-only .zoom-info{margin-top:0;}
+.zoom-note{font-size:12px; color:var(--text-faint); margin:6px 0 0; line-height:1.45;}
+.zoom-ctrl{display:flex; gap:8px; margin-top:12px; align-items:center;}
+.zoom-ctrl .sp{flex:1;}
 .modal-body h3{font-size:13.5px; color:var(--amber); margin:18px 0 6px; font-weight:600;}
 .modal-body h3:first-child{margin-top:0;}
 .modal-body p{font-size:13.5px; line-height:1.6; color:var(--text-dim); margin:0 0 4px;}
@@ -211,6 +226,18 @@ canvas.chart{width:100%; height:260px; display:block;}
 .chart-legend{display:flex; gap:16px; flex-wrap:wrap; font-size:11.8px; color:var(--text-dim); padding:6px 4px 6px;}
 .chart-legend i{display:inline-block; width:14px; height:9px; border-radius:2px; margin-right:6px; vertical-align:-1px;}
 
+.eco-top{display:flex; gap:22px; align-items:center; flex-wrap:wrap; margin-bottom:14px; padding:12px 14px; border:1px solid var(--line-soft); border-radius:4px; background:var(--panel-alt);}
+.eco-big{display:flex; flex-direction:column; gap:2px; min-width:200px;}
+.eco-big .k{font-size:11px; color:var(--text-faint);}
+.eco-big .v{font-size:24px; font-weight:600;}
+.eco-big .s{font-size:12px; color:var(--text-dim);}
+.eco-crude{flex:1; min-width:240px;}
+.eco-crude .row{margin-bottom:6px;}
+.eco-grid{display:grid; grid-template-columns:1fr; gap:16px; align-items:start;}
+.eco-h{font-size:12.5px; color:var(--text-dim); font-weight:600; margin:0 0 6px;}
+input.eco-price{width:76px; padding:4px 6px; font-size:12.5px; text-align:right; font-family:ui-monospace,"Cascadia Mono",Consolas,"SF Mono",Menlo,monospace;}
+tr.eco-sum td{border-top:1px solid var(--line); font-weight:600; color:var(--text);}
+.eco-pos, tr.eco-sum td.eco-pos{color:var(--good);} .eco-neg, tr.eco-sum td.eco-neg{color:var(--danger);}
 .proc-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
 @media (max-width:760px){ .proc-grid{grid-template-columns:1fr;} }
 .proc{border:1px solid var(--line-soft); border-radius:4px; background:var(--panel-alt); padding:12px 14px;}
@@ -423,7 +450,7 @@ header>.tag{flex:1 1 160px;min-width:0}
 
       <h3>Bedienung</h3>
       <p>Links wählst du das <strong>Rohöl</strong> und schaltest die Anlagenteile ein oder aus. Die Verfahren werden über Knöpfe zu- und abgeschaltet und lassen sich beliebig kombinieren. Alle Ergebnisse unten (Produktbilanz, Fraktionen) passen sich sofort an.</p>
-      <p>Mit <strong>„Anlage starten“</strong> werden 1000 t Rohöl verarbeitet: Die Ströme fließen durch die Anlage und die Produkttanks füllen sich. Wird während des Laufs ein Verfahren zu- oder abgeschaltet, beginnt der Lauf mit leeren Tanks neu. Temperaturen lassen sich auch während des Laufs verändern. <strong>Tippe ein Anlagenteil an</strong>, um eine kurze Erklärung zu erhalten.</p>
+      <p>Mit <strong>„Anlage starten“</strong> werden 1000 t Rohöl verarbeitet: Die Ströme fließen durch die Anlage und die Produkttanks füllen sich. Wird während des Laufs ein Verfahren zu- oder abgeschaltet, beginnt der Lauf mit leeren Tanks neu. Temperaturen lassen sich auch während des Laufs verändern. <strong>Tippe ein Anlagenteil an</strong>: Es öffnet sich ein Fenster mit einer kurzen Erklärung. Bei Rohöltank, Ofen, Kolonnen, Entschwefelung, Reformer, Isomerisierung und Cracker öffnet sich zusätzlich eine <strong>Vergrößerung</strong>: links die ganze Teilanlage, rechts die Vorgänge auf Teilchenebene als Animation. Im Fließbild erscheinen nur die Anlagenteile, die eingeschaltet sind.</p>
 
       <h3>Atmosphärische Destillation</h3>
       <p>Das Rohöl wird im Röhrenofen auf etwa 360 °C erhitzt und verdampft dabei größtenteils. In der Kolonne steigt der Dampf nach oben und kühlt sich ab; an den Glockenböden kondensieren die Bestandteile entsprechend ihrer Siedetemperatur. Unter „Erweiterte Einstellungen“ lässt sich über die <strong>Fraktionsgrenzen</strong> verschieben, welcher Siedebereich zum Benzin, Kerosin oder Gasöl zählt.</p>
@@ -437,6 +464,7 @@ header>.tag{flex:1 1 160px;min-width:0}
 
       <h3>Auswertung</h3>
       <p><strong>Produktbilanz:</strong> Mengen je 1000 t Rohöl, Vergleich mit dem Bedarf und Prüfung der Anforderungen an Ottokraftstoff (Normalbenzin ROZ ≥ 91, Super ROZ ≥ 95, Schwefel ≤ 10 mg/kg) und Diesel (Schwefel ≤ 10 mg/kg).<br>
+      <strong>Wirtschaftlichkeit:</strong> Erlöse, Kosten und Gewinn je 1000 t Rohöl für die gewählte Einstellung; Rohöl- und Produktpreise sind veränderbar.<br>
       <strong>Fraktionen:</strong> Siedekurve des gewählten Rohöls mit den Fraktionsgrenzen, Kettenlängen und Verwendungen.<br>
       <strong>Verfahren &amp; Reaktionen:</strong> Beispielgleichungen zu allen Verfahren.</p>
 
@@ -455,7 +483,7 @@ header>.tag{flex:1 1 160px;min-width:0}
     <div class="modal-body">
       <div class="vh-ver"><span class="v">V1.3</span><span class="d">07.11.2026</span></div>
       <ul>
-        <li><strong>Auswertung als PDF:</strong> einheitlicher Dialog „Auswertung als PDF“: Jeder abgeschlossene Lauf ist einzeln auswählbar, dazu optionale Felder für Name und Kurs. Das PDF enthält je Lauf Versuchsbedingungen, Diagramm (weißer Hintergrund) und Messwerte im druckfreundlichen A4-Layout.</li><li><strong>QR-Code:</strong> Schaltfläche rechts in der Kopfzeile; Antippen vergrößert den QR-Code, mit dem sich diese Seite direkt auf dem Mobilgerät öffnen lässt.</li>
+        <li><strong>Auswertung als PDF:</strong> einheitlicher Dialog „Auswertung als PDF“: Jeder abgeschlossene Lauf ist einzeln auswählbar, dazu optionale Felder für Name und Kurs. Das PDF enthält je Lauf Versuchsbedingungen, Diagramm (weißer Hintergrund) und Messwerte im druckfreundlichen A4-Layout.</li><li><strong>Vergrößerung auf Teilchenebene:</strong> Ein Klick auf Rohöltank, Röhrenofen, Destillationskolonne, Vakuumkolonne, Entschwefelung, Reformer oder katalytischen Cracker öffnet ein zweigeteiltes Fenster: links die ganze Teilanlage mit animierten Stoffströmen und Lupe, rechts die Vorgänge auf Teilchenebene (z. B. vier Reformer-Reaktionen nacheinander: Cyclohexan → Benzol, Methylcyclohexan → Toluol, Heptan → Toluol, Hexan → 2-Methylpentan; drei Spaltungsvarianten von Decan am Zeolith, getrennt davon die Koksbildung als Nebenreaktion und die Regeneration des Katalysators als Bild im Bild (der entstandene Koks fliegt sichtbar in den Regenerator und reagiert dort mit den umherfliegenden O₂-Molekülen; ohne Koks fliegen die O₂-Moleküle nur umher), Ringschluss am Platin, Abspaltung von H₂S).</li><li><strong>Wirtschaftlichkeit:</strong> Neuer Reiter mit Erlösen je Produkt (mit Ab- und Zuschlägen nach Qualität), Betriebskosten der eingeschalteten Anlagen, Wasserstoff-Zukauf und Gesamtgewinn je 1000 t Rohöl; Rohölpreis und Produktpreise sind einstellbar. Kennwert „Gewinn je t Rohöl“ über dem Fließbild und in der PDF-Auswertung.</li><li><strong>Option „Leichtbenzin → Chemie“:</strong> Das Leichtbenzin wird als Naphtha an die chemische Industrie abgegeben statt ins Benzin gemischt (höhere Oktanzahl, aber weniger Benzin); schließt die Isomerisierung aus. Anklickbar im Fließbild, eigene Zeile in der Produktbilanz.</li><li><strong>Isomerisierung</strong> wieder aufgenommen: zuschaltbar über die Verfahrensknöpfe, im Fließbild am Leichtbenzin mit Oktanzahl vorher/nachher, anklickbar mit Vergrößerung (Anlagenteil und Teilchenebene: Pentan → 2-Methylbutan, Hexan → 2-Methylpentan). Damit ist Superbenzin (ROZ ≥ 95) erreichbar.</li><li><strong>Fließbild:</strong> Oktanzahlen (ROZ) an Leichtbenzin, Schwerbenzin, Reformat und Crackbenzin sowie am Benzintank; ein Mischpunkt zeigt, wo die Benzinkomponenten zusammengeführt werden. So wird der Zweck des Reformers sichtbar. Es werden nur noch die Anlagenteile und Leitungen gezeigt, die eingeschaltet sind. Die Erklärung eines Anlagenteils erscheint beim Antippen im Vergrößerungsfenster (bei den Produkttanks als kurzes Infofenster) statt unter dem Fließbild.</li><li><strong>QR-Code:</strong> Schaltfläche rechts in der Kopfzeile; Antippen vergrößert den QR-Code, mit dem sich diese Seite direkt auf dem Mobilgerät öffnen lässt.</li>
       </ul>
       <div class="vh-ver"><span class="v">V1.2</span><span class="d">01.11.2026</span></div>
       <ul>
@@ -479,6 +507,35 @@ header>.tag{flex:1 1 160px;min-width:0}
           <li>Auswertung mit Produktbilanz und Bedarfsvergleich, Qualitätsprüfung (Oktanzahl, Schwefelgehalt), Siedekurve und Beispielreaktionen.</li>
           <li>Anleitung zur Bedienung.</li>
         </ul>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="zoomBackdrop">
+  <div class="modal-box zoom-box" role="dialog" aria-modal="true" aria-labelledby="zoomTitle">
+    <div class="modal-head">
+      <h2><span id="zoomPre" style="color:var(--text-faint); font-weight:500; margin-right:8px">Vergrößerung ·</span><span id="zoomTitle"></span></h2>
+      <button class="modal-close" id="zoomClose" aria-label="Schließen">×</button>
+    </div>
+    <div class="zoom-grid" id="zoomGrid">
+      <div class="zoom-pane">
+        <div class="zoom-ph">Anlagenteil</div>
+        <canvas class="zoom-cv" id="zoomUnit"></canvas>
+      </div>
+      <div class="zoom-pane">
+        <div class="zoom-ph">Vergrößerung: Teilchenebene</div>
+        <canvas class="zoom-cv" id="zoomCanvas"></canvas>
+      </div>
+    </div>
+    <div class="zoom-info" id="zoomInfo"></div>
+    <div class="zoom-eq" id="zoomEq"></div>
+    <p class="zoom-text" id="zoomText"></p>
+    <p class="zoom-note" id="zoomNote"></p>
+    <div class="zoom-ctrl" id="zoomCtrl">
+      <button class="btn" id="zoomPause">Pause</button>
+      <button class="btn ghost" id="zoomRestart">Neu starten</button>
+      <span class="sp"></span>
+      <span class="zoom-note" style="margin:0">Teilchenmodell, stark vereinfacht</span>
     </div>
   </div>
 </div>
@@ -509,18 +566,20 @@ header>.tag{flex:1 1 160px;min-width:0}
 
     <section class="block">
       <h2>Verfahren</h2>
-      <p class="sub-note" style="margin-top:-4px">Die atmosphärische Destillation läuft immer. Weitere Verfahren durch Antippen zu- oder abschalten – beliebig kombinierbar. Der katalytische Cracker benötigt Vakuumgasöl; die Vakuumdestillation wird dann automatisch eingeschaltet.</p>
+      <p class="sub-note" style="margin-top:-4px">Die atmosphärische Destillation läuft immer. Weitere Verfahren durch Antippen zu- oder abschalten – beliebig kombinierbar. Der katalytische Cracker benötigt Vakuumgasöl; die Vakuumdestillation wird dann automatisch eingeschaltet. Das Leichtbenzin wird entweder isomerisiert oder als Naphtha an die Chemie abgegeben.</p>
       <div class="ptog-grid" id="procToggles">
         <button class="ptog" data-key="vac"><span class="led"></span>Vakuum&shy;destillation</button>
         <button class="ptog" data-key="hds"><span class="led"></span>Entschwefelung</button>
         <button class="ptog" data-key="fcc"><span class="led"></span>Katalytischer Cracker</button>
         <button class="ptog" data-key="ref"><span class="led"></span>Reformer</button>
+        <button class="ptog" data-key="iso"><span class="led"></span>Isomerisierung</button>
+        <button class="ptog" data-key="naph"><span class="led"></span>Leichtbenzin → Chemie</button>
       </div>
       <div class="ptog-quick">
         <button class="btn ghost" id="allOff">Alle aus</button>
         <button class="btn ghost" id="allOn">Alle ein</button>
       </div>
-      <p class="sub-note" style="margin:8px 0 0">Erklärungen: Anlagenteil im Fließbild antippen.</p>
+      <p class="sub-note" style="margin:8px 0 0">Erklärung und Vergrößerung auf Teilchenebene: Anlagenteil im Fließbild antippen.</p>
     </section>
 
     <section class="block">
@@ -568,14 +627,15 @@ header>.tag{flex:1 1 160px;min-width:0}
         <div class="readout"><span class="k">Benzinausbeute</span><span class="v mono" id="roBen">–</span></div>
         <div class="readout"><span class="k">Oktanzahl Benzin (ROZ)</span><span class="v mono" id="roRON">–</span></div>
         <div class="readout"><span class="k">Schwefel im Diesel</span><span class="v mono" id="roSDie">–</span></div>
+        <div class="readout"><span class="k">Gewinn je t Rohöl</span><span class="v mono" id="roProfit">–</span></div>
       </div>
-      <div class="unit-info" id="unitInfo"><span class="muted">Tippe ein Anlagenteil im Fließbild an, um eine Erklärung zu erhalten.</span></div>
       <div class="chrom-hint" id="warnBox" style="display:none;"></div>
     </div>
 
     <div class="tabs">
       <button class="tabbtn active" data-tab="bal">Produktbilanz</button>
       <button class="tabbtn" data-tab="frac">Fraktionen</button>
+      <button class="tabbtn" data-tab="eco">Wirtschaftlichkeit</button>
       <button class="tabbtn" data-tab="proc">Verfahren &amp; Reaktionen</button>
     </div>
 
@@ -607,6 +667,38 @@ header>.tag{flex:1 1 160px;min-width:0}
         </table>
       </div>
       <p class="note">Die Siedekurve zeigt, welcher Massenanteil des Rohöls bis zu einer bestimmten Temperatur verdampft. Die Kettenlängen sind über die Siedetemperaturen der unverzweigten Alkane abgeschätzt: Mit wachsender Kettenlänge nehmen die Van-der-Waals-Kräfte zu und die Siedetemperatur steigt.</p>
+    </div>
+
+    <div class="tabpanel" id="tab-eco">
+      <div class="eco-top">
+        <div class="eco-big"><span class="k">Gewinn je 1000 t Rohöl</span><span class="v mono" id="ecoProfit">–</span><span class="s mono" id="ecoPerT">–</span></div>
+        <div class="eco-crude">
+          <div class="row"><label for="rCrudeP">Rohölpreis (leichtes Rohöl)</label><span class="val mono" id="vCrudeP">560 €/t</span></div>
+          <input type="range" id="rCrudeP" min="350" max="850" step="10" value="560">
+          <p class="sub-note" id="ecoCrudeNote" style="margin:6px 0 0"></p>
+        </div>
+      </div>
+      <div class="eco-grid">
+        <div>
+          <p class="eco-h">Erlöse</p>
+          <div class="table-wrap">
+            <table id="ecoRevTable">
+              <thead><tr><th>Produkt</th><th class="num">Menge</th><th>Einstufung</th><th class="num">Preis (€/t)</th><th class="num">Erlös</th></tr></thead>
+              <tbody id="ecoRev"></tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <p class="eco-h">Kosten</p>
+          <div class="table-wrap">
+            <table id="ecoCostTable">
+              <thead><tr><th>Posten</th><th class="num">Menge</th><th class="num">Satz</th><th class="num">Kosten</th></tr></thead>
+              <tbody id="ecoCost"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <p class="note">Alle Preise und Kosten sind grob gerundete Richtwerte (Großhandel, ohne Steuern) und lassen sich in der Spalte „Preis“ ändern. Die Preise gelten für normgerechte Ware; erfüllt ein Produkt die Anforderungen nicht, wird es niedriger eingestuft (Abschlag). Betriebskosten je Tonne Einsatz enthalten Energie, Katalysator und Personal; Investitions- und Fixkosten sind nicht berücksichtigt. Schwere, schwefelreiche Rohöle sind billiger als leichte (Abschlag je Sorte), erfordern aber mehr Aufwand bei der Verarbeitung. Der Eigenverbrauch (Raffineriegas, Koks) wird als Brennstoff genutzt und nicht verkauft.</p>
     </div>
 
     <div class="tabpanel" id="tab-proc">
@@ -687,7 +779,7 @@ header>.tag{flex:1 1 160px;min-width:0}
 
   const S = {
     crude:"light", furnace:360, cutBK:180, cutKG:250,
-    vac:false, fcc:false, tFCC:510, ref:false, tRef:500, hds:false,
+    vac:false, fcc:false, tFCC:510, ref:false, tRef:500, hds:false, iso:false, naph:false,
     speed:1, running:false, processed:0, total:1000,
     tanks:{lpg:0, ben:0, ker:0, die:0, hvy:0}, sel:null
   };
@@ -807,7 +899,13 @@ header>.tag{flex:1 1 160px;min-width:0}
       h2cons += 0.2*sRem/1e6 + 0.003*treated;
     }
 
-    const lnOut = f.ln, lnRON = 72;
+    // Isomerisierung des Leichtbenzins: unverzweigte → verzweigte Alkane
+    let lnOut = f.ln, lnRON = 72, isoGas = 0, naph = 0;
+    if(S.naph){ naph = f.ln; lnOut = 0; }               // Leichtbenzin geht als Naphtha in die chemische Industrie
+    else if(S.iso){
+      lnOut = f.ln*0.98; isoGas = f.ln*0.02; lnRON = 88; h2cons += f.ln*0.002;
+      if(!S.hds){ lnRON -= 10; warn.push("Schwefelverbindungen schädigen auch den Katalysator der Isomerisierung – die Oktanzahl des Isomerisats sinkt. Das Leichtbenzin sollte vorher entschwefelt werden."); }
+    }
 
     // Reformer
     const refFeed = f.hn, sRefFeed = sHN;
@@ -826,7 +924,7 @@ header>.tag{flex:1 1 160px;min-width:0}
     }
 
     // Produkte (Massenanteile bezogen auf das Rohöl)
-    const gasTot = f.gas + crkGas + Math.max(0, refGas - h2prod);
+    const gasTot = f.gas + crkGas + isoGas + Math.max(0, refGas - h2prod);
     const p = {
       lpg: gasTot*0.6,
       ben: lnOut + hnOut + crkBen,
@@ -836,7 +934,7 @@ header>.tag{flex:1 1 160px;min-width:0}
     };
     const own = gasTot*0.4 + coke + h2prod;            // Raffineriegas, Koks, Wasserstoff
     const q = {};
-    q.benRON = p.ben > 0 ? (lnOut*lnRON + hnOut*hnRON + crkBen*93)/p.ben : 0;
+    q.benRON = p.ben > 0 ? Math.round((lnOut*lnRON + hnOut*hnRON + crkBen*93)/p.ben) : 0;   // gerundet wie angezeigt
     q.benS   = p.ben > 0 ? (lnOut*sLN + hnOut*(S.ref && S.hds ? 0.5 : sHnOut) + crkBen*sCrkBen)/p.ben : 0;
     q.kerS   = p.ker > 0 ? sKER : 0;
     q.dieS   = p.die > 0 ? (f.go*sGO + lco*sLco)/p.die : 0;
@@ -846,7 +944,7 @@ header>.tag{flex:1 1 160px;min-width:0}
       warn.push("Der Wasserstoffbedarf ist größer als die Produktion im Reformer. Die Fehlmenge (" + fmt((h2cons-h2prod)*S.total,1) + " t je 1000 t Rohöl) wird aus Erdgas durch Dampfreformierung erzeugt.");
     }
     return {c, st, AE, bk, kg, f, s, vgo, vr, resBypass, crkGas, crkBen, crkKer, crkDie, crkHvy,
-            lnOut, hnOut, refGas, refFeed, p, own, q, coke, sRec: sRec/1e6, h2prod, h2cons, warn, kOver};
+            lnOut, hnOut, refGas, refFeed, p, own, q, coke, sRec: sRec/1e6, h2prod, h2cons, warn, kOver, lnRON, hnRON, naph};
   }
 
   // ---------- Fließbild ----------
@@ -861,9 +959,11 @@ header>.tag{flex:1 1 160px;min-width:0}
     crude:{x:30,  y:380, w:80,  h:90,  name:"Rohöltank"},
     furn: {x:150, y:400, w:80,  h:60,  name:"Röhrenofen"},
     col:  {x:280, y:30,  w:60,  h:450, name:"Destillationskolonne"},
-    hds:  {x:372, y:92,  w:58,  h:272, name:"Entschwefelung"},
+    hds:  {x:456, y:92,  w:58,  h:272, name:"Entschwefelung"},
     vac:  {x:410, y:390, w:50,  h:110, name:"Vakuumkolonne"},
-    ref:  {x:520, y:154, w:110, h:36,  name:"Reformer"},
+    iso:  {x:530, y:100, w:110, h:36,  name:"Isomerisierung"},
+    naph: {x:530, y:100, w:110, h:36,  name:"Naphtha → Chemie"},
+    ref:  {x:530, y:154, w:110, h:36,  name:"Reformer"},
     crk:  {x:520, y:384, w:110, h:56,  name:"Cracker"}
   };
   Object.keys(TANKS).forEach(k=> UNITS["tank_"+k] = {x:TANK_X, y:TANKS[k].y, w:TANK_W, h:TANK_H});
@@ -873,23 +973,27 @@ header>.tag{flex:1 1 160px;min-width:0}
     {pts:[[230,430],[280,430]], col:"crude", f:()=>1},
     {pts:[[340,60],[650,60]],   col:"gas", f:m=>m.f.gas},
     {pts:[[650,60],[930,60]],   col:"gas", f:m=>m.p.lpg},
-    {pts:[[630,162],[660,162],[660,60]], col:"gas", f:m=>m.refGas},
-    {pts:[[630,392],[650,392],[650,60]], col:"gas", f:m=>m.crkGas},
-    {pts:[[340,118],[700,118],[700,150]], col:"ben", f:m=>m.f.ln},
-    {pts:[[340,172],[520,172]], col:"ben", f:m=>m.f.hn},
-    {pts:[[630,172],[700,172],[700,150]], col:"ben", f:m=>m.hnOut},
-    {pts:[[630,404],[700,404],[700,150]], col:"ben", f:m=>m.crkBen},
-    {pts:[[700,150],[930,150]], col:"ben", f:m=>m.p.ben},
+    {pts:[[640,162],[652,162],[652,60]], col:"gas", f:m=>m.refGas, vis:()=>S.ref},
+    {pts:[[630,392],[805,392],[805,60]], col:"gas", f:m=>m.crkGas, vis:()=>unitOn("crk")},
+    {pts:[[340,118],[530,118]], col:"ben", f:m=>m.f.ln},
+    {pts:[[530,118],[640,118]], col:"ben", f:m=>m.f.ln, vis:()=>!S.iso && !S.naph},
+    {pts:[[640,118],[740,118],[740,150]], col:"ben", f:m=>m.lnOut, vis:()=>!S.naph},
+    {pts:[[340,172],[530,172]], col:"ben", f:m=>m.f.hn},
+    {pts:[[530,172],[640,172]], col:"ben", f:m=>m.f.hn, vis:()=>!S.ref},
+    {pts:[[640,172],[740,172],[740,150]], col:"ben", f:m=>m.hnOut},
+    {pts:[[630,404],[740,404],[740,150]], col:"ben", f:m=>m.crkBen, vis:()=>unitOn("crk")},
+    {pts:[[740,150],[930,150]], col:"ben", f:m=>m.p.ben},
     {pts:[[340,245],[690,245]], col:"ker", f:m=>m.f.ker},
     {pts:[[690,245],[930,245]], col:"ker", f:m=>m.p.ker},
     {pts:[[340,340],[680,340]], col:"die", f:m=>m.f.go},
     {pts:[[680,340],[930,340]], col:"die", f:m=>m.p.die},
-    {pts:[[630,426],[680,426],[680,340]], col:"die", f:m=>m.crkDie},
+    {pts:[[630,426],[680,426],[680,340]], col:"die", f:m=>m.crkDie, vis:()=>unitOn("crk")},
     {pts:[[340,465],[410,465]], col:"hvy", f:m=>m.f.res},
-    {pts:[[460,465],[720,465],[720,445]], col:"hvy", f:m=>m.resBypass},
-    {pts:[[460,405],[520,405]], col:"hvy", f:m=>m.vgo},
-    {pts:[[460,490],[720,490],[720,445]], col:"hvy", f:m=>m.vr},
-    {pts:[[630,436],[720,436],[720,445]], col:"hvy", f:m=>m.crkHvy},
+    {pts:[[410,465],[720,465],[720,445]], col:"hvy", f:m=>m.resBypass, vis:()=>!S.vac},
+    {pts:[[460,405],[520,405]], col:"hvy", f:m=>m.vgo, vis:()=>unitOn("crk")},
+    {pts:[[460,405],[720,405],[720,445]], col:"hvy", f:m=>m.vgo, vis:()=>S.vac && !unitOn("crk")},
+    {pts:[[460,490],[720,490],[720,445]], col:"hvy", f:m=>m.vr, vis:()=>S.vac},
+    {pts:[[630,436],[720,436],[720,445]], col:"hvy", f:m=>m.crkHvy, vis:()=>unitOn("crk")},
     {pts:[[720,445],[930,445]], col:"hvy", f:m=>m.p.hvy}
   ];
   ROUTES.forEach(r=>{
@@ -930,6 +1034,8 @@ header>.tag{flex:1 1 160px;min-width:0}
     if(k==="vac") return S.vac;
     if(k==="crk") return S.fcc && S.vac;
     if(k==="ref") return S.ref;
+    if(k==="iso") return S.iso;
+    if(k==="naph") return S.naph;
     if(k==="hds") return S.hds;
     return true;
   }
@@ -943,6 +1049,7 @@ header>.tag{flex:1 1 160px;min-width:0}
 
     // Leitungen
     ROUTES.forEach(r=>{
+      if(r.vis && !r.vis()) return;
       const fl = r.f(M);
       c.lineCap = "round"; c.lineJoin = "round";
       c.strokeStyle = line; c.lineWidth = 7;
@@ -957,6 +1064,7 @@ header>.tag{flex:1 1 160px;min-width:0}
     // Teilchen in den Leitungen
     if(S.running){
       ROUTES.forEach((r,ri)=>{
+        if(r.vis && !r.vis()) return;
         const fl = r.f(M);
         if(fl <= 1e-4) return;
         const spacing = clamp(11/Math.pow(fl,0.6), 11, 170);
@@ -1032,13 +1140,14 @@ header>.tag{flex:1 1 160px;min-width:0}
       [245, "Kerosin", "ker"], [340, "Gasöl", "die"]
     ];
     c.font = "600 12px " + FONT; c.textAlign = "left";
-    names.forEach(([y,t,k])=>{ c.fillStyle = COL[k]; c.fillText(t, 442, y - 8); });
+    names.forEach(([y,t,k])=>{ c.fillStyle = COL[k]; c.fillText(t, 350, y - 8); });
     c.fillStyle = COL.hvy; c.fillText("Rückstand", 344, 484);
 
     // Entschwefelung
     drawUnitBox(c, "hds", true);
     // Vakuumkolonne
     const va = u.vac, vOn = unitOn("vac");
+    if(vOn){
     c.globalAlpha = vOn ? 1 : .45;
     c.fillStyle = "#171b1f"; c.strokeStyle = S.sel==="vac" ? teal : (vOn ? tealDim : line); c.lineWidth = S.sel==="vac" ? 2 : 1.5;
     rr(c, va.x, va.y, va.w, va.h, 18); c.fill(); c.stroke();
@@ -1049,11 +1158,20 @@ header>.tag{flex:1 1 160px;min-width:0}
     c.fillText("Vakuum", va.x + va.w/2, va.y - 6);
     if(vOn){
       c.font = "600 12px " + FONT; c.textAlign = "left"; c.fillStyle = COL.hvy;
-      c.fillText("Vakuumgasöl", 466, 379);
+      c.fillText("Vakuumgasöl", 466, 380);
       c.fillText("Vakuumrückstand", 466, 510);
+    }
     }
 
     drawUnitBox(c, "ref");
+    drawUnitBox(c, "iso");
+    if(S.naph){
+      const n = UNITS.naph;
+      rr(c, n.x, n.y, n.w, n.h, 4); c.fillStyle = "rgba(183,156,242,.10)"; c.fill();
+      c.strokeStyle = S.sel==="naph" ? teal : "#8f7bc4"; c.lineWidth = S.sel==="naph" ? 2 : 1.5; c.stroke();
+      c.fillStyle = text; c.font = "600 11.5px " + FONT; c.textAlign = "center"; c.fillText("Naphtha → Chemie", n.x + n.w/2, n.y + 15);
+      c.font = "10.5px " + MONO; c.fillStyle = "#b79cf2"; c.fillText(fmt(M.naph*S.total) + " t je 1000 t", n.x + n.w/2, n.y + 29);
+    }
     drawUnitBox(c, "crk");
 
     // Produkttanks
@@ -1073,7 +1191,29 @@ header>.tag{flex:1 1 160px;min-width:0}
       c.fillStyle = dim; c.textAlign = "right";
       c.fillText(fmt(M.p[pr.k]*100,1) + " %", x + TANK_W - 9, y + 42);
       c.textAlign = "left";
+      if(pr.k === "ben"){
+        const r = M.q.benRON, col = r >= 95 ? css("--good") : r >= 91 ? amber : css("--danger");
+        c.font = "600 11.5px " + MONO; c.textAlign = "right"; c.fillStyle = col;
+        c.fillText("ROZ " + fmt(r), x + TANK_W - 9, y + 20); c.textAlign = "left";
+        c.font = "10.5px " + FONT; c.fillStyle = col;
+        c.fillText(r >= 95 ? "Super" : r >= 91 ? "Normalbenzin" : "unter Norm", x + 9, y + TANK_H + 13);
+      }
     });
+    // Oktanzahlen an den Benzinströmen: zeigt den Zweck des Reformers
+    const ron = (txt, x, y, col) => {
+      c.font = "600 10.5px " + MONO; const w = c.measureText(txt).width + 10;
+      rr(c, x - w/2, y - 8, w, 15, 7); c.fillStyle = "#0e1113"; c.fill(); c.strokeStyle = col; c.lineWidth = 1; c.stroke();
+      c.fillStyle = col; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText(txt, x, y); c.textBaseline = "alphabetic"; c.textAlign = "left";
+    };
+    const ronCol = r => { r = Math.round(r); return r >= 95 ? css("--good") : r >= 85 ? amber : css("--danger"); };
+    ron("ROZ 72", 380, 133, ronCol(72));
+    ron("ROZ 55", 380, 187, ronCol(55));
+    if(S.ref){ ron("ROZ " + fmt(M.hnRON), 696, 172, ronCol(M.hnRON)); c.font = "11px " + FONT; c.fillStyle = dim; c.textAlign = "center"; c.fillText("Reformat", 696, 194); c.textAlign = "left"; }
+    if(S.iso){ ron("ROZ " + fmt(M.lnRON), 696, 118, ronCol(M.lnRON)); c.font = "11px " + FONT; c.fillStyle = dim; c.textAlign = "center"; c.fillText("Isomerisat", 696, 140); c.textAlign = "left"; }
+    if(unitOn("crk")) ron("ROZ 93", 664, 404, ronCol(93));
+    // Mischpunkt der Benzinkomponenten
+    c.beginPath(); c.arc(740, 150, 6, 0, Math.PI*2); c.fillStyle = "#0e1113"; c.fill(); c.strokeStyle = COL.ben; c.lineWidth = 2; c.stroke();
+    c.font = "11px " + FONT; c.fillStyle = dim; c.textAlign = "left"; c.fillText("Mischen", 748, 168);
     c.fillStyle = faint; c.font = "12px " + FONT; c.textAlign = "left";
     c.fillText("Eigenverbrauch & Verluste: " + fmt(M.own*100,1) + " %", 760, 512);
   }
@@ -1081,6 +1221,7 @@ header>.tag{flex:1 1 160px;min-width:0}
   function drawUnitBox(c, k, vertical){
     const u = UNITS[k], on = unitOn(k);
     const teal = css("--teal"), tealDim = css("--teal-dim"), line = css("--line"), text = css("--text"), faint = css("--text-faint");
+    if(!on) return;                       // ausgeschaltete Anlagenteile werden nicht gezeigt
     if(vertical){ drawHDS(c, u, on); return; }
     c.globalAlpha = on ? 1 : .5;
     c.fillStyle = on ? "rgba(79,209,197,.08)" : "#171b1f";
@@ -1145,7 +1286,9 @@ header>.tag{flex:1 1 160px;min-width:0}
     col:"<strong>Atmosphärische Destillationskolonne.</strong> Der Dampf steigt durch die Glockenböden nach oben und kühlt sich dabei ab. Stoffe mit hoher Siedetemperatur kondensieren weiter unten, leicht siedende weiter oben. So entstehen Fraktionen mit bestimmten Siedebereichen – reine Stoffe erhält man nicht.",
     hds:"<strong>Entschwefelung (Hydrotreating).</strong> Schwefelverbindungen reagieren bei etwa 350 °C und 30–60 bar an Co-Mo-Katalysatoren mit Wasserstoff zu Schwefelwasserstoff, aus dem im Claus-Verfahren Schwefel gewonnen wird. Kraftstoffe in der EU dürfen höchstens 10 mg Schwefel pro kg enthalten.",
     vac:"<strong>Vakuumdestillation.</strong> Der Rückstand der atmosphärischen Destillation wird bei 20–50 hPa erneut destilliert. Bei vermindertem Druck sinken die Siedetemperaturen, sodass sich Vakuumgasöl ohne Zersetzung abtrennen lässt. Übrig bleibt der Vakuumrückstand (Bitumen, schweres Heizöl).",
-    ref:"<strong>Reformer.</strong> Aus Alkanen und Cycloalkanen des Schwerbenzins entstehen an Platin-Katalysatoren Aromaten mit hoher Oktanzahl. Je höher die Reaktortemperatur, desto höher die Oktanzahl – aber desto mehr Gas entsteht und desto geringer ist die Benzinausbeute. Nebenprodukt: Wasserstoff.",
+    naph:"<strong>Leichtbenzin → Chemie.</strong> Das Leichtbenzin (ROZ ≈ 72) senkt die Oktanzahl des Benzins. Viele Raffinerien geben es deshalb nicht in den Kraftstoff, sondern als <em>Naphtha</em> an die chemische Industrie ab. Dort wird es im Steamcracker zu Ethen und Propen gespalten – den Grundstoffen für Kunststoffe. Das Benzin wird dadurch klopffester, aber die Benzinmenge sinkt. Alternative: das Leichtbenzin isomerisieren.",
+    iso:"<strong>Isomerisierung.</strong> Zweck: Leichtbenzin besteht vor allem aus unverzweigten Alkanen mit 5 und 6 C-Atomen (Pentan, Hexan) und hat nur etwa ROZ 72. Bei etwa 150–250 °C werden sie an einem Platin-Katalysator unter Wasserstoff in verzweigte Isomere mit gleicher Summenformel umgewandelt – das Isomerisat hat etwa ROZ 88. Verzweigte Alkane sind deutlich klopffester. Der Katalysator ist schwefelempfindlich.",
+    ref:"<strong>Reformer.</strong> Zweck: Schwerbenzin aus der Destillation hat nur eine Oktanzahl von etwa 55 und ist als Kraftstoff kaum brauchbar. Der Reformer hebt sie auf über 90 – im Fließbild an den ROZ-Angaben vor und hinter dem Reformer zu sehen. Aus Alkanen und Cycloalkanen des Schwerbenzins entstehen an Platin-Katalysatoren Aromaten mit hoher Oktanzahl. Je höher die Reaktortemperatur, desto höher die Oktanzahl – aber desto mehr Gas entsteht und desto geringer ist die Benzinausbeute. Nebenprodukt: Wasserstoff.",
     crk:"<strong>Katalytischer Cracker.</strong> Langkettige Moleküle des Vakuumgasöls werden bei etwa 500 °C an einem Zeolith-Katalysator im Wirbelbett in kürzere Alkane und Alkene gespalten. Es entstehen vor allem Benzin mit hoher Oktanzahl und Gase. Höhere Temperatur bedeutet höheren Umsatz, aber mehr Gas und Koks.",
     tank_lpg:"<strong>Flüssiggas (LPG).</strong> Propan und Butan, unter Druck verflüssigt. Verwendung als Autogas, Heiz- und Campinggas sowie als Chemierohstoff. Methan und Ethan (Raffineriegas) dienen als Brennstoff in der Raffinerie selbst.",
     tank_ben:"<strong>Benzin (Ottokraftstoff).</strong> Gemisch aus Reformat, Crackbenzin und Leichtbenzin. Normalbenzin muss eine Research-Oktanzahl (ROZ) von mindestens 91, Superbenzin von mindestens 95 haben und darf höchstens 10 mg/kg Schwefel enthalten. Ein Teil des Destillatbenzins (Naphtha) geht als Rohstoff in die chemische Industrie.",
@@ -1155,7 +1298,6 @@ header>.tag{flex:1 1 160px;min-width:0}
   };
   function showInfo(k){
     S.sel = k;
-    $("unitInfo").innerHTML = INFO[k] || '<span class="muted">Tippe ein Anlagenteil im Fließbild an, um eine Erklärung zu erhalten.</span>';
     document.querySelectorAll(".proc").forEach(p=> p.classList.toggle("hl", p.dataset.unit===k || false));
     drawPlant();
   }
@@ -1163,17 +1305,1075 @@ header>.tag{flex:1 1 160px;min-width:0}
     const r = plant.getBoundingClientRect();
     const x = (e.clientX - r.left)/r.width*LW, y = (e.clientY - r.top)/r.height*LH;
     let hit = null;
-    Object.entries(UNITS).forEach(([k,u])=>{ if(x>=u.x-4 && x<=u.x+u.w+4 && y>=u.y-4 && y<=u.y+u.h+4) hit = k; });
+    Object.entries(UNITS).forEach(([k,u])=>{ if(unitOn(k) && x>=u.x-4 && x<=u.x+u.w+4 && y>=u.y-4 && y<=u.y+u.h+4) hit = k; });
     showInfo(hit);
+    if(hit) openZoom(hit, e.clientX, e.clientY);
   });
-  document.querySelectorAll(".unit-label .info").forEach(b=> b.addEventListener("click", ()=>{
-    showInfo(b.dataset.unit);
-    $("unitInfo").scrollIntoView({behavior:"smooth", block:"nearest"});
-  }));
+
+  // ---------- Vergrößerung: Vorgänge auf Teilchenebene ----------
+  const ZW = 720, ZH = 380;
+  const zBack = $("zoomBackdrop"), zBox = zBack.querySelector(".modal-box"), zCv = $("zoomCanvas");
+  let zc = null, zKey = null, zT = 0, zLast = null, zPaused = false, zOpen = false, zSc = null;
+  const ZCOL = {O:"#d9604a", Os:"#f2a08f", C:"#5f6a72", Cs:"#b3bcc3", H:"#e7e4dd", Hs:"#8a9299", S:"#e6d36a", Ss:"#a8962f",
+                txt:"#e7e4dd", dim:"#9aa2a9", faint:"#5f6870", amber:"#ffb454", teal:"#4fd1c5", red:"#e4785b"};
+  const ZF = "system-ui,-apple-system,'Segoe UI',Roboto,sans-serif";
+  const ease = t => t<=0 ? 0 : t>=1 ? 1 : t*t*(3-2*t);
+  const lerp = (a,b,t) => a + (b-a)*t;
+  const ph = (t,a,b) => ease((t-a)/(b-a));
+  const rnd = (a,b) => a + Math.random()*(b-a);
+  const bpOf = n => ALK_BP[Math.max(1, Math.min(n, ALK_BP.length-1))];
+  const fracCol = bp => bp < 30 ? COL.gas : bp < 180 ? COL.ben : bp < 250 ? COL.ker : bp < 370 ? COL.die : COL.hvy;
+  function pickLen(max){ const L = [1,2,3,3,4,4,5,6,6,7,7,8,8,9,10,10,11,12,12,13,14,15,16,17,18,19,20,22,24,26,28,30]; let n; do{ n = L[Math.floor(Math.random()*L.length)]; }while(n > max); return n; }
+
+  function zTxt(c, t, x, y, o){
+    o = o || {};
+    c.font = (o.w || 400) + " " + (o.s || 12) + "px " + ZF;
+    c.fillStyle = o.c || ZCOL.dim; c.textAlign = o.a || "center"; c.textBaseline = o.b || "alphabetic";
+    c.globalAlpha = o.al === undefined ? 1 : o.al;
+    c.fillText(t, x, y); c.globalAlpha = 1;
+  }
+  function zAtom(c, x, y, el, al){
+    const r = el==="C" ? 8 : el==="S" ? 9.5 : el==="O" ? 7.5 : 5;
+    c.globalAlpha = al === undefined ? 1 : al;
+    c.beginPath(); c.arc(x, y, r, 0, Math.PI*2);
+    c.fillStyle = ZCOL[el]; c.fill();
+    c.lineWidth = 1.2; c.strokeStyle = ZCOL[el+"s"]; c.stroke();
+    if(el !== "H"){ c.fillStyle = el==="S" ? "#3a3210" : "#e7e4dd"; c.font = "600 " + (el==="S"?11:10) + "px " + ZF; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText(el, x, y+0.5); }
+    c.globalAlpha = 1;
+  }
+  function zBond(c, x1, y1, x2, y2, o){
+    o = o || {};
+    c.globalAlpha = o.al === undefined ? 1 : o.al;
+    c.strokeStyle = o.col || "#8d969d"; c.lineWidth = o.w || 2.4; c.lineCap = "round";
+    if(o.dash) c.setLineDash([4,4]);
+    const ord = o.ord || 1;
+    if(ord === 2){
+      const dx = x2-x1, dy = y2-y1, L = Math.hypot(dx,dy) || 1, nx = -dy/L*3, ny = dx/L*3;
+      c.beginPath(); c.moveTo(x1+nx,y1+ny); c.lineTo(x2+nx,y2+ny); c.moveTo(x1-nx,y1-ny); c.lineTo(x2-nx,y2-ny); c.stroke();
+    } else { c.beginPath(); c.moveTo(x1,y1); c.lineTo(x2,y2); c.stroke(); }
+    c.setLineDash([]); c.globalAlpha = 1;
+  }
+  // Molekül zeichnen: atoms [{x,y,el,al}], bonds [[i,j,opts]]
+  function zMol(c, A, B){
+    B.forEach(([i,j,o]) => { if(A[i] && A[j]) zBond(c, A[i].x, A[i].y, A[j].x, A[j].y, o); });
+    A.forEach(a => { if(a) zAtom(c, a.x, a.y, a.el, a.al); });
+  }
+  // vereinfachte Kette (nur C-Gerüst) für Gemische
+  function zChain(c, n, x, y, ang, col, al){
+    const d = 5, ca = Math.cos(ang), sa = Math.sin(ang), P = [];
+    for(let i=0;i<n;i++){ const u = (i - (n-1)/2)*d, v = (i%2 ? 2 : -2); P.push([x + u*ca - v*sa, y + u*sa + v*ca]); }
+    c.globalAlpha = al === undefined ? 1 : al;
+    c.strokeStyle = col; c.lineWidth = 2; c.lineJoin = "round";
+    c.beginPath(); P.forEach((p,i)=> i ? c.lineTo(p[0],p[1]) : c.moveTo(p[0],p[1])); c.stroke();
+    c.fillStyle = col; P.forEach(p=>{ c.beginPath(); c.arc(p[0], p[1], 2.3, 0, Math.PI*2); c.fill(); });
+    c.globalAlpha = 1;
+    return P;
+  }
+  function zLegend(c, y){
+    const items = [["Gas",COL.gas],["Benzin",COL.ben],["Kerosin",COL.ker],["Gasöl/Diesel",COL.die],["Rückstand",COL.hvy]];
+    let x = 70;
+    items.forEach(([t,col])=>{ c.fillStyle = col; c.fillRect(x, y-8, 14, 8); zTxt(c, t, x+20, y, {a:"left", s:11.5}); x += 30 + t.length*6.6; });
+  }
+  function zFlames(c, x0, x1, y, t){
+    for(let x = x0; x <= x1; x += 26){
+      const h = 16 + 7*Math.abs(Math.sin(t*6 + x*0.37));
+      const g = c.createLinearGradient(0, y, 0, y - h);
+      g.addColorStop(0, "#ffb454"); g.addColorStop(1, "rgba(228,120,91,0)");
+      c.fillStyle = g; c.beginPath(); c.moveTo(x-8, y); c.quadraticCurveTo(x, y - h*1.4, x+8, y); c.fill();
+    }
+  }
+  function zSurface(c, y, cols, label){
+    for(let x = 20, i = 0; x < ZW; x += 24, i++){
+      c.beginPath(); c.arc(x, y, 11, 0, Math.PI*2);
+      c.fillStyle = cols[i % cols.length]; c.fill(); c.strokeStyle = "rgba(255,255,255,.18)"; c.lineWidth = 1; c.stroke();
+      c.beginPath(); c.arc(x+12, y+18, 11, 0, Math.PI*2); c.fillStyle = cols[(i+1) % cols.length]; c.globalAlpha = .7; c.fill(); c.globalAlpha = 1;
+    }
+    zTxt(c, label, ZW - 14, ZH - 8, {a:"right", s:11.5, c:ZCOL.dim});
+  }
+  // gerade Kette mit allen H-Atomen: liefert Atome (C zuerst) und Bindungen
+  function fullChain(n, cx, cy, d){
+    d = d || 26;
+    const A = [], B = [], C = [];
+    for(let i=0;i<n;i++){ C.push(A.length); A.push({x: cx + (i-(n-1)/2)*d, y: cy, el:"C"}); }
+    for(let i=0;i<n-1;i++) B.push([C[i], C[i+1], {}]);
+    const H = {};
+    const addH = (i, dx, dy, tag) => { H[i+tag] = A.length; A.push({x: A[C[i]].x + dx, y: cy + dy, el:"H", c:i, dx, dy}); B.push([C[i], A.length-1, {w:1.6}]); };
+    for(let i=0;i<n;i++){
+      if(i===0) addH(i, -20, 0, "l");
+      if(i===n-1) addH(i, 20, 0, "r");
+      addH(i, 0, -20, "u"); addH(i, 0, 20, "d");
+    }
+    return {A, B, C, H};
+  }
+
+  const ZOOM = {
+    crude: {
+      title: "Rohöl – ein Stoffgemisch",
+      text: "Rohöl besteht aus sehr vielen verschiedenen Kohlenwasserstoffmolekülen – von kurzen Ketten mit 1–4 C-Atomen bis zu langen Ketten mit über 40 C-Atomen. Einige Moleküle enthalten Schwefelatome. Die Moleküle bewegen sich ungeordnet; je kürzer, desto beweglicher.",
+      note: "Dargestellt sind nur die C-Atome der Kohlenstoffketten. Farbe = Fraktion, in der das Molekül später landet.",
+      init(){
+        this.m = [];
+        for(let i=0;i<30;i++){
+          const n = pickLen(30);
+          this.m.push({n, x:rnd(110,610), y:rnd(110,250), vx:rnd(-1,1)*60/Math.sqrt(n), vy:rnd(-1,1)*60/Math.sqrt(n), a:rnd(0,6.3), va:rnd(-1,1)*1.2/Math.sqrt(n), s: n>8 && Math.random()<0.25});
+        }
+      },
+      draw(c, t, dt){
+        c.strokeStyle = "#31383e"; c.lineWidth = 1.5; c.strokeRect(20, 30, ZW-40, 300);
+        this.m.forEach(m=>{
+          m.x += m.vx*dt; m.y += m.vy*dt; m.a += m.va*dt;
+          const half = m.n*2.6 + 6;
+          if(m.x < 20+half || m.x > ZW-20-half) m.vx *= -1;
+          if(m.y < 30+half || m.y > 330-half) m.vy *= -1;
+          m.x = clamp(m.x, 20+half, ZW-20-half); m.y = clamp(m.y, 30+half, 330-half);
+          const P = zChain(c, m.n, m.x, m.y, m.a, fracCol(bpOf(m.n)));
+          if(m.s){ const p = P[Math.floor(P.length/2)]; c.beginPath(); c.arc(p[0], p[1], 5, 0, Math.PI*2); c.fillStyle = ZCOL.S; c.fill(); }
+        });
+        zLegend(c, 356);
+        c.beginPath(); c.arc(ZW-120, 352, 5, 0, Math.PI*2); c.fillStyle = ZCOL.S; c.fill();
+        zTxt(c, "Schwefelatom", ZW-110, 356, {a:"left", s:11.5});
+      }
+    },
+
+    furn: {
+      title: "Röhrenofen – Erhitzen und Verdampfen",
+      text: "Beim Erhitzen nehmen die Moleküle Energie auf und bewegen sich immer heftiger. Ist die Siedetemperatur eines Stoffes erreicht, können seine Moleküle die Anziehungskräfte (Van-der-Waals-Kräfte) zu den Nachbarmolekülen überwinden und gehen in die Gasphase über. Kurze Moleküle verdampfen früh, lange erst bei hoher Temperatur – die längsten gar nicht.",
+      note: "Dargestellt sind nur die C-Atome. Temperatur im Rohr von links (≈ 20 °C) nach rechts (≈ 360 °C).",
+      init(){ this.m = []; this.sp = 0; for(let k=0;k<160;k++) this.step(0.1); },
+      spawn(){ const n = pickLen(26); this.m.push({n, x:30, y:rnd(214,254), a:rnd(-0.3,0.3), gas:false, vy:0}); },
+      step(dt){
+        this.sp -= dt; if(this.sp <= 0){ this.spawn(); this.sp = 0.42; }
+        this.m.forEach(m=>{
+          const T = 20 + 340*clamp((m.x-50)/620, 0, 1);
+          m.x += (m.gas ? 62 : 38)*dt;
+          if(!m.gas && T >= bpOf(m.n)){ m.gas = true; m.ty = rnd(135,180); }
+          if(m.gas){ m.y = lerp(m.y, m.ty, Math.min(1, dt*3)); }
+          m.T = T;
+        });
+        this.m = this.m.filter(m=> m.x < 760);
+      },
+      draw(c, t, dt){
+        this.step(dt);
+        const g = c.createLinearGradient(40, 0, 680, 0);
+        g.addColorStop(0, "rgba(108,182,255,.10)"); g.addColorStop(1, "rgba(228,120,91,.22)");
+        c.fillStyle = g; c.fillRect(40, 120, 640, 150);
+        c.strokeStyle = "#6b757e"; c.lineWidth = 3; c.beginPath(); c.moveTo(40,120); c.lineTo(680,120); c.moveTo(40,270); c.lineTo(680,270); c.stroke();
+        zFlames(c, 70, 660, 312, t);
+        c.save(); c.beginPath(); c.rect(41, 122, 638, 146); c.clip();
+        this.m.forEach(m=>{
+          const j = 0.4 + m.T/45;
+          const x = m.x + rnd(-j,j), y = m.y + rnd(-j,j)*0.8;
+          zChain(c, m.n, x, y, m.a + (m.gas ? Math.sin(t*3 + m.x)*0.4 : 0), fracCol(bpOf(m.n)), m.gas ? 1 : 0.75);
+        });
+        c.restore();
+        zTxt(c, "≈ 20 °C", 46, 108, {a:"left", c:"#6cb6ff", w:600});
+        zTxt(c, "≈ 360 °C", 674, 108, {a:"right", c:ZCOL.red, w:600});
+        zTxt(c, "Fließrichtung →", 360, 108, {s:11.5});
+        zTxt(c, "gasförmig (verdampft)", 676, 140, {a:"right", s:11.5, c:ZCOL.txt, al:.8});
+        zTxt(c, "flüssig", 46, 262, {a:"left", s:11.5, c:ZCOL.txt, al:.8});
+        zTxt(c, "Brenner", 360, 336, {s:11.5});
+        zLegend(c, 366);
+      }
+    },
+
+    col: {
+      title: "Destillationskolonne – Kondensieren auf den Böden",
+      text: "Der heiße Dampf steigt durch die Glockenböden nach oben und kühlt sich dabei ab. Jedes Molekül kondensiert auf dem ersten Boden, dessen Temperatur unter seiner Siedetemperatur liegt, und wird dort als Flüssigkeit seitlich abgezogen. Lange Moleküle (hohe Siedetemperatur) kondensieren weiter unten, kurze steigen weiter auf. So entstehen Fraktionen.",
+      note: "Dargestellt sind nur die C-Atome. Ausschnitt aus der Kolonne mit vier Böden.",
+      trays: [{y:308,T:250,n:"Gasöl"},{y:234,T:180,n:"Kerosin"},{y:160,T:100,n:"Schwerbenzin"},{y:86,T:30,n:"Leichtbenzin"}],
+      init(){ this.m = []; this.sp = 0; for(let k=0;k<120;k++) this.step(0.1); },
+      step(dt){
+        this.sp -= dt; if(this.sp <= 0){ const n = pickLen(20); this.m.push({n, x:rnd(270,440), y:380, a:rnd(-0.6,0.6), st:"up", bp:bpOf(n)}); this.sp = 0.34; }
+        this.m.forEach(m=>{
+          if(m.st === "up"){
+            m.y -= 52*dt; m.x += Math.sin(m.y*0.08 + m.n)*0.5;
+            const tr = this.trays.find(tr => tr.T < m.bp && m.y <= tr.y - 6 && m.y > tr.y - 14);
+            if(tr){ m.st = "liq"; m.y = tr.y - 7; m.a = 0; }
+            if(m.y < 20) m.out = true;
+          } else {
+            m.x += 55*dt;
+            if(m.x > 560) m.out = true;
+          }
+        });
+        this.m = this.m.filter(m=> !m.out);
+      },
+      draw(c, t, dt){
+        this.step(dt);
+        c.fillStyle = "#14191c"; c.fillRect(240, 14, 230, 362);
+        c.strokeStyle = "#6b757e"; c.lineWidth = 3; c.beginPath(); c.moveTo(240,14); c.lineTo(240,376); c.moveTo(470,14); c.lineTo(470,376); c.stroke();
+        this.trays.forEach(tr=>{
+          c.fillStyle = "rgba(255,180,84,.10)"; c.fillRect(240, tr.y-10, 230, 10);
+          c.strokeStyle = "#8d969d"; c.lineWidth = 2.5; c.beginPath(); c.moveTo(240, tr.y); c.lineTo(470, tr.y); c.stroke();
+          for(let x = 270; x < 460; x += 48){ c.beginPath(); c.arc(x, tr.y-2, 9, Math.PI, 0); c.strokeStyle = "#6b757e"; c.lineWidth = 1.6; c.stroke(); }
+          c.strokeStyle = "#6b757e"; c.lineWidth = 3; c.beginPath(); c.moveTo(470, tr.y-5); c.lineTo(540, tr.y-5); c.stroke();
+          zTxt(c, tr.T + " °C", 230, tr.y - 2, {a:"right", c:ZCOL.amber, s:12, w:600});
+          zTxt(c, "→ " + tr.n, 548, tr.y - 1, {a:"left", c:ZCOL.txt, s:12.5, w:600});
+        });
+        zTxt(c, "↑ Gas", 355, 12, {c:COL.gas, s:12, w:600, b:"top"});
+        zTxt(c, "kühler", 120, 40, {c:"#6cb6ff", s:11.5});
+        zTxt(c, "heißer", 120, 360, {c:ZCOL.red, s:11.5});
+        c.strokeStyle = "#31383e"; c.lineWidth = 2; c.beginPath(); c.moveTo(120, 50); c.lineTo(120, 344); c.stroke();
+        zTxt(c, "Dampf aus dem Ofen ↑", 230, 372, {a:"right", s:11.5, c:ZCOL.dim});
+        c.save(); c.beginPath(); c.rect(242, 0, 228, 372); this.trays.forEach(tr=> c.rect(470, tr.y-14, 66, 14)); c.clip();
+        this.m.forEach(m=> zChain(c, m.n, m.x, m.y, m.a, fracCol(m.bp), m.st === "liq" ? 1 : 0.85));
+        c.restore();
+      }
+    },
+
+    vac: {
+      title: "Vakuumdestillation – Sieden bei vermindertem Druck",
+      text: "Die langen Moleküle im Rückstand würden bei Normaldruck erst oberhalb von 400 °C sieden und sich dabei zersetzen. Senkt man den Druck, sind über der Flüssigkeit kaum noch Gasteilchen, die die Moleküle zurückdrängen: Schon bei niedrigerer Temperatur können sie die Flüssigkeit verlassen. Die Siedetemperatur sinkt.",
+      note: "Links und rechts herrscht dieselbe Temperatur. Graue Punkte: Gasteilchen über der Flüssigkeit. Die langen Moleküle (über 25 C-Atome) sind verkürzt gezeichnet.",
+      init(){
+        this.box = [{x:30, w:315, n:70, esc:false}, {x:375, w:315, n:6, esc:true}];
+        this.box.forEach(b=>{
+          b.g = []; for(let i=0;i<b.n;i++) b.g.push({x:rnd(b.x+8, b.x+b.w-8), y:rnd(78, 262), vx:rnd(-1,1)*140, vy:rnd(-1,1)*140});
+          b.j = []; for(let i=0;i<5;i++) b.j.push({x: b.x + 45 + i*56, y: 296, n: 9 + Math.floor(rnd(0,3)), ph: rnd(0, 3), a: rnd(-0.3, 0.3), up:0});
+          b.liq = []; for(let i=0;i<10;i++) b.liq.push({x: b.x + 30 + (i%5)*62 + rnd(-6,6), y: i < 5 ? 304 : 320, n: 9 + Math.floor(rnd(0,3)), a: rnd(-0.2,0.2)});
+        });
+      },
+      draw(c, t, dt){
+        this.box.forEach(b=>{
+          c.strokeStyle = "#6b757e"; c.lineWidth = 2.5; c.beginPath();
+          c.moveTo(b.x, 66); c.lineTo(b.x, 332); c.lineTo(b.x+b.w, 332); c.lineTo(b.x+b.w, 66); c.stroke();
+          if(!b.esc){ c.beginPath(); c.moveTo(b.x, 66); c.lineTo(b.x+b.w, 66); c.stroke(); }
+          c.fillStyle = "rgba(166,138,109,.22)"; c.fillRect(b.x+2, 286, b.w-4, 44);
+          b.liq.forEach(l=> zChain(c, l.n, l.x + Math.sin(t*2 + l.y)*1.2, l.y, l.a, COL.hvy, .8));
+          b.g.forEach(g=>{
+            g.x += g.vx*dt; g.y += g.vy*dt;
+            if(g.x < b.x+5 || g.x > b.x+b.w-5) g.vx *= -1;
+            if(g.y < 72 || g.y > 280) g.vy *= -1;
+            g.x = clamp(g.x, b.x+5, b.x+b.w-5); g.y = clamp(g.y, 72, 280);
+            c.beginPath(); c.arc(g.x, g.y, 3.2, 0, Math.PI*2); c.fillStyle = "#8a9299"; c.fill();
+          });
+          b.j.forEach(m=>{
+            m.ph += dt;
+            if(!b.esc){
+              const k = (m.ph % 3)/3, h = Math.sin(Math.min(k*2,1)*Math.PI)*45;
+              m.y = 290 - h;
+            } else {
+              m.y -= (m.ph > 0.5 ? 75 : 0)*dt;
+              if(m.y < 40){ m.y = 296; m.ph = rnd(-1.5, 0); }
+            }
+            zChain(c, m.n, m.x, m.y, m.a + Math.sin(t*3 + m.x)*0.15, COL.hvy, 1);
+          });
+        });
+        zTxt(c, "Normaldruck · 1013 hPa", 187, 30, {c:ZCOL.txt, w:600, s:13});
+        zTxt(c, "gleiche Temperatur: ≈ 380 °C", 187, 48, {c:ZCOL.amber, s:11.5});
+        zTxt(c, "Vakuum · ≈ 30 hPa", 532, 30, {c:ZCOL.txt, w:600, s:13});
+        zTxt(c, "gleiche Temperatur: ≈ 380 °C", 532, 48, {c:ZCOL.amber, s:11.5});
+        zTxt(c, "Moleküle werden zurückgedrängt – kein Sieden", 187, 356, {s:11.5});
+        zTxt(c, "Moleküle verdampfen → Vakuumgasöl", 532, 356, {s:11.5, c:ZCOL.teal});
+        zTxt(c, "↑", 532, 62, {s:18, c:ZCOL.teal, w:700});
+      }
+    },
+
+    crk: {
+      title: "Katalytischer Cracker – Spaltung im Reaktor, Regeneration im Regenerator",
+      text: "Ein langes Alkanmolekül trifft auf die Oberfläche des Zeolith-Katalysators. An einem aktiven Zentrum bricht eine C–C-Bindung. Ein H-Atom wechselt vom einen Bruchstück zum anderen: Es entstehen ein kürzeres Alkan und ein Alken mit C=C-Doppelbindung. Die Produkte lösen sich vom Katalysator. Die Kette kann an verschiedenen Stellen brechen; bei diesen Spaltungen entsteht kein Koks. Koks (fast reiner Kohlenstoff) bildet sich in einer Nebenreaktion: Lagern sich Alkene erneut an, können sie ihren gesamten Wasserstoff abgeben – zurück bleibt Kohlenstoff, der das aktive Zentrum blockiert. Bild im Bild: Sobald Koks entstanden ist, gelangt er mit dem Katalysator in den Regenerator (der Koks „fliegt“ in das Bild im Bild). Dort verbrennt der Koks bei etwa 700 °C mit dem Sauerstoff der Luft zu Kohlenstoffdioxid. Ohne Koks fliegen die O₂-Moleküle nur umher, ohne zu reagieren – das aktive Zentrum ist wieder frei, und der heiße Katalysator kehrt in den Reaktor zurück.",
+      eq: "Spaltungen: C₁₀H₂₂ → C₅H₁₂ + C₅H₁₀ | C₇H₁₆ + C₃H₆ | C₈H₁₈ + C₂H₄   ·   Koksbildung: C₃H₆ → 3 C + 3 H₂   ·   Regenerator: C + O₂ → CO₂",
+      note: "Ablauf: drei Spaltungen von Decan, danach die Nebenreaktion Koksbildung. Rot gestrichelt: die Bindung, die bricht · orange: das H-Atom, das übertragen wird · dunkle C-Atome: Koks · blau: abgespaltener Wasserstoff · rot: Sauerstoffatome.",
+      L: 8.5,
+      init(){ this.assigned = false; this.o2 = []; for(let i=0;i<6;i++) this.o2.push({x:rnd(30,290), y:rnd(25,165), vx:rnd(-1,1)*45, vy:rnd(-1,1)*45, a:rnd(0,6.3), va:rnd(-1,1)*1.5}); this.lastT = 0; },
+      // Katalysatoroberfläche mit aktivem Zentrum
+      surface(c, x0, w, y, siteX, glow, blocked, label){
+        c.fillStyle = "#13201f"; c.fillRect(x0, y, w, 80);
+        c.save(); c.beginPath(); c.rect(x0, y, w, 80); c.clip();
+        for(let x = x0 + 10; x < x0 + w + 20; x += 34) for(let yy = y + 12; yy < y + 80; yy += 30){
+          const ox = ((yy - y - 12)/30 % 2) ? 17 : 0;
+          c.beginPath(); for(let k=0;k<6;k++){ const a = Math.PI/3*k; const px = x+ox+11*Math.cos(a), py = yy+11*Math.sin(a); k ? c.lineTo(px,py) : c.moveTo(px,py); } c.closePath();
+          c.strokeStyle = "rgba(79,209,197,.35)"; c.lineWidth = 1.2; c.stroke();
+        }
+        c.restore();
+        c.strokeStyle = "#4fd1c5"; c.lineWidth = 2; c.beginPath(); c.moveTo(x0, y); c.lineTo(x0 + w, y); c.stroke();
+        const rg = c.createRadialGradient(siteX, y, 2, siteX, y, 40);
+        rg.addColorStop(0, "rgba(255,180,84," + (0.8*glow) + ")"); rg.addColorStop(1, "rgba(255,180,84,0)");
+        c.fillStyle = rg; c.beginPath(); c.arc(siteX, y, 40, 0, Math.PI*2); c.fill();
+        if(label) zTxt(c, blocked ? "aktives Zentrum (blockiert)" : "aktives Zentrum", siteX, y + 22, {s:10.5, c: blocked ? ZCOL.dim : ZCOL.amber, al:.9});
+      },
+      coke(c, sx, y, al){
+        const P = [[sx - 22, y - 11], [sx, y - 16], [sx + 22, y - 11]];
+        zBond(c, P[0][0], P[0][1], P[1][0], P[1][1], {al, col:"#55606a"}); zBond(c, P[1][0], P[1][1], P[2][0], P[2][1], {al, col:"#55606a"});
+        P.forEach(([x, yy])=>{ zAtom(c, x, yy, "C", al); c.beginPath(); c.arc(x, yy, 8, 0, Math.PI*2); c.fillStyle = "rgba(20,20,20," + (0.55*al) + ")"; c.fill(); });
+        return P;
+      },
+      draw(c, t){
+        const SX = 290;
+        const VAR = [
+          {k:4, a:"Pentan", b:"Pent-1-en", f:"C₁₀H₂₂ → C₅H₁₂ + C₅H₁₀"},
+          {k:6, a:"Heptan", b:"Propen", f:"C₁₀H₂₂ → C₇H₁₆ + C₃H₆"},
+          {k:7, a:"Octan", b:"Ethen", f:"C₁₀H₂₂ → C₈H₁₈ + C₂H₄"}
+        ];
+        const LV = 6.4, LK = 9.0, L = VAR.length*LV + LK;
+        const T = t % L, vi = Math.floor(T / LV);
+        const cokeMode = vi >= VAR.length;
+        const u = cokeMode ? T - VAR.length*LV : T % LV;
+        // aktives Zentrum: leuchtet beim Spalten, erlischt erst, wenn Koks entstanden ist
+        let glow = 0.25, blocked = false;
+        if(!cokeMode) glow = (u > 1.3 && u < 3.0) ? 0.5 + 0.5*Math.sin(u*10) : 0.25;
+        else { blocked = u > 4.6 && u < 7.0; glow = blocked ? 0.04 : (u > 1.4 && u < 4.6 ? 0.4 + 0.3*Math.sin(u*10) : 0.25); }
+        this.surface(c, 0, ZW, 300, SX, glow, blocked, true);
+        zTxt(c, "Reaktor · ≈ 500 °C · Zeolith-Katalysator", 14, ZH - 8, {a:"left", s:11.5, c:ZCOL.dim});
+
+        if(!cokeMode){
+          const V = VAR[vi], k = V.k;
+          const M = fullChain(10, 0, 0, 32);
+          const pA = ph(u, 0, 1.3), pC = ph(u, 2.2, 3.0), pD = ph(u, 3.2, 5.2), fade = 1 - ph(u, 5.5, 6.3);
+          const baseX = SX, baseY = lerp(60, 262, pA);
+          const off = i => i <= k ? {x: -18*pC - 90*pD, y: -150*pD} : {x: 18*pC, y: -150*pD};
+          const mv = M.H[(k+2) + "d"];                     // dieses H-Atom wird übertragen
+          const A = M.A.map((a, idx)=>{
+            const ci = a.el === "C" ? idx : a.c, o = off(ci);
+            let x = baseX + a.x + o.x, y = baseY + a.y + o.y;
+            if(idx === mv){
+              const sx = baseX + M.A[M.C[k+2]].x, sy = baseY + 20;
+              const tx = baseX + M.A[M.C[k]].x + 20 + off(k).x, ty = baseY + off(k).y;
+              x = lerp(sx, tx, pC); y = lerp(sy, ty, pC) - Math.sin(pC*Math.PI)*34;
+            }
+            return {x, y, el: a.el, al: fade};
+          });
+          const B = M.B.map(([i,j,o])=>{
+            if(i === M.C[k] && j === M.C[k+1]) return [i, j, {col: ZCOL.red, dash: true, al: (u < 2.2 ? (u > 1.3 ? 0.5 + 0.5*Math.sin(u*14) : 1) : 0)*fade, w: 2.6}];
+            if(j === mv) return pC <= 0 ? [i, j, {al: fade, w: 1.6}] : [M.C[k], j, {al: (pC >= 1 ? 1 : 0)*fade, w: 1.8, col: ZCOL.amber}];
+            if(i === M.C[k+1] && j === M.C[k+2]) return [i, j, {ord: pC > 0.7 ? 2 : 1, al: fade, col: pC > 0.7 && pD < 0.5 ? ZCOL.amber : undefined}];
+            return [i, j, Object.assign({}, o, {al: fade})];
+          });
+          zMol(c, A, B);
+          c.save(); c.globalAlpha = fade; c.beginPath(); c.arc(A[mv].x, A[mv].y, 7.5, 0, Math.PI*2); c.strokeStyle = ZCOL.amber; c.lineWidth = 2; c.stroke(); c.restore();
+          if(u < 2.2) zTxt(c, "Decan (C₁₀H₂₂)", baseX, baseY - 40, {c:ZCOL.txt, w:600, s:13, al: fade});
+          if(pD > 0.3){
+            const al = ph(u, 3.8, 4.5)*fade;
+            const c1 = SX + (k/2 - 4.5)*32 - 18 - 90, c2 = SX + ((k + 10)/2 - 4.5)*32 + 18;
+            zTxt(c, V.a + " – ein Alkan", c1, 72, {c:ZCOL.txt, w:600, s:13, al});
+            zTxt(c, V.b + " – ein Alken", Math.min(c2, 410), 72, {c:ZCOL.txt, w:600, s:13, al});
+            zTxt(c, "C=C", SX + (k + 1.5 - 4.5)*32 + 18*pC, baseY - 150*pD + 42, {c:ZCOL.amber, s:11.5, w:600, al: ph(u, 4.4, 5.0)*fade});
+          }
+          const step = u < 1.3 ? "Molekül trifft auf den Katalysator" : u < 2.2 ? "Anlagerung am aktiven Zentrum" : u < 3.2 ? "C–C-Bindung bricht, H-Atom wird übertragen" : "Alkan und Alken lösen sich ab – kein Koks";
+          zTxt(c, "Spaltung " + (vi + 1) + " von 3 · " + step, 14, 22, {a:"left", c:ZCOL.amber, s:12.5, w:600});
+          zTxt(c, V.f + "   (die Bindung kann an verschiedenen Stellen brechen)", 14, 40, {a:"left", c:ZCOL.dim, s:11.5});
+        } else {
+          // Nebenreaktion: Koksbildung aus einem Alken (Propen gibt seinen Wasserstoff ab)
+          const pA = ph(u, 0, 1.4);
+          const M = fullChain(3, 0, 0, 32);
+          const drop = [M.H["0d"], M.H["1d"]];             // Propen: C1 und C2 haben je ein H weniger
+          const baseX = SX, baseY = lerp(60, 262, pA);
+          const pairs = [[M.H["0l"], M.H["0u"]], [M.H["1u"], M.H["2u"]], [M.H["2d"], M.H["2r"]]];
+          const pairOf = {}; pairs.forEach((p, i)=> p.forEach(h=> pairOf[h] = i));
+          const cokeP = [[SX - 22, 289], [SX, 284], [SX + 22, 289]];
+          const pSink = ph(u, 1.6, 4.4), dark = ph(u, 2.0, 4.8);
+          const A = M.A.map((a, idx)=>{
+            if(drop.includes(idx)) return null;
+            if(a.el === "C"){
+              const x0 = baseX + a.x, y0 = baseY + a.y;
+              return {x: lerp(x0, cokeP[idx][0], pSink), y: lerp(y0, cokeP[idx][1], pSink), el:"C"};
+            }
+            const pi = pairOf[idx], t0 = 1.6 + pi*0.9;
+            const pL = ph(u, t0, t0 + 0.8), pU = ph(u, t0 + 0.8, t0 + 2.2);
+            const x0 = baseX + a.x, y0 = baseY + a.y;
+            const side = pairs[pi][0] === idx ? -1 : 1;
+            const tx = SX - 110 + pi*110 + side*9, ty = 190 - 120*pU;
+            return {x: lerp(x0, tx, pL), y: lerp(y0, ty, pL), el:"H", al: 1 - ph(u, t0 + 1.6, t0 + 2.2), pL, pi};
+          });
+          const B = [];
+          B.push([0, 1, {ord:2, al: 1 - pSink}]); B.push([1, 2, {al: 1 - pSink*0.4}]);
+          if(pSink > 0.5) B.push([0, 1, {al: 1, col:"#55606a"}]);
+          A.forEach((a, idx)=>{ if(a && a.el === "H"){ if(a.pL <= 0) B.push([M.A[idx].c, idx, {w:1.6}]); } });
+          pairs.forEach(([h1, h2])=>{ if(A[h1] && A[h1].pL >= 1) B.push([h1, h2, {w:2.2, col:"#9fd3ff", al: A[h1].al}]); });
+          if(u < 6.0){
+            zMol(c, A, B);
+            [0,1,2].forEach(i=>{ const a = A[i]; c.beginPath(); c.arc(a.x, a.y, 8, 0, Math.PI*2); c.fillStyle = "rgba(20,20,20," + (0.55*dark) + ")"; c.fill(); });
+          }
+          this.flyU = u;
+          if(u < 1.6) zTxt(c, "Propen (C₃H₆) lagert sich erneut an", baseX, baseY - 32, {c:ZCOL.txt, w:600, s:13});
+          if(u > 2.3 && u < 5.6) zTxt(c, "3 H₂", SX, 128 - ph(u, 2.4, 5.0)*60, {c:"#9fd3ff", w:600, s:13, al: 1 - ph(u, 5.0, 5.6)});
+          if(u > 4.8 && u < 6.4) zTxt(c, "Koks (Kohlenstoff) bleibt zurück – aktives Zentrum blockiert", SX, 252, {c:ZCOL.dim, s:11.5, w:600, al: ph(u, 4.8, 5.3)*(1 - ph(u, 6.0, 6.4))});
+          if(u > 5.4 && u < 8.6) zTxt(c, "→ der Koks gelangt mit dem Katalysator in den Regenerator", SX, 234, {c:"#c4a785", s:11.5, w:600, al: ph(u, 5.4, 5.8)*(1 - ph(u, 8.0, 8.6))});
+          const step = u < 1.6 ? "Alken trifft erneut auf den Katalysator" : u < 4.6 ? "Wasserstoff wird abgespalten" : u < 6.0 ? "Koks bleibt auf dem aktiven Zentrum zurück" : "Koks wandert in den Regenerator (Bild im Bild)";
+          zTxt(c, "Nebenreaktion: Koksbildung · " + step, 14, 22, {a:"left", c:ZCOL.red, s:12.5, w:600});
+          zTxt(c, "C₃H₆ → 3 C + 3 H₂   (nur hier entsteht Koks)", 14, 40, {a:"left", c:ZCOL.dim, s:11.5});
+        }
+        // Zeit, seit der verkokte Katalysator in den Regenerator gelangt ist (nur wenn vorher Koks entstanden ist)
+        const tReg = VAR.length*LV + 7.2;
+        const rT = t < tReg ? null : ((t - tReg) % L);
+        this.pip(c, t, rT !== null && rT < 7.0 ? rT : null);
+        // Koks fliegt aus dem Reaktor in das Bild im Bild
+        if(cokeMode && u > 6.0 && u < 7.2){
+          const G = this.pipGeo(), p = ph(u, 6.0, 7.2), s0 = lerp(1, G.sc, p);
+          const from = [[SX - 22, 289], [SX, 284], [SX + 22, 289]];
+          const to = [[G.SX - 22, G.SY - 11], [G.SX, G.SY - 16], [G.SX + 22, G.SY - 11]].map(([x, y])=> [G.X + x*G.sc, G.Y + y*G.sc]);
+          const Q = from.map((f, i)=> [lerp(f[0], to[i][0], p), lerp(f[1], to[i][1], p) - Math.sin(p*Math.PI)*90]);
+          zBond(c, Q[0][0], Q[0][1], Q[1][0], Q[1][1], {col:"#55606a"}); zBond(c, Q[1][0], Q[1][1], Q[2][0], Q[2][1], {col:"#55606a"});
+          Q.forEach(([x, y])=>{ c.save(); c.translate(x, y); c.scale(s0, s0); zAtom(c, 0, 0, "C"); c.beginPath(); c.arc(0, 0, 8, 0, Math.PI*2); c.fillStyle = "rgba(20,20,20,.55)"; c.fill(); c.restore(); });
+          // Flugbahn andeuten
+          c.save(); c.strokeStyle = "rgba(196,167,133,.45)"; c.lineWidth = 1.5; c.setLineDash([4,5]);
+          c.beginPath(); c.moveTo(SX, 284); c.quadraticCurveTo((SX + to[1][0])/2, Math.min(284, to[1][1]) - 120, to[1][0], to[1][1]); c.stroke(); c.restore();
+        }
+      },
+      // Bild im Bild: Regenerator – O2 fliegt immer umher, reagiert nur mit angekommenem Koks
+      pipGeo(){ const X = 478, Y = 44, W = 234, IW = 320; return {X, Y, W, H:192, IW, sc: W/IW, SX:160, SY:196}; },
+      pip(c, t, rT){
+        const G = this.pipGeo(), {X, Y, W, H, IW, sc, SX, SY} = G;
+        const dt = Math.max(0, Math.min(0.05, t - (this.lastT || 0))); this.lastT = t;
+        const regen = rT !== null, u = regen ? rT : 0;
+        const P = [[SX - 22, SY - 11], [SX, SY - 16], [SX + 22, SY - 11]];
+        // Zuordnung: die drei nächstgelegenen O2-Moleküle reagieren mit den Koks-Atomen
+        if(regen && !this.assigned){
+          this.assigned = true;
+          P.forEach(([x, y], i)=>{
+            let best = null, bd = 1e9;
+            this.o2.forEach(o=>{ if(o.busy === undefined){ const d = Math.hypot(o.x - x, o.y - y); if(d < bd){ bd = d; best = o; } } });
+            if(best){ best.busy = i; best.sx = best.x; best.sy = best.y; best.sa = best.a; }
+          });
+        }
+        if(!regen && this.assigned){
+          this.assigned = false;
+          this.o2.forEach(o=>{ if(o.busy !== undefined){ o.busy = undefined; o.x = rnd(30, IW - 30); o.y = 20; o.vy = Math.abs(o.vy) || 30; o.fade = 0; } });
+        }
+        c.save();
+        rr(c, X, Y, W, H, 6); c.fillStyle = "#211815"; c.fill();
+        c.clip();
+        c.translate(X, Y); c.scale(sc, sc);
+        const active = !regen || u > 4.8;
+        const glow = !regen ? 0.3 + 0.15*Math.sin(t*3) : (active ? 0.55 + 0.45*Math.sin(u*8) : 0.04);
+        this.surface(c, 0, IW, SY, SX, glow, !active, false);
+        // frei fliegende O2-Moleküle
+        this.o2.forEach(o=>{
+          if(o.busy !== undefined) return;
+          o.x += o.vx*dt; o.y += o.vy*dt; o.a += o.va*dt;
+          if(o.x < 18 || o.x > IW - 18) o.vx *= -1;
+          if(o.y < 18 || o.y > SY - 22) o.vy *= -1;
+          o.x = clamp(o.x, 18, IW - 18); o.y = clamp(o.y, 18, SY - 22);
+          if(o.fade === undefined) o.fade = 1; o.fade = Math.min(1, o.fade + dt*1.5);
+          const dx = Math.cos(o.a)*9, dy = Math.sin(o.a)*9;
+          zBond(c, o.x - dx, o.y - dy, o.x + dx, o.y + dy, {ord:2, col:"#f2a08f", al:o.fade});
+          zAtom(c, o.x - dx, o.y - dy, "O", o.fade); zAtom(c, o.x + dx, o.y + dy, "O", o.fade);
+        });
+        if(regen){
+          P.forEach(([x, y], i)=>{
+            const o = this.o2.find(q=> q.busy === i);
+            const t0 = 0.2 + i*1.5;
+            const pO = ph(u, t0, t0 + 1.2), pX = ph(u, t0 + 1.2, t0 + 1.6), pF = ph(u, t0 + 1.6, t0 + 3.2);
+            const fx = x + (i - 1)*85*pF, fy = y - 150*pF, al = 1 - ph(u, t0 + 2.6, t0 + 3.2);
+            if(i < 2 && u < t0 + 1.2) zBond(c, x, y, P[i+1][0], P[i+1][1], {col:"#55606a"});
+            if(o && al > 0.01){
+              const ox = lerp(o.sx, x, pO), oy = lerp(o.sy, y - 26, pO), an = lerp(o.sa, 0, pO);
+              const dx = Math.cos(an)*9, dy = Math.sin(an)*9;
+              const o1 = {x: lerp(ox - dx, fx - 22, pX), y: lerp(oy - dy, fy, pX)}, o2 = {x: lerp(ox + dx, fx + 22, pX), y: lerp(oy + dy, fy, pX)};
+              if(pX < 0.5) zBond(c, o1.x, o1.y, o2.x, o2.y, {ord:2, al:(1 - pX*2)*al, col:"#f2a08f"});
+              if(pX > 0.5){ zBond(c, o1.x, o1.y, fx, fy, {ord:2, al}); zBond(c, fx, fy, o2.x, o2.y, {ord:2, al}); }
+              zAtom(c, o1.x, o1.y, "O", al); zAtom(c, o2.x, o2.y, "O", al);
+              if(pO > 0 && pO < 1) { c.beginPath(); c.arc(ox, oy, 16, 0, Math.PI*2); c.strokeStyle = "rgba(242,160,143,.6)"; c.lineWidth = 1.5; c.setLineDash([3,3]); c.stroke(); c.setLineDash([]); }
+              if(pF > 0.25 && pF < 0.95) zTxt(c, "CO₂", fx, fy - 15, {c:ZCOL.txt, w:600, s:13, al});
+            }
+            if(al > 0.01){ zAtom(c, fx, fy, "C", al); c.beginPath(); c.arc(fx, fy, 8, 0, Math.PI*2); c.fillStyle = "rgba(20,20,20," + (0.55*(1 - pX)*al) + ")"; c.fill(); }
+          });
+          if(active) zTxt(c, "aktives Zentrum wieder frei", SX, SY + 30, {c:ZCOL.amber, s:13, w:600, al: ph(u, 4.8, 5.2)});
+          else zTxt(c, "Koks verbrennt", SX, SY + 30, {c:ZCOL.red, s:13, w:600});
+        } else {
+          zTxt(c, "kein Koks – O₂ reagiert nicht", SX, SY + 32, {c:ZCOL.dim, s:13, w:600});
+        }
+        c.restore();
+        rr(c, X, Y, W, H, 6); c.strokeStyle = ZCOL.red; c.lineWidth = 1.6; c.stroke();
+        zTxt(c, "Bild im Bild: Regenerator · ≈ 700 °C", X + 2, Y - 7, {a:"left", c:ZCOL.red, s:11.5, w:600});
+        zTxt(c, regen ? "C + O₂ → CO₂" : "Luft: O₂ strömt hindurch", X + W - 8, Y + H - 8, {a:"right", c:ZCOL.txt, s:11.5, w:600});
+      }
+    },
+
+    ref: {
+      title: "Reformer – mehr Klopffestigkeit durch Umbau der Moleküle",
+      text: "Am Platin-Katalysator werden die Moleküle des Schwerbenzins umgebaut, ohne dass sich die Zahl der C-Atome ändert. Nacheinander sind vier typische Reaktionen zu sehen: Aus Cycloalkanen werden durch Abspaltung von Wasserstoff Aromaten (Benzol, Toluol). Kettenförmige Alkane schließen sich zum Ring und werden ebenfalls zu Aromaten. Unverzweigte Alkane werden zu verzweigten Isomeren umgelagert. Alle Produkte haben eine deutlich höhere Oktanzahl. Der abgespaltene Wasserstoff wird in der Entschwefelung gebraucht.",
+      eq: "C₆H₁₂ → C₆H₆ + 3 H₂  ·  C₇H₁₄ → C₇H₈ + 3 H₂  ·  C₇H₁₆ → C₇H₈ + 4 H₂  ·  n-C₆H₁₄ → iso-C₆H₁₄",
+      note: "Ablauf: vier Reaktionen nacheinander. Orange: neu geknüpfte Bindung · rot gestrichelt: Bindung, die bricht · blau: abgespaltener Wasserstoff (H₂).",
+      init(){},
+      VARS: [
+        {L:7.6, name:"Cyclohexan → Benzol", kind:"Dehydrierung", fn:"ring", methyl:false, from:"Cyclohexan (C₆H₁₂)", ronA:83, to:"Benzol (C₆H₆) – ein Aromat", ronB:"≈ 100", h2:3},
+        {L:7.6, name:"Methylcyclohexan → Toluol", kind:"Dehydrierung", fn:"ring", methyl:true, from:"Methylcyclohexan (C₇H₁₄)", ronA:75, to:"Toluol (C₇H₈) – ein Aromat", ronB:"≈ 120", h2:3},
+        {L:9.5, name:"Heptan → Toluol", kind:"Ringschluss + Dehydrierung", fn:"heptane", ronA:0, ronB:"≈ 120"},
+        {L:7.6, name:"Hexan → 2-Methylpentan", kind:"Isomerisierung", fn:"iso", ronA:25, ronB:73}
+      ],
+      draw(c, t){
+        const tot = this.VARS.reduce((s,v)=> s + v.L, 0);
+        let T = t % tot, vi = 0;
+        while(T >= this.VARS[vi].L){ T -= this.VARS[vi].L; vi++; }
+        const V = this.VARS[vi];
+        zSurface(c, 338, ["#aeb6bc", "#c9d0d5"], "Platin-Katalysator · ≈ 500 °C");
+        const step = V.fn === "ring" ? this.ring(c, T, V) : V.fn === "iso" ? this.iso(c, T, V) : this.heptane(c, T);
+        zTxt(c, "Produkt " + (vi + 1) + " von 4 · " + V.kind + ": " + step, 14, 22, {a:"left", c:ZCOL.amber, s:12.5, w:600});
+        zTxt(c, V.name + "   ·   Oktanzahl (ROZ): " + V.ronA + " → " + V.ronB, 14, 40, {a:"left", c:ZCOL.dim, s:11.5});
+      },
+      // Cycloalkan → Aromat (Dehydrierung)
+      ring(c, u, V){
+        const pA = ph(u, 0, 1.4), pAr = ph(u, 3.6, 4.2), pE = ph(u, 4.8, 6.6), fade = 1 - ph(u, 6.7, 7.5);
+        const R = 28, cx = 360, cy = 252 + lerp(-200, 0, pA) - 150*pE, DEG = Math.PI/180;
+        const out = [-150, 150, 90, 30, -30, -90];
+        const Cp = out.map(a=> ({x: cx + R*Math.cos(a*DEG), y: cy + R*Math.sin(a*DEG)}));
+        const A = Cp.map(p=> ({x:p.x, y:p.y, el:"C", al:fade})), B = [];
+        for(let i=0;i<6;i++) B.push([i, (i+1)%6, {al:fade}]);
+        if(V.methyl){
+          A.push({x: Cp[5].x, y: Cp[5].y - 28, el:"C", al:fade}); B.push([5, 6, {al:fade}]);
+          [[0,-20],[-17,-10],[17,-10]].forEach(([dx,dy])=>{ A.push({x: A[6].x + dx*(dx===0?1:1), y: A[6].y + dy, el:"H", al:fade}); B.push([6, A.length-1, {w:1.6, al:fade}]); });
+        }
+        // je Ring-C: ein H bleibt (dreht nach außen), eines wird abgespalten
+        let k = 0, last = -1;
+        out.forEach((a, ci)=>{
+          const keep = !(V.methyl && ci === 5);
+          if(keep){
+            const ang = lerp(a - 34, a, pAr)*DEG;
+            A.push({x: Cp[ci].x + 20*Math.cos(ang), y: Cp[ci].y + 20*Math.sin(ang), el:"H", al:fade}); B.push([ci, A.length-1, {w:1.6, al:fade}]);
+          }
+          const angL = (V.methyl && ci === 5) ? (a + 38)*DEG : (a + 34)*DEG;
+          const pair = Math.floor(k/2), side = k % 2, t0 = 1.6 + pair*0.6;
+          const pL = ph(u, t0, t0 + 0.7), pU = ph(u, t0 + 0.7, t0 + 2.4);
+          const sx = Cp[ci].x + 20*Math.cos(angL), sy = Cp[ci].y + 20*Math.sin(angL);
+          const tx = 280 + pair*80 + (side ? 10 : -10), ty = 150 - 100*pU;
+          const alH = 1 - ph(u, t0 + 1.9, t0 + 2.5);
+          A.push({x: lerp(sx, tx, pL), y: lerp(sy, ty, pL), el:"H", al: alH}); const idx = A.length - 1;
+          if(pL <= 0) B.push([ci, idx, {w:1.6, al:fade}]);
+          if(side === 1 && pL >= 1) B.push([last, idx, {w:2.2, col:"#9fd3ff", al: alH}]);
+          last = idx; k++;
+        });
+        zMol(c, A, B);
+        if(pAr > 0){ c.globalAlpha = pAr*fade; c.beginPath(); c.arc(cx, cy, 14, 0, Math.PI*2); c.strokeStyle = "#8d969d"; c.lineWidth = 2; c.stroke(); c.globalAlpha = 1; }
+        if(u > 2.2 && u < 4.6) zTxt(c, V.h2 + " H₂", 360, 128 - ph(u, 2.2, 4.0)*60, {c:"#9fd3ff", w:600, s:13, al: 1 - ph(u, 4.0, 4.6)});
+        if(u < 2.0) zTxt(c, V.from, cx, cy + 76, {c:ZCOL.txt, w:600, s:13});
+        if(u > 3.8) zTxt(c, V.to, cx, cy + 76, {c:ZCOL.txt, w:600, s:13, al: ph(u, 3.8, 4.3)*fade});
+        return u < 1.6 ? "Molekül lagert sich am Platin an" : u < 3.6 ? "Wasserstoff wird abgespalten (" + V.h2 + " H₂)" : u < 4.8 ? "aromatischer Ring entsteht" : "Aromat löst sich ab";
+      },
+      // Isomerisierung: n-Hexan → 2-Methylpentan
+      iso(c, u, V){
+        const pA = ph(u, 0, 1.4), pM = ph(u, 2.4, 4.0), pE = ph(u, 4.8, 6.6), fade = 1 - ph(u, 6.7, 7.5);
+        const d = 30, y0 = 256 + lerp(-200, 0, pA) - 150*pE;
+        const N = V.n || 6, E = N - 1, Q = N - 2;
+        const M = fullChain(N, 360, y0, d);
+        // C6 (Index 5) mit seinen drei H wandert an C2 (Index 1); das obere H von C2 wandert an das neue Kettenende C5 (Index 4)
+        const tgt = {x: M.A[1].x, y: y0 - 30};
+        const mvH = M.H["1u"];
+        const A = M.A.map((a, idx)=>{
+          let x = a.x, y = a.y;
+          if(idx === E){ x = lerp(a.x, tgt.x, pM); y = lerp(a.y, tgt.y, pM) - Math.sin(pM*Math.PI)*40; }
+          else if(a.el === "H" && a.c === E){
+            const end = a.dx > 0 ? {dx:17, dy:-10} : a.dy < 0 ? {dx:0, dy:-20} : {dx:-17, dy:-10};
+            const cx = lerp(M.A[E].x, tgt.x, pM), cy = lerp(M.A[E].y, tgt.y, pM) - Math.sin(pM*Math.PI)*40;
+            x = cx + lerp(a.dx, end.dx, pM); y = cy + lerp(a.dy, end.dy, pM);
+          } else if(idx === mvH){
+            const sx = M.A[1].x, sy = y0 - 20, tx = M.A[Q].x + 20, ty = y0;
+            x = lerp(sx, tx, pM); y = lerp(sy, ty, pM) - Math.sin(pM*Math.PI)*60;
+          }
+          return {x, y, el: a.el, al: fade};
+        });
+        const B = M.B.map(([i, j, o])=>{
+          if(i === Q && j === E) return [i, j, {col: ZCOL.red, dash: true, w: 2.6, al: (u < 2.4 ? (u > 1.5 ? 0.5 + 0.5*Math.sin(u*14) : 1) : 0)*fade}];
+          if(j === mvH) return pM <= 0 ? [i, j, {w:1.6, al:fade}] : [Q, j, {w:1.8, col: ZCOL.amber, al: (pM >= 1 ? 1 : 0)*fade}];
+          return [i, j, Object.assign({}, o, {al: fade})];
+        });
+        if(pM >= 1) B.push([1, E, {col: u < 4.8 ? ZCOL.amber : undefined, w: 2.6, al: fade}]);
+        zMol(c, A, B);
+        c.save(); c.globalAlpha = fade; c.beginPath(); c.arc(A[mvH].x, A[mvH].y, 7.5, 0, Math.PI*2); c.strokeStyle = ZCOL.amber; c.lineWidth = 2; c.stroke(); c.restore();
+        if(u < 2.4) zTxt(c, V.from || "n-Hexan (C₆H₁₄) – unverzweigt", 360, y0 + 46, {c:ZCOL.txt, w:600, s:13});
+        if(u > 4.2) zTxt(c, V.to || "2-Methylpentan (C₆H₁₄) – verzweigt", 360, y0 + 46, {c:ZCOL.txt, w:600, s:13, al: ph(u, 4.2, 4.7)*fade});
+        return u < 1.5 ? "Molekül lagert sich am Katalysator an" : u < 2.4 ? "eine C–C-Bindung wird gelöst" : u < 4.2 ? "Methylgruppe wandert, Kette wird verzweigt" : "verzweigtes Isomer löst sich ab";
+      },
+      heptane(c, u){
+        const pA = ph(u, 0, 1.4), pB = ph(u, 1.6, 3.6), pC = ph(u, 3.8, 5.0), pAr = ph(u, 5.0, 5.6), pE = ph(u, 6.2, 8.4), fade = 1 - ph(u, 8.6, 9.4);
+        const ringC = {x:360, y:252}, d = 28;
+        const yOff = lerp(-200, 0, pA) - 150*pE;
+        const DEG = Math.PI/180;
+        const th0 = lerp(0, 90, pB)*DEG, al = lerp(0, -60, pB)*DEG;
+        const P = [{x:0, y:0}]; let th = th0;
+        for(let i=1;i<6;i++){ P.push({x: P[i-1].x + d*Math.cos(th), y: P[i-1].y + d*Math.sin(th)}); th += al; }
+        const gx = P.reduce((s,p)=>s+p.x,0)/6, gy = P.reduce((s,p)=>s+p.y,0)/6;
+        const tx0 = lerp(360 - 14, ringC.x, pB), ty0 = lerp(256, ringC.y, pB);
+        const Cp = P.map(p=> ({x: p.x - gx + tx0, y: p.y - gy + ty0 + yOff}));
+        const a6 = lerp(0, -90, pB)*DEG;
+        Cp.push({x: Cp[5].x + d*Math.cos(a6), y: Cp[5].y + d*Math.sin(a6)});
+        // Richtung "nach außen" je Ring-C (Endzustand)
+        const out = [-150, 150, 90, 30, -30, -90];
+        const angL = (a, b, t) => { let dd = ((b - a + 540) % 360) - 180; return (a + dd*t)*DEG; };
+        // H-Atome: [C-Index, Startwinkel, Zielwinkel oder null (wird abgespalten)]
+        const HS = [
+          [0,180, out[0]], [0,-90,null], [0,90,null],
+          [1,-90, out[1]], [1,90,null],
+          [2,-90, out[2]], [2,90,null],
+          [3,-90, out[3]], [3,90,null],
+          [4,-90, out[4]], [4,90,null],
+          [5,-90,null], [5,90,null],
+          [6,0,-30], [6,-90,-90], [6,90,-150]
+        ];
+        const A = Cp.map(p=> ({x:p.x, y:p.y, el:"C", al:fade}));
+        const B = [];
+        for(let i=0;i<6;i++) B.push([i, i+1, {al:fade}]);
+        B.push([0, 5, {al: (pB > 0.92 ? 1 : 0)*fade, col: pAr < 1 ? ZCOL.amber : undefined, w: 2.8}]);
+        let leave = 0, lastLeave = -1;
+        HS.forEach(([ci, sa, ea])=>{
+          const C0 = Cp[ci];
+          if(ea !== null){
+            const a = angL(sa, ea, pB);
+            A.push({x: C0.x + 20*Math.cos(a), y: C0.y + 20*Math.sin(a), el:"H", al:fade}); B.push([ci, A.length-1, {w:1.6, al:fade}]);
+          } else {
+            const k = leave++, pair = Math.floor(k/2), side = k % 2;
+            // während des Ringschlusses mit der Kette mitdrehen
+            const rot = sa*DEG + th0 + Math.max(0, ci - 0.5)*al;
+            const sx = C0.x + 20*Math.cos(rot), sy = C0.y + 20*Math.sin(rot);
+            const tx = 240 + pair*80 + (side ? 10 : -10), ty = 140 - ph(u, 5.0, 7.0)*110;
+            const x = lerp(sx, tx, pC), y = lerp(sy, ty, pC);
+            const alH = 1 - ph(u, 6.4, 7.2);
+            A.push({x, y, el:"H", al: alH}); const idx = A.length-1;
+            if(pC <= 0) B.push([ci, idx, {w:1.6, al:fade}]);
+            if(side === 1 && pC >= 1) B.push([lastLeave, idx, {w:2.2, al: alH, col:"#9fd3ff"}]);
+            lastLeave = idx;
+          }
+        });
+        zMol(c, A, B);
+        if(pAr > 0){ c.globalAlpha = pAr*fade; c.beginPath(); c.arc(ringC.x, ringC.y + yOff, 14, 0, Math.PI*2); c.strokeStyle = "#8d969d"; c.lineWidth = 2; c.stroke(); c.globalAlpha = 1; }
+        if(pC >= 1 && u < 7.2) zTxt(c, "4 H₂", 360, 140 - ph(u,5.0,7.0)*110 - 18, {c:"#9fd3ff", w:600, s:13, al: 1 - ph(u,6.4,7.2)});
+        if(u < 1.8) zTxt(c, "Heptan (C₇H₁₆)", 360, 256 + yOff + 46, {c:ZCOL.txt, w:600, s:13});
+        if(u > 5.4) zTxt(c, "Toluol (C₇H₈) – ein Aromat", ringC.x, ringC.y + yOff + 76, {c:ZCOL.txt, w:600, s:13, al: ph(u,5.4,6.0)*fade});
+        return u < 1.6 ? "Heptan lagert sich am Platin an" : u < 3.8 ? "Ringschluss: aus der Kette wird ein Sechsring" : u < 5.4 ? "Wasserstoff wird abgespalten (4 H₂)" : "Toluol löst sich ab";
+      }
+    },
+
+    iso: {
+      title: "Isomerisierung – aus geraden Ketten werden verzweigte",
+      text: "Ein unverzweigtes Alkanmolekül aus dem Leichtbenzin lagert sich am Platin-Katalysator an. Eine C–C-Bindung wird gelöst, die endständige Methylgruppe wandert an das zweite C-Atom, und ein H-Atom wechselt an das neue Kettenende. Es entsteht ein verzweigtes Isomer mit derselben Summenformel. Verzweigte Moleküle sind kompakter und verbrennen im Motor gleichmäßiger – die Oktanzahl steigt deutlich.",
+      eq: "n-C₅H₁₂ → iso-C₅H₁₂ (Pentan → 2-Methylbutan)   ·   n-C₆H₁₄ → iso-C₆H₁₄ (Hexan → 2-Methylpentan)",
+      note: "Ablauf: zwei Beispiele nacheinander. Rot gestrichelt: Bindung, die gelöst wird · orange: neue Bindung und das wandernde H-Atom.",
+      init(){},
+      VARS: [
+        {L:7.6, n:5, name:"Pentan → 2-Methylbutan (Isopentan)", from:"n-Pentan (C₅H₁₂) – unverzweigt", to:"2-Methylbutan (C₅H₁₂) – verzweigt", ronA:62, ronB:93},
+        {L:7.6, n:6, name:"Hexan → 2-Methylpentan", from:"n-Hexan (C₆H₁₄) – unverzweigt", to:"2-Methylpentan (C₆H₁₄) – verzweigt", ronA:25, ronB:73}
+      ],
+      draw(c, t){
+        const tot = this.VARS.reduce((s,v)=> s + v.L, 0);
+        let T = t % tot, vi = 0;
+        while(T >= this.VARS[vi].L){ T -= this.VARS[vi].L; vi++; }
+        const V = this.VARS[vi];
+        zSurface(c, 338, ["#aeb6bc", "#c9d0d5"], "Platin-Katalysator · ≈ 150–250 °C · mit H₂");
+        const step = ZOOM.ref.iso(c, T, V);
+        zTxt(c, "Beispiel " + (vi + 1) + " von 2 · " + step, 14, 22, {a:"left", c:ZCOL.amber, s:12.5, w:600});
+        zTxt(c, V.name + "   ·   Oktanzahl (ROZ): " + V.ronA + " → " + V.ronB, 14, 40, {a:"left", c:ZCOL.dim, s:11.5});
+      }
+    },
+
+    hds: {
+      title: "Entschwefelung – Schwefel wird als H₂S entfernt",
+      text: "Schwefelhaltige Moleküle und Wasserstoff lagern sich am Co-Mo-Katalysator an. Die C–S-Bindungen brechen, Wasserstoffatome treten an ihre Stelle. Es entstehen schwefelfreie Kohlenwasserstoffe und Schwefelwasserstoff H₂S, aus dem im Claus-Verfahren elementarer Schwefel gewonnen wird.",
+      eq: "C₂H₅–S–C₂H₅ + 2 H₂ → 2 C₂H₆ + H₂S   (Diethylsulfid → Ethan + Schwefelwasserstoff)",
+      note: "Rot gestrichelt: die C–S-Bindungen, die brechen · blau: Wasserstoff aus H₂.",
+      init(){},
+      draw(c, t){
+        const L = 8.5, u = t % L;
+        zSurface(c, 338, ["#6c8fd6", "#b79cf2"], "Co-Mo-Katalysator");
+        const pA = ph(u, 0, 1.6), pC = ph(u, 2.6, 3.8), pD = ph(u, 4.0, 6.6), fade = 1 - ph(u, 7.4, 8.3);
+        const d = 30, cx = 360, cy = lerp(70, 258, pA);
+        // Atome des Diethylsulfids: C0 C1 S C3 C4
+        const xs = [-2*d, -d, 0, d, 2*d];
+        const shift = i => i < 2 ? {x: -26*pC - 150*pD, y: -170*pD} : i > 2 ? {x: 26*pC + 150*pD, y: -170*pD} : {x: 0, y: -120*pD};
+        const A = [], B = [];
+        const P = i => ({x: cx + xs[i] + shift(i).x, y: cy + shift(i).y});
+        ["C","C","S","C","C"].forEach((el,i)=>{ const p = P(i); A.push({x:p.x, y:p.y, el, al:fade}); });
+        B.push([0,1,{al:fade}]); B.push([3,4,{al:fade}]);
+        const brk = u < 2.6 ? (u > 1.6 ? 0.5 + 0.5*Math.sin(u*14) : 1) : 0;
+        B.push([1,2,{col: u > 1.6 ? ZCOL.red : undefined, dash: u > 1.6, al: brk*fade}]);
+        B.push([2,3,{col: u > 1.6 ? ZCOL.red : undefined, dash: u > 1.6, al: brk*fade}]);
+        const addH = (ci, dx, dy) => { const p = P(ci); A.push({x:p.x+dx, y:p.y+dy, el:"H", al:fade}); B.push([ci, A.length-1, {w:1.6, al:fade}]); };
+        addH(0,-20,0); addH(0,0,-20); addH(0,0,20); addH(1,0,-20); addH(1,0,20);
+        addH(4,20,0); addH(4,0,-20); addH(4,0,20); addH(3,0,-20); addH(3,0,20);
+        // zwei H2-Moleküle
+        const h2s = [{sx:110, sy:90, ex:cx-48, ey:258-56}, {sx:610, sy:90, ex:cx+48, ey:258-56}];
+        h2s.forEach((h, k)=>{
+          const bx = lerp(h.sx, h.ex, pA), by = lerp(h.sy, h.ey, pA);
+          const a1 = {x: bx - 9, y: by}, a2 = {x: bx + 9, y: by};
+          // Ziel: ein H an das C-Atom, eines an das S-Atom
+          const cAt = k === 0 ? P(1) : P(3), sAt = P(2);
+          const t1 = {x: cAt.x + (k === 0 ? 20 : -20), y: cAt.y};
+          const t2 = {x: sAt.x + (k === 0 ? -15 : 15), y: sAt.y - 14};
+          const q1 = k === 0 ? {x: lerp(a1.x, t1.x, pC), y: lerp(a1.y, t1.y, pC)} : {x: lerp(a2.x, t1.x, pC), y: lerp(a2.y, t1.y, pC)};
+          const q2 = k === 0 ? {x: lerp(a2.x, t2.x, pC), y: lerp(a2.y, t2.y, pC)} : {x: lerp(a1.x, t2.x, pC), y: lerp(a1.y, t2.y, pC)};
+          A.push({x:q1.x, y:q1.y, el:"H", al:fade}); const i1 = A.length-1;
+          A.push({x:q2.x, y:q2.y, el:"H", al:fade}); const i2 = A.length-1;
+          if(pC < 0.4) B.push([i1, i2, {col:"#9fd3ff", w:2, al:(1 - pC/0.4)*fade}]);
+          if(pC >= 1){ B.push([k === 0 ? 1 : 3, i1, {w:1.8, col: pD < 0.4 ? "#9fd3ff" : undefined, al:fade}]); B.push([2, i2, {w:1.8, col: pD < 0.4 ? "#9fd3ff" : undefined, al:fade}]); }
+        });
+        zMol(c, A, B);
+        if(u < 2.6) zTxt(c, "Diethylsulfid", cx, cy + 46, {c:ZCOL.txt, w:600, s:13, al:fade});
+        if(u < 2.4) zTxt(c, "H₂", lerp(110, cx-48, pA), lerp(90, 202, pA) - 14, {c:"#9fd3ff", w:600, s:12});
+        if(u < 2.4) zTxt(c, "H₂", lerp(610, cx+48, pA), lerp(90, 202, pA) - 14, {c:"#9fd3ff", w:600, s:12});
+        if(pD > 0.4){
+          const al = ph(u, 4.8, 5.4)*fade;
+          const e1 = P(0), e2 = P(1), e3 = P(3), e4 = P(4), sP = P(2);
+          zTxt(c, "Ethan", (e1.x + e2.x)/2, e1.y + 42, {c:ZCOL.txt, w:600, s:13, al});
+          zTxt(c, "Ethan", (e3.x + e4.x)/2, e3.y + 42, {c:ZCOL.txt, w:600, s:13, al});
+          zTxt(c, "H₂S → Claus-Verfahren → Schwefel", sP.x, sP.y + 36, {c:ZCOL.S, w:600, s:13, al});
+        }
+        const step = u < 1.6 ? "1 · Schwefelverbindung und Wasserstoff treffen auf den Katalysator" : u < 2.6 ? "2 · Anlagerung, C–S-Bindungen werden geschwächt" : u < 4.0 ? "3 · C–S-Bindungen brechen, H-Atome treten an ihre Stelle" : "4 · Ethan und Schwefelwasserstoff lösen sich ab";
+        zTxt(c, step, 14, 22, {a:"left", c:ZCOL.amber, s:12.5, w:600});
+      }
+    }
+  };
+
+  // ---------- Vergrößerung, linke Hälfte: die ganze Teilanlage ----------
+  const UW = 400, UH = 380;
+  const uCv = $("zoomUnit");
+  let uc = null;
+  function uVessel(c, x, y, w, h, r, fill){
+    rr(c, x, y, w, h, r); c.fillStyle = fill || "#171b1f"; c.fill(); c.strokeStyle = "#6b757e"; c.lineWidth = 1.8; c.stroke();
+  }
+  // Rohrleitung mit fließendem Inhalt
+  function uPipe(c, pts, col, t, o){
+    o = o || {};
+    c.lineCap = "round"; c.lineJoin = "round";
+    c.strokeStyle = "#31383e"; c.lineWidth = o.w || 8;
+    c.beginPath(); pts.forEach((p,i)=> i ? c.lineTo(p[0],p[1]) : c.moveTo(p[0],p[1])); c.stroke();
+    c.strokeStyle = col; c.lineWidth = (o.w || 8) - 4.5;
+    c.setLineDash([7, 9]); c.lineDashOffset = -t*(o.v || 34);
+    c.beginPath(); pts.forEach((p,i)=> i ? c.lineTo(p[0],p[1]) : c.moveTo(p[0],p[1])); c.stroke();
+    c.setLineDash([]); c.lineDashOffset = 0;
+    if(o.arrow){
+      const a = pts[pts.length-2], b = pts[pts.length-1], an = Math.atan2(b[1]-a[1], b[0]-a[0]);
+      c.fillStyle = col; c.beginPath();
+      c.moveTo(b[0] + 7*Math.cos(an), b[1] + 7*Math.sin(an));
+      c.lineTo(b[0] + 7*Math.cos(an + 2.4), b[1] + 7*Math.sin(an + 2.4));
+      c.lineTo(b[0] + 7*Math.cos(an - 2.4), b[1] + 7*Math.sin(an - 2.4)); c.fill();
+    }
+  }
+  function uLab(c, t, x, y, o){ zTxt(c, t, x, y, Object.assign({s:11.5}, o || {})); }
+  function uFlames(c, x0, x1, y, t, sz){
+    sz = sz || 1;
+    for(let x = x0; x <= x1; x += 18*sz){
+      const h = (11 + 6*Math.abs(Math.sin(t*6 + x*0.31)))*sz;
+      const g = c.createLinearGradient(0, y, 0, y - h);
+      g.addColorStop(0, "#ffb454"); g.addColorStop(1, "rgba(228,120,91,0)");
+      c.fillStyle = g; c.beginPath(); c.moveTo(x-6*sz, y); c.quadraticCurveTo(x, y - h*1.4, x+6*sz, y); c.fill();
+    }
+  }
+  function uBed(c, x, y, w, h, col, t){
+    c.save(); rr(c, x, y, w, h, 4); c.clip();
+    c.fillStyle = "rgba(255,255,255,.03)"; c.fillRect(x, y, w, h);
+    for(let yy = y + 5; yy < y + h; yy += 9) for(let xx = x + 5 + ((yy/9)%2 ? 4 : 0); xx < x + w; xx += 9){
+      c.beginPath(); c.arc(xx, yy, 2.6, 0, Math.PI*2); c.fillStyle = col; c.globalAlpha = .55; c.fill();
+    }
+    c.globalAlpha = 1; c.restore();
+    c.strokeStyle = "rgba(255,255,255,.15)"; c.lineWidth = 1; c.setLineDash([3,3]); c.strokeRect(x, y, w, h); c.setLineDash([]);
+  }
+  function uBubbles(c, x0, x1, y0, y1, t, col, n){
+    for(let i=0;i<n;i++){
+      const ph = (t*0.35 + i*0.137) % 1, x = x0 + ((i*37) % 100)/100*(x1-x0) + Math.sin(t*2 + i)*2;
+      const y = y1 - ph*(y1 - y0);
+      c.beginPath(); c.arc(x, y, 2.2, 0, Math.PI*2); c.fillStyle = typeof col === "function" ? col(ph) : col; c.globalAlpha = .8; c.fill();
+    }
+    c.globalAlpha = 1;
+  }
+  // Lupe mit Sichtkegel zur rechten Hälfte
+  function uLens(c, x, y, r, col, noCone){
+    col = col || "#4fd1c5";
+    c.save();
+    if(!noCone){
+    c.strokeStyle = "rgba(79,209,197,.3)"; c.lineWidth = 1.2; c.setLineDash([4,4]);
+    c.beginPath(); c.moveTo(x + r*0.6, y - r*0.8); c.lineTo(UW, 6); c.moveTo(x + r*0.6, y + r*0.8); c.lineTo(UW, UH - 6); c.stroke();
+    c.setLineDash([]);
+    }
+    c.beginPath(); c.arc(x, y, r, 0, Math.PI*2); c.fillStyle = col === "#4fd1c5" ? "rgba(79,209,197,.08)" : "rgba(228,120,91,.10)"; c.fill();
+    c.strokeStyle = col; c.lineWidth = 3; c.stroke();
+    c.lineWidth = 5; c.lineCap = "round"; c.beginPath(); c.moveTo(x - r*0.72, y + r*0.72); c.lineTo(x - r*1.15, y + r*1.15); c.stroke();
+    c.restore();
+  }
+
+  const UNITVIEW = {
+    crude(c, t){
+      // Tank mit Dach
+      uPipe(c, [[20,70],[110,70],[110,96]], COL.crude, t, {arrow:true});
+      uLab(c, "Anlieferung", 20, 60, {a:"left"});
+      uVessel(c, 100, 100, 200, 230, 8);
+      c.beginPath(); c.ellipse(200, 100, 100, 18, 0, Math.PI, 0); c.fillStyle = "#1d2226"; c.fill(); c.strokeStyle = "#6b757e"; c.lineWidth = 1.8; c.stroke();
+      c.save(); rr(c, 100, 100, 200, 230, 8); c.clip();
+      c.beginPath(); c.moveTo(100, 170);
+      for(let x = 100; x <= 300; x += 5) c.lineTo(x, 160 + Math.sin(x*0.05 + t*1.6)*3);
+      c.lineTo(300, 330); c.lineTo(100, 330); c.closePath();
+      const g = c.createLinearGradient(0, 160, 0, 330); g.addColorStop(0, "rgba(184,154,120,.55)"); g.addColorStop(1, "rgba(90,70,50,.85)");
+      c.fillStyle = g; c.fill(); c.restore();
+      uPipe(c, [[300,310],[392,310]], COL.crude, t, {arrow:true});
+      uLab(c, "zum Ofen", 392, 298, {a:"right"});
+      uLab(c, "Rohöltank", 200, 356, {c:ZCOL.txt, w:600, s:13});
+      uLab(c, "Rohöl", 200, 200, {c:"#e7e4dd", al:.7});
+      uLens(c, 200, 255, 34);
+    },
+    furn(c, t){
+      c.fillStyle = "#231d1a"; rr(c, 80, 60, 230, 270, 6); c.fill(); c.strokeStyle = "#7a5a4a"; c.lineWidth = 2; c.stroke();
+      c.fillStyle = "#231d1a"; c.fillRect(175, 18, 40, 44); c.strokeRect(175, 18, 40, 44);
+      for(let i=0;i<3;i++){ const ph = (t*0.4 + i/3) % 1; c.beginPath(); c.arc(195 + Math.sin(t+i)*4, 14 - ph*14, 5 + ph*6, 0, Math.PI*2); c.fillStyle = "rgba(154,162,169," + (0.35*(1-ph)) + ")"; c.fill(); }
+      const rows = [100, 140, 180, 220, 260];
+      const P = [[20,100]]; rows.forEach((y,i)=>{ const xs = i%2 ? [280,110] : [110,280]; P.push([xs[0], y]); P.push([xs[1], y]); });
+      P.push([392, 260]);
+      // Farbe wird heißer
+      for(let i=1;i<P.length;i++){
+        const k = i/(P.length-1);
+        const col = "rgb(" + Math.round(lerp(108,228,k)) + "," + Math.round(lerp(182,120,k)) + "," + Math.round(lerp(255,91,k)) + ")";
+        uPipe(c, [P[i-1], P[i]], col, t, {w:9, arrow: i === P.length-1});
+      }
+      uFlames(c, 100, 290, 318, t, 1.2);
+      uLab(c, "Rohöl ≈ 20 °C", 20, 88, {a:"left", c:"#6cb6ff"});
+      uLab(c, "≈ 360 °C → Kolonne", 392, 248, {a:"right", c:ZCOL.red});
+      uLab(c, "Brenner", 195, 345, {});
+      uLab(c, "Röhrenofen", 195, 370, {c:ZCOL.txt, w:600, s:13});
+      uLens(c, 200, 180, 30);
+    },
+    col(c, t){
+      const x = 95, w = 80;
+      uPipe(c, [[10,300],[x,300]], COL.crude, t, {arrow:true});
+      uLab(c, "aus dem Ofen", 10, 288, {a:"left"});
+      uVessel(c, x, 20, w, 340, 30, "#14191c");
+      const g = c.createLinearGradient(0, 360, 0, 20); g.addColorStop(0, "rgba(228,120,91,.25)"); g.addColorStop(1, "rgba(108,182,255,.12)");
+      rr(c, x, 20, w, 340, 30); c.fillStyle = g; c.fill();
+      c.strokeStyle = "#3d454c"; c.lineWidth = 1;
+      for(let y = 50; y < 345; y += 20){ c.beginPath(); c.moveTo(x+6, y); c.lineTo(x+w-6, y); c.stroke(); }
+      uBubbles(c, x+8, x+w-8, 40, 330, t, ph => ph < 0.3 ? COL.die : ph < 0.55 ? COL.ker : ph < 0.8 ? COL.ben : COL.gas, 26);
+      const draws = [[36,"Gas",COL.gas],[90,"Leichtbenzin",COL.ben],[140,"Schwerbenzin",COL.ben],[200,"Kerosin",COL.ker],[262,"Gasöl",COL.die],[345,"Rückstand",COL.hvy]];
+      draws.forEach(([y,n,col])=>{ uPipe(c, [[x+w, y],[262, y]], col, t, {w:7, arrow:true}); uLab(c, n, 270, y + 4, {a:"left", c:col, w:600}); });
+      uLab(c, "≈ 30 °C", x - 6, 44, {a:"right", c:"#6cb6ff"});
+      uLab(c, "≈ 360 °C", x - 6, 352, {a:"right", c:ZCOL.red});
+      uLab(c, "Destillationskolonne", 330, 372, {c:ZCOL.txt, w:600, s:13});
+      uLens(c, x + w/2, 200, 32);
+    },
+    vac(c, t){
+      uPipe(c, [[10,300],[78,300]], COL.hvy, t, {arrow:true});
+      uLab(c, "Rückstand", 10, 288, {a:"left"});
+      c.fillStyle = "#231d1a"; rr(c, 80, 250, 66, 80, 4); c.fill(); c.strokeStyle = "#7a5a4a"; c.lineWidth = 1.6; c.stroke();
+      uFlames(c, 92, 136, 326, t, 0.8); uLab(c, "Ofen", 113, 344, {});
+      uPipe(c, [[146,280],[173,280]], COL.hvy, t, {arrow:true});
+      uVessel(c, 175, 50, 90, 300, 30, "#14191c");
+      c.strokeStyle = "#3d454c"; c.lineWidth = 1; for(let y = 80; y < 335; y += 22){ c.beginPath(); c.moveTo(181, y); c.lineTo(259, y); c.stroke(); }
+      uBubbles(c, 185, 255, 90, 320, t, COL.hvy, 14);
+      // Vakuumpumpe
+      uPipe(c, [[220,50],[220,26],[318,26],[318,44]], "#8a9299", t, {w:6});
+      c.beginPath(); c.arc(330, 66, 20, 0, Math.PI*2); c.fillStyle = "#1d2226"; c.fill(); c.strokeStyle = "#6b757e"; c.lineWidth = 1.8; c.stroke();
+      c.save(); c.translate(330, 66); c.rotate(t*4); c.strokeStyle = "#9aa2a9"; c.lineWidth = 2;
+      for(let k=0;k<4;k++){ c.rotate(Math.PI/2); c.beginPath(); c.moveTo(0,0); c.lineTo(13,0); c.stroke(); } c.restore();
+      uLab(c, "Vakuumpumpe", 330, 104, {c:ZCOL.txt, w:600});
+      uLab(c, "≈ 30 hPa", 330, 118, {c:ZCOL.amber});
+      uPipe(c, [[265,180],[392,180]], COL.hvy, t, {w:7, arrow:true}); uLab(c, "Vakuumgasöl", 392, 170, {a:"right", c:COL.hvy, w:600});
+      uPipe(c, [[220,350],[220,366],[392,366]], "#6d5a48", t, {w:7, arrow:true}); uLab(c, "Vakuumrückstand", 392, 356, {a:"right", c:COL.hvy, w:600});
+      uLab(c, "Vakuum-", 95, 70, {c:ZCOL.txt, w:600, s:13}); uLab(c, "kolonne", 95, 86, {c:ZCOL.txt, w:600, s:13});
+      uLens(c, 220, 225, 30);
+    },
+    crk(c, t){
+      uVessel(c, 150, 50, 110, 125, 14);
+      uVessel(c, 150, 230, 110, 100, 14);
+      // Katalysator im Reaktor wirbelt
+      for(let i=0;i<46;i++){ const px = 160 + ((i*53) % 90) + Math.sin(t*3 + i)*4, py = 95 + ((i*29) % 72) + Math.cos(t*2.4 + i*1.3)*4; c.beginPath(); c.arc(px, py, 2.2, 0, Math.PI*2); c.fillStyle = i % 4 ? "#4fd1c5" : "#a68a6d"; c.globalAlpha = .7; c.fill(); }
+      for(let i=0;i<34;i++){ const px = 160 + ((i*41) % 90) + Math.sin(t*3 + i)*4, py = 262 + ((i*23) % 58) + Math.cos(t*2.4 + i)*4; c.beginPath(); c.arc(px, py, 2.2, 0, Math.PI*2); c.fillStyle = "#4fd1c5"; c.globalAlpha = .7; c.fill(); }
+      c.globalAlpha = 1;
+      uLab(c, "Reaktor", 205, 70, {c:ZCOL.txt, w:600, s:13}); uLab(c, "≈ 500 °C", 205, 86, {c:ZCOL.amber});
+      uLab(c, "Regenerator", 205, 250, {c:ZCOL.txt, w:600, s:13});
+      uPipe(c, [[240,178],[240,226]], "#a68a6d", t, {w:9, arrow:true});
+      uPipe(c, [[170,226],[170,178]], "#4fd1c5", t, {w:9, arrow:true});
+      uLab(c, "verkokter Kat.", 250, 206, {a:"left", c:"#c4a785"});
+      uLab(c, "heißer Kat.", 160, 206, {a:"right", c:ZCOL.teal});
+      uPipe(c, [[10,140],[148,140]], COL.hvy, t, {arrow:true}); uLab(c, "Vakuumgasöl", 10, 128, {a:"left", c:COL.hvy, w:600});
+      uPipe(c, [[205,50],[205,22],[392,22]], COL.ben, t, {arrow:true}); uLab(c, "Crackprodukte → Trennkolonne", 392, 42, {a:"right", c:COL.ben, w:600});
+      uPipe(c, [[60,300],[148,300]], "#9fd3ff", t, {w:6, arrow:true}); uLab(c, "Luft", 60, 290, {a:"left", c:"#9fd3ff"});
+      uPipe(c, [[262,300],[360,300]], "#8a9299", t, {w:6, arrow:true}); uLab(c, "Abgas (CO₂)", 362, 290, {a:"right"});
+      uLab(c, "Katalytischer Cracker", 205, 362, {c:ZCOL.txt, w:600, s:13});
+      uLens(c, 205, 128, 30);
+      uLens(c, 205, 286, 20, ZCOL.red, true);
+      uLab(c, "Bild im Bild", 238, 330, {a:"left", c:ZCOL.red, w:600});
+    },
+    ref(c, t){
+      uPipe(c, [[10,280],[48,280]], COL.ben, t, {arrow:true}); uLab(c, "Schwerbenzin", 10, 230, {a:"left", c:COL.ben, w:600});
+      c.fillStyle = "#231d1a"; rr(c, 50, 240, 70, 80, 4); c.fill(); c.strokeStyle = "#7a5a4a"; c.lineWidth = 1.6; c.stroke();
+      uFlames(c, 62, 110, 316, t, 0.8); uLab(c, "Ofen", 85, 336, {});
+      uPipe(c, [[120,260],[140,260],[140,40],[190,40],[190,58]], COL.ben, t, {arrow:true});
+      uVessel(c, 160, 60, 70, 270, 16);
+      uBed(c, 168, 110, 54, 190, "#c9d0d5", t);
+      uLab(c, "Pt-Kat.", 195, 102, {c:"#c9d0d5"});
+      uLab(c, "Reaktor", 195, 350, {c:ZCOL.txt, w:600});
+      uLab(c, "≈ 500 °C", 195, 364, {c:ZCOL.amber});
+      uPipe(c, [[230,300],[284,300]], COL.ben, t, {w:7});
+      uVessel(c, 285, 220, 60, 100, 12);
+      uLab(c, "Abscheider", 315, 336, {});
+      uPipe(c, [[315,220],[315,140]], "#9fd3ff", t, {w:7, arrow:true}); uLab(c, "Wasserstoff H₂", 315, 116, {c:"#9fd3ff", w:600}); uLab(c, "→ Entschwefelung", 315, 130, {c:"#9fd3ff"});
+      uPipe(c, [[345,300],[392,300]], "#ffd166", t, {w:7, arrow:true}); uLab(c, "Reformat", 392, 276, {a:"right", c:"#ffd166", w:600}); uLab(c, "→ Benzin", 392, 290, {a:"right", c:"#ffd166"});
+      uLab(c, "Reformer", 200, 22, {c:ZCOL.txt, w:600, s:13});
+      uLens(c, 195, 205, 30);
+    },
+    iso(c, t){
+      uPipe(c, [[10,280],[48,280]], COL.ben, t, {arrow:true}); uLab(c, "Leichtbenzin", 10, 230, {a:"left", c:COL.ben, w:600}); uLab(c, "ROZ 72", 10, 246, {a:"left", c:ZCOL.red});
+      uPipe(c, [[10,160],[90,160],[90,262]], "#9fd3ff", t, {w:6}); uLab(c, "H₂ (frisch)", 10, 150, {a:"left", c:"#9fd3ff"});
+      c.fillStyle = "#231d1a"; rr(c, 50, 262, 70, 60, 4); c.fill(); c.strokeStyle = "#7a5a4a"; c.lineWidth = 1.6; c.stroke();
+      uFlames(c, 62, 110, 318, t, 0.7); uLab(c, "Vorwärmer", 85, 338, {});
+      uPipe(c, [[120,282],[140,282],[140,40],[190,40],[190,58]], COL.ben, t, {arrow:true});
+      uVessel(c, 160, 60, 70, 270, 16);
+      uBed(c, 168, 110, 54, 190, "#c9d0d5", t);
+      uLab(c, "Pt-Kat.", 195, 102, {c:"#c9d0d5"});
+      uLab(c, "Reaktor", 195, 350, {c:ZCOL.txt, w:600});
+      uLab(c, "≈ 150–250 °C", 195, 364, {c:ZCOL.amber});
+      uPipe(c, [[230,300],[284,300]], COL.ben, t, {w:7});
+      uVessel(c, 285, 220, 60, 100, 12);
+      uLab(c, "Abscheider", 315, 336, {});
+      uPipe(c, [[315,220],[315,150],[260,150],[260,26],[90,26],[90,150]], "#9fd3ff", t, {w:5});
+      uLab(c, "H₂ zurück", 175, 20, {c:"#9fd3ff"});
+      uPipe(c, [[345,300],[392,300]], "#ffd166", t, {w:7, arrow:true}); uLab(c, "Isomerisat", 392, 196, {a:"right", c:"#ffd166", w:600}); uLab(c, "ROZ ≈ 88 → Benzin", 392, 210, {a:"right", c:"#7fd68a"});
+      uLab(c, "Isomerisierung", 330, 60, {c:ZCOL.txt, w:600, s:13});
+      uLens(c, 195, 205, 30);
+    },
+    hds(c, t){
+      uPipe(c, [[10,110],[118,110],[118,40],[180,40],[180,58]], COL.die, t, {arrow:true});
+      uLab(c, "Destillate", 10, 98, {a:"left", c:COL.ben, w:600});
+      uLab(c, "(schwefelhaltig)", 10, 128, {a:"left"});
+      uPipe(c, [[10,175],[118,175],[118,110]], "#9fd3ff", t, {w:6});
+      uLab(c, "Wasserstoff H₂", 10, 165, {a:"left", c:"#9fd3ff"});
+      uVessel(c, 145, 60, 70, 270, 16);
+      uBed(c, 153, 110, 54, 190, "#8fa5e0", t);
+      uLab(c, "Co-Mo-Kat.", 180, 102, {c:"#8fa5e0"});
+      uLab(c, "Reaktor ≈ 350 °C", 180, 350, {c:ZCOL.txt, w:600});
+      uPipe(c, [[215,300],[274,300]], COL.die, t, {w:7});
+      uVessel(c, 275, 220, 60, 100, 12);
+      uLab(c, "Abscheider", 305, 336, {});
+      uPipe(c, [[305,220],[305,140]], ZCOL.S, t, {w:7, arrow:true}); uLab(c, "H₂S", 305, 116, {c:ZCOL.S, w:600}); uLab(c, "→ Claus-Anlage", 305, 130, {c:ZCOL.S});
+      uPipe(c, [[335,300],[392,300]], COL.ker, t, {w:7, arrow:true}); uLab(c, "schwefelarme", 392, 276, {a:"right", c:COL.ker, w:600}); uLab(c, "Produkte", 392, 290, {a:"right", c:COL.ker, w:600});
+      uLab(c, "Entschwefelung", 210, 22, {c:ZCOL.txt, w:600, s:13});
+      uLens(c, 180, 205, 30);
+    }
+  };
+  function uSize(){
+    const w = uCv.clientWidth || 360, h = w*UH/UW, dpr = window.devicePixelRatio || 1;
+    uCv.style.height = h + "px"; uCv.width = Math.round(w*dpr); uCv.height = Math.round(h*dpr);
+    uc = uCv.getContext("2d"); uc.setTransform(dpr*w/UW, 0, 0, dpr*w/UW, 0, 0);
+  }
+  function zSize(){
+    uSize();
+    const w = zCv.clientWidth || 680, h = w*ZH/ZW, dpr = window.devicePixelRatio || 1;
+    zCv.style.height = h + "px"; zCv.width = Math.round(w*dpr); zCv.height = Math.round(h*dpr);
+    zc = zCv.getContext("2d"); zc.setTransform(dpr*w/ZW, 0, 0, dpr*w/ZW, 0, 0);
+  }
+  function zFrame(ts){
+    if(!zOpen) return;
+    if(zLast === null) zLast = ts;
+    const dt = Math.min(0.05, (ts - zLast)/1000); zLast = ts;
+    if(!zPaused) zT += dt;
+    zc.fillStyle = "#0e1113"; zc.fillRect(0, 0, ZW, ZH);
+    zSc.draw(zc, zT, zPaused ? 0 : dt);
+    uc.fillStyle = "#0e1113"; uc.fillRect(0, 0, UW, UH);
+    if(UNITVIEW[zKey]) UNITVIEW[zKey](uc, zT);
+    requestAnimationFrame(zFrame);
+  }
+  function openZoom(k, px, py){
+    const sc = ZOOM[k], info = INFO[k];
+    if(!sc && !info) return;
+    $("zoomInfo").innerHTML = info || "";
+    $("zoomInfo").style.display = info ? "" : "none";
+    const only = !sc;
+    zBox.classList.toggle("info-only", only);
+    ["zoomGrid","zoomEq","zoomText","zoomNote","zoomCtrl"].forEach(id=> $(id).style.display = only ? "none" : "");
+    if(only){
+      zKey = k; zSc = null;
+      $("zoomPre").textContent = "Anlagenteil ·";
+      $("zoomTitle").textContent = (info.match(/<strong>(.*?)\.?<\/strong>/) || [,""])[1].replace(/\.$/, "");
+      zBack.classList.add("open"); zOpen = false;
+    } else {
+    zKey = k; zSc = sc; zT = 0; zLast = null; zPaused = false;
+    $("zoomPre").textContent = "Vergrößerung ·";
+    $("zoomTitle").textContent = sc.title;
+    $("zoomText").innerHTML = "<strong>Auf Teilchenebene:</strong> " + sc.text;
+    $("zoomEq").textContent = sc.eq || ""; $("zoomEq").style.display = sc.eq ? "" : "none";
+    $("zoomNote").textContent = sc.note || "";
+    $("zoomPause").textContent = "Pause";
+    zBack.classList.add("open"); zOpen = true;
+    zSize(); sc.init();
+    }
+    if(px !== undefined && zBox.animate){
+      const r = zBox.getBoundingClientRect();
+      zBox.style.transformOrigin = (px - r.left) + "px " + (py - r.top) + "px";
+      zBox.animate([{transform:"scale(.12)", opacity:0}, {transform:"scale(1)", opacity:1}], {duration:320, easing:"cubic-bezier(.2,.8,.3,1)"});
+    }
+    if(zOpen) requestAnimationFrame(zFrame);
+  }
+  function closeZoom(){ zBack.classList.remove("open"); zOpen = false; }
+  $("zoomClose").addEventListener("click", closeZoom);
+  zBack.addEventListener("click", e=>{ if(e.target === zBack) closeZoom(); });
+  document.addEventListener("keydown", e=>{ if(zBack.classList.contains("open") && e.key === "Escape") closeZoom(); });
+  $("zoomPause").addEventListener("click", ()=>{ zPaused = !zPaused; $("zoomPause").textContent = zPaused ? "Weiter" : "Pause"; });
+  $("zoomRestart").addEventListener("click", ()=>{ zT = 0; zSc.init(); zPaused = false; $("zoomPause").textContent = "Pause"; });
+  window.addEventListener("resize", ()=>{ if(zOpen) zSize(); });
+  globalThis.__zoom = {open: openZoom, ZOOM, setT: v=>{ zT = v; }, pause: v=>{ zPaused = v; }};
 
   // ---------- Auswertung ----------
   function sStr(v){ return v >= 1000 ? fmt(v/1e4, 2) + " %" : fmt(v, v < 10 ? 1 : 0) + " mg/kg"; }
   function check(ok){ return ok ? '<span class="ok">✓</span>' : '<span class="bad">✗</span>'; }
+
+
+  // ---------- Wirtschaftlichkeit ----------
+  const ECO = {
+    crude: 560,
+    diff: {kond: 20, light: 0, medium: -40, heavy: -110},   // Zu-/Abschlag je Rohölsorte (schweres, schwefelreiches Rohöl ist billiger)
+    price: {lpg:520, ben:740, ker:760, die:740, hvy:450, naph:620, sul:100},
+    cost:  {dist:12, vac:8, hds:10, ref:18, iso:14, crk:22, h2:2500}
+  };
+  const ECO_ROWS = [
+    {k:"lpg", n:"Flüssiggas", col:"#b79cf2"},
+    {k:"ben", n:"Benzin", col:"#ffd166"},
+    {k:"ker", n:"Kerosin", col:"#7fd68a"},
+    {k:"die", n:"Diesel / Heizöl EL", col:"#e8955c"},
+    {k:"hvy", n:"Schweres Heizöl / Bitumen", col:"#a68a6d"},
+    {k:"naph", n:"Naphtha (Chemie)", col:"#b79cf2"},
+    {k:"sul", n:"Schwefel", col:"#e6d36a"}
+  ];
+  function ecoBuild(){
+    $("ecoRev").innerHTML = ECO_ROWS.map(r=> `<tr id="ecoR_${r.k}"><td><span class="swatch" style="background:${r.col}"></span>${r.n}</td><td class="num" id="ecoM_${r.k}">–</td><td id="ecoQ_${r.k}">–</td><td class="num"><input type="number" class="eco-price" id="ecoP_${r.k}" value="${ECO.price[r.k]}" min="0" step="10"></td><td class="num" id="ecoE_${r.k}">–</td></tr>`).join("") +
+      `<tr class="eco-sum"><td>Summe der Erlöse</td><td></td><td></td><td></td><td class="num" id="ecoRevSum">–</td></tr>`;
+    ECO_ROWS.forEach(r=> $("ecoP_" + r.k).addEventListener("input", e=>{ const v = parseFloat(e.target.value); ECO.price[r.k] = isFinite(v) ? v : 0; updateEcon(); }));
+    $("rCrudeP").addEventListener("input", e=>{ ECO.crude = +e.target.value; $("vCrudeP").textContent = e.target.value + " €/t"; updateEcon(); });
+  }
+  const eur = v => (v < 0 ? "−" : "") + Math.round(Math.abs(v)).toLocaleString("de-DE") + " €";
+  function updateEcon(){
+    const m = M, T = S.total, q = m.q, P = ECO.price, C = ECO.cost;
+    // Einstufung nach Qualität: [Abschlag €/t, Text]
+    const grade = {
+      lpg: [0, "Flüssiggas"],
+      ben: q.benRON >= 95 ? [-40, "Super (ROZ ≥ 95): Zuschlag 40 €/t"] : q.benRON >= 91 ? [0, "Normalbenzin (ROZ ≥ 91)"] : [140, "unter Norm – nur Mischkomponente: −140 €/t"],
+      ker: q.kerS <= 3000 ? [0, "Düsenkraftstoff"] : [110, "zu viel Schwefel: −110 €/t"],
+      die: q.dieS <= 10 ? [0, "Diesel (S ≤ 10 mg/kg)"] : q.dieS <= 1000 ? [100, "nur Heizöl EL: −100 €/t"] : [240, "Schwefel zu hoch: −240 €/t"],
+      hvy: q.hvyS <= 5000 ? [0, "S ≤ 0,5 %"] : [70, "S > 0,5 %: −70 €/t"],
+      naph: [0, "Rohstoff für die Chemie"],
+      sul: [0, "aus dem Claus-Verfahren"]
+    };
+    if(q.benS > 10 && q.benRON >= 91) grade.ben = [140, "Schwefel > 10 mg/kg – nur Mischkomponente: −140 €/t"];
+    const mass = {lpg:m.p.lpg*T, ben:m.p.ben*T, ker:m.p.ker*T, die:m.p.die*T, hvy:m.p.hvy*T, naph:(m.naph||0)*T, sul:m.sRec*T};
+    let rev = 0;
+    ECO_ROWS.forEach(r=>{
+      const g = grade[r.k], price = Math.max(0, P[r.k] - g[0]), e = mass[r.k]*price;
+      rev += e;
+      $("ecoR_" + r.k).style.display = (r.k === "naph" && mass.naph <= 0) ? "none" : "";
+      $("ecoM_" + r.k).textContent = fmt(mass[r.k], r.k === "sul" ? 1 : 0) + " t";
+      const qc = $("ecoQ_" + r.k); qc.textContent = g[1]; qc.className = g[0] > 0 ? "bad" : g[0] < 0 ? "ok" : "dim";
+      $("ecoE_" + r.k).textContent = eur(e);
+    });
+    $("ecoRevSum").textContent = eur(rev);
+    // Kosten
+    const treated = S.hds ? (m.f.ln + m.f.hn + m.f.ker + m.f.go + m.crkBen + (S.fcc && S.vac ? m.crkDie : 0))*T : 0;
+    const h2buy = Math.max(0, m.h2cons - m.h2prod)*T;
+    const items = [
+      ["Rohöl (" + CRUDES[S.crude].name.replace(/ \(.*\)/, "") + ")", T, ECO.crude + (ECO.diff[S.crude] || 0), "€/t", true],
+      ["Atmosphärische Destillation", T, C.dist, "€/t", true],
+      ["Vakuumdestillation", S.vac ? m.f.res*T : 0, C.vac, "€/t Einsatz", S.vac],
+      ["Entschwefelung", treated, C.hds, "€/t Einsatz", S.hds],
+      ["Reformer", S.ref ? m.refFeed*T : 0, C.ref, "€/t Einsatz", S.ref],
+      ["Isomerisierung", S.iso ? m.f.ln*T : 0, C.iso, "€/t Einsatz", S.iso],
+      ["Katalytischer Cracker", (S.fcc && S.vac) ? m.vgo*T : 0, C.crk, "€/t Einsatz", S.fcc && S.vac],
+      ["Wasserstoff-Zukauf", h2buy, C.h2, "€/t H₂", h2buy > 0.005]
+    ];
+    let cost = 0;
+    $("ecoCost").innerHTML = items.filter(i=> i[4]).map(([n, q2, rate, unit])=>{
+      const k = q2*rate; cost += k;
+      return `<tr><td>${n}</td><td class="num">${fmt(q2, q2 < 10 ? 1 : 0)} t</td><td class="num">${fmt(rate)} ${unit}</td><td class="num">${eur(k)}</td></tr>`;
+    }).join("") + `<tr class="eco-sum"><td>Summe der Kosten</td><td></td><td></td><td class="num">${eur(cost)}</td></tr>` +
+      `<tr class="eco-sum"><td>Gewinn</td><td></td><td></td><td class="num ${rev - cost >= 0 ? "eco-pos" : "eco-neg"}">${eur(rev - cost)}</td></tr>`;
+    const d = ECO.diff[S.crude] || 0;
+    $("ecoCrudeNote").textContent = "Gewählte Sorte: " + (ECO.crude + d) + " €/t" + (d ? " (" + (d > 0 ? "Zuschlag +" : "Abschlag ") + d + " €/t gegenüber leichtem Rohöl)" : "");
+    const profit = rev - cost, perT = profit/T;
+    const pe = $("ecoProfit"); pe.textContent = (profit >= 0 ? "+ " : "") + eur(profit); pe.className = "v mono " + (profit >= 0 ? "eco-pos" : "eco-neg");
+    $("ecoPerT").textContent = "≈ " + (perT >= 0 ? "+" : "") + fmt(perT, 1) + " € je Tonne Rohöl · Erlöse " + eur(rev) + " · Kosten " + eur(cost);
+    const ro = $("roProfit"); ro.textContent = (perT >= 0 ? "+" : "−") + fmt(Math.abs(perT), 0) + " €"; ro.className = "v mono " + (perT >= 0 ? "ok" : "bad");
+  }
 
   function updateTables(){
     const p = M.p, q = M.q;
@@ -1195,6 +2395,7 @@ header>.tag{flex:1 1 160px;min-width:0}
     }).join("");
     const h2net = (M.h2prod - M.h2cons)*S.total;
     $("balBody").innerHTML = rows +
+      (M.naph > 0 ? `<tr class="sep"><td><span class="swatch" style="background:#b79cf2"></span>Naphtha (an die Chemie)</td><td class="num">${fmt(M.naph*S.total)} t</td><td colspan="4" class="dim">Leichtbenzin als Rohstoff für den Steamcracker (Ethen, Propen) – nicht im Benzin enthalten</td></tr>` : "") +
       `<tr class="sep"><td>Eigenverbrauch &amp; Verluste</td><td class="num">${fmt(M.own*S.total)} t</td><td colspan="4" class="dim">Raffineriegas (C₁–C₂), Koks, Wasserstoff – wird als Brennstoff in der Raffinerie genutzt</td></tr>` +
       `<tr><td>Schwefel (gewonnen)</td><td class="num">${fmt(M.sRec*S.total,1)} t</td><td colspan="4" class="dim">aus Schwefelwasserstoff im Claus-Verfahren</td></tr>` +
       `<tr><td>Wasserstoff-Bilanz</td><td class="num">${h2net>=0?"+":""}${fmt(h2net,1)} t</td><td colspan="4" class="dim">Produktion im Reformer ${fmt(M.h2prod*S.total,1)} t · Verbrauch ${fmt(M.h2cons*S.total,1)} t</td></tr>`;
@@ -1227,6 +2428,7 @@ header>.tag{flex:1 1 160px;min-width:0}
     else wb.style.display = "none";
 
     drawBal(); drawTBP();
+    if($("ecoRev").children.length) updateEcon();
   }
 
   function prepChart(cv){
@@ -1329,7 +2531,7 @@ header>.tag{flex:1 1 160px;min-width:0}
   bindRange("rRef", "vRef", "tRef", " °C");
   bindRange("rFCC", "vFCC", "tFCC", " °C");
 
-  const PROC_KEYS = ["vac","hds","fcc","ref"];
+  const PROC_KEYS = ["vac","hds","fcc","ref","iso"];   // „Leichtbenzin → Chemie“ ist eine Option und wird von „Alle ein“ nicht gesetzt
   function syncControls(){
     document.querySelectorAll(".ptog").forEach(b=> b.classList.toggle("on", !!S[b.dataset.key]));
     $("refControls").style.display = S.ref ? "" : "none";
@@ -1340,10 +2542,13 @@ header>.tag{flex:1 1 160px;min-width:0}
     // Cracker brauchen Vakuumgasöl: Vakuumdestillation automatisch mitschalten
     if(k==="fcc" && S.fcc) S.vac = true;
     if(k==="vac" && !S.vac) S.fcc = false;
+    // Leichtbenzin entweder isomerisieren oder an die Chemie abgeben
+    if(k==="naph" && S.naph) S.iso = false;
+    if(k==="iso" && S.iso) S.naph = false;
     procChanged();
   }));
-  $("allOff").addEventListener("click", ()=>{ PROC_KEYS.forEach(k=> S[k] = false); procChanged(); });
-  $("allOn").addEventListener("click",  ()=>{ PROC_KEYS.forEach(k=> S[k] = true);  procChanged(); });
+  $("allOff").addEventListener("click", ()=>{ PROC_KEYS.forEach(k=> S[k] = false); S.naph = false; procChanged(); });
+  $("allOn").addEventListener("click",  ()=>{ PROC_KEYS.forEach(k=> S[k] = true); S.naph = false; procChanged(); });
   // Verfahren geändert: laufenden Prozess zurücksetzen und neu starten, sonst nur Tanks leeren
   function procChanged(){
     syncControls(); recompute();
@@ -1420,6 +2625,7 @@ header>.tag{flex:1 1 160px;min-width:0}
   window.addEventListener("resize", resize);
 
   // Start
+  ecoBuild();
   crudeInfo(); syncControls();
   M = model(); resize(); updateTables();
   requestAnimationFrame(frame);
@@ -1968,13 +3174,14 @@ function snap(label){
   const html=BK.sec('Versuchsbedingungen',BK.condRows(c))
     +BK.sec('Ergebnis',BK.condRows(ro))
     +BK.sec('Produktbilanz (je 1000 t Rohöl)',BK.imgTag(im.bal,'Produktbilanz')+BK.leg([['#9a5b00','Ausbeute (Säulen)'],['#555','Bedarf (gestrichelt)']])+BK.tbl($('balBody').closest('table')))
-    +BK.sec('Fraktionen und Siedekurve',BK.imgTag(im.tbp,'Siedekurve')+BK.tbl($('fracBody').closest('table')));
+    +BK.sec('Fraktionen und Siedekurve',BK.imgTag(im.tbp,'Siedekurve')+BK.tbl($('fracBody').closest('table')))
+    +BK.sec('Wirtschaftlichkeit (je 1000 t Rohöl, Richtwerte)','<p class="bk-small">Rohölpreis: '+$('vCrudeP').textContent+' · '+$('ecoProfit').textContent+' Gewinn ('+$('ecoPerT').textContent+')</p>'+BK.tbl($('ecoRevTable'))+BK.tbl($('ecoCostTable')));
   const n=BK.runs.length+1, col=BK.COL[(n-1)%BK.COL.length];
   const short=c[0][1]+' · '+c[1][1].replace('Atmosphärische Destillation','Destillation')+' · Ofen '+(c.find(x=>x[0]==='Ofentemperatur')||['',''])[1];
   return {label:(label||'Lauf '+n)+': '+short,color:col,html};
 }
 BK.setup({url:'https://chemie.mail-baumgart.de/EP/EP-Raffination.html',sim:true,footName:'Simulation „Erdölraffination“',version:'1.3',printTitle:'Erdölraffination – Auswertung',
-  hint:'Die Auswertung enthält je gewähltem Lauf die Versuchsbedingungen, die Kennwerte, die Produktbilanz mit Diagramm und Tabelle sowie Fraktionen und Siedekurve.',
+  hint:'Die Auswertung enthält je gewähltem Lauf die Versuchsbedingungen, die Kennwerte, die Produktbilanz mit Diagramm und Tabelle, Fraktionen und Siedekurve sowie die Wirtschaftlichkeit.',
   noRuns:'Noch kein Lauf abgeschlossen. Ein Lauf ist abgeschlossen, wenn 1000 t Rohöl verarbeitet sind.',
   buttons:[{ref:'.screen-top #btnReset',pos:'afterend'}],btnClass:'btn ghost',
   done:()=>BK.addRun(snap()),
