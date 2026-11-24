@@ -112,6 +112,9 @@ code{background:var(--screen);padding:1px 5px;border-radius:3px;font-size:13px}
 .left{scrollbar-width:thin;scrollbar-color:var(--line) transparent;overscroll-behavior:auto}
 .left::-webkit-scrollbar{width:6px}.left::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
 @media (max-width:600px){header h1{white-space:normal;font-size:17px}}
+
+.cvname .cverr{display:block;margin-top:4px;font-size:13px;font-weight:600;color:#ff6b6b;text-shadow:0 1px 3px rgba(0,0,0,.7)}
+.canvaswrap.l3 .cvname .cverr{color:#c40000;text-shadow:0 1px 2px rgba(255,255,255,.9)}
 </style></head><body>
 <header>
   <a class="back" href="../index.html">← Zurück</a>
@@ -146,7 +149,7 @@ code{background:var(--screen);padding:1px 5px;border-radius:3px;font-size:13px}
     </div>
     <h3>Element</h3>
     <div class="pal" id="elPal"></div>
-    <label class="opt"><input type="checkbox" id="chgEl"> beim Wählen markiertes Atom umwandeln</label>
+    <label class="opt"><input type="checkbox" id="chgEl"> Atom ändern: Element wählen, dann Atom in der Zeichnung anklicken</label>
     <h3>Bindungen</h3>
     <div class="hint" style="margin-top:0">Bindung anklicken: einfach → doppelt → dreifach → wieder einfach. Neue Bindungen entstehen immer als Einfachbindung.</div>
     <h3>Ring wählen</h3>
@@ -2109,7 +2112,7 @@ function compute(){
   info=infoOf(mol);
   const cn=$('cvName');
   if(info.empty)cn.innerHTML='';
-  else cn.innerHTML=(info.name?esc(info.name):'<span style="opacity:.7">Noch kein Name</span>')+(info.c2dLight&&mode==='3d'?'<div class="c2dw">'+info.c2dLight+'</div>':info.c2d?'<div class="c2dw">'+info.c2d+'</div>':'')+(info.name?'':'<small>'+esc((info.err||'').slice(0,110))+'</small>');
+  else cn.innerHTML=(info.name?esc(info.name):'<span style="opacity:.7">Noch kein Name</span>')+(info.err?'<div class="cverr" role="alert">'+esc(info.err)+'</div>':'')+(info.c2dLight&&mode==='3d'?'<div class="c2dw">'+info.c2dLight+'</div>':info.c2d?'<div class="c2dw">'+info.c2d+'</div>':'');
   const R=$('res');
   if(info.empty){R.innerHTML='<div class="resalt">Noch keine Struktur. Zeichne auf der Fläche oder gib oben einen Namen bzw. eine Formel ein.</div>';return;}
   let h='';
@@ -2179,9 +2182,10 @@ function pointer3(e,kind){
   if(kind==='cancel'){draw();return;}
   const J=project3D(M3||embed3D(mol),o3());
   if(!d.moved){
-    if(d.a>=0){sel=(sel===d.a?null:d.a);update();return;}
+    if(d.a>=0){if(chgOn()){convAtom(d.a);return;}sel=(sel===d.a?null:d.a);update();return;}
     if(d.b>=0&&(tool==='draw'||tool==='bond')){snap();const t=mol.bonds[d.b];t.o=t.o%3+1;update();return;}
     if(tool==='draw'){
+      if(chgOn())return;
       if(frag){attach(frag.smi,frag.ord||1,null,{});return;}
       snap();
       const dir=unproj(x-J.cx0,y-J.cy0,J),k=Math.hypot(x-J.cx0,y-J.cy0)/(J.sc||1);
@@ -2264,7 +2268,7 @@ function endDrag(e,cancel){
   if(d.type==='pan'){draw();return;}
   if(d.type==='bondtap'){if(!d.moved){snap();const t=mol.bonds[d.b];t.o=t.o%3+1;update();}return;}
   if(d.type==='bond'){
-    if(!d.moved){sel=(sel===d.a?null:d.a);update();return;}
+    if(!d.moved){if(chgOn()){convAtom(d.a);return;}sel=(sel===d.a?null:d.a);update();return;}
     const A=mol.atoms[d.a];let t=hitAtom(p,d.a);
     if(tool==='bond'){if(t>=0){snap();setBond(d.a,t);sel=t;update();ensureVisible();}else draw();return;}
     if(t>=0){draw();return;}
@@ -2275,7 +2279,7 @@ function endDrag(e,cancel){
         snap();t=mol.addAtom(elSel,q.x,q.y,0);setBond(d.a,t);sel=t;update();ensureVisible();return;}}
     return;}
   if(d.type==='empty'){
-    if(d.moved||tool==='bond'){draw();return;}
+    if(d.moved||tool==='bond'||chgOn()){draw();return;}
     snap();
     if(frag){snapUndoPop();attach(frag.smi,frag.ord||1,null,{pos:{x:p.x,y:p.y}});return;}
     sel=mol.addAtom(elSel,p.x,p.y,0);
@@ -2312,17 +2316,19 @@ function attach(smi,ord,par,opt){
 }
 const RINGS=[['C₃','C1CC1'],['C₄','C1CCC1'],['C₅','C1CCCC1'],['C₆','C1CCCCC1'],['C₇','C1CCCCCC1'],['C₈','C1CCCCCCC1'],['Benzol','c1ccccc1']];
 function mkBtns(host,list,fn){list.forEach(g=>{const b=document.createElement('button');b.type='button';b.className='btn';b.textContent=g[0];b.onclick=()=>fn(g,b);host.appendChild(b);});}
+function chgOn(){return $('chgEl').checked&&!frag&&tool==='draw';}
+function convAtom(a){if(a>=0&&mol.atoms[a]&&mol.atoms[a].el!==elSel){snap();mol.atoms[a].el=elSel;mol.atoms[a].charge=0;sel=a;update();}else if(a>=0){sel=a;draw();}}
 function showBuild(){const el=$('buildSel');
+  if($('chgEl').checked&&!frag){el.innerHTML='Anklicken eines Atoms wandelt es um in: <b>'+elSel+'</b>';return;}
   const t=frag?'<b>'+esc(frag.label)+'</b>':'Atom <b>'+elSel+'</b>';
   el.innerHTML='Beim Ziehen entsteht: '+t;}
+$('chgEl').onchange=()=>showBuild();
 function clearFragUI(){document.querySelectorAll('#ringPal .btn,#chainGo').forEach(x=>x.classList.remove('on'));}
 function pickFrag(btn,f){setTool('draw');if(frag&&frag.smi===f.smi&&frag.label===f.label){frag=null;clearFragUI();}else{frag=f;clearFragUI();btn.classList.add('on');}showBuild();}
 mkBtns($('ringPal'),RINGS,(g,b)=>pickFrag(b,{smi:g[1],ord:1,label:'Ring '+g[0]}));
 ['C','O','N','S','F','Cl','Br','I'].forEach(el=>{const b=document.createElement('button');b.type='button';b.className='btn'+(el==='C'?' on':'');b.textContent=el;b.dataset.el=el;
   b.onclick=()=>{setTool('draw');elSel=el;frag=null;clearFragUI();showBuild();[...$('elPal').children].forEach(x=>x.classList.toggle('on',x===b));
-    if(sel!=null&&mol.atoms[sel]){
-      if($('chgEl').checked){if(mol.atoms[sel].el!==el){snap();mol.atoms[sel].el=el;mol.atoms[sel].charge=0;update();}}
-}};
+};
   $('elPal').appendChild(b);});
 $('chainGo').onclick=()=>{const n=Math.max(1,Math.min(20,parseInt($('chainN').value)||1));pickFrag($('chainGo'),{smi:'C'.repeat(n),ord:1,label:n+'-C-Kette'});};
 function setTool(t){tool=t;document.querySelectorAll('#toolRow .btn').forEach(x=>x.classList.toggle('on',x.dataset.tool===t));svg.style.cursor=(t==='draw'||t==='bond')?'crosshair':t==='move'?'grab':'not-allowed';}

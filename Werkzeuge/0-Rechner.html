@@ -116,6 +116,8 @@ header .hbtn:hover{border-color:var(--teal);color:var(--teal)}
 .backsel{margin:0 0 12px;font-weight:600;color:var(--teal);border-color:var(--teal)}
 .mlw{overflow-x:auto;padding:4px 0}.mlw svg.lw{display:block}.lw .cv{fill:none;stroke:var(--amber);stroke-width:1.4;stroke-linecap:round}.lw text.mop{font-size:18px}.lw text.mar{font-size:22px}.lw text.mov{font-size:10px;fill:var(--text-dim)}.lw text.mdl{font-size:11px;fill:var(--teal)}.lw text.mbr{font-size:46px;font-weight:200}.lw text.mtx{font-size:12px}
 .mech{margin:8px 0 12px;padding:8px 12px;background:var(--bg);border:1px solid var(--line);border-radius:8px}.mech summary{cursor:pointer;padding:2px 0}.mech ol{margin:8px 0 4px;padding-left:22px}.mech li{margin:0 0 12px}.mech .mt{font-weight:600;color:var(--teal);margin-bottom:3px}.meq{font-size:1.05rem;margin:3px 0;line-height:1.9}.marr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1;margin:0 4px}.mover{font-size:.7rem;color:var(--text-dim)}.rdot{font-weight:900;font-size:1.25em;line-height:0;color:var(--amber)}
+.optchk{display:flex;align-items:center;gap:10px;padding:8px 4px;cursor:pointer;font-size:.95rem}.optchk input{width:18px;height:18px;flex:none;accent-color:var(--teal)}
+.known{margin:8px 0 2px}.known summary{cursor:pointer;color:var(--teal);font-weight:600}.known table{margin-top:6px}.known ul{margin:6px 0 0;padding-left:20px}
 .rclass{margin:6px 0 10px;padding:8px 12px;border-left:3px solid var(--acc,#3ec7b0);background:var(--bg);border-radius:6px}.rclass .note{margin:4px 0 0}
 .cands{display:flex;flex-direction:column;gap:8px;margin:8px 0}.cand{text-align:left;display:flex;flex-direction:column;gap:2px;padding:10px 12px;border:1px solid var(--line,#2a3138);border-radius:8px;background:var(--bg);color:inherit;font:inherit;cursor:pointer}.cand:hover{border-color:var(--acc,#3ec7b0)}.cand .eqh{font-size:1.05rem}
 .pgeq{display:flex;align-items:center;flex-wrap:wrap;gap:6px 14px;padding:12px;margin:8px 0;background:var(--bg);border:1px solid var(--line,#2a3138);border-radius:8px;overflow-x:auto;font-family:var(--mono)}
@@ -188,15 +190,15 @@ svg.lw{overflow:visible;flex:none}
     <button class="bigbtn" id="btnGl">Grundlagen · 7 Themen <span style="float:right" id="glArr">▸</span></button>
     <div class="card" id="glList" hidden><div class="nav" id="glNav"></div></div>
     <button class="bigbtn" id="btnTab">Tabellenwerte öffnen</button>
-    <a class="bigbtn" id="lnkOther" href="#" style="display:block;text-decoration:none;color:var(--teal)"></a>
     <div class="card"><button class="homebtn" id="btnHome">◂ Zurück zur Übersicht</button><h2 id="navTitle">Stoffmenge und Lösungen</h2><div class="nav" id="calcNav"></div></div>
     <div class="card"><h2>Reaktionen</h2><div class="nav" id="reactNav"></div></div>
+    <div class="card" id="optCard" hidden><h2>Optionen</h2><div id="optBox"></div></div>
     <button class="bigbtn" id="btnProt">Rechenprotokoll · <span id="protN">0</span> <span style="float:right">PDF ▸</span></button>
   </aside>
   <main class="main" id="main"></main>
 </div>
 <footer>
-  <p class="footer-note">Atommassen (PSE), Konstanten und Dichten nach der mathematisch-naturwissenschaftlichen Formelsammlung (Abiturpool der Länder, Stand 14.02.2024); V<sub>m</sub> = 24,466 L/mol bei 25 °C und 101,325 kPa; Volumina werden als additiv angenommen. Konzentrierte Lösungen: handelsübliche Werte.</p>
+  <p class="footer-note">Atommassen (PSE), Konstanten und Dichten nach IQB Mathematisch-naturwissenschaftliche Formelsammlung (Stand 14.02.2024); V<sub>m</sub> = 24,466 L/mol bei 25 °C und 101,325 kPa; Volumina werden als additiv angenommen. Konzentrierte Lösungen: handelsübliche Werte.</p>
   <p class="footer-credit">Bastian Baumgart · Chemie-Rechner V1.0 · <a href="#" id="lnkVer">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 <div id="modalRoot"></div>
@@ -204,7 +206,7 @@ svg.lw{overflow:visible;flex:none}
 <script>
 'use strict';
 var MODE='calc';
-var PAGE_URL='https://chemie.mail-baumgart.de/EP/0-Rechner.html';
+var PAGE_URL='https://chemie.mail-baumgart.de/Werkzeuge/0-Rechner.html';
 var OTHER_URL=MODE==='react'?'0-Rechner.html':'0-Reaktionsgleichungen.html';
 var PAGENAME=MODE==='react'?'Reaktionsgleichungen und Stöchiometrie':'Chemie-Rechner';
 var VERSION='1.0';
@@ -501,7 +503,6 @@ var RUBRIKEN=[
 function renderHome(){
   var h='<div class="card"><h2 class="t">Rubriken</h2><p class="desc">Wähle einen Themenbereich. Jede Rubrik enthält Rechner mit Rechenweg; die Werte stammen aus der Formelsammlung.</p><div class="tiles">';
   RUBRIKEN.forEach(function(r){h+='<button class="tile'+(r.ok?'':' soon')+'" data-r="'+r.id+'"'+(r.ok?'':' aria-disabled="true"')+'><span class="tic">'+r.ic+'</span><span class="tt">'+r.t+'</span><span class="td">'+r.d+'</span>'+(r.ok?'<span class="tgo">Öffnen ▸</span>':'<span class="tsoon">in Vorbereitung</span>')+'</button>'});
-  h+='<a class="tile" href="'+OTHER_URL+'"><span class="tic">⟶</span><span class="tt">Reaktionsgleichungen und Stöchiometrie</span><span class="td">Gleichungen aufstellen und ausgleichen, Oxidationszahlen, Lewis- und Strukturformeln, Stöchiometrie</span><span class="tgo">Zur Seite ▸</span></a>';
   h+='</div></div>';
   $('main').innerHTML=h;
   $('main').querySelector('.tiles').onclick=function(e){var b=e.target.closest('button.tile');if(!b)return;
@@ -750,7 +751,7 @@ function stState(){var s=st('stoich');if(!s.e){s.e=[emptyRow(),emptyRow(),emptyR
 function stFromLists(s,L,R){s.pre=-1;[['e',L],['p',R]].forEach(function(g){s[g[0]]=g[1].map(function(x){var r=emptyRow();r.co=String(x.c);r.f=x.t;return r});if(!s[g[0]].length)s[g[0]]=[emptyRow()]})}
 function stEqTxt(s){function side(a){return a.filter(function(r){return r.f.trim()}).map(function(r){return (r.co&&r.co!=='1'?r.co+' ':'')+r.f}).join(' + ')}return side(s.e)+' → '+side(s.p)}
 function renderStoich(c){
-  var s=stState();
+  var s=stState();if(typeof rqOpts==='function')rqOpts(false);
   $('cdesc').innerHTML='Gib die Edukte und – falls bekannt – die Produkte ein (als Formeln oder Namen, z. B. <i>Magnesium + Sauerstoff</i>) oder übernimm sie aus „Reaktionsgleichung aufstellen“. Fehlende Koeffizienten und Produkte werden ergänzt. Gib dann in der Tabelle bei einem oder mehreren Stoffen eine Menge an. Bei mehreren Edukten bestimmt der Rechner das <b>limitierende Edukt</b>; mit einer tatsächlich erhaltenen Produktmenge berechnet er die <b>Ausbeute</b>. Gase: V<sub>m</sub> = 24,466 L/mol (25 °C, 101,325 kPa).';
   var eqp=String(s.eq||'').split(/\s*(?:->|→|⟶|=>)\s*/);
   var h='<div class="rqio"><label class="rqlab inLl" for="stL">Edukte</label><input id="stL" class="inL" placeholder="z. B. Magnesium + Sauerstoff" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc((eqp[0]||'').trim())+'"><span class="rqarr">⟶</span><label class="rqlab inRl" for="stR">Produkte <span class="note">(optional)</span></label><input id="stR" class="inR" placeholder="leer lassen oder z. B. MgO" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(eqp.slice(1).join(' ').trim())+'"></div><div class="act"><button class="btn pri" id="stGo">Gleichung übernehmen</button></div><div id="stMsg"></div>';
@@ -1502,7 +1503,7 @@ function fillTab(key,q){
   if(key==='el'){h='<table class="t"><tr><th>Z</th><th>Symbol</th><th>Element</th><th>Atommasse M</th></tr>';
     EL.forEach(function(e){var ms=e.t.replace('.',',');
       if(ok(e.s+' '+e.n+' '+e.z))h+='<tr><td>'+e.z+'</td><td><b>'+e.s+'</b></td><td>'+e.n+'</td><td class="n">'+ms+(e.r?'*':'')+' g/mol'+takeBtn('M',ms,'g/mol')+'</td></tr>'});
-    h+='</table><p class="note">Mittlere relative Atommasse in u; * Atommasse des stabilsten Isotops bei radioaktiven Elementen. Quelle: verändert nach Gemeinsame Abituraufgabenpools der Länder – Aufgaben für die Fächer Mathematik, Chemie und Physik: <i>Mathematisch-naturwissenschaftliche Formelsammlung</i>, Stand: 14.02.2024, Kapitel 4 Anhang, S. 71 (Periodensystem der Elemente).</p>'}
+    h+='</table><p class="note">Mittlere relative Atommasse in u; * Atommasse des stabilsten Isotops bei radioaktiven Elementen. Quelle: verändert nach IQB Mathematisch-naturwissenschaftliche Formelsammlung (Stand 14.02.2024), S. 71.</p>'}
   else if(key==='const'){h='<table class="t"><tr><th>Größe</th><th>Zeichen</th><th>Wert</th></tr>';
     CONST.forEach(function(c){if(!ok(c.n+c.sym))return;
       var tk=c.take?takeBtn(c.qty,c.take,c.qty==='NA'?'1/mol':'L/mol'):'';
@@ -1591,7 +1592,7 @@ function showPSE(){
     var ms=e.t.replace('.',',');
     h+='<div class="el" data-s="'+e.s+'" style="grid-row:'+r+';grid-column:'+(q[1]+1)+'" title="'+e.n+'"><span class="z">'+e.z+'</span>'+(ENS[e.s]?'<span class="en">'+ENS[e.s].replace('.',',')+'</span>':'')+'<div class="sy">'+e.s+'</div><div class="nm">'+e.n+'</div><div class="ms">'+ms+(e.r?'*':'')+'</div></div>'});
   h+='<div class="lab" style="grid-row:11;grid-column:2/4">Lanthanoide</div><div class="lab" style="grid-row:12;grid-column:2/4">Actinoide</div>';
-  h+='</div></div><p class="note" style="margin-top:10px">Oben links: Ordnungszahl · oben rechts: Elektronegativität (nach Pauling) · unten: mittlere relative Atommasse in u (* Atommasse des stabilsten Isotops bei radioaktiven Elementen). Quelle: verändert nach Gemeinsame Abituraufgabenpools der Länder – Aufgaben für die Fächer Mathematik, Chemie und Physik: <i>Mathematisch-naturwissenschaftliche Formelsammlung</i>, Stand: 14.02.2024, Kapitel 4 Anhang, S. 71 (Periodensystem der Elemente). Tipp: Klicke zuerst in ein Feld „molare Masse M“, dann auf ein Element, um dessen Atommasse zu übernehmen.</p>';
+  h+='</div></div><p class="note" style="margin-top:10px">Oben links: Ordnungszahl · oben rechts: Elektronegativität (nach Pauling) · unten: mittlere relative Atommasse in u (* Atommasse des stabilsten Isotops bei radioaktiven Elementen). Quelle: verändert nach IQB Mathematisch-naturwissenschaftliche Formelsammlung (Stand 14.02.2024), S. 71. Tipp: Klicke zuerst in ein Feld „molare Masse M“, dann auf ein Element, um dessen Atommasse zu übernehmen.</p>';
   var box=openModal(h,'wide');box.style.maxWidth='1340px';box.style.width='97vw';
   $('mx').onclick=closeModal;
   box.querySelector('.pse').onclick=function(e){var c=e.target.closest('.el');if(!c)return;var el=EM[c.dataset.s],ms=el.t.replace('.',',');
@@ -2059,7 +2060,26 @@ function ionsOf(t,c){ // [{t,n}] auch für Acid (schwach) und Peroxid
   if(c.k==='peroxide')return[{t:'H2O2',n:1}];
   return[{t:nk(t),n:1}];
 }
+function orgRedox(t){var o=null;try{o=orgInfo(t)}catch(e){}if(!o)return null;
+  function aN(n){return n<=0?'H':(n===1?'CH3':'C'+n+'H'+(2*n+1))}
+  if(o.cls==='alcohol'&&o.deg===1&&o.n)return{prim:1,ald:aN(o.n-1)+'CHO',acid:aN(o.n-1)+'COOH'};
+  if(o.cls==='alcohol'&&o.deg===2&&o.R1&&o.R2)return{p:o.R1+'CO'+o.R2,lab:'Oxidation eines sekundären Alkohols zum Keton'};
+  if(o.cls==='aldehyde')return{p:(o.R||'H')+'COOH',lab:'Oxidation eines Aldehyds zur Carbonsäure'};
+  if(o.cls==='acid'&&o.R==='H')return{p:'CO2',lab:'Oxidation von Methansäure'};
+  return null}
 function redoxSolution(Lt,cl,ans){
+  var strong=Lt.some(function(t,i){return ionsOf(t,cl[i]).some(function(x){return x.t==='MnO4^-'||x.t==='Cr2O7^2-'})});
+  if(!strong)return redoxSolution0(Lt,cl,ans);
+  var added=[],lab=null;
+  for(var i=0;i<Lt.length;i++){var g=orgRedox(Lt[i]);if(!g)continue;var key=nk(Lt[i]),p=g.p;
+    if(g.prim){if(!ans.oxst)return ask_('oxst','Bis zu welcher Stufe wird der primäre Alkohol oxidiert?',[{v:'ald',l:'zum Aldehyd (vorsichtig erhitzen, Aldehyd abdestillieren)'},{v:'acid',l:'zur Carbonsäure (Oxidationsmittel im Überschuss, Erhitzen unter Rückfluss)'}]);
+      p=ans.oxst==='ald'?g.ald:g.acid;lab=ans.oxst==='ald'?'Oxidation eines primären Alkohols zum Aldehyd':'Oxidation eines primären Alkohols zur Carbonsäure'}else lab=g.lab;
+    if(!REDX[key]){REDX[key]={E:0.2,p:p,org:1};added.push(key)}}
+  var r;try{r=redoxSolution0(Lt,cl,ans)}finally{added.forEach(function(k){delete REDX[k]})}
+  if(r&&r.ok&&lab){r.type=lab+' (Redoxreaktion in Lösung)';r.notes=(r.notes||[]).filter(function(n){return !/Reduktionsmittel: /.test(n)||!/0,20 V/.test(n)}).map(function(n){return n.replace(/, Reduktionsmittel: ([^)]*) \(E° = 0,20 V\)/,', Reduktionsmittel: $1')});
+    r.notes.push(/Cr2O7|Dichromat/.test(Lt.join(' '))?'Beobachtung: Die orange Dichromat-Lösung färbt sich grün (Cr³⁺) – Grundlage des früheren Alkoholtests.':'Beobachtung: Die violette Permanganat-Lösung wird entfärbt (Mn²⁺).')}
+  return r}
+function redoxSolution0(Lt,cl,ans){
   var Lt2=Lt.slice(),cl2=cl.slice();
   var allIons={};
   function collect(){allIons={};Lt2.forEach(function(t,i){ionsOf(t,cl2[i]).forEach(function(x){allIons[x.t]=1})})}
@@ -2185,6 +2205,7 @@ function solve2(P,ans){
   if(!P.R||ans.ignoreR)return derive(P.L,ans);
   // Produkte gegeben: zuerst prüfen, ob die Regeln aus den Edukten alle angegebenen Produkte liefern (ergänzt fehlende Stoffe)
   if(!ans.rawBal&&typeof compKey==='function'){var d0=null;try{d0=derive(P.L,ans)}catch(e){}
+    if(d0&&d0.ask&&(d0.ask.id==='oxst'||d0.ask.id==='mil')&&d0.ask.opts){var Pk0=P.R.map(compKey);for(var oi=0;oi<d0.ask.opts.length;oi++){var a2={};for(var kk in ans)a2[kk]=ans[kk];a2[d0.ask.id]=d0.ask.opts[oi].v;var d1=null;try{d1=derive(P.L,a2)}catch(e){}if(d1&&d1.ask&&d1.ask.opts&&(d1.ask.id==='oxst'||d1.ask.id==='mil')){for(var oj=0;oj<d1.ask.opts.length;oj++){var a3={};for(var k3 in a2)a3[k3]=a2[k3];a3[d1.ask.id]=d1.ask.opts[oj].v;var d2=null;try{d2=derive(P.L,a3)}catch(e){}if(d2&&d2.ok&&Pk0.every(function(k){return d2.R.map(function(x){return compKey(x.t)}).indexOf(k)>=0})){d0=d2;break}}if(d0&&d0.ok)break}else if(d1&&d1.ok&&Pk0.every(function(k){return d1.R.map(function(x){return compKey(x.t)}).indexOf(k)>=0})){d0=d1;break}}}
     if(d0&&d0.ok){var Rk=d0.R.map(function(x){return compKey(x.t)}),Pk=P.R.map(compKey);
       if(Pk.every(function(k){return Rk.indexOf(k)>=0})){var extra=d0.R.filter(function(x){return Pk.indexOf(compKey(x.t))<0}).map(function(x){return x.t});
         if(extra.length)d0.notes=(d0.notes||[]).concat(['Ergänzt: '+extra.map(fsp).join(', ')+' (fehlte in deiner Eingabe).']);return d0}}}
@@ -2894,7 +2915,10 @@ function oxChanges(L,R){
     if(!B[e])return;
     var lo=Object.keys(A[e]).filter(function(k){return !B[e][k]}).map(function(k){return A[e][k]}),ro=Object.keys(B[e]).filter(function(k){return !A[e][k]}).map(function(k){return B[e][k]});
     if(!lo.length&&!ro.length)return;
-    if(!lo.length||!ro.length){return}
+    if(!lo.length||!ro.length){var all=function(o,ex){return Object.keys(o).filter(function(k){return ex.indexOf(k)<0}).map(function(k){return o[k]})};
+      if(!ro.length){var lk=Object.keys(A[e]).filter(function(k){return !B[e][k]});ro=Object.keys(B[e]).filter(function(k){return lk.indexOf(k)<0}).map(function(k){return B[e][k]})}
+      else{var rk=Object.keys(B[e]).filter(function(k){return !A[e][k]});lo=Object.keys(A[e]).filter(function(k){return rk.indexOf(k)<0}).map(function(k){return A[e][k]})}
+      if(!lo.length||!ro.length)return}
     function v(x){return x[0]/x[1]}
     var lmax=Math.max.apply(null,lo.map(v)),lmin=Math.min.apply(null,lo.map(v)),rmax=Math.max.apply(null,ro.map(v)),rmin=Math.min.apply(null,ro.map(v)),kind;
     if(rmin>lmax)kind='ox';else if(rmax<lmin)kind='red';else kind=lo.length<ro.length?'dis':'kom';
@@ -3240,6 +3264,7 @@ function orgPiece(base,q){
 function cnt(n){return n>1?'<span class="lwc">'+n+'</span>':''}
 // Darstellung eines Teilchens; null = nicht möglich
 function drawSpecies(t){
+  if(typeof PEPDRAW!=='undefined'&&PEPDRAW[t]){try{return PEPDRAW[t]()}catch(e){}}
   if(t==='e-'||t==='e^-')return simpleTxt('e<sup>−</sup>');
   var sp=pspec(t);if(!sp.ok)return null;
   var b=sp.base,q=sp.q;
@@ -3445,9 +3470,10 @@ function polyCo(A,B){
     bil:polyBil([[1,A.sum],[1,B.sum]],[[1,A.sum],[1,B.sum]],'Atombilanz je eingebautem Monomerpaar:'),fs:'Monomere: '+A.nm+' und '+B.nm};
 }
 function polyShow(r,s,ra){
-  var h='<h3>Ergebnis</h3><div class="eqbig">'+r.eq+'</div><p class="note"><b>Reaktionstyp:</b> '+esc(r.type)+' · '+r.fs+'</p>'+reactClassHtml(r)+mechHtml(r,s.lw);
+  var h='<h3>Ergebnis</h3><div class="eqbig">'+r.eq+'</div><p class="note"><b>Reaktionstyp:</b> '+esc(r.type)+' · '+r.fs+'</p>'+reactClassHtml(r);
   if(s.ox)h+='<p class="note">Die Oxidationszahlen der Atome ändern sich bei der Kunststoffsynthese nicht – es ist <b>keine Redoxreaktion</b>.</p>';
   if(r.grid&&s.lw)h+='<h3>Strukturformeln</h3>'+r.grid+'<p class="note">Die eckigen Klammern umschließen die <b>Wiederholungseinheit</b>; n gibt an, wie oft sie sich wiederholt (meist mehrere Tausend). Die Bindungsstriche an den Klammern zeigen, dass die Kette weitergeht.</p>';
+  h+=s.mech!==false?mechHtml(r,s.lw):'';
   if(r.alt)h+='<div class="note">Annahme ändern:</div><div class="chips" id="rqAlt">'+r.alt.opts.map(function(o){return'<button class="chip'+(o.v===r.alt.cur?' on':'')+'" data-v="'+o.v+'">'+esc(o.l)+'</button>'}).join('')+'</div>';
   h+='<ul class="notes">'+r.notes.map(function(n){return'<li>'+n+'</li>'}).join('')+'</ul><h3>Kontrolle: Atombilanz</h3>'+r.bil;
   if(MODE!=='react')h+='<div class="act"><button class="btn" id="bProt">Zum Rechenprotokoll hinzufügen</button></div>';
@@ -3458,6 +3484,7 @@ function polyShow(r,s,ra){
 }
 // Ergebnis der allgemeinen Regeln mit Kunststoff-Möglichkeiten ergänzen
 function polyMerge(txt,ans,res){
+  var aaR=(typeof aaSolve==='function')?aaSolve(txt,ans):null;if(aaR&&(aaR.syn||!res||!res.ok))return aaR;
   if(res&&res.ask&&res.ask.id==='partner'){var t=String(txt).split('+').map(function(x){return x.trim()}).filter(Boolean);if(t.length!==1)return res;var xo=(typeof extraOx==='function')?extraOx(txt):null;if(xo)return xo;var m=polyFind(t[0]);if(!m)return res;
     var add=m.k==='add'?[{v:'Polymerisation',l:'Polymerisation (Kunststoff)'}]:(m.k==='hacid'||m.k==='aacid'?[{v:'Polykondensation',l:'Polykondensation (Kunststoff)'}]:polyPartners(m.k));
     if(add.length)res.ask.opts=add.concat(res.ask.opts||[]);return res}
@@ -3520,7 +3547,9 @@ function extraOx(txt){
   var r=fin(e[1],F,e[0],{notes:e[2]?[e[2]]:[]});return r.ok?r:null;
 }
 // ======== Reaktionsart (Donator-Akzeptor), Eduktsuche, Ergänzen fehlender Stoffe ========
-function compKey(f){var p=pspec(f);if(!p.ok)return f;var ks=Object.keys(p.el).sort();return ks.map(function(k){return k+p.el[k]}).join('')+'|'+p.q}
+function compKey(f){var p=pspec(f);if(!p.ok)return f;var ks=Object.keys(p.el).sort(),key=ks.map(function(k){return k+p.el[k]}).join('')+'|'+p.q;
+  if(p.el.C&&p.el.H){var o=null;try{o=orgInfo(f)}catch(e){}function hk(x){try{return x?hill(elComb([[1,x]])):''}catch(e){return x||''}}
+    key+='|'+(o&&o.cls?o.cls+(o.deg?o.deg:'')+':'+[o.R,o.R1,o.R2].map(hk).join(','):'other')}return key}
 function elsOf(f){var p=pspec(f);return p.ok?Object.keys(p.el):[]}
 function listF(a){return a.filter(function(x,i){return a.indexOf(x)===i}).map(fsp).join(', ')}
 // ---- Reaktionsart nach dem Donator-Akzeptor-Konzept bzw. Mechanismus ----
@@ -3533,13 +3562,18 @@ var RCLASS=[
  [/Veresterung/,'Kondensationsreaktion (Veresterung)','Das O-Atom des Alkohols greift als Nucleophil das positiv polarisierte C-Atom der Carboxygruppe an (nucleophile Addition), anschließend wird Wasser abgespalten (Eliminierung). Säurekatalysiert, Gleichgewichtsreaktion.'],
  [/Verseifung/,'Hydrolyse (alkalische Esterspaltung, nucleophiler Angriff von OH⁻)','Das Hydroxid-Ion greift als Nucleophil das Carbonyl-C-Atom des Esters an. Es entstehen der Alkohol und das Salz der Carbonsäure; die Reaktion ist nicht umkehrbar.'],
  [/Esterhydrolyse|Fetthydrolyse|Hydrolyse eines Zweifachzuckers/,'Hydrolyse (Spaltung durch Wasser)','Umkehrung der Kondensation: Durch Reaktion mit Wasser wird eine Ester- bzw. glycosidische Bindung gespalten.'],
+ [/Eliminierung/,'Eliminierung (E)','Aus einem Molekül werden zwei Atome bzw. Atomgruppen an benachbarten C-Atomen abgespalten (hier H und OH als Wasser); es entsteht eine C=C-Doppelbindung.'],
+ [/Aminosäuresynthese/,'Nucleophile Substitution (S<sub>N</sub>) – Aminosäuresynthese','Das freie Elektronenpaar des N-Atoms im Ammoniak greift das positiv polarisierte α-C-Atom an; das Halogenid-Ion wird als Abgangsgruppe verdrängt.'],
+ [/Strecker-Synthese \(1/,'Nucleophile Addition (Strecker-Synthese)','Ammoniak addiert an die C=O-Doppelbindung des Aldehyds (Iminbildung unter Wasserabspaltung), anschließend addiert das Cyanid an die C=N-Doppelbindung.'],
+ [/Strecker-Synthese \(2/,'Hydrolyse (Spaltung durch Wasser)','Die Nitrilgruppe wird durch Wasser in saurer Lösung zur Carboxygruppe umgesetzt.'],
+ [/Peptidbindung/,'Kondensationsreaktion (Bildung einer Peptidbindung)','Die Aminogruppe der einen Aminosäure greift als Nucleophil das C-Atom der Carboxygruppe der anderen an; unter Abspaltung von Wasser entsteht die Peptidbindung –CO–NH–.'],
  [/Polykondensation/,'Kondensationsreaktion (Polykondensation)','Monomere mit zwei funktionellen Gruppen verknüpfen sich schrittweise; bei jedem Schritt wird ein kleines Molekül (Wasser) abgespalten.'],
  [/Polyaddition/,'Additionsreaktion (Polyaddition)','Die Monomere verknüpfen sich durch Addition (Umlagerung eines H-Atoms), ohne dass ein Nebenprodukt entsteht.'],
  [/Ringöffnung/,'Ringöffnungspolymerisation','Ringförmige Monomere werden geöffnet und zu Ketten verknüpft.'],
  [/Polymerisation/,'Radikalische Polymerisation (Kettenreaktion)','Radikale addieren sich an die C=C-Doppelbindungen der Monomere: Startreaktion, Kettenwachstum, Kettenabbruch.'],
  [/Komplexbildung/,'Komplexbildungsreaktion (Elektronenpaarübertragung)','Liganden mit freien Elektronenpaaren (Elektronenpaardonatoren) binden an das Zentral-Ion (Elektronenpaarakzeptor); dabei werden Wasser-Liganden ausgetauscht.'],
  [/Fällung/,'Fällungsreaktion (Ionenreaktion)','Aus gelösten Ionen bildet sich ein schwer lösliches Salz, das als Niederschlag ausfällt. Die übrigen Ionen bleiben gelöst (Zuschauer-Ionen).']];
-var ACIDBASE=/Neutralisation|Protolyse|Säure \+ Metalloxid|Gasentwicklung|Basisches Oxid \+ Wasser|Säure \+ Ammoniak|Amin als Base/;
+var ACIDBASE=/Aminogruppe als Base|Neutralisation|Protolyse|Säure \+ Metalloxid|Gasentwicklung|Basisches Oxid \+ Wasser|Säure \+ Ammoniak|Amin als Base/;
 function reactClass(r){
   var t=r.type||'';
   for(var i=0;i<RCLASS.length;i++)if(RCLASS[i][0].test(t))return{n:RCLASS[i][1],d:RCLASS[i][2]};
@@ -3548,7 +3582,7 @@ function reactClass(r){
   var L=(r.L||[]).map(function(x){return x.t});
   if(chg.length){
     var ox=chg.filter(function(c){return c.kind==='ox'}),red=chg.filter(function(c){return c.kind==='red'}),dis=chg.filter(function(c){return c.kind==='dis'||c.kind==='kom'});
-    function holders(es){var o=[];es.forEach(function(c){L.forEach(function(f){if(elsOf(f.split('^')[0]).indexOf(c.e)>=0&&o.indexOf(f)<0)o.push(f)})});return o}
+    function holders(es){var o=[];es.forEach(function(c){var fr=String(c.from).split(' und ');L.forEach(function(f){var v=null;try{v=oxValues([{c:1,t:f}])[c.e]}catch(e){}var hit=v&&Object.keys(v).some(function(kk){return fr.indexOf(onTxt(v[kk]))>=0});if((hit||(!v&&elsOf(f.split('^')[0]).indexOf(c.e)>=0))&&o.indexOf(f)<0)o.push(f)})});return o}
     var d='';
     if(ox.length&&red.length)d='Elektronendonator (Reduktionsmittel, wird oxidiert): <b>'+listF(holders(ox))+'</b> – '+ox.map(function(c){return c.e+': '+c.from+' → '+c.to}).join('; ')+'. Elektronenakzeptor (Oxidationsmittel, wird reduziert): <b>'+listF(holders(red))+'</b> – '+red.map(function(c){return c.e+': '+c.from+' → '+c.to}).join('; ')+'.';
     else if(dis.length)d=(dis[0].kind==='kom'?'Komproportionierung':'Disproportionierung')+': Atome desselben Elements ('+dis.map(function(c){return c.e}).join(', ')+') werden zugleich oxidiert und reduziert ('+dis.map(function(c){return c.from+' → '+c.to}).join('; ')+').';
@@ -3557,6 +3591,7 @@ function reactClass(r){
   if(ACIDBASE.test(t)){
     var cl=L.map(function(f){try{return classify(f)}catch(e){return{}}}),don=[],acc=[];
     L.forEach(function(f,i){var k=cl[i].k;if(k==='acid'||/^NH4/.test(f)||(k==='organic'&&/COOH|C6H5OH/.test(f)))don.push(f)});
+    if(/Aminogruppe als Base/.test(t))don=L.filter(function(f){return f==='HCl'});
     if(!don.length&&L.indexOf('H2O')>=0)don.push('H2O');
     L.forEach(function(f){if(don.indexOf(f)<0)acc.push(f)});
     return{n:'Protonenübertragungsreaktion (Säure-Base-Reaktion)',d:'Protonendonator (Säure): <b>'+listF(don)+'</b>; Protonenakzeptor (Base): <b>'+listF(acc)+'</b>. '+(/Gasentwicklung/.test(t)?'Die entstehende Kohlensäure bzw. schweflige Säure zerfällt, das Gas entweicht.':'Die Oxidationszahlen ändern sich nicht.')}
@@ -3588,6 +3623,24 @@ function eductPool(F){
     })}
   return pool.filter(function(x,i){return pool.indexOf(x)===i&&pspec(x).ok});
 }
+
+// gezielte Vorstufen für organische Produkte (Oxidation, Hydrolyse, Addition …)
+function precursorCands(P){var out=[];
+  P.forEach(function(f){var o=null;try{o=orgInfo(f)}catch(e){}if(!o)return;
+    function al(R){return R==='H'?'CH3OH':(R==='CH3'?'C2H5OH':R+'CH2OH')}
+    if(o.cls==='acid'){var R=o.R;
+      out.push({L:[R+'CHO','O2'],txt:R+'CHO + O2 -> '+f,type:'Oxidation eines Aldehyds zur Carbonsäure'});
+      out.push({L:[al(R),'O2'],txt:al(R)+' + O2 -> '+f+' + H2O',type:'Oxidation eines primären Alkohols zur Carbonsäure'});
+      out.push({L:[al(R),'KMnO4'],txt:al(R)+' + KMnO4 -> '+f});
+      out.push({L:[R+'COOC2H5','H2O'],txt:R+'COOC2H5 + H2O'});
+      out.push({L:[R+'COONa','HCl'],txt:R+'COONa + HCl'});
+      if(R==='CH3')out.push({L:['C2H5OH','O2'],txt:'C2H5OH + O2 -> CH3COOH + H2O',type:'Essigsäuregärung (Oxidation von Ethanol durch Essigsäurebakterien)'});}
+    if(typeof aaOf==='function'){var aq=aaOf(f);if(aq&&aq[2]!==null){var Ra=({'CH2C6H5':'C6H5CH2','CH(CH3)2':'(CH3)2CH','CH2CH(CH3)2':'(CH3)2CHCH2','CH2OH':'HOCH2','CH2SH':'HSCH2','CH(CH3)CH2CH3':'CH3CH2CH(CH3)','CH2COOH':'HOOCCH2','CH2CH2COOH':'HOOCCH2CH2','CH2C6H4OH':'HOC6H4CH2','CH2CH2SCH3':'CH3SCH2CH2'})[aq[2]]||aq[2];out.push({L:[Ra==='H'?'ClCH2COOH':Ra+'CHClCOOH','NH3'],txt:(Ra==='H'?'ClCH2COOH':Ra+'CHClCOOH')+' + NH3',aa:1});out.push({L:[Ra==='H'?'H2NCH2CN':'H2NCH('+Ra+')CN','H2O','HCl'],txt:(Ra==='H'?'H2NCH2CN':'H2NCH('+Ra+')CN')+' + H2O + HCl',aa:1})}}
+    if(o.cls==='aldehyde'){var R2=o.R;out.push({L:[al(R2),'CuO'],txt:al(R2)+' + CuO -> '+f+' + Cu + H2O',type:'Oxidation eines primären Alkohols zum Aldehyd'});out.push({L:[al(R2),'K2Cr2O7'],txt:al(R2)+' + K2Cr2O7 -> '+f});}
+    if(o.cls==='alcohol'&&o.n){var n=o.n;out.push({L:[cH(n,2*n),'H2O'],txt:cH(n,2*n)+' + H2O'});if(n===2)out.push({L:['C6H12O6'],txt:'C6H12O6 -> C2H5OH + CO2',type:'Alkoholische Gärung'})}
+  });
+  return out;
+}
 function solveSafe(t,a){try{return solve(t,a||{})}catch(e){return{err:e.message}}}
 // Lk: bekannte Edukte (Formeln), P: gegebene Produkte (Formeln)
 function eductSearch(Lk,P){
@@ -3605,6 +3658,11 @@ function eductSearch(Lk,P){
   else{sets.push(Lk.slice());if(Lk.length<3)share.concat(free).forEach(function(a){sets.push(Lk.concat([a]))})}
   sets=sets.filter(okC);
   var need=Object.keys(pEl),out=[],seen={},t0=Date.now();
+  precursorCands(P).forEach(function(pc){var rr=null;try{rr=reqNormal(pc.txt,{})}catch(e){}if(!rr||!rr.ok||rr.poly)return;
+    var Rk=rr.R.map(function(x){return compKey(x.t)});if(!Pk.every(function(k){return Rk.indexOf(k)>=0}))return;
+    if(pc.type&&(rr.type==='Ausgleichen'||/Verbrennung/.test(rr.type)))rr.type=pc.type;
+    if(Lk.length&&!Lk.every(function(f){return rr.L.some(function(x){return compKey(x.t)===compKey(f)})}))return;
+    var key=rr.L.map(function(x){return x.c+x.t}).sort().join('+')+'>'+rr.R.map(function(x){return x.c+x.t}).sort().join('+');if(seen[key])return;seen[key]=1;out.push({L:rr.L.map(function(x){return x.t}),txt:pc.txt,ans:{},r:rr,score:100-out.length})});
   sets.forEach(function(S){
     if(Date.now()-t0>6000)return;
     var u={};S.forEach(function(f){elsOf(f).forEach(function(e){u[e]=1})});
@@ -3614,7 +3672,7 @@ function eductSearch(Lk,P){
     tries.forEach(function(a){
       var rr=Object.keys(a).length?solveSafe(txt,a):r;if(!rr||!rr.ok)return;
       var Rk=rr.R.map(function(x){return compKey(x.t)});if(!Pk.every(function(k){return Rk.indexOf(k)>=0}))return;
-      var key=feq(rr.L,rr.R);if(seen[key])return;seen[key]=1;
+      var key=rr.L.map(function(x){return x.c+x.t}).sort().join('+')+'>'+rr.R.map(function(x){return x.c+x.t}).sort().join('+');if(seen[key])return;seen[key]=1;
       var exact=P.filter(function(f){return rr.R.some(function(x){return x.t===f})}).length;
       out.push({L:S,ans:a,r:rr,score:exact*10-(rr.R.length-P.length)*2-S.length-(rr.type==='Ausgleichen'?5:0)});
     });
@@ -3623,7 +3681,8 @@ function eductSearch(Lk,P){
   return out.slice(0,10);
 }
 function isPh(x){return /^(\?+|…|\.\.\.|x|X|_+)$/.test(x.trim())}
-function reqNormal(txt,ans){return polySolve(txt,ans,false)||polyMerge(txt,ans,solve(txt,ans))}
+function reqNormal(txt,ans){var r=polySolve(txt,ans,false)||polyMerge(txt,ans,solve(txt,ans));if(r&&r.ok&&!r.poly&&r.type==='Ausgleichen')typeFix(r);return r}
+function typeFix(r){try{var Rf=r.R.map(function(x){return x.t}),key=feq(r.L,r.R);precursorCands(Rf).some(function(pc){if(!pc.type)return false;var q=null;try{q=polySolve(pc.txt,{},false)||solve(pc.txt,{})}catch(e){}if(q&&q.ok&&feq(q.L,q.R)===key){r.type=pc.type;return true}return false})}catch(e){}}
 // Hauptfunktion für die Seite
 function reqSolve(txt,ans){
   var t=String(txt||'').trim();
@@ -3648,7 +3707,7 @@ function searchShow(r,s,ra){
   r.cands.forEach(function(c,i){var rc=reactClass(c.r);h+='<button class="cand" data-i="'+i+'"><span class="eqh">'+feq(c.r.L,c.r.R,c.r.arrow)+'</span><span class="note">'+(rc&&rc.n.indexOf(c.r.type)===0?rc.n:esc(c.r.type)+(rc?' · '+rc.n:''))+'</span></button>'});
   h+='</div><p class="note">Gefunden wurden typische Schulreaktionen aus bekannten Stoffen. Weitere Wege sind möglich.</p>';
   ra.innerHTML=h;S.last=null;
-  ra.querySelectorAll('.cand').forEach(function(b){b.onclick=function(){var c=r.cands[+b.dataset.i];s.back={txt:s.txt,res:r};s.txt=c.L.join(' + ');s.ans=c.ans;if(typeof rqFill==='function')rqFill();reqRun()}});
+  ra.querySelectorAll('.cand').forEach(function(b){b.onclick=function(){var c=r.cands[+b.dataset.i];s.back={txt:s.txt,res:r};s.txt=c.txt||c.L.join(' + ');s.ans=c.ans;if(typeof rqFill==='function')rqFill();reqRun()}});
 }
 // ======== Reaktionsmechanismen Schritt für Schritt ========
 function mF(s){ // Halbstruktur-/Summenformel mit Tiefstellung; ^+ ^- ^(δ+) als Hochstellung, * als Radikalpunkt
@@ -3743,12 +3802,12 @@ function mechSteps(r){
       mStep('Abspaltung des Alkoholat-Ions',[mEq([Re+'–C(O^-)(OH)–O–'+Ro2],[Re+'–COOH',Ro2+'–O^-'])],'Die C=O-Doppelbindung bildet sich zurück, das Alkoholat-Ion wird abgespalten.'),
       mStep('Protonenübergang',[mEq([Re+'–COOH',Ro2+'–O^-'],[Re+'–COO^-',Ro2+'–OH'])],'Das stark basische Alkoholat-Ion nimmt das Proton der Carbonsäure auf. Das Carboxylat-Ion reagiert nicht zurück – die Verseifung ist nicht umkehrbar.')]};
   }
-  if(r.pc&&/Polykondensation|Polyaddition/.test(t)){var lb=pcLab(r.pc),A=lb.A,B=lb.B,k=r.pc.k,grow=mStep('Kettenwachstum',[mEq([],[],'')].slice(0,0).concat(['<div class="meq">'+(r.eq||'')+'</div>']),'Jedes Monomer trägt zwei funktionelle Gruppen. Deshalb kann das Produkt an beiden Enden weiterreagieren – Schritt für Schritt entstehen lange Ketten.');
+  if(r.pc&&/Polykondensation|Polyaddition|Peptidbindung/.test(t)){var lb=pcLab(r.pc),A=lb.A,B=lb.B,k=r.pc.k,grow=r.pc.pep?mStep('Weitere Verknüpfung',[],'Das Dipeptid trägt noch eine freie Amino- und eine freie Carboxygruppe. Daran können weitere Aminosäuren auf dieselbe Weise gebunden werden – es entstehen Polypeptide und Proteine.'):mStep('Kettenwachstum',[mEq([],[],'')].slice(0,0).concat(['<div class="meq">'+(r.eq||'')+'</div>']),'Jedes Monomer trägt zwei funktionelle Gruppen. Deshalb kann das Produkt an beiden Enden weiterreagieren – Schritt für Schritt entstehen lange Ketten.');
     if(k==='ester')return{name:'Polykondensation zum Polyester (säurekatalysierte Veresterung an beiden Kettenenden)',steps:esterTextSteps(A,B).concat([grow])};
-    if(k==='amid')return{name:'Polykondensation zum Polyamid (nucleophile Addition + Eliminierung)',steps:[
+    if(k==='amid')return{name:r.pc.pep?'Bildung der Peptidbindung (nucleophile Addition + Eliminierung)':'Polykondensation zum Polyamid (nucleophile Addition + Eliminierung)',steps:[
       mStep('Nucleophiler Angriff',[mEq([A+'–COOH','H2N–'+B],[A+'–C(O^-)(OH)–N^+H2–'+B],'⇌')],'Das N-Atom der Aminogruppe greift mit seinem freien Elektronenpaar das positiv polarisierte C-Atom der Carboxygruppe an; die C=O-Doppelbindung klappt zum O-Atom um.'),
       mStep('Protonenübergang',[mEq([A+'–C(O^-)(OH)–N^+H2–'+B],[A+'–C(OH)2–NH–'+B],'⇌')],'Ein Proton wandert vom N-Atom zum negativ geladenen O-Atom.'),
-      mStep('Abspaltung von Wasser',[mEq([A+'–C(OH)2–NH–'+B],[A+'–CO–NH–'+B,'H2O'])],'Die C=O-Doppelbindung bildet sich zurück, Wasser wird abgespalten. Es entsteht die Amidgruppe (Peptidgruppe) –CO–NH–. Vereinfacht: Technisch wird zuerst das Ammoniumsalz („Nylonsalz“) gebildet und erhitzt.'),grow]};
+      mStep('Abspaltung von Wasser',[mEq([A+'–C(OH)2–NH–'+B],[A+'–CO–NH–'+B,'H2O'])],'Die C=O-Doppelbindung bildet sich zurück, Wasser wird abgespalten. Es entsteht die Amidgruppe (Peptidgruppe) –CO–NH–.'+(r.pc.pep?' Vereinfachte Darstellung: In Zellen wird die Carboxygruppe zuvor aktiviert (an tRNA gebunden), die Verknüpfung erfolgt am Ribosom.':' Vereinfacht: Technisch wird zuerst das Ammoniumsalz („Nylonsalz“) gebildet und erhitzt.')),grow]};
     var nu=k==='urethan'?'O':'N';return{name:'Polyaddition zum '+(k==='urethan'?'Polyurethan':'Polyharnstoff')+' (nucleophile Addition an die Isocyanatgruppe)',steps:[
       mStep('Nucleophiler Angriff',[mEq([A+'–N=C=O',(nu==='O'?'HO–':'H2N–')+B],[A+'–N^-–C(=O)–'+(nu==='O'?'O^+H–':'N^+H2–')+B])],'Das '+nu+'-Atom greift mit einem freien Elektronenpaar das stark positiv polarisierte C-Atom der Isocyanatgruppe –N=C=O an; die N=C-Doppelbindung klappt zum N-Atom um.'),
       mStep('Protonenübergang',[mEq([A+'–N^-–C(=O)–'+(nu==='O'?'O^+H–':'N^+H2–')+B],[A+'–NH–CO–'+(nu==='O'?'O–':'NH–')+B])],'Das Proton wandert zum negativ geladenen N-Atom. Es entsteht eine '+(nu==='O'?'Urethangruppe –NH–CO–O–':'Harnstoffgruppe –NH–CO–NH–')+'; anders als bei der Polykondensation wird nichts abgespalten.'),grow]};
@@ -3843,7 +3902,7 @@ function esterLewis(Ra,Ro){var st=mScene;
 }
 function mechLewis(r){
   var t=r.type||'',L=r.L||[],R=r.R||[],S=[];
-  if(r.pc&&/Polykondensation|Polyaddition/.test(t))return mechLewisPoly(r);
+  if(r.pc&&/Polykondensation|Polyaddition|Peptidbindung/.test(t))return mechLewisPoly(r);
   function st(items,curves){return mScene(items,curves)}
   if(/Radikalische Substitution/.test(t)){
     var X2=mFind(L,/^(Cl2|Br2|F2|I2)$/)||'Cl2',X=X2.replace('2',''),alk=L.filter(function(y){return y.t!==X2})[0],n=alk?cOfF(alk.t):1,rem=alkylN(n-1);
@@ -3991,6 +4050,180 @@ function mechLewisPoly(r){var pc=r.pc;if(!pc)return null;var l=pcLab(pc);
 function piAlkene(rm,X){var m=MM();mA(m,'C1','C',0,0);mA(m,'C2','C',1,0);mB(m,'C1','C2',2);mSub(m,'a','H',-0.55,-0.85,'C1');mSub(m,'b','H',-0.55,0.85,'C1');mSub(m,'c','H',1.55,-0.85,'C2');mSub(m,'d',rm,1.55,0.85,'C2');
   mA(m,'M','',0.5,0,{hide:1});mA(m,'X1',X,0.5,-1.15,{lp:3});mA(m,'X2',X,0.5,-2.15,{lp:3});mB(m,'X1','X2');m.bonds.push({a:m.ids.M,b:m.ids.X1,o:1,dash:1});mT(m,1.05,-1.3,'δ+','mdl');mT(m,1.05,-2.3,'δ−','mdl');return m}
 function piBenz(E){var m=MM();mRing(m,0,0,[1,3,5]);mA(m,'M','',0,0,{hide:1});mA(m,'X',E,1.9,-0.2,{ps:/^[A-Z][a-z]?$/.test(E)?0:1,lp:/^(Br|Cl)$/.test(E)?3:0,fc:1});m.bonds.push({a:m.ids.M,b:m.ids.X,o:1,dash:1});return m}
+// ======== Aminosäuren: Namen, Peptidbindung, Säure-Base-Reaktionen ========
+var AAS=[['Glycin','Gly','H'],['Alanin','Ala','CH3'],['Valin','Val','CH(CH3)2'],['Leucin','Leu','CH2CH(CH3)2'],['Isoleucin','Ile','CH(CH3)CH2CH3'],
+ ['Prolin','Pro',null],['Phenylalanin','Phe','CH2C6H5'],['Tyrosin','Tyr','CH2C6H4OH'],['Tryptophan','Trp','CH2C8H6N'],['Serin','Ser','CH2OH'],
+ ['Threonin','Thr','CH(OH)CH3'],['Cystein','Cys','CH2SH'],['Methionin','Met','CH2CH2SCH3'],['Asparagin','Asn','CH2CONH2'],['Glutamin','Gln','CH2CH2CONH2'],
+ ['Asparaginsäure','Asp','CH2COOH'],['Glutaminsäure','Glu','CH2CH2COOH'],['Lysin','Lys','(CH2)4NH2'],['Arginin','Arg','(CH2)3NHC(NH)NH2'],['Histidin','His','CH2C3H3N2']];
+function aaF(a){return a[2]===null?'C4H7NHCOOH':(a[2]==='H'?'H2NCH2COOH':'H2NCH('+a[2]+')COOH')}
+(function(){var al={'asparaginsaeure':'Asparaginsäure','aspartat':'Asparaginsäure','glutaminsaeure':'Glutaminsäure','glutamat':'Glutaminsäure','glycocoll':'Glycin','glykokoll':'Glycin','2-aminoethansäure':'Glycin','aminoethansäure':'Glycin','aminoessigsäure':'Glycin','2-aminopropansäure':'Alanin'};
+  AAS.forEach(function(a){var k=a[0].toLowerCase();if(!NAMEDICT[k])NAMEDICT[k]=aaF(a)});
+  Object.keys(al).forEach(function(k){var a=AAS.filter(function(x){return x[0]===al[k]})[0];if(a&&!NAMEDICT[k.replace(/[\s\-]/g,'')])NAMEDICT[k.replace(/[\s\-]/g,'')]=aaF(a)})})();
+function aaOf(term){var t=String(term).trim();if(!t)return null;var low=t.toLowerCase();
+  var a=AAS.filter(function(x){return x[0].toLowerCase()===low||x[1].toLowerCase()===low&&/^[A-Z][a-z]{2}$/.test(t)})[0];if(a)return a;
+  var f=null;try{f=formulaFromInput(t)}catch(e){}if(!f||f.err)return null;
+  var hits=AAS.filter(function(x){return aaF(x)===f.f});if(hits.length)return hits[0];
+  var p=pspec(f.f);if(!p.ok||!p.el.N)return null;var h=hill(p.el);hits=AAS.filter(function(x){return hill(pspec(aaF(x)).el)===h});
+  return hits.length===1&&/NH2|H2N|N/.test(f.f)&&/COOH/.test(f.f)?hits[0]:null}
+function aaSeg(a){return a[2]===null?null:(a[2]==='H'?'CH2':'CH('+a[2]+')')}
+function aaLab(a){return a[2]===null?'C₄H₇NH':(a[2]==='H'?'H₂N–CH2':'H₂N–CH('+a[2]+')')}
+function pepF(a1,a2){if(a1[2]!==null&&a2[2]!==null)return 'H2N'+aaSeg(a1)+'CONH'+aaSeg(a2)+'COOH';
+  if(a1[2]===null&&a2[2]!==null)return 'C4H7NHCONH'+aaSeg(a2)+'COOH';
+  return hill(elComb([[1,aaF(a1)],[1,aaF(a2)],[-1,'H2O']]))}
+var PEPDRAW={};
+function aaSide(m,id,R,x){if(R==='H')mA(m,id+'u','H',x,-1);else mA(m,id+'u',R,x,-1,{ps:1,anch:R.length>3?'start':null});mB(m,id,id+'u');mA(m,id+'d','H',x,1);mB(m,id,id+'d')}
+function aaFrag(m,p,x,R,last){ // –CH(R)–C(=O)– ab x; liefert id des Carbonyl-C
+  mA(m,p+'a','C',x,0);aaSide(m,p+'a',R,x);mA(m,p+'c','C',x+1,0);mB(m,p+'a',p+'c');mA(m,p+'o','O',x+1,1,{lp:2});mB(m,p+'c',p+'o',2);return p+'c'}
+function nTerm(m,cat){mA(m,'N1','N',0,0,cat?{fc:1}:{lp:1});mA(m,'h1','H',-0.6,-0.8);mA(m,'h2','H',-0.6,0.8);mB(m,'N1','h1');mB(m,'N1','h2');if(cat){mA(m,'h0','H',-1,0);mB(m,'N1','h0')}}
+function cTerm(m,c,x){mA(m,'O3','O',x,0,{lp:2});mB(m,c,'O3');mA(m,'h4','H',x+0.6,0.8);mB(m,'O3','h4')}
+function aaDraw(a){var m=MM();nTerm(m);var c=aaFrag(m,'A',1,a[2]);mB(m,'N1','Aa');cTerm(m,c,3);return svgGraph(m)}
+function pepDraw(a1,a2){var m=MM();nTerm(m);var c=aaFrag(m,'A',1,a1[2]);mB(m,'N1','Aa');mA(m,'N2','N',3,0,{lp:1});mB(m,c,'N2');mA(m,'h3','H',3,1);mB(m,'N2','h3');
+  var c2=aaFrag(m,'B',4,a2[2]);mB(m,'N2','Ba');cTerm(m,c2,6);mT(m,2.5,1.85,'Peptidbindung','mdl');return svgGraph(m,{texts:m.texts})}
+function saltDraw(a){var m=MM();nTerm(m,1);var c=aaFrag(m,'A',1,a[2]);mB(m,'N1','Aa');cTerm(m,c,3);var cl=MM();mA(cl,'X','Cl',0,0,{lp:4,fc:-1});return svgGraph(m)+'<span class="lwop"> </span>'+svgGraph(cl)}
+AAS.forEach(function(a){if(a[2]===null)return;var f=function(){return aaDraw(a)};PEPDRAW[aaF(a)]=f;var k=NAMEDICT[a[0].toLowerCase()];if(k)PEPDRAW[k]=f});
+(function(){var D={chloressigsäure:'ClCH2COOH',monochloressigsäure:'ClCH2COOH',chlorethansäure:'ClCH2COOH','2chlorethansäure':'ClCH2COOH',bromessigsäure:'BrCH2COOH',bromethansäure:'BrCH2COOH','2bromethansäure':'BrCH2COOH',
+  '2chlorpropansäure':'CH3CHClCOOH','2brompropansäure':'CH3CHBrCOOH','2chlorbutansäure':'C2H5CHClCOOH','2brombutansäure':'C2H5CHBrCOOH','2brom3methylbutansäure':'(CH3)2CHCHBrCOOH','2brom3phenylpropansäure':'C6H5CH2CHBrCOOH',
+  aminoacetonitril:'H2NCH2CN',aminoethannitril:'H2NCH2CN','2aminopropannitril':'H2NCH(CH3)CN',methanal:'HCHO',formaldehyd:'HCHO',phenylethanal:'C6H5CH2CHO','2methylpropanal':'(CH3)2CHCHO',methylpropanal:'(CH3)2CHCHO'};
+  Object.keys(D).forEach(function(k){if(!NAMEDICT[k])NAMEDICT[k]=D[k]})})();
+function aaByR(R){var a=AAS.filter(function(x){return x[2]===R})[0];if(a)return a;var h=null;try{h=hill(elComb([[1,R]]))}catch(e){}if(!h)return null;var c=AAS.filter(function(x){if(!x[2]||x[2]==='H')return false;try{return hill(elComb([[1,x[2]]]))===h}catch(e){return false}});return c.length===1?c[0]:null}
+function normR(R){var a=aaByR(R);return a?a[2]:R}
+function aaFR(R){R=normR(R);return R==='H'?'H2NCH2COOH':'H2NCH('+R+')COOH'}
+function aaNameR(R){var a=aaByR(R);return a?a[0]:'die Aminosäure'}
+function haloR(f){var m=f.match(/^(Cl|Br|I)CH2COOH$/);if(m)return{R:'H',X:m[1]};m=f.match(/^(.+)CH(Cl|Br|I)COOH$/);if(m)return{R:m[1],X:m[2]};return null}
+function aaSynth(T){if(T.length<2||T.length>3)return null;var F=[];for(var i=0;i<T.length;i++){var f=null;try{f=formulaFromInput(T[i])}catch(e){}if(!f||f.err)return null;F.push(f.f)}
+  var has=function(x){return F.indexOf(x)>=0},rest=F.filter(function(x){return x!=='NH3'&&x!=='HCN'&&x!=='H2O'&&x!=='HCl'});
+  if(F.length===2&&has('NH3')&&rest.length===1){var h=haloR(rest[0]);if(h){var aa=aaFR(h.R);
+    var r=fin('Aminosäuresynthese (Substitution mit Ammoniak)',[rest[0],'NH3'],[aa,'NH4'+h.X],{notes:['Es entsteht <b>'+aaNameR(h.R)+'</b>. Das Ammoniakmolekül greift als Nucleophil das C-Atom an, das das Halogenatom trägt (α-C-Atom), und ersetzt das Halogenatom durch die Aminogruppe (nucleophile Substitution).','Daneben reagiert Ammoniak auch als Base mit der Carboxygruppe (Ammoniumsalz); für die Synthese entscheidend ist die Substitution am α-C-Atom. Ein zweites Ammoniakmolekül bindet den entstehenden Halogenwasserstoff als Ammoniumsalz. Ammoniak wird im Überschuss eingesetzt, damit nicht mehrere Säurereste am N-Atom gebunden werden.','Auf diesem Weg entsteht ein Racemat (Gemisch beider Enantiomere); in Proteinen kommen nur L-Aminosäuren vor.']});return r.ok?r:null}}
+  if(F.length===3&&has('NH3')&&has('HCN')&&rest.length===1){var o=null;try{o=orgInfo(rest[0])}catch(e){}if((!o||o.cls!=='aldehyde')&&/CHO$/.test(rest[0])&&!/COOH/.test(rest[0]))o={cls:'aldehyde',R:rest[0]==='HCHO'?'H':rest[0].slice(0,-3)};if(o&&o.cls==='aldehyde'){var R=normR(o.R||'H'),an=R==='H'?'H2NCH2CN':'H2NCH('+R+')CN';
+    var r2=fin('Strecker-Synthese (1. Schritt: Bildung des α-Aminonitrils)',[rest[0],'NH3','HCN'],[an,'H2O'],{notes:['Aus dem Aldehyd und Ammoniak bildet sich zunächst ein Imin, an das Cyanwasserstoff addiert wird. Es entsteht ein <b>α-Aminonitril</b>.','2. Schritt (saure Hydrolyse der Nitrilgruppe): '+mF(an)+' + 2 H<sub>2</sub>O + HCl ⟶ '+mF(aaFR(R))+' + NH<sub>4</sub>Cl. Ergebnis: <b>'+aaNameR(R)+'</b> (als Racemat). Gib dazu <i>'+an+' + H2O + HCl</i> ein.','Vorsicht: Cyanwasserstoff (Blausäure) ist sehr giftig – die Strecker-Synthese wird nicht im Schulversuch durchgeführt.']});return r2.ok?r2:null}}
+  if(has('H2O')&&rest.length===1&&/CN$/.test(rest[0])&&/^H2NCH/.test(rest[0])){var R2=rest[0]==='H2NCH2CN'?'H':(rest[0].match(/^H2NCH\((.*)\)CN$/)||[])[1];if(R2==null)return null;var withH=has('HCl');
+    var r3=fin('Strecker-Synthese (2. Schritt: Hydrolyse des Aminonitrils)',withH?[rest[0],'H2O','HCl']:[rest[0],'H2O'],withH?[aaFR(R2),'NH4Cl']:[aaFR(R2),'NH3'],{notes:['Die Nitrilgruppe –C≡N wird in saurer Lösung zur Carboxygruppe –COOH hydrolysiert; der Stickstoff wird als Ammonium-Ion abgespalten. Es entsteht <b>'+aaNameR(R2)+'</b>.']});return r3.ok?r3:null}
+  return null}
+function aaSolve(txt,ans){
+  var t=String(txt||'');if(/(->|→|⟶|=>)/.test(t))return null;
+  var T=t.split('+').map(function(x){return x.trim()}).filter(Boolean);if(ans&&ans.partner)T.push(ans.partner);
+  var syn=aaSynth(T);if(syn){syn.syn=1;return syn}
+  if(!T.length||T.length>2)return null;var A=T.map(aaOf);if(!A.some(Boolean))return null;
+  if(T.length===1){var a=A[0];return{ask:{id:'partner',q:'Womit soll '+a[0]+' reagieren?',opts:[{v:a[0],l:'mit '+a[0]+' (Dipeptid, Peptidbindung)'},{v:a[0]==='Glycin'?'Alanin':'Glycin',l:'mit '+(a[0]==='Glycin'?'Alanin':'Glycin')+' (Dipeptid, Peptidbindung)'},{v:'Salzsäure',l:'Salzsäure (Aminogruppe als Base)'},{v:'Natronlauge',l:'Natronlauge (Carboxygruppe als Säure)'},{v:'Sauerstoff',l:'Sauerstoff (Verbrennung)'}]}}}
+  if(A[0]&&A[1]){
+    var ord=ans&&ans.pord==='21'?[A[1],A[0]]:[A[0],A[1]],P=pepF(ord[0],ord[1]),nm=ord[0][1]+'-'+ord[1][1];if(ord[0][2]!==null&&ord[1][2]!==null)PEPDRAW[P]=function(){return pepDraw(ord[0],ord[1])};
+    var r=fin('Kondensation (Peptidbindung)',ord[0]===ord[1]?[aaF(ord[0])]:[aaF(ord[0]),aaF(ord[1])],[P,'H2O'],{notes:['Es entsteht das Dipeptid <b>'+nm+'</b> ('+ord[0][0]+' am N-Terminus, '+ord[1][0]+' am C-Terminus). Die Carboxygruppe der einen und die Aminogruppe der anderen Aminosäure verknüpfen sich unter Abspaltung von Wasser zur <b>Peptidbindung</b> –CO–NH– (Amidbindung).',
+      A[0]!==A[1]?'Aus zwei verschiedenen Aminosäuren können zwei Dipeptide entstehen: '+A[0][1]+'-'+A[1][1]+' und '+A[1][1]+'-'+A[0][1]+'. Die Reihenfolge lässt sich unten ändern.':'Weitere Aminosäuren können an beiden Enden angeknüpft werden – so entstehen Polypeptide und Proteine.',
+      'Im Körper wird die Peptidbindung an den Ribosomen geknüpft; im Labor sind dafür Schutzgruppen und Aktivierungsreagenzien nötig.']});
+    if(!r.ok)return null;r.pc={k:'amid',a:(ord[0][2]===null?'C₄H₇NH':aaLab(ord[0]))+'–COOH',b:aaLab(ord[1]).replace(/^H₂N–/,'H₂N–')+'–COOH',pep:1};
+    r.pc.b='H₂N–'+(ord[1][2]===null?'C4H7':(ord[1][2]==='H'?'CH2':'CH('+ord[1][2]+')'))+'–COOH';
+    if(A[0]!==A[1])r.alt={id:'pord',cur:ans&&ans.pord==='21'?'21':'12',opts:[{v:'12',l:A[0][1]+'-'+A[1][1]},{v:'21',l:A[1][1]+'-'+A[0][1]}]};
+    return r}
+  var ai=A[0]?0:1,aa=A[ai],other=T[1-ai],of=null;try{of=formulaFromInput(other)}catch(e){}if(!of||of.err)return null;
+  if(of.f==='HCl'){if(aa[2]===null)return null;var salt='ClH3N'+aaSeg(aa)+'COOH';PEPDRAW[salt]=function(){return saltDraw(aa)};
+    var r2=fin('Säure-Base-Reaktion (Aminogruppe als Base)',[aaF(aa),'HCl'],[salt],{notes:['Die Aminogruppe nimmt als Base (Protonenakzeptor) ein Proton der Salzsäure auf; es entsteht das Hydrochlorid mit der Ammoniumgruppe –NH₃⁺ (Kation) und Cl⁻.','In wässriger Lösung liegen Aminosäuren als <b>Zwitterionen</b> vor (⁺H₃N–CH(R)–COO⁻); in saurer Lösung als Kation, in alkalischer als Anion. Aminosäuren sind daher <b>Ampholyte</b>.']});return r2.ok?r2:null}
+  return null;
+}
+// ======== Weitere Mechanismen: Aminosäuresynthese, Strecker, Protonenübertragung, Oxidation, Esterhydrolyse, Eliminierung … ========
+// neue Reaktionen: Eliminierung (Alkohol + konz. Schwefelsäure), Alkohol + Halogenwasserstoff
+function orgExtra(T){if(T.length!==2)return null;var F=[];for(var i=0;i<2;i++){var f=null;try{f=formulaFromInput(T[i])}catch(e){}if(!f||f.err)return null;F.push(f.f)}
+  var al=null,ot=null;F.forEach(function(f){var o=null;try{o=orgInfo(f)}catch(e){}if(o&&o.cls==='alcohol'&&o.n)al={f:f,o:o};else ot=f});if(!al||!ot)return null;var n=al.o.n;
+  if(ot==='H2SO4'&&n>=2){var ak=n===2?'C2H4':(al.o.deg===2&&n===3?'CH2CHCH3':cH(n,2*n));var r=fin('Eliminierung (Dehydratisierung eines Alkohols)',[al.f],[ak,'H2O'],{notes:['Konzentrierte Schwefelsäure wirkt als Katalysator und wasserentziehendes Mittel (ca. 170 °C); sie erscheint daher nicht in der Gleichung.','Bei tieferer Temperatur (ca. 140 °C) entsteht bevorzugt ein Ether (z. B. Diethylether) durch nucleophile Substitution.','Bei unsymmetrischen Alkoholen entsteht bevorzugt das höher substituierte Alken (Regel von Saizew).']});return r.ok?r:null}
+  var hx=ot.match(/^H(Cl|Br|I)$/);if(hx){var X=hx[1],p=al.o.deg===1?(al.o.R+X):(al.o.deg===2&&al.o.R1?al.o.R1+'CH'+X+al.o.R2:null);if(!p)return null;
+    var r2=fin('Nucleophile Substitution (Alkohol + Halogenwasserstoff)',[al.f,ot],[p,'H2O'],{notes:['Die OH-Gruppe ist eine schlechte Abgangsgruppe; erst nach Protonierung kann sie als Wasser abgespalten werden.']});return r2.ok?r2:null}
+  return null}
+(function(){var old=aaSolve;aaSolve=function(txt,ans){var t=String(txt||'');if(!/(->|→|⟶|=>)/.test(t)){var T=t.split('+').map(function(x){return x.trim()}).filter(Boolean);var x=orgExtra(T);if(x){x.syn=1;return x}}return old(txt,ans)}})();
+// ---- Text-Mechanismen ----
+function mOrg(list,re){return (list||[]).map(function(x){return x.t}).filter(function(t){return re.test(t)})[0]||null}
+function amRest(f){if(/NH2$/.test(f))return f.replace(/NH2$/,'');if(/^H2N/.test(f))return f.replace(/^H2N/,'');return 'R'}
+var mechSteps0=mechSteps,mechLewis0=mechLewis;
+mechSteps=function(r){var t=r.type||'',L=r.L||[],R=r.R||[];
+  if(/Aminosäuresynthese/.test(t)){var hf=mOrg(L,/COOH$/),h=hf?haloR(hf):null;if(!h)return null;var Rg=h.R==='H'?'CH2':'CH('+normR(h.R)+')';
+    return{name:'Nucleophile Substitution (S<sub>N</sub>2) mit Ammoniak',steps:[
+      mStep('Nucleophiler Angriff',[mEq(['H3N',h.X+'–'+Rg+'–COOH'],['H3N^+–'+Rg+'–COOH',h.X+'^-'])],'Das N-Atom des Ammoniaks greift mit seinem freien Elektronenpaar das positiv polarisierte α-C-Atom an (Rückseitenangriff); das Halogenid-Ion wird als Abgangsgruppe verdrängt.'),
+      mStep('Deprotonierung',[mEq(['H3N^+–'+Rg+'–COOH','NH3'],['H2N–'+Rg+'–COOH','NH4^+'])],'Ein zweites Ammoniakmolekül nimmt als Base ein Proton vom N-Atom auf. Zusammen mit dem Halogenid-Ion entsteht das Ammoniumsalz NH<sub>4</sub>'+h.X+'.')]}}
+  if(/Strecker-Synthese \(1/.test(t)){var ald=mOrg(L,/CHO$/)||'RCHO',Rs=ald==='HCHO'?'H':ald.replace(/CHO$/,'');
+    return{name:'Strecker-Synthese, 1. Schritt (nucleophile Addition – Eliminierung – Addition)',steps:[
+      mStep('Nucleophile Addition von Ammoniak',[mEq([Rs+'–CHO','NH3'],[Rs+'–CH(OH)–NH2'],'⇌')],'Das N-Atom des Ammoniaks greift das positiv polarisierte Carbonyl-C-Atom an; nach Protonenübergang entsteht ein Halbaminal.'),
+      mStep('Abspaltung von Wasser (Iminbildung)',[mEq([Rs+'–CH(OH)–NH2'],[Rs+'–CH=NH','H2O'],'⇌')],'Die OH-Gruppe wird (säurekatalysiert) als Wasser abgespalten; es entsteht ein Imin mit C=N-Doppelbindung.'),
+      mStep('Nucleophile Addition von Cyanid',[mEq([Rs+'–CH=NH','CN^-'],[Rs+'–CH(N^-H)–CN']),mEq([Rs+'–CH(N^-H)–CN','HCN'],[Rs+'–CH(NH2)–CN','CN^-'])],'Das Cyanid-Ion (aus HCN) greift das C-Atom der C=N-Doppelbindung an. Das negativ geladene N-Atom nimmt anschließend ein Proton von HCN auf – das Cyanid-Ion wird zurückgebildet.')]}}
+  if(/Strecker-Synthese \(2/.test(t)){var an=mOrg(L,/CN$/)||'R–CN',Rn=an.replace(/CN$/,'');
+    return{name:'Strecker-Synthese, 2. Schritt (saure Hydrolyse der Nitrilgruppe)',steps:[
+      mStep('Protonierung und Angriff von Wasser',[mEq([Rn+'–C≡N','H^+'],[Rn+'–C≡N^+H'],'⇌'),mEq([Rn+'–C≡N^+H','H2O'],[Rn+'–C(OH)=NH','H^+'],'⇌')],'Das N-Atom der Nitrilgruppe wird protoniert; dadurch wird das C-Atom stärker positiv und von einem Wassermolekül angegriffen.'),
+      mStep('Umlagerung zum Amid',[mEq([Rn+'–C(OH)=NH'],[Rn+'–CO–NH2'],'⇌')],'Durch Protonenwanderung (Tautomerie) entsteht ein Carbonsäureamid.'),
+      mStep('Hydrolyse des Amids',[mEq([Rn+'–CO–NH2','H2O','H^+'],[Rn+'–COOH','NH4^+'])],'Wasser greift das Carbonyl-C-Atom an, Ammoniak wird abgespalten und in der sauren Lösung als Ammonium-Ion gebunden. Es entsteht die Carboxygruppe.')]}}
+  if(/Aminogruppe als Base|Amin als Base|^Protolyse/.test(t)){var am=mOrg(L,/N/);if(am&&/C/.test(am)){var HA=mOrg(L,/^H(Cl|Br|I)$|^H2O$|^HNO3$/)||'HCl',Ra=amRest(am),X=HA==='H2O'?'OH':HA.slice(1);
+    return{name:'Protonenübertragung (Säure-Base-Reaktion)',steps:[mStep('Protonenübergang',[mEq([Ra+'–NH2',HA==='H2O'?'H–OH':'H–'+X],[Ra+'–NH3^+',X+'^-'],HA==='H2O'?'⇌':'⟶')],'Das N-Atom der Aminogruppe bindet mit seinem freien Elektronenpaar ein Proton der Säure (Protonenakzeptor = Base). Die Bindungselektronen H–'+X+' verbleiben beim '+X+'-Atom.')]}}}
+  if(/Neutralisation/.test(t)){var ac=mOrg(L,/COOH$/);if(ac){var Rc=ac.replace(/COOH$/,'')||'H',B=mOrg(L,/^(Na|K|Li|Ca|Ba)(\(OH\)\d|OH)$/);
+    if(B&&/^(Na|K|Li|Ca|Ba)/.test(B))return{name:'Protonenübertragung (Neutralisation)',steps:[mStep('Protonenübergang',[mEq([Rc+'–COOH','OH^-'],[Rc+'–COO^-','H2O'])],'Das Hydroxid-Ion bindet mit einem freien Elektronenpaar das Proton der Carboxygruppe. Es entstehen Wasser und das Carboxylat-Ion; die Metall-Ionen ('+B.replace(/\(?OH\)?\d?$/,'')+'<sup>+</sup>) sind Zuschauer-Ionen.')]};
+    if(mOrg(L,/^NH3$/))return{name:'Protonenübertragung (Neutralisation)',steps:[mStep('Protonenübergang',[mEq([Rc+'–COOH','NH3'],[Rc+'–COO^-','NH4^+'])],'Das N-Atom des Ammoniaks nimmt das Proton der Carboxygruppe auf; es entsteht ein Ammoniumsalz.')]}}}
+  if(/Oxidation eines (primären |sekundären )?Alkohols|Oxidation eines Aldehyds/.test(t)){var org=L.map(function(x){return x.t}).filter(function(x){var o=null;try{o=orgInfo(x)}catch(e){}return o&&(o.cls==='alcohol'||o.cls==='aldehyde')})[0],pr=R.map(function(x){return x.t}).filter(function(x){var o=null;try{o=orgInfo(x)}catch(e){}return o&&o.cls!=='other'})[0]||(R.filter(function(x){return /C/.test(x.t)&&x.t!=='CO2'})[0]||{}).t;
+    if(org&&pr){var ox=mOrg(L,/^(CuO|O2|KMnO4|K2Cr2O7|MnO4\^-|Cr2O7\^2-)$/)||'',ald=/CHO$/.test(org),e=2,steps=[];
+      steps.push(mStep('Oxidation des organischen Stoffs (Elektronenabgabe)',[mEq([org].concat(ald?['H2O']:[]),[pr,'2 H^+','2 e^-'])],ald?'Das Aldehyd-C-Atom wird oxidiert (Oxidationszahl +I → +III): Mit einem Wassermolekül entsteht die Carboxygruppe; dabei werden zwei Elektronen und zwei Protonen abgegeben.':'Am C-Atom mit der OH-Gruppe werden formal zwei H-Atome abgespalten (Dehydrierung): das H der OH-Gruppe und das H am C-Atom. Es entsteht eine C=O-Doppelbindung; das C-Atom gibt zwei Elektronen ab (Oxidationszahl steigt um 2).'));
+      var red={CuO:[['CuO','2 H^+','2 e^-'],['Cu','H2O']],O2:[['O2','4 H^+','4 e^-'],['2 H2O']],KMnO4:[['MnO4^-','8 H^+','5 e^-'],['Mn^2+','4 H2O']],'MnO4^-':[['MnO4^-','8 H^+','5 e^-'],['Mn^2+','4 H2O']],K2Cr2O7:[['Cr2O7^(2−)','14 H^+','6 e^-'],['2 Cr^(3+)','7 H2O']],'Cr2O7^2-':[['Cr2O7^(2−)','14 H^+','6 e^-'],['2 Cr^(3+)','7 H2O']]}[ox];
+      if(red)steps.push(mStep('Reduktion des Oxidationsmittels (Elektronenaufnahme)',[mEq(red[0],red[1])],'Das Oxidationsmittel nimmt die Elektronen auf. Die Elektronenzahlen beider Teilschritte werden durch Multiplikation ausgeglichen (siehe Gesamtgleichung).'));
+      if(/primären Alkohols zur Carbonsäure/.test(t))steps.splice(1,0,mStep('Weiteroxidation des Aldehyds',[mEq([pr.replace(/COOH$/,'CHO'),'H2O'],[pr,'2 H^+','2 e^-'])],'Der zunächst entstehende Aldehyd wird im Überschuss des Oxidationsmittels weiter zur Carbonsäure oxidiert.'));
+      return{name:'Oxidation als Elektronenübertragung in Teilschritten',steps:steps}}}
+  if(/^Esterhydrolyse/.test(t)){var es=mOrg(L,/COO/),m=es?es.match(/^(.*?)COO(.*)$/):null;if(m){var Ra2=m[1]||'H',Ro=m[2];
+    return{name:'Saure Esterhydrolyse (Umkehrung der Veresterung)',steps:[
+      mStep('Protonierung',[mEq([Ra2+'–COO–'+Ro,'H^+'],[Ra2+'–C(OH)^+–O–'+Ro],'⇌')],'Das Carbonyl-O-Atom wird protoniert; das C-Atom wird stärker positiv.'),
+      mStep('Nucleophiler Angriff von Wasser',[mEq([Ra2+'–C(OH)^+–O–'+Ro,'H2O'],[Ra2+'–C(OH)(OH2^+)–O–'+Ro],'⇌')],'Ein Wassermolekül greift mit einem freien Elektronenpaar das C-Atom an.'),
+      mStep('Protonenwanderung',[mEq([Ra2+'–C(OH)(OH2^+)–O–'+Ro],[Ra2+'–C(OH)2–O^+H–'+Ro],'⇌')],'Ein Proton wandert zum O-Atom der Alkoxygruppe; so entsteht eine gute Abgangsgruppe (Alkohol).'),
+      mStep('Abspaltung des Alkohols',[mEq([Ra2+'–C(OH)2–O^+H–'+Ro],[Ra2+'–C(OH)2^+',Ro+'–OH'],'⇌')],'Das Alkoholmolekül wird abgespalten.'),
+      mStep('Deprotonierung',[mEq([Ra2+'–C(OH)2^+'],[Ra2+'–COOH','H^+'],'⇌')],'Das Proton wird zurückgegeben (Katalysator). Alle Schritte sind umkehrbar – Gleichgewicht mit der Veresterung.')]}}}
+  if(/Eliminierung \(Dehydratisierung/.test(t)){var alc=L[0]?L[0].t:'R–OH',ak=(R.filter(function(x){return x.t!=='H2O'})[0]||{}).t||'Alken';
+    return{name:'Eliminierung (E1, säurekatalysiert)',steps:[
+      mStep('Protonierung der OH-Gruppe',[mEq([alc,'H^+'],[alc.replace(/OH$/,'')+'–OH2^+'],'⇌')],'Ein Proton der Schwefelsäure bindet an ein freies Elektronenpaar des O-Atoms. Aus der schlechten Abgangsgruppe OH⁻ wird die gute Abgangsgruppe H₂O.'),
+      mStep('Abspaltung von Wasser',[mEq([alc.replace(/OH$/,'')+'–OH2^+'],[alc.replace(/OH$/,'')+'^+','H2O'])],'Die C–O-Bindung wird heterolytisch gespalten; es entsteht ein Carbenium-Ion (langsamer Schritt).'),
+      mStep('Abspaltung eines Protons',[mEq([alc.replace(/OH$/,'')+'^+'],[ak,'H^+'])],'Vom benachbarten C-Atom wird ein Proton abgespalten; das Bindungselektronenpaar bildet die C=C-Doppelbindung. Der Katalysator H⁺ wird zurückgebildet.')]}}
+  if(/Alkohol \+ Halogenwasserstoff/.test(t)){var alc2=(L.filter(function(x){return /OH$/.test(x.t)})[0]||{}).t||'R–OH',hx=mOrg(L,/^H(Cl|Br|I)$/)||'HBr',X2=hx.slice(1),pr2=(R.filter(function(x){return x.t!=='H2O'})[0]||{}).t;
+    return{name:'Nucleophile Substitution nach Protonierung',steps:[
+      mStep('Protonierung der OH-Gruppe',[mEq([alc2,hx],[alc2.replace(/OH$/,'')+'–OH2^+',X2+'^-'],'⇌')],'Das O-Atom nimmt das Proton des Halogenwasserstoffs auf; die OH-Gruppe wird zur guten Abgangsgruppe H₂O.'),
+      mStep('Nucleophiler Angriff des Halogenid-Ions',[mEq([X2+'^-',alc2.replace(/OH$/,'')+'–OH2^+'],[pr2,'H2O'])],'Das Halogenid-Ion greift das C-Atom von der Rückseite an, Wasser wird abgespalten (S<sub>N</sub>2; bei tertiären Alkoholen über ein Carbenium-Ion, S<sub>N</sub>1).')]}}
+  if(/Ringöffnungspolymerisation/.test(t))return{name:'Ringöffnungspolymerisation von ε-Caprolactam',steps:[
+      mStep('Ringöffnung durch Wasser (Start)',[mEq(['C6H11NO','H2O'],['H2N–(CH2)5–COOH'])],'Wenig Wasser öffnet den Lactamring durch Hydrolyse der inneren Amidbindung; es entsteht 6-Aminohexansäure.'),
+      mStep('Kettenwachstum',[mEq(['H2N–(CH2)5–COOH','C6H11NO'],['H2N–(CH2)5–CO–NH–(CH2)5–COOH'])],'Die Aminogruppe greift als Nucleophil das Carbonyl-C-Atom eines weiteren Caprolactam-Moleküls an und öffnet dessen Ring; dabei verlängert sich die Kette um eine Einheit, ohne dass Wasser frei wird.'),
+      mStep('Polymer',[mEq(['n C6H11NO'],['[–NH–(CH2)5–CO–]n'])],'Nach vielen Schritten entsteht Polyamid 6 (Perlon).')]};
+  return mechSteps0(r);
+};
+// ---- Lewis-Mechanismen ----
+mechLewis=function(r){var t=r.type||'',L=r.L||[],st=mScene;
+  if(/Aminosäuresynthese/.test(t)){var hf=mOrg(L,/COOH$/),h=hf?haloR(hf):null;if(!h)return null;var Rr=normR(h.R);
+    var NH3=function(){var m=MM();mA(m,'N','N',0,0,{lp:1});mA(m,'H1','H',-0.8,-0.6);mA(m,'H2','H',-0.8,0.6);mA(m,'H3','H',-1,0);['H1','H2','H3'].forEach(function(x){mB(m,'N',x)});return m};
+    var SUB=function(){var m=MM();mA(m,'C','C',0,0);mSub(m,'u','COOH',0,-1,'C');mSub(m,'d',Rr,0,1,'C');mSub(m,'l','H',-0.8,-0.6,'C');mA(m,'X',h.X,1,0,{lp:3});return mB(m,'C','X')};
+    var CAT=function(){var m=MM();mA(m,'N','N',-1,0,{fc:1});mA(m,'H1','H',-1.7,-0.6);mA(m,'H2','H',-1.7,0.6);mA(m,'H','H',-1,-1);['H1','H2','H'].forEach(function(x){mB(m,'N',x)});mA(m,'C','C',0,0);mB(m,'N','C');mSub(m,'u','COOH',0,-1,'C');mSub(m,'d',Rr,0,1,'C');mSub(m,'r','H',0.8,-0.6,'C');return m};
+    var NEU=function(){var m=MM();mA(m,'N','N',-1,0,{lp:1});mA(m,'H1','H',-1.7,-0.6);mA(m,'H2','H',-1.7,0.6);['H1','H2'].forEach(function(x){mB(m,'N',x)});mA(m,'C','C',0,0);mB(m,'N','C');mSub(m,'u','COOH',0,-1,'C');mSub(m,'d',Rr,0,1,'C');mSub(m,'r','H',0.8,-0.6,'C');return m};
+    var NH4=function(){var m=MM();mA(m,'N','N',0,0,{fc:1});[['a',0,-1],['b',0,1],['c',-1,0],['d',1,0]].forEach(function(q){mA(m,q[0],'H',q[1],q[2]);mB(m,'N',q[0])});return m};
+    return[st([NH3(),OP('+'),SUB(),OP('⟶'),CAT(),OP('+'),mX(h.X,{lp:4,fc:-1})],[{f:{i:0,a:'N',dir:0},t:{i:2,a:'C'},bend:-0.4},{f:{i:2,b:['C','X']},t:{i:2,a:'X',dir:-90},bend:0.8}]),
+      st([NH3(),OP('+'),CAT(),OP('⟶'),NH4(),OP('+'),NEU()],[{f:{i:0,a:'N',dir:0},t:{i:2,a:'H1'},bend:0.4},{f:{i:2,b:['N','H1']},t:{i:2,a:'N',dir:-150},bend:-0.9}])]}
+  if(/Strecker-Synthese \(1/.test(t)){var ald=mOrg(L,/CHO$/)||'CH3CHO',Rs=ald==='HCHO'?'H':normR(ald.replace(/CHO$/,''));
+    var ALD=function(){var m=MM();mA(m,'C','C',0,0);mSub(m,'R',Rs,-1,0,'C');mA(m,'O','O',0,-1,{lp:2});mB(m,'C','O',2);mSub(m,'d','H',0,1,'C');return m};
+    var AM=function(){var m=MM();mA(m,'N','N',0,0,{lp:1});mA(m,'H1','H',0.8,-0.6);mA(m,'H2','H',0.8,0.6);mA(m,'H3','H',1,0);['H1','H2','H3'].forEach(function(x){mB(m,'N',x)});return m};
+    var HAM=function(){var m=MM();mA(m,'C','C',0,0);mSub(m,'R',Rs,-1,0,'C');mA(m,'O','O',0,-1,{lp:2});mA(m,'Ho','H',0.7,-1.7);mB(mB(m,'C','O'),'O','Ho');mSub(m,'d','H',0,1,'C');mA(m,'N','N',1,0,{lp:1});mA(m,'Hn1','H',1.7,-0.6);mA(m,'Hn2','H',1.7,0.6);return mB(mB(mB(m,'C','N'),'N','Hn1'),'N','Hn2')};
+    var IM=function(){var m=MM();mA(m,'C','C',0,0);mSub(m,'R',Rs,-1,0,'C');mSub(m,'u','H',0,-1,'C');mA(m,'N','N',1,0,{lp:1});mB(m,'C','N',2);mA(m,'Hn','H',1.7,0.6);return mB(m,'N','Hn')};
+    var CN=function(){var m=MM();mA(m,'C','C',0,0,{lp:1,fc:-1});mA(m,'N','N',1,0,{lp:1});return mB(m,'C','N',3)};
+    var AN=function(neg){var m=MM();mA(m,'C','C',0,0);mSub(m,'R',Rs,-1,0,'C');mSub(m,'u','H',0,-1,'C');mA(m,'N','N',1,0,neg?{lp:2,fc:-1}:{lp:1});mB(m,'C','N');mA(m,'Hn','H',1.7,0.6);mB(m,'N','Hn');if(!neg){mA(m,'Hn2','H',1.7,-0.6);mB(m,'N','Hn2')}
+      mA(m,'Cc','C',0,1);mB(m,'C','Cc');mA(m,'Nc','N',0,2,{lp:1});return mB(m,'Cc','Nc',3)};
+    var HCN=function(){var m=MM();mA(m,'H','H',0,0);mA(m,'C','C',1,0);mA(m,'N','N',2,0,{lp:1});return mB(mB(m,'H','C'),'C','N',3)};
+    return[st([ALD(),OP('+'),AM(),OP('⇌'),HAM()],[{f:{i:2,a:'N',dir:180},t:{i:0,a:'C'},bend:0.5},{f:{i:0,b:['C','O'],off:-0.12},t:{i:0,a:'O',dir:180},bend:0.9}]),
+      st([HAM(),OP('⇌'),IM(),OP('+'),mH2O()],[{f:{i:0,a:'N',dir:-30},t:{i:0,b:['C','N'],off:0.1},bend:0.9},{f:{i:0,b:['C','O']},t:{i:0,a:'O',dir:200},bend:-1.4}]),
+      st([IM(),OP('+'),CN(),OP('⟶'),AN(true)],[{f:{i:2,a:'C',dir:180},t:{i:0,a:'C'},bend:0.5},{f:{i:0,b:['C','N'],off:-0.12},t:{i:0,a:'N',dir:60},bend:-0.9}])+st([AN(true),OP('+'),HCN(),OP('⟶'),AN(false),OP('+'),CN()],[{f:{i:0,a:'N',dir:-30},t:{i:2,a:'H'},bend:0.5},{f:{i:2,b:['H','C']},t:{i:2,a:'C',dir:-90},bend:0.8}])]}
+  if(/Aminogruppe als Base|Amin als Base|^Protolyse/.test(t)){var am=mOrg(L,/N/);if(!am||!/C/.test(am))return mechLewis0(r);var HA=mOrg(L,/^H(Cl|Br|I)$|^H2O$/)||'HCl',Ra=amRest(am);
+    var AMN=function(){var m=MM();mA(m,'N','N',0,0,{lp:1});mSub(m,'R',Ra,-1,0,'N');mA(m,'H1','H',0,-1);mA(m,'H2','H',0,1);return mB(mB(m,'N','H1'),'N','H2')};
+    var AMM=function(){var m=MM();mA(m,'N','N',0,0,{fc:1});mSub(m,'R',Ra,-1,0,'N');mA(m,'H1','H',0,-1);mA(m,'H2','H',0,1);mA(m,'H3','H',1,0);return mB(mB(mB(m,'N','H1'),'N','H2'),'N','H3')};
+    var A=HA==='H2O'?(function(){var m=MM();mA(m,'H','H',0,0);mA(m,'X','O',1,0,{lp:2});mA(m,'Hb','H',1.6,0.8);return mB(mB(m,'H','X'),'X','Hb')})():mHX(HA.slice(1));
+    var Xm=HA==='H2O'?(function(){var m=MM();mA(m,'X','O',0,0,{lp:3,fc:-1});mA(m,'H','H',0.6,0.8);return mB(m,'X','H')})():mX(HA.slice(1),{lp:4,fc:-1});
+    return[st([AMN(),OP('+'),A,OP(HA==='H2O'?'⇌':'⟶'),AMM(),OP('+'),Xm],[{f:{i:0,a:'N',dir:0},t:{i:2,a:'H'},bend:0.5},{f:{i:2,b:['H','X']},t:{i:2,a:'X',dir:-90},bend:0.8}])]}
+  if(/Neutralisation/.test(t)){var ac=mOrg(L,/COOH$/);if(!ac)return mechLewis0(r);var Rc=normR(ac.replace(/COOH$/,'')||'H'),nh3=!!mOrg(L,/^NH3$/);
+    var ACD=function(){var m=MM();mA(m,'C','C',0,0);mSub(m,'R',Rc,-1,0,'C');mA(m,'O1','O',0,-1,{lp:2});mB(m,'C','O1',2);mA(m,'O2','O',1,0,{lp:2});mA(m,'H','H',2,0);return mB(mB(m,'C','O2'),'O2','H')};
+    var CBX=function(){var m=MM();mA(m,'C','C',0,0);mSub(m,'R',Rc,-1,0,'C');mA(m,'O1','O',0,-1,{lp:2});mB(m,'C','O1',2);mA(m,'O2','O',1,0,{lp:3,fc:-1});return mB(m,'C','O2')};
+    var BS=nh3?(function(){var m=MM();mA(m,'N','N',0,0,{lp:1});mA(m,'H1','H',0.8,-0.6);mA(m,'H2','H',0.8,0.6);mA(m,'H3','H',1,0);['H1','H2','H3'].forEach(function(x){mB(m,'N',x)});return m})():mOHm(false);
+    var PR=nh3?(function(){var m=MM();mA(m,'N','N',0,0,{fc:1});[['a',0,-1],['b',0,1],['c',-1,0],['d',1,0]].forEach(function(q){mA(m,q[0],'H',q[1],q[2]);mB(m,'N',q[0])});return m})():mH2O();
+    return[st([ACD(),OP('+'),BS,OP('⟶'),CBX(),OP('+'),PR],[{f:{i:2,a:nh3?'N':'O',dir:180},t:{i:0,a:'H'},bend:0.5},{f:{i:0,b:['O2','H']},t:{i:0,a:'O2',dir:-60},bend:0.9}])]}
+  if(/Eliminierung \(Dehydratisierung/.test(t)){var alo=null;try{alo=orgInfo(L[0].t)}catch(e){}if(!alo||alo.deg!==1)return null;var rem=alkylN(alo.n-2);
+    var AL=function(){var m=MM();mC4(m,'C1',0,0,{u:'H',d:'H',l:rem});mA(m,'C2','C',1,0);mB(m,'C1','C2');mSub(m,'u2','H',1,-1,'C2');mSub(m,'d2','H',1,1,'C2');mA(m,'O','O',2,0,{lp:2});mA(m,'Ho','H',2.6,0.8);return mB(mB(m,'C2','O'),'O','Ho')};
+    var OX=function(){var m=MM();mC4(m,'C1',0,0,{u:'H',d:'H',l:rem});mA(m,'C2','C',1,0);mB(m,'C1','C2');mSub(m,'u2','H',1,-1,'C2');mSub(m,'d2','H',1,1,'C2');mA(m,'O','O',2,0,{lp:1,fc:1});mA(m,'Ho','H',2.6,0.8);mA(m,'H','H',2.6,-0.8);return mB(mB(mB(m,'C2','O'),'O','Ho'),'O','H')};
+    var CB=function(){var m=MM();mC4(m,'C1',0,0,{u:'H',d:'H',l:rem});mA(m,'C2','C',1,0,{fc:1});mB(m,'C1','C2');mSub(m,'u2','H',1.6,-0.8,'C2');mSub(m,'d2','H',1.6,0.8,'C2');return m};
+    var EN=function(){var m=MM();mA(m,'C1','C',0,0);mA(m,'C2','C',1,0);mB(m,'C1','C2',2);mSub(m,'a','H',-0.55,-0.85,'C1');mSub(m,'b',rem,-0.55,0.85,'C1');mSub(m,'c','H',1.55,-0.85,'C2');mSub(m,'d','H',1.55,0.85,'C2');return m};
+    return[st([AL(),OP('+'),mHp(),OP('⇌'),OX()],[{f:{i:0,a:'O',dir:-60},t:{i:2,a:'H'},bend:0.5}]),
+      st([OX(),OP('⟶'),CB(),OP('+'),mH2O()],[{f:{i:0,b:['C2','O']},t:{i:0,a:'O',dir:90},bend:-0.9}]),
+      st([CB(),OP('⟶'),EN(),OP('+'),mHp()],[{f:{i:0,b:['C1','C1u']},t:{i:0,b:['C1','C2'],off:0.12},bend:-0.9}])]}
+  return mechLewis0(r)};
 // ---------- Reaktionsgleichung: Oberfläche ----------
 var REQ_EX=['Magnesium + Salzsäure','CH4 + O2','Eisen + Sauerstoff','Zink + Kupfer(II)-sulfat','Silbernitrat + Natriumchlorid','Natronlauge + Schwefelsäure','CaCO3 + HCl','Kupfer + konz. Salpetersäure','Kaliumpermanganat + Eisen(II)-sulfat + Schwefelsäure','Kaliumpermanganat + Kaliumiodid, neutral','Aluminium + Eisen(III)-oxid','Fe2O3 + CO -> Fe + CO2'];
 function qFmt(s){return esc(s).replace(/(^|[\s„(+])((?:[A-Z][a-z]?|\(|\)|\d)+)\^(\d*[+-])/g,function(m,p,f,c){return p+fsp(f+'^'+c)}).replace(/\^/g,'')}
@@ -3999,21 +4232,22 @@ function rqFill(){var s=reqState(),L=$('rqL'),R=$('rqR');if(!L)return;var p=Stri
 function rqRead(){var s=reqState(),L=$('rqL'),R=$('rqR');if(!L)return;var l=L.value.trim(),r=R.value.trim();
   if(RQARR.test(l)&&!r){var p=l.split(RQARR);l=p[0].trim();r=p.slice(1).join(' ').trim()}
   s.txt=r?(l+' → '+r).trim():l}
-function reqState(){var s=st('req');if(!s.init){s.init=1;s.txt='';s.ans={};s.res=null;s.ox=false;s.lw=true}return s}
+function rqOpts(show){var card=$('optCard');if(!card)return;card.hidden=!show;if(!show)return;var s=reqState();
+  var O=[['hint','Hinweise zur Eingabe'],['ox','Oxidationszahlen'],['lw','Struktur- und Lewis-Formeln'],['mech','Reaktionsmechanismen']];
+  $('optBox').innerHTML=O.map(function(o){return '<label class="optchk"><input type="checkbox" data-o="'+o[0]+'"'+(s[o[0]]?' checked':'')+'> '+o[1]+'</label>'}).join('');
+  $('optBox').querySelectorAll('input').forEach(function(i){i.onchange=function(){s[i.dataset.o]=i.checked;if(S.cur!=='req')return;if(i.dataset.o==='hint'){var c=BYID?BYID.req:null;renderMain()}else reqShow()}})}
+function reqState(){var s=st('req');if(!s.init){s.init=1;s.txt='';s.ans={};s.res=null;s.ox=false;s.lw=true;s.mech=false;s.hint=false}return s}
 function renderReq(c){
   var s=reqState();
-  $('cdesc').innerHTML='Gib die <b>Edukte</b> ins erste Feld und – falls bekannt – die <b>Produkte</b> ins zweite Feld ein, als <b>Formeln</b> (<i>Mg + HCl</i>; mit Produkt: <i>Al + HCl</i> ⟶ <i>AlCl3</i>) oder als <b>Namen</b> (<i>Magnesium + Salzsäure</i>, <i>Eisen(III)-chlorid + Natronlauge</i>). Namen werden in Formeln umgewandelt; Elemente wie Sauerstoff oder Chlor erscheinen als Moleküle (O₂, Cl₂). Die Koeffizienten werden als kleinste ganze Zahlen bestimmt – Brüche wie ½ O₂ sind nicht zulässig. Fehlen Angaben (Oxidationsstufe, Milieu, Konzentration …), frage ich nach. Angaben wie <i>konz.</i>, <i>verdünnt</i> oder <i>in saurer Lösung</i> werden berücksichtigt. Ionen: Fe<sup>3+</sup>, MnO<sub>4</sub><sup>−</sup> oder <i>Eisen(III)-Ionen</i> (eintippen als <i>Fe3+</i>, <i>MnO4-</i>). Fehlende Stoffe werden ergänzt (<i>CH4 + O2</i> ⟶ <i>CO2</i>; <i>? + HCl</i> ⟶ <i>MgCl2 + H2</i>). <b>Nur das Produkt bekannt?</b> Lass das Eduktfeld leer und gib z. B. <i>NaCl</i> als Produkt ein – dann schlage ich mögliche Edukte vor.';
-  var h='<div class="rqio"><label class="rqlab" for="rqL">Edukte</label><input id="rqL" class="fo" placeholder="z. B. Magnesium + Salzsäure" autocomplete="off" autocapitalize="off" spellcheck="false"><span class="rqarr">⟶</span><label class="rqlab" for="rqR">Produkte <span class="note">(optional)</span></label><input id="rqR" class="fo" placeholder="leer lassen oder z. B. MgCl2" autocomplete="off" autocapitalize="off" spellcheck="false"></div><div class="act"><button class="btn pri" id="rqGo">Gleichung aufstellen</button></div>';
-  h+='<div class="act" style="align-items:center"><button class="btn" id="rqClr">Eingabe löschen</button><label class="oxchk"><input type="checkbox" id="rqOx"'+(s.ox?' checked':'')+'> Oxidationszahlen anzeigen</label><label class="oxchk"><input type="checkbox" id="rqLw"'+(s.lw?' checked':'')+'> Struktur-/Lewis-Formeln</label><button class="btn" id="rqKnown">Welche Stoffe kennt das Werkzeug?</button></div>';
+  $('cdesc').innerHTML=s.hint?'Gib die <b>Edukte</b> ins erste Feld und – falls bekannt – die <b>Produkte</b> ins zweite Feld ein, als <b>Formeln</b> (<i>Mg + HCl</i>; mit Produkt: <i>Al + HCl</i> ⟶ <i>AlCl3</i>) oder als <b>Namen</b> (<i>Magnesium + Salzsäure</i>, <i>Eisen(III)-chlorid + Natronlauge</i>). Namen werden in Formeln umgewandelt; Elemente wie Sauerstoff oder Chlor erscheinen als Moleküle (O₂, Cl₂). Die Koeffizienten werden als kleinste ganze Zahlen bestimmt – Brüche wie ½ O₂ sind nicht zulässig. Fehlen Angaben (Oxidationsstufe, Milieu, Konzentration …), frage ich nach. Angaben wie <i>konz.</i>, <i>verdünnt</i> oder <i>in saurer Lösung</i> werden berücksichtigt. Ionen: Fe<sup>3+</sup>, MnO<sub>4</sub><sup>−</sup> oder <i>Eisen(III)-Ionen</i> (eintippen als <i>Fe3+</i>, <i>MnO4-</i>). Fehlende Stoffe werden ergänzt (<i>CH4 + O2</i> ⟶ <i>CO2</i>; <i>? + HCl</i> ⟶ <i>MgCl2 + H2</i>). <b>Nur das Produkt bekannt?</b> Lass das Eduktfeld leer und gib z. B. <i>NaCl</i> als Produkt ein – dann schlage ich mögliche Edukte vor.'+knownHtml():'Gib die <b>Edukte</b> ins erste Feld und – falls bekannt – die <b>Produkte</b> ins zweite Feld ein, als Formeln oder Namen. Ausführliche Hinweise zur Eingabe und eine Übersicht der bekannten Stoffe kannst du links unter <b>Optionen</b> einblenden.';
+  var h='<div class="rqio"><label class="rqlab" for="rqL">Edukte</label><input id="rqL" class="fo" placeholder="z. B. Magnesium + Salzsäure" autocomplete="off" autocapitalize="off" spellcheck="false"><span class="rqarr">⟶</span><label class="rqlab" for="rqR">Produkte <span class="note">(optional)</span></label><input id="rqR" class="fo" placeholder="leer lassen oder z. B. MgCl2" autocomplete="off" autocapitalize="off" spellcheck="false"></div><div class="act"><button class="btn pri" id="rqGo">Gleichung aufstellen</button><button class="btn" id="rqClr">Eingabe löschen</button></div>';
   $('cbody').innerHTML=h;
   var iL=$('rqL'),iR=$('rqR');rqFill();
   function go(){rqRead();rqFill();s.ans={};s.back=null;reqRun()}
   [iL,iR].forEach(function(i){i.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();go()}});i.addEventListener('input',rqRead)});
   $('rqGo').onclick=go;
   $('rqClr').onclick=function(){s.back=null;s.txt='';s.ans={};s.res=null;iL.value='';iR.value='';reqShow()};
-  $('rqOx').onchange=function(){s.ox=this.checked;reqShow()};
-  $('rqLw').onchange=function(){s.lw=this.checked;reqShow()};
-  $('rqKnown').onclick=showKnown;
+  rqOpts(true);
   if(s.txt)reqRun();else reqShow();
 }
 function reqRun(){var s=reqState();if(/(->|→|⟶|=>)/.test(s.txt||'')&&$('resArea'))$('resArea').innerHTML='<p class="note">Suche passende Stoffe …</p>';setTimeout(function(){try{s.res=reqSolve(s.txt,s.ans)}catch(e){s.res={err:'Unerwarteter Fehler: '+e.message}}reqShow()},15)}
@@ -4055,7 +4289,7 @@ function reqShow0(){
   function EQ(L,R,ar){return ox?feqOx(L,R,ar,mark):feq(L,R,ar)}
   var h='<h3>Ergebnis</h3><div class="eqbig'+(ox?' withox':'')+'">'+EQ(r.L,r.R,r.arrow)+'</div>';
   h+='<p class="note"><b>Reaktionstyp:</b> '+esc(r.type)+(r.arrow==='⇌'?' – Gleichgewichtsreaktion (⇌)':'')+'</p>';
-  h+=reactClassHtml(r)+mechHtml(r,s.lw);
+  h+=reactClassHtml(r);
   if(ox){
     if(!chg.length)h+='<p class="note">Die Oxidationszahlen ändern sich nicht – es ist <b>keine Redoxreaktion</b>.</p>';
     else{var KN={ox:'Oxidation',red:'Reduktion',dis:'Disproportionierung',kom:'Komproportionierung'};
@@ -4064,6 +4298,7 @@ function reqShow0(){
   }
   if(s.lw){var lwq=lewisEquation(r.L,r.R,r.arrow,s.ox);
     h+='<h3>Struktur- und Lewis-Schreibweise</h3>'+lwq.html+'<p class="note">Organische Stoffe als Strukturformel (Valenzstrichformel), anorganische Stoffe in Lewis-Schreibweise: Bindungen und freie Elektronenpaare als Striche, ungepaarte Elektronen (Radikale wie NO) als Punkte, Formalladungen eingekreist; Salze sind in ihre Ionen zerlegt (gestrichelter Rahmen). Metalle und feste Nichtmetalle (z. B. C, S, P) stehen als Elementsymbol, da sie in Metallgittern bzw. Molekül- oder Atomgittern vorliegen.'+(lwq.miss.length?' Für '+lwq.miss.map(fsp).join(', ')+' ist keine Struktur hinterlegt; dort steht die Summenformel.':'')+'</p>'}
+  h+=s.mech!==false?mechHtml(r,s.lw):'';
   if(r.alt){h+='<div class="note">Annahme ändern:</div><div class="chips" id="rqAlt">'+r.alt.opts.map(function(o){return'<button class="chip'+(o.v===r.alt.cur?' on':'')+'" data-v="'+o.v+'">'+esc(o.l)+'</button>'}).join('')+'</div>'}
   if(r.notes&&r.notes.length){h+='<ul class="notes">'+r.notes.filter(function(n){return n}).map(function(n){return'<li>'+n+'</li>'}).join('')+'</ul>'}
   var conv=(r.notes||[]).filter(function(n){return /^Erkannt:/.test(n)})[0];
@@ -4090,17 +4325,16 @@ function reqShow0(){
     S.cur='stoich';buildNav();renderMain();toast('Gleichung in die Stöchiometrie übernommen')};
 }
 
-function showKnown(){
+function knownHtml(){
   var L=[['Elemente','alle 118 Elemente mit Namen oder Symbol; H₂, N₂, O₂, F₂, Cl₂, Br₂, I₂ werden automatisch als Moleküle geschrieben'],
    ['Salze und Oxide','systematische Namen mit Oxidationsstufe, z. B. Eisen(III)-chlorid, Kupfer(II)-sulfat, Mangan(IV)-oxid, Kaliumhexacyanidoferrat(II); Zahlwörter wie Distickstoffpentoxid; Hydrate wie Kupfer(II)-sulfat-Pentahydrat; Peroxide, Hydride, Nitride, Carbide, Thiosulfate'],
    ['Säuren und Laugen','Salzsäure, Schwefelsäure, Salpetersäure, Phosphorsäure, Kohlensäure, Essigsäure, Borsäure, Kieselsäure …; Natronlauge, Kalilauge, Kalkwasser, Barytwasser, Ammoniak'],
    ['Trivialnamen','Kochsalz, Soda, Natron, Pottasche, Kalk, Branntkalk, Löschkalk, Gips, Braunstein, Kupfervitriol, Bittersalz, Glaubersalz, Salmiak, Höllenstein, Wasserglas, Chilesalpeter, Malachit, Rost, Luft, Benzin, Kalkstein, Marmor, Quarz, Pyrit, Bleiglanz, Zinkblende, Magnetit, Flussspat, Borax, Chlorkalk, Trockeneis …'],
    ['Kohlenwasserstoffe','Alkane, Alkene, Alkine und Cycloalkane bis C₁₀ (auch verzweigt, z. B. 2-Methylpropan), Benzol, Toluol, Styrol'],
-   ['Organische Stoffklassen','Halogenalkane (Chlormethan, 1,2-Dibromethan), Alkohole (Ethanol, Propan-2-ol, Glycerin), Aldehyde, Ketone, Carbonsäuren (auch Fettsäuren, Milchsäure, Benzoesäure), Ester (Ethansäureethylester, Ethylacetat), Ether, Amine, Fette, Zucker, Harnstoff, Aminosäuren; Diole (Ethylenglycol, Propylenglycol, Butan-1,4-diol), Sorbit, Dicarbonsäuren (Adipinsäure, Terephthalsäure, Bernsteinsäure), Diamine, Caprolactam, Monomere (Isopren, Methylmethacrylat, Vinylacetat, Acrylnitril), Xylol, Cumol, TNT, Nitroglycerin'],
+   ['Organische Stoffklassen','Halogenalkane (Chlormethan, 1,2-Dibromethan), Alkohole (Ethanol, Propan-2-ol, Glycerin), Aldehyde, Ketone, Carbonsäuren (auch Fettsäuren, Milchsäure, Benzoesäure), Ester (Ethansäureethylester, Ethylacetat), Ether, Amine, Fette, Zucker, Harnstoff; alle 20 proteinogenen Aminosäuren (Glycin, Alanin, Valin, Leucin, Isoleucin, Prolin, Phenylalanin, Tyrosin, Tryptophan, Serin, Threonin, Cystein, Methionin, Asparagin, Glutamin, Asparaginsäure, Glutaminsäure, Lysin, Arginin, Histidin); Diole (Ethylenglycol, Propylenglycol, Butan-1,4-diol), Sorbit, Dicarbonsäuren (Adipinsäure, Terephthalsäure, Bernsteinsäure), Diamine, Caprolactam, Monomere (Isopren, Methylmethacrylat, Vinylacetat, Acrylnitril), Xylol, Cumol, TNT, Nitroglycerin'],
    ['Ionen','mit Ladung (Fe<sup>3+</sup>, MnO<sub>4</sub><sup>−</sup>, SO<sub>4</sub><sup>2−</sup>; eintippen als Fe3+, MnO4-) oder als Namen (Eisen(III)-Ionen, Permanganat-Ionen)']];
-  var R=['Synthese aus den Elementen, Verbrennung (auch unvollständig, mit Halogen-, Stickstoff- und Schwefelverbindungen)','Metalle mit Wasser, Säuren (auch oxidierenden), Salzlösungen und Metalloxiden (Thermit)','Neutralisation, Fällung, Gasentwicklung, Nachweisreaktionen (z. B. Fe³⁺ mit Thiocyanat, Berliner Blau, Kalkwasser)','Oxide mit Wasser, Säuren und Basen; Reduktion von Metalloxiden mit H₂, C, CO','thermische Zersetzung (Carbonate, Hydrogencarbonate, Hydroxide, Nitrate, Ammoniumsalze, Hydrate, Oxide edler Metalle, Permanganat)','Redoxreaktionen in Lösung mit Milieu (Permanganat, Dichromat, H₂O₂, Halogene, Fe³⁺, Thiosulfat/Iod) mit Teilgleichungen','Kunststoffsynthesen: Polymerisation (Ethen, Propen, Chlorethen, Styrol, Tetrafluorethen, Acrylnitril, Methylmethacrylat, Vinylacetat, Butadien, Isopren u. a., auch Copolymere), Polykondensation (Dicarbonsäure + Diol bzw. Diamin, z. B. PET, Nylon; Milchsäure), Polyaddition (Diisocyanat + Diol), Ringöffnung von Caprolactam – Eingabe z. B. „Polymerisation von Ethen“, „n Styrol“, „Hexandisäure + Hexan-1,6-diamin“ oder nur „PVC“','organische Reaktionen: radikalische Substitution, Addition (H₂, Halogene, Halogenwasserstoffe, Wasser), Substitution am Benzol, nucleophile Substitution, Oxidation von Alkoholen mit CuO, Veresterung, Esterhydrolyse, Verseifung, Alkohol + Natrium, Gärung, Hydrolyse von Zweifachzuckern'];
-  var h='<div class="mhead"><h3>Welche Stoffe kennt das Werkzeug?</h3><button class="x" id="mx">×</button></div><table class="t">'+L.map(function(x){return '<tr><td style="white-space:nowrap;vertical-align:top"><b>'+x[0]+'</b></td><td>'+x[1]+'</td></tr>'}).join('')+'</table><h3 style="margin-top:14px">Reaktionstypen</h3><ul>'+R.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul><p class="note">Formeln immer mit richtiger Groß- und Kleinschreibung eingeben. Kennt das Werkzeug einen Stoff oder eine Reaktion nicht, kannst du die Produkte selbst angeben – dann wird nur ausgeglichen.</p><div class="act"><button class="btn" id="mclose">Schließen</button></div>';
-  openModal(h);$('mx').onclick=closeModal;$('mclose').onclick=closeModal;
+  var R=['Synthese aus den Elementen, Verbrennung (auch unvollständig, mit Halogen-, Stickstoff- und Schwefelverbindungen)','Metalle mit Wasser, Säuren (auch oxidierenden), Salzlösungen und Metalloxiden (Thermit)','Neutralisation, Fällung, Gasentwicklung, Nachweisreaktionen (z. B. Fe³⁺ mit Thiocyanat, Berliner Blau, Kalkwasser)','Oxide mit Wasser, Säuren und Basen; Reduktion von Metalloxiden mit H₂, C, CO','thermische Zersetzung (Carbonate, Hydrogencarbonate, Hydroxide, Nitrate, Ammoniumsalze, Hydrate, Oxide edler Metalle, Permanganat)','Redoxreaktionen in Lösung mit Milieu (Permanganat, Dichromat, H₂O₂, Halogene, Fe³⁺, Thiosulfat/Iod) mit Teilgleichungen','Kunststoffsynthesen: Polymerisation (Ethen, Propen, Chlorethen, Styrol, Tetrafluorethen, Acrylnitril, Methylmethacrylat, Vinylacetat, Butadien, Isopren u. a., auch Copolymere), Polykondensation (Dicarbonsäure + Diol bzw. Diamin, z. B. PET, Nylon; Milchsäure), Polyaddition (Diisocyanat + Diol), Ringöffnung von Caprolactam – Eingabe z. B. „Polymerisation von Ethen“, „n Styrol“, „Hexandisäure + Hexan-1,6-diamin“ oder nur „PVC“','organische Reaktionen (mit Mechanismus): radikalische Substitution, Addition (H₂, Halogene, Halogenwasserstoffe, Wasser), Substitution am Benzol, nucleophile Substitution, Oxidation von Alkoholen und Aldehyden mit CuO, O₂, Permanganat und Dichromat, Veresterung, Esterhydrolyse, Verseifung, Alkohol + Natrium, Gärung, Hydrolyse von Zweifachzuckern, Peptidbindung zwischen Aminosäuren, Aminosäuren mit Säuren und Basen, Aminosäuresynthese (α-Halogencarbonsäure + Ammoniak, Strecker-Synthese aus Aldehyd, Ammoniak und Blausäure)'];
+  return '<details class="known"><summary>Bekannte Stoffe</summary><table class="t">'+L.map(function(x){return '<tr><td style="white-space:nowrap;vertical-align:top"><b>'+x[0]+'</b></td><td>'+x[1]+'</td></tr>'}).join('')+'</table></details><details class="known"><summary>Bekannte Reaktionstypen</summary><ul>'+R.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul></details><p class="note">Formeln immer mit richtiger Groß- und Kleinschreibung eingeben. Kennt das Werkzeug einen Stoff oder eine Reaktion nicht, kannst du die Produkte selbst angeben – dann wird nur ausgeglichen.</p>';
 }
 // ---------- QR-Code (Byte-Modus, Fehlerkorrektur L, Version 1–10) ----------
 function qrSvg(text){
@@ -4175,17 +4409,17 @@ function openProt(){
     var nm=$('pName').value,ku=$('pKurs').value;
     var ph='<div class="meta"><h1>'+PAGENAME+' – Rechenprotokoll</h1><div>Name: '+(esc(nm)||'______________')+' &nbsp; Kurs: '+(esc(ku)||'________')+' &nbsp; Datum: '+new Date().toLocaleDateString('de-DE')+'</div></div>';
     chosen.forEach(function(p,i){ph+='<div class="blk"><h2>'+(i+1)+'. '+esc(p.title)+'</h2>'+p.rows.map(function(r){return '<div class="pr"><div>'+esc(r.k)+'</div><div class="v">'+r.v+'</div></div>'}).join('')+'</div>'});
-    ph+='<div class="pf">'+PAGENAME+' V'+VERSION+' · Bastian Baumgart · chemie.mail-baumgart.de · Lizenz CC BY-NC-SA 4.0 · Atommassen, Konstanten und Dichten nach der Formelsammlung (Abiturpool, Stand 14.02.2024); V<sub>m</sub> = 24,466 L/mol</div>';
+    ph+='<div class="pf">'+PAGENAME+' V'+VERSION+' · Bastian Baumgart · chemie.mail-baumgart.de · Lizenz CC BY-NC-SA 4.0 · Atommassen, Konstanten und Dichten nach IQB Mathematisch-naturwissenschaftliche Formelsammlung (Stand 14.02.2024); V<sub>m</sub> = 24,466 L/mol</div>';
     $('print').innerHTML=ph;closeModal();setTimeout(function(){window.print()},150);
   };
 }
 // ---------- Anleitung, Versionshinweise ----------
 function showHelp(){
-  var box=openModal('<div class="mhead"><h3>Anleitung</h3><button class="x" id="mx">×</button></div><p>'+(MODE==='react'?'Hier stellst du Reaktionsgleichungen auf, gleichst sie aus und rechnest stöchiometrisch (limitierendes Edukt, Überschuss, Ausbeute) – jeweils mit <b>Rechenweg</b>.':'Der Chemie-Rechner löst typische Rechnungen zu Stoffmenge, Konzentration und Gasen und zeigt jeweils den <b>Rechenweg</b>.')+'</p><ol>'+(MODE==='react'?'<li>Wähle links <b>Reaktionsgleichung aufstellen & ausgleichen</b> oder <b>Stöchiometrie</b>.</li><li>Bei <b>Reaktionsgleichung aufstellen & ausgleichen</b> gibst du Edukte (oder eine teilweise bekannte Gleichung) als Formeln oder Namen ein, z. B. <code>Mg + HCl</code>, <code>Magnesium + Salzsäure</code> oder <code>Kaliumpermanganat + Eisen(II)-sulfat + Schwefelsäure</code>. Koeffizienten werden immer als kleinste ganze Zahlen bestimmt (keine Brüche wie ½ O₂). Ionen mit Ladung: Fe<sup>3+</sup>, MnO<sub>4</sub><sup>−</sup> (eintippen als <code>Fe3+</code>, <code>MnO4-</code>). Bei fehlenden Angaben wird nachgefragt. Unterstützt werden auch typische organische Reaktionen (Substitution, Addition, Oxidation von Alkoholen, Veresterung, Verseifung u. a.).</li><li>Mit <b>Oxidationszahlen anzeigen</b> erscheinen die Oxidationszahlen über den Elementsymbolen; Oxidation und Reduktion werden farbig markiert und benannt. Unter <b>Struktur- und Lewis-Schreibweise</b> steht die Gleichung zusätzlich mit Strukturformeln (organische Stoffe) bzw. Lewis-Formeln (anorganische Stoffe); das lässt sich mit dem Schalter <b>Struktur-/Lewis-Formeln</b> ausblenden. Über <b>Welche Stoffe kennt das Werkzeug?</b> findest du eine Übersicht.</li><li>Bei der <b>Stöchiometrie</b> trägst du eine ausgeglichene Gleichung ein (oder übernimmst sie aus dem Gleichungs-Tool), wählst bei einem Stoff die gegebene Größe und erhältst Stoffmengen, Massen und Volumina aller Stoffe sowie limitierendes Edukt und Ausbeute.</li>':'<li><b>Alle Tabellenwerte</b> (oben) öffnet sämtliche Tabellen; der Knopf links in einer Rubrik zeigt nur die dafür passenden Tabellen. Mit „übernehmen“ trägst du einen Wert in das zuletzt angeklickte Eingabefeld ein.</li><li>Wähle auf der Startseite eine <b>Rubrik</b> (z. B. „Stoffmenge und Lösungen“, „Säuren und Basen“, „Elektrochemie“ oder „Einheiten umrechnen“; weitere Rubriken folgen) und links einen <b>Rechner</b>. Über „Zurück zur Übersicht“ kommst du zurück.</li><li>Wähle die <b>gesuchte Größe</b>; die benötigten Felder erscheinen.</li><li>Gib die Werte ein (Dezimalkomma, Zehnerpotenzen wie 7,14·10<sup>−4</sup> eintippen als <code>7,14·10-4</code> oder <code>7,14e-4</code>) und wähle die Einheit. Das Ergebnis erscheint sofort; die Einheit des Ergebnisses kannst du ändern.</li><li>Bei der <b>molaren Masse M</b> kannst du statt einer Zahl auch eine Formel (z. B. <code>NaCl</code>, <code>CuSO4*5H2O</code>) oder einen Namen (z. B. <code>Schwefelsäure</code>) eingeben – M wird dann aus den Atommassen des Periodensystems der Formelsammlung berechnet.</li><li>Mit <b>Tabellenwerte</b> findest du Atommassen, Konstanten, Dichten und konzentrierte Lösungen. Klickst du vorher in ein Eingabefeld, kannst du passende Werte per „übernehmen“ eintragen.</li>')+''+(MODE==='react'?'':'<li>Mit „Zum Rechenprotokoll hinzufügen“ sammelst du Rechnungen und gibst sie über <b>Auswertung als PDF</b> aus.</li>')+'</ol><p class="note">Ergebnisse sind auf drei gültige Ziffern gerundet. Es werden keine Daten gespeichert oder übertragen.</p><div class="act"><button class="btn" id="mclose">Schließen</button></div>');
+  var box=openModal('<div class="mhead"><h3>Anleitung</h3><button class="x" id="mx">×</button></div><p>'+(MODE==='react'?'Hier stellst du Reaktionsgleichungen auf, gleichst sie aus und rechnest stöchiometrisch (limitierendes Edukt, Überschuss, Ausbeute) – jeweils mit <b>Rechenweg</b>.':'Der Chemie-Rechner löst typische Rechnungen zu Stoffmenge, Konzentration und Gasen und zeigt jeweils den <b>Rechenweg</b>.')+'</p><ol>'+(MODE==='react'?'<li>Wähle links <b>Reaktionsgleichung aufstellen & ausgleichen</b> oder <b>Stöchiometrie</b>.</li><li>Bei <b>Reaktionsgleichung aufstellen & ausgleichen</b> gibst du Edukte (oder eine teilweise bekannte Gleichung) als Formeln oder Namen ein, z. B. <code>Mg + HCl</code>, <code>Magnesium + Salzsäure</code> oder <code>Kaliumpermanganat + Eisen(II)-sulfat + Schwefelsäure</code>. Koeffizienten werden immer als kleinste ganze Zahlen bestimmt (keine Brüche wie ½ O₂). Ionen mit Ladung: Fe<sup>3+</sup>, MnO<sub>4</sub><sup>−</sup> (eintippen als <code>Fe3+</code>, <code>MnO4-</code>). Bei fehlenden Angaben wird nachgefragt. Unterstützt werden auch typische organische Reaktionen (Substitution, Addition, Oxidation von Alkoholen, Veresterung, Verseifung u. a.).</li><li>Links unter <b>Optionen</b> lassen sich die Hinweise zur Eingabe, die Oxidationszahlen, die Struktur- und Lewis-Formeln und die Reaktionsmechanismen ein- und ausblenden. Mit <b>Oxidationszahlen</b> erscheinen die Oxidationszahlen über den Elementsymbolen; Oxidation und Reduktion werden farbig markiert und benannt. Unter <b>Struktur- und Lewis-Schreibweise</b> steht die Gleichung zusätzlich mit Strukturformeln (organische Stoffe) bzw. Lewis-Formeln (anorganische Stoffe); das lässt sich mit dem Schalter <b>Struktur-/Lewis-Formeln</b> ausblenden. Welche Stoffe und Reaktionen das Werkzeug kennt, steht in der Einleitung unter <b>Bekannte Stoffe</b> und <b>Bekannte Reaktionstypen</b>.</li><li>Bei der <b>Stöchiometrie</b> trägst du eine ausgeglichene Gleichung ein (oder übernimmst sie aus dem Gleichungs-Tool), wählst bei einem Stoff die gegebene Größe und erhältst Stoffmengen, Massen und Volumina aller Stoffe sowie limitierendes Edukt und Ausbeute.</li>':'<li><b>Alle Tabellenwerte</b> (oben) öffnet sämtliche Tabellen; der Knopf links in einer Rubrik zeigt nur die dafür passenden Tabellen. Mit „übernehmen“ trägst du einen Wert in das zuletzt angeklickte Eingabefeld ein.</li><li>Wähle auf der Startseite eine <b>Rubrik</b> (z. B. „Stoffmenge und Lösungen“, „Säuren und Basen“, „Elektrochemie“ oder „Einheiten umrechnen“; weitere Rubriken folgen) und links einen <b>Rechner</b>. Über „Zurück zur Übersicht“ kommst du zurück.</li><li>Wähle die <b>gesuchte Größe</b>; die benötigten Felder erscheinen.</li><li>Gib die Werte ein (Dezimalkomma, Zehnerpotenzen wie 7,14·10<sup>−4</sup> eintippen als <code>7,14·10-4</code> oder <code>7,14e-4</code>) und wähle die Einheit. Das Ergebnis erscheint sofort; die Einheit des Ergebnisses kannst du ändern.</li><li>Bei der <b>molaren Masse M</b> kannst du statt einer Zahl auch eine Formel (z. B. <code>NaCl</code>, <code>CuSO4*5H2O</code>) oder einen Namen (z. B. <code>Schwefelsäure</code>) eingeben – M wird dann aus den Atommassen des Periodensystems der Formelsammlung berechnet.</li><li>Mit <b>Tabellenwerte</b> findest du Atommassen, Konstanten, Dichten und konzentrierte Lösungen. Klickst du vorher in ein Eingabefeld, kannst du passende Werte per „übernehmen“ eintragen.</li>')+''+(MODE==='react'?'':'<li>Mit „Zum Rechenprotokoll hinzufügen“ sammelst du Rechnungen und gibst sie über <b>Auswertung als PDF</b> aus.</li>')+'</ol><p class="note">Ergebnisse sind auf drei gültige Ziffern gerundet. Es werden keine Daten gespeichert oder übertragen.</p><div class="act"><button class="btn" id="mclose">Schließen</button></div>');
   $('mx').onclick=closeModal;$('mclose').onclick=closeModal;
 }
 function showVer(){
-  openModal('<div class="mhead"><h3>Versionshinweise</h3><button class="x" id="mx">×</button></div>'+(MODE==='react'?'<p><b>V1.0 – 23.11.2026</b></p><ul><li>Reaktionsgleichungen aufstellen und ausgleichen – nur mit Edukten oder mit teilweise bekannter Gleichung, Eingabe als Formel oder Stoffname (z. B. Eisen(III)-chlorid, Natronlauge, Propan), Elemente als Moleküle (H₂, O₂, Cl₂ …), nur ganzzahlige Koeffizienten, mit Rückfragen bei fehlenden Angaben (Oxidationsstufe, Milieu, Konzentration). Unterstützt: Synthesen, Verbrennungen (Alkane u. a.), Metalle mit Wasser, Säuren und Salzlösungen, Neutralisation, Fällung, Gasentwicklung, Oxide, thermische Zersetzung und Redoxreaktionen in Lösung (Permanganat, Dichromat, H₂O₂ u. a.) mit Teilgleichungen.</li><li>Deutlich mehr bekannte Stoffe (Trivialnamen, Hydrate, Peroxide, Carbide, Nitride, Hydride, Thiosulfat, organische Stoffklassen mit verzweigten Ketten, Halogenalkane, Ester, Ether, Amine, Fette, Zucker) und neue Reaktionstypen (organische Reaktionen, thermische Zersetzungen, Halogene als Oxidationsmittel, Nachweisreaktionen)</li><li>Zuschaltbare Anzeige der Oxidationszahlen mit Kennzeichnung von Oxidation, Reduktion und Disproportionierung</li><li>Eigene Grundlagen: Reaktionsgleichungen aufstellen, Reaktionstypen, Oxidationszahlen, Redoxgleichungen, Lewis-Schreibweise und Strukturformeln, stöchiometrisches Rechnen</li><li>Stöchiometrie: Eingabefeld für die Reaktionsgleichung (Formeln oder Namen, wird automatisch ergänzt und ausgeglichen), Anzeige der übernommenen Gleichung als Reaktionsgleichung, beliebig viele Edukte und Produkte; Beispielreaktionen entfernt</li><li>Reaktionsmechanismen in Struktur- und Lewis-Schreibweise mit Elektronenpfeilen (voller Pfeil: Elektronenpaar, Angelhaken: einzelnes Elektron), sonst in Halbstrukturformeln:  radikalische Substitution, elektrophile Addition (Halogen, Halogenwasserstoff, Wasser), elektrophile Substitution (Bromierung, Nitrierung), nucleophile Substitution (S<sub>N</sub>1/S<sub>N</sub>2, Hydrolyse), katalytische Hydrierung, Veresterung, Verseifung, radikalische Polymerisation</li><li>Oxidationszahlen auch an jedem Atom der Struktur- und Lewis-Formeln (aus den Bindungen und der Elektronegativität bestimmt)</li><li>Reaktionsart zu jeder Gleichung: Elektronenübertragung (mit Elektronendonator und -akzeptor), Protonenübertragung (mit Protonendonator und -akzeptor), Fällung, Komplexbildung, radikalische/elektrophile/nucleophile Substitution, elektrophile Addition, Kondensation, Hydrolyse, Polymerisation</li><li>Eduktsuche: Nur das Produkt eingeben (z. B. „→ NaCl“) – mögliche Edukte werden vorgeschlagen; unvollständige Gleichungen werden ergänzt, auch fehlende Edukte („? + HCl → MgCl2 + H2“)</li><li>Weitere Stoffnamen: Diole (z. B. Ethylenglycol), Dicarbonsäuren, Diamine, Monomere, Aromaten, Sprengstoffe, Minerale (Kalkstein, Pyrit, Zinkblende …) mit Verbrennung, Rösten und explosiver Zersetzung</li><li>Kunststoffsynthesen: Polymerisation (mit Strukturformeln von Monomer und Wiederholungseinheit), Copolymerisation, Polykondensation zu Polyestern und Polyamiden (mit Endgruppen und (2n − 1) H₂O), Polyaddition zu Polyurethanen, Ringöffnung von Caprolactam; Eingabe auch über den Kunststoffnamen (z. B. PVC, PET, Nylon)</li><li>Gleichung zusätzlich in Struktur- und Lewis-Schreibweise: organische Stoffe als Valenzstrichformel, anorganische Stoffe als Lewis-Formel mit freien Elektronenpaaren und Formalladungen, Salze als Ionen</li><li>Stöchiometrie mit limitierendem Edukt, Überschuss und Ausbeute; Gasvolumen mit V<sub>m</sub> = 24,466 L/mol (Formelsammlung)</li><li>Atommassen nach dem Periodensystem der Formelsammlung (Abiturpool der Länder)</li></ul>':'<p><b>V1.0 – 20.11.2026</b></p><ul><li>Erster Baustein „Stoffmenge und Lösungen“: Stoffmenge, Teilchenzahl, molare Masse (auch aus der Formel), Konzentration, Massenkonzentration, Dichte, Verdünnen, Mischen, Massen- und Volumenanteil, Gasvolumen, allgemeine Gasgleichung</li><li>Startseite mit Kacheln für die Rubriken (Stoffmenge und Lösungen, Säuren und Basen, Elektrochemie; Chemisches Gleichgewicht und Energetik in Vorbereitung)</li><li>Schaltfläche „Alle Tabellenwerte“ in der Kopfzeile; in den Rubriken zeigt „Tabellenwerte“ nur die jeweils passenden Tabellen</li><li>Rubrik „Elektrochemie“: Zellspannung galvanischer Zellen aus den Standardpotenzialen der Formelsammlung – Halbzellen aus der Tabelle oder als eigene Eingabe (Metall, Element oder Ion als Name oder Formel, Rückfrage bei mehreren möglichen Redoxpaaren), automatische Zuordnung von Elektronendonator und -akzeptor, Anzahl der übertragenen Elektronen (mit Pluspol/Minuspol, Teilgleichungen, Zellreaktion, Zelldiagramm, wahlweise mit Nernst-Gleichung), Konzentrationszelle, Nernst-Gleichung (auch pH-Abhängigkeit von Wasserstoff- und Sauerstoffelektrode), Zersetzungsspannung mit Überspannungen, Faraday-Gleichung (Masse, Stoffmenge, Stromstärke oder Zeit; Gasvolumen); Tabelle der Standardpotenziale und Grundlagen zur Elektrochemie</li><li>Kachel „Einheiten umrechnen“: Masse, Volumen, Stoffmenge, Konzentrationen, Dichte, Anteile, Druck, Temperatur, Energie, Länge, Zeit, Fläche und Ladung mit Rechenweg</li><li>Rubrik „Säuren und Basen“: pH/pOH und Konzentrationen, pH starker und schwacher Säuren und Basen (Näherung und exakt; Stoff als Formel oder Name, Anzahl der H₃O⁺/OH⁻ wird bestimmt), K<sub>S</sub>/pK<sub>S</sub>/K<sub>B</sub>/pK<sub>B</sub>, Pufferlösungen mit Zugabe, Konzentrationsbestimmung durch Titration (Stoffmengenverhältnis aus Probe und Maßlösung bestimmt), Titrationskurven mit Indikatorempfehlung; Tabellenwerte pK<sub>S</sub>/pK<sub>B</sub> und Indikatoren aus der Formelsammlung</li><li>Molare Masse als Zahl, Formel oder Stoffname eingeben (Berechnung aus den Atommassen der Formelsammlung); Brüche im Rechenweg zweizeilig</li><li>Rubrik „Tabellenwerte“ mit Atommassen (alle 118 Elemente laut Periodensystem der Formelsammlung), Konstanten, Dichten (fest, flüssig, gasförmig), konzentrierten Lösungen und molaren Massen; Werte werden bei Bedarf in die Rechner übernommen</li><li>Alle Werte nach der mathematisch-naturwissenschaftlichen Formelsammlung (Abiturpool der Länder): V<sub>m</sub> = 24,466 L/mol bei 25 °C, R = 8,314462618 J/(mol·K), N<sub>A</sub> = 6,02214076·10²³ 1/mol</li><li>Grundlagen mit 6 Themen, Rechenprotokoll mit PDF-Ausgabe</li></ul>')+'<div class="act"><button class="btn" id="mclose">Schließen</button></div>');
+  openModal('<div class="mhead"><h3>Versionshinweise</h3><button class="x" id="mx">×</button></div>'+(MODE==='react'?'<p><b>V1.0 – 23.11.2026</b></p><ul><li>Reaktionsgleichungen aufstellen und ausgleichen – nur mit Edukten oder mit teilweise bekannter Gleichung, Eingabe als Formel oder Stoffname (z. B. Eisen(III)-chlorid, Natronlauge, Propan), Elemente als Moleküle (H₂, O₂, Cl₂ …), nur ganzzahlige Koeffizienten, mit Rückfragen bei fehlenden Angaben (Oxidationsstufe, Milieu, Konzentration). Unterstützt: Synthesen, Verbrennungen (Alkane u. a.), Metalle mit Wasser, Säuren und Salzlösungen, Neutralisation, Fällung, Gasentwicklung, Oxide, thermische Zersetzung und Redoxreaktionen in Lösung (Permanganat, Dichromat, H₂O₂ u. a.) mit Teilgleichungen.</li><li>Deutlich mehr bekannte Stoffe (Trivialnamen, Hydrate, Peroxide, Carbide, Nitride, Hydride, Thiosulfat, organische Stoffklassen mit verzweigten Ketten, Halogenalkane, Ester, Ether, Amine, Fette, Zucker) und neue Reaktionstypen (organische Reaktionen, thermische Zersetzungen, Halogene als Oxidationsmittel, Nachweisreaktionen)</li><li>Zuschaltbare Anzeige der Oxidationszahlen mit Kennzeichnung von Oxidation, Reduktion und Disproportionierung</li><li>Eigene Grundlagen: Reaktionsgleichungen aufstellen, Reaktionstypen, Oxidationszahlen, Redoxgleichungen, Lewis-Schreibweise und Strukturformeln, stöchiometrisches Rechnen</li><li>Weitere Reaktionsmechanismen: Aminosäuresynthese (S<sub>N</sub>2 mit Ammoniak und Deprotonierung), Strecker-Synthese (Iminbildung, Addition von Cyanid; Nitrilhydrolyse), Protonierung von Aminen und Aminosäuren, Neutralisation von Carbonsäuren, Eliminierung (Dehydratisierung von Alkoholen, E1), Alkohol + Halogenwasserstoff, Oxidation von Alkoholen und Aldehyden (Teilgleichungen), saure Esterhydrolyse, Ringöffnungspolymerisation</li><li>Aminosäuresynthese: α-Halogencarbonsäure + Ammoniak (nucleophile Substitution) und Strecker-Synthese in zwei Schritten; Eduktsuche findet beide Wege; Seitenketten in Strukturformeln übersichtlicher; linke Spalte schmaler</li><li>Aminosäuren: alle 20 proteinogenen Aminosäuren mit Namen; Peptidbindung (Dipeptid, Reihenfolge wählbar, mit Mechanismus), Reaktion mit Salzsäure (Aminogruppe als Base) und Natronlauge, Verbrennung</li><li>Reaktionsmechanismen standardmäßig ausgeblendet (unter Optionen einschaltbar)</li><li>Oxidation organischer Stoffe mit Permanganat und Dichromat (primäre Alkohole zum Aldehyd oder zur Carbonsäure mit Rückfrage, sekundäre Alkohole zum Keton, Aldehyde zur Carbonsäure) als Ionen- und Stoffgleichung; Eduktsuche unterscheidet Isomere; Elektronendonator und -akzeptor auch bei Oxidationen mit Sauerstoff</li><li>Stöchiometrie: Eingabefeld für die Reaktionsgleichung (Formeln oder Namen, wird automatisch ergänzt und ausgeglichen), Anzeige der übernommenen Gleichung als Reaktionsgleichung, beliebig viele Edukte und Produkte; Beispielreaktionen entfernt</li><li>Reaktionsmechanismen in Struktur- und Lewis-Schreibweise mit Elektronenpfeilen (voller Pfeil: Elektronenpaar, Angelhaken: einzelnes Elektron), sonst in Halbstrukturformeln:  radikalische Substitution, elektrophile Addition (Halogen, Halogenwasserstoff, Wasser), elektrophile Substitution (Bromierung, Nitrierung), nucleophile Substitution (S<sub>N</sub>1/S<sub>N</sub>2, Hydrolyse), katalytische Hydrierung, Veresterung, Verseifung, radikalische Polymerisation</li><li>Oxidationszahlen auch an jedem Atom der Struktur- und Lewis-Formeln (aus den Bindungen und der Elektronegativität bestimmt)</li><li>Reaktionsart zu jeder Gleichung: Elektronenübertragung (mit Elektronendonator und -akzeptor), Protonenübertragung (mit Protonendonator und -akzeptor), Fällung, Komplexbildung, radikalische/elektrophile/nucleophile Substitution, elektrophile Addition, Kondensation, Hydrolyse, Polymerisation</li><li>Eduktsuche: Nur das Produkt eingeben (z. B. „→ NaCl“) – mögliche Edukte werden vorgeschlagen; unvollständige Gleichungen werden ergänzt, auch fehlende Edukte („? + HCl → MgCl2 + H2“)</li><li>Weitere Stoffnamen: Diole (z. B. Ethylenglycol), Dicarbonsäuren, Diamine, Monomere, Aromaten, Sprengstoffe, Minerale (Kalkstein, Pyrit, Zinkblende …) mit Verbrennung, Rösten und explosiver Zersetzung</li><li>Kunststoffsynthesen: Polymerisation (mit Strukturformeln von Monomer und Wiederholungseinheit), Copolymerisation, Polykondensation zu Polyestern und Polyamiden (mit Endgruppen und (2n − 1) H₂O), Polyaddition zu Polyurethanen, Ringöffnung von Caprolactam; Eingabe auch über den Kunststoffnamen (z. B. PVC, PET, Nylon)</li><li>Gleichung zusätzlich in Struktur- und Lewis-Schreibweise: organische Stoffe als Valenzstrichformel, anorganische Stoffe als Lewis-Formel mit freien Elektronenpaaren und Formalladungen, Salze als Ionen</li><li>Stöchiometrie mit limitierendem Edukt, Überschuss und Ausbeute; Gasvolumen mit V<sub>m</sub> = 24,466 L/mol (Formelsammlung)</li><li>Atommassen nach dem Periodensystem der IQB Mathematisch-naturwissenschaftlichen Formelsammlung</li></ul>':'<p><b>V1.0 – 20.11.2026</b></p><ul><li>Erster Baustein „Stoffmenge und Lösungen“: Stoffmenge, Teilchenzahl, molare Masse (auch aus der Formel), Konzentration, Massenkonzentration, Dichte, Verdünnen, Mischen, Massen- und Volumenanteil, Gasvolumen, allgemeine Gasgleichung</li><li>Startseite mit Kacheln für die Rubriken (Stoffmenge und Lösungen, Säuren und Basen, Elektrochemie; Chemisches Gleichgewicht und Energetik in Vorbereitung)</li><li>Schaltfläche „Alle Tabellenwerte“ in der Kopfzeile; in den Rubriken zeigt „Tabellenwerte“ nur die jeweils passenden Tabellen</li><li>Rubrik „Elektrochemie“: Zellspannung galvanischer Zellen aus den Standardpotenzialen der Formelsammlung – Halbzellen aus der Tabelle oder als eigene Eingabe (Metall, Element oder Ion als Name oder Formel, Rückfrage bei mehreren möglichen Redoxpaaren), automatische Zuordnung von Elektronendonator und -akzeptor, Anzahl der übertragenen Elektronen (mit Pluspol/Minuspol, Teilgleichungen, Zellreaktion, Zelldiagramm, wahlweise mit Nernst-Gleichung), Konzentrationszelle, Nernst-Gleichung (auch pH-Abhängigkeit von Wasserstoff- und Sauerstoffelektrode), Zersetzungsspannung mit Überspannungen, Faraday-Gleichung (Masse, Stoffmenge, Stromstärke oder Zeit; Gasvolumen); Tabelle der Standardpotenziale und Grundlagen zur Elektrochemie</li><li>Kachel „Einheiten umrechnen“: Masse, Volumen, Stoffmenge, Konzentrationen, Dichte, Anteile, Druck, Temperatur, Energie, Länge, Zeit, Fläche und Ladung mit Rechenweg</li><li>Rubrik „Säuren und Basen“: pH/pOH und Konzentrationen, pH starker und schwacher Säuren und Basen (Näherung und exakt; Stoff als Formel oder Name, Anzahl der H₃O⁺/OH⁻ wird bestimmt), K<sub>S</sub>/pK<sub>S</sub>/K<sub>B</sub>/pK<sub>B</sub>, Pufferlösungen mit Zugabe, Konzentrationsbestimmung durch Titration (Stoffmengenverhältnis aus Probe und Maßlösung bestimmt), Titrationskurven mit Indikatorempfehlung; Tabellenwerte pK<sub>S</sub>/pK<sub>B</sub> und Indikatoren aus der Formelsammlung</li><li>Molare Masse als Zahl, Formel oder Stoffname eingeben (Berechnung aus den Atommassen der Formelsammlung); Brüche im Rechenweg zweizeilig</li><li>Rubrik „Tabellenwerte“ mit Atommassen (alle 118 Elemente laut Periodensystem der Formelsammlung), Konstanten, Dichten (fest, flüssig, gasförmig), konzentrierten Lösungen und molaren Massen; Werte werden bei Bedarf in die Rechner übernommen</li><li>Alle Werte nach IQB Mathematisch-naturwissenschaftliche Formelsammlung: V<sub>m</sub> = 24,466 L/mol bei 25 °C, R = 8,314462618 J/(mol·K), N<sub>A</sub> = 6,02214076·10²³ 1/mol</li><li>Grundlagen mit 6 Themen, Rechenprotokoll mit PDF-Ausgabe</li></ul>')+'<div class="act"><button class="btn" id="mclose">Schließen</button></div>');
   $('mx').onclick=closeModal;$('mclose').onclick=closeModal;
 }
 // ---------- Start ----------
@@ -4197,7 +4431,7 @@ $('btnTab').onclick=function(){openTab(null,S.cur!=='home'&&RUBTABS[S.rub]?RUBTA
 if($('btnTabAll'))$('btnTabAll').onclick=function(){openTab(null,null)};
 if(MODE==='react'){$('btnTab').style.display='none';$('btnProt').style.display='none'}
 $('btnHome').onclick=function(){S.cur='home';buildNav();renderMain()};if(MODE==='react')$('btnHome').style.display='none';
-$('lnkOther').href=OTHER_URL;$('lnkOther').innerHTML='<span>'+(MODE==='react'?'Zum Chemie-Rechner':'Reaktionsgleichungen und Stöchiometrie')+'</span><span class="lnkarr">▸</span>';$('btnProt').onclick=openProt;
+$('btnProt').onclick=openProt;
 (function(){var h='';GL.forEach(function(g,i){h+='<button data-i="'+i+'">'+(i+1)+'. '+g.t+'</button>'});$('glNav').innerHTML=h;
   $('btnGl').innerHTML='Grundlagen · '+GL.length+' Themen <span style="float:right" id="glArr">▸</span>';
   $('glNav').onclick=function(e){var b=e.target.closest('button');if(b)glOpen(+b.dataset.i)};
