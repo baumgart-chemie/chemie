@@ -91,6 +91,10 @@ header .hbtn:hover{border-color:var(--teal);color:var(--teal)}
 .pse .nm{font-size:8.5px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pse .ms{font-size:10px;font-family:var(--mono)}
 .pse .lab{grid-column:2/4;align-self:center;color:var(--text-dim);font-size:12px;text-align:right;padding-right:6px}
+.xferrow{margin-top:-4px}.xferrow .note{font-size:12px}
+.xferb{min-height:34px;padding:6px 10px;font-size:13px;white-space:nowrap}
+.xferbar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;border:1px solid var(--accent);border-radius:8px;padding:10px 12px;margin-bottom:10px;color:var(--text)}
+@media (max-width:920px){.row .enwide{grid-column:1/-1}}
 @media (max-width:920px){.layout{grid-template-columns:1fr;padding:14px}.side{position:static;max-height:none}.row{grid-template-columns:1fr 1fr}.row label{grid-column:1/-1}}
 @media (max-width:600px){footer{padding:16px 16px 30px}.bk-qr .qrtxt{display:none}header{flex-wrap:wrap;padding:12px 14px}.step{grid-template-columns:1fr}}
 #print{display:none}
@@ -198,7 +202,7 @@ svg.lw{overflow:visible;flex:none}
   <main class="main" id="main"></main>
 </div>
 <footer>
-  <p class="footer-note">Atommassen (PSE), Konstanten und Dichten nach IQB Mathematisch-naturwissenschaftliche Formelsammlung (Stand 14.02.2024); V<sub>m</sub> = 24,466 L/mol bei 25 °C und 101,325 kPa; Volumina werden als additiv angenommen. Konzentrierte Lösungen: handelsübliche Werte.</p>
+  <p class="footer-note">Atommassen (PSE), Konstanten und Dichten nach IQB Mathematisch-naturwissenschaftliche Formelsammlung (Stand 14.02.2024); V<sub>m</sub> = 24,466 L/mol bei 25 °C und 101,325 kPa; Volumina werden als additiv angenommen. Konzentrierte Lösungen: handelsübliche Werte. Standardbildungsenthalpien und -entropien: gerundete Literaturwerte; mittlere Bindungsenthalpien nach gängigen Schulbuch-Tabellenwerken (beides nicht in der Formelsammlung).</p>
   <p class="footer-credit">Bastian Baumgart · Chemie-Rechner V1.0 · <a href="#" id="lnkVer">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 <div id="modalRoot"></div>
@@ -439,7 +443,7 @@ var $=function(id){return document.getElementById(id)};
 var ORDER=['nmM','part','molf','conc','concm','beta','betac','dens','dil','mix','frac','phi','wc','vmol','gasl'];
 var REACT=['req','stoich'];
 var SBORDER=['phconv','phstrong','phweak','pkconv','buffer','titr','tcurve'];
-var RUBTITLE={stoff:'Stoffmenge und Lösungen',sb:'Säuren und Basen',ec:'Elektrochemie',units:'Einheiten umrechnen'};var UNITORDER=['unitconv'];var ECORDER=['galv','konz','nernst','elyse','faraday'];
+var RUBTITLE={en:'Energetik und Kinetik',stoff:'Stoffmenge und Lösungen',sb:'Säuren und Basen',ec:'Elektrochemie',units:'Einheiten umrechnen'};var UNITORDER=['unitconv'];var ECORDER=['galv','konz','nernst','elyse','faraday'];var ENORDER=['kalor','rhkal','bild','bind','ent','ghh','hs1','vrate'];
 if(MODE==='react')ORDER=[];
 var CUSTOM={molf:{id:'molf',grp:'Stoffmenge',title:'Molare Masse aus Formel',custom:1},
  mix:{id:'mix',grp:'Lösungen',title:'Mischen zweier Lösungen',custom:1},
@@ -481,8 +485,8 @@ function navHtml(list){
   return h;
 }
 function buildNav(){
-  if(!S.rub)S.rub=SBORDER.indexOf(S.cur)>=0?'sb':(ECORDER.indexOf(S.cur)>=0?'ec':(S.cur==='unitconv'?'units':'stoff'));
-  $('calcNav').innerHTML=navHtml(S.rub==='sb'?SBORDER:(S.rub==='ec'?ECORDER:(S.rub==='units'?UNITORDER:ORDER)));if($('navTitle'))$('navTitle').textContent=RUBTITLE[S.rub];
+  if(!S.rub)S.rub=SBORDER.indexOf(S.cur)>=0?'sb':(ECORDER.indexOf(S.cur)>=0?'ec':(ENORDER.indexOf(S.cur)>=0?'en':(S.cur==='unitconv'?'units':'stoff')));
+  $('calcNav').innerHTML=navHtml(S.rub==='sb'?SBORDER:(S.rub==='ec'?ECORDER:(S.rub==='en'?ENORDER:(S.rub==='units'?UNITORDER:ORDER))));if($('navTitle'))$('navTitle').textContent=RUBTITLE[S.rub];
   $('reactNav').innerHTML=navHtml(REACT).replace(/<div class="grp">Reaktionen<\/div>/,'');
   $('calcNav').parentNode.style.display=MODE==='react'||S.cur==='home'?'none':'';
   if(MODE!=='react'){var bt=$('btnTab');bt.style.display=S.cur!=='home'&&!RUBTABS[S.rub]?'none':'';bt.textContent=S.cur==='home'?'Tabellenwerte öffnen':'Tabellenwerte: '+RUBTITLE[S.rub]}
@@ -499,20 +503,20 @@ var RUBRIKEN=[
  {id:'gg',t:'Chemisches Gleichgewicht',ic:'K<sub>c</sub>',d:'Massenwirkungsgesetz, Gleichgewichtskonstante K<sub>c</sub>, Gleichgewichtskonzentrationen, Löslichkeitsprodukt'},
  {id:'ec',t:'Elektrochemie',ic:'E°',d:'Zellspannung aus Standardpotenzialen, Nernst-Gleichung, Faraday-Gesetz, Elektrolyse und Zersetzungsspannung',ok:1},
  {id:'units',t:'Einheiten umrechnen',ic:'mL ⇄ L',d:'Masse, Volumen, Stoffmenge, Konzentration, Dichte, Anteile, Druck, Temperatur, Energie, Länge, Zeit u. a. – z. B. L in mL oder g in kg',ok:1},
- {id:'en',t:'Energetik',ic:'ΔH',d:'Kalorimetrie, Reaktionsenthalpie, Satz von Hess, Bildungsenthalpien, Entropie und freie Enthalpie, Reaktionsgeschwindigkeit'}];
+ {id:'en',t:'Energetik und Kinetik',ic:'ΔH',d:'Kalorimetrie, Reaktionsenthalpie aus Bildungs- und Bindungsenthalpien, Entropie und freie Enthalpie, innere Energie und Volumenarbeit, mittlere und momentane Reaktionsgeschwindigkeit',ok:1}];
 function renderHome(){
   var h='<div class="card"><h2 class="t">Rubriken</h2><p class="desc">Wähle einen Themenbereich. Jede Rubrik enthält Rechner mit Rechenweg; die Werte stammen aus der Formelsammlung.</p><div class="tiles">';
   RUBRIKEN.forEach(function(r){h+='<button class="tile'+(r.ok?'':' soon')+'" data-r="'+r.id+'"'+(r.ok?'':' aria-disabled="true"')+'><span class="tic">'+r.ic+'</span><span class="tt">'+r.t+'</span><span class="td">'+r.d+'</span>'+(r.ok?'<span class="tgo">Öffnen ▸</span>':'<span class="tsoon">in Vorbereitung</span>')+'</button>'});
   h+='</div></div>';
   $('main').innerHTML=h;
   $('main').querySelector('.tiles').onclick=function(e){var b=e.target.closest('button.tile');if(!b)return;
-    if(b.dataset.r==='stoff'||b.dataset.r==='sb'||b.dataset.r==='ec'||b.dataset.r==='units'){S.rub=b.dataset.r;S.cur={sb:'phconv',ec:'galv',units:'unitconv',stoff:'nmM'}[b.dataset.r];buildNav();renderMain();if(window.innerWidth<=920)$('main').scrollIntoView()}
+    if(b.dataset.r==='stoff'||b.dataset.r==='sb'||b.dataset.r==='ec'||b.dataset.r==='units'||b.dataset.r==='en'){S.rub=b.dataset.r;S.cur={sb:'phconv',ec:'galv',units:'unitconv',stoff:'nmM',en:'kalor'}[b.dataset.r];buildNav();renderMain();if(window.innerWidth<=920)$('main').scrollIntoView()}
     else toast('Diese Rubrik ist in Vorbereitung.')};
 }
 function renderMain(){
   if(S.cur==='home'){renderHome();return}
   var c=BYID[S.cur],m=$('main');
-  if(c.custom){var f={molf:renderMolf,mix:renderMix,stoich:renderStoich,req:renderReq,phconv:renderPhconv,unitconv:renderUnitconv,phstrong:renderPhstrong,phweak:renderPhweak,pkconv:renderPkconv,buffer:renderBuffer,titr:renderTitr,tcurve:renderTcurve,galv:renderGalv,konz:renderKonz,nernst:renderNernst,elyse:renderElyse,faraday:renderFaraday}[c.id];
+  if(c.custom){var f={molf:renderMolf,mix:renderMix,stoich:renderStoich,req:renderReq,phconv:renderPhconv,unitconv:renderUnitconv,phstrong:renderPhstrong,phweak:renderPhweak,pkconv:renderPkconv,buffer:renderBuffer,titr:renderTitr,tcurve:renderTcurve,galv:renderGalv,konz:renderKonz,nernst:renderNernst,elyse:renderElyse,faraday:renderFaraday,kalor:renderKalor,rhkal:renderRhkal,bild:renderBild,hess:renderHess,bind:renderBind,ent:renderEnt,ghh:renderGhh,hs1:renderHs1,vrate:renderVrate}[c.id];
     m.innerHTML='<div class="card"><h2 class="t">'+c.title+'</h2><p class="desc" id="cdesc"></p><div id="cbody"></div></div><div class="card" id="resArea"></div>';
     f(c);return}
   var s=st(c.id);if(!s.t)s.t=Object.keys(c.t)[0];
@@ -884,7 +888,7 @@ function fpk(x){var s=Math.abs(x)%1?String(Math.abs(Math.round(x*100)/100)).repl
 function pw(e){return '10<sup>'+(e<0?'−':'')+Math.abs(e).toFixed(2).replace('.',',')+'</sup>'}
 function lgc(x){return fmt(x,3)}
 // --- gemeinsame Bausteine ---
-function sbRow(k,label,val,opt){opt=opt||{};return '<div class="row"><label>'+label+'</label><input data-k="'+k+'" data-qty="'+(opt.qty||'')+'" inputmode="'+(opt.text?'text':'decimal')+'" value="'+esc(val==null?'':val)+'" placeholder="'+(opt.ph||'Wert eingeben')+'" autocomplete="off" autocapitalize="off" spellcheck="false">'+(opt.q?unitSel(opt.q,opt.ui||0).replace('<select','<select data-u="'+k+'"'):'<span></span>')+'</div>'}
+function sbRow(k,label,val,opt){opt=opt||{};return '<div class="row"><label>'+label+'</label><input data-k="'+k+'" data-qty="'+(opt.qty||'')+'"'+(opt.q?' data-q="'+opt.q+'"':'')+' inputmode="'+(opt.text?'text':'decimal')+'" value="'+esc(val==null?'':val)+'" placeholder="'+(opt.ph||'Wert eingeben')+'" autocomplete="off" autocapitalize="off" spellcheck="false">'+(opt.q?unitSel(opt.q,opt.ui||0).replace('<select','<select data-u="'+k+'"'):'<span></span>')+'</div>'}
 function sbSel(k,label,opts,cur){return '<div class="row"><label>'+label+'</label><select data-s="'+k+'" class="sel">'+opts.map(function(o){return '<option value="'+esc(o[0])+'"'+(String(o[0])===String(cur)?' selected':'')+'>'+o[1]+'</option>'}).join('')+'</select><span></span></div>'}
 function sbBind(s,upd,rer){
   var b=$('cbody');
@@ -1485,7 +1489,7 @@ var RUBTABS={stoff:['el','const','dens','conc','sub'],sb:['pks','ind','const'],e
 function openTab(key,set){
   if(set!==undefined)S.tabSet=set;var T=S.tabSet?S.tabSet.map(function(k){return TABS.filter(function(t){return t[0]===k})[0]}).filter(Boolean):TABS;
   if(!key||!T.some(function(t){return t[0]===key}))key=(S.tabKey&&T.some(function(t){return t[0]===S.tabKey}))?S.tabKey:T[0][0];S.tabKey=key;
-  var fq={pKS:'Säureexponent pKS',pKB:'Basenexponent pKB',M:'molare Masse M',rho:'Dichte ρ',NA:'Avogadro-Konstante',Vm:'molares Volumen',w:'Massenanteil w'};
+  var fq={c:'spezifische Wärmekapazität c',pKS:'Säureexponent pKS',pKB:'Basenexponent pKB',M:'molare Masse M',rho:'Dichte ρ',NA:'Avogadro-Konstante',Vm:'molares Volumen',w:'Massenanteil w'};
   var f=S.focus&&S.focus.isConnected?S.focus:null;
   var hint=f&&f.dataset.qty?'Markiertes Feld: <b>'+fq[f.dataset.qty]+'</b> – Werte dieser Art lassen sich mit „übernehmen“ eintragen.':'Tipp: Klicke zuerst in ein Eingabefeld des Rechners (z. B. molare Masse), dann kannst du hier Werte übernehmen.';
   var h='<div class="mhead"><h3>Tabellenwerte'+(S.tabSet&&S.rub&&RUBTITLE[S.rub]?' – '+RUBTITLE[S.rub]:'')+'</h3><button class="x" id="mx">×</button></div><div class="chips">'+T.map(function(t){return '<button class="chip'+(t[0]===key?' on':'')+'" data-t="'+t[0]+'">'+t[1]+'</button>'}).join('')+'</div><p class="note">'+hint+'</p><input class="sel" id="tsearch" placeholder="Suchen …" autocomplete="off" style="margin-bottom:8px"><div id="tbody"></div>';
@@ -4224,6 +4228,599 @@ mechLewis=function(r){var t=r.type||'',L=r.L||[],st=mScene;
       st([OX(),OP('⟶'),CB(),OP('+'),mH2O()],[{f:{i:0,b:['C2','O']},t:{i:0,a:'O',dir:90},bend:-0.9}]),
       st([CB(),OP('⟶'),EN(),OP('+'),mHp()],[{f:{i:0,b:['C1','C1u']},t:{i:0,b:['C1','C2'],off:0.12},bend:-0.9}])]}
   return mechLewis0(r)};
+// ========== Rubrik Energetik und Kinetik ==========
+U.energy=[{u:'kJ',f:1},{u:'J',f:1e-3}];BASEU.energy='kJ';
+U.hmol=[{u:'kJ/mol',f:1},{u:'J/mol',f:1e-3}];BASEU.hmol='kJ/mol';
+U.smol=[{u:'J/(mol·K)',f:1},{u:'kJ/(mol·K)',f:1e3}];BASEU.smol='J/(mol·K)';
+U.cp=[{u:'kJ/(kg·K)',f:1},{u:'J/(g·K)',f:1},{u:'J/(kg·K)',f:1e-3}];BASEU.cp='kJ/(kg·K)';
+U.hcap=[{u:'J/K',f:1},{u:'kJ/K',f:1e3}];BASEU.hcap='J/K';
+U.dT=[{u:'K',f:1}];BASEU.dT='K';
+(function(){var o={kalor:['Kalorimetrie','Kalorimetrie: Wärme Q = c · m · ΔT'],rhkal:['Kalorimetrie','Reaktionsenthalpie aus Kalorimetrie'],bild:['Enthalpie','Reaktionsenthalpie aus Bildungsenthalpien'],hess:['Enthalpie','Satz von Hess (Teilreaktionen)'],bind:['Enthalpie','Reaktionsenthalpie aus Bindungsenthalpien'],ent:['Entropie und freie Enthalpie','Reaktionsentropie aus Standardentropien'],ghh:['Entropie und freie Enthalpie','Gibbs-Helmholtz-Gleichung'],hs1:['Erster Hauptsatz','Innere Energie und Volumenarbeit'],vrate:['Kinetik','Reaktionsgeschwindigkeit (mittlere und momentane)']};
+ for(var k in o){CUSTOM[k]={id:k,grp:o[k][0],title:o[k][1],custom:1};BYID[k]=CUSTOM[k]}})();
+// Spezifische Wärmekapazitäten von Flüssigkeiten (Formelsammlung) und Dichten (Formelsammlung, Benzol: Literaturwert)
+var CPLIQ=[['w','Wasser',4.183,1.00],['eth','Ethanol',2.42,0.79],['gly','Glycerin',2.39,1.26],['pet','Petroleum',2.00,0.81],['ben','Benzol',1.70,null],['hg','Quecksilber',0.14,13.53],['x','– eigener Wert –',null,null]];
+var CPSOL=[['Aluminium','0,90'],['Beton','0,92'],['Diamant','0,50'],['Fensterglas','0,17'],['Gold','0,13'],['Graphit','0,71'],['Holz (Eiche)','2,39'],['Kupfer','0,38'],['Magnesium','1,02'],['Mauerwerk','0,86'],['Platin','0,13'],['Porzellan','0,84'],['Quarzglas','0,73'],['Silber','0,24'],['Stahl','0,47'],['Wolfram','0,13'],['Zink','0,39'],['Zinn','0,23']];
+var CPGAS=[['Ammoniak','1,56','2,05'],['Helium','3,22','5,24'],['Kohlenstoffdioxid','0,65','0,85'],['Luft','0,72','1,01'],['Propan','1,36','1,55'],['Sauerstoff','0,65','0,92'],['Stickstoff','0,75','1,04'],['Wasserdampf','1,40','1,86'],['Wasserstoff','10,13','14,28']];
+var MELT=[['Aluminium','660,3','397'],['Blei','327,5','26'],['Eis / Wasser','0','334'],['Ethanol','−114,1','108'],['Gold','1064,2','65'],['Helium','−270 (bei 2,6 MPa)',''],['Kupfer','1084,6','205'],['Magnesium','650','382'],['Methanol','−97,53','69'],['Platin','1768,4','113'],['Quecksilber','−38,83','11,3'],['Sauerstoff','−218,79',''],['Silber','961,78','104'],['Silicium','1414','142'],['Stahl','723 – 1536',''],['Stickstoff','−210,0',''],['Wasserstoff','−259,34','59'],['Wolfram','3422','192'],['Zink','419,53','111'],['Zinn','231,93','59']];
+var BOIL=[['Ammoniak','−33,33','1370'],['Aceton','56,05','520'],['Ethanol','78,29','842'],['Glycerin','290','853'],['Helium','−268,93','25'],['Kohlenstoffdioxid','−79 (Sublimation)','574'],['Methanol','64,6','1102'],['Sauerstoff','−182,95','213'],['Stickstoff','−195,79','198'],['Wasser','100','2260'],['Wasserstoff','−252,87','455']];
+// Standardbildungsenthalpien ΔfH° (kJ/mol) und Standardentropien S° (J/(mol·K)) bei 298,15 K und 101,325 kPa
+// [Formel, Zustand, Name, ΔfH°, S°, Standardzustand?, erlaubte Schreibweisen (Isomere)]
+var TD=[
+['H2','g','Wasserstoff',0,130.7,1],['O2','g','Sauerstoff',0,205.2,1],['O3','g','Ozon',142.7,238.9,1],['N2','g','Stickstoff',0,191.6,1],['F2','g','Fluor',0,202.8,1],['Cl2','g','Chlor',0,223.1,1],
+['Br2','l','Brom',0,152.2,1],['Br2','g','Brom',30.9,245.5],['I2','s','Iod',0,116.1,1],['I2','g','Iod',62.4,260.7],['He','g','Helium',0,126.2,1],
+['C','s','Kohlenstoff (Graphit)',0,5.7,1],['C','dia','Kohlenstoff (Diamant)',1.9,2.4],['S','s','Schwefel (rhombisch)',0,32.1,1],['P','s','Phosphor (weiß)',0,41.1,1],
+['Na','s','Natrium',0,51.3,1],['K','s','Kalium',0,64.7,1],['Mg','s','Magnesium',0,32.7,1],['Ca','s','Calcium',0,41.6,1],['Al','s','Aluminium',0,28.3,1],['Fe','s','Eisen',0,27.3,1],
+['Cu','s','Kupfer',0,33.2,1],['Zn','s','Zink',0,41.6,1],['Ag','s','Silber',0,42.6,1],['Pb','s','Blei',0,64.8,1],['Hg','l','Quecksilber',0,75.9,1],
+['H2O','l','Wasser',-285.8,69.9,1],['H2O','g','Wasser (Wasserdampf)',-241.8,188.8],['H2O2','l','Wasserstoffperoxid',-187.8,109.6,1],
+['CO','g','Kohlenstoffmonooxid',-110.5,197.7,1],['CO2','g','Kohlenstoffdioxid',-393.5,213.8,1],
+['CH4','g','Methan',-74.6,186.3,1],['C2H6','g','Ethan',-84.0,229.2,1],['C3H8','g','Propan',-103.8,270.3,1],['C4H10','g','Butan',-125.6,309.9,1,['C4H10','CH3CH2CH2CH3','CH3(CH2)2CH3']],
+['C8H18','l','Octan',-250.1,361.1,1,['C8H18','CH3(CH2)6CH3']],['C2H4','g','Ethen',52.4,219.3,1],['C2H2','g','Ethin',227.4,200.9,1],['C6H6','l','Benzol',49.1,173.4,1],
+['CH3OH','l','Methanol',-239.2,126.8,1],['C2H5OH','l','Ethanol',-277.6,160.7,1,['C2H5OH','CH3CH2OH','C2H6O']],['C2H5OH','g','Ethanol',-234.8,281.6,0,['C2H5OH','CH3CH2OH','C2H6O']],
+['CH3CHO','l','Ethanal',-192.2,160.2,1,['CH3CHO','C2H4O']],['CH3COCH3','l','Aceton (Propanon)',-248.4,199.8,1,['CH3COCH3','(CH3)2CO','C3H6O']],
+['HCOOH','l','Methansäure',-425.0,129.0,1,['HCOOH','CH2O2']],['CH3COOH','l','Essigsäure (Ethansäure)',-484.3,159.8,1,['CH3COOH','CH3CO2H','C2H4O2']],
+['C6H12O6','s','Glucose',-1273.3,209.2,1],['C12H22O11','s','Saccharose',-2226.1,360.2,1],
+['NH3','g','Ammoniak',-45.9,192.8,1],['NH3','aq','Ammoniak (gelöst)',-80.3,111.3],['N2O','g','Distickstoffmonooxid',81.6,220.0,1],['NO','g','Stickstoffmonooxid',91.3,210.8,1],['NO2','g','Stickstoffdioxid',33.2,240.1,1],['N2O4','g','Distickstofftetraoxid',11.1,304.4,1],
+['HNO3','l','Salpetersäure',-174.1,155.6,1],['HF','g','Fluorwasserstoff',-273.3,173.8,1],['HCl','g','Chlorwasserstoff',-92.3,186.9,1],['HCl','aq','Salzsäure',-167.2,56.5],['HBr','g','Bromwasserstoff',-36.3,198.7,1],['HI','g','Iodwasserstoff',26.5,206.6,1],
+['H2S','g','Schwefelwasserstoff',-20.6,205.8,1],['SO2','g','Schwefeldioxid',-296.8,248.2,1],['SO3','g','Schwefeltrioxid',-395.7,256.8,1],['H2SO4','l','Schwefelsäure',-814.0,156.9,1],
+['NaCl','s','Natriumchlorid',-411.2,72.1,1],['NaCl','aq','Natriumchlorid (gelöst)',-407.3,115.5],['NaOH','s','Natriumhydroxid',-425.6,64.5,1],['NaOH','aq','Natronlauge',-470.1,48.1],
+['Na2CO3','s','Natriumcarbonat',-1130.7,135.0,1],['NaHCO3','s','Natriumhydrogencarbonat',-950.8,101.7,1],['KCl','s','Kaliumchlorid',-436.5,82.6,1],['KOH','s','Kaliumhydroxid',-424.6,78.9,1],['KNO3','s','Kaliumnitrat',-494.6,133.1,1],
+['MgO','s','Magnesiumoxid',-601.6,27.0,1],['MgCl2','s','Magnesiumchlorid',-641.3,89.6,1],['Mg(OH)2','s','Magnesiumhydroxid',-924.5,63.2,1],
+['CaO','s','Calciumoxid',-634.9,38.1,1],['Ca(OH)2','s','Calciumhydroxid',-985.2,83.4,1],['CaCO3','s','Calciumcarbonat (Calcit)',-1207.6,91.7,1],['CaCl2','s','Calciumchlorid',-795.4,108.4,1],['CaSO4','s','Calciumsulfat',-1434.5,106.5,1],
+['Al2O3','s','Aluminiumoxid',-1675.7,50.9,1],['Fe2O3','s','Eisen(III)-oxid',-824.2,87.4,1],['Fe3O4','s','Eisen(II,III)-oxid',-1118.4,146.4,1],['CuO','s','Kupfer(II)-oxid',-157.3,42.6,1],['Cu2O','s','Kupfer(I)-oxid',-168.6,93.1,1],
+['ZnO','s','Zinkoxid',-350.5,43.7,1],['PbO','s','Blei(II)-oxid',-219.0,66.5,1],['SiO2','s','Siliciumdioxid (Quarz)',-910.7,41.5,1],['AgCl','s','Silberchlorid',-127.0,96.3,1],
+['NH4Cl','s','Ammoniumchlorid',-314.4,94.6,1],['NH4NO3','s','Ammoniumnitrat',-365.6,151.1,1],['CuSO4','s','Kupfer(II)-sulfat',-771.4,109.2,1],['CuSO4*5H2O','s','Kupfer(II)-sulfat-Pentahydrat',-2279.7,300.4,1],
+['H+','aq','Wasserstoff-Ion (Oxonium-Ion)',0,0,1],['H3O+','aq','Oxonium-Ion',-285.8,69.9,1],['OH-','aq','Hydroxid-Ion',-230.0,-10.8,1],['Na+','aq','Natrium-Ion',-240.1,59.0,1],['K+','aq','Kalium-Ion',-252.4,102.5,1],
+['NH4+','aq','Ammonium-Ion',-132.5,113.4,1],['Ca^2+','aq','Calcium-Ion',-542.8,-53.1,1],['Mg^2+','aq','Magnesium-Ion',-466.9,-138.1,1],['Cu^2+','aq','Kupfer(II)-Ion',64.8,-99.6,1],['Zn^2+','aq','Zink-Ion',-153.9,-112.1,1],
+['Ag+','aq','Silber-Ion',105.6,72.7,1],['Fe^2+','aq','Eisen(II)-Ion',-89.1,-137.7,1],['Fe^3+','aq','Eisen(III)-Ion',-48.5,-315.9,1],['F-','aq','Fluorid-Ion',-332.6,-13.8,1],['Cl-','aq','Chlorid-Ion',-167.2,56.5,1],
+['Br-','aq','Bromid-Ion',-121.6,82.4,1],['I-','aq','Iodid-Ion',-55.2,111.3,1],['NO3-','aq','Nitrat-Ion',-207.4,146.4,1],['SO4^2-','aq','Sulfat-Ion',-909.3,20.1,1],['CO3^2-','aq','Carbonat-Ion',-677.1,-56.9,1],['HCO3-','aq','Hydrogencarbonat-Ion',-692.0,91.2,1]
+].map(function(a){var raw=a[0],h3o=raw==='H3O+',sp=h3o?{el:{H:3,O:1},q:1}:pspec(raw);return{f:raw,st:a[1],n:a[2],h:a[3],s:a[4],def:!!a[5],alt:a[6],el:sp.el,q:sp.q,key:elKey(sp.el)+'|'+sp.q}});
+var STN={s:'s',l:'l',g:'g',aq:'aq',dia:'s, Diamant'},STL={s:'fest',l:'flüssig',g:'gasförmig',aq:'gelöst',dia:'fest (Diamant)'};
+function enStateOf(x){x=String(x||'').toLowerCase();return {s:'s',f:'s',fest:'s',l:'l',fl:'l','flüssig':'l',g:'g',gas:'g',aq:'aq',graphit:'s',diamant:'dia'}[x]||null}
+function enSpLabel(sp){var t=sp.h3o?'H<sub>3</sub>O<sup>+</sup>':(typeof fsp==='function'?fsp(sp.t):prettyFormula(sp.t));return t+(sp.st?'('+STN[sp.st]+')':'')}
+function enFr(x){if(Math.abs(x-Math.round(x))<1e-9)return String(Math.round(x));for(var d=2;d<=12;d++)if(Math.abs(x*d-Math.round(x*d))<1e-7)return Math.round(x*d)+'/'+d;return fmt(x,4)}
+function enCo(x){var s=enFr(x);return s==='1'?'':s+' '}
+function enS(x,sig){var t=fmt(Math.abs(x),sig||4);return (x<0&&t!=='0'?'−':'')+t}
+function enPS(x,sig){return x<0?'('+enS(x,sig)+')':enS(x,sig)}
+function enNum(x,d){var f=Math.pow(10,d==null?1:d),r=Math.sign(x)*Math.round(Math.abs(x)*f)/f;if(Object.is(r,-0))r=0;return (r<0?'−':'')+Math.abs(r).toFixed(d==null?1:d).replace('.',',')}
+function enPar(x,d){return x<0?'('+enNum(x,d)+')':enNum(x,d)}
+// --- Gleichung lesen: {L:[sp],R:[sp]} oder {err}
+function enParseTerm(t0){
+  var t=String(t0).trim();if(!t)return{err:'Leerer Stoff in der Gleichung.'};
+  var co=null,coTxt='',m=t.match(/^(\d+(?:[.,]\d+)?(?:\/\d+)?)\s*(?=[A-Z(\[a-zäöü])/);
+  if(m){coTxt=m[1];var a=m[1].replace(',','.');co=a.indexOf('/')>=0?(+a.split('/')[0])/(+a.split('/')[1]):+a;t=t.slice(m[0].length).trim();if(!(co>0))return{err:'Koeffizient „'+esc(m[1])+'“ ist ungültig.'}}
+  var st=null,ms=t.match(/\(\s*(s|f|fest|l|fl|flüssig|g|gas|aq|graphit|diamant)\s*\)$/i);
+  if(ms){st=enStateOf(ms[1]);t=t.slice(0,ms.index).trim()}
+  var raw=t,sp;
+  if(/^H3O(\^?\+|⁺|\+)$/.test(t.replace(/\s+/g,''))){sp={f:'H3O',t:'H3O+',q:1,el:{H:3,O:1},h3o:1}}
+  else{var fi=formulaFromInput(t);if(!fi)return{err:'Leerer Stoff.'};if(fi.err)return{err:fi.err};var pf=parseFormula(fi.f);if(pf.err)return{err:pf.err};
+    sp={f:fi.f,q:fi.q||0,el:pf.el,name:fi.name,t:fi.f+(fi.q?'^'+(Math.abs(fi.q)>1?Math.abs(fi.q):'')+(fi.q>0?'+':'-'):'')};
+    if(!st&&fi.name&&/lauge$|^salzsäure$|lösung$/i.test(fi.name))st='aq';
+    if(!st&&/^diamant$/i.test(raw))st='dia'}
+  if(!st&&sp.f==='C'&&/diamant/i.test(raw))st='dia';
+  sp.co=co==null?1:co;sp.coTxt=coTxt;sp.stIn=st;sp.raw=raw;sp.key=elKey(sp.el)+'|'+sp.q;sp.base=sp.f.replace(/\s+/g,'');
+  return sp;
+}
+function enSplitSide(side){
+  var parts=String(side).split(/\s+\+\s+/),out=[];
+  parts.forEach(function(p){p.split(/\+(?=\s*(?:\d+(?:[.,]\d+)?(?:\/\d+)?\s*)?[A-Z\[])|\+(?=\s*\((?!\s*(?:s|f|l|fl|g|aq|gas|fest|graphit|diamant)\s*\)))/i).forEach(function(x){if(x.trim())out.push(x.trim())})});
+  return out;
+}
+function enParseEq(txt,noBal){
+  var t=String(txt||'').trim();if(!t)return{empty:1};
+  t=t.replace(/<=+>|<[-–—]+>|⇌|⟶|⟹|→|=+>|[-–—]+>|=+/g,'→');var p=t.split('→');
+  if(p.length!==2)return{err:'Bitte eine Reaktionsgleichung mit genau einem Pfeil eingeben, z. B. CH4 + 2 O2 -> CO2 + 2 H2O(l).'};
+  var L=enSplitSide(p[0]).map(enParseTerm),R=enSplitSide(p[1]).map(enParseTerm),all=L.concat(R);
+  if(!L.length||!R.length)return{err:'Links und rechts vom Pfeil muss mindestens ein Stoff stehen.'};
+  for(var i=0;i<all.length;i++)if(all[i].err)return{err:all[i].err};
+  var res={L:L,R:R,auto:false};
+  if(!enBalanced(L,R)){
+    if(noBal)return{err:'Die Gleichung ist nicht ausgeglichen. Prüfe die Koeffizienten.'};
+    if(all.some(function(x){return x.coTxt}))return{err:'Die Gleichung ist nicht ausgeglichen. Prüfe die Koeffizienten (oder lass alle Koeffizienten weg, dann wird automatisch ausgeglichen).'};
+    var b=enBalance(L,R);if(!b)return{err:'Die Gleichung lässt sich nicht eindeutig ausgleichen. Prüfe die Stoffe oder gib die Koeffizienten an.'};
+    all.forEach(function(x,j){x.co=b[j]});res.auto=true}
+  return res;
+}
+function enBalanced(L,R){var acc={};function add(list,sg){list.forEach(function(x){for(var e in x.el)acc[e]=(acc[e]||0)+sg*x.co*x.el[e];acc['#q']=(acc['#q']||0)+sg*x.co*x.q})}add(L,1);add(R,-1);for(var k in acc)if(Math.abs(acc[k])>1e-9)return false;return true}
+function enBalance(L,R){
+  var all=L.concat(R),els={};all.forEach(function(x){for(var e in x.el)els[e]=1});
+  var rows=Object.keys(els).map(function(e){return all.map(function(x,j){return (j<L.length?1:-1)*(x.el[e]||0)})});
+  if(all.some(function(x){return x.q}))rows.push(all.map(function(x,j){return (j<L.length?1:-1)*x.q}));
+  var ns=nullsp(rows,all.length);if(ns.free.length!==1)return null;
+  var f=ns.free[0],x=all.map(function(){return fr(0,1)});x[f]=fr(1,1);ns.piv.forEach(function(pc,k){x[pc]=fr(-ns.M[k][f][0],ns.M[k][f][1])});
+  var Lc=1;x.forEach(function(v){Lc=Lc*v[1]/gcd_(Lc,v[1])});var ints=x.map(function(v){return v[0]*(Lc/v[1])});var g=0;ints.forEach(function(v){g=gcd_(g,v)});ints=ints.map(function(v){return v/g});
+  if(ints[0]<0)ints=ints.map(function(v){return -v});if(ints.some(function(v){return v<=0}))return null;return ints;
+}
+function enEqHtml(L,R,arrow){function side(a){return a.map(function(x){return enCo(x.co)+enSpLabel(x)}).join(' + ')}return side(L)+' '+(arrow||'⟶')+' '+side(R)}
+// Tabellenwerte zuordnen; liefert pro Stoff {e} (Eintrag) oder fehlend; Zustandsauswahl über s.o
+function enLookup(s,all){
+  all.forEach(function(x,i){
+    var c=TD.filter(function(e){return e.key===x.key&&(!e.alt||e.alt.indexOf(x.base)>=0||(x.name&&e.n.toLowerCase().indexOf(x.name.toLowerCase())>=0))});
+    x.cands=c;var ok='stsel_'+x.key;
+    if(x.stIn){var m=c.filter(function(e){return e.st===x.stIn});x.e=m[0]||null;x.st=x.stIn;x.chosen=false}
+    else if(c.length){var pick=s.o[ok]&&c.filter(function(e){return e.st===s.o[ok]})[0];x.e=pick||c.filter(function(e){return e.def})[0]||c[0];x.st=x.e.st;x.chosen=c.length>1}
+    else{x.e=null;x.st=null}
+    x.mk='m_'+x.key.replace(/[^A-Za-z0-9]/g,'_')+'_'+(x.st||'');
+  });
+}
+// Zusatzbereich (Zustandsauswahl, fehlende Werte) – wird nur bei Änderung neu gezeichnet
+function enExtra(s,all,needS,upd,noH){
+  var box=$('enExtra');if(!box)return;var h='',seen={},sig='';
+  all.forEach(function(x){if(x.chosen&&!seen['c'+x.key]){seen['c'+x.key]=1;var lab=x.h3o?'H<sub>3</sub>O<sup>+</sup>':fsp(x.t);
+      h+='<div class="row"><label>Zustand von '+lab+'</label><div class="chips" data-st="'+esc(x.key)+'" style="margin:0">'+x.cands.map(function(e){return '<button class="chip'+(e.st===x.st?' on':'')+'" data-v="'+e.st+'">'+STL[e.st]+' ('+STN[e.st]+')</button>'}).join('')+'</div><span></span></div>';sig+='c'+x.key+x.st}});
+  all.forEach(function(x){if(!x.e&&!seen['m'+x.mk]){seen['m'+x.mk]=1;var lab=enSpLabel(x);
+      if(!noH)h+='<div class="row"><label>Δ<sub>f</sub>H°('+lab+')</label><input data-k="'+x.mk+'_h" inputmode="decimal" value="'+esc(s.v[x.mk+'_h']||'')+'" placeholder="nicht in der Tabelle – Wert eingeben" autocomplete="off"><span class="note">kJ/mol</span></div>';
+      if(needS)h+='<div class="row"><label>S°('+lab+')</label><input data-k="'+x.mk+'_s" inputmode="decimal" value="'+esc(s.v[x.mk+'_s']||'')+'" placeholder="nicht in der Tabelle – Wert eingeben" autocomplete="off"><span class="note">J/(mol·K)</span></div>';sig+='m'+x.mk}});
+  if(box.dataset.sig===sig)return;box.dataset.sig=sig;box.innerHTML=h;
+  box.querySelectorAll('input[data-k]').forEach(function(i){i.addEventListener('focus',function(){S.focus=i});i.addEventListener('input',function(){s.v[i.dataset.k]=i.value;upd()})});
+  box.querySelectorAll('.chips[data-st] button').forEach(function(b){b.onclick=function(){s.o['stsel_'+b.parentNode.dataset.st]=b.dataset.v;box.dataset.sig='';upd()}});
+}
+function enVal(s,x,k){if(x.e)return{x:k==='h'?x.e.h:x.e.s,tab:1};var str=s.v[x.mk+'_'+k];if(str==null||!String(str).trim())return{empty:1};var v=parseNum(str);if(isNaN(v))return{err:1};return{x:v}}
+// Summenformel Σν·X(Produkte) − Σν·X(Edukte) mit Zahlen
+function enSum(L,R,vals,unit,d){
+  function part(list,off){return list.map(function(x,i){return (x.co!==1?enFr(x.co)+' · ':'')+enPar(vals[off+i],d)}).join(' + ')}
+  var sP=0,sE=0;R.forEach(function(x,i){sP+=x.co*vals[L.length+i]});L.forEach(function(x,i){sE+=x.co*vals[i]});
+  return{v:sP-sE,txt:'['+part(R,L.length)+'] '+unit+' − ['+part(L,0)+'] '+unit,sP:sP,sE:sE};
+}
+function enSymSum(L,R,sym){function part(list){return list.map(function(x){return (x.co!==1?enFr(x.co)+' · ':'')+sym+'('+enSpLabel(x)+')'}).join(' + ')}return '['+part(R)+'] − ['+part(L)+']'}
+function enEqBlock(s,mode,needS,ph){
+  var tip=mode==='bind'?'Alle Stoffe werden als Moleküle im Gaszustand betrachtet.':'Aggregatzustand optional anhängen: (s), (l), (g), (aq); Ionen z. B. Na+, SO4^2-, H3O+.';
+  return '<div class="row"><label>Reaktionsgleichung</label><input data-k="eq" inputmode="text" value="'+esc(s.v.eq||'')+'" placeholder="'+(ph||'z. B. CH4 + O2 -> CO2 + H2O(l)')+'" autocomplete="off" autocapitalize="off" spellcheck="false"><span></span></div><div class="row xferrow"><span></span><div>'+xferBtn('eq')+' <span class="note">… lässt die Gleichung auf der Seite „Reaktionsgleichungen“ aufstellen und übernimmt sie hierher.</span></div><span></span></div><p class="note" style="margin:2px 0 8px">Formeln oder Namen; Koeffizienten (auch 1/2) dürfen fehlen – dann wird ausgeglichen. '+tip+'</p><div id="'+(mode==='bind'?'beExtra':'enExtra')+'"></div>';
+}
+function enCommon(s,needS){
+  var r=enParseEq(s.v.eq);if(r.empty){if($('enExtra'))$('enExtra').innerHTML='';return{msg:'Gib eine Reaktionsgleichung ein.'}}
+  if(r.err){if($('enExtra')){$('enExtra').innerHTML='';$('enExtra').dataset.sig=''}return{msg:esc(r.err).replace(/&lt;(\/?(?:sub|sup|b))&gt;/g,'<$1>'),warn:1}}
+  var all=r.L.concat(r.R);enLookup(s,all);return{r:r,all:all};
+}
+// ---------- 1. Kalorimetrie ----------
+function enLiqRows(s,withC){
+  var h=sbSel('liq','Kalorimeterflüssigkeit',CPLIQ.map(function(x){return [x[0],x[1]+(x[2]!=null?' · c = '+String(x[2]).replace('.',',')+' kJ/(kg·K)':'')]}),s.o.liq);
+  if(withC&&s.o.liq==='x')h+=sbRow('c','c · spezifische Wärmekapazität',s.v.c,{q:'cp',qty:'c',ui:s.u.c||0,ph:'z. B. 4,183'});
+  return h;
+}
+function enTempRows(s){
+  if(s.u.T1==null)s.u.T1=1;if(s.u.T2==null)s.u.T2=1;
+  var h='<div class="note" style="margin-top:6px">Temperaturänderung:</div>'+sbChips('dt',[['t','Anfangs- und Endtemperatur'],['d','ΔT direkt']],s.o.dt);
+  if(s.o.dt==='t')h+=sbRow('T1','ϑ<sub>1</sub> · Anfangstemperatur',s.v.T1,{q:'temp',ui:s.u.T1,ph:'z. B. 20,4'})+sbRow('T2','ϑ<sub>2</sub> · Endtemperatur',s.v.T2,{q:'temp',ui:s.u.T2,ph:'z. B. 26,9'});
+  else h+=sbRow('dT','ΔT · Temperaturänderung',s.v.dT,{q:'dT',ph:'z. B. 6,5 (Abkühlung negativ)'});
+  return h;
+}
+function enReadC(s,steps){
+  if(s.o.liq==='x'){var c=sbNum(s,'c','cp');if(c.empty)return{empty:'Gib die spezifische Wärmekapazität c ein.'};if(c.err)return{err:'c muss eine Zahl größer 0 sein.'};steps.push({k:'Wärmekapazität',v:'c = '+fmt(c.x,4)+' kJ/(kg·K)'});return{x:c.x}}
+  var l=CPLIQ.filter(function(y){return y[0]===s.o.liq})[0];steps.push({k:'Wärmekapazität',v:'c('+l[1]+') = '+String(l[2]).replace('.',',')+' kJ/(kg·K) (Formelsammlung)'});return{x:l[2],l:l};
+}
+function enReadDT(s,steps){
+  if(s.o.dt==='t'){var a=sbNum(s,'T1','temp'),b=sbNum(s,'T2','temp');if(a.empty||b.empty)return{empty:'Gib Anfangs- und Endtemperatur ein.'};if(a.err||b.err)return{err:'Die Temperaturen müssen Zahlen sein (in K größer 0).'};
+    var d=b.x-a.x,u1=U.temp[s.u.T1].u,u2=U.temp[s.u.T2].u;steps.push({k:'Temperaturänderung',v:'ΔT = ϑ<sub>2</sub> − ϑ<sub>1</sub> = '+fmt(parseNum(s.v.T2),5)+' '+u2+' − '+fP2(parseNum(s.v.T1))+' '+u1+' = '+enNum(d,2)+' K',raw:1});return{x:d}}
+  var c=sbNum(s,'dT','dT',{any:1});if(c.empty)return{empty:'Gib die Temperaturänderung ΔT ein.'};if(c.err)return{err:'ΔT muss eine Zahl sein.'};if(c.x===0)return{err:'ΔT darf nicht 0 sein.'};steps.push({k:'Temperaturänderung',v:'ΔT = '+enNum(c.x,2)+' K'});return{x:c.x};
+}
+function fP2(x){var s=fmt(x,5);return x<0?'('+s.replace('-','−')+')':s}
+function enCK(s,steps){var c=sbNum(s,'CK','hcap',{any:1});if(c.empty)return{x:0};if(c.err||c.x<0)return{err:'Die Wärmekapazität des Kalorimeters muss eine Zahl ≥ 0 sein.'};if(c.x>0)steps.push({k:'Kalorimeter',v:'C<sub>K</sub> = '+fmt(c.x,4)+' J/K = '+fmt(c.x/1000,4)+' kJ/K',raw:1});return{x:c.x/1000}}
+function renderKalor(){
+  var s=sbSt('kalor',{g:'Q',liq:'w',dt:'t'});if(s.u.m==null)s.u.m=0;
+  $('cdesc').innerHTML='Wärme, die die Kalorimeterflüssigkeit aufnimmt oder abgibt. Formelsammlung: <b>Q = c · m · ΔT</b> (geschlossenes System, konstanter Druck, Temperaturänderung des Kalorimeters vernachlässigt). Optional kann die Wärmekapazität C<sub>K</sub> des Kalorimeters berücksichtigt werden: Q = (c · m + C<sub>K</sub>) · ΔT.';
+  var g=s.o.g,h='<div class="note">Gesucht ist:</div>'+sbChips('g',[['Q','Wärme Q'],['dT','Temperaturänderung ΔT'],['m','Masse m'],['c','spez. Wärmekapazität c']],g);
+  if(g!=='c')h+=enLiqRows(s,true);
+  if(g!=='m')h+=sbRow('m','m · Masse der Flüssigkeit',s.v.m,{q:'mass',ui:s.u.m,ph:'z. B. 200'});
+  if(g!=='dT')h+=enTempRows(s);
+  if(g!=='Q')h+=sbRow('Q','Q · Wärme (aufgenommen +, abgegeben −)',s.v.Q,{q:'energy',ui:s.u.Q||0,ph:'z. B. 5,4'});
+  h+=sbRow('CK','C<sub>K</sub> · Wärmekapazität des Kalorimeters (optional)',s.v.CK,{q:'hcap',ui:s.u.CK||0,ph:'leer = vernachlässigt'});
+  $('cbody').innerHTML=h;sbBind(s,updKalor,renderKalor);updKalor();
+}
+function updKalor(){
+  var s=st('kalor'),g=s.o.g,steps=[],c,m,dT,Q,ck=enCK(s,steps);if(ck.err)return sbMsg(ck.err,1);
+  function need(r){if(r.empty){sbMsg(r.empty);return null}if(r.err){sbMsg(r.err,1);return null}return r}
+  if(g!=='c'){c=need(enReadC(s,steps));if(!c)return;c=c.x}
+  if(g!=='m'){var mm=sbNum(s,'m','mass');if(mm.empty)return sbMsg('Gib die Masse der Flüssigkeit ein.');if(mm.err)return sbMsg('m muss eine Zahl größer 0 sein.',1);m=mm.x/1000;steps.push({k:'Masse',v:'m = '+fmt(mm.x,4)+' g = '+fmt(m,4)+' kg'})}
+  if(g!=='dT'){dT=need(enReadDT(s,steps));if(!dT)return;dT=dT.x}
+  if(g!=='Q'){var qq=sbNum(s,'Q','energy',{any:1});if(qq.empty)return sbMsg('Gib die Wärme Q ein.');if(qq.err||qq.x===0)return sbMsg('Q muss eine Zahl ungleich 0 sein.',1);Q=qq.x;steps.push({k:'Wärme',v:'Q = '+enNum(Q,3)+' kJ'})}
+  var ckT=ck.x?' + C<sub>K</sub>':'',res;
+  if(g==='Q'){Q=(c*m+ck.x)*dT;steps.push({k:'Wärme',v:(ck.x?'Q = (c · m + C<sub>K</sub>) · ΔT = ('+fmt(c,4)+' kJ/(kg·K) · '+fmt(m,4)+' kg + '+fmt(ck.x,4)+' kJ/K) · '+enPar(dT,2)+' K':'Q = c · m · ΔT = '+fmt(c,4)+' kJ/(kg·K) · '+fmt(m,4)+' kg · '+enPar(dT,2)+' K')+' = '+enNum(Q,3)+' kJ',raw:1});res='Q = '+enNum(Q,3)+' kJ'}
+  else if(g==='dT'){dT=Q/(c*m+ck.x);steps.push({k:'Temperaturänderung',v:'ΔT = '+fracH('Q','c · m'+ckT)+' = '+fracH(enNum(Q,3)+' kJ',fmt(c,4)+' kJ/(kg·K) · '+fmt(m,4)+' kg'+(ck.x?' + '+fmt(ck.x,4)+' kJ/K':''))+' = '+enNum(dT,2)+' K',raw:1});res='ΔT = '+enNum(dT,2)+' K'}
+  else if(g==='m'){m=(Q/dT-ck.x)/c;if(!(m>0))return sbMsg('Mit diesen Werten ergibt sich keine positive Masse – prüfe die Vorzeichen von Q und ΔT.',1);steps.push({k:'Masse',v:'m = '+fracH('Q'+(ck.x?' − C<sub>K</sub> · ΔT':''),'c · ΔT')+' = '+fracH(enNum(Q,3)+' kJ'+(ck.x?' − '+fmt(ck.x,4)+' kJ/K · '+enPar(dT,2)+' K':''),fmt(c,4)+' kJ/(kg·K) · '+enPar(dT,2)+' K')+' = '+fmt(m,4)+' kg = '+fmt(m*1000,4)+' g',raw:1});res='m = '+fmt(m*1000,4)+' g'}
+  else{c=(Q/dT-ck.x)/m;if(!(c>0))return sbMsg('Mit diesen Werten ergibt sich keine positive Wärmekapazität – prüfe die Vorzeichen von Q und ΔT.',1);steps.push({k:'Wärmekapazität',v:'c = '+fracH('Q'+(ck.x?' − C<sub>K</sub> · ΔT':''),'m · ΔT')+' = '+fracH(enNum(Q,3)+' kJ'+(ck.x?' − '+fmt(ck.x,4)+' kJ/K · '+enPar(dT,2)+' K':''),fmt(m,4)+' kg · '+enPar(dT,2)+' K')+' = '+fmt(c,4)+' kJ/(kg·K)',raw:1});res='c = '+fmt(c,4)+' kJ/(kg·K)'}
+  var expl=Q>0?'Die Flüssigkeit nimmt Wärme auf (Temperatur steigt). Läuft im Kalorimeter eine Reaktion ab, ist sie <b>exotherm</b>.':'Die Flüssigkeit gibt Wärme ab (Temperatur sinkt). Läuft im Kalorimeter eine Reaktion ab, ist sie <b>endotherm</b>.';
+  steps.push({k:'Deutung',v:expl,raw:1});
+  sbOut('Kalorimetrie','<div class="big">'+res+'</div><div class="note">'+(g!=='Q'?'Q = '+enNum(Q,3)+' kJ · ':'')+'Q = '+enNum(Q*1000,0)+' J</div>',steps);
+}
+// ---------- 2. Reaktionsenthalpie aus Kalorimetrie ----------
+function renderRhkal(){
+  var s=sbSt('rhkal',{liq:'w',dt:'t',mm:'V',nm:'m'});if(s.u.V==null)s.u.V=1;if(s.u.mX==null)s.u.mX=0;if(s.u.VX==null)s.u.VX=1;
+  $('cdesc').innerHTML='Molare Reaktionsenthalpie aus einem Kalorimeterversuch (z. B. Lösungs-, Neutralisations- oder Verbrennungsenthalpie). Formelsammlung: Q = c · m · ΔT und – bezogen auf 1 mol der Teilchen X – <b>Δ<sub>r</sub>H<sub>m</sub> = − Q / n(X)</b>. Das Minuszeichen berücksichtigt, dass die Wärme, die die Reaktion abgibt, von der Kalorimeterflüssigkeit aufgenommen wird.';
+  var h=enLiqRows(s,true)+'<div class="note" style="margin-top:6px">Menge der Kalorimeterflüssigkeit:</div>'+sbChips('mm',[['V','Volumen'],['m','Masse']],s.o.mm);
+  if(s.o.mm==='V'){h+=sbRow('V','V · Volumen der Flüssigkeit (bzw. Lösung)',s.v.V,{q:'vol',ui:s.u.V,ph:'z. B. 100'});var l=CPLIQ.filter(function(y){return y[0]===s.o.liq})[0];h+=sbRow('rho','ρ · Dichte',s.v.rho,{q:'dens',qty:'rho',ui:s.u.rho==null?1:s.u.rho,ph:l&&l[3]!=null?'leer = '+String(l[3]).replace('.',',')+' g/mL':'z. B. 1,00'});if(s.u.rho==null)s.u.rho=1}
+  else h+=sbRow('m','m · Masse der Flüssigkeit',s.v.m,{q:'mass',ui:s.u.m||0,ph:'z. B. 100'});
+  h+=enTempRows(s)+sbRow('CK','C<sub>K</sub> · Wärmekapazität des Kalorimeters (optional)',s.v.CK,{q:'hcap',ui:s.u.CK||0,ph:'leer = vernachlässigt'});
+  h+='<div class="note" style="margin-top:10px">Umgesetzter Stoff X:</div>'+sbRow('X','Stoff X (Formel oder Name)',s.v.X,{text:1,ph:'z. B. NaOH'})+sbChips('nm',[['m','Masse m(X)'],['n','Stoffmenge n(X)'],['cV','Konzentration und Volumen']],s.o.nm);
+  if(s.o.nm==='m')h+=sbRow('mX','m(X) · Masse',s.v.mX,{q:'mass',ui:s.u.mX,ph:'z. B. 2,0'});
+  else if(s.o.nm==='n')h+=sbRow('nX','n(X) · Stoffmenge',s.v.nX,{q:'amount',ui:s.u.nX||0,ph:'z. B. 0,05'});
+  else h+=sbRow('cX','c(X) · Konzentration',s.v.cX,{q:'conc',ui:s.u.cX||0,ph:'z. B. 1,0'})+sbRow('VX','V · Volumen der Lösung von X',s.v.VX,{q:'vol',ui:s.u.VX,ph:'z. B. 50'});
+  $('cbody').innerHTML=h;sbBind(s,updRhkal,renderRhkal);updRhkal();
+}
+function updRhkal(){
+  var s=st('rhkal'),steps=[],ck=enCK(s,[]);if(ck.err)return sbMsg(ck.err,1);
+  var c=enReadC(s,steps);if(c.empty)return sbMsg(c.empty);if(c.err)return sbMsg(c.err,1);c=c.x;
+  var m;if(s.o.mm==='V'){var V=sbNum(s,'V','vol');if(V.empty)return sbMsg('Gib das Volumen der Flüssigkeit ein.');if(V.err)return sbMsg('V muss eine Zahl größer 0 sein.',1);
+    var l=CPLIQ.filter(function(y){return y[0]===s.o.liq})[0],r=sbNum(s,'rho','dens'),rho;
+    if(r.empty){if(!l||l[3]==null)return sbMsg('Gib die Dichte der Flüssigkeit ein.');rho=l[3]*1000}else if(r.err)return sbMsg('ρ muss eine Zahl größer 0 sein.',1);else rho=r.x;
+    m=rho*V.x;steps.push({k:'Masse der Flüssigkeit',v:'m = ρ · V = '+fmt(rho/1000,4)+' g/mL · '+fmt(V.x*1000,4)+' mL = '+fmt(m,4)+' g = '+fmt(m/1000,4)+' kg'+(r.empty?' (Dichte '+(l[0]==='w'?'von Wasser, auch für verdünnte wässrige Lösungen':'laut Formelsammlung')+')':'')})}
+  else{var mm=sbNum(s,'m','mass');if(mm.empty)return sbMsg('Gib die Masse der Flüssigkeit ein.');if(mm.err)return sbMsg('m muss eine Zahl größer 0 sein.',1);m=mm.x;steps.push({k:'Masse der Flüssigkeit',v:'m = '+fmt(m,4)+' g = '+fmt(m/1000,4)+' kg'})}
+  m/=1000;
+  var d=enReadDT(s,steps);if(d.empty)return sbMsg(d.empty);if(d.err)return sbMsg(d.err,1);var dT=d.x;ck=enCK(s,steps);
+  var Q=(c*m+ck.x)*dT;steps.push({k:'Wärme',v:(ck.x?'Q = (c · m + C<sub>K</sub>) · ΔT = ('+fmt(c,4)+' kJ/(kg·K) · '+fmt(m,4)+' kg + '+fmt(ck.x,4)+' kJ/K) · '+enPar(dT,2)+' K':'Q = c · m · ΔT = '+fmt(c,4)+' kJ/(kg·K) · '+fmt(m,4)+' kg · '+enPar(dT,2)+' K')+' = '+enNum(Q,3)+' kJ',raw:1});
+  var X=null,xl='X';if(s.v.X&&String(s.v.X).trim()){var fi=formulaFromInput(s.v.X);if(fi&&fi.err)return sbMsg(esc(fi.err),1);if(fi){X=parseFormula(fi.f);if(X.err)return sbMsg(esc(X.err),1);xl=fsp(fi.f)}}
+  var n;
+  if(s.o.nm==='m'){if(!X)return sbMsg('Gib den Stoff X ein (für die molare Masse).');var a=sbNum(s,'mX','mass');if(a.empty)return sbMsg('Gib die Masse von X ein.');if(a.err)return sbMsg('m(X) muss eine Zahl größer 0 sein.',1);n=a.x/X.M;steps.push({k:'Stoffmenge',v:'n('+xl+') = m / M = '+fmt(a.x,4)+' g / '+fmt(X.M,5)+' g/mol = '+fmt(n,4)+' mol',raw:1})}
+  else if(s.o.nm==='n'){var b=sbNum(s,'nX','amount');if(b.empty)return sbMsg('Gib die Stoffmenge von X ein.');if(b.err)return sbMsg('n(X) muss eine Zahl größer 0 sein.',1);n=b.x;steps.push({k:'Stoffmenge',v:'n('+xl+') = '+fmt(n,4)+' mol',raw:1})}
+  else{var cc=sbNum(s,'cX','conc'),vv=sbNum(s,'VX','vol');if(cc.empty||vv.empty)return sbMsg('Gib Konzentration und Volumen der Lösung von X ein.');if(cc.err||vv.err)return sbMsg('c und V müssen Zahlen größer 0 sein.',1);n=cc.x*vv.x;steps.push({k:'Stoffmenge',v:'n('+xl+') = c · V = '+fmt(cc.x,4)+' mol/L · '+fmt(vv.x,4)+' L = '+fmt(n,4)+' mol',raw:1})}
+  var H=-Q/n;steps.push({k:'Molare Reaktionsenthalpie',v:'Δ<sub>r</sub>H<sub>m</sub> = − '+fracH('Q','n('+xl+')')+' = − '+fracH(enNum(Q,3)+' kJ',fmt(n,4)+' mol')+' = '+enNum(H,1)+' kJ/mol',raw:1});
+  steps.push({k:'Deutung',v:H<0?'Δ<sub>r</sub>H<sub>m</sub> < 0: Die Reaktion ist <b>exotherm</b> – sie gibt Wärme an die Umgebung ab (Temperatur steigt).':'Δ<sub>r</sub>H<sub>m</sub> > 0: Die Reaktion ist <b>endotherm</b> – sie nimmt Wärme aus der Umgebung auf (Temperatur sinkt).',raw:1});
+  sbOut('Reaktionsenthalpie aus Kalorimetrie','<div class="big">Δ<sub>r</sub>H<sub>m</sub> = '+enNum(H,1)+' kJ/mol</div><div class="note">bezogen auf 1 mol '+xl+' · '+(H<0?'exotherm':'endotherm')+' · Q = '+enNum(Q,3)+' kJ</div>',steps);
+}
+// ---------- 3. Reaktionsenthalpie aus Bildungsenthalpien ----------
+function renderBild(){
+  var s=sbSt('bild',{per:''});
+  $('cdesc').innerHTML='Formelsammlung: Für aA + bB ⟶ cC + dD gilt bei 298,15 K und 101,325 kPa <b>Δ<sub>r</sub>H° = [n<sub>c</sub> · Δ<sub>f</sub>H°(C) + n<sub>d</sub> · Δ<sub>f</sub>H°(D)] − [n<sub>a</sub> · Δ<sub>f</sub>H°(A) + n<sub>b</sub> · Δ<sub>f</sub>H°(B)]</b>. Elemente im Standardzustand haben Δ<sub>f</sub>H° = 0. Die Bildungsenthalpien stehen unter „Tabellenwerte“; fehlende Werte kannst du selbst eingeben.';
+  $('cbody').innerHTML=enEqBlock(s,'',false)+'<div id="enPer"></div>';sbBind(s,updBild);xferBind(s);updBild();
+}
+function enPerSel(s,all,id){
+  var box=$('enPer');if(!box)return;var opts=[['','Formelumsatz (Gleichung wie angegeben)']].concat(all.map(function(x,i){return [String(i),'1 mol '+enSpLabel(x).replace(/<[^>]+>/g,'')]}));
+  var sig=opts.map(function(o){return o[1]}).join('|');if(s.o.perSig&&s.o.perSig!==sig)s.o.per='';s.o.perSig=sig;if(!all.some(function(x,i){return String(i)===s.o.per}))s.o.per='';
+  if(box.dataset.sig===sig)return;box.dataset.sig=sig;box.innerHTML=sbSel('per','Bezogen auf',opts,s.o.per);box.querySelector('select').onchange=function(){s.o.per=this.value;({bild:updBild,ent:updEnt,ghh:updGhh}[id]||updEnt)()};
+}
+function updBild(){
+  var s=st('bild'),c=enCommon(s,false);if(c.msg){if($('enPer'))$('enPer').innerHTML='',$('enPer').dataset.sig='';return sbMsg(c.msg,c.warn)}
+  var r=c.r,all=c.all;enExtra(s,all,false,updBild);enPerSel(s,all,'bild');
+  var vals=[],tab=[];for(var i=0;i<all.length;i++){var v=enVal(s,all[i],'h');if(v.empty)return sbMsg('Für '+enSpLabel(all[i])+' fehlt die Standardbildungsenthalpie – bitte oben eingeben.');if(v.err)return sbMsg('Der Wert für '+enSpLabel(all[i])+' ist keine Zahl.',1);vals.push(v.x);tab.push(v.tab)}
+  var steps=[{k:'Reaktionsgleichung',v:enEqHtml(r.L,r.R)+(r.auto?' <span class="note">(automatisch ausgeglichen)</span>':''),raw:1}];
+  steps.push({k:'Tabellenwerte',v:all.map(function(x,i){return 'Δ<sub>f</sub>H°('+enSpLabel(x)+') = '+enNum(vals[i],1)+' kJ/mol'+(tab[i]?'':' <span class="note">(eigener Wert)</span>')}).filter(function(t,i,a){return a.indexOf(t)===i}).join('<br>'),raw:1});
+  var sm=enSum(r.L,r.R,vals,'kJ/mol',1);
+  steps.push({k:'Reaktionsenthalpie',v:'Δ<sub>r</sub>H° = '+enSymSum(r.L,r.R,'Δ<sub>f</sub>H°')+'<br>= '+sm.txt+'<br>= '+enNum(sm.sP,1)+' kJ/mol − '+enPar(sm.sE,1)+' kJ/mol = <b>'+enNum(sm.v,1)+' kJ/mol</b>',raw:1});
+  var H=sm.v,res='Δ<sub>r</sub>H° = '+enNum(H,1)+' kJ/mol',note='bezogen auf den Formelumsatz';
+  if(s.o.per!==''){var x=all[+s.o.per],Hx=H/x.co;steps.push({k:'Bezogen auf 1 mol',v:'Δ<sub>r</sub>H° = '+fracH(enNum(H,1)+' kJ/mol',enFr(x.co))+' = '+enNum(Hx,1)+' kJ pro mol '+enSpLabel(x),raw:1});note='bezogen auf 1 mol '+enSpLabel(x)+' (Formelumsatz: '+enNum(H,1)+' kJ/mol)';res='Δ<sub>r</sub>H° = '+enNum(Hx,1)+' kJ/mol'}
+  steps.push({k:'Deutung',v:H<0?'Δ<sub>r</sub>H° < 0: <b>exotherme</b> Reaktion (Wärme wird abgegeben).':(H>0?'Δ<sub>r</sub>H° > 0: <b>endotherme</b> Reaktion (Wärme wird aufgenommen).':'Δ<sub>r</sub>H° = 0: weder exotherm noch endotherm.'),raw:1});
+  sbOut('Reaktionsenthalpie aus Bildungsenthalpien','<div class="big">'+res+'</div><div class="note">'+note+' · '+(H<0?'exotherm':(H>0?'endotherm':'thermoneutral'))+'</div>',steps);
+}
+// ---------- 4. Satz von Hess ----------
+function renderHess(){
+  var s=sbSt('hess',{});
+  $('cdesc').innerHTML='<b>Satz von Hess:</b> Die Reaktionsenthalpie hängt nur vom Anfangs- und Endzustand ab, nicht vom Weg. Gib die gesuchte Reaktion und bekannte Teilreaktionen mit ihren Reaktionsenthalpien ein – der Rechner bestimmt, wie die Teilgleichungen kombiniert werden müssen (umkehren: Vorzeichen von ΔH ändern; vervielfachen: ΔH mit demselben Faktor multiplizieren).';
+  var h='<div class="row"><label>Gesuchte Reaktion</label><input data-k="z" inputmode="text" value="'+esc(s.v.z||'')+'" placeholder="z. B. C + 1/2 O2 -> CO" autocomplete="off" autocapitalize="off" spellcheck="false"><span>'+xferBtn('z')+'</span></div>';
+  var ph=[['C + O2 -> CO2','−393,5'],['CO + 1/2 O2 -> CO2','−283,0'],['',''],['','']];
+  for(var i=1;i<=4;i++)h+='<div class="note" style="margin-top:8px">Teilreaktion '+i+(i>2?' (optional)':'')+'</div><div class="row"><label>Gleichung '+i+'</label><input data-k="e'+i+'" inputmode="text" value="'+esc(s.v['e'+i]||'')+'" placeholder="'+(ph[i-1][0]?'z. B. '+ph[i-1][0]:'Gleichung eingeben')+'" autocomplete="off" autocapitalize="off" spellcheck="false"><span>'+xferBtn('e'+i)+'</span></div>'+sbRow('h'+i,'Δ<sub>r</sub>H<sub>'+i+'</sub>',s.v['h'+i],{q:'hmol',ui:s.u['h'+i]||0,ph:ph[i-1][1]?'z. B. '+ph[i-1][1]:'Wert eingeben'});
+  h+='<p class="note">Koeffizienten werden hier nicht automatisch ergänzt – die Gleichungen müssen ausgeglichen sein (Brüche wie 1/2 sind erlaubt). Aggregatzustände (s), (l), (g), (aq) werden unterschieden, wenn du sie angibst. Mit „Aufstellen“ lässt sich jede Gleichung auf der Seite „Reaktionsgleichungen“ aufstellen und übernehmen.</p>';
+  $('cbody').innerHTML=h;sbBind(s,updHess);xferBind(s);updHess();
+}
+function enVec(r){var v={};function add(list,sg){list.forEach(function(x){var k=x.key+'|'+(x.stIn||'');v[k]=(v[k]||0)+sg*x.co;if(!enVec.lab[k])enVec.lab[k]=x})}add(r.L,-1);add(r.R,1);return v}
+enVec.lab={};
+function updHess(){
+  var s=st('hess');var z=enParseEq(s.v.z,true);if(z.empty)return sbMsg('Gib die gesuchte Reaktion ein.');if(z.err)return sbMsg('Gesuchte Reaktion: '+esc(z.err),1);
+  var parts=[];for(var i=1;i<=4;i++){var t=s.v['e'+i];if(!t||!String(t).trim())continue;var r=enParseEq(t,true);if(r.err)return sbMsg('Teilreaktion '+i+': '+esc(r.err),1);var hv=sbNum(s,'h'+i,'hmol',{any:1});if(hv.empty)return sbMsg('Gib Δ<sub>r</sub>H<sub>'+i+'</sub> ein.');if(hv.err)return sbMsg('Δ<sub>r</sub>H<sub>'+i+'</sub> muss eine Zahl sein.',1);parts.push({i:i,r:r,h:hv.x})}
+  if(!parts.length)return sbMsg('Gib mindestens eine Teilreaktion mit Reaktionsenthalpie ein.');
+  var tv=enVec(z),pv=parts.map(function(p){return enVec(p.r)}),keys={};[tv].concat(pv).forEach(function(v){for(var k in v)if(Math.abs(v[k])>1e-12)keys[k]=1});keys=Object.keys(keys);
+  // lineares Gleichungssystem A·x = b lösen (Gauß, Teilpivot)
+  var n=parts.length,A=keys.map(function(k){return pv.map(function(v){return v[k]||0}).concat([tv[k]||0])}),piv=[],row=0;
+  for(var col=0;col<n&&row<A.length;col++){var best=row;for(var j=row;j<A.length;j++)if(Math.abs(A[j][col])>Math.abs(A[best][col]))best=j;if(Math.abs(A[best][col])<1e-10)continue;var tmp=A[row];A[row]=A[best];A[best]=tmp;var d=A[row][col];for(var c2=0;c2<=n;c2++)A[row][c2]/=d;for(var j2=0;j2<A.length;j2++)if(j2!==row){var f=A[j2][col];if(f)for(var c3=0;c3<=n;c3++)A[j2][c3]-=f*A[row][c3]}piv.push(col);row++}
+  for(var j3=row;j3<A.length;j3++)if(Math.abs(A[j3][n])>1e-8)return sbMsg('Die gesuchte Reaktion lässt sich nicht aus diesen Teilreaktionen zusammensetzen. Prüfe die Gleichungen (auch die Aggregatzustände) oder ergänze eine weitere Teilreaktion.',1);
+  var x=parts.map(function(){return 0});piv.forEach(function(col,k){x[col]=A[k][n]});
+  var steps=[{k:'Gesuchte Reaktion',v:enEqHtml(z.L,z.R),raw:1}],H=0,terms=[],lines=[];
+  parts.forEach(function(p,k){var f=x[k];if(Math.abs(f)<1e-10){lines.push('Gleichung '+p.i+': wird nicht benötigt');return}
+    var rev=f<0,af=Math.abs(f),L=rev?p.r.R:p.r.L,R=rev?p.r.L:p.r.R;
+    var eq=enEqHtml(L.map(function(y){return Object.assign({},y,{co:y.co*af})}),R.map(function(y){return Object.assign({},y,{co:y.co*af})}));
+    var how=(rev?'umgekehrt':'unverändert')+(Math.abs(af-1)>1e-9?(rev?' und ':', ')+'mit '+enFr(af)+' multipliziert':'');
+    lines.push('Gleichung '+p.i+' '+how+':<br>'+eq+'  Δ<sub>r</sub>H = '+(rev||Math.abs(af-1)>1e-9?(rev?'−':'')+(Math.abs(af-1)>1e-9?enFr(af)+' · ':'')+enPar(p.h,1)+' kJ/mol = ':'')+enNum(f*p.h,1)+' kJ/mol');
+    H+=f*p.h;terms.push(enPar(f*p.h,1))});
+  steps.push({k:'Kombination',v:lines.join('<br><br>'),raw:1});
+  steps.push({k:'Summe',v:'Beim Addieren der Teilgleichungen heben sich Zwischenprodukte auf beiden Seiten weg.<br>Δ<sub>r</sub>H = '+terms.join(' + ')+' kJ/mol = <b>'+enNum(H,1)+' kJ/mol</b>',raw:1});
+  sbOut('Satz von Hess','<div class="big">Δ<sub>r</sub>H = '+enNum(H,1)+' kJ/mol</div><div class="note">'+(H<0?'exotherm':(H>0?'endotherm':'thermoneutral'))+' · für '+enEqHtml(z.L,z.R)+'</div>',steps);
+}
+// ---------- 5. Reaktionsentropie und freie Enthalpie ----------
+function renderEnt(){
+  var s=sbSt('ent',{per:''});
+  $('cdesc').innerHTML='Formelsammlung: Für aA + bB ⟶ cC + dD gilt bei 298,15 K und 101,325 kPa <b>Δ<sub>r</sub>S° = [n<sub>c</sub> · S°(C) + n<sub>d</sub> · S°(D)] − [n<sub>a</sub> · S°(A) + n<sub>b</sub> · S°(B)]</b>. Die Standardentropien stehen unter „Tabellenwerte“; fehlende Werte kannst du selbst eingeben. Die freie Enthalpie berechnet der Rechner „Gibbs-Helmholtz-Gleichung“.';
+  $('cbody').innerHTML=enEqBlock(s,'',true,'z. B. CaCO3 -> CaO + CO2')+'<div id="enPer"></div>';sbBind(s,updEnt);xferBind(s);updEnt();
+}
+function updEnt(){entCore('ent',updEnt,'Reaktionsentropie aus Standardentropien','Sonly')}
+function entCore(id,upd,ttl,g){
+  var s=st(id),c=enCommon(s,true);if(c.msg){if($('enPer'))$('enPer').innerHTML='',$('enPer').dataset.sig='';return sbMsg(c.msg,c.warn)}
+  var r=c.r,all=c.all,sOnly=g==='Sonly';enExtra(s,all,true,upd,sOnly);if(g!=='T')enPerSel(s,all,id);else if($('enPer')){$('enPer').innerHTML='';$('enPer').dataset.sig=''}
+  var vh=[],vs=[],tab=[];for(var i=0;i<all.length;i++){var a=sOnly?{x:0,tab:1}:enVal(s,all[i],'h'),b=enVal(s,all[i],'s');if(a.empty||b.empty)return sbMsg('Für '+enSpLabel(all[i])+' fehlen Tabellenwerte – bitte oben eingeben.');if(a.err||b.err)return sbMsg('Ein Wert für '+enSpLabel(all[i])+' ist keine Zahl.',1);vh.push(a.x);vs.push(b.x);tab.push(all[i].e?1:0)}
+  var steps=[{k:'Reaktionsgleichung',v:enEqHtml(r.L,r.R)+(r.auto?' <span class="note">(automatisch ausgeglichen)</span>':''),raw:1}];
+  var seen={},tl=[];all.forEach(function(x,i){var t=(sOnly?'':'Δ<sub>f</sub>H°('+enSpLabel(x)+') = '+enNum(vh[i],1)+' kJ/mol;  ')+'S°('+enSpLabel(x)+') = '+enNum(vs[i],1)+' J/(mol·K)'+(tab[i]?'':' <span class="note">(eigene Werte)</span>');if(!seen[t]){seen[t]=1;tl.push(t)}});
+  steps.push({k:'Tabellenwerte',v:tl.join('<br>'),raw:1});
+  var H=enSum(r.L,r.R,vh,'kJ/mol',1),Sx=enSum(r.L,r.R,vs,'J/(mol·K)',1);
+  var px=s.o.per!==''&&s.o.per!=null&&g!=='T'?all[+s.o.per]:null,pf=px?1/px.co:1,pl=px?' pro mol '+enSpLabel(px):'';
+  function perStep(txt){if(px)steps.push({k:'Bezogen auf 1 mol',v:txt,raw:1})}
+  if(!sOnly)steps.push({k:'Reaktionsenthalpie',v:'Δ<sub>r</sub>H° = '+enSymSum(r.L,r.R,'Δ<sub>f</sub>H°')+'<br>= '+H.txt+' = <b>'+enNum(H.v,1)+' kJ/mol</b>',raw:1});
+  steps.push({k:'Reaktionsentropie',v:'Δ<sub>r</sub>S° = '+enSymSum(r.L,r.R,'S°')+'<br>= '+Sx.txt+'<br>= <b>'+enNum(Sx.v,1)+' J/(mol·K)</b> = '+enNum(Sx.v/1000,4)+' kJ/(mol·K)',raw:1});
+  if(sOnly||g==='S'){
+    var ng=0;r.R.forEach(function(x){if(x.st==='g')ng+=x.co});r.L.forEach(function(x){if(x.st==='g')ng-=x.co});
+    perStep('Δ<sub>r</sub>S° = '+enNum(Sx.v*pf,1)+' J/(mol·K)'+pl);
+    steps.push({k:'Deutung',v:(Sx.v>0?'Δ<sub>r</sub>S° > 0: Die Entropie <b>nimmt zu</b>':(Sx.v<0?'Δ<sub>r</sub>S° < 0: Die Entropie <b>nimmt ab</b>':'Δ<sub>r</sub>S° = 0: Die Entropie bleibt gleich'))+(ng?' – die Stoffmenge an Gasen '+(ng>0?'steigt':'sinkt')+' um '+enFr(Math.abs(ng))+' mol (je Formelumsatz).':'.'),raw:1});
+    return sbOut(ttl,'<div class="big">Δ<sub>r</sub>S° = '+enNum(Sx.v*pf,1)+' J/(mol·K)</div><div class="note">'+(px?'bezogen auf 1 mol '+enSpLabel(px)+' · ':'')+(Sx.v>0?'Entropiezunahme':(Sx.v<0?'Entropieabnahme':'keine Änderung'))+'</div>',steps)}
+  if(g==='H'){perStep('Δ<sub>r</sub>H° = '+enNum(H.v*pf,1)+' kJ/mol'+pl);steps.push({k:'Deutung',v:H.v<0?'Δ<sub>r</sub>H° < 0: <b>exotherme</b> Reaktion.':'Δ<sub>r</sub>H° > 0: <b>endotherme</b> Reaktion.',raw:1});
+    return sbOut(ttl,'<div class="big">Δ<sub>r</sub>H° = '+enNum(H.v*pf,1)+' kJ/mol</div><div class="note">'+(px?'bezogen auf 1 mol '+enSpLabel(px)+' · ':'')+(H.v<0?'exotherm':'endotherm')+'</div>',steps)}
+  if(g==='T'){
+    var gv=sbNum(s,'G','hmol',{any:1}),G0=gv.empty?0:gv.x;if(gv.err)return sbMsg('ΔG muss eine Zahl sein.',1);
+    if(Math.abs(Sx.v)<1e-9)return sbMsg('Δ<sub>r</sub>S° = 0: ΔG hängt nicht von der Temperatur ab.',1);
+    var Tq=(H.v-G0)*1000/Sx.v;
+    if(!(Tq>0))return sbMsg('Es ergibt sich keine Temperatur über 0 K (T = '+fmt(Tq,4)+' K). '+(G0===0?(H.v<0&&Sx.v>0?'Die Reaktion läuft bei allen Temperaturen freiwillig ab (Δ<sub>r</sub>H < 0, Δ<sub>r</sub>S > 0).':'Die Reaktion läuft bei keiner Temperatur freiwillig ab (Δ<sub>r</sub>H > 0, Δ<sub>r</sub>S < 0).'):''),1);
+    steps.push({k:'Umgestellt',v:'T = '+fracH('Δ<sub>r</sub>H − Δ<sub>r</sub>G','Δ<sub>r</sub>S')+' = '+fracH(enNum(H.v,1)+' kJ/mol − '+enPar(G0,1)+' kJ/mol',enNum(Sx.v/1000,4)+' kJ/(mol·K)')+' = '+fmt(Tq,4)+' K = '+fmt(Tq-273.15,4)+' °C',raw:1});
+    steps.push({k:'Deutung',v:G0===0?'Bei dieser Temperatur ist Δ<sub>r</sub>G = 0 (Gleichgewichtstemperatur). '+(H.v>0?'<b>Oberhalb</b> läuft die Reaktion freiwillig ab (entropiegetrieben).':'<b>Unterhalb</b> läuft die Reaktion freiwillig ab (enthalpiegetrieben).'):'Bei dieser Temperatur hat Δ<sub>r</sub>G den Wert '+enNum(G0,1)+' kJ/mol (Näherung: Δ<sub>r</sub>H und Δ<sub>r</sub>S temperaturunabhängig).',raw:1});
+    return sbOut(ttl,'<div class="big">T ≈ '+fmt(Tq,4)+' K</div><div class="note">= '+fmt(Tq-273.15,4)+' °C · für Δ<sub>r</sub>G = '+enNum(G0,1)+' kJ/mol'+(G0===0?' (Gleichgewichtstemperatur)':'')+'</div>',steps)}
+  // g==='G'
+  var T=298.15,tr=sbNum(s,'T','temp');if(tr.err)return sbMsg('T muss eine Temperatur über 0 K sein.',1);if(!tr.empty)T=tr.x;
+  var G=H.v-T*Sx.v/1000;
+  steps.push({k:'Freie Enthalpie',v:'Δ<sub>r</sub>G = Δ<sub>r</sub>H − T · Δ<sub>r</sub>S = '+enNum(H.v,1)+' kJ/mol − '+fmt(T,5)+' K · '+enPar(Sx.v/1000,4)+' kJ/(mol·K) = <b>'+enNum(G,1)+' kJ/mol</b>'+(Math.abs(T-298.15)>0.01?' <span class="note">(Näherung)</span>':''),raw:1});
+  perStep('Δ<sub>r</sub>G = '+enNum(G*pf,1)+' kJ/mol'+pl);
+  var dev=G<0?'Δ<sub>r</sub>G < 0: Die Reaktion ist <b>exergonisch</b> und läuft bei '+fmt(T,5)+' K ('+fmt(T-273.15,4)+' °C) freiwillig ab.':(G>0?'Δ<sub>r</sub>G > 0: Die Reaktion ist <b>endergonisch</b> und läuft bei '+fmt(T,5)+' K ('+fmt(T-273.15,4)+' °C) nicht freiwillig ab (die Rückreaktion ist begünstigt).':'Δ<sub>r</sub>G = 0: Gleichgewicht.');
+  var Tu=null,tt='';
+  if(Math.abs(Sx.v)>1e-9&&H.v*Sx.v>0){Tu=H.v*1000/Sx.v;tt='Gleichgewichtstemperatur (Δ<sub>r</sub>G = 0): T = '+fracH('Δ<sub>r</sub>H','Δ<sub>r</sub>S')+' = '+fracH(enNum(H.v,1)+' kJ/mol',enNum(Sx.v/1000,4)+' kJ/(mol·K)')+' ≈ '+fmt(Tu,4)+' K ('+fmt(Tu-273.15,4)+' °C). '+(H.v>0?'<b>Oberhalb</b> dieser Temperatur läuft die Reaktion freiwillig ab (entropiegetrieben).':'<b>Unterhalb</b> dieser Temperatur läuft die Reaktion freiwillig ab (enthalpiegetrieben).')}
+  else if(H.v<0&&Sx.v>0)tt='Δ<sub>r</sub>H < 0 und Δ<sub>r</sub>S > 0: Die Reaktion läuft bei allen Temperaturen freiwillig ab.';
+  else if(H.v>0&&Sx.v<0)tt='Δ<sub>r</sub>H > 0 und Δ<sub>r</sub>S < 0: Die Reaktion läuft bei keiner Temperatur freiwillig ab.';
+  steps.push({k:'Deutung',v:dev+(tt?'<br>'+tt:''),raw:1});
+  sbOut(ttl,'<div class="big">Δ<sub>r</sub>G = '+enNum(G*pf,1)+' kJ/mol <span class="note">bei '+fmt(T,5)+' K</span></div><div class="note">'+(px?'bezogen auf 1 mol '+enSpLabel(px)+' · ':'')+'Δ<sub>r</sub>H° = '+enNum(H.v,1)+' kJ/mol · Δ<sub>r</sub>S° = '+enNum(Sx.v,1)+' J/(mol·K) · '+(G<0?'exergonisch':(G>0?'endergonisch':'Gleichgewicht'))+(Tu?' · Gleichgewichtstemperatur ≈ '+fmt(Tu,4)+' K':'')+'</div>',steps);
+}
+// ---------- 6. Gibbs-Helmholtz-Gleichung ----------
+function renderGhh(){
+  var s=sbSt('ghh',{g:'G'});if(s.u.T==null)s.u.T=0;
+  $('cdesc').innerHTML='Formelsammlung: <b>ΔG = ΔH − T · ΔS</b>. Achte auf die Einheiten: ΔH und ΔG meist in kJ/mol, ΔS meist in J/(mol·K) – der Rechner rechnet um. Für ΔG = 0 erhält man die Temperatur, bei der sich die Freiwilligkeit umkehrt. Wahlweise berechnet der Rechner ΔH und ΔS aus einer Reaktionsgleichung mit den Standardbildungsenthalpien und Standardentropien (Tabellenwerte) und daraus ΔG.';
+  if(!s.o.src)s.o.src='eq';var h='<div class="note">Eingabe:</div>'+sbChips('src',[['eq','Reaktionsgleichung (Werte aus Tabellen)'],['v','ΔH, ΔS, T und ΔG als Werte']],s.o.src);
+  if(s.o.src==='eq'){var ge=s.o.g;h+='<div class="note">Gesucht ist:</div>'+sbChips('g',[['G','freie Enthalpie ΔG'],['T','Temperatur T'],['H','Enthalpie ΔH'],['S','Entropie ΔS']],ge)+enEqBlock(s,'',true,'z. B. CaCO3 -> CaO + CO2')+(ge==='G'?sbRow('T','T · Temperatur',s.v.T,{q:'temp',ui:s.u.T,ph:'leer = 298,15 K'}):'')+(ge==='T'?sbRow('G','ΔG · freie Enthalpie',s.v.G,{q:'hmol',ui:s.u.G||0,ph:'leer = 0 (Gleichgewichtstemperatur)'}):'')+'<div id="enPer"></div>';$('cbody').innerHTML=h;sbBind(s,updGhh,renderGhh);xferBind(s);updGhh();return}
+  var g=s.o.g;h+='<div class="note">Gesucht ist:</div>'+sbChips('g',[['G','freie Enthalpie ΔG'],['T','Temperatur T'],['H','Enthalpie ΔH'],['S','Entropie ΔS']],g);
+  if(g!=='H')h+=sbRow('H','ΔH · Reaktionsenthalpie',s.v.H,{q:'hmol',ui:s.u.H||0,ph:'z. B. 178,3'});
+  if(g!=='S')h+=sbRow('S','ΔS · Reaktionsentropie',s.v.S,{q:'smol',ui:s.u.S||0,ph:'z. B. 160,4'});
+  if(g!=='T')h+=sbRow('T','T · Temperatur',s.v.T,{q:'temp',ui:s.u.T,ph:'z. B. 298,15'});
+  if(g!=='G')h+=sbRow('G','ΔG · freie Enthalpie',s.v.G,{q:'hmol',ui:s.u.G||0,ph:g==='T'?'leer = 0 (Umkehrtemperatur)':'z. B. 130,5'});
+  $('cbody').innerHTML=h;sbBind(s,updGhh,renderGhh);updGhh();
+}
+function updGhh(){
+  if(st('ghh').o&&st('ghh').o.src==='eq')return entCore('ghh',updGhh,'Gibbs-Helmholtz-Gleichung (aus der Reaktionsgleichung)',st('ghh').o.g||'G');
+  var s=st('ghh'),g=s.o.g,steps=[],v={};
+  var need={G:['H','S','T'],T:['H','S','G'],H:['G','S','T'],S:['G','H','T']}[g];
+  for(var i=0;i<need.length;i++){var k=need[i],q={H:'hmol',S:'smol',T:'temp',G:'hmol'}[k],r=sbNum(s,k,q,{any:k!=='T'});
+    if(r.empty){if(k==='G'&&g==='T'){r={x:0}}else return sbMsg('Gib '+{H:'ΔH',S:'ΔS',T:'T',G:'ΔG'}[k]+' ein.')}
+    if(r.err)return sbMsg(k==='T'?'T muss eine Temperatur über 0 K sein.':'Bitte eine Zahl eingeben.',1);v[k]=r.x}
+  if(v.H!=null)steps.push({k:'Enthalpie',v:'ΔH = '+enNum(v.H,2)+' kJ/mol'});
+  if(v.S!=null)steps.push({k:'Entropie',v:'ΔS = '+enNum(v.S,2)+' J/(mol·K) = '+enNum(v.S/1000,5)+' kJ/(mol·K)'});
+  if(v.T!=null)steps.push({k:'Temperatur',v:'T = '+fmt(v.T,5)+' K'+(s.u.T===1?' (aus ϑ = '+fmt(parseNum(s.v.T),5)+' °C: T = ϑ + 273,15 K)':'')});
+  if(v.G!=null)steps.push({k:'Freie Enthalpie',v:'ΔG = '+enNum(v.G,2)+' kJ/mol'});
+  var res,x;
+  if(g==='G'){x=v.H-v.T*v.S/1000;steps.push({k:'Gibbs-Helmholtz',v:'ΔG = ΔH − T · ΔS = '+enNum(v.H,2)+' kJ/mol − '+fmt(v.T,5)+' K · '+enPar(v.S/1000,5)+' kJ/(mol·K) = '+enNum(x,2)+' kJ/mol',raw:1});res='ΔG = '+enNum(x,2)+' kJ/mol';v.G=x}
+  else if(g==='T'){if(Math.abs(v.S)<1e-12)return sbMsg('Für ΔS = 0 hängt ΔG nicht von der Temperatur ab.',1);x=(v.H-v.G)*1000/v.S;if(!(x>0))return sbMsg('Es ergibt sich keine Temperatur über 0 K (T = '+fmt(x,4)+' K). Bei diesen Vorzeichen von ΔH und ΔS gibt es keine solche Temperatur.',1);
+    steps.push({k:'Umgestellt',v:'T = '+fracH('ΔH − ΔG','ΔS')+' = '+fracH(enNum(v.H,2)+' kJ/mol − '+enPar(v.G,2)+' kJ/mol',enNum(v.S/1000,5)+' kJ/(mol·K)')+' = '+fmt(x,4)+' K = '+fmt(x-273.15,4)+' °C',raw:1});res='T = '+fmt(x,4)+' K';v.T=x}
+  else if(g==='H'){x=v.G+v.T*v.S/1000;steps.push({k:'Umgestellt',v:'ΔH = ΔG + T · ΔS = '+enNum(v.G,2)+' kJ/mol + '+fmt(v.T,5)+' K · '+enPar(v.S/1000,5)+' kJ/(mol·K) = '+enNum(x,2)+' kJ/mol',raw:1});res='ΔH = '+enNum(x,2)+' kJ/mol';v.H=x}
+  else{x=(v.H-v.G)/v.T*1000;steps.push({k:'Umgestellt',v:'ΔS = '+fracH('ΔH − ΔG','T')+' = '+fracH(enNum(v.H,2)+' kJ/mol − '+enPar(v.G,2)+' kJ/mol',fmt(v.T,5)+' K')+' = '+enNum(x/1000,5)+' kJ/(mol·K) = '+enNum(x,2)+' J/(mol·K)',raw:1});res='ΔS = '+enNum(x,2)+' J/(mol·K)';v.S=x}
+  var d=v.G<-1e-9?'ΔG < 0: exergonisch – die Reaktion läuft freiwillig ab.':(v.G>1e-9?'ΔG > 0: endergonisch – die Reaktion läuft nicht freiwillig ab.':'ΔG = 0: Die Reaktion befindet sich im Gleichgewicht (Umkehrtemperatur).');
+  if(g==='T'&&Math.abs(v.G)<1e-12)d+=' '+(v.H>0?'Oberhalb':'Unterhalb')+' von '+fmt(v.T,4)+' K wird ΔG negativ.';
+  steps.push({k:'Deutung',v:d});
+  sbOut('Gibbs-Helmholtz-Gleichung','<div class="big">'+res+'</div>',steps);
+}
+// ---------- 7. Innere Energie und Volumenarbeit ----------
+function renderHs1(){
+  var s=sbSt('hs1',{g:'W',vv:'V'});if(s.u.p==null)s.u.p=0;
+  $('cdesc').innerHTML='Formelsammlung: Erster Hauptsatz für geschlossene Systeme <b>ΔU = Q + W</b>; bei konstantem Druck <b>ΔH = Q<sub>p</sub></b>; Volumenarbeit <b>W = − p · ΔV</b>. Vorzeichen aus Sicht des Systems: zugeführte Energie positiv, abgegebene negativ. Hinweis: 1 kPa · 1 L = 1 J.';
+  var g=s.o.g,h='<div class="note">Gesucht ist:</div>'+sbChips('g',[['W','Volumenarbeit W'],['U','ΔU aus Q und W'],['UH','ΔU aus ΔH (konstanter Druck)']],g);
+  if(g==='U')h+=sbRow('Q','Q · Wärme',s.v.Q,{q:'energy',ui:s.u.Q||0,ph:'z. B. −50'})+sbRow('W','W · Arbeit',s.v.W,{q:'energy',ui:s.u.W||0,ph:'z. B. 2,5'});
+  else{if(g==='UH')h+=sbRow('H','ΔH · Enthalpieänderung (= Q<sub>p</sub>)',s.v.H,{q:'energy',ui:s.u.H||0,ph:'z. B. −890'});
+    h+='<div class="note" style="margin-top:6px">Volumenänderung:</div>'+sbChips('vv',[['V','ΔV angeben'],['n','aus der Änderung der Gasstoffmenge Δn']],s.o.vv);
+    if(s.o.vv==='V')h+=sbRow('p','p · Druck',s.v.p,{q:'press',ui:s.u.p,ph:'z. B. 101,325'})+sbRow('dV','ΔV · Volumenänderung (Zunahme +)',s.v.dV,{q:'vol',ui:s.u.dV||0,ph:'z. B. 24,5'});
+    else h+=sbRow('dn','Δn(Gas) · n(gasförmige Produkte) − n(gasförmige Edukte)',s.v.dn,{q:'amount',ui:s.u.dn||0,ph:'z. B. −2'})}
+  $('cbody').innerHTML=h;sbBind(s,updHs1,renderHs1);updHs1();
+}
+function updHs1(){
+  var s=st('hs1'),g=s.o.g,steps=[];
+  if(g==='U'){var Q=sbNum(s,'Q','energy',{any:1}),W=sbNum(s,'W','energy',{any:1});if(Q.empty||W.empty)return sbMsg('Gib Wärme Q und Arbeit W ein.');if(Q.err||W.err)return sbMsg('Q und W müssen Zahlen sein.',1);
+    var U1=Q.x+W.x;steps.push({k:'Erster Hauptsatz',v:'ΔU = Q + W = '+enS(Q.x,4)+' kJ + '+enPar(W.x,3)+' kJ = '+enS(U1,4)+' kJ'});steps.push({k:'Deutung',v:U1<0?'ΔU < 0: Das System gibt insgesamt Energie an die Umgebung ab.':'ΔU > 0: Das System nimmt insgesamt Energie aus der Umgebung auf.'});
+    return sbOut('Innere Energie','<div class="big">ΔU = '+enS(U1,4)+' kJ</div>',steps)}
+  var p,dV;
+  if(s.o.vv==='V'){var a=sbNum(s,'p','press'),b=sbNum(s,'dV','vol',{any:1});if(a.empty||b.empty)return sbMsg('Gib Druck und Volumenänderung ein.');if(a.err||b.err)return sbMsg('p muss größer 0 und ΔV eine Zahl sein.',1);p=a.x;dV=b.x;steps.push({k:'Gegeben',v:'p = '+fmt(p,6)+' kPa;  ΔV = '+enS(dV,4)+' L'})}
+  else{var c=sbNum(s,'dn','amount',{any:1});if(c.empty)return sbMsg('Gib die Änderung der Gasstoffmenge Δn ein.');if(c.err)return sbMsg('Δn muss eine Zahl sein.',1);p=101.325;dV=c.x*VM;
+    steps.push({k:'Volumenänderung',v:'ΔV = Δn · V<sub>m</sub> = '+enS(c.x,4)+' mol · 24,466 L/mol = '+enS(dV,4)+' L (bei 25 °C und p = 101,325 kPa; Volumen von Feststoffen und Flüssigkeiten vernachlässigt)',raw:1})}
+  var W2=-p*dV/1000;steps.push({k:'Volumenarbeit',v:'W = − p · ΔV = − '+fmt(p,6)+' kPa · '+enPS(dV,4)+' L = '+enNum(W2*1000,1)+' J = '+enS(W2,4)+' kJ'});
+  if(g==='W'){steps.push({k:'Deutung',v:W2<0?'W < 0: Das System dehnt sich aus und verrichtet Arbeit an der Umgebung.':(W2>0?'W > 0: Das System wird verdichtet; die Umgebung verrichtet Arbeit am System.':'Keine Volumenarbeit.')});return sbOut('Volumenarbeit','<div class="big">W = '+enS(W2,4)+' kJ</div><div class="note">= '+enNum(W2*1000,1)+' J</div>',steps)}
+  var H=sbNum(s,'H','energy',{any:1});if(H.empty)return sbMsg('Gib die Enthalpieänderung ΔH ein.');if(H.err)return sbMsg('ΔH muss eine Zahl sein.',1);
+  var U2=H.x+W2;steps.push({k:'Innere Energie',v:'Bei konstantem Druck ist Q<sub>p</sub> = ΔH:<br>ΔU = Q<sub>p</sub> + W = ΔH − p · ΔV = '+enS(H.x,4)+' kJ + '+enPar(W2,3)+' kJ = '+enS(U2,4)+' kJ',raw:1});
+  sbOut('Innere Energie aus Enthalpie','<div class="big">ΔU = '+enS(U2,4)+' kJ</div><div class="note">ΔH = '+enS(H.x,4)+' kJ · W = '+enS(W2,4)+' kJ</div>',steps);
+}
+// ---------- 8. Mittlere Reaktionsgeschwindigkeit ----------
+function renderVrate(){
+  var s=sbSt('vrate',{md:'z',ab:'A'});if(s.u.tt==null)s.u.tt=0;if(s.u.cc==null)s.u.cc=0;if((s.o.qk||'c')!==(s.o.qkPrev||'c')){s.u.cc={c:0,V:1,n:1}[s.o.qk||'c'];s.o.qkPrev=s.o.qk||'c'}
+  $('cdesc').innerHTML='Formelsammlung: Für A ⟶ B gilt die mittlere Reaktionsgeschwindigkeit <b>v = − Δc(A) / Δt = Δc(B) / Δt</b>. Die Konzentration eines Edukts nimmt ab (daher das Minuszeichen), die eines Produkts zu. Die <b>momentane Reaktionsgeschwindigkeit</b> zu einem Zeitpunkt t<sub>0</sub> entspricht der Steigung der Tangente an die c(t)-Kurve: v(t<sub>0</sub>) = − dc(A)/dt bzw. dc(B)/dt.';
+  var h=sbChips('md',[['z','mittlere: zwei Messpunkte'],['r','mittlere: Messreihe'],['m','momentane (Tangente)']],s.o.md)+sbSel('ab','Gemessener Stoff',[['A','Edukt A (Messgröße nimmt ab)'],['B','Produkt B (Messgröße nimmt zu)']],s.o.ab);
+  if(s.o.md==='z')h+=sbRow('c1','c<sub>1</sub> · Konzentration zum Zeitpunkt t<sub>1</sub>',s.v.c1,{q:'conc',ui:s.u.c1||0,ph:'z. B. 0,50'})+sbRow('t1','t<sub>1</sub> · Zeitpunkt',s.v.t1,{q:'time',ui:s.u.t1||0,ph:'z. B. 0'})+sbRow('c2','c<sub>2</sub> · Konzentration zum Zeitpunkt t<sub>2</sub>',s.v.c2,{q:'conc',ui:s.u.c2||0,ph:'z. B. 0,32'})+sbRow('t2','t<sub>2</sub> · Zeitpunkt',s.v.t2,{q:'time',ui:s.u.t2||0,ph:'z. B. 60'});
+  else{var Q=vrQK(s);h+=sbSel('qk','Messgröße',[['c','Konzentration c'],['V','Volumen V (z. B. Gas im Kolbenprober)'],['n','Stoffmenge n']],s.o.qk||'c')+sbRow('sp','Stoff (optional)',s.v.sp,{text:1,ph:'z. B. H₃O⁺ oder H₂'})+'<div class="row xferrow"><span></span><div><button type="button" class="btn xferb" id="vrSim" title="Messwerte in der Simulation „Reaktionsgeschwindigkeit“ erzeugen und hierher übernehmen">Messwerte aus der Simulation ▸</button> <span class="note">… öffnet die Simulation „Reaktionsgeschwindigkeit“; die Messwerte lassen sich dort hierher übernehmen.</span></div><span></span></div><div class="row"><label>Einheiten</label><span class="enwide" style="display:flex;gap:8px;align-items:center;white-space:nowrap">t in '+unitSel('time',s.u.tt).replace('<select','<select data-u="tt" style="flex:1"')+'<span style="margin-left:6px">'+Q.sym+' in</span>'+unitSel(Q.ut,s.u.cc).replace('<select','<select data-u="cc" style="flex:1"')+'</span><span></span></div><div class="row" style="align-items:start"><label>Messwerte<br><span class="note">je Zeile: t ; '+Q.sym+'</span></label><textarea id="vrTab" class="enwide" rows="7" style="font-family:var(--mono);width:100%;background:var(--panel-alt);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px" placeholder="0 ; 0,50&#10;30 ; 0,41&#10;60 ; 0,34&#10;90 ; 0,29&#10;120 ; 0,25">'+esc(s.v.tab||'')+'</textarea><span></span></div>'+(s.o.md==='m'?sbRow('ts','t<sub>0</sub> · Zeitpunkt (Einheit wie in der Tabelle)',s.v.ts,{ph:'z. B. 60'}):'')}
+  $('cbody').innerHTML=h;sbBind(s,updVrate,renderVrate);
+  var ta=$('vrTab');if(ta){ta.addEventListener('input',function(){s.v.tab=ta.value;s.v.src='';updVrate()})}
+  if($('vrSim'))$('vrSim').onclick=function(){try{sessionStorage.setItem('chemXfer',JSON.stringify({st:S.st,rub:S.rub,cur:S.cur,prot:S.prot}))}catch(e){}xferGo(SIM_RG+'?ret=calc')};
+  updVrate();
+}
+function updVrate(){
+  var s=st('vrate'),A=s.o.ab==='A',sg=A?'−':'',steps=[];
+  if(s.o.md==='z'){
+    var c1=sbNum(s,'c1','conc',{any:1}),c2=sbNum(s,'c2','conc',{any:1}),t1=sbNum(s,'t1','time',{any:1}),t2=sbNum(s,'t2','time',{any:1});
+    if(c1.empty||c2.empty||t1.empty||t2.empty)return sbMsg('Gib zwei Messpunkte (Konzentration und Zeitpunkt) ein.');
+    if(c1.err||c2.err||t1.err||t2.err||c1.x<0||c2.x<0||t1.x<0||t2.x<0)return sbMsg('Konzentrationen und Zeiten müssen Zahlen ≥ 0 sein.',1);
+    if(t2.x===t1.x)return sbMsg('Die beiden Zeitpunkte müssen verschieden sein.',1);
+    var dc=c2.x-c1.x,dt=t2.x-t1.x,v=(A?-1:1)*dc/dt;
+    steps.push({k:'Konzentrationsänderung',v:'Δc('+s.o.ab+') = c<sub>2</sub> − c<sub>1</sub> = '+fmt(c2.x,4)+' mol/L − '+fmt(c1.x,4)+' mol/L = '+enS(dc,4)+' mol/L',raw:1});
+    steps.push({k:'Zeitintervall',v:'Δt = t<sub>2</sub> − t<sub>1</sub> = '+fmt(t2.x,5)+' s − '+fmt(t1.x,5)+' s = '+enS(dt,4)+' s',raw:1});
+    steps.push({k:'Mittlere Geschwindigkeit',v:'v = '+sg+fracH('Δc('+s.o.ab+')','Δt')+' = '+sg+fracH(enPS(dc,4)+' mol/L',enS(dt,4)+' s')+' = '+vFmt(v)+' mol/(L·s)',raw:1});
+    steps.push({k:'Umrechnung',v:'v = '+vFmt(v)+' mol/(L·s) = '+vFmt(v*60)+' mol/(L·min)'});
+    if(v<0)steps.push({k:'Hinweis',v:A?'v ist negativ: Die Konzentration des Edukts müsste abnehmen – prüfe die Reihenfolge der Messwerte oder ob der Stoff ein Produkt ist.':'v ist negativ: Die Konzentration des Produkts müsste zunehmen – prüfe die Reihenfolge der Messwerte oder ob der Stoff ein Edukt ist.'});
+    return sbOut('Mittlere Reaktionsgeschwindigkeit','<div class="big">v = '+vFmt(v)+' mol/(L·s)</div><div class="note">= '+vFmt(v*60)+' mol/(L·min)</div>',steps)}
+  var Q=vrQK(s),X=Q.sym+'('+vrX(s)+')';
+  var lines=String(s.v.tab||'').split(/\n/).map(function(l){return l.trim()}).filter(Boolean),pts=[];
+  for(var i=0;i<lines.length;i++){var p=lines[i].split(/\s*[;\t|]\s*|\s+/).filter(Boolean);if(p.length<2)return sbMsg('Zeile '+(i+1)+': Bitte „t ; '+Q.sym+'“ eingeben.',1);var t=parseNum(p[0]),c=parseNum(p[1]);if(isNaN(t)||isNaN(c)||t<0||c<0)return sbMsg('Zeile '+(i+1)+': „'+esc(lines[i])+'“ enthält keine gültigen Zahlen.',1);pts.push([toBase(t,'time',s.u.tt),toBase(c,Q.ut,s.u.cc)*Q.fac,t,c])}
+  if(pts.length<2)return sbMsg('Gib mindestens zwei Messwerte ein (je Zeile: Zeit ; '+Q.name+').');
+  pts.sort(function(a,b){return a[0]-b[0]});for(var j=1;j<pts.length;j++)if(pts[j][0]===pts[j-1][0])return sbMsg('Zwei Messwerte haben denselben Zeitpunkt.',1);
+  if(s.o.md==='m')return vrMoment(s,pts,A,sg);
+  var tu=U.time[s.u.tt].u,cu=U[Q.ut][s.u.cc].u,rows='<table class="t"><tr><th>Intervall</th><th>Δt</th><th>Δ'+Q.sym+'</th><th>v in '+Q.ru+'</th><th>v in '+Q.rum+'</th></tr>';
+  for(var k=1;k<pts.length;k++){var dt2=pts[k][0]-pts[k-1][0],dc2=pts[k][1]-pts[k-1][1],v2=(A?-1:1)*dc2/dt2;rows+='<tr><td>'+fmt(pts[k-1][2],5)+' – '+fmt(pts[k][2],5)+' '+tu+'</td><td class="n">'+fmt(dt2,4)+' s</td><td class="n">'+enS(dc2,4)+' '+Q.du+'</td><td class="n">'+vFmt(v2)+'</td><td class="n">'+vFmt(v2*60)+'</td></tr>'}
+  rows+='</table>';var f=pts[0],l=pts[pts.length-1],vg=(A?-1:1)*(l[1]-f[1])/(l[0]-f[0]);
+  steps.push({k:'Messwerte',v:pts.length+' Messpunkte von t = '+fmt(f[2],5)+' '+tu+' bis t = '+fmt(l[2],5)+' '+tu+(s.v.src?' <span class="note">('+esc(s.v.src)+')</span>':''),raw:1});
+  steps.push({k:'Gesamter Zeitraum',v:'v = '+sg+fracH(Q.sym+'(t<sub>'+pts.length+'</sub>) − '+Q.sym+'(t<sub>1</sub>)','t<sub>'+pts.length+'</sub> − t<sub>1</sub>')+' = '+sg+fracH(fmt(l[1],4)+' '+Q.du+' − '+fmt(f[1],4)+' '+Q.du,fmt(l[0],5)+' s − '+fmt(f[0],5)+' s')+' = '+vFmt(vg)+' '+Q.ru,raw:1});
+  steps.push({k:'Intervalle',v:rows+'<p class="note">Die mittlere Geschwindigkeit nimmt meist mit der Zeit ab, weil die Konzentration der Edukte sinkt.</p>',raw:1});
+  sbOut('Mittlere Reaktionsgeschwindigkeit (Messreihe)','<div class="big">v̄ = '+vFmt(vg)+' '+Q.ru+'</div><div class="note">über den gesamten Zeitraum · '+vFmt(vg*60)+' '+Q.rum+' · aus '+X+'</div>',steps,vrSvg(pts,tu,cu,null,Q.sym+' in '+cu));
+}
+function vrQK(s){var k=s.o.qk||'c';return{k:k,ut:{c:'conc',V:'vol',n:'amount'}[k],sym:{c:'c',V:'V',n:'n'}[k],name:{c:'Konzentration',V:'Volumen',n:'Stoffmenge'}[k],fac:{c:1,V:1000,n:1000}[k],du:{c:'mol/L',V:'mL',n:'mmol'}[k],ru:{c:'mol/(L·s)',V:'mL/s',n:'mmol/s'}[k],rum:{c:'mol/(L·min)',V:'mL/min',n:'mmol/min'}[k]}}
+function vrX(s){var t=String(s.v.sp||'').trim();return t?esc(t):s.o.ab}
+function vFmt(x){if(x===0)return '0';var a=Math.abs(x);var s=(a>=1e-3&&a<1e4)?fmt(a,3):sci(a,3);return (x<0?'−':'')+s}
+function vrSvg(pts,tu,cu,tan,ylab){
+  var W=640,H=300,L=56,R=16,T=14,B=42,tmin=pts[0][2],tmax=pts[pts.length-1][2],cmax=Math.max.apply(null,pts.map(function(p){return p[3]}))*1.1||1;
+  function X(t){return L+(W-L-R)*(t-tmin)/(tmax-tmin)}function Y(c){return T+(H-T-B)*(1-c/cmax)}
+  function nice(span){var st=span/5,m=Math.pow(10,Math.floor(Math.log10(st)));return [1,2,2.5,5,10].map(function(x){return x*m}).filter(function(x){return x>=st})[0]}
+  var g='<div class="tcwrap"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Messgröße in Abhängigkeit von der Zeit">',sc=nice(cmax),stt=nice(tmax-tmin);
+  for(var c=0;c<=cmax+1e-12;c+=sc)g+='<line class="tcg" x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(c)+'" y2="'+Y(c)+'"/><text class="tct" x="'+(L-8)+'" y="'+(Y(c)+4)+'" text-anchor="end">'+fmt(c,3)+'</text>';
+  for(var t=Math.ceil(tmin/stt)*stt;t<=tmax+1e-9;t+=stt)g+='<line class="tcg" x1="'+X(t)+'" x2="'+X(t)+'" y1="'+T+'" y2="'+(H-B)+'"/><text class="tct" x="'+X(t)+'" y="'+(H-B+16)+'" text-anchor="middle">'+fmt(t,4)+'</text>';
+  g+='<text class="tct" x="'+((L+W-R)/2)+'" y="'+(H-6)+'" text-anchor="middle">t in '+tu+'</text><text class="tct" x="14" y="'+(T+(H-T-B)/2)+'" text-anchor="middle" transform="rotate(-90 14 '+(T+(H-T-B)/2)+')">'+(ylab||'c in '+cu)+'</text>';
+  g+='<path class="tcl" d="'+pts.map(function(p,i){return (i?'L':'M')+X(p[2]).toFixed(1)+' '+Y(p[3]).toFixed(1)}).join('')+'"/>';
+  if(tan){var ta=tmin,tb=tmax,ya=tan.c+tan.m*(ta-tan.t),yb=tan.c+tan.m*(tb-tan.t);
+    function clip(t,y){if(y<0){t=tan.t+(0-tan.c)/tan.m;y=0}if(y>cmax){t=tan.t+(cmax-tan.c)/tan.m;y=cmax}return[t,y]}
+    if(tan.m){var A1=clip(ta,ya),B1=clip(tb,yb);ta=A1[0];ya=A1[1];tb=B1[0];yb=B1[1]}
+    g+='<line x1="'+X(ta).toFixed(1)+'" y1="'+Y(ya).toFixed(1)+'" x2="'+X(tb).toFixed(1)+'" y2="'+Y(yb).toFixed(1)+'" stroke="var(--amber)" stroke-width="2" stroke-dasharray="6 4"/><circle cx="'+X(tan.t)+'" cy="'+Y(tan.c)+'" r="5" fill="var(--amber)" stroke="var(--panel)" stroke-width="2"><title>Tangente bei t = '+fmt(tan.t,5)+' '+tu+'</title></circle><text class="tct" x="'+(X(tan.t)+8)+'" y="'+(Y(tan.c)-8)+'" style="fill:var(--amber)">Tangente</text>'}
+  pts.forEach(function(p){g+='<g><title>t = '+fmt(p[2],5)+' '+tu+' · c = '+fmt(p[3],4)+' '+cu+'</title><circle cx="'+X(p[2])+'" cy="'+Y(p[3])+'" r="12" fill="transparent"/><circle class="tcm" cx="'+X(p[2])+'" cy="'+Y(p[3])+'" r="5"/></g>'});
+  return g+'</svg></div>';
+}
+// ---------- Reaktionsenthalpie aus Bindungsenthalpien ----------
+// mittlere Bindungsenthalpien in kJ/mol (gerundete Literaturwerte, nicht in der Formelsammlung)
+var BE={'H-H':436,'C-H':414,'C-C':346,'C=C':614,'C#C':839,'C-O':358,'C=O':745,'C=O*CO2':803,'O-H':463,'O=O':498,'O-O':146,'N-H':391,'N#N':945,'C-N':293,'C-Cl':328,'Cl-Cl':242,'H-Cl':432,
+ 'C#O':1072,'N-N':163,'N=N':418,'C=N':615,'C#N':891,'H-F':567,'H-Br':366,'H-I':299,'F-F':155,'Br-Br':193,'I-I':151,'C-F':485,'C-Br':276,'C-I':240,'S-H':339,'S-S':266,'C-S':259,'P-H':322,'Si-H':323,'Si-O':452};
+// Grundwerte (Schulbuchtabellen, C–H 414, C–C 346 nach Vorgabe); weitere Werte ergänzt
+var BE_SIM=['H-H','C-H','C-C','C=C','C#C','C-O','C=O','C=O*CO2','O-H','O=O','O-O','N-H','N#N','C-N','C-Cl','Cl-Cl','H-Cl'];
+var BORD={1:'-',2:'=',3:'#'},BSYM={'-':'–','=':'=','#':'≡'};
+function beLab(k){var m=k.split('*');var p=m[0].match(/^([A-Z][a-z]?)([-=#])([A-Z][a-z]?)$/);return p[1]+BSYM[p[2]]+p[3]+(m[1]?' (im CO<sub>2</sub>-Molekül)':(k==='C=O'?' (allgemein)':''))}
+function enGraph(sp){
+  if(sp.q)return{err:'Ionen'};var b=sp.f,p=parseFormula(b);if(p.err)return{err:p.err};var n=0;for(var e in p.el)n+=p.el[e];
+  if(n===1){if(/^(He|Ne|Ar|Kr|Xe|Rn)$/.test(b))return{bonds:[]};return{err:'Element'}}
+  var g=null;try{if(isOrg(b))g=orgSkeleton(b,0);if(!g){g=inorgSkeleton(p.el,0,b);if(g&&!lewisElectrons(g,0))g=null}}catch(e){g=null}
+  if(!g||!g.atoms||g.atoms.some(function(a){return a.pseudo})||(g.cations&&g.cations.length))return{err:'Struktur'};
+  if(typeof classify==='function'){var c=classify(b);if(c&&/salt|hydroxide|basoxide/.test(c.k))return{err:'Salz'}}
+  var out=[];g.bonds.forEach(function(bd){var a=g.atoms[bd.a].e,c=g.atoms[bd.b].e,o=bd.o||1;var k1=a+BORD[o]+c,k2=c+BORD[o]+a,k=BE[k1]!=null?k1:(BE[k2]!=null?k2:(function(){function rk(x){return x==='C'?0:(x==='H'?2:1)}return rk(a)<rk(c)||(rk(a)===rk(c)&&enOf(a)<=enOf(c))?k1:k2})());if(k==='C=O'&&b==='CO2')k='C=O*CO2';out.push(k)});
+  return{bonds:out,g:g};
+}
+function renderBind(){
+  var s=sbSt('bind',{});
+  $('cdesc').innerHTML='Abschätzung der Reaktionsenthalpie für Reaktionen von Molekülen im <b>Gaszustand</b>: Beim Aufbrechen von Bindungen wird Energie benötigt, beim Bilden von Bindungen frei. <b>Δ<sub>r</sub>H ≈ Σ E<sub>B</sub>(gespaltene Bindungen) − Σ E<sub>B</sub>(gebildete Bindungen)</b>. Die Strukturformeln werden automatisch ermittelt. Es werden mittlere Bindungsenthalpien verwendet – das Ergebnis ist daher ein Näherungswert.';
+  $('cbody').innerHTML=enEqBlock(s,'bind',false,'z. B. CH4 + O2 -> CO2 + H2O');
+  sbBind(s,updBind);xferBind(s);updBind();
+}
+function updBind(){
+  var s=st('bind'),box=$('beExtra'),r=enParseEq(s.v.eq);
+  function clr(){if(box){box.innerHTML='';box.dataset.sig=''}}
+  if(r.empty){clr();return sbMsg('Gib eine Reaktionsgleichung ein.')}
+  if(r.err){clr();return sbMsg(esc(r.err),1)}
+  var all=r.L.concat(r.R),cnt=[];
+  for(var i=0;i<all.length;i++){var g=enGraph(all[i]);if(g.err){clr();var lab=enSpLabel(Object.assign({},all[i],{st:null}));
+      return sbMsg(g.err==='Ionen'?'Für Ionen ('+lab+') lässt sich die Reaktionsenthalpie nicht aus Bindungsenthalpien berechnen – verwende „Reaktionsenthalpie aus Bildungsenthalpien“.':(g.err==='Element'?lab+' liegt als Feststoff/Metall vor (kein Molekül). Die Methode gilt nur für Moleküle im Gaszustand – verwende „Reaktionsenthalpie aus Bildungsenthalpien“.':(g.err==='Salz'?lab+' ist eine Ionenverbindung. Die Methode gilt nur für Moleküle mit Elektronenpaarbindungen.':'Für '+lab+' konnte keine Strukturformel ermittelt werden.')),1)}
+    var m={};g.bonds.forEach(function(k){m[k]=(m[k]||0)+1});cnt.push(m)}
+  // fehlende Bindungswerte
+  var miss=[];cnt.forEach(function(m){for(var k in m)if(BE[k]==null&&miss.indexOf(k)<0)miss.push(k)});
+  if(box){var sig=miss.join('|');if(box.dataset.sig!==sig){box.dataset.sig=sig;box.innerHTML=miss.map(function(k){return '<div class="row"><label>E<sub>B</sub>('+beLab(k)+')</label><input data-k="be_'+k+'" inputmode="decimal" value="'+esc(s.v['be_'+k]||'')+'" placeholder="nicht in der Tabelle – Wert eingeben" autocomplete="off"><span class="note">kJ/mol</span></div>'}).join('');
+    box.querySelectorAll('input[data-k]').forEach(function(i){i.addEventListener('focus',function(){S.focus=i});i.addEventListener('input',function(){s.v[i.dataset.k]=i.value;updBind()})})}}
+  var val={};for(var k in BE)val[k]=BE[k];
+  for(var j=0;j<miss.length;j++){var v=parseNum(s.v['be_'+miss[j]]);if(s.v['be_'+miss[j]]==null||!String(s.v['be_'+miss[j]]).trim())return sbMsg('Für die Bindung '+beLab(miss[j])+' fehlt die Bindungsenthalpie – bitte oben eingeben.');if(isNaN(v)||v<=0)return sbMsg('Die Bindungsenthalpie für '+beLab(miss[j])+' muss eine Zahl größer 0 sein.',1);val[miss[j]]=v}
+  function sideSum(list,off){var tot={},lines=[];list.forEach(function(x,i){var m=cnt[off+i],parts=[];Object.keys(m).forEach(function(k){parts.push(m[k]+' × '+beLab(k));tot[k]=(tot[k]||0)+x.co*m[k]});lines.push((x.co!==1?enFr(x.co)+' · ':'')+enSpLabel(Object.assign({},x,{st:null}))+': '+(parts.length?parts.join(', '):'keine Bindungen'))});
+    var sum=0,terms=[];Object.keys(tot).forEach(function(k){sum+=tot[k]*val[k];terms.push(enFr(tot[k])+' · '+val[k])});return{lines:lines,sum:sum,terms:terms,tot:tot}}
+  var A=sideSum(r.L,0),B=sideSum(r.R,r.L.length),H=A.sum-B.sum;
+  var steps=[{k:'Reaktionsgleichung',v:enEqHtml(r.L.map(function(x){return Object.assign({},x,{st:null})}),r.R.map(function(x){return Object.assign({},x,{st:null})}))+(r.auto?' <span class="note">(automatisch ausgeglichen)</span>':''),raw:1}];
+  var lwH='';var ints=all.every(function(x){return Math.abs(x.co-Math.round(x.co))<1e-9});
+  if(ints&&typeof lewisEquation==='function'){try{var le=lewisEquation(r.L.map(function(x){return{c:x.co,t:x.t}}),r.R.map(function(x){return{c:x.co,t:x.t}}));if(!le.miss.length)lwH='<div class="note" style="margin-top:10px">Strukturformeln</div>'+le.html}catch(e){}}
+  steps.push({k:'Gespaltene Bindungen (Edukte)',v:A.lines.join('<br>')+'<br>Σ E<sub>B</sub> = '+(A.terms.join(' + ')||'0')+' kJ/mol = <b>'+enNum(A.sum,0)+' kJ/mol</b>',raw:1});
+  steps.push({k:'Gebildete Bindungen (Produkte)',v:B.lines.join('<br>')+'<br>Σ E<sub>B</sub> = '+(B.terms.join(' + ')||'0')+' kJ/mol = <b>'+enNum(B.sum,0)+' kJ/mol</b>',raw:1});
+  var used={};[A.tot,B.tot].forEach(function(t){for(var k in t)used[k]=1});
+  steps.push({k:'Bindungsenthalpien',v:Object.keys(used).map(function(k){return 'E<sub>B</sub>('+beLab(k)+') = '+val[k]+' kJ/mol'+(BE[k]==null?' <span class="note">(eigener Wert)</span>':'')}).join('<br>'),raw:1});
+  steps.push({k:'Reaktionsenthalpie',v:'Δ<sub>r</sub>H ≈ Σ E<sub>B</sub>(gespalten) − Σ E<sub>B</sub>(gebildet) = '+enNum(A.sum,0)+' kJ/mol − '+enNum(B.sum,0)+' kJ/mol = <b>'+enNum(H,0)+' kJ/mol</b>',raw:1});
+  steps.push({k:'Deutung',v:(H<0?'Δ<sub>r</sub>H < 0: <b>exotherm</b> – in den gebildeten Bindungen ist mehr Energie gebunden, als zum Spalten der Bindungen der Edukte nötig war.':'Δ<sub>r</sub>H > 0: <b>endotherm</b> – zum Spalten der Bindungen wird mehr Energie benötigt, als beim Bilden der neuen Bindungen frei wird.')+'<br><span class="note">Mittlere Bindungsenthalpien gelten für Moleküle im Gaszustand und hängen vom Molekül ab; Abweichungen zum Wert aus Bildungsenthalpien sind daher normal (z. B. Wasser hier als Wasserdampf; Benzol ohne Mesomerieenergie).</span>',raw:1});
+  sbOut('Reaktionsenthalpie aus Bindungsenthalpien','<div class="big">Δ<sub>r</sub>H ≈ '+enNum(H,0)+' kJ/mol</div><div class="note">Näherung aus mittleren Bindungsenthalpien · '+(H<0?'exotherm':'endotherm')+' · gespalten '+enNum(A.sum,0)+' kJ/mol, gebildet '+enNum(B.sum,0)+' kJ/mol</div>',steps,lwH);
+}
+
+function vrMoment(s,pts,A,sg){
+  var Q=vrQK(s),X=Q.sym+'('+vrX(s)+')',tu=U.time[s.u.tt].u,cu=U[Q.ut][s.u.cc].u;
+  if(pts.length<3)return sbMsg('Für die Tangente werden mindestens drei Messwerte benötigt.');
+  var t0s=s.v.ts;if(t0s==null||!String(t0s).trim())return sbMsg('Gib den Zeitpunkt t<sub>0</sub> ein, für den die momentane Geschwindigkeit bestimmt werden soll.');
+  var t0=parseNum(t0s);if(isNaN(t0))return sbMsg('t<sub>0</sub> muss eine Zahl sein.',1);
+  var tmin=pts[0][2],tmax=pts[pts.length-1][2];if(t0<tmin||t0>tmax)return sbMsg('t<sub>0</sub> muss zwischen '+fmt(tmin,5)+' '+tu+' und '+fmt(tmax,5)+' '+tu+' liegen (innerhalb der Messreihe).',1);
+  var bi=0;pts.forEach(function(p,i){if(Math.abs(p[2]-t0)<Math.abs(pts[bi][2]-t0))bi=i});var i0=Math.min(Math.max(bi-1,0),pts.length-3),P=pts.slice(i0,i0+3);
+  var x0=P[0][2],x1=P[1][2],x2=P[2][2],y0=P[0][3],y1=P[1][3],y2=P[2][3];
+  var d0=(x0-x1)*(x0-x2),d1=(x1-x0)*(x1-x2),d2=(x2-x0)*(x2-x1);
+  var c0=y0*(t0-x1)*(t0-x2)/d0+y1*(t0-x0)*(t0-x2)/d1+y2*(t0-x0)*(t0-x1)/d2;
+  var m=y0*(2*t0-x1-x2)/d0+y1*(2*t0-x0-x2)/d1+y2*(2*t0-x0-x1)/d2;
+  var mB=m*toBase(1,Q.ut,s.u.cc)*Q.fac/toBase(1,'time',s.u.tt),v=(A?-1:1)*mB;
+  var steps=[{k:'Verfahren',v:'Die Tangente im Punkt t<sub>0</sub> = '+fmt(t0,5)+' '+tu+' wird über eine Parabel durch die drei nächstgelegenen Messpunkte bestimmt: ('+P.map(function(p){return fmt(p[2],5)+' | '+fmt(p[3],4)}).join('), (')+'). Die Steigung der Parabel bei t<sub>0</sub> ist die Steigung der Tangente.'+(s.v.src?' <span class="note">Messwerte: '+esc(s.v.src)+'</span>':''),raw:1}];
+  steps.push({k:'Tangente',v:Q.sym+'(t<sub>0</sub>) ≈ '+fmt(c0,4)+' '+cu+';  Steigung d'+Q.sym+'/dt ≈ '+vFmt(m)+' '+cu+'/'+tu,raw:1});
+  steps.push({k:'Momentane Geschwindigkeit',v:'v(t<sub>0</sub>) = '+sg+'d'+X+'/dt ≈ '+(A?sg+(m<0?'('+vFmt(mB)+')':vFmt(mB))+' '+Q.ru+' = ':'')+vFmt(v)+' '+Q.ru+' = '+vFmt(v*60)+' '+Q.rum,raw:1});
+  var j=0;while(j<pts.length-2&&pts[j+1][2]<t0)j++;var a=pts[j],b=pts[j+1],vs=(A?-1:1)*(b[1]-a[1])/(b[0]-a[0]);
+  steps.push({k:'Vergleich',v:'Mittlere Geschwindigkeit im Intervall '+fmt(a[2],5)+' – '+fmt(b[2],5)+' '+tu+' (Sekante): v = '+vFmt(vs)+' '+Q.ru+'. Die Tangentensteigung ist der Grenzwert der Sekantensteigung für Δt → 0.',raw:1});
+  steps.push({k:'Hinweis',v:'Graphisch: Tangente an die Kurve im Punkt t<sub>0</sub> zeichnen, an ihr ein Steigungsdreieck ablesen und v = '+sg+'Δ'+Q.sym+'/Δt berechnen. Der Rechner liefert einen Näherungswert – je dichter die Messpunkte, desto genauer.',raw:1});
+  sbOut('Momentane Reaktionsgeschwindigkeit','<div class="big">v('+fmt(t0,5)+' '+tu+') ≈ '+vFmt(v)+' '+Q.ru+'</div><div class="note">= '+vFmt(v*60)+' '+Q.rum+' · Steigung der Tangente an '+X+'</div>',steps,vrSvg(pts,tu,cu,{t:t0,c:c0,m:m},Q.sym+' in '+cu));
+}
+// ---------- Energetik: Tabellen und Grundlagen ----------
+TABS.push(['td','Bildungsenthalpien und Entropien'],['be','Bindungsenthalpien'],['cp','Wärmekapazitäten'],['phase','Schmelz- und Verdampfungswärme']);
+RUBTABS.en=['td','be','cp','phase','const'];
+var fillTab0=fillTab;
+fillTab=function(key,q){
+  function ok(s){return !q||s.toLowerCase().indexOf(q)>=0}
+  var h='';
+  if(key==='td'){h='<table class="t"><tr><th>Stoff</th><th>Formel</th><th>Δ<sub>f</sub>H° in kJ/mol</th><th>S° in J/(mol·K)</th></tr>';
+    TD.forEach(function(e){var lab=(e.f==='H3O+'?'H<sub>3</sub>O<sup>+</sup>':fsp(e.f.replace('*','·')))+'('+STN[e.st]+')';if(!ok(e.n+' '+e.f))return;h+='<tr><td>'+e.n+'</td><td>'+lab+'</td><td class="n">'+enNum(e.h,1)+'</td><td class="n">'+enNum(e.s,1)+'</td></tr>'});
+    h+='</table><p class="note">Standardbildungsenthalpien und Standardentropien bei 298,15 K und 101,325 kPa. <b>Nicht in der IQB-Formelsammlung enthalten</b> – gerundete Literaturwerte (u. a. nach CRC Handbook of Chemistry and Physics und NIST Chemistry WebBook); je nach Tabellenwerk weichen die Werte geringfügig ab. Ionen in wässriger Lösung relativ zu H<sup>+</sup>(aq): Δ<sub>f</sub>H° = 0, S° = 0. (s) fest, (l) flüssig, (g) gasförmig, (aq) gelöst.</p>'}
+  else if(key==='be'){h='<table class="t"><tr><th>Bindung</th><th>mittlere Bindungsenthalpie E<sub>B</sub> in kJ/mol</th></tr>';
+    Object.keys(BE).forEach(function(k){var l=beLab(k);if(!ok(l.replace(/<[^>]+>/g,'')))return;h+='<tr><td>'+l+(BE_SIM.indexOf(k)<0?' <span class="note">*</span>':'')+'</td><td class="n">'+BE[k]+'</td></tr>'});
+    h+='</table><p class="note">Mittlere Bindungsenthalpien für Moleküle im Gaszustand (– Einfach-, = Doppel-, ≡ Dreifachbindung). <b>Nicht in der IQB-Formelsammlung enthalten</b> – Werte nach gängigen Schulbuch-Tabellenwerken (gerundet auf ganze kJ/mol); mit * markierte Werte sind ergänzte Literaturwerte. Einzelne Schulbücher geben teilweise leicht abweichende Werte an.</p>'}
+  else if(key==='cp'){
+    h='<h3 style="font-size:14px;margin:6px 0">Flüssigkeiten</h3><table class="t"><tr><th>Stoff</th><th>c in kJ/(kg·K)</th></tr>';
+    CPLIQ.forEach(function(x){if(x[2]==null||!ok(x[1]))return;var v=String(x[2]).replace('.',',');h+='<tr><td>'+x[1]+'</td><td class="n">'+v+takeBtn('c',v,'kJ/(kg·K)')+'</td></tr>'});
+    h+='</table><h3 style="font-size:14px;margin:14px 0 6px">Feste Stoffe</h3><table class="t"><tr><th>Stoff</th><th>c in kJ/(kg·K)</th></tr>';
+    CPSOL.forEach(function(x){if(!ok(x[0]))return;h+='<tr><td>'+x[0]+'</td><td class="n">'+x[1]+takeBtn('c',x[1],'kJ/(kg·K)')+'</td></tr>'});
+    h+='</table><h3 style="font-size:14px;margin:14px 0 6px">Gase</h3><table class="t"><tr><th>Stoff</th><th>c<sub>V</sub> in kJ/(kg·K) (konstantes Volumen)</th><th>c<sub>p</sub> in kJ/(kg·K) (konstanter Druck)</th></tr>';
+    CPGAS.forEach(function(x){if(!ok(x[0]))return;h+='<tr><td>'+x[0]+'</td><td class="n">'+x[1]+'</td><td class="n">'+x[2]+takeBtn('c',x[2],'kJ/(kg·K)')+'</td></tr>'});
+    h+='</table><p class="note">Spezifische Wärmekapazitäten laut IQB Mathematisch-naturwissenschaftliche Formelsammlung (Anhang).</p>'}
+  else if(key==='phase'){
+    h='<h3 style="font-size:14px;margin:6px 0">Schmelztemperatur und spezifische Schmelzwärme</h3><table class="t"><tr><th>Stoff</th><th>ϑ<sub>S</sub> in °C (101,325 kPa)</th><th>q<sub>S</sub> in kJ/kg</th></tr>';
+    MELT.forEach(function(x){if(ok(x[0]))h+='<tr><td>'+x[0]+'</td><td class="n">'+x[1]+'</td><td class="n">'+(x[2]||'–')+'</td></tr>'});
+    h+='</table><h3 style="font-size:14px;margin:14px 0 6px">Siedetemperatur und spezifische Verdampfungswärme</h3><table class="t"><tr><th>Stoff</th><th>ϑ<sub>V</sub> in °C (101,325 kPa)</th><th>q<sub>V</sub> in kJ/kg</th></tr>';
+    BOIL.forEach(function(x){if(ok(x[0]))h+='<tr><td>'+x[0]+'</td><td class="n">'+x[1]+'</td><td class="n">'+x[2]+'</td></tr>'});
+    h+='</table><p class="note">Werte laut IQB Mathematisch-naturwissenschaftliche Formelsammlung (Anhang). Wärme beim Schmelzen bzw. Verdampfen: Q = q · m.</p>'}
+  else return fillTab0(key,q);
+  $('tbody').innerHTML=h;
+};
+var GL_EN=[
+{t:'Enthalpie und erster Hauptsatz',h:'<p>Bei chemischen Reaktionen wird Energie umgesetzt. Für ein <b>geschlossenes System</b> gilt der erste Hauptsatz der Thermodynamik:</p><p style="font-family:var(--mono)">ΔU = Q + W</p><p>ΔU ist die Änderung der <b>inneren Energie</b>, Q die ausgetauschte Wärme und W die Arbeit. Vorzeichen aus Sicht des Systems: Was das System aufnimmt, ist positiv; was es abgibt, ist negativ.</p><p>Entstehen oder verschwinden Gase, ändert sich bei konstantem Druck das Volumen; das System verrichtet <b>Volumenarbeit</b> W = − p · ΔV. Die bei konstantem Druck ausgetauschte Wärme heißt <b>Enthalpieänderung</b>: ΔH = Q<sub>p</sub>. Es gilt ΔH = ΔU + p · ΔV.</p><ul><li><b>exotherm:</b> ΔH < 0, Wärme wird abgegeben</li><li><b>endotherm:</b> ΔH > 0, Wärme wird aufgenommen</li></ul>'},
+{t:'Kalorimetrie',h:'<p>Im Kalorimeter läuft eine Reaktion in einer Flüssigkeit (meist Wasser) ab. Aus der Temperaturänderung der Flüssigkeit folgt die ausgetauschte Wärme:</p><p style="font-family:var(--mono)">Q = c · m · ΔT  (c(Wasser) = 4,183 kJ/(kg·K))</p><p>Bezogen auf die umgesetzte Stoffmenge ergibt sich die molare Reaktionsenthalpie:</p><p style="font-family:var(--mono)">Δ<sub>r</sub>H<sub>m</sub> = − Q / n(X)</p><p>Das Minuszeichen steht, weil die Wärme, die die Reaktion abgibt, von der Flüssigkeit aufgenommen wird: Erwärmt sich das Wasser (Q > 0), ist Δ<sub>r</sub>H<sub>m</sub> negativ (exotherm).</p><p><b>Beispiel:</b> 2,0 g NaOH lösen sich in 100 g Wasser, die Temperatur steigt um 5,0 K.<br><span style="font-family:var(--mono)">Q = 4,183 kJ/(kg·K) · 0,100 kg · 5,0 K = 2,09 kJ; n(NaOH) = 2,0 g / 40,0 g/mol = 0,050 mol; Δ<sub>L</sub>H<sub>m</sub> = −2,09 kJ / 0,050 mol ≈ −42 kJ/mol</span></p><p>Die Wärmekapazität des Kalorimeters selbst wird laut Formelsammlung vernachlässigt; genauer wird es, wenn man sie berücksichtigt.</p>'},
+{t:'Satz von Hess und Bildungsenthalpien',h:'<p><b>Satz von Hess:</b> Die Reaktionsenthalpie hängt nur vom Anfangs- und Endzustand ab, nicht vom Reaktionsweg. Man kann Reaktionsgleichungen daher wie Gleichungen addieren:</p><ul><li>Gleichung umkehren → Vorzeichen von ΔH umkehren</li><li>Gleichung mit einem Faktor multiplizieren → ΔH mit demselben Faktor multiplizieren</li></ul><p>Die <b>Standardbildungsenthalpie</b> Δ<sub>f</sub>H° ist die Reaktionsenthalpie für die Bildung von 1 mol eines Stoffes aus den Elementen im Standardzustand (298,15 K, 101,325 kPa). Elemente im Standardzustand haben Δ<sub>f</sub>H° = 0. Damit gilt:</p><p style="font-family:var(--mono)">Δ<sub>r</sub>H° = Σ n · Δ<sub>f</sub>H°(Produkte) − Σ n · Δ<sub>f</sub>H°(Edukte)</p><p><b>Beispiel:</b> CH₄ + 2 O₂ ⟶ CO₂ + 2 H₂O(l)<br><span style="font-family:var(--mono)">Δ<sub>r</sub>H° = [−393,5 + 2 · (−285,8)] − [−74,6 + 2 · 0] = −890,5 kJ/mol</span></p><p>Achte auf den Aggregatzustand: H₂O(l) und H₂O(g) haben verschiedene Bildungsenthalpien.</p>'},
+{t:'Bindungsenthalpien',h:'<p>Die <b>Bindungsenthalpie</b> E<sub>B</sub> ist die Energie, die man benötigt, um 1 mol einer bestimmten Bindung im Gaszustand zu spalten. Beim Bilden derselben Bindung wird dieselbe Energie frei.</p><p>Für eine Reaktion von Molekülen im Gaszustand lässt sich die Reaktionsenthalpie abschätzen:</p><p style="font-family:var(--mono)">Δ<sub>r</sub>H ≈ Σ E<sub>B</sub>(gespaltene Bindungen) − Σ E<sub>B</sub>(gebildete Bindungen)</p><p><b>Beispiel:</b> CH₄ + 2 O₂ ⟶ CO₂ + 2 H₂O(g)<br><span style="font-family:var(--mono)">gespalten: 4 · E(C–H) + 2 · E(O=O) = 4 · 414 + 2 · 498 = 2652 kJ/mol<br>gebildet: 2 · E(C=O) + 4 · E(O–H) = 2 · 803 + 4 · 463 = 3458 kJ/mol<br>Δ<sub>r</sub>H ≈ 2652 − 3458 = −806 kJ/mol</span></p><p>Für C=O im CO<sub>2</sub>-Molekül gilt der eigene Wert 803 kJ/mol, sonst der allgemeine Wert 745 kJ/mol (Aldehyde, Ketone). Der Literaturwert mit gasförmigem Wasser liegt bei −802 kJ/mol.</p><p>Da tabellierte Werte <b>Mittelwerte</b> aus vielen Molekülen sind, ist das Ergebnis nur eine Näherung. Genauer ist die Berechnung mit Standardbildungsenthalpien.</p>'},
+{t:'Entropie',h:'<p>Die <b>Entropie S</b> ist ein Maß für die Zahl der Möglichkeiten, wie sich Teilchen und Energie in einem System verteilen können („Unordnung“). Sie nimmt zu</p><ul><li>beim Übergang fest → flüssig → gasförmig,</li><li>wenn bei einer Reaktion die Zahl der Gasteilchen steigt,</li><li>beim Lösen und Mischen sowie bei steigender Temperatur.</li></ul><p>Standardentropien S° sind tabelliert (in J/(mol·K)); auch Elemente haben S° > 0. Für eine Reaktion gilt:</p><p style="font-family:var(--mono)">Δ<sub>r</sub>S° = Σ n · S°(Produkte) − Σ n · S°(Edukte)</p><p><b>Beispiel:</b> CaCO₃ ⟶ CaO + CO₂: Δ<sub>r</sub>S° = (38,1 + 213,8) − 91,7 = +160,2 J/(mol·K) – es entsteht ein Gas, die Entropie nimmt zu.</p>'},
+{t:'Freie Enthalpie und Gibbs-Helmholtz-Gleichung',h:'<p>Ob eine Reaktion freiwillig abläuft, entscheidet die <b>freie Enthalpie</b> G (Gibbs-Energie):</p><p style="font-family:var(--mono)">ΔG = ΔH − T · ΔS</p><ul><li>ΔG < 0: <b>exergonisch</b>, die Reaktion läuft freiwillig ab</li><li>ΔG > 0: <b>endergonisch</b>, die Reaktion läuft nicht freiwillig ab</li><li>ΔG = 0: Gleichgewicht</li></ul><p>Einheiten beachten: ΔS in J/(mol·K) durch 1000 teilen, wenn ΔH in kJ/mol angegeben ist; T in Kelvin.</p><table class="t"><tr><th>ΔH</th><th>ΔS</th><th>freiwillig?</th></tr><tr><td>&lt; 0</td><td>&gt; 0</td><td>bei allen Temperaturen</td></tr><tr><td>&lt; 0</td><td>&lt; 0</td><td>bei tiefen Temperaturen (T &lt; ΔH/ΔS)</td></tr><tr><td>&gt; 0</td><td>&gt; 0</td><td>bei hohen Temperaturen (T &gt; ΔH/ΔS)</td></tr><tr><td>&gt; 0</td><td>&lt; 0</td><td>nie</td></tr></table><p>Freiwillig bedeutet nicht schnell: Viele exergonische Reaktionen brauchen eine Aktivierungsenergie (z. B. Verbrennung von Holz).</p>'},
+{t:'Reaktionsgeschwindigkeit',h:'<p>Die <b>mittlere Reaktionsgeschwindigkeit</b> gibt an, wie stark sich die Konzentration eines Stoffes in einem Zeitintervall ändert. Für A ⟶ B gilt:</p><p style="font-family:var(--mono)">v = − Δc(A) / Δt = Δc(B) / Δt   (Einheit mol/(L·s))</p><p>Das Minuszeichen sorgt dafür, dass v positiv ist, obwohl die Eduktkonzentration abnimmt. Trägt man c gegen t auf, entspricht die mittlere Geschwindigkeit der Steigung der Sekante, die momentane Geschwindigkeit der Steigung der Tangente.</p><p>Die Reaktionsgeschwindigkeit steigt mit der <b>Konzentration</b> (bzw. dem Druck) der Edukte, der <b>Temperatur</b> (RGT-Regel: etwa Verdopplung bis Vervierfachung je 10 K), dem <b>Zerteilungsgrad</b> und durch <b>Katalysatoren</b>, die die Aktivierungsenergie senken.</p>'}
+];
+if(MODE!=='react')GL=GL.concat(GL_EN);
+// ---------- Gleichungen zwischen den Seiten übergeben ----------
+var XFER=null;var SIM_RG='../Q1/1-Reaktionsgeschwindigkeit.html';
+function xferQ(){var o={};try{String(location.search||'').replace(/^\?/,'').split('&').forEach(function(p){if(!p)return;var i=p.indexOf('=');var k=decodeURIComponent(i<0?p:p.slice(0,i)),v=i<0?'':decodeURIComponent(p.slice(i+1).replace(/\+/g,' '));o[k]=v})}catch(e){}return o}
+function xferClean(){try{history.replaceState(null,'',location.pathname)}catch(e){}}
+function xferBtn(fld){return '<button type="button" class="btn xferb" data-xf="'+fld+'" title="Gleichung auf der Seite „Reaktionsgleichungen“ aufstellen und hierher übernehmen">Automatisch aufstellen ▸</button>'}
+function xferBind(s){document.querySelectorAll('#cbody .xferb').forEach(function(b){b.onclick=function(){
+  try{sessionStorage.setItem('chemXfer',JSON.stringify({st:S.st,rub:S.rub,cur:S.cur,prot:S.prot}))}catch(e){}
+  xferGo(OTHER_URL+'?ret=calc&calc='+encodeURIComponent(S.cur)+'&fld='+encodeURIComponent(b.dataset.xf)+'&q='+encodeURIComponent(s.v[b.dataset.xf]||''))}})}
+function xferGo(u){try{location.href=u}catch(e){}setTimeout(function(){toast('Die Seite „'+OTHER_URL+'“ konnte nicht geöffnet werden. Beide Dateien müssen im selben Ordner liegen (in der Vorschau einer einzelnen Datei geht das nicht).')},1500)}
+function xferPlain(L,R){function side(a){return a.map(function(x){return (x.c>1?x.c+' ':'')+x.t}).join(' + ')}return side(L)+' -> '+side(R)}
+function xferInit(){
+  var q=xferQ();
+  if(MODE==='react'){if(q.ret!=='calc')return;XFER={calc:q.calc||'',fld:q.fld||'eq'};xferClean();
+    var t=String(q.q||'').replace(/\(\s*(s|l|g|aq|fl|f|fest|gas|graphit|diamant)\s*\)/gi,'').replace(/<=+>|<[-–—]+>|⇌|⟶|⟹|→|=+>|[-–—]+>|=+/g,' → ').replace(/\s+/g,' ').trim();
+    var s=reqState();if(t){s.txt=t;s.ans={};s.res=null}return}
+  if(q.xfer!=='1')return;xferClean();
+  var d=null;try{d=JSON.parse(sessionStorage.getItem('chemXfer')||'null');sessionStorage.removeItem('chemXfer')}catch(e){}
+  if(d&&d.st){S.st=d.st;if(d.prot)S.prot=d.prot}
+  var cur=q.calc||(d&&d.cur);if(!cur||!BYID[cur])return;S.cur=cur;S.rub=(d&&d.rub)||null;if(!S.rub&&ENORDER.indexOf(cur)>=0)S.rub='en';
+  if(cur==='vrate'&&q.tab){var sv=st('vrate');if(!sv.o)sv.o={md:'r',ab:'A'};if(!sv.o.md||sv.o.md==='z')sv.o.md='r';
+    var qk=q.qk==='V'||q.qk==='n'?q.qk:'c',ut={c:'conc',V:'vol',n:'amount'}[qk];sv.o.qk=qk;sv.o.qkPrev=qk;sv.o.ab=q.ab==='B'?'B':'A';
+    var ci=U[ut].map(function(x){return x.u}).indexOf(q.cu);sv.u.cc=ci<0?0:ci;var ti=U.time.map(function(x){return x.u}).indexOf(q.tu||'s');sv.u.tt=ti<0?0:ti;
+    sv.v.tab=q.tab;sv.v.sp=q.sp||'';sv.v.src=q.src||'';if(sv.o.md==='m'&&!sv.v.ts){var ln=q.tab.split('\n');var mid=ln[Math.floor(ln.length/3)]||'';sv.v.ts=(mid.split(';')[0]||'').trim()}
+    setTimeout(function(){toast('Messwerte aus der Simulation übernommen')},300)}
+  if(q.eq){var s2=st(cur);s2.v[q.fld||'eq']=q.eq;if(cur==='ghh'){s2.o=s2.o||{g:'G'};s2.o.src='eq'}setTimeout(function(){toast('Gleichung übernommen')},300)}
+}
+function xferBack(eq){xferGo(OTHER_URL+'?xfer=1&calc='+encodeURIComponent(XFER.calc)+'&fld='+encodeURIComponent(XFER.fld)+(eq?'&eq='+encodeURIComponent(eq):''))}
 // ---------- Reaktionsgleichung: Oberfläche ----------
 var REQ_EX=['Magnesium + Salzsäure','CH4 + O2','Eisen + Sauerstoff','Zink + Kupfer(II)-sulfat','Silbernitrat + Natriumchlorid','Natronlauge + Schwefelsäure','CaCO3 + HCl','Kupfer + konz. Salpetersäure','Kaliumpermanganat + Eisen(II)-sulfat + Schwefelsäure','Kaliumpermanganat + Kaliumiodid, neutral','Aluminium + Eisen(III)-oxid','Fe2O3 + CO -> Fe + CO2'];
 function qFmt(s){return esc(s).replace(/(^|[\s„(+])((?:[A-Z][a-z]?|\(|\)|\d)+)\^(\d*[+-])/g,function(m,p,f,c){return p+fsp(f+'^'+c)}).replace(/\^/g,'')}
@@ -4240,6 +4837,7 @@ function reqState(){var s=st('req');if(!s.init){s.init=1;s.txt='';s.ans={};s.res
 function renderReq(c){
   var s=reqState();
   $('cdesc').innerHTML=s.hint?'Gib die <b>Edukte</b> ins erste Feld und – falls bekannt – die <b>Produkte</b> ins zweite Feld ein, als <b>Formeln</b> (<i>Mg + HCl</i>; mit Produkt: <i>Al + HCl</i> ⟶ <i>AlCl3</i>) oder als <b>Namen</b> (<i>Magnesium + Salzsäure</i>, <i>Eisen(III)-chlorid + Natronlauge</i>). Namen werden in Formeln umgewandelt; Elemente wie Sauerstoff oder Chlor erscheinen als Moleküle (O₂, Cl₂). Die Koeffizienten werden als kleinste ganze Zahlen bestimmt – Brüche wie ½ O₂ sind nicht zulässig. Fehlen Angaben (Oxidationsstufe, Milieu, Konzentration …), frage ich nach. Angaben wie <i>konz.</i>, <i>verdünnt</i> oder <i>in saurer Lösung</i> werden berücksichtigt. Ionen: Fe<sup>3+</sup>, MnO<sub>4</sub><sup>−</sup> oder <i>Eisen(III)-Ionen</i> (eintippen als <i>Fe3+</i>, <i>MnO4-</i>). Fehlende Stoffe werden ergänzt (<i>CH4 + O2</i> ⟶ <i>CO2</i>; <i>? + HCl</i> ⟶ <i>MgCl2 + H2</i>). <b>Nur das Produkt bekannt?</b> Lass das Eduktfeld leer und gib z. B. <i>NaCl</i> als Produkt ein – dann schlage ich mögliche Edukte vor.'+knownHtml():'Gib die <b>Edukte</b> ins erste Feld und – falls bekannt – die <b>Produkte</b> ins zweite Feld ein, als Formeln oder Namen. Ausführliche Hinweise zur Eingabe und eine Übersicht der bekannten Stoffe kannst du links unter <b>Optionen</b> einblenden.';
+  if(XFER)$('cdesc').innerHTML='<div class="xferbar"><span>Du kommst vom <b>Chemie-Rechner</b>: Stelle die Gleichung auf und übernimm sie mit „In den Chemie-Rechner übernehmen“.</span><button class="btn" id="xfCancel">Zurück ohne Übernahme</button></div>'+$('cdesc').innerHTML;
   var h='<div class="rqio"><label class="rqlab" for="rqL">Edukte</label><input id="rqL" class="fo" placeholder="z. B. Magnesium + Salzsäure" autocomplete="off" autocapitalize="off" spellcheck="false"><span class="rqarr">⟶</span><label class="rqlab" for="rqR">Produkte <span class="note">(optional)</span></label><input id="rqR" class="fo" placeholder="leer lassen oder z. B. MgCl2" autocomplete="off" autocapitalize="off" spellcheck="false"></div><div class="act"><button class="btn pri" id="rqGo">Gleichung aufstellen</button><button class="btn" id="rqClr">Eingabe löschen</button></div>';
   $('cbody').innerHTML=h;
   var iL=$('rqL'),iR=$('rqR');rqFill();
@@ -4248,6 +4846,7 @@ function renderReq(c){
   $('rqGo').onclick=go;
   $('rqClr').onclick=function(){s.back=null;s.txt='';s.ans={};s.res=null;iL.value='';iR.value='';reqShow()};
   rqOpts(true);
+  if($('xfCancel'))$('xfCancel').onclick=function(){xferBack('')};
   if(s.txt)reqRun();else reqShow();
 }
 function reqRun(){var s=reqState();if(/(->|→|⟶|=>)/.test(s.txt||'')&&$('resArea'))$('resArea').innerHTML='<p class="note">Suche passende Stoffe …</p>';setTimeout(function(){try{s.res=reqSolve(s.txt,s.ans)}catch(e){s.res={err:'Unerwarteter Fehler: '+e.message}}reqShow()},15)}
@@ -4316,10 +4915,12 @@ function reqShow0(){
   var pure=!r.ionicOnly&&r.L.concat(r.R).every(function(x){return ichg(x.t)===0});
   if(pure)h+='<button class="btn" id="rqSt">In Stöchiometrie übernehmen</button>';
   h+='</div>';
+  if(XFER){var xb='<div class="act" style="margin-top:10px"><button class="btn pri" id="rqXf">In den Chemie-Rechner übernehmen ▸</button></div>',h2=h.replace(/(<div class="eqbig[^"]*">[\s\S]*?<\/div>)/,'$1'+xb);h=h2===h?h.replace('<div class="act">','<div class="act">'+'<button class="btn pri" id="rqXf">In den Chemie-Rechner übernehmen ▸</button>'):h2}
   ra.innerHTML=h;
   S.last={title:'Reaktionsgleichung',rows:rows};
   if($('bProt'))$('bProt').onclick=addProt;
   if(r.alt)$('rqAlt').onclick=function(e){var b=e.target.closest('button');if(!b)return;s.ans[r.alt.id]=b.dataset.v;reqRun()};
+  if(XFER&&$('rqXf'))$('rqXf').onclick=function(){xferBack(xferPlain(r.L,r.R))};
   if(pure)$('rqSt').onclick=function(){var t=stState();t.pre=-1;
     stFromLists(t,r.L,r.R);t.eq=stEqTxt(t);
     S.cur='stoich';buildNav();renderMain();toast('Gleichung in die Stöchiometrie übernommen')};
@@ -4419,11 +5020,12 @@ function showHelp(){
   $('mx').onclick=closeModal;$('mclose').onclick=closeModal;
 }
 function showVer(){
-  openModal('<div class="mhead"><h3>Versionshinweise</h3><button class="x" id="mx">×</button></div>'+(MODE==='react'?'<p><b>V1.0 – 23.11.2026</b></p><ul><li>Reaktionsgleichungen aufstellen und ausgleichen – nur mit Edukten oder mit teilweise bekannter Gleichung, Eingabe als Formel oder Stoffname (z. B. Eisen(III)-chlorid, Natronlauge, Propan), Elemente als Moleküle (H₂, O₂, Cl₂ …), nur ganzzahlige Koeffizienten, mit Rückfragen bei fehlenden Angaben (Oxidationsstufe, Milieu, Konzentration). Unterstützt: Synthesen, Verbrennungen (Alkane u. a.), Metalle mit Wasser, Säuren und Salzlösungen, Neutralisation, Fällung, Gasentwicklung, Oxide, thermische Zersetzung und Redoxreaktionen in Lösung (Permanganat, Dichromat, H₂O₂ u. a.) mit Teilgleichungen.</li><li>Deutlich mehr bekannte Stoffe (Trivialnamen, Hydrate, Peroxide, Carbide, Nitride, Hydride, Thiosulfat, organische Stoffklassen mit verzweigten Ketten, Halogenalkane, Ester, Ether, Amine, Fette, Zucker) und neue Reaktionstypen (organische Reaktionen, thermische Zersetzungen, Halogene als Oxidationsmittel, Nachweisreaktionen)</li><li>Zuschaltbare Anzeige der Oxidationszahlen mit Kennzeichnung von Oxidation, Reduktion und Disproportionierung</li><li>Eigene Grundlagen: Reaktionsgleichungen aufstellen, Reaktionstypen, Oxidationszahlen, Redoxgleichungen, Lewis-Schreibweise und Strukturformeln, stöchiometrisches Rechnen</li><li>Weitere Reaktionsmechanismen: Aminosäuresynthese (S<sub>N</sub>2 mit Ammoniak und Deprotonierung), Strecker-Synthese (Iminbildung, Addition von Cyanid; Nitrilhydrolyse), Protonierung von Aminen und Aminosäuren, Neutralisation von Carbonsäuren, Eliminierung (Dehydratisierung von Alkoholen, E1), Alkohol + Halogenwasserstoff, Oxidation von Alkoholen und Aldehyden (Teilgleichungen), saure Esterhydrolyse, Ringöffnungspolymerisation</li><li>Aminosäuresynthese: α-Halogencarbonsäure + Ammoniak (nucleophile Substitution) und Strecker-Synthese in zwei Schritten; Eduktsuche findet beide Wege; Seitenketten in Strukturformeln übersichtlicher; linke Spalte schmaler</li><li>Aminosäuren: alle 20 proteinogenen Aminosäuren mit Namen; Peptidbindung (Dipeptid, Reihenfolge wählbar, mit Mechanismus), Reaktion mit Salzsäure (Aminogruppe als Base) und Natronlauge, Verbrennung</li><li>Reaktionsmechanismen standardmäßig ausgeblendet (unter Optionen einschaltbar)</li><li>Oxidation organischer Stoffe mit Permanganat und Dichromat (primäre Alkohole zum Aldehyd oder zur Carbonsäure mit Rückfrage, sekundäre Alkohole zum Keton, Aldehyde zur Carbonsäure) als Ionen- und Stoffgleichung; Eduktsuche unterscheidet Isomere; Elektronendonator und -akzeptor auch bei Oxidationen mit Sauerstoff</li><li>Stöchiometrie: Eingabefeld für die Reaktionsgleichung (Formeln oder Namen, wird automatisch ergänzt und ausgeglichen), Anzeige der übernommenen Gleichung als Reaktionsgleichung, beliebig viele Edukte und Produkte; Beispielreaktionen entfernt</li><li>Reaktionsmechanismen in Struktur- und Lewis-Schreibweise mit Elektronenpfeilen (voller Pfeil: Elektronenpaar, Angelhaken: einzelnes Elektron), sonst in Halbstrukturformeln:  radikalische Substitution, elektrophile Addition (Halogen, Halogenwasserstoff, Wasser), elektrophile Substitution (Bromierung, Nitrierung), nucleophile Substitution (S<sub>N</sub>1/S<sub>N</sub>2, Hydrolyse), katalytische Hydrierung, Veresterung, Verseifung, radikalische Polymerisation</li><li>Oxidationszahlen auch an jedem Atom der Struktur- und Lewis-Formeln (aus den Bindungen und der Elektronegativität bestimmt)</li><li>Reaktionsart zu jeder Gleichung: Elektronenübertragung (mit Elektronendonator und -akzeptor), Protonenübertragung (mit Protonendonator und -akzeptor), Fällung, Komplexbildung, radikalische/elektrophile/nucleophile Substitution, elektrophile Addition, Kondensation, Hydrolyse, Polymerisation</li><li>Eduktsuche: Nur das Produkt eingeben (z. B. „→ NaCl“) – mögliche Edukte werden vorgeschlagen; unvollständige Gleichungen werden ergänzt, auch fehlende Edukte („? + HCl → MgCl2 + H2“)</li><li>Weitere Stoffnamen: Diole (z. B. Ethylenglycol), Dicarbonsäuren, Diamine, Monomere, Aromaten, Sprengstoffe, Minerale (Kalkstein, Pyrit, Zinkblende …) mit Verbrennung, Rösten und explosiver Zersetzung</li><li>Kunststoffsynthesen: Polymerisation (mit Strukturformeln von Monomer und Wiederholungseinheit), Copolymerisation, Polykondensation zu Polyestern und Polyamiden (mit Endgruppen und (2n − 1) H₂O), Polyaddition zu Polyurethanen, Ringöffnung von Caprolactam; Eingabe auch über den Kunststoffnamen (z. B. PVC, PET, Nylon)</li><li>Gleichung zusätzlich in Struktur- und Lewis-Schreibweise: organische Stoffe als Valenzstrichformel, anorganische Stoffe als Lewis-Formel mit freien Elektronenpaaren und Formalladungen, Salze als Ionen</li><li>Stöchiometrie mit limitierendem Edukt, Überschuss und Ausbeute; Gasvolumen mit V<sub>m</sub> = 24,466 L/mol (Formelsammlung)</li><li>Atommassen nach dem Periodensystem der IQB Mathematisch-naturwissenschaftlichen Formelsammlung</li></ul>':'<p><b>V1.0 – 20.11.2026</b></p><ul><li>Erster Baustein „Stoffmenge und Lösungen“: Stoffmenge, Teilchenzahl, molare Masse (auch aus der Formel), Konzentration, Massenkonzentration, Dichte, Verdünnen, Mischen, Massen- und Volumenanteil, Gasvolumen, allgemeine Gasgleichung</li><li>Startseite mit Kacheln für die Rubriken (Stoffmenge und Lösungen, Säuren und Basen, Elektrochemie; Chemisches Gleichgewicht und Energetik in Vorbereitung)</li><li>Schaltfläche „Alle Tabellenwerte“ in der Kopfzeile; in den Rubriken zeigt „Tabellenwerte“ nur die jeweils passenden Tabellen</li><li>Rubrik „Elektrochemie“: Zellspannung galvanischer Zellen aus den Standardpotenzialen der Formelsammlung – Halbzellen aus der Tabelle oder als eigene Eingabe (Metall, Element oder Ion als Name oder Formel, Rückfrage bei mehreren möglichen Redoxpaaren), automatische Zuordnung von Elektronendonator und -akzeptor, Anzahl der übertragenen Elektronen (mit Pluspol/Minuspol, Teilgleichungen, Zellreaktion, Zelldiagramm, wahlweise mit Nernst-Gleichung), Konzentrationszelle, Nernst-Gleichung (auch pH-Abhängigkeit von Wasserstoff- und Sauerstoffelektrode), Zersetzungsspannung mit Überspannungen, Faraday-Gleichung (Masse, Stoffmenge, Stromstärke oder Zeit; Gasvolumen); Tabelle der Standardpotenziale und Grundlagen zur Elektrochemie</li><li>Kachel „Einheiten umrechnen“: Masse, Volumen, Stoffmenge, Konzentrationen, Dichte, Anteile, Druck, Temperatur, Energie, Länge, Zeit, Fläche und Ladung mit Rechenweg</li><li>Rubrik „Säuren und Basen“: pH/pOH und Konzentrationen, pH starker und schwacher Säuren und Basen (Näherung und exakt; Stoff als Formel oder Name, Anzahl der H₃O⁺/OH⁻ wird bestimmt), K<sub>S</sub>/pK<sub>S</sub>/K<sub>B</sub>/pK<sub>B</sub>, Pufferlösungen mit Zugabe, Konzentrationsbestimmung durch Titration (Stoffmengenverhältnis aus Probe und Maßlösung bestimmt), Titrationskurven mit Indikatorempfehlung; Tabellenwerte pK<sub>S</sub>/pK<sub>B</sub> und Indikatoren aus der Formelsammlung</li><li>Molare Masse als Zahl, Formel oder Stoffname eingeben (Berechnung aus den Atommassen der Formelsammlung); Brüche im Rechenweg zweizeilig</li><li>Rubrik „Tabellenwerte“ mit Atommassen (alle 118 Elemente laut Periodensystem der Formelsammlung), Konstanten, Dichten (fest, flüssig, gasförmig), konzentrierten Lösungen und molaren Massen; Werte werden bei Bedarf in die Rechner übernommen</li><li>Alle Werte nach IQB Mathematisch-naturwissenschaftliche Formelsammlung: V<sub>m</sub> = 24,466 L/mol bei 25 °C, R = 8,314462618 J/(mol·K), N<sub>A</sub> = 6,02214076·10²³ 1/mol</li><li>Grundlagen mit 6 Themen, Rechenprotokoll mit PDF-Ausgabe</li></ul>')+'<div class="act"><button class="btn" id="mclose">Schließen</button></div>');
+  openModal('<div class="mhead"><h3>Versionshinweise</h3><button class="x" id="mx">×</button></div>'+(MODE==='react'?'<p><b>V1.0 – 23.11.2026</b></p><ul><li>Aufruf aus dem Chemie-Rechner: aufgestellte Gleichung mit „In den Chemie-Rechner übernehmen“ zurückgeben</li><li>Reaktionsgleichungen aufstellen und ausgleichen – nur mit Edukten oder mit teilweise bekannter Gleichung, Eingabe als Formel oder Stoffname (z. B. Eisen(III)-chlorid, Natronlauge, Propan), Elemente als Moleküle (H₂, O₂, Cl₂ …), nur ganzzahlige Koeffizienten, mit Rückfragen bei fehlenden Angaben (Oxidationsstufe, Milieu, Konzentration). Unterstützt: Synthesen, Verbrennungen (Alkane u. a.), Metalle mit Wasser, Säuren und Salzlösungen, Neutralisation, Fällung, Gasentwicklung, Oxide, thermische Zersetzung und Redoxreaktionen in Lösung (Permanganat, Dichromat, H₂O₂ u. a.) mit Teilgleichungen.</li><li>Deutlich mehr bekannte Stoffe (Trivialnamen, Hydrate, Peroxide, Carbide, Nitride, Hydride, Thiosulfat, organische Stoffklassen mit verzweigten Ketten, Halogenalkane, Ester, Ether, Amine, Fette, Zucker) und neue Reaktionstypen (organische Reaktionen, thermische Zersetzungen, Halogene als Oxidationsmittel, Nachweisreaktionen)</li><li>Zuschaltbare Anzeige der Oxidationszahlen mit Kennzeichnung von Oxidation, Reduktion und Disproportionierung</li><li>Eigene Grundlagen: Reaktionsgleichungen aufstellen, Reaktionstypen, Oxidationszahlen, Redoxgleichungen, Lewis-Schreibweise und Strukturformeln, stöchiometrisches Rechnen</li><li>Weitere Reaktionsmechanismen: Aminosäuresynthese (S<sub>N</sub>2 mit Ammoniak und Deprotonierung), Strecker-Synthese (Iminbildung, Addition von Cyanid; Nitrilhydrolyse), Protonierung von Aminen und Aminosäuren, Neutralisation von Carbonsäuren, Eliminierung (Dehydratisierung von Alkoholen, E1), Alkohol + Halogenwasserstoff, Oxidation von Alkoholen und Aldehyden (Teilgleichungen), saure Esterhydrolyse, Ringöffnungspolymerisation</li><li>Aminosäuresynthese: α-Halogencarbonsäure + Ammoniak (nucleophile Substitution) und Strecker-Synthese in zwei Schritten; Eduktsuche findet beide Wege; Seitenketten in Strukturformeln übersichtlicher; linke Spalte schmaler</li><li>Aminosäuren: alle 20 proteinogenen Aminosäuren mit Namen; Peptidbindung (Dipeptid, Reihenfolge wählbar, mit Mechanismus), Reaktion mit Salzsäure (Aminogruppe als Base) und Natronlauge, Verbrennung</li><li>Reaktionsmechanismen standardmäßig ausgeblendet (unter Optionen einschaltbar)</li><li>Oxidation organischer Stoffe mit Permanganat und Dichromat (primäre Alkohole zum Aldehyd oder zur Carbonsäure mit Rückfrage, sekundäre Alkohole zum Keton, Aldehyde zur Carbonsäure) als Ionen- und Stoffgleichung; Eduktsuche unterscheidet Isomere; Elektronendonator und -akzeptor auch bei Oxidationen mit Sauerstoff</li><li>Stöchiometrie: Eingabefeld für die Reaktionsgleichung (Formeln oder Namen, wird automatisch ergänzt und ausgeglichen), Anzeige der übernommenen Gleichung als Reaktionsgleichung, beliebig viele Edukte und Produkte; Beispielreaktionen entfernt</li><li>Reaktionsmechanismen in Struktur- und Lewis-Schreibweise mit Elektronenpfeilen (voller Pfeil: Elektronenpaar, Angelhaken: einzelnes Elektron), sonst in Halbstrukturformeln:  radikalische Substitution, elektrophile Addition (Halogen, Halogenwasserstoff, Wasser), elektrophile Substitution (Bromierung, Nitrierung), nucleophile Substitution (S<sub>N</sub>1/S<sub>N</sub>2, Hydrolyse), katalytische Hydrierung, Veresterung, Verseifung, radikalische Polymerisation</li><li>Oxidationszahlen auch an jedem Atom der Struktur- und Lewis-Formeln (aus den Bindungen und der Elektronegativität bestimmt)</li><li>Reaktionsart zu jeder Gleichung: Elektronenübertragung (mit Elektronendonator und -akzeptor), Protonenübertragung (mit Protonendonator und -akzeptor), Fällung, Komplexbildung, radikalische/elektrophile/nucleophile Substitution, elektrophile Addition, Kondensation, Hydrolyse, Polymerisation</li><li>Eduktsuche: Nur das Produkt eingeben (z. B. „→ NaCl“) – mögliche Edukte werden vorgeschlagen; unvollständige Gleichungen werden ergänzt, auch fehlende Edukte („? + HCl → MgCl2 + H2“)</li><li>Weitere Stoffnamen: Diole (z. B. Ethylenglycol), Dicarbonsäuren, Diamine, Monomere, Aromaten, Sprengstoffe, Minerale (Kalkstein, Pyrit, Zinkblende …) mit Verbrennung, Rösten und explosiver Zersetzung</li><li>Kunststoffsynthesen: Polymerisation (mit Strukturformeln von Monomer und Wiederholungseinheit), Copolymerisation, Polykondensation zu Polyestern und Polyamiden (mit Endgruppen und (2n − 1) H₂O), Polyaddition zu Polyurethanen, Ringöffnung von Caprolactam; Eingabe auch über den Kunststoffnamen (z. B. PVC, PET, Nylon)</li><li>Gleichung zusätzlich in Struktur- und Lewis-Schreibweise: organische Stoffe als Valenzstrichformel, anorganische Stoffe als Lewis-Formel mit freien Elektronenpaaren und Formalladungen, Salze als Ionen</li><li>Stöchiometrie mit limitierendem Edukt, Überschuss und Ausbeute; Gasvolumen mit V<sub>m</sub> = 24,466 L/mol (Formelsammlung)</li><li>Atommassen nach dem Periodensystem der IQB Mathematisch-naturwissenschaftlichen Formelsammlung</li></ul>':'<p><b>V1.0 – 20.11.2026</b></p><ul><li>Gleichungen können per „Automatisch aufstellen“ auf der Seite „Reaktionsgleichungen“ aufgestellt und in den Rechner übernommen werden (Bildungs- und Bindungsenthalpien, Entropie/freie Enthalpie)</li><li>Rubrik „Energetik und Kinetik“: Kalorimetrie (Q = c · m · ΔT, wahlweise mit Wärmekapazität des Kalorimeters), Reaktionsenthalpie aus Kalorimeterversuchen, Reaktionsenthalpie aus Standardbildungsenthalpien (Gleichung wird bei Bedarf ausgeglichen, Aggregatzustände wählbar), Reaktionsenthalpie aus Bindungsenthalpien (Strukturformeln werden automatisch ermittelt), Reaktionsentropie aus Standardentropien, Gibbs-Helmholtz-Gleichung (mit Werten oder direkt aus einer Reaktionsgleichung, jeweils gesucht ΔG, T, ΔH oder ΔS, mit Gleichgewichtstemperatur), innere Energie und Volumenarbeit, mittlere Reaktionsgeschwindigkeit (zwei Messpunkte oder Messreihe mit Diagramm) und momentane Reaktionsgeschwindigkeit (Tangente); Tabellen der Bildungsenthalpien, Entropien und Bindungsenthalpien (Literaturwerte), spezifischen Wärmekapazitäten sowie Schmelz- und Verdampfungswärmen (Formelsammlung); sieben neue Grundlagen-Themen</li><li>Kein Link mehr zur Seite „Reaktionsgleichungen und Stöchiometrie“; linke Spalte wieder in der ursprünglichen Breite</li><li>Erster Baustein „Stoffmenge und Lösungen“: Stoffmenge, Teilchenzahl, molare Masse (auch aus der Formel), Konzentration, Massenkonzentration, Dichte, Verdünnen, Mischen, Massen- und Volumenanteil, Gasvolumen, allgemeine Gasgleichung</li><li>Startseite mit Kacheln für die Rubriken (Stoffmenge und Lösungen, Säuren und Basen, Elektrochemie; Chemisches Gleichgewicht in Vorbereitung)</li><li>Schaltfläche „Alle Tabellenwerte“ in der Kopfzeile; in den Rubriken zeigt „Tabellenwerte“ nur die jeweils passenden Tabellen</li><li>Rubrik „Elektrochemie“: Zellspannung galvanischer Zellen aus den Standardpotenzialen der Formelsammlung – Halbzellen aus der Tabelle oder als eigene Eingabe (Metall, Element oder Ion als Name oder Formel, Rückfrage bei mehreren möglichen Redoxpaaren), automatische Zuordnung von Elektronendonator und -akzeptor, Anzahl der übertragenen Elektronen (mit Pluspol/Minuspol, Teilgleichungen, Zellreaktion, Zelldiagramm, wahlweise mit Nernst-Gleichung), Konzentrationszelle, Nernst-Gleichung (auch pH-Abhängigkeit von Wasserstoff- und Sauerstoffelektrode), Zersetzungsspannung mit Überspannungen, Faraday-Gleichung (Masse, Stoffmenge, Stromstärke oder Zeit; Gasvolumen); Tabelle der Standardpotenziale und Grundlagen zur Elektrochemie</li><li>Kachel „Einheiten umrechnen“: Masse, Volumen, Stoffmenge, Konzentrationen, Dichte, Anteile, Druck, Temperatur, Energie, Länge, Zeit, Fläche und Ladung mit Rechenweg</li><li>Rubrik „Säuren und Basen“: pH/pOH und Konzentrationen, pH starker und schwacher Säuren und Basen (Näherung und exakt; Stoff als Formel oder Name, Anzahl der H₃O⁺/OH⁻ wird bestimmt), K<sub>S</sub>/pK<sub>S</sub>/K<sub>B</sub>/pK<sub>B</sub>, Pufferlösungen mit Zugabe, Konzentrationsbestimmung durch Titration (Stoffmengenverhältnis aus Probe und Maßlösung bestimmt), Titrationskurven mit Indikatorempfehlung; Tabellenwerte pK<sub>S</sub>/pK<sub>B</sub> und Indikatoren aus der Formelsammlung</li><li>Molare Masse als Zahl, Formel oder Stoffname eingeben (Berechnung aus den Atommassen der Formelsammlung); Brüche im Rechenweg zweizeilig</li><li>Rubrik „Tabellenwerte“ mit Atommassen (alle 118 Elemente laut Periodensystem der Formelsammlung), Konstanten, Dichten (fest, flüssig, gasförmig), konzentrierten Lösungen und molaren Massen; Werte werden bei Bedarf in die Rechner übernommen</li><li>Alle Werte nach IQB Mathematisch-naturwissenschaftliche Formelsammlung: V<sub>m</sub> = 24,466 L/mol bei 25 °C, R = 8,314462618 J/(mol·K), N<sub>A</sub> = 6,02214076·10²³ 1/mol</li><li>Grundlagen mit 6 Themen, Rechenprotokoll mit PDF-Ausgabe</li></ul>')+'<div class="act"><button class="btn" id="mclose">Schließen</button></div>');
   $('mx').onclick=closeModal;$('mclose').onclick=closeModal;
 }
 // ---------- Start ----------
 BYID.wc.vars.w.tag='w';
+xferInit();
 buildNav();renderMain();
 $('qrSmall').innerHTML=qrSvg(PAGE_URL);
 $('btnQR').onclick=showQR;$('btnPSE').onclick=showPSE;$('btnHelp').onclick=showHelp;$('lnkVer').onclick=function(e){e.preventDefault();showVer()};
