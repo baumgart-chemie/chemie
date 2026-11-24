@@ -363,6 +363,9 @@ footer sub{font-size:.75em;}
 .mode-sel button.active .ms-d{color:var(--text-dim);}
 .wrap.pick .sidebar > section.block:not(.keep){display:none;}
 .wrap.pick .main > *:not(.pick-hint){display:none;}
+.calc-bar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;border:1px solid var(--teal-dim);border-left:3px solid var(--teal);background:var(--panel);border-radius:4px;padding:10px 12px;margin-bottom:14px;font-size:13.5px;color:var(--text-dim)}
+.calc-bar[hidden]{display:none}
+.calc-bar b{color:var(--text)}
 .pick-hint{display:none; border:1px dashed var(--line); border-radius:4px; padding:22px 24px; color:var(--text-dim); font-size:13.5px; line-height:1.6; max-width:640px;}
 .pick-hint h2{font-size:16px; color:var(--text); margin-bottom:8px;}
 .pick-hint p{margin:0;}
@@ -619,6 +622,10 @@ header>.tag{flex:1 1 160px;min-width:0}
       <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.5</span><span class="d">24.11.2026</span></div>
+      <ul>
+        <li><strong>Verknüpfung mit dem Chemie-Rechner:</strong> Im Tab „Messwerte“ übergibt „Im Chemie-Rechner auswerten“ die Messwerte der angezeigten Diagrammgröße an den Rechner „Reaktionsgeschwindigkeit (mittlere und momentane)“. Wird die Simulation aus dem Rechner geöffnet, erscheint oben ein Hinweis mit „In den Chemie-Rechner übernehmen“ und „Zurück ohne Übernahme“.</li>
+      </ul>
       <div class="vh-ver"><span class="v">V1.4</span><span class="d">16.11.2026</span></div>
       <ul>
         <li><strong>Neue Kachel „Simulation Stoßtheorie“:</strong> Teilchenmodell allgemeiner Reaktionen in einem geschlossenen Gefäß (A + B → C, A + B + C → D + E + F, A + B → C + D, A + B + C → A + B). Wirksame Zusammenstöße (genügend Energie) wandeln die Teilchen sichtbar um, unwirksame Stöße prallen ab. Temperatur und Konzentrationen der Ausgangsstoffe sind variierbar; Geschwindigkeit ×0,5 (Standard), ×1, ×10; Reaktionsbedingungen jederzeit einstellbar. Die bisherige „Simulation“ heißt jetzt „Simulation Geschwindigkeit chemischer Reaktionen“, die Übung „Aufnehmen von Messwerten und Berechnung der Reaktionsgeschwindigkeit am Beispiel der Reaktion von Zink mit Salzsäure“; die Stoßtheorie steht an erster Stelle der Auswahl. Dazu ein Diagramm der Teilchenzahlen, Messreihen und Ausgabe als PDF.</li>
@@ -733,6 +740,7 @@ header>.tag{flex:1 1 160px;min-width:0}
       <h2>Aufgabenart wählen</h2>
       <p>Wähle als Aufgabenart die <strong>Simulation Stoßtheorie</strong>, die <strong>Simulation Geschwindigkeit chemischer Reaktionen</strong> oder die <strong>Übung „Aufnehmen von Messwerten und Berechnung der Reaktionsgeschwindigkeit“</strong> – die Auswahl findest du unter „Grundlagen“. Die Grundlagen kannst du jederzeit aufklappen.</p>
     </div>
+    <div class="calc-bar" id="calcBar" hidden><span>Du kommst vom <b>Chemie-Rechner</b>: Führe eine Messung durch und übernimm die Messwerte der angezeigten Diagrammgröße mit „In den Chemie-Rechner übernehmen“.</span><span class="btn-row"><button class="btn primary" id="calcTake">In den Chemie-Rechner übernehmen ▸</button><button class="btn ghost" id="calcCancel">Zurück ohne Übernahme</button></span></div>
     <div class="screen-card">
       <div class="screen-top">
         <button class="btn primary" id="bStart">Reaktion starten</button>
@@ -844,6 +852,7 @@ header>.tag{flex:1 1 160px;min-width:0}
         </table>
       </div>
       <div class="btn-row" style="margin-top:12px;">
+        <button class="btn" id="btnToCalc" title="Messwerte der aktuellen Messung im Chemie-Rechner auswerten (mittlere und momentane Reaktionsgeschwindigkeit)">Im Chemie-Rechner auswerten ▸</button>
         <button class="btn ghost" id="btnDataCsv">Messwerte als CSV exportieren</button>
         <button class="btn ghost" id="btnDataPdf">Ausgabe als PDF</button>
       </div>
@@ -1080,7 +1089,7 @@ header>.tag{flex:1 1 160px;min-width:0}
 
 <footer>
   <p class="footer-note">Simulierte Daten zu Lehrzwecken · Geschwindigkeitsgesetze vereinfacht (Feststoffe: Oberfläche schrumpft mit dem Umsatz; Thiosulfat und H<sub>2</sub>O<sub>2</sub> 1. Ordnung; HI-Bildung 2. Ordnung mit Rückreaktion). Aktivierungsenergien und Geschwindigkeitskonstanten gerundet bzw. Modellwerte. Gasvolumen im Kolbenprober bei 25 °C und dem eingestellten Druck, ideales Gas; Löslichkeit der Gase vernachlässigt.</p>
-  <p class="footer-credit">Bastian Baumgart · Simulation „Reaktionsgeschwindigkeit“ V1.4 · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Simulation „Reaktionsgeschwindigkeit“ V1.5 · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <script>
@@ -3523,6 +3532,39 @@ $("colPdf").addEventListener("click",()=>window.BK&&BK.open({
 }));
 colInit(); colBuildRx();
 
+/* ---------- Verknüpfung mit dem Chemie-Rechner (Werkzeuge/0-Rechner.html) ---------- */
+const RECHNER="../Werkzeuge/0-Rechner.html";
+let FROMCALC=false;
+(function(){ try{ const q=new URLSearchParams(location.search); if(q.get("ret")==="calc"){ FROMCALC=true; history.replaceState(null,"",location.pathname); } }catch(e){} })();
+function calcGo(u){ try{ location.href=u; }catch(e){} setTimeout(()=>toastMsg("Der Chemie-Rechner konnte nicht geöffnet werden. Er muss unter Werkzeuge/0-Rechner.html liegen."),1500); }
+function toastMsg(t){ const d=document.createElement("div"); d.textContent=t; d.style.cssText="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--panel-alt);border:1px solid var(--line);color:var(--text);padding:10px 14px;border-radius:6px;z-index:2000;font-size:13.5px;max-width:90vw"; document.body.appendChild(d); setTimeout(()=>d.remove(),4000); }
+function calcPayload(){
+  if(!(S.started||S.t>0)) return null;
+  const q=curQ(), {cols,rows}=dataRows(); if(rows.length<2) return null;
+  const want = q.multi ? "c(HI)" : q.txt;
+  let ci=cols.findIndex(c=>c.txt===want); if(ci<0) ci=0;
+  const col=cols[ci], num=v=>String(+(+v).toPrecision(5)).replace(".",",");
+  const tab=rows.map(r=>num(r[0])+" ; "+num(r[ci+1])).join("\n");
+  const qk = col.unit==="mL" ? "V" : col.unit==="mmol" ? "n" : "c";
+  const first=rows[0][ci+1], lastv=rows[rows.length-1][ci+1];
+  const sp=(col.txt.match(/\((.*)\)/)||[,""])[1];
+  const src="Simulation „Reaktionsgeschwindigkeit“: "+S.rx.name+", "+S.cfg.T+" °C, "+S.cfg.p+" hPa"+(S.rx.c?", "+fmt(S.cfg.c,S.rx.c.dec)+" mol/L":"")+", Messung "+S.run.no;
+  return {tab, qk, cu:col.unit, tu:"s", ab: lastv<first ? "A" : "B", sp, src};
+}
+function toCalc(){
+  const d=calcPayload();
+  if(!d){ toastMsg("Starte zuerst eine Messung – dann lassen sich die Messwerte übernehmen."); return; }
+  const u=RECHNER+"?xfer=1&calc=vrate&"+Object.entries(d).map(([k,v])=>k+"="+encodeURIComponent(v)).join("&");
+  calcGo(u);
+}
+$("btnToCalc").addEventListener("click", toCalc);
+$("calcTake").addEventListener("click", toCalc);
+$("calcCancel").addEventListener("click", ()=>calcGo(RECHNER+"?xfer=1&calc=vrate"));
+if(FROMCALC){
+  $("calcBar").hidden=false;
+  setTimeout(()=>{ const b=document.querySelector('#simWrap .mode-sel button[data-mode="sim"]'); if(b) b.click(); },0);
+}
+
 /* Start */
 loadReaction("zn");
 sizeCanvases();
@@ -3839,7 +3881,7 @@ BK.trainer=o=>{
 <script id="bk-page">
 (()=>{
 const G=globalThis.__rg;
-BK.setup({url:'https://chemie.mail-baumgart.de/Q1/1-Reaktionsgeschwindigkeit.html',sim:true,footName:'Simulation „Reaktionsgeschwindigkeit“',version:'1.4',printTitle:'Reaktionsgeschwindigkeit – Auswertung',
+BK.setup({url:'https://chemie.mail-baumgart.de/Q1/1-Reaktionsgeschwindigkeit.html',sim:true,footName:'Simulation „Reaktionsgeschwindigkeit“',version:'1.5',printTitle:'Reaktionsgeschwindigkeit – Auswertung',
   hint:'Die Auswertung enthält auf Wunsch eine Übersichtstabelle der Messreihen und je gewählter Messreihe die Versuchsbedingungen, die Ergebnisse (t<sub>½</sub>, v<sub>0</sub>, Endwert), das Diagramm (weißer Hintergrund) und die Messwerte.',
   noRuns:'Noch keine Messreihe abgeschlossen. Jede beendete Messung wird als Messreihe gespeichert.',
   runs:G.runs, live:G.live,
