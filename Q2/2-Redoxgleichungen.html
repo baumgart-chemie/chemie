@@ -526,11 +526,17 @@ header>.tag{flex:1 1 160px;min-width:0}
 .bk-sheet .bk-tnote{font-size:9pt;color:#333;margin-top:3pt}
 .bk-sheet .bk-foot{margin-top:14pt;border-top:1px solid #888;padding-top:4pt;font-size:8.5pt;color:#444;text-align:center}
 </style>
+<style id="bk-frac-style">
+/* Brüche wie im Chemie-Rechner */
+.bkfrac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 .25em;line-height:1.25;text-align:center}
+.bkfrac>.bkn{border-bottom:1.2px solid currentColor;padding:0 .25em .08em;white-space:nowrap}
+.bkfrac>.bkd{padding:.08em .25em 0;white-space:nowrap}
+</style>
 </head>
 <body>
 
 <header>
-  <a href="../index.html" class="back-btn" title="Zur Übersicht aller Simulationen"><span class="ar" aria-hidden="true">←</span>Zurück</a>
+  <a href="../index.html" class="back-btn" title="Zur Übersicht aller Simulationen"><span class="ar" aria-hidden="true">←</span>Zur Übersicht</a>
   <h1>Redoxgleichungen aufstellen</h1>
   <span class="tag">Teilgleichungen, Gesamtgleichung &amp; Stoffgleichung – anorganisch und organisch</span>
   <a href="#" class="guide-link" id="btnGuide">Anleitung</a>
@@ -2051,6 +2057,208 @@ BK.trainer=o=>{
 BK.trainer({url:'https://chemie.mail-baumgart.de/Q2/2-Redoxgleichungen.html',footName:'Redoxgleichungen',version:'1.2',printTitle:'Redoxgleichungen – Zusammenfassung',
   hint:'Die Auswertung enthält jede bearbeitete Aufgabe mit der richtigen Lösung und dem Vermerk, ob sie richtig gelöst wurde, sowie die Statistik mit der Erfolgsquote.',
   items:()=>(globalThis.__redoxPdf?globalThis.__redoxPdf():[])});
+
+</script>
+<script id="bk-frac">
+/* Bruchdarstellung: setzt „a / b“ (Schrägstrich mit Leerzeichen) in Formeln als Bruch mit Bruchstrich – wie im Chemie-Rechner. */
+(function(){
+'use strict';
+var INL={sub:1,sup:1,i:1,b:1,strong:1,em:1,span:1,small:1};
+var UNIT=/^(kJ|J|mol|mmol|g|kg|mg|L|mL|K|V|s|min|h|W|Pa|kPa|hPa|bar|°C|ppm|%|cm|mm|dm|m|nm|pm|u)(\/[A-Za-z(][A-Za-z·()⁻¹²³\-]*)?$/;
+var UNITR=/^ (kJ|J|mol|mmol|g|kg|mg|L|mL|K|V|s|min|h|W|Pa|kPa|hPa|bar|°C|ppm|%|cm|mm|dm|m|nm|pm|u)(\/[A-Za-z(][A-Za-z·()⁻¹²³\-]*)?(?![A-Za-zäöüÄÖÜ])/;
+function sp(c){return c===' '||c==='\n'||c==='\t'||c===' ';}
+function strip(t){return t.replace(/<[^>]*>/g,'');}
+function tagAt(s,k){ // Tag, der bei k beginnt: {end,name,close}
+  if(s[k]!=='<')return null;var e=s.indexOf('>',k);if(e<0)return null;
+  var m=/^<(\/?)([a-zA-Z0-9]+)/.exec(s.slice(k,e+1));if(!m)return null;
+  return {end:e+1,name:m[2].toLowerCase(),close:m[1]==='/'};
+}
+function tagBefore(s,e){ // Tag, der vor e (exklusiv) endet
+  if(s[e-1]!=='>')return null;var b=s.lastIndexOf('<',e-1);if(b<0)return null;
+  var t=tagAt(s,b);if(!t||t.end!==e)return null;t.start=b;return t;
+}
+function balanced(h){
+  var st=[],re=/<(\/?)([a-zA-Z0-9]+)[^>]*>/g,m;
+  while((m=re.exec(h))){var n=m[2].toLowerCase();if(n==='br')continue;
+    if(m[1]){if(st.pop()!==n)return false}else st.push(n)}
+  return st.length===0;
+}
+/* ----- rechts: Nenner ----- */
+function readRight(s,j){
+  var n=s.length,k=j,depth=0,pd=0,c,stk=[];
+  if(k>=n)return -1;
+  while(k<n){
+    c=s[k];
+    if(c==='<'){var t=tagAt(s,k);if(!t||!INL[t.name])break;
+      if(t.close){if(!stk.length||stk[stk.length-1]!==t.name)break;stk.pop()}else stk.push(t.name);
+      if(t.name==='sub'||t.name==='sup')depth+=t.close?-1:1;k=t.end;continue}
+    if(sp(c))break;
+    if(c==='('){pd++;k++;
+      while(k<n&&pd>0){var d=s[k];if(d==='(')pd++;else if(d===')')pd--;k++}
+      if(pd>0)return -1;continue}
+    if(c===')')break;
+    if(depth===0&&(c===','||c==='.'||c===';'||c===':'||c==='!'||c==='?')){
+      var nx=s[k+1];if(nx===undefined||sp(nx)||nx==='<'||nx===')')break}
+    if(depth===0&&(c==='='||c==='≈'||c==='⇒'||c==='→'))break;
+    k++;
+  }
+  if(k===j)return -1;
+  var fac=strip(s.slice(j,k));
+  if(/^[−+\-]?\d[\d.,]*(·10.*)?$/.test(fac)){var m=UNITR.exec(s.slice(k));if(m)k+=m[0].length}
+  return k;
+}
+/* ----- links: ein Faktor, der vor e endet ----- */
+function readLeftFactor(s,e){
+  var k=e,depth=0,c,pd=0,stk=[];
+  if(k<=0)return -1;
+  while(k>0){
+    c=s[k-1];
+    if(c==='>'){var t=tagBefore(s,k);if(!t||!INL[t.name])break;
+      if(t.close)stk.push(t.name);else{if(!stk.length||stk[stk.length-1]!==t.name)break;stk.pop()}
+      if(t.name==='sub'||t.name==='sup')depth+=t.close?1:-1;k=t.start;continue}
+    if(sp(c))break;
+    if(c===')'){pd=1;k--;
+      while(k>0&&pd>0){var d=s[k-1];if(d===')')pd++;else if(d==='(')pd--;k--}
+      if(pd>0)return -1;continue}
+    if(c==='(')break;
+    if(depth===0&&(c===';'||c===':'||c==='='||c==='≈'||c==='⇒'||c==='→'))break;
+    if(depth===0&&c===','){var pv=s[k-2];if(!(pv&&/\d/.test(pv)))break}
+    k--;
+  }
+  if(k===e)return -1;
+  return k;
+}
+function readLeftChain(s,e){
+  var st=readLeftFactor(s,e);if(st<0)return -1;
+  var fac=strip(s.slice(st,e));
+  // Einheit hinter Zahl: „0,500 g“, „−11,2 kJ“
+  if(UNIT.test(fac)&&s[st-1]===' '){
+    var st2=readLeftFactor(s,st-1);
+    if(st2>=0&&/^[−+\-]?\d[\d.,]*(·10.*)?$/.test(strip(s.slice(st2,st-1))))st=st2;
+  }
+  // Produktkette: „n · R · T“
+  while(st>=3){
+    var sep=s.slice(st-3,st);
+    if(sep===' · '||sep===' × '||sep===' * '){
+      var st3=readLeftFactor(s,st-3);if(st3<0)break;
+      var f2=strip(s.slice(st3,st-3));
+      var st4=st3;
+      if(UNIT.test(f2)&&s[st3-1]===' '){var st5=readLeftFactor(s,st3-1);if(st5>=0&&/^[−+\-]?\d[\d.,]*(·10.*)?$/.test(strip(s.slice(st5,st3-1))))st4=st5}
+      st=st4;
+    }else break;
+  }
+  return st;
+}
+function mathy(h){
+  var t=strip(h.replace(/<(sub|sup)>.*?<\/\1>/g,'')).replace(/\([^()]*\)/g,'()').replace(/\b(mol|min|ppm|bar|exp|log|lg|ln|kJ|kg|kPa|hPa)\b/g,'');
+  t=t.trim();
+  if(!t)return false;
+  if(/[a-zäöüß]{3,}/.test(t))return false;
+  if(/^[δΔ]?[+−\-]$/.test(strip(h).trim()))return false;
+  return true;
+}
+function unwrap(h){
+  var t=h.trim();
+  if(t[0]==='('&&t[t.length-1]===')'){var pd=0,ok=true;
+    for(var i=0;i<t.length;i++){var c=t[i];if(c==='(')pd++;else if(c===')'){pd--;if(pd===0&&i<t.length-1){ok=false;break}}}
+    if(ok)return t.slice(1,-1).trim()}
+  return t;
+}
+var BOUND=/<br\s*\/?>|[;:](?=\s)|[.!?]\s+(?=[A-ZÄÖÜ])/g;
+function ctxOK(s,start,whole,numH,denH){
+  var pre=s.slice(0,start),last=0,m;
+  BOUND.lastIndex=0;
+  while((m=BOUND.exec(pre)))last=m.index+m[0].length;
+  var clause=pre.slice(last);
+  var q=clause.search(/[=≈⇒]/);
+  if(q>=0){
+    var lhs=strip(clause.slice(0,q)).trim();
+    return lhs.length>0;
+  }
+  // Zahl (mit Einheit) durch einzelne Größe, z. B. „0,059 V / z“
+  var ns=strip(numH).trim(),ds=strip(denH).trim();
+  if(/^[−+\-]?\d[\d.,]*( (V|J|kJ|K|mol|g|L|s))?$/.test(ns)&&/^[A-Za-zΔν]$/.test(strip(denH.replace(/<sub>.*?<\/sub>/g,'')).trim()))return true;
+  // freistehender Ausdruck (z. B. Tabellenzelle „n / ν“)
+  var w=strip(whole).replace(/\s+/g,' ').trim();
+  var own=(strip(numH)+' / '+strip(denH)).replace(/\s+/g,' ').trim();
+  var strict=function(x){var t=strip(x).trim();return /[νρηΣΔϑαβγλμπσ]/.test(t)||/^[A-Za-z]$/.test(t)||/<su[bp]>/.test(x)};
+  return w===own&&strict(numH)&&strict(denH)&&!/[δ]/.test(w);
+}
+function tryAt(s,i,whole){
+  var ns=readLeftChain(s,i);if(ns<0)return null;
+  var de=readRight(s,i+3);if(de<0)return null;
+  var numH=s.slice(ns,i),denH=s.slice(i+3,de);
+  if(!balanced(numH)||!balanced(denH))return null;
+  var nu=unwrap(numH),dn=unwrap(denH);
+  if(!nu||!dn||!mathy(nu)||!mathy(dn))return null;
+  if(!ctxOK(s,ns,whole,numH,denH))return null;
+  var html='<span class="bkfrac"><span class="bkn">'+nu+'</span><span class="bkd">'+dn+'</span></span>';
+  return {s:s.slice(0,ns)+html+s.slice(de),next:ns+html.length};
+}
+function conv(h,whole){
+  if(h.indexOf(' / ')<0)return h;
+  var pos=0,guard=0,i;
+  while(guard++<60){
+    i=h.indexOf(' / ',pos);if(i<0)break;
+    var lt=h.lastIndexOf('<',i),gt=h.lastIndexOf('>',i);
+    if(lt>gt){pos=i+3;continue}
+    var r=tryAt(h,i,whole||h);
+    if(r){h=r.s;pos=r.next}else pos=i+3;
+  }
+  return h;
+}
+/* ----- DOM ----- */
+var BLK='div,p,li,td,th,tr,table,ul,ol,h1,h2,h3,h4,h5,h6,dl,dt,dd,section,pre,details,summary,canvas,svg,select,textarea,input,button,img,form,nav,header,footer,main,aside,figure';
+var BLOCKISH={DIV:1,P:1,LI:1,TD:1,TH:1,H1:1,H2:1,H3:1,H4:1,H5:1,H6:1,DT:1,DD:1,LABEL:1,BUTTON:1,SUMMARY:1,FIGCAPTION:1,CAPTION:1};
+var SKIPT={SCRIPT:1,STYLE:1,TEXTAREA:1,INPUT:1,SELECT:1,OPTION:1,NOSCRIPT:1,TITLE:1,SVG:1,CANVAS:1};
+var done=new WeakMap();
+function isCand(e){
+  if(e.nodeType!==1||SKIPT[e.tagName]||!e.tagName)return false;
+  if(e.namespaceURI!=='http://www.w3.org/1999/xhtml')return false;
+  if(e.closest('svg,script,style,textarea,[data-nofrac],[contenteditable="true"]'))return false;
+  if(e.querySelector(BLK))return false;
+  var ok=BLOCKISH[e.tagName]||(e.parentElement&&e.parentElement.querySelector(BLK)&&e.tagName!=='BODY');
+  return !!ok;
+}
+function proc(e){
+  var h=e.innerHTML;
+  if(h.indexOf(' / ')<0)return;
+  if(done.get(e)===h)return;
+  var n=conv(h,h);
+  if(n!==h){e.innerHTML=n;done.set(e,e.innerHTML)}else done.set(e,h);
+}
+function scan(root){
+  if(!root||root.nodeType!==1||!root.isConnected)return;
+  var tw=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null),n,seen=new Set(),list=[];
+  while((n=tw.nextNode())){
+    if(n.nodeValue.indexOf(' / ')<0)continue;
+    for(var a=n.parentElement;a;a=a.parentElement){
+      if(a===document.body||a===document.documentElement)break;
+      if(isCand(a)){if(!seen.has(a)){seen.add(a);list.push(a)}break}
+    }
+  }
+  list.forEach(proc); // erst nach dem Durchlauf umbauen (der TreeWalker verliert sonst seine Position)
+}
+var dirty=new Set(),sched=false;
+function flush(){sched=false;var arr=Array.from(dirty);dirty.clear();arr.forEach(scan)}
+function mark(n){
+  if(!n)return;var el=n.nodeType===1?n:n.parentElement;if(!el)return;
+  dirty.add(el);if(!sched){sched=true;(window.requestAnimationFrame||setTimeout)(flush)}
+}
+function start(){
+  scan(document.body);
+  new MutationObserver(function(ms){
+    ms.forEach(function(m){
+      if(m.type==='characterData')mark(m.target);
+      else{mark(m.target);for(var i=0;i<m.addedNodes.length;i++)mark(m.addedNodes[i])}
+    });
+  }).observe(document.body,{childList:true,subtree:true,characterData:true});
+  // vor dem Drucken/PDF sofort umwandeln (nicht erst im nächsten Frame)
+  window.addEventListener('beforeprint',function(){flush();scan(document.body)});
+}
+window.BKFRAC={conv:conv,scan:scan,isCand:isCand,proc:proc,done:done,flush:flush};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+})();
 
 </script>
 </body>

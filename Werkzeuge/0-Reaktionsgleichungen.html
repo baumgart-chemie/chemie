@@ -183,7 +183,7 @@ svg.lw{overflow:visible;flex:none}
 </head>
 <body>
 <header>
-  <a class="back-btn" href="../index.html">← Zurück</a>
+  <a class="back-btn" href="../index.html">← Zur Übersicht</a>
   <h1>Reaktionsgleichungen<br>und Stöchiometrie</h1>
   <span class="tag">Werkzeug zum Aufstellen von Reaktionsgleichungen und für stöchiometrische Berechnungen</span>
   <button class="hbtn" id="btnPSE">Periodensystem</button>
@@ -4634,7 +4634,7 @@ function renderVrate(){
   else{var Q=vrQK(s);h+=sbSel('qk','Messgröße',[['c','Konzentration c'],['V','Volumen V (z. B. Gas im Kolbenprober)'],['n','Stoffmenge n']],s.o.qk||'c')+sbRow('sp','Stoff (optional)',s.v.sp,{text:1,ph:'z. B. H₃O⁺ oder H₂'})+'<div class="row xferrow"><span></span><div><button type="button" class="btn xferb" id="vrSim" title="Messwerte in der Simulation „Reaktionsgeschwindigkeit“ erzeugen und hierher übernehmen">Messwerte aus der Simulation ▸</button> <span class="note">… öffnet die Simulation „Reaktionsgeschwindigkeit“; die Messwerte lassen sich dort hierher übernehmen.</span></div><span></span></div><div class="row"><label>Einheiten</label><span class="enwide" style="display:flex;gap:8px;align-items:center;white-space:nowrap">t in '+unitSel('time',s.u.tt).replace('<select','<select data-u="tt" style="flex:1"')+'<span style="margin-left:6px">'+Q.sym+' in</span>'+unitSel(Q.ut,s.u.cc).replace('<select','<select data-u="cc" style="flex:1"')+'</span><span></span></div><div class="row" style="align-items:start"><label>Messwerte<br><span class="note">je Zeile: t ; '+Q.sym+'</span></label><textarea id="vrTab" class="enwide" rows="7" style="font-family:var(--mono);width:100%;background:var(--panel-alt);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px" placeholder="0 ; 0,50&#10;30 ; 0,41&#10;60 ; 0,34&#10;90 ; 0,29&#10;120 ; 0,25">'+esc(s.v.tab||'')+'</textarea><span></span></div>'+(s.o.md==='m'?sbRow('ts','t<sub>0</sub> · Zeitpunkt (Einheit wie in der Tabelle)',s.v.ts,{ph:'z. B. 60'}):'')}
   $('cbody').innerHTML=h;sbBind(s,updVrate,renderVrate);
   var ta=$('vrTab');if(ta){ta.addEventListener('input',function(){s.v.tab=ta.value;s.v.src='';updVrate()})}
-  if($('vrSim'))$('vrSim').onclick=function(){try{sessionStorage.setItem('chemXfer',JSON.stringify({st:S.st,rub:S.rub,cur:S.cur,prot:S.prot}))}catch(e){}xferGo(SIM_RG+'?ret=calc')};
+  if($('vrSim'))$('vrSim').onclick=function(){xferOpen(SIM_RG+'?ret=calc')};
   updVrate();
 }
 function updVrate(){
@@ -4798,32 +4798,54 @@ var GL_EN=[
 ];
 if(MODE!=='react')GL=GL.concat(GL_EN);
 // ---------- Gleichungen zwischen den Seiten übergeben ----------
-var XFER=null;var SIM_RG='../Q1/1-Reaktionsgeschwindigkeit.html';
+var XFER=null;var SIM_RG='../Q1/1-Reaktionsgeschwindigkeit.html';var XWIN=null;
+/* Übergabe zwischen den Seiten ohne Browser-Speicher (nichts wird im Browser abgelegt):
+   Der Rechner öffnet die andere Seite in einem neuen Tab und bleibt mit allen Eingaben offen.
+   Die andere Seite schickt das Ergebnis per postMessage an den Rechner zurück und schließt sich.
+   Angenommen werden nur Nachrichten aus dem selbst geöffneten Tab (und im Netz nur von derselben Adresse). */
 function xferQ(){var o={};try{String(location.search||'').replace(/^\?/,'').split('&').forEach(function(p){if(!p)return;var i=p.indexOf('=');var k=decodeURIComponent(i<0?p:p.slice(0,i)),v=i<0?'':decodeURIComponent(p.slice(i+1).replace(/\+/g,' '));o[k]=v})}catch(e){}return o}
 function xferClean(){try{history.replaceState(null,'',location.pathname)}catch(e){}}
-function xferBtn(fld){return '<button type="button" class="btn xferb" data-xf="'+fld+'" title="Gleichung auf der Seite „Reaktionsgleichungen“ aufstellen und hierher übernehmen">Automatisch aufstellen ▸</button>'}
+function xferBtn(fld){return '<button type="button" class="btn xferb" data-xf="'+fld+'" title="Gleichung auf der Seite „Reaktionsgleichungen“ (neuer Tab) aufstellen und hierher übernehmen">Automatisch aufstellen ▸</button>'}
+function xferOpen(u){var w=null;try{w=window.open(u,'_blank')}catch(e){}
+  if(!w){toast('Die Seite konnte nicht in einem neuen Tab geöffnet werden. Bitte Pop-ups für diese Seite erlauben.');return}
+  XWIN=w;toast('Die Seite wurde in einem neuen Tab geöffnet. Deine Eingaben hier bleiben erhalten.')}
 function xferBind(s){document.querySelectorAll('#cbody .xferb').forEach(function(b){b.onclick=function(){
-  try{sessionStorage.setItem('chemXfer',JSON.stringify({st:S.st,rub:S.rub,cur:S.cur,prot:S.prot}))}catch(e){}
-  xferGo(OTHER_URL+'?ret=calc&calc='+encodeURIComponent(S.cur)+'&fld='+encodeURIComponent(b.dataset.xf)+'&q='+encodeURIComponent(s.v[b.dataset.xf]||''))}})}
+  xferOpen(OTHER_URL+'?ret=calc&calc='+encodeURIComponent(S.cur)+'&fld='+encodeURIComponent(b.dataset.xf)+'&q='+encodeURIComponent(s.v[b.dataset.xf]||''))}})}
 function xferGo(u){try{location.href=u}catch(e){}setTimeout(function(){toast('Die Seite „'+OTHER_URL+'“ konnte nicht geöffnet werden. Beide Dateien müssen im selben Ordner liegen (in der Vorschau einer einzelnen Datei geht das nicht).')},1500)}
 function xferPlain(L,R){function side(a){return a.map(function(x){return (x.c>1?x.c+' ':'')+x.t}).join(' + ')}return side(L)+' -> '+side(R)}
-function xferInit(){
-  var q=xferQ();
-  if(MODE==='react'){if(q.ret!=='calc')return;XFER={calc:q.calc||'',fld:q.fld||'eq'};xferClean();
-    var t=String(q.q||'').replace(/\(\s*(s|l|g|aq|fl|f|fest|gas|graphit|diamant)\s*\)/gi,'').replace(/<=+>|<[-–—]+>|⇌|⟶|⟹|→|=+>|[-–—]+>|=+/g,' → ').replace(/\s+/g,' ').trim();
-    var s=reqState();if(t){s.txt=t;s.ans={};s.res=null}return}
-  if(q.xfer!=='1')return;xferClean();
-  var d=null;try{d=JSON.parse(sessionStorage.getItem('chemXfer')||'null');sessionStorage.removeItem('chemXfer')}catch(e){}
-  if(d&&d.st){S.st=d.st;if(d.prot)S.prot=d.prot}
-  var cur=q.calc||(d&&d.cur);if(!cur||!BYID[cur])return;S.cur=cur;S.rub=(d&&d.rub)||null;if(!S.rub&&ENORDER.indexOf(cur)>=0)S.rub='en';
+function xferTarget(){return /^https?:$/.test(location.protocol)&&location.origin&&location.origin!=='null'?location.origin:'*'}
+function xferPost(m){var o=null;try{o=window.opener}catch(e){}if(!o||o.closed)return false;
+  try{o.postMessage(m,xferTarget())}catch(e){return false}
+  try{window.close()}catch(e){}
+  setTimeout(function(){toast('Übergeben – du kannst diesen Tab schließen und zum Chemie-Rechner zurückkehren.')},300);return true}
+function xferApply(q){
+  var cur=q.calc;if(!cur||!BYID[cur])return false;
+  if(S.cur!==cur){S.cur=cur;S.rub=ENORDER.indexOf(cur)>=0?'en':null}
   if(cur==='vrate'&&q.tab){var sv=st('vrate');if(!sv.o)sv.o={md:'r',ab:'A'};if(!sv.o.md||sv.o.md==='z')sv.o.md='r';
     var qk=q.qk==='V'||q.qk==='n'?q.qk:'c',ut={c:'conc',V:'vol',n:'amount'}[qk];sv.o.qk=qk;sv.o.qkPrev=qk;sv.o.ab=q.ab==='B'?'B':'A';
     var ci=U[ut].map(function(x){return x.u}).indexOf(q.cu);sv.u.cc=ci<0?0:ci;var ti=U.time.map(function(x){return x.u}).indexOf(q.tu||'s');sv.u.tt=ti<0?0:ti;
     sv.v.tab=q.tab;sv.v.sp=q.sp||'';sv.v.src=q.src||'';if(sv.o.md==='m'&&!sv.v.ts){var ln=q.tab.split('\n');var mid=ln[Math.floor(ln.length/3)]||'';sv.v.ts=(mid.split(';')[0]||'').trim()}
     setTimeout(function(){toast('Messwerte aus der Simulation übernommen')},300)}
   if(q.eq){var s2=st(cur);s2.v[q.fld||'eq']=q.eq;if(cur==='ghh'){s2.o=s2.o||{g:'G'};s2.o.src='eq'}setTimeout(function(){toast('Gleichung übernommen')},300)}
+  return true}
+function xferInit(){
+  var q=xferQ();
+  if(MODE==='react'){if(q.ret!=='calc')return;XFER={calc:q.calc||'',fld:q.fld||'eq'};xferClean();
+    var t=String(q.q||'').replace(/\(\s*(s|l|g|aq|fl|f|fest|gas|graphit|diamant)\s*\)/gi,'').replace(/<=+>|<[-–—]+>|⇌|⟶|⟹|→|=+>|[-–—]+>|=+/g,' → ').replace(/\s+/g,' ').trim();
+    var s=reqState();if(t){s.txt=t;s.ans={};s.res=null}return}
+  if(q.xfer!=='1')return;xferClean();xferApply(q);
 }
-function xferBack(eq){xferGo(OTHER_URL+'?xfer=1&calc='+encodeURIComponent(XFER.calc)+'&fld='+encodeURIComponent(XFER.fld)+(eq?'&eq='+encodeURIComponent(eq):''))}
+if(MODE!=='react')window.addEventListener('message',function(e){
+  var d=e.data;if(!d||typeof d!=='object'||d.type!=='chemXfer')return;
+  if(!XWIN||e.source!==XWIN)return;
+  if(xferTarget()!=='*'&&e.origin!==location.origin)return;
+  XWIN=null;
+  var q={};['calc','fld','eq','tab','qk','cu','tu','ab','sp','src'].forEach(function(k){if(d[k]!=null)q[k]=String(d[k])});
+  if(!d.cancel&&xferApply(q)){buildNav();renderMain()}
+  try{window.focus()}catch(x){}
+});
+function xferBack(eq){if(xferPost({type:'chemXfer',calc:XFER.calc,fld:XFER.fld,eq:eq||'',cancel:!eq}))return;
+  xferGo(OTHER_URL+'?xfer=1&calc='+encodeURIComponent(XFER.calc)+'&fld='+encodeURIComponent(XFER.fld)+(eq?'&eq='+encodeURIComponent(eq):''))}
 // ========== Rubrik Chemisches Gleichgewicht ==========
 (function(){var o={mwg:['Massenwirkungsgesetz','Massenwirkungsgesetz: K<sub>c</sub>, Konzentration, Reaktionsquotient'],ice:['Massenwirkungsgesetz','Gleichgewichtskonzentrationen (Umsatztabelle)'],kp:['Gasgleichgewichte','K<sub>p</sub> aus Partialdrücken, Umrechnung K<sub>c</sub> ↔ K<sub>p</sub>'],kl:['Löslichkeitsprodukt','Löslichkeitsprodukt und Löslichkeit'],klf:['Löslichkeitsprodukt','Fällung: Bildet sich ein Niederschlag?']};
  for(var k in o){CUSTOM[k]={id:k,grp:o[k][0],title:o[k][1],custom:1};BYID[k]=CUSTOM[k]}})();
