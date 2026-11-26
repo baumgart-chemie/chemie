@@ -113,6 +113,7 @@ code{background:var(--screen);padding:1px 5px;border-radius:3px;font-size:13px}
 .left::-webkit-scrollbar{width:6px}.left::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
 @media (max-width:600px){header h1{white-space:normal;font-size:17px}}
 
+.synbar{border-color:var(--teal);background:#16292a}.synbar p{margin:0 0 8px;font-size:14px}.synbar .row{gap:8px}
 .cvname .cverr{display:block;margin-top:4px;font-size:13px;font-weight:600;color:#ff6b6b;text-shadow:0 1px 3px rgba(0,0,0,.7)}
 .canvaswrap.l3 .cvname .cverr{color:#c40000;text-shadow:0 1px 2px rgba(255,255,255,.9)}
 </style><style id="bk-frac-style">
@@ -180,6 +181,7 @@ code{background:var(--screen);padding:1px 5px;border-radius:3px;font-size:13px}
   </div>
  </aside>
  <main class="right">
+  <div class="panel synbar" id="synBar" hidden><h2>Synthesewege</h2><p id="synTxt"></p><div class="row"><button class="btn pri" id="synTake" type="button">Übernehmen ▸</button><button class="btn" id="synBack" type="button">Zurück ohne Übernahme</button></div><div class="msg" id="synMsg"></div></div>
   <div class="panel">
     <div class="tools">
       <button class="btn sm on" id="m2" type="button">2D</button>
@@ -208,6 +210,7 @@ code{background:var(--screen);padding:1px 5px;border-radius:3px;font-size:13px}
   <div class="panel" id="resPanel">
     <h2>Strukturformel → Name</h2>
     <div id="res"></div>
+    <div class="row" style="margin-top:10px"><button class="btn sm" id="toSyn" type="button" title="Struktur als Zielprodukt in „Reaktionsgleichungen und Stöchiometrie → Synthesewege“ übernehmen">In Synthesewege übernehmen ▸</button></div>
   </div>
   <div class="panel">
     <h2>Sammlung</h2>
@@ -219,7 +222,7 @@ code{background:var(--screen);padding:1px 5px;border-radius:3px;font-size:13px}
 </div>
 <footer>
   <p class="footer-note">Werkzeug zum Bauen, Benennen und Umwandeln organischer Strukturformeln. Namen werden regelbasiert nach IUPAC erzeugt – bei Zweifeln im Nachschlagewerk prüfen.</p>
-  <p class="footer-credit">Bastian Baumgart · Molekülbaukasten und Nomenklaturhilfe V1.0 · <a href="#" id="vLink">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Molekülbaukasten und Nomenklaturhilfe V1.1 · <a href="#" id="vLink">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <div class="modal" id="mHelp" hidden><div class="mbox"><button class="x" data-close aria-label="Schließen">×</button>
@@ -229,6 +232,7 @@ code{background:var(--screen);padding:1px 5px;border-radius:3px;font-size:13px}
 <li><b>Umwandeln:</b> Name oder Formel oben links eingeben und „Zeichnen“ antippen. Formeln gibst du als Halbstrukturformel ein (<code>CH3-CH(OH)-CH3</code>) sein.</li>
 <li><b>Ergebnis:</b> Name, Stoffklasse, Summenformel, Masse, Halbstrukturformel stehen unter der Zeichenfläche und folgen jeder Änderung sofort.</li>
 <li><b>3D:</b> „3D“ über der Zeichenfläche zeigt die Struktur räumlich. Ziehen dreht das Molekül, „Rotieren“ lässt es kreisen.</li>
+<li><b>Synthesewege:</b> „In Synthesewege übernehmen“ (unter dem Namen) übergibt die gezeichnete Struktur als Zielprodukt an die Synthesewege im Werkzeug „Reaktionsgleichungen und Stöchiometrie“. Kommst du von dort hierher, hat sich der Baukasten in einem neuen Tab geöffnet; oben erscheint eine Leiste mit „Übernehmen“ (schickt die Struktur zurück und schließt den Tab) und „Zurück ohne Übernahme“.</li>
 <li><b>Sammlung:</b> Strukturen ablegen, später wieder laden oder als PDF ausgeben. „Zwischenstand“ speichert alles als Datei.</li>
 </ol>
 <p class="hint">Die Ziffern an der Struktur zeigen die Nummerierung der Hauptkette, auf die sich der Name bezieht.</p>
@@ -241,6 +245,8 @@ code{background:var(--screen);padding:1px 5px;border-radius:3px;font-size:13px}
 
 <div class="modal" id="mVer" hidden><div class="mbox"><button class="x" data-close aria-label="Schließen">×</button>
 <h2>Versionshinweise</h2>
+<h3>V1.1 · 26.11.2026</h3>
+<ul><li>Gezeichnete Strukturen lassen sich mit „In Synthesewege übernehmen“ als Zielprodukt oder Ausgangsstoff an die Synthesewege (Werkzeug „Reaktionsgleichungen und Stöchiometrie“) übergeben. Von dort aus öffnet sich der Baukasten in einem neuen Tab; „Übernehmen“ schickt die Struktur zurück und schließt den Tab, „Zurück ohne Übernahme“ schließt ihn nur. Ohne Browser-Speicher.</li></ul>
 <h3>V1.0 · 18.11.2026</h3>
 <ul><li>Erste Fassung von Molekülbaukasten und Nomenklaturhilfe.</li>
 <li>Bauen per Zeichnen mit Atomen, Ringen und Ketten; Valenzstrich- und Skelettformel.</li>
@@ -2214,7 +2220,7 @@ function draw(){
   const d=drawMol(mol,o);
   svg.innerHTML=d.inner+preview;
 }
-function update(){compute();draw();$('undoBtn').disabled=!undoS.length;$('redoBtn').disabled=!redoS.length;$('delSel').disabled=sel==null;}
+function update(){compute();draw();synState();$('undoBtn').disabled=!undoS.length;$('redoBtn').disabled=!redoS.length;$('delSel').disabled=sel==null;}
 /* ---------- Treffer ---------- */
 function hitAtom(p,skip){const R=Math.max(16,22*view.s);let b=-1,bd=R;mol.atoms.forEach((a,i)=>{if(i===skip)return;const d=Math.hypot(a.x-p.x,a.y-p.y);if(d<bd){bd=d;b=i;}});return b;}
 function hitBond(p){const R=Math.max(8,12*view.s);let b=-1,bd=R;mol.bonds.forEach((t,k)=>{const A=mol.atoms[t.a],B=mol.atoms[t.b];const dx=B.x-A.x,dy=B.y-A.y,l2=dx*dx+dy*dy||1;let u=((p.x-A.x)*dx+(p.y-A.y)*dy)/l2;u=Math.max(0,Math.min(1,u));const d=Math.hypot(A.x+u*dx-p.x,A.y+u*dy-p.y);if(d<bd){bd=d;b=k;}});return b;}
@@ -2467,10 +2473,36 @@ $('pdfGo').onclick=()=>{
      +(inf.classes.length?'<tr><td>Stoffklasse</td><td>'+inf.classes.map(esc).join(', ')+'</td></tr>':'')
      +'<tr><td>Summenformel</td><td>'+inf.formula+'</td></tr><tr><td>Molare Masse</td><td>'+inf.mass.toFixed(2).replace('.',',')+' g/mol</td></tr>'
      +(inf.cond?'<tr><td>Halbstruktur</td><td>'+(C2D.svg(m,inf.numbering,{color:'#000',size:13})||'')+'</td></tr>':'')+'</table></div></div>';});
-  h+='<div class="pfoot">Molekülbaukasten und Nomenklaturhilfe V1.0 · Bastian Baumgart · chemie.mail-baumgart.de · Lizenz CC BY-NC-SA 4.0</div>';
+  h+='<div class="pfoot">Molekülbaukasten und Nomenklaturhilfe V1.1 · Bastian Baumgart · chemie.mail-baumgart.de · Lizenz CC BY-NC-SA 4.0</div>';
   $('print').innerHTML=h;closeM('mPdf');setTimeout(()=>{try{window.print();}catch(e){}},60);
 };
+/* ---------- Übergabe an die Synthesewege ---------- */
+const SYN_URL='0-Reaktionsgleichungen.html';
+const SQ=(()=>{const o={};try{new URLSearchParams(location.search).forEach((v,k)=>{o[k]=v;});}catch(e){}return o;})();
+const synRet=SQ.ret==='syn',synRole=SQ.role==='start'?'start':'ziel';
+/* In neuem Tab aus den Synthesewegen geöffnet: Rückgabe per postMessage an genau dieses Fenster, dann Tab schließen (Leitfaden Abschnitt 7) */
+const synTab=(()=>{try{return synRet&&!!window.opener&&!window.opener.closed;}catch(e){return false;}})();
+const synTgt=location.protocol==='file:'?'*':location.origin;
+function synPost(d){if(!synTab)return false;try{window.opener.postMessage(Object.assign({type:'chemXfer',kind:'syn'},d),synTgt);window.close();return true;}catch(e){return false;}}
+function synOk(){return !info.empty&&!!info.name&&!info.err&&!!info.smiles;}
+function synState(){const ok=synOk();$('toSyn').disabled=!ok;if(synRet){$('synTake').disabled=!ok;$('synMsg').className='msg'+(ok?' ok':'');$('synMsg').textContent=ok?'Übernommen wird: '+info.name:(info.empty?'Noch keine Struktur gezeichnet.':'Die Struktur braucht einen gültigen Namen (ein zusammenhängendes Molekül).');}}
+function synGo(role){if(!synOk())return;
+  const p=new URLSearchParams();p.set('syn','1');p.set('role',role);p.set('smi',info.smiles);p.set('name',info.name);
+  if(role==='start'&&SQ.t)p.set('t',SQ.t);
+  if(synRet&&synPost({role:role,smi:info.smiles,name:info.name,t:SQ.t||''}))return;
+  location.href=SYN_URL+'?'+p.toString();}
+$('toSyn').onclick=()=>synGo(synRet?synRole:'ziel');
+if(synRet){
+  $('synBar').hidden=false;
+  $('synTxt').innerHTML=synRole==='start'?'Zeichne den <b>Ausgangsstoff</b>'+(SQ.t?' für die Synthese von <b>'+esc(SQ.t)+'</b>':'')+' und tippe dann auf „Als Ausgangsstoff übernehmen“.':'Zeichne das <b>Zielprodukt</b> und tippe dann auf „Als Zielprodukt übernehmen“.';
+  $('synTake').textContent=synRole==='start'?'Als Ausgangsstoff übernehmen ▸':'Als Zielprodukt übernehmen ▸';
+  $('synTake').onclick=()=>synGo(synRole);
+  $('synBack').onclick=()=>{if(synPost({cancel:true}))return;location.href=SYN_URL+(SQ.t?'?syn='+encodeURIComponent(SQ.t):'?syn=1');};
+  const pre=synRole==='start'?SQ.s:SQ.t;
+  if(pre){setTimeout(()=>{$('nameIn').value=pre;try{const r=nameToMol(pre);loadMol(r.mol);}catch(e){$('fIn').value=pre;try{doFormula();}catch(_){}}},0);}
+}
 /* ---------- Start ---------- */
+
 window.__mk={get scr(){const J=project3D(M3,o3());return J.X.slice(0,M3.n).map((x,i)=>[x,J.Y[i]]);},get mol(){return mol;},get info(){return info;},attach,doName,doFormula};
 update();fit();renderColl();showBuild();
 })();
