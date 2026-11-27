@@ -269,7 +269,7 @@ footer .footer-credit{margin-top:8px;color:var(--text-dim)}
         <div class="legend"><span><i style="border-color:var(--amber)"></i>CO₂</span><span><i style="border-color:var(--teal)"></i>CH₄</span><span><i style="border-color:var(--violet)"></i>N₂O</span></div>
       </div>
       <div id="tab-val" hidden>
-        <div class="row" style="margin-bottom:8px"><button class="btn small" id="btnCsv">Messwerte als CSV</button><button class="btn small" id="btnPdf1">Ausgabe als PDF</button></div>
+        <div class="row" style="margin-bottom:8px"><button class="btn small" id="btnCsv">Messwerte als CSV</button><button class="btn small" id="btnPdf1">Ausgabe als PDF</button><button class="btn small" id="btnGraph" title="Temperatur und Gasgehalte im Werkzeug „Graphen zeichnen und auswerten“ öffnen">Im Graphen auswerten ▸</button></div>
         <div class="tw"><table id="valTab"></table></div>
       </div>
       <div id="tab-runs" hidden>
@@ -282,7 +282,7 @@ footer .footer-credit{margin-top:8px;color:var(--text-dim)}
 
 <footer>
   <p class="footer-note">Simulierte Daten zu Lehrzwecken. Stark vereinfachtes Klimamodell mit gerundeten Modellwerten: weltweite Emissionen auf dem Stand von etwa 2023–2025, berechnet werden CO₂, CH₄ und N₂O, Aerosole und weitere Treibhausgase gehen nur pauschal ein; Rückkopplungen wie tauender Permafrost und die Herstellung der Fahrzeuge bleiben unberücksichtigt. Klimaschutzmaßnahmen wirken im Modell sofort und gleichbleibend. Kosten, Arbeitsplätze und Gewinne sind sehr grobe Schätzungen mit einheitlichen Richtwerten je Quelle. Die Ergebnisse zeigen Größenordnungen und sind keine Klimavorhersage.</p>
-  <p class="footer-credit">Bastian Baumgart · Treibhauseffekt V1.0 · <button id="btnVer">Versionshinweise</button> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Treibhauseffekt V1.1 · <button id="btnVer">Versionshinweise</button> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <div id="modals"></div>
@@ -294,7 +294,7 @@ const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const f=(x,d=0)=>x.toLocaleString('de-DE',{minimumFractionDigits:d,maximumFractionDigits:d});
 const sg=(x,d=2)=>{const r=+x.toFixed(d);return (r>0?'+':r<0?'−':'±')+f(Math.abs(r),d);};
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
-const VERSION='1.0', TITLE='Treibhauseffekt', URL_SELF='https://chemie.mail-baumgart.de/EP/EP-Treibhauseffekt.html';
+const VERSION='1.1', TITLE='Treibhauseffekt', URL_SELF='https://chemie.mail-baumgart.de/EP/EP-Treibhauseffekt.html';
 
 /* ===================== Modell ===================== */
 const T0=14.0, YEND=2100; // Zeitachse in Kalenderjahren: vorindustriell ab 1850, heute ab 2025, Ende 2100
@@ -854,9 +854,84 @@ function initUI(){
   $$('#tabs button').forEach(b=>b.addEventListener('click',()=>{$$('#tabs button').forEach(x=>x.classList.toggle('act',x===b));
     ['dia','src','val','runs'].forEach(t=>$('#tab-'+t).hidden=t!==b.dataset.t);refresh(true);}));
   $('#btnCsv').addEventListener('click',csv);
+  $('#btnGraph').addEventListener('click',()=>graphOpen($('#btnGraph'),'treibhauseffekt',graphDataTH,'Es liegen noch keine Messwerte vor – lass die Simulation laufen.'));
   window.addEventListener('resize',drawMain);
   newRun();requestAnimationFrame(loop);
 }
+
+/* ---------- Übergabe an „Graphen zeichnen und auswerten“ (Werkzeuge/0-Graphen.html) ----------
+   Neuer Tab bzw. Rückgabe an das aufrufende Werkzeug (?ret=graph), Daten per postMessage,
+   ohne Browser-Speicher (Leitfaden Abschnitt 7). */
+const GRAPH={win:null,fn:null,tgt:(/^https?:$/.test(location.protocol)&&location.origin&&location.origin!=='null')?location.origin:'*'};
+function graphRet(){
+  try{return new URLSearchParams(location.search).get('ret')==='graph'&&window.opener&&!window.opener.closed?window.opener:null;}catch(e){return null;}
+}
+function graphNote(btn,t){
+  let n=btn._gn;
+  if(!n||!n.isConnected){n=document.createElement('span');n.className='graph-note';n.style.cssText='margin-left:8px;font-size:12.5px;color:#9aa2a9';btn.insertAdjacentElement('afterend',n);btn._gn=n;}
+  n.textContent=t;clearTimeout(n._t);n._t=setTimeout(()=>{n.textContent='';},7000);
+}
+function graphOpen(btn,id,fn,emptyMsg){
+  let d=null;try{d=fn();}catch(e){d=null;}
+  if(!d){graphNote(btn,emptyMsg);return;}
+  const r=graphRet();
+  if(r){
+    try{r.postMessage(Object.assign({type:'graphData',src:id},d),GRAPH.tgt);}
+    catch(e){graphNote(btn,'Das Werkzeug ist nicht mehr erreichbar.');return;}
+    graphNote(btn,'Messwerte übertragen. Dieser Tab schließt sich …');
+    setTimeout(()=>{try{window.close();}catch(e){}setTimeout(()=>graphNote(btn,'Messwerte übertragen – du kannst diesen Tab schließen.'),300);},400);
+    return;
+  }
+  const w=window.open('../Werkzeuge/0-Graphen.html?from='+id,'_blank');
+  if(!w){graphNote(btn,'Bitte Pop-ups für diese Seite erlauben.');return;}
+  GRAPH.win=w;GRAPH.fn=fn;
+  graphNote(btn,'Das Werkzeug wurde in einem neuen Tab geöffnet. Deine Eingaben hier bleiben erhalten.');
+}
+window.addEventListener('message',e=>{
+  if(!GRAPH.win||e.source!==GRAPH.win)return;
+  if(GRAPH.tgt!=='*'&&e.origin!==GRAPH.tgt)return;
+  const m=e.data;if(!m||m.type!=='graphReady'||!GRAPH.fn)return;
+  let d=null;try{d=GRAPH.fn();}catch(err){d=null;}
+  if(d){try{GRAPH.win.postMessage(Object.assign({type:'graphData'},d),GRAPH.tgt);}catch(err){}}
+});
+/* Aufruf aus dem Werkzeug: Leiste unter der Kopfzeile, Knöpfe geben die Messwerte zurück */
+function graphRetSetup(id,fn,emptyMsg,where){
+  if(!graphRet())return;
+  [['bGraph','Messwerte übernehmen ▸'],['btnToGraph','Messwerte übernehmen ▸'],['btnGraph','Messwerte übernehmen ▸'],['btnRunsGraph','Messreihen übernehmen ▸']].forEach(([i,t])=>{const b=document.getElementById(i);if(b)b.textContent=t;});
+  const st=document.createElement('style');st.textContent='@media print{#graphRetBar{display:none!important}}';document.head.appendChild(st);
+  const bar=document.createElement('div');bar.id='graphRetBar';
+  bar.style.cssText='display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:10px 16px 0;padding:10px 14px;background:#20252a;border:1px solid #4fd1c5;border-radius:8px;color:#e7e4dd;font-size:14px;line-height:1.4';
+  const tx=document.createElement('span');tx.style.cssText='flex:1 1 320px';
+  tx.innerHTML='<b style="color:#4fd1c5">Du kommst vom Werkzeug „Graphen zeichnen und auswerten“.</b> Nimm hier Messwerte auf und tippe dann auf „Messwerte übernehmen ▸“ (hier oder '+where+'). Die Werte erscheinen im Werkzeug, dieser Tab schließt sich.';
+  const bs='font:inherit;font-size:14px;font-weight:600;border-radius:6px;padding:8px 14px;min-height:40px;cursor:pointer;';
+  const b1=document.createElement('button');b1.type='button';b1.id='graphRetTake';b1.textContent='Messwerte übernehmen ▸';b1.style.cssText=bs+'background:#4fd1c5;color:#14171a;border:1px solid #4fd1c5';
+  const b2=document.createElement('button');b2.type='button';b2.id='graphRetCancel';b2.textContent='Zurück ohne Übernahme';b2.style.cssText=bs+'background:transparent;color:#9aa2a9;border:1px solid #31383e';
+  b1.onclick=()=>graphOpen(b1,id,fn,emptyMsg);
+  b2.onclick=()=>{const r=graphRet();try{if(r)r.postMessage({type:'graphData',src:id,cancel:true},GRAPH.tgt);}catch(e){}setTimeout(()=>{try{window.close();}catch(e){}},150);};
+  const box=document.createElement('span');box.style.cssText='display:flex;flex-wrap:wrap;align-items:center;gap:8px';box.append(b1,b2);
+  bar.append(tx,box);
+  const h=document.querySelector('header');
+  if(h)h.insertAdjacentElement('afterend',bar);else document.body.insertBefore(bar,document.body.firstChild);
+}
+
+function graphDataTH(){
+  const L=runs.slice(); if(cur&&!L.includes(cur)&&cur.rec.length>1)L.push(cur);
+  if(!L.length)return null;
+  const series=[];
+  L.forEach(r=>{
+    const x=r.rec.map(q=>q.t);
+    series.push({name:'Temperatur, Lauf '+r.no,unit:'°C',x,y:r.rec.map(q=>T0+q.T)});
+    if(r===L[L.length-1]){
+      series.push({name:'CO₂, Lauf '+r.no,unit:'ppm',x,y:r.rec.map(q=>q.C)});
+      series.push({name:'CH₄, Lauf '+r.no,unit:'ppb',x,y:r.rec.map(q=>q.M),hidden:true});
+      series.push({name:'N₂O, Lauf '+r.no,unit:'ppb',x,y:r.rec.map(q=>q.N),hidden:true});
+      series.push({name:'Ausstoß netto, Lauf '+r.no,unit:'Gt CO₂-Äq./Jahr',x,y:r.rec.map(q=>q.eq),hidden:true});
+      series.push({name:'Kosten, Lauf '+r.no,unit:'Mrd €/Jahr',x,y:r.rec.map(q=>q.K||0),hidden:true});
+    }
+  });
+  return {title:'Treibhauseffekt',xName:'Jahr',xUnit:'',series};
+}
+graphRetSetup('treibhauseffekt',graphDataTH,'Es liegen noch keine Messwerte vor – lass die Simulation laufen.','im Tab „Messwerte“');
 </script>
 <script>
 "use strict";
@@ -1049,9 +1124,12 @@ const HELP=head('Anleitung')+`
 <li><b>Kosten:</b> Vom Zustand „Heute“ aus zeigt die Simulation, was die eingestellten klimafreundlichen Maßnahmen ungefähr kosten – pro Jahr und aufsummiert bis 2100, dazu wegfallende und neu entstehende Arbeitsplätze sowie wegfallende und neu entstehende Gewinne der Branchen (Grundlagen, Thema 10).</li>
 <li><b>Diagramm:</b> Verlauf von Temperatur oder Gasgehalten; gestrichelt die Prognose, gepunktet der Vergleich „alle Quellen wie heute“.</li>
 <li><b>Quellen:</b> Ausstoß jeder Quelle und ihr Beitrag zur Temperatur im Jahr 2100.</li>
-<li><b>Messwerte, Läufe:</b> Tabelle (auch als CSV) und „Ausgabe als PDF“.</li></ul>
+<li><b>Messwerte, Läufe:</b> Tabelle (auch als CSV), „Ausgabe als PDF“ und „Im Graphen auswerten“ (öffnet Temperatur und CO₂ aller Läufe im Werkzeug „Graphen zeichnen und auswerten“).</li></ul>
 <p>Es werden keine Daten gespeichert oder übertragen.</p>`;
 const VERS=head('Versionshinweise')+`
+<h3>Version 1.1 · 26.11.2026</h3>
+<ul><li>Neuer Knopf „Im Graphen auswerten“ im Tab „Messwerte“: übergibt Temperatur, CO₂ und weitere Größen der Läufe an das Werkzeug „Graphen zeichnen und auswerten“ (neuer Tab, die Simulation bleibt geöffnet, nichts wird gespeichert).</li>
+<li>Wird die Simulation aus dem Werkzeug „Graphen zeichnen und auswerten“ geöffnet, erscheint unter der Kopfzeile eine Leiste mit „Messwerte übernehmen ▸“: Die Messwerte gehen zurück an das Werkzeug, der Tab der Simulation schließt sich.</li></ul>
 <h3>Version 1.0 · 10.11.2026</h3>
 <ul><li>Erste Fassung der Simulation „Treibhauseffekt“.</li>
 <li>Ausgangszustand „Heute (2025)“ als Standard oder „Vorindustrieller Zustand“ (nur natürlicher Treibhauseffekt, 14,0 °C).</li>

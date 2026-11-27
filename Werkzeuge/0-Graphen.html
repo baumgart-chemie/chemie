@@ -1,0 +1,1964 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Graphen zeichnen und auswerten – Chemieseiten</title><style>
+:root{--bg:#14171a;--panel:#1b1f23;--panel-alt:#20252a;--line:#31383e;--line-soft:#262c31;--text:#e7e4dd;--text-dim:#9aa2a9;--text-faint:#5f6870;--amber:#ffb454;--teal:#4fd1c5;--good:#7fd68a;--danger:#e4785b;--screen:#0e1113;}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
+a{color:var(--teal)}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;padding:10px 20px;border-bottom:1px solid var(--line);background:var(--panel)}
+header .back{color:var(--text-dim);text-decoration:none;font-size:14px;padding:6px 4px}
+header h1{margin:0;font-size:19px;white-space:nowrap}
+header .tag{flex:1 1 160px;color:var(--text-dim);font-size:13px}
+header .hl{font-size:13px;color:var(--teal);background:none;border:0;padding:6px 4px;cursor:pointer;text-decoration:underline}
+.qrbtn{display:flex;align-items:center;gap:7px;background:var(--panel-alt);border:1px solid var(--line);border-radius:4px;padding:2px 8px 2px 2px;color:var(--text-dim);font-size:10px;line-height:1.2;max-width:170px;text-align:left;cursor:pointer}
+.qrbtn .q{width:30px;height:30px;flex:none;background:#fff;border-radius:2px;overflow:hidden}
+.qrbtn .q svg{width:30px;height:30px;display:block}
+.status{font-size:12px;color:var(--text-dim);padding:3px 9px;border:1px solid var(--line);border-radius:12px;white-space:nowrap}
+.status.ok{color:var(--good);border-color:#3a5a40}.status.warn{color:var(--danger);border-color:#6b3a2e}
+@media (max-width:600px){.qrbtn span.t{display:none}header{padding:8px 12px}.status{display:none}}
+.grid{display:grid;grid-template-columns:330px minmax(0,1fr);gap:16px;padding:16px 20px;align-items:start}
+.left{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto;display:flex;flex-direction:column;gap:12px;padding-right:2px}
+.right{display:flex;flex-direction:column;gap:14px;min-width:0}
+@media (max-width:920px){.grid{grid-template-columns:1fr;padding:12px}.left{position:static;max-height:none;overflow:visible}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.panel h2{margin:0 0 8px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);font-weight:600}
+.panel h3{margin:10px 0 5px;font-size:12px;color:var(--text-dim);font-weight:600}
+button,input,textarea,select{font:inherit;color:var(--text)}
+.btn{background:var(--panel-alt);border:1px solid var(--line);border-radius:6px;padding:9px 12px;min-height:42px;cursor:pointer;color:var(--text)}
+.btn:hover{border-color:var(--text-faint)}
+.btn.pri{background:var(--amber);border-color:var(--amber);color:#1a1405;font-weight:600}
+.btn.sm{min-height:36px;padding:6px 10px;font-size:13px}
+.btn.on{border-color:var(--teal);color:var(--teal);background:#1a2a2b}
+.btn:disabled{opacity:.4;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:6px}
+.row>.btn{flex:1 1 auto}
+input[type=text],input[type=number]{width:100%;background:var(--screen);border:1px solid var(--line);border-radius:6px;padding:9px 10px;min-height:42px}
+input:focus,button:focus-visible{outline:2px solid var(--teal);outline-offset:1px}
+.inrow{display:flex;gap:6px}.inrow input{flex:1;min-width:0}
+.msg{font-size:12.5px;margin-top:6px;color:var(--text-dim)}.msg.err{color:var(--danger)}.msg.ok{color:var(--good)}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.chip{background:var(--screen);border:1px solid var(--line);border-radius:14px;padding:4px 10px;font-size:12px;color:var(--text-dim);cursor:pointer}
+.chip.cls{cursor:default;color:var(--teal);border-color:#2b5a56}
+.pal{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.pal .btn{padding:6px 2px;font-weight:600}
+.grp{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.grp .btn{padding:6px 2px;font-size:13px}
+.hint{font-size:12px;color:var(--text-faint);margin-top:6px}
+.opt{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:14px;cursor:pointer}
+.opt input{width:20px;height:20px;accent-color:var(--teal)}
+.canvaswrap{background:var(--screen);border:1px solid var(--line);border-radius:6px;overflow:hidden;position:relative}
+#cv{display:block;width:100%;height:min(60vh,560px);min-height:340px;touch-action:none;user-select:none;-webkit-user-select:none;cursor:crosshair}
+.canvaswrap.l3{background:radial-gradient(circle at 50% 40%,#f7f9fb,#c3ccd4)}
+.tools{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.tools .btn{flex:0 1 auto}
+.tools .sp{flex:1}
+.resname{font-size:24px;font-weight:600;color:var(--amber);word-break:break-word;margin:2px 0}
+.resalt{color:var(--text-dim);font-size:14px}
+.rtab{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
+.rtab td{padding:6px 4px;border-top:1px solid var(--line-soft);vertical-align:top}
+.rtab td:first-child{color:var(--text-dim);width:130px}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;word-break:break-all}
+.coll{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-top:10px}
+.card{background:var(--screen);border:1px solid var(--line);border-radius:6px;padding:8px;display:flex;flex-direction:column;gap:5px}
+.card .th{height:100px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.card .nm{font-size:13px;color:var(--text);min-height:34px;word-break:break-word}
+.card .bt{display:flex;gap:5px}.card .bt .btn{flex:1}
+footer{padding:16px 28px 30px;color:var(--text-faint);font-size:11.5px;border-top:1px solid var(--line-soft);margin-top:10px;}
+footer p{margin:0;}
+footer a{color:var(--text-dim);text-decoration:none;border-bottom:1px solid var(--line);}
+footer a:hover{color:var(--text);border-bottom-color:var(--text-dim);}
+footer .footer-credit{margin-top:8px;color:var(--text-dim);}
+@media (max-width:600px){footer{padding:16px 16px 30px;}}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:50;padding:12px}
+.mbox{background:var(--panel);border:1px solid var(--line);border-radius:10px;max-width:560px;width:100%;max-height:92vh;overflow:auto;padding:18px 20px;position:relative}
+.mbox.wide{max-width:860px}
+.mbox h2{margin:0 0 10px;font-size:18px;color:var(--amber)}
+.mbox h3{font-size:15px;margin:14px 0 4px}
+.mbox p,.mbox li{font-size:14.5px}
+.mbox .x{position:absolute;top:8px;right:10px;background:none;border:0;font-size:26px;line-height:1;color:var(--text-dim);cursor:pointer;padding:6px 10px}
+.mbox table{border-collapse:collapse;width:100%;font-size:13.5px;margin:8px 0}
+.mbox th,.mbox td{border:1px solid var(--line);padding:5px 8px;text-align:left}
+.mbox th{background:var(--panel-alt);color:var(--text-dim);font-weight:600}
+.mfoot{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:14px}
+.qrbig{background:#fff;padding:14px;border-radius:6px;width:min(300px,80vw);margin:8px auto}.qrbig svg{width:100%;height:auto;display:block}
+.field{display:block;margin:8px 0}.field span{display:block;font-size:12.5px;color:var(--text-dim);margin-bottom:3px}
+.sel{display:flex;flex-direction:column;gap:2px;margin:6px 0 10px}
+code{background:var(--screen);padding:1px 5px;border-radius:3px;font-size:13px}
+#print{display:none}
+@page{size:A4;margin:14mm}
+@media print{
+  body>*:not(#print){display:none!important}
+  body{background:#fff;color:#000}
+  #print{display:block;color:#000;font:11pt/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  #print h1{font-size:17pt;margin:0 0 4px}
+  #print .pmeta{font-size:10pt;color:#333;border-bottom:1px solid #999;padding-bottom:6px;margin-bottom:10px}
+  #print .pitem{break-inside:avoid;border:1px solid #bbb;border-radius:4px;padding:8px 10px;margin-bottom:10px;display:flex;gap:14px;align-items:center}
+  #print .pitem .pm{flex:0 0 auto;background:#fff}
+  #print .pitem .pt{flex:1;font-size:10pt}
+  #print .pn{font-size:13pt;font-weight:600}
+  #print table{border-collapse:collapse;font-size:9.5pt;margin-top:4px}
+  #print td{padding:1px 8px 1px 0;vertical-align:top}#print td:first-child{color:#444}
+  #print .pfoot{margin-top:12px;border-top:1px solid #999;padding-top:5px;font-size:8.5pt;color:#444}
+}
+
+
+/* ---- Graphen-Seite ---- */
+select,textarea{background:var(--screen);border:1px solid var(--line);border-radius:6px;padding:9px 10px;min-height:42px;width:100%;color:var(--text)}
+textarea{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;font-size:13px;resize:vertical}
+select:focus,textarea:focus{outline:2px solid var(--teal);outline-offset:1px}
+.grp2{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.grp2 .btn{padding:6px 6px;font-size:13px;min-height:42px}
+.tabs{display:flex;gap:6px}
+.tabbtn{background:var(--panel-alt);border:1px solid var(--line);border-radius:6px 6px 0 0;padding:9px 18px;cursor:pointer;color:var(--text-dim)}
+.tabbtn.active{color:var(--teal);border-color:var(--teal);background:var(--panel)}
+.tabpanel{display:flex;flex-direction:column;gap:14px}
+.tabpanel[hidden]{display:none}
+#cv{height:min(62vh,580px);min-height:360px;cursor:crosshair;touch-action:pan-y}
+#cv.draw{touch-action:none}
+.legend{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.lg{display:inline-flex;align-items:center;gap:6px;background:var(--screen);border:1px solid var(--line);border-radius:14px;padding:4px 10px;font-size:13px;color:var(--text);cursor:pointer}
+.lg.act{border-color:var(--teal);color:var(--teal)}
+.lg i{width:12px;height:12px;border-radius:50%;display:inline-block;flex:none}
+.lg.off{opacity:.45}
+.readout{font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;font-size:13px;color:var(--amber);margin-top:8px;min-height:20px}
+.obj{background:var(--screen);border:1px solid var(--line);border-left:4px solid var(--amber);border-radius:6px;padding:10px 12px;margin-bottom:10px;position:relative}
+.obj h3{margin:0 0 4px;font-size:14px;color:var(--text)}
+.obj h3 small{color:var(--text-dim);font-weight:400}
+.obj .rl{font-size:14px;margin:2px 0}
+.obj .rl b{color:var(--amber);font-weight:600}
+.obj .del{position:absolute;top:4px;right:6px;background:none;border:0;color:var(--text-dim);font-size:22px;line-height:1;cursor:pointer;padding:4px 8px}
+.obj .par{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;margin:6px 0}
+.obj .par label{font-size:12px;color:var(--text-dim);display:flex;flex-direction:column;gap:2px}
+.obj .par input{width:110px;min-height:36px;padding:5px 8px}
+.obj .par input.wide{width:260px}
+.obj .par .btn{min-height:36px;padding:5px 10px;font-size:13px}
+.obj .note{font-size:12.5px;color:var(--text-dim);margin-top:4px}
+.obj table{border-collapse:collapse;font-size:13.5px;margin:6px 0}
+.obj td,.obj th{border:1px solid var(--line);padding:4px 9px;text-align:left}
+.obj th{background:var(--panel-alt);color:var(--text-dim);font-weight:600}
+.obj tr.best td{color:var(--good);font-weight:600}
+.obj .err{color:var(--danger)}
+.tscroll{max-height:380px;overflow:auto;border:1px solid var(--line);border-radius:6px}
+table.gt{border-collapse:collapse;width:100%}
+table.gt th{position:sticky;top:0;background:var(--panel-alt);color:var(--text-dim);font-size:12.5px;padding:6px 8px;text-align:left;z-index:1}
+table.gt td{border-top:1px solid var(--line-soft);padding:2px 4px}
+table.gt td.n{color:var(--text-faint);width:36px;text-align:right;padding-right:8px;font-size:12px}
+table.gt input{min-height:34px;padding:4px 8px;border-color:transparent;background:transparent;font-family:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace}
+table.gt input:hover{border-color:var(--line)}
+table.gt input.bad{border-color:var(--danger);color:var(--danger)}
+table.gt .rm{background:none;border:0;color:var(--text-faint);cursor:pointer;font-size:18px;padding:2px 8px}
+.serrow{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;align-items:end;margin-top:6px}
+.serrow .field{margin:0}
+.srcmsg{font-size:13px}
+.xferbar{border-color:var(--teal);background:#16292a}
+#print .pchart{width:100%;max-width:100%;height:auto;border:1px solid #bbb}
+#print h2{font-size:12.5pt;margin:12px 0 4px;break-after:avoid}
+#print .pobj{break-inside:avoid;border:1px solid #bbb;border-left:3px solid #c26a00;border-radius:3px;padding:5px 9px;margin:6px 0;font-size:10pt}
+#print .pobj b.t{display:block;font-size:10.5pt}
+#print table.pt{border-collapse:collapse;font-size:9.5pt;margin:4px 0}
+#print table.pt th,#print table.pt td{border:1px solid #999;padding:2px 7px;text-align:right}
+#print table.pt th{background:#eee}
+#print .ptb{break-inside:avoid;margin-bottom:8px}
+#print .ptb.long{break-inside:auto}
+#print .ptb.long tr{break-inside:avoid}
+#print .pmeta{margin-bottom:8px}
+@media (max-width:600px){#cv{min-height:300px}.grp2{grid-template-columns:1fr}}
+</style><style id="bk-frac-style">
+/* Brüche wie im Chemie-Rechner */
+.bkfrac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 .25em;line-height:1.25;text-align:center}
+.bkfrac>.bkn{border-bottom:1.2px solid currentColor;padding:0 .25em .08em;white-space:nowrap}
+.bkfrac>.bkd{padding:.08em .25em 0;white-space:nowrap}
+</style>
+</head><body>
+<header>
+  <a class="back" href="../index.html">← Zur Übersicht</a>
+  <h1>Graphen zeichnen und auswerten</h1>
+  <div class="tag">Messwerte darstellen, Kurven anpassen, Steigungen und Flächen bestimmen</div>
+  <button class="hl" id="helpLink" type="button">Anleitung</button>
+  <button class="qrbtn" id="qrBtn" type="button" aria-label="QR-Code vergrößern"><span class="q" id="qrSmall"></span><span class="t">Auf dem Mobilgerät öffnen – QR-Code antippen zum Vergrößern</span></button>
+</header>
+<div class="grid">
+ <aside class="left">
+  <div class="panel">
+    <button class="btn" id="gBtn" type="button" style="width:100%;text-align:left" aria-expanded="false">▸ Grundlagen</button>
+    <div id="gList" hidden class="sel" style="margin-bottom:0"></div>
+  </div>
+
+  <div class="panel" id="srcBar" hidden>
+    <h2>Übernahme</h2>
+    <div id="srcInfo" class="msg"></div>
+    <div class="row" style="margin-top:6px"><button class="btn sm" id="srcAgain" type="button">Messwerte neu holen</button></div>
+  </div>
+
+  <div class="panel">
+    <h2>Messwerte aus einer Simulation</h2>
+    <label class="field"><span>Simulation</span>
+      <select id="jumpSel"><option value="">– wählen –</option>
+        <optgroup label="Einführungsphase"><option value="treibhauseffekt">Treibhauseffekt</option></optgroup>
+        <optgroup label="Q1"><option value="kalorimetrie">Kalorimetrie</option><option value="reaktionsgeschwindigkeit">Reaktionsgeschwindigkeit</option><option value="gleichgewicht">Chemisches Gleichgewicht</option></optgroup>
+        <optgroup label="Q2"><option value="titration">Titration</option></optgroup>
+      </select></label>
+    <div class="row"><button class="btn sm" id="jumpGo" type="button" disabled>Simulation öffnen ▸</button></div>
+    <div id="jumpInfo" class="msg">Öffnet die Simulation in einem neuen Tab. Dort Messwerte aufnehmen und „Messwerte übernehmen ▸“ tippen – die Werte erscheinen hier (je nach „Beim Laden“ unter „Daten“ ersetzt oder ergänzt).</div>
+  </div>
+
+  <div class="panel">
+    <h2>Daten</h2>
+    <button class="btn pri" id="bEnter" type="button" style="width:100%;margin-bottom:8px">Werte eingeben ▸</button>
+    <div class="row">
+      <button class="btn sm" id="bFile" type="button">CSV-Datei laden</button>
+      <button class="btn sm" id="bPaste" type="button">Tabelle einfügen</button>
+    </div>
+    <input type="file" id="fileCsv" accept=".csv,.txt,.tsv,text/csv,text/plain" hidden>
+    <label class="field"><span>Beim Laden</span>
+      <select id="loadMode"><option value="replace">vorhandene Daten ersetzen</option><option value="add">zu vorhandenen Daten hinzufügen</option></select></label>
+    <label class="field"><span>Beispieldaten</span>
+      <select id="demoSel"><option value="">– wählen –</option><option value="zerfall">Konzentration c(t), Reaktion 1. Ordnung</option><option value="titration">Titrationskurve HCl mit NaOH</option><option value="arrh">Geschwindigkeitskonstante k(T)</option></select></label>
+    <div class="row" style="margin-top:6px">
+      <button class="btn sm" id="bNew" type="button">Neue Reihe</button>
+      <button class="btn sm" id="bClear" type="button">Alles löschen</button>
+    </div>
+    <label class="opt"><input type="checkbox" id="setPts"> Punkte im Diagramm setzen</label>
+    <label class="opt" id="penRow" hidden><input type="checkbox" id="penOnly" checked> Nur mit Stift</label>
+    <div class="hint" id="setHint" hidden>Tippe ins Diagramm, um einen Punkt der gewählten Reihe zu setzen. Ein Tipp auf einen vorhandenen Punkt löscht ihn.</div>
+  </div>
+
+  <div class="panel">
+    <h2>Achsen und Darstellung</h2>
+    <div class="inrow">
+      <label class="field" style="flex:2"><span>x-Größe</span><input type="text" id="xName" autocomplete="off"></label>
+      <label class="field" style="flex:1"><span>Einheit</span><input type="text" id="xUnit" autocomplete="off"></label>
+    </div>
+    <div class="inrow">
+      <label class="field" style="flex:1"><span>x darstellen als</span><select id="tx"></select></label>
+      <label class="field" style="flex:1"><span>y darstellen als</span><select id="ty"></select></label>
+    </div>
+    <label class="opt" id="celRow" hidden><input type="checkbox" id="celOn" checked> x in °C, für 1/x in Kelvin umrechnen</label>
+    <div class="row" id="linRow">
+      <button class="btn sm" data-lin="none" type="button">Messwerte</button>
+      <button class="btn sm" data-lin="ln" type="button">ln y – x</button>
+      <button class="btn sm" data-lin="inv" type="button">1/y – x</button>
+      <button class="btn sm" data-lin="arr" type="button">ln y – 1/x</button>
+    </div>
+    <label class="opt"><input type="checkbox" id="oGrid" checked> Raster</label>
+    <label class="opt"><input type="checkbox" id="oCross" checked> Ablesen mit Fadenkreuz</label>
+    <label class="opt"><input type="checkbox" id="oAuto" checked> Achsenbereich automatisch</label>
+    <div id="rangeBox" hidden>
+      <div class="inrow"><label class="field"><span>x von</span><input type="text" id="rxmin"></label><label class="field"><span>x bis</span><input type="text" id="rxmax"></label></div>
+      <div class="inrow"><label class="field"><span>y links von</span><input type="text" id="rymin"></label><label class="field"><span>y links bis</span><input type="text" id="rymax"></label></div>
+      <div class="inrow"><label class="field"><span>y rechts von</span><input type="text" id="ry2min"></label><label class="field"><span>y rechts bis</span><input type="text" id="ry2max"></label></div>
+    </div>
+    <h3>Achsenbeschriftung</h3>
+    <label class="field"><span>x-Achse</span><input type="text" id="lblX" maxlength="80" autocomplete="off"></label>
+    <label class="field"><span>y-Achse links</span><input type="text" id="lblYL" maxlength="80" autocomplete="off"></label>
+    <label class="field"><span>y-Achse rechts</span><input type="text" id="lblYR" maxlength="80" autocomplete="off"></label>
+    <div class="row"><button class="btn sm" id="lblAuto" type="button">Beschriftung automatisch</button></div>
+    <div class="hint">Leeres Feld: Die Beschriftung entsteht automatisch aus Größe und Einheit (grau angezeigt). Eigene Beschriftungen gelten auch im PDF.</div>
+  </div>
+
+  <div class="panel">
+    <h2>Auswertung</h2>
+    <label class="field"><span>Auswerten für Reihe</span><select id="actSel"></select></label>
+    <div class="grp2">
+      <button class="btn sm" data-add="fit" type="button">Ausgleichsgerade</button>
+      <button class="btn sm" data-add="avg" type="button">Steigung zwischen zwei Stellen</button>
+      <button class="btn sm" data-add="inst" type="button">Steigung an einer Stelle</button>
+      <button class="btn sm" data-add="area" type="button">Fläche unter der Kurve</button>
+      <button class="btn sm" data-add="steep" type="button">Steilster Punkt</button>
+      <button class="btn sm" data-add="ext" type="button">Maximum und Minimum</button>
+      <button class="btn sm" data-add="order" type="button">Reaktionsordnung testen</button>
+      <button class="btn sm" data-add="func" type="button">Funktion einzeichnen</button>
+    </div>
+    <label class="field"><span>Ausgleichskurve</span>
+      <div class="inrow"><select id="curveSel"></select><button class="btn sm" id="bCurve" type="button">Anpassen</button></div></label>
+    <label class="opt"><input type="checkbox" id="oDeriv"> Steigungskurve einblenden</label>
+    <div class="hint" id="derivHint"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Laden/Speichern</h2>
+    <div class="row">
+      <button class="btn sm" id="bCsv" type="button">Daten als CSV</button>
+      <button class="btn sm pri" id="pdfBtn" type="button">Ausgabe als PDF</button>
+    </div>
+    <div class="row" style="margin-top:6px">
+      <button class="btn sm" id="bSave" type="button">Zwischenstand speichern</button>
+      <button class="btn sm" id="bLoad" type="button">Zwischenstand laden</button>
+    </div>
+    <input type="file" id="fileState" accept=".json,application/json" hidden>
+    <div class="msg" id="fileMsg"></div>
+  </div>
+ </aside>
+
+ <main class="right">
+  <div class="tabs" role="tablist">
+    <button class="tabbtn active" data-tab="chart" type="button" role="tab">Diagramm</button>
+    <button class="tabbtn" data-tab="table" type="button" role="tab">Tabelle</button>
+  </div>
+  <div id="tab-chart" class="tabpanel">
+    <div class="panel">
+      <div class="legend" id="legend"></div>
+      <div class="canvaswrap"><canvas id="cv" aria-label="Diagramm"></canvas></div>
+      <div class="readout" id="readout">Fahre mit Maus oder Stift über das Diagramm, um Werte abzulesen.</div>
+      <div class="hint" id="penHint" hidden>Stift-Modus: Nur Stifteingaben setzen und löschen Punkte (Finger und Maus werden ignoriert).</div>
+    </div>
+    <div class="panel">
+      <h2>Auswertungen</h2>
+      <div id="objs"><div class="hint">Noch keine Auswertung. Wähle links ein Verfahren; das Ergebnis erscheint hier und im Diagramm.</div></div>
+    </div>
+  </div>
+  <div id="tab-table" class="tabpanel" hidden>
+    <div class="panel">
+      <h2>Messreihen</h2>
+      <div class="legend" id="chips"></div>
+      <div id="serBox"></div>
+    </div>
+    <div class="panel">
+      <h2>Werte der gewählten Reihe</h2>
+      <div class="tscroll"><table class="gt" id="gt"></table></div>
+      <div class="row" style="margin-top:8px"><button class="btn sm" id="bRow" type="button">Zeile hinzufügen</button><button class="btn sm" id="bSort" type="button">Nach x sortieren</button></div>
+      <div class="hint">Eingabe mit der Eingabetaste: von x zu y, von y in die nächste Zeile; in der letzten Zeile entsteht automatisch eine neue. Bei gleichmäßigen x-Abständen ist der nächste x-Wert schon eingetragen und markiert: Eingabetaste übernimmt ihn, Tippen ersetzt ihn.</div>
+      <div id="stats" class="hint" style="margin-top:8px"></div>
+    </div>
+  </div>
+ </main>
+</div>
+<footer>
+  <p class="footer-note">Werkzeug zum Zeichnen und Auswerten von Graphen. Ausgleichsrechnungen und Steigungen beruhen auf den eingegebenen Werten (Näherungen); die Ergebnisse ersetzen keine Fehlerbetrachtung.</p>
+  <p class="footer-credit">Bastian Baumgart · Graphen zeichnen und auswerten V1.0 · <a href="#" id="vLink">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+</footer>
+
+<div class="modal" id="mHelp" hidden><div class="mbox"><button class="x" data-close aria-label="Schließen">×</button>
+<h2>Anleitung</h2>
+<ol>
+<li><b>Daten holen:</b> Unter „Messwerte aus einer Simulation“ wählst du eine Simulation und öffnest sie mit „Simulation öffnen ▸“ in einem neuen Tab. Dort nimmst du Messwerte auf und tippst auf „Messwerte übernehmen ▸“; die Werte kommen hierher zurück, der Tab der Simulation schließt sich, und deine Daten hier bleiben erhalten. Umgekehrt gibt es in den Simulationen Kalorimetrie, Reaktionsgeschwindigkeit, Titration, Chemisches Gleichgewicht und Treibhauseffekt gibt es den Knopf „Im Graphen auswerten“. Er öffnet dieses Werkzeug in einem neuen Tab und übergibt die Messwerte; die Simulation bleibt mit allen Eingaben geöffnet. Zusätzlich lassen sich CSV-Dateien laden, Tabellen aus der Zwischenablage einfügen (Spalten durch Tabulator, Semikolon oder Leerzeichen, Dezimalkomma oder -punkt) und Werte von Hand eintragen. Die erste Spalte ist x, jede weitere eine eigene Reihe.</li>
+<li><b>Achsenbeschriftung:</b> Unter „Achsen und Darstellung“ lassen sich die Beschriftungen der x-Achse und beider y-Achsen frei eintragen, z. B. „Konzentration c(Ethanol) in mol/L“. Ein leeres Feld bedeutet automatische Beschriftung aus Größe und Einheit.</li>
+<li><b>Werte eingeben:</b> „Werte eingeben ▸“ unter „Daten“ öffnet die Tabelle mit einer leeren Zeile (gibt es noch keine Reihe, wird eine angelegt). Die Eingabetaste springt von x zu y und weiter in die nächste Zeile; Name und Einheit der Reihe stehen über der Tabelle.</li>
+<li><b>Zeichnen:</b> Im Tab „Tabelle“ lassen sich Reihen benennen, Werte ändern, Linien (gerade oder glatt) und die rechte y-Achse für Reihen mit anderer Einheit wählen. Mit „Punkte im Diagramm setzen“ trägst du Punkte direkt ein (standardmäßig nur mit Stift).</li>
+<li><b>Auswerten:</b> Wähle links die Reihe und ein Verfahren. Jede Auswertung erscheint im Diagramm und mit Ergebnis unter dem Diagramm. Stellen gibst du als Zahl ein oder tippst mit „Im Diagramm wählen“ ins Diagramm.</li>
+<li><b>Linearisieren:</b> Mit „x darstellen als“ und „y darstellen als“ (ln, lg, 1/…) lassen sich Messwerte in Geraden überführen, z. B. ln c gegen t für Reaktionen 1. Ordnung oder ln k gegen 1/T für die Aktivierungsenergie. „Reaktionsordnung testen“ vergleicht die drei Darstellungen.</li>
+<li><b>Ausgabe:</b> „Ausgabe als PDF“ erzeugt Diagramm, Auswertungen und Wertetabellen; „Zwischenstand speichern“ legt alles als Datei ab. Es wird nichts im Browser gespeichert oder übertragen.</li>
+</ol>
+<p class="hint">Hinweis: Alle Rechnungen laufen in deinem Browser. Die Ergebnisse sind Näherungen aus den eingegebenen Werten.</p>
+</div></div>
+
+<div class="modal" id="mGrund" hidden><div class="mbox wide"><button class="x" data-close aria-label="Schließen">×</button>
+<h2 id="gTitle"></h2><div id="gBody"></div>
+<div class="mfoot"><button class="btn sm" id="gPrev" type="button">← Zurück</button><span class="hint" id="gCnt"></span><button class="btn sm" id="gNext" type="button">Weiter →</button></div>
+</div></div>
+
+<div class="modal" id="mVer" hidden><div class="mbox"><button class="x" data-close aria-label="Schließen">×</button>
+<h2>Versionshinweise</h2>
+<h3>V1.0 · 26.11.2026</h3>
+<ul><li>Erste Fassung von „Graphen zeichnen und auswerten“.</li>
+<li>Messreihen zeichnen, mit zwei y-Achsen, Linien und Linearisierung (ln, lg, 1/…).</li>
+<li>Übernahme von Messwerten aus Kalorimetrie, Reaktionsgeschwindigkeit, Titration, Chemischem Gleichgewicht und Treibhauseffekt sowie Laden von CSV-Dateien und Einfügen von Tabellen.</li>
+<li>Ausgleichsgerade, Ausgleichskurven, Steigung zwischen zwei Stellen und an einer Stelle, Fläche, steilster Punkt, Extremwerte, Reaktionsordnung und Aktivierungsenergie.</li>
+<li>PDF-Ausgabe, Zwischenstand als Datei (Bereich „Laden/Speichern“).</li>
+<li>Eigene Achsenbeschriftung für x-Achse und beide y-Achsen.</li>
+<li>Knopf „Werte eingeben“ unter „Daten“; Eingabetaste springt in der Tabelle weiter.</li>
+<li>Auswahlmenü „Messwerte aus einer Simulation“: öffnet eine Simulation in einem neuen Tab; die dort aufgenommenen Messwerte kommen per „Messwerte übernehmen“ zurück (ohne Speichern im Browser).</li></ul>
+</div></div>
+
+<div class="modal" id="mQr" hidden><div class="mbox" style="text-align:center"><button class="x" data-close aria-label="Schließen">×</button>
+<h2>Auf dem Mobilgerät öffnen</h2><div class="qrbig" id="qrBig"></div>
+<p class="mono" id="qrUrl" style="font-size:13px"></p>
+<p class="hint">Mit der Kamera scannen und den Link öffnen.</p>
+<button class="btn" data-close type="button">Schließen</button></div></div>
+
+<div class="modal" id="mPaste" hidden><div class="mbox"><button class="x" data-close aria-label="Schließen">×</button>
+<h2>Tabelle einfügen</h2>
+<p class="hint" style="margin-top:0">Füge Werte aus einer Tabellenkalkulation oder Textdatei ein. Erste Spalte: x, weitere Spalten: je eine Reihe. Eine Kopfzeile wie „t in s“ oder „c (mol/L)“ wird als Name und Einheit erkannt.</p>
+<textarea id="pasteTa" rows="9" spellcheck="false" placeholder="t in s;c in mol/L&#10;0;0,100&#10;30;0,079&#10;60;0,062"></textarea>
+<div class="msg" id="pasteMsg"></div>
+<div class="row" style="margin-top:10px"><button class="btn pri" id="pasteGo" type="button">Übernehmen</button><button class="btn" data-close type="button">Abbrechen</button></div>
+</div></div>
+
+<div class="modal" id="mPdf" hidden><div class="mbox"><button class="x" data-close aria-label="Schließen">×</button>
+<h2>Auswertung als PDF</h2>
+<h3>Auswahl</h3><div class="sel" id="pdfSel"></div>
+<h3>Angaben (optional)</h3>
+<div class="inrow"><label class="field" style="flex:1"><span>Name</span><input type="text" id="pName" autocomplete="off"></label>
+<label class="field" style="flex:1"><span>Kurs</span><input type="text" id="pKurs" autocomplete="off"></label></div>
+<p class="hint">Das PDF enthält das Diagramm (hell für den Druck), alle Auswertungen mit Ergebnissen und die Wertetabellen der gewählten Reihen. Die Angaben erscheinen nur im Ausdruck und werden nicht gespeichert.</p>
+<p class="hint"><b>So speicherst du das PDF:</b> Nach „PDF erstellen“ öffnet sich der Druckdialog des Browsers. Dort als Drucker bzw. Ziel „Als PDF speichern“ wählen und auf „Speichern“ tippen (am iPad: Teilen → „In Dateien sichern“). Es wird nichts gedruckt oder übertragen.</p>
+<div class="row" style="margin-top:10px"><button class="btn pri" id="pdfGo" type="button">PDF erstellen</button><button class="btn" data-close type="button">Abbrechen</button></div>
+</div></div>
+<div id="print"></div>
+<script>
+const QR=(function(){
+  const ECC_PER_BLOCK=[0,7,10,15,20,26,18,20,24,30,18],NUM_BLOCKS=[0,1,1,1,1,1,2,2,2,2,4];
+  function rawModules(v){let r=(16*v+128)*v+64;if(v>=2){const na=Math.floor(v/7)+2;r-=(25*na-10)*na-55;if(v>=7)r-=36;}return r;}
+  function dataCodewords(v){return Math.floor(rawModules(v)/8)-ECC_PER_BLOCK[v]*NUM_BLOCKS[v];}
+  function gfMul(x,y){let z=0;for(let i=7;i>=0;i--){z=(z<<1)^((z>>>7)*0x11D);z^=((y>>>i)&1)*x;}return z;}
+  function rsDivisor(deg){const r=new Array(deg).fill(0);r[deg-1]=1;let root=1;for(let i=0;i<deg;i++){for(let j=0;j<deg;j++){r[j]=gfMul(r[j],root);if(j+1<deg)r[j]^=r[j+1];}root=gfMul(root,2);}return r;}
+  function rsRemainder(data,div){const r=div.map(()=>0);for(const b of data){const f=b^r.shift();r.push(0);div.forEach((c,i)=>{r[i]^=gfMul(c,f);});}return r;}
+  function encode(text){
+    const bytes=Array.from(new TextEncoder().encode(text));
+    let ver=1;for(;ver<=10;ver++){const cc=ver<10?8:16;if(4+cc+bytes.length*8<=dataCodewords(ver)*8)break;}
+    if(ver>10)throw new Error('Text zu lang für QR');
+    const bits=[];const put=(val,len)=>{for(let i=len-1;i>=0;i--)bits.push((val>>>i)&1);};
+    put(4,4);put(bytes.length,ver<10?8:16);bytes.forEach(b=>put(b,8));
+    const cap=dataCodewords(ver)*8;put(0,Math.min(4,cap-bits.length));put(0,(8-bits.length%8)%8);
+    for(let pad=0xEC;bits.length<cap;pad^=0xEC^0x11)put(pad,8);
+    const data=[];for(let i=0;i<bits.length;i+=8){let b=0;for(let j=0;j<8;j++)b=(b<<1)|bits[i+j];data.push(b);}
+    // Blöcke
+    const nb=NUM_BLOCKS[ver],ecl=ECC_PER_BLOCK[ver],raw=Math.floor(rawModules(ver)/8);
+    const shortLen=Math.floor(raw/nb)-ecl,numShort=nb-raw%nb;
+    const blocks=[],div=rsDivisor(ecl);
+    for(let i=0,k=0;i<nb;i++){const len=shortLen+(i<numShort?0:1);const d=data.slice(k,k+len);k+=len;const e=rsRemainder(d,div);if(i<numShort)d.push(0);blocks.push(d.concat(e));}
+    const all=[];for(let i=0;i<blocks[0].length;i++)blocks.forEach((b,j)=>{if(i!==shortLen||j>=numShort)all.push(b[i]);});
+    // Matrix
+    const size=ver*4+17;const M=Array.from({length:size},()=>new Array(size).fill(false)),F=Array.from({length:size},()=>new Array(size).fill(false));
+    const set=(x,y,d)=>{M[y][x]=d;F[y][x]=true;};
+    for(let i=0;i<size;i++){set(6,i,i%2===0);set(i,6,i%2===0);}
+    const finder=(cx,cy)=>{for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){const d=Math.max(Math.abs(dx),Math.abs(dy)),x=cx+dx,y=cy+dy;if(x>=0&&x<size&&y>=0&&y<size)set(x,y,d!==2&&d!==4);}};
+    finder(3,3);finder(size-4,3);finder(3,size-4);
+    if(ver>=2){const na=Math.floor(ver/7)+2;const step=ver===32?26:Math.ceil((ver*4+4)/(na*2-2))*2;const pos=[6];for(let p=size-7;pos.length<na;p-=step)pos.splice(1,0,p);
+      for(let i=0;i<na;i++)for(let j=0;j<na;j++){if((i===0&&j===0)||(i===0&&j===na-1)||(i===na-1&&j===0))continue;
+        for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)set(pos[i]+dx,pos[j]+dy,Math.max(Math.abs(dx),Math.abs(dy))!==1);}}
+    const fmt=(mask)=>{const d=(1<<3)|mask;let rem=d;for(let i=0;i<10;i++)rem=(rem<<1)^((rem>>>9)*0x537);const b=((d<<10)|rem)^0x5412;const g=i=>((b>>>i)&1)!==0;
+      for(let i=0;i<=5;i++)set(8,i,g(i));set(8,7,g(6));set(8,8,g(7));set(7,8,g(8));for(let i=9;i<15;i++)set(14-i,8,g(i));
+      for(let i=0;i<8;i++)set(size-1-i,8,g(i));for(let i=8;i<15;i++)set(8,size-15+i,g(i));set(8,size-8,true);};
+    fmt(0);
+    if(ver>=7){let rem=ver;for(let i=0;i<12;i++)rem=(rem<<1)^((rem>>>11)*0x1F25);const b=(ver<<12)|rem;
+      for(let i=0;i<18;i++){const bit=((b>>>i)&1)!==0,a=size-11+i%3,c=Math.floor(i/3);set(a,c,bit);set(c,a,bit);}}
+    // Daten
+    let bi=0;const total=all.length*8;
+    for(let right=size-1;right>=1;right-=2){if(right===6)right=5;
+      for(let vert=0;vert<size;vert++)for(let j=0;j<2;j++){const x=right-j,upward=((right+1)&2)===0,y=upward?size-1-vert:vert;
+        if(!F[y][x]&&bi<total){M[y][x]=((all[bi>>>3]>>>(7-(bi&7)))&1)!==0;bi++;}}}
+    // Maske wählen
+    const maskFn=[(x,y)=>(x+y)%2===0,(x,y)=>y%2===0,(x,y)=>x%3===0,(x,y)=>(x+y)%3===0,(x,y)=>(Math.floor(x/3)+Math.floor(y/2))%2===0,(x,y)=>x*y%2+x*y%3===0,(x,y)=>(x*y%2+x*y%3)%2===0,(x,y)=>((x+y)%2+x*y%3)%2===0];
+    function penalty(G){let p=0;for(let y=0;y<size;y++){let run=1;for(let x=1;x<size;x++){if(G[y][x]===G[y][x-1]){run++;if(run===5)p+=3;else if(run>5)p++;}else run=1;}}
+      for(let x=0;x<size;x++){let run=1;for(let y=1;y<size;y++){if(G[y][x]===G[y-1][x]){run++;if(run===5)p+=3;else if(run>5)p++;}else run=1;}}
+      for(let y=0;y<size-1;y++)for(let x=0;x<size-1;x++){const c=G[y][x];if(c===G[y][x+1]&&c===G[y+1][x]&&c===G[y+1][x+1])p+=3;}
+      let dark=0;for(const r of G)for(const c of r)if(c)dark++;p+=Math.floor(Math.abs(dark*20-size*size*10)/(size*size))*10;return p;}
+    let best=null,bm=0;
+    for(let m=0;m<8;m++){const G=M.map((r,y)=>r.map((c,x)=>F[y][x]?c:(c!==maskFn[m](x,y))));
+      // Formatbits für diese Maske in G schreiben
+      const save=M.map(r=>r.slice());
+      for(let y=0;y<size;y++)for(let x=0;x<size;x++)M[y][x]=G[y][x];fmt(m);const G2=M.map(r=>r.slice());
+      for(let y=0;y<size;y++)for(let x=0;x<size;x++)M[y][x]=save[y][x];
+      const p=penalty(G2);if(best===null||p<best.p){best={p,G:G2};bm=m;}}
+    return best.G;
+  }
+  function svg(text,opts){
+    opts=opts||{};const G=encode(text),n=G.length,q=opts.quiet===undefined?2:opts.quiet,dark=opts.dark||'#000',light=opts.light||'#fff';
+    let d='';for(let y=0;y<n;y++)for(let x=0;x<n;x++)if(G[y][x])d+='M'+(x+q)+','+(y+q)+'h1v1h-1z';
+    const t=n+2*q;
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+t+' '+t+'" shape-rendering="crispEdges"><rect width="'+t+'" height="'+t+'" fill="'+light+'"/><path d="'+d+'" fill="'+dark+'"/></svg>';
+  }
+  return {encode,svg};
+})();
+
+'use strict';
+/* ====================== Hilfsfunktionen ====================== */
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const SUPD={'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻','+':'⁺'};
+const SUPR={'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9','⁻':'-','⁺':'+'};
+const sup=t=>String(t).split('').map(c=>SUPD[c]||c).join('');
+const COL=['#4fd1c5','#ffb454','#7fd68a','#e4785b','#9db8ff','#e6a3f0','#f2e36b','#8fd0ff'];
+const COLP=['#007c73','#c26a00','#2e8b3d','#c0432a','#2f56c8','#a23bb5','#7a6c00','#0a6fb0'];
+const OBJCOL='#ffb454',OBJCOLP='#c26a00';
+/* Zahl mit n gültigen Ziffern, Dezimalkomma, Zehnerpotenzen */
+function fmt(v,sig){
+  sig=sig||4; if(v==null||!isFinite(v))return '–'; if(v===0)return '0';
+  const a=Math.abs(v);let r;
+  if(a<1e-3||a>=1e6){const p=v.toExponential(sig-1).split('e');const m=String(parseFloat(p[0])).replace('.',',');r=m+'·10'+sup(String(parseInt(p[1],10)));}
+  else r=String(+v.toPrecision(sig)).replace('.',',');
+  return r.replace(/^-/,'−');
+}
+const fmtPlain=v=>(v==null||!isFinite(v))?'':String(v).replace('.',',');
+/* Zahl lesen: Dezimalkomma oder -punkt, 7,14·10^-4, 7,14e-4, Hochzahlen */
+function parseNum(s){
+  if(typeof s==='number')return s;
+  s=String(s==null?'':s).replace(/^﻿/,'').trim().replace(/\s*\*+$/,'').replace(/−/g,'-').replace(/\s+/g,'');
+  if(!s)return NaN;
+  s=s.replace(/[·×]10\^?([-+]?\d+)/i,'e$1').replace(/[·×]10([⁻⁺]?[⁰¹²³⁴⁵⁶⁷⁸⁹]+)/,(m,g)=>'e'+g.split('').map(c=>SUPR[c]||'').join(''));
+  if(s.indexOf(',')>=0&&s.indexOf('.')>=0){ if(s.lastIndexOf(',')>s.lastIndexOf('.'))s=s.replace(/\./g,'').replace(',','.'); else s=s.replace(/,/g,''); }
+  else s=s.replace(',','.');
+  if(!/^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(s))return NaN;
+  return parseFloat(s);
+}
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+/* sauberer Maßstab mit „schönen“ Teilungen */
+function niceStep(range,n){
+  const raw=range/Math.max(1,n),p=Math.pow(10,Math.floor(Math.log10(raw))),f=raw/p;
+  return (f<1.5?1:f<3?2:f<7?5:10)*p;
+}
+function niceScale(lo,hi,n){
+  if(!isFinite(lo)||!isFinite(hi)){lo=0;hi=1;}
+  if(hi-lo<=0){const d=Math.abs(lo)*0.1||1;lo-=d;hi+=d;}
+  const st=niceStep(hi-lo,n);
+  return {min:Math.floor(lo/st+1e-9)*st,max:Math.ceil(hi/st-1e-9)*st,step:st};
+}
+function tickLabel(v,step){
+  if(Math.abs(v)<step*1e-6)return '0';
+  const a=Math.abs(v);
+  if(a>=1e6||a<1e-3)return fmt(v,3);
+  const dec=Math.max(0,-Math.floor(Math.log10(step)+1e-9));
+  return v.toFixed(Math.min(dec,8)).replace('.',',');
+}
+/* lineare Gleichungssysteme (Gauß) */
+function solveLin(A,b){
+  const n=b.length;A=A.map((r,i)=>r.concat([b[i]]));
+  for(let c=0;c<n;c++){
+    let p=c;for(let r=c+1;r<n;r++)if(Math.abs(A[r][c])>Math.abs(A[p][c]))p=r;
+    if(Math.abs(A[p][c])<1e-300)return null;
+    [A[c],A[p]]=[A[p],A[c]];
+    for(let r=c+1;r<n;r++){const f=A[r][c]/A[c][c];for(let k=c;k<=n;k++)A[r][k]-=f*A[c][k];}
+  }
+  const x=new Array(n);
+  for(let i=n-1;i>=0;i--){let s=A[i][n];for(let k=i+1;k<n;k++)s-=A[i][k]*x[k];x[i]=s/A[i][i];}
+  return x;
+}
+/* Ausgleichsgerade y = m x + b */
+function linreg(P,through0){
+  const n=P.length;if(n<2&&!(through0&&n>=1))return null;
+  let sx=0,sy=0,sxx=0,sxy=0,syy=0;
+  P.forEach(p=>{sx+=p.x;sy+=p.y;sxx+=p.x*p.x;sxy+=p.x*p.y;syy+=p.y*p.y;});
+  let m,b;
+  if(through0){if(sxx===0)return null;m=sxy/sxx;b=0;}
+  else{const d=n*sxx-sx*sx;if(Math.abs(d)<1e-300)return null;m=(n*sxy-sx*sy)/d;b=(sy-m*sx)/n;}
+  let ssr=0,sst=0;const my=sy/n;
+  P.forEach(p=>{const e=p.y-(m*p.x+b);ssr+=e*e;sst+=(p.y-my)*(p.y-my);});
+  const r2=sst>0?1-ssr/sst:1;
+  let sm=null,sb=null;
+  const dof=n-(through0?1:2);
+  if(dof>0){
+    const s2=ssr/dof;
+    if(through0){sm=Math.sqrt(s2/sxx);}
+    else{const d=n*sxx-sx*sx;sm=Math.sqrt(s2*n/d);sb=Math.sqrt(s2*sxx/d);}
+  }
+  return {m,b,r2,sm,sb,n};
+}
+/* Polynom vom Grad g (x zentriert und skaliert) */
+function polyfit(P,g){
+  const n=P.length;if(n<g+1)return null;
+  let x0=0;P.forEach(p=>x0+=p.x);x0/=n;
+  let sc=0;P.forEach(p=>sc=Math.max(sc,Math.abs(p.x-x0)));if(!sc)return null;
+  const A=[],b=[];
+  for(let i=0;i<=g;i++){A.push(new Array(g+1).fill(0));b.push(0);}
+  P.forEach(p=>{const u=(p.x-x0)/sc;const pw=[1];for(let k=1;k<=2*g;k++)pw.push(pw[k-1]*u);
+    for(let i=0;i<=g;i++){for(let j=0;j<=g;j++)A[i][j]+=pw[i+j];b[i]+=pw[i]*p.y;}});
+  const c=solveLin(A,b);if(!c)return null;
+  /* zurück in Koeffizienten von x: Entwicklung (x-x0)/sc */
+  const f=x=>{const u=(x-x0)/sc;let s=0;for(let i=g;i>=0;i--)s=s*u+c[i];return s;};
+  /* Koeffizienten in x ausrechnen (Binomialentwicklung) */
+  const coef=new Array(g+1).fill(0);
+  for(let i=0;i<=g;i++){
+    /* c[i] * ((x-x0)/sc)^i */
+    for(let k=0;k<=i;k++){
+      let bin=1;for(let t=0;t<k;t++)bin=bin*(i-t)/(t+1);
+      coef[k]+=c[i]*bin*Math.pow(-x0,i-k)/Math.pow(sc,i);
+    }
+  }
+  return {f,coef};
+}
+function rSquared(P,f){
+  let ssr=0,sst=0,my=0;P.forEach(p=>my+=p.y);my/=P.length;
+  P.forEach(p=>{const e=p.y-f(p.x);ssr+=e*e;sst+=(p.y-my)*(p.y-my);});
+  return sst>0?1-ssr/sst:1;
+}
+/* y = A + B·exp(−k·x): für feste k linear, k durch Suche */
+function satfit(P){
+  const n=P.length;if(n<4)return null;
+  let xmin=Infinity,xmax=-Infinity;P.forEach(p=>{xmin=Math.min(xmin,p.x);xmax=Math.max(xmax,p.x);});
+  const R=xmax-xmin;if(!(R>0))return null;
+  const x0=xmin;
+  function lin(k){
+    let s1=0,sE=0,sEE=0,sy=0,sEy=0;
+    P.forEach(p=>{const e=Math.exp(-k*(p.x-x0));s1++;sE+=e;sEE+=e*e;sy+=p.y;sEy+=e*p.y;});
+    const d=s1*sEE-sE*sE;if(Math.abs(d)<1e-300)return null;
+    const B=(s1*sEy-sE*sy)/d,A=(sy-B*sE)/s1;
+    let ss=0;P.forEach(p=>{const e=A+B*Math.exp(-k*(p.x-x0))-p.y;ss+=e*e;});
+    return {A,B,k,ss};
+  }
+  let best=null;
+  for(let i=-60;i<=60;i++){const k=Math.pow(10,i/12)/R*1; const r=lin(k);if(r&&(!best||r.ss<best.ss))best=r;}
+  const sgn=[1];
+  if(!best)return null;
+  /* Verfeinerung (Goldener Schnitt im Bereich um das beste k) */
+  let lo=best.k/1.35,hi=best.k*1.35;
+  for(let it=0;it<60;it++){
+    const m1=lo+(hi-lo)*0.382,m2=lo+(hi-lo)*0.618;
+    const r1=lin(m1),r2=lin(m2);
+    if(!r1||!r2)break;
+    if(r1.ss<r2.ss)hi=m2;else lo=m1;
+  }
+  const fin=lin((lo+hi)/2)||best;
+  /* Abnahme (k>0) bzw. Zunahme durch negatives k: auch negatives k prüfen */
+  let bestN=null;
+  for(let i=-60;i<=60;i++){const k=-Math.pow(10,i/12)/R;const r=lin(k);if(r&&(!bestN||r.ss<bestN.ss))bestN=r;}
+  let use=fin;
+  if(bestN&&bestN.ss<fin.ss*0.999){
+    let l2=bestN.k*1.35,h2=bestN.k/1.35;
+    for(let it=0;it<60;it++){
+      const m1=l2+(h2-l2)*0.382,m2=l2+(h2-l2)*0.618;
+      const r1=lin(m1),r2=lin(m2);if(!r1||!r2)break;
+      if(r1.ss<r2.ss)h2=m2;else l2=m1;
+    }
+    use=lin((l2+h2)/2)||bestN;
+  }
+  const f=x=>use.A+use.B*Math.exp(-use.k*(x-x0));
+  return {A:use.A,B:use.B,k:use.k,x0,f};
+}
+/* monotone kubische Interpolation (Fritsch–Carlson) auf sortierten Punkten */
+function monoSpline(P){
+  const n=P.length;if(n<2)return null;
+  const h=[],d=[];for(let i=0;i<n-1;i++){h.push(P[i+1].x-P[i].x);d.push(h[i]>0?(P[i+1].y-P[i].y)/h[i]:0);}
+  const m=new Array(n);m[0]=d[0];m[n-1]=d[n-2];
+  for(let i=1;i<n-1;i++)m[i]=d[i-1]*d[i]<=0?0:(d[i-1]+d[i])/2;
+  for(let i=0;i<n-1;i++){
+    if(d[i]===0){m[i]=0;m[i+1]=0;continue;}
+    const a=m[i]/d[i],b=m[i+1]/d[i],s=a*a+b*b;
+    if(s>9){const t=3/Math.sqrt(s);m[i]=t*a*d[i];m[i+1]=t*b*d[i];}
+  }
+  return {P,h,m};
+}
+function splinePath(sp,x0,x1,steps,cb){
+  // zeichnet Segment für Segment mit Zwischenpunkten (cb(x,y))
+  for(let i=0;i<sp.P.length-1;i++){
+    const a=sp.P[i],b=sp.P[i+1],h=sp.h[i];
+    const cnt=Math.max(2,Math.min(steps,Math.ceil(steps/ (sp.P.length-1)*4)));
+    for(let k=(i===0?0:1);k<=cnt;k++){
+      const t=k/cnt,t2=t*t,t3=t2*t;
+      const y=(2*t3-3*t2+1)*a.y+(t3-2*t2+t)*h*sp.m[i]+(-2*t3+3*t2)*b.y+(t3-t2)*h*sp.m[i+1];
+      cb(a.x+t*h,y);
+    }
+  }
+}
+/* sichere Funktionsauswertung (kein eval): Zahlen, x, + − * / ^, Klammern, exp ln lg sqrt sin cos tan abs, pi, e */
+function parseExpr(src){
+  const s=String(src).replace(/\s+/g,'').replace(/,/g,'.').replace(/·/g,'*').replace(/−/g,'-').replace(/√/g,'sqrt');
+  let i=0;
+  const FN={exp:Math.exp,ln:Math.log,lg:Math.log10,log:Math.log10,sqrt:Math.sqrt,sin:Math.sin,cos:Math.cos,tan:Math.tan,abs:Math.abs};
+  function num(){const m=/^(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?/.exec(s.slice(i));if(!m)throw 0;i+=m[0].length;const v=parseFloat(m[0]);return ()=>v;}
+  function prim(){
+    if(s[i]==='('){i++;const e=sum();if(s[i]!==')')throw 0;i++;return e;}
+    if(/[0-9.]/.test(s[i]||''))return num();
+    const m=/^[a-z]+/.exec(s.slice(i));if(!m)throw 0;
+    const id=m[0];i+=id.length;
+    if(id==='x')return x=>x;
+    if(id==='pi')return ()=>Math.PI;
+    if(id==='e')return ()=>Math.E;
+    if(FN[id]){if(s[i]!=='(')throw 0;i++;const a=sum();if(s[i]!==')')throw 0;i++;const f=FN[id];return x=>f(a(x));}
+    throw 0;
+  }
+  function unary(){if(s[i]==='-'){i++;const a=unary();return x=>-a(x);}if(s[i]==='+'){i++;return unary();}return power();}
+  function power(){const b=prim();if(s[i]==='^'){i++;const e=unary();return x=>Math.pow(b(x),e(x));}return b;}
+  function term(){let a=unary();
+    for(;;){
+      if(s[i]==='*'||s[i]==='/'){const op=s[i++];const b=unary();const l=a;a=op==='*'?x=>l(x)*b(x):x=>l(x)/b(x);}
+      else if(i<s.length&&(s[i]==='('||/[a-z]/.test(s[i]))){const b=power();const l=a;a=x=>l(x)*b(x);}
+      else break;
+    }
+    return a;}
+  function sum(){let a=term();while(s[i]==='+'||s[i]==='-'){const op=s[i++];const b=term();const l=a;a=op==='+'?x=>l(x)+b(x):x=>l(x)-b(x);}return a;}
+  try{const f=sum();if(i!==s.length)return null;return f;}catch(e){return null;}
+}
+
+/* ====================== Zustand ====================== */
+const TFS={
+  none:{n:'Messwerte',ok:()=>true,f:v=>v},
+  ln:{n:'ln',ok:v=>v>0,f:Math.log},
+  lg:{n:'lg',ok:v=>v>0,f:Math.log10},
+  inv:{n:'1/…',ok:v=>v!==0,f:v=>1/v},
+  sq:{n:'Quadrat',ok:()=>true,f:v=>v*v},
+  sqrt:{n:'Wurzel',ok:v=>v>=0,f:Math.sqrt}
+};
+const S={
+  xName:'x',xUnit:'',series:[],active:null,objs:[],nextId:1,
+  tx:'none',ty:'none',celsius:true,grid:true,cross:true,
+  auto:true,rng:{xmin:0,xmax:1,ymin:0,ymax:1,y2min:0,y2max:1},
+  lbl:{x:'',yl:'',yr:''},deriv:false,src:null,setPts:false,penOnly:true,pick:null,cursor:null
+};
+function newSeries(name,unit,pts,axis){
+  const id=S.nextId++;
+  /* Farbe: erste Farbe, die keine vorhandene Reihe nutzt; sonst reihum */
+  const usedC=new Set(S.series.map(x=>x.ci));
+  let ci=-1;for(let k=0;k<COL.length;k++){if(!usedC.has(k)){ci=k;break;}}
+  if(ci<0)ci=(S.ciN==null?0:S.ciN)%COL.length;
+  S.ciN=(S.ciN==null?0:S.ciN)+1;
+  /* Name: kleinste freie Nummer „Reihe n“ (gelöschte Nummern werden wieder vergeben) */
+  if(!name){const usedN=new Set(S.series.map(x=>{const m=/^Reihe (\d+)$/.exec(x.name);return m?+m[1]:0;}));let k=1;while(usedN.has(k))k++;name='Reihe '+k;}
+  const s={id,name,unit:unit||'',axis:axis||'L',pts:pts||[],line:'none',marks:true,visible:true,ci,color:COL[ci]};
+  S.series.push(s);return s;
+}
+const serById=id=>S.series.find(s=>s.id===id)||null;
+const actSer=()=>serById(S.active)||S.series[0]||null;
+
+/* ====================== Tabellen lesen ====================== */
+function parseHeader(h){
+  h=String(h==null?'':h).replace(/^﻿/,'').trim().replace(/^"|"$/g,'');
+  let m=/^(.*?)\s*\(([^()]*)\)\s*$/.exec(h);
+  if(m&&m[1])return {name:m[1].trim(),unit:m[2].trim()};
+  m=/^(.*?)\s+in\s+(.+)$/.exec(h);
+  if(m)return {name:m[1].trim(),unit:m[2].trim()};
+  return {name:h,unit:''};
+}
+function parseTable(text){
+  const lines=String(text).replace(/^﻿/,'').split(/\r?\n/).map(l=>l.replace(/\s+$/,'')).filter(l=>l.trim()!=='');
+  if(!lines.length)return null;
+  const split=l=>{
+    if(l.indexOf('\t')>=0)return l.split('\t');
+    if(l.indexOf(';')>=0)return l.split(';');
+    return l.trim().split(/\s+/);
+  };
+  const rows=lines.map(split).map(r=>r.map(c=>c.replace(/^"|"$/g,'').trim()));
+  let first=-1;
+  for(let i=0;i<rows.length;i++){if(rows[i].length>=2&&isFinite(parseNum(rows[i][0]))&&isFinite(parseNum(rows[i][1]))){first=i;break;}}
+  if(first<0)return null;
+  let head=null;if(first>0&&rows[first-1].length>=2)head=rows[first-1];
+  const ncol=rows[first].length;
+  const out={xName:'x',xUnit:'',series:[]};
+  if(head&&head.length>=2){const h=parseHeader(head[0]);out.xName=h.name||'x';out.xUnit=h.unit;}
+  for(let c=1;c<ncol;c++){
+    const hh=head&&head[c]!=null?parseHeader(head[c]):{name:'',unit:''};
+    const pts=[];
+    for(let i=first;i<rows.length;i++){
+      const r=rows[i];if(r.length<=c)continue;
+      const x=parseNum(r[0]),y=parseNum(r[c]);
+      if(isFinite(x)&&isFinite(y))pts.push({x,y});
+    }
+    if(pts.length)out.series.push({name:hh.name||('y'+(ncol>2?c:'')),unit:hh.unit,pts});
+  }
+  return out.series.length?out:null;
+}
+
+/* ====================== Darstellung und Einheiten ====================== */
+const isCelX=()=>/°C/.test(S.xUnit||'');
+const celOn=()=>S.tx==='inv'&&S.celsius&&isCelX();
+function tfx(x){return celOn()?1/(x+273.15):TFS[S.tx].f(x);}
+function okx(x){return celOn()?(x+273.15)!==0:TFS[S.tx].ok(x);}
+const wrapU=u=>/[\/·\s]/.test(u)?'('+u+')':u;
+function invUnit(u){
+  if(!u)return '';
+  const m=/^([^\/()·\s]+)\/([^\/()·\s]+)$/.exec(u);
+  if(m)return m[2]+'/'+m[1];
+  const m1=/^1\/(.+)$/.exec(u);if(m1)return m1[1];
+  return '1/'+wrapU(u);
+}
+function divUnit(a,b){
+  if(!a&&!b)return '';if(!b)return a;if(!a)return invUnit(b);
+  const m=/^([^\/()·\s]+)\/([^\/()·\s]+)$/.exec(a);
+  if(m&&/^[^\/()·\s]+$/.test(b))return m[1]+'/('+m[2]+'·'+b+')';
+  if(/^[^\/()·\s]+$/.test(a)&&/^[^\/()·\s]+$/.test(b)&&a===b)return '';
+  return wrapU(a)+'/'+wrapU(b);
+}
+const mulUnit=(a,b)=>(a&&b)?wrapU(a)+'·'+wrapU(b):(a||b);
+function tfUnit(tf,u,isX){
+  if(tf==='none')return u;
+  if(tf==='ln'||tf==='lg')return '';
+  if(tf==='inv')return (isX&&celOn())?'1/K':invUnit(u);
+  if(tf==='sq')return u?wrapU(u)+'²':'';
+  return '';
+}
+function tfLabel(tf,name,unit,isX){
+  const n=name||(isX?'x':'y');
+  if(tf==='none')return unit?n+' in '+unit:n;
+  if(tf==='ln'||tf==='lg')return unit?tf+'('+n+'/'+wrapU(unit)+')':tf+' '+n;
+  if(tf==='inv'){const u=tfUnit('inv',unit,isX);return '1/'+n+(u?' in '+u:'');}
+  if(tf==='sq')return n+'²'+(unit?' in '+wrapU(unit)+'²':'');
+  return '√'+n;
+}
+const xLabel=()=>tfLabel(S.tx,S.xName,S.xUnit,true);
+const xUnitT=()=>tfUnit(S.tx,S.xUnit,true);
+const yUnitT=s=>tfUnit(S.ty,s.unit,false);
+const yLabelOf=s=>tfLabel(S.ty,s.name,s.unit,false);
+function axisLabel(axis){
+  const L=S.series.filter(s=>s.visible&&s.axis===axis);
+  if(!L.length)return '';
+  const units=[...new Set(L.map(s=>s.unit))];
+  if(units.length===1&&L.length>1){
+    const u=tfUnit(S.ty,units[0],false);
+    const names=L.map(s=>s.name).join(', ');
+    if(S.ty==='none')return names+(units[0]?' in '+units[0]:'');
+    return tfLabel(S.ty,names,units[0],false);
+  }
+  return L.map(yLabelOf).join(' · ');
+}
+/* Messpunkte in der dargestellten Größe, nach x sortiert */
+function viewPts(s){
+  const out=[];
+  s.pts.forEach((p,i)=>{
+    if(!isFinite(p.x)||!isFinite(p.y))return;
+    if(!okx(p.x)||!TFS[S.ty].ok(p.y))return;
+    const X=tfx(p.x),Y=TFS[S.ty].f(p.y);
+    if(isFinite(X)&&isFinite(Y))out.push({x:X,y:Y,i,rx:p.x,ry:p.y});
+  });
+  out.sort((a,b)=>a.x-b.x);
+  return out;
+}
+function interpY(P,x){
+  if(P.length<1)return null;
+  if(x<P[0].x-1e-12||x>P[P.length-1].x+1e-12)return null;
+  for(let i=0;i<P.length-1;i++){
+    if(x>=P[i].x-1e-12&&x<=P[i+1].x+1e-12){
+      const d=P[i+1].x-P[i].x;if(d<=0)return P[i].y;
+      return P[i].y+(P[i+1].y-P[i].y)*(x-P[i].x)/d;
+    }
+  }
+  return P[P.length-1].y;
+}
+function inRange(P,x1,x2){
+  if(x1==null&&x2==null)return P;
+  const a=Math.min(x1==null?-Infinity:x1,x2==null?Infinity:x2),b=Math.max(x1==null?-Infinity:x1,x2==null?Infinity:x2);
+  return P.filter(p=>p.x>=a-1e-12&&p.x<=b+1e-12);
+}
+/* Steigung und Wert an einer Stelle: lokale Ausgleichsparabel durch die nächsten Punkte */
+function localDeriv(P,x0){
+  const n=P.length;if(n<2)return null;
+  const k=Math.min(n,clamp(Math.round(n/8),4,9));
+  const idx=P.map((p,i)=>i).sort((a,b)=>Math.abs(P[a].x-x0)-Math.abs(P[b].x-x0)).slice(0,k);
+  const Q=idx.map(i=>({x:P[i].x-x0,y:P[i].y}));
+  let r=null;
+  if(k>=3){r=polyfit(Q,2);if(r)return {m:r.coef[1],y:r.coef[0]};}
+  const l=linreg(Q);return l?{m:l.m,y:l.b}:null;
+}
+/* Steigung an den Messpunkten aus den Nachbarpunkten (Differenzenquotient) */
+function centralSlope(P,i){
+  const a=P[Math.max(0,i-1)],b=P[Math.min(P.length-1,i+1)];
+  const dx=b.x-a.x;return dx>0?(b.y-a.y)/dx:null;
+}
+function derivSeries(s){
+  const P=viewPts(s);if(P.length<3)return [];
+  const out=[];
+  for(let i=0;i<P.length;i++){const m=centralSlope(P,i);if(m!=null&&isFinite(m))out.push({x:P[i].x,y:m});}
+  return out;
+}
+
+/* ====================== Achsenbereiche ====================== */
+function extent(which){
+  let lo=Infinity,hi=-Infinity;
+  const add=v=>{if(isFinite(v)){lo=Math.min(lo,v);hi=Math.max(hi,v);}};
+  S.series.forEach(s=>{
+    if(!s.visible)return;
+    if(which!=='x'&&s.axis!==which)return;
+    viewPts(s).forEach(p=>add(which==='x'?p.x:p.y));
+  });
+  if(which==='R'&&S.deriv){const a=actSer();if(a)derivSeries(a).forEach(p=>add(p.y));}
+  return {lo,hi};
+}
+function axisFrom(e,allowZero,n){
+  let lo=e.lo,hi=e.hi;
+  if(!isFinite(lo)||!isFinite(hi)){lo=0;hi=1;}
+  if(allowZero&&lo>=0&&lo<=hi*0.4)lo=0;
+  if(allowZero&&hi<=0&&hi>=lo*0.4)hi=0;
+  const sc=niceScale(lo,hi,n);return sc;
+}
+function getRanges(){
+  const R={};
+  const mk=(min,max)=>({min,max,step:niceStep(max-min,8)});
+  const tn=S.tx==='none',yn=S.ty==='none';
+  R.x=axisFrom(extent('x'),tn,8);
+  R.L=axisFrom(extent('L'),yn,7);
+  R.R=axisFrom(extent('R'),yn,7);
+  if(!S.auto){
+    const g=S.rng;
+    const ok=(a,b)=>isFinite(a)&&isFinite(b)&&b>a;
+    if(ok(g.xmin,g.xmax))R.x=mk(g.xmin,g.xmax);
+    if(ok(g.ymin,g.ymax))R.L=mk(g.ymin,g.ymax);
+    if(ok(g.y2min,g.y2max))R.R=mk(g.y2min,g.y2max);
+  }
+  return R;
+}
+const hasR=()=>S.series.some(s=>s.visible&&s.axis==='R')||(S.deriv&&!S.series.some(s=>s.visible&&s.axis==='R')&&!!actSer());
+
+/* ====================== Zeichnen ====================== */
+const TH_SCREEN={bg:'#0e1113',fg:'#e7e4dd',dim:'#9aa2a9',grid:'#232a2f',axis:'#5f6870',cols:COL,obj:OBJCOL,fill:'rgba(255,180,84,.18)'};
+const TH_PRINT={bg:'#ffffff',fg:'#111111',dim:'#444444',grid:'#dddddd',axis:'#555555',cols:COLP,obj:OBJCOLP,fill:'rgba(194,106,0,.15)'};
+let LAST=null;   // letzte Zeichenparameter (für Ablesen und Setzen)
+function drawChart(ctx,W,H,th,live){
+  const R=getRanges(),useR=hasR();
+  const pl=76,pr=W-(useR?76:20),pt=14,pb=H-56;
+  const X=v=>pl+(v-R.x.min)/(R.x.max-R.x.min)*(pr-pl);
+  const Yf=(v,ax)=>{const r=ax==='R'?R.R:R.L;return pb-(v-r.min)/(r.max-r.min)*(pb-pt);};
+  ctx.save();
+  ctx.fillStyle=th.bg;ctx.fillRect(0,0,W,H);
+  ctx.font='12.5px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';
+  /* Raster und Teilungen */
+  ctx.lineWidth=1;ctx.textBaseline='middle';
+  const xs=R.x;
+  for(let v=xs.min;v<=xs.max+xs.step*1e-6;v+=xs.step){
+    const px=X(v);if(px<pl-1||px>pr+1)continue;
+    if(S.grid){ctx.strokeStyle=th.grid;ctx.beginPath();ctx.moveTo(px,pt);ctx.lineTo(px,pb);ctx.stroke();}
+    ctx.strokeStyle=th.axis;ctx.beginPath();ctx.moveTo(px,pb);ctx.lineTo(px,pb+4);ctx.stroke();
+    ctx.fillStyle=th.dim;ctx.textAlign='center';ctx.fillText(tickLabel(v,xs.step),px,pb+16);
+  }
+  const ys=R.L;
+  for(let v=ys.min;v<=ys.max+ys.step*1e-6;v+=ys.step){
+    const py=Yf(v,'L');if(py<pt-1||py>pb+1)continue;
+    if(S.grid){ctx.strokeStyle=th.grid;ctx.beginPath();ctx.moveTo(pl,py);ctx.lineTo(pr,py);ctx.stroke();}
+    ctx.strokeStyle=th.axis;ctx.beginPath();ctx.moveTo(pl-4,py);ctx.lineTo(pl,py);ctx.stroke();
+    ctx.fillStyle=th.dim;ctx.textAlign='right';ctx.fillText(tickLabel(v,ys.step),pl-7,py);
+  }
+  if(useR){
+    const yr=R.R;
+    for(let v=yr.min;v<=yr.max+yr.step*1e-6;v+=yr.step){
+      const py=Yf(v,'R');if(py<pt-1||py>pb+1)continue;
+      ctx.strokeStyle=th.axis;ctx.beginPath();ctx.moveTo(pr,py);ctx.lineTo(pr+4,py);ctx.stroke();
+      ctx.fillStyle=th.dim;ctx.textAlign='left';ctx.fillText(tickLabel(v,yr.step),pr+7,py);
+    }
+  }
+  ctx.strokeStyle=th.axis;ctx.lineWidth=1.2;ctx.strokeRect(pl,pt,pr-pl,pb-pt);
+  /* Achsentitel */
+  ctx.fillStyle=th.fg;ctx.font='13px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';ctx.textAlign='center';
+  ctx.fillText(S.lbl.x||xLabel(),(pl+pr)/2,H-14);
+  ctx.save();ctx.translate(16,(pt+pb)/2);ctx.rotate(-Math.PI/2);ctx.fillText(S.lbl.yl||axisLabel('L')||'y',0,0);ctx.restore();
+  if(useR){
+    let rl=S.lbl.yr||axisLabel('R');if(!rl&&S.deriv){const a=actSer();rl='Steigung dy/dx'+(a?' von '+a.name:'');}
+    ctx.save();ctx.translate(W-14,(pt+pb)/2);ctx.rotate(Math.PI/2);ctx.fillText(rl,0,0);ctx.restore();
+  }
+  /* Inhalt (beschnitten) */
+  ctx.save();ctx.beginPath();ctx.rect(pl,pt,pr-pl,pb-pt);ctx.clip();
+  const map={X,Y:Yf,ctx,th,pl,pr,pt,pb,R};
+  /* Reihen */
+  S.series.forEach(s=>{
+    if(!s.visible)return;
+    const P=viewPts(s);if(!P.length)return;
+    const col=th.cols[s.ci%th.cols.length];
+    if(s.line!=='none'&&P.length>=2){
+      ctx.strokeStyle=col;ctx.lineWidth=2;ctx.lineJoin='round';ctx.beginPath();
+      if(s.line==='smooth'){
+        const Q=[];P.forEach(p=>{if(!Q.length||p.x>Q[Q.length-1].x+1e-12)Q.push(p);});
+        const sp=monoSpline(Q);
+        if(sp){let first=true;splinePath(sp,0,0,Math.max(40,Q.length*6),(x,y)=>{const px=X(x),py=Yf(y,s.axis);if(first){ctx.moveTo(px,py);first=false;}else ctx.lineTo(px,py);});}
+      }else{P.forEach((p,i)=>{const px=X(p.x),py=Yf(p.y,s.axis);if(i)ctx.lineTo(px,py);else ctx.moveTo(px,py);});}
+      ctx.stroke();
+    }
+    if(s.marks){
+      const r=P.length>200?2:3.8;
+      ctx.fillStyle=col;ctx.strokeStyle=th.bg;ctx.lineWidth=1;
+      P.forEach(p=>{ctx.beginPath();ctx.arc(X(p.x),Yf(p.y,s.axis),r,0,6.2832);ctx.fill();if(r>3)ctx.stroke();});
+    }
+  });
+  /* Steigungskurve */
+  if(S.deriv&&!S.series.some(s=>s.visible&&s.axis==='R')){
+    const a=actSer();
+    if(a){const D=derivSeries(a);ctx.strokeStyle=th.cols[(a.ci+3)%th.cols.length];ctx.lineWidth=1.6;ctx.setLineDash([6,4]);ctx.beginPath();
+      D.forEach((p,i)=>{const px=X(p.x),py=Yf(p.y,'R');if(i)ctx.lineTo(px,py);else ctx.moveTo(px,py);});ctx.stroke();ctx.setLineDash([]);}
+  }
+  /* Auswertungen */
+  S.objs.forEach(o=>{if(o.res&&o.res.draw)try{o.res.draw(map);}catch(e){}});
+  /* Punkte-Hilfe beim Setzen */
+  ctx.restore();
+  /* Fadenkreuz */
+  if(live&&S.cursor&&S.cross){
+    const c=S.cursor;
+    if(c.px>=pl&&c.px<=pr&&c.py>=pt&&c.py<=pb){
+      ctx.strokeStyle='rgba(255,180,84,.55)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+      ctx.beginPath();ctx.moveTo(c.px,pt);ctx.lineTo(c.px,pb);ctx.moveTo(pl,c.py);ctx.lineTo(pr,c.py);ctx.stroke();ctx.setLineDash([]);
+    }
+  }
+  ctx.restore();
+  return {R,X,Y:Yf,pl,pr,pt,pb,W,H,useR};
+}
+function resizeCanvas(){
+  const cv=$('cv');const r=cv.getBoundingClientRect();
+  const dpr=window.devicePixelRatio||1;
+  const w=Math.max(200,Math.round(r.width)),h=Math.max(200,Math.round(r.height));
+  if(cv.width!==Math.round(w*dpr)||cv.height!==Math.round(h*dpr)){cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);}
+  return {w,h,dpr};
+}
+function redraw(){
+  if($('tab-chart').hidden)return;
+  const {w,h,dpr}=resizeCanvas();
+  const ctx=$('cv').getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  LAST=drawChart(ctx,w,h,TH_SCREEN,true);
+}
+function chartImage(){
+  const W=1000,H=620,c=document.createElement('canvas');c.width=W*2;c.height=H*2;
+  const ctx=c.getContext('2d');ctx.setTransform(2,0,0,2,0,0);
+  const keep=S.cursor;S.cursor=null;
+  drawChart(ctx,W,H,TH_PRINT,false);
+  S.cursor=keep;
+  return c.toDataURL('image/png');
+}
+
+/* ====================== Auswertungen ====================== */
+const OBJC=['#ffb454','#ff7ab6','#c4f06b','#78d2ff','#f0e68c'];
+const OBJCP=['#c26a00','#c2185b','#4d7c0f','#0369a1','#7a6c00'];
+TH_SCREEN.objs=OBJC;TH_PRINT.objs=OBJCP;
+const RGAS=8.314462618;
+const timeLike=()=>/^(s|min|h|d|ms|a)$/.test((S.xUnit||'').trim())||/^t$/i.test((S.xName||'').trim());
+const objCol=(m,o)=>m.th.objs[(o.ci||0)%m.th.objs.length];
+const E=(m)=>({title:null,lines:['<span class="err">'+m+'</span>']});
+function snapX(P,x){let b=null;P.forEach(p=>{if(b==null||Math.abs(p.x-x)<Math.abs(b-x))b=p.x;});return b;}
+function sgnTxt(v){return v<0?'−':'+';}
+function lineAcross(m,o,x1,y1,x2,y2,axis,dash){
+  const c=m.ctx;c.strokeStyle=objCol(m,o);c.lineWidth=2;c.setLineDash(dash||[]);c.beginPath();c.moveTo(m.X(x1),m.Y(y1,axis));c.lineTo(m.X(x2),m.Y(y2,axis));c.stroke();c.setLineDash([]);
+}
+function dot(m,o,x,y,axis,hollow){
+  const c=m.ctx;c.beginPath();c.arc(m.X(x),m.Y(y,axis),5.5,0,6.2832);
+  if(hollow){c.strokeStyle=objCol(m,o);c.lineWidth=2;c.fillStyle=m.th.bg;c.fill();c.stroke();}
+  else{c.fillStyle=objCol(m,o);c.fill();}
+}
+function vline(m,o,x){const c=m.ctx;c.strokeStyle=objCol(m,o);c.lineWidth=1;c.setLineDash([4,4]);c.beginPath();c.moveTo(m.X(x),m.pt);c.lineTo(m.X(x),m.pb);c.stroke();c.setLineDash([]);}
+function rateHint(s,unitSlope,val,kind){
+  if(S.tx==='none'&&S.ty==='none'&&timeLike()&&/mol/.test(s.unit||'')){
+    return '<div class="note">'+(kind==='avg'?'Durchschnittsgeschwindigkeit der Reaktion':'Momentangeschwindigkeit der Reaktion')+': v = |Δc/Δt| = <b>'+fmt(Math.abs(val))+(unitSlope?' '+unitSlope:'')+'</b> (Betrag, bezogen auf den Stoff dieser Reihe)</div>';
+  }
+  return '';
+}
+const OBJ_NAMES={fit:'Ausgleichsgerade',curve:'Ausgleichskurve',avg:'Steigung zwischen zwei Stellen (Durchschnitt)',inst:'Steigung an einer Stelle (Momentan)',area:'Fläche unter der Kurve',steep:'Steilster Punkt',ext:'Maximum und Minimum',order:'Reaktionsordnung testen',func:'Funktion'};
+const CURVE_NAMES={p2:'Parabel (Polynom 2. Grades)',p3:'Polynom 3. Grades',sat:'Exponentiell mit Grenzwert: y = A + B·e^(−k·x)',expo:'Exponentiell: y = a·e^(b·x)',pow:'Potenzfunktion: y = a·x^b',logf:'Logarithmisch: y = a + b·ln x'};
+
+function computeObj(o){
+  if(o.type==='func')return cFunc(o);
+  const s=serById(o.sid);
+  if(!s)return E('Die Reihe gibt es nicht mehr.');
+  const P=viewPts(s);
+  if(P.length<2)return E('Für diese Auswertung braucht die Reihe mindestens zwei darstellbare Punkte.');
+  switch(o.type){
+    case 'fit':return cFit(o,s,P);
+    case 'curve':return cCurve(o,s,P);
+    case 'avg':return cAvg(o,s,P);
+    case 'inst':return cInst(o,s,P);
+    case 'area':return cArea(o,s,P);
+    case 'steep':return cSteep(o,s,P);
+    case 'ext':return cExt(o,s,P);
+    case 'order':return cOrder(o,s);
+  }
+  return E('Unbekannte Auswertung.');
+}
+function cFit(o,s,P){
+  const Q=inRange(P,o.x1,o.x2),r=linreg(Q,o.through0);
+  if(!r)return E('Im gewählten Bereich liegen zu wenige Punkte (mindestens 2).');
+  const ux=xUnitT(),uy=yUnitT(s),mu=divUnit(uy,ux);
+  const L=[];
+  L.push('Gleichung: <b>y = '+fmt(r.m)+' · x '+(o.through0?'':sgnTxt(r.b)+' '+fmt(Math.abs(r.b)))+'</b>');
+  L.push('Steigung m = <b>'+fmt(r.m)+(mu?' '+mu:'')+'</b>'+(r.sm!=null?' (± '+fmt(r.sm,2)+')':''));
+  if(!o.through0)L.push('Achsenabschnitt b = <b>'+fmt(r.b)+(uy?' '+uy:'')+'</b>'+(r.sb!=null?' (± '+fmt(r.sb,2)+')':''));
+  L.push('Bestimmtheitsmaß R² = <b>'+r.r2.toFixed(4).replace('.',',')+'</b> · '+r.n+' Punkte');
+  let note='';
+  if(timeLike()&&S.tx==='none'&&S.ty==='ln'){
+    const k=-r.m,ku=ux?'1/'+wrapU(S.xUnit):'';
+    note='Reaktion 1. Ordnung (wenn die Punkte auf der Geraden liegen): k = −m = <b>'+fmt(k)+(S.xUnit?' '+invUnit(S.xUnit):'')+'</b>'+(k>0?', Halbwertszeit t<sub>½</sub> = ln 2/k = <b>'+fmt(Math.LN2/k)+(S.xUnit?' '+S.xUnit:'')+'</b>':'')+(o.through0?'':', Anfangswert = e<sup>b</sup> = <b>'+fmt(Math.exp(r.b))+(s.unit?' '+s.unit:'')+'</b>');
+  }else if(timeLike()&&S.tx==='none'&&S.ty==='inv'){
+    const ku=divUnit(invUnit(s.unit),S.xUnit);
+    note='Reaktion 2. Ordnung (wenn die Punkte auf der Geraden liegen): k = m = <b>'+fmt(r.m)+(ku?' '+ku:'')+'</b>'+(!o.through0&&r.b>0?', Anfangswert c₀ = 1/b = <b>'+fmt(1/r.b)+(s.unit?' '+s.unit:'')+'</b>':'');
+  }else if(S.tx==='inv'&&S.ty==='ln'){
+    if(S.xUnit==='K'||celOn()){
+      note='Arrhenius-Auftragung: E<sub>A</sub> = −m · R = <b>'+fmt(-r.m*RGAS/1000)+' kJ/mol</b> (mit R = 8,314 J/(mol·K))'+(o.through0?'':', Frequenzfaktor A = e<sup>b</sup> = <b>'+fmt(Math.exp(r.b))+'</b>');
+    }else note='Für die Aktivierungsenergie muss x die Temperatur in Kelvin sein (oder in °C mit Umrechnung): E<sub>A</sub> = −m · R.';
+  }else if(S.tx==='none'&&S.ty==='none'&&timeLike()&&/mol/.test(s.unit||'')){
+    note='Ist die Konzentration über die Zeit linear (Reaktion 0. Ordnung), so ist die Geschwindigkeit v = |m| = <b>'+fmt(Math.abs(r.m))+(mu?' '+mu:'')+'</b>.';
+  }
+  return {lines:L,note,
+    draw(m){
+      const xa=o.x1==null?m.R.x.min:Math.min(o.x1,o.x2==null?o.x1:o.x2),xb=o.x2==null?m.R.x.max:Math.max(o.x2,o.x1==null?o.x2:o.x1);
+      lineAcross(m,o,xa,r.m*xa+r.b,xb,r.m*xb+r.b,s.axis);
+    }};
+}
+function cCurve(o,s,P){
+  const Q=inRange(P,o.x1,o.x2);let f=null,eq='',extra='',r2=null;const L=[];
+  const k=o.kind;
+  if(k==='p2'||k==='p3'){
+    const g=k==='p2'?2:3;if(Q.length<g+1)return E('Für diese Kurve braucht man mindestens '+(g+1)+' Punkte im Bereich.');
+    const r=polyfit(Q,g);if(!r)return E('Die Anpassung ist mit diesen Werten nicht möglich.');
+    f=r.f;const c=r.coef;
+    eq='y = '+(g===3?fmt(c[3])+' · x³ '+sgnTxt(c[2])+' '+fmt(Math.abs(c[2]))+' · x² ':fmt(c[2])+' · x² ')+(g===3?'':'')+sgnTxt(c[1])+' '+fmt(Math.abs(c[1]))+' · x '+sgnTxt(c[0])+' '+fmt(Math.abs(c[0]));
+    if(g===2&&Math.abs(c[2])>1e-300){const xs=-c[1]/(2*c[2]);extra='Scheitelpunkt bei x = <b>'+fmt(xs)+'</b>, y = <b>'+fmt(f(xs))+'</b>';}
+  }else if(k==='sat'){
+    const r=satfit(Q);if(!r)return E('Die Anpassung braucht mindestens 4 Punkte mit erkennbarem Verlauf.');
+    f=r.f;const B=r.B*Math.exp(r.k*r.x0);
+    eq='y = '+fmt(r.A)+' '+sgnTxt(B)+' '+fmt(Math.abs(B))+' · e^(−'+fmt(r.k)+' · x)';
+    extra='Grenzwert (x → ∞'+(r.k>0?'':', hier wachsend, daher kein Grenzwert')+'): y<sub>∞</sub> = <b>'+fmt(r.A)+'</b>'+(r.k>0&&timeLike()?'; Halbwertszeit der Annäherung = ln 2/k = <b>'+fmt(Math.LN2/r.k)+(S.xUnit?' '+S.xUnit:'')+'</b>':'');
+  }else if(k==='expo'){
+    const T=Q.filter(p=>p.y>0).map(p=>({x:p.x,y:Math.log(p.y)}));if(T.length<2)return E('Für y = a·e^(b·x) müssen die y-Werte positiv sein.');
+    const l=linreg(T);if(!l)return E('Die Anpassung ist mit diesen Werten nicht möglich.');
+    const a=Math.exp(l.b),b=l.m;f=x=>a*Math.exp(b*x);eq='y = '+fmt(a)+' · e^('+fmt(b)+' · x)';
+    extra='Näherung über ln y (lineare Ausgleichsrechnung)'+(b<0&&timeLike()?'; Halbwertszeit t<sub>½</sub> = ln 2/|b| = <b>'+fmt(Math.LN2/(-b))+(S.xUnit?' '+S.xUnit:'')+'</b>':'');
+  }else if(k==='pow'){
+    const T=Q.filter(p=>p.x>0&&p.y>0).map(p=>({x:Math.log(p.x),y:Math.log(p.y)}));if(T.length<2)return E('Für y = a·x^b müssen x und y positiv sein.');
+    const l=linreg(T);if(!l)return E('Die Anpassung ist mit diesen Werten nicht möglich.');
+    const a=Math.exp(l.b),b=l.m;f=x=>x>0?a*Math.pow(x,b):NaN;eq='y = '+fmt(a)+' · x^'+fmt(b);extra='Näherung über ln y gegen ln x';
+  }else if(k==='logf'){
+    const T=Q.filter(p=>p.x>0).map(p=>({x:Math.log(p.x),y:p.y}));if(T.length<2)return E('Für y = a + b·ln x muss x positiv sein.');
+    const l=linreg(T);if(!l)return E('Die Anpassung ist mit diesen Werten nicht möglich.');
+    f=x=>x>0?l.b+l.m*Math.log(x):NaN;eq='y = '+fmt(l.b)+' '+sgnTxt(l.m)+' '+fmt(Math.abs(l.m))+' · ln x';
+  }
+  r2=rSquared(Q.filter(p=>isFinite(f(p.x))),f);
+  L.push('<b>'+CURVE_NAMES[k]+'</b>');
+  L.push('Gleichung: <b>'+eq+'</b>');
+  L.push('Bestimmtheitsmaß R² = <b>'+r2.toFixed(4).replace('.',',')+'</b> · '+Q.length+' Punkte');
+  if(extra)L.push(extra);
+  return {lines:L,
+    draw(m){
+      const c=m.ctx;c.strokeStyle=objCol(m,o);c.lineWidth=2.2;c.beginPath();
+      const xa=o.x1==null?Q[0].x:Math.min(o.x1,o.x2==null?o.x1:o.x2),xb=o.x2==null?Q[Q.length-1].x:Math.max(o.x2,o.x1==null?o.x2:o.x1);
+      let first=true;
+      for(let i=0;i<=300;i++){const x=xa+(xb-xa)*i/300,y=f(x);if(!isFinite(y)){first=true;continue;}
+        const px=m.X(x),py=m.Y(y,s.axis);if(first){c.moveTo(px,py);first=false;}else c.lineTo(px,py);}
+      c.stroke();
+    }};
+}
+function cAvg(o,s,P){
+  if(o.x1==null||o.x2==null||o.x1===o.x2)return E('Gib zwei verschiedene Stellen an (oder wähle sie im Diagramm).');
+  const y1=interpY(P,o.x1),y2=interpY(P,o.x2);
+  if(y1==null||y2==null)return E('Mindestens eine Stelle liegt außerhalb des Messbereichs von '+fmt(P[0].x)+' bis '+fmt(P[P.length-1].x)+'.');
+  const dx=o.x2-o.x1,dy=y2-y1,m=dy/dx,mu=divUnit(yUnitT(s),xUnitT());
+  const L=['Stelle 1: x = <b>'+fmt(o.x1)+'</b>, y = <b>'+fmt(y1)+'</b>','Stelle 2: x = <b>'+fmt(o.x2)+'</b>, y = <b>'+fmt(y2)+'</b>',
+    'Δx = <b>'+fmt(dx)+(xUnitT()?' '+xUnitT():'')+'</b>, Δy = <b>'+fmt(dy)+(yUnitT(s)?' '+yUnitT(s):'')+'</b>',
+    'Durchschnittliche Steigung Δy / Δx = <b>'+fmt(m)+(mu?' '+mu:'')+'</b>'];
+  return {lines:L,note:rateHint(s,mu,m,'avg'),
+    draw(mp){lineAcross(mp,o,mp.R.x.min,y1+m*(mp.R.x.min-o.x1),mp.R.x.max,y1+m*(mp.R.x.max-o.x1),s.axis,[7,4]);dot(mp,o,o.x1,y1,s.axis,true);dot(mp,o,o.x2,y2,s.axis,true);}};
+}
+function cInst(o,s,P){
+  if(o.x0==null)return E('Gib eine Stelle an (oder wähle sie im Diagramm).');
+  if(o.x0<P[0].x-1e-12||o.x0>P[P.length-1].x+1e-12)return E('Die Stelle liegt außerhalb des Messbereichs von '+fmt(P[0].x)+' bis '+fmt(P[P.length-1].x)+'.');
+  const d=localDeriv(P,o.x0);if(!d)return E('Die Steigung lässt sich hier nicht bestimmen.');
+  {const yi=interpY(P,o.x0);if(yi!=null)d.y=yi;}
+  const mu=divUnit(yUnitT(s),xUnitT());
+  const L=['Stelle: x = <b>'+fmt(o.x0)+'</b>, y = <b>'+fmt(d.y)+(yUnitT(s)?' '+yUnitT(s):'')+'</b>','Steigung an dieser Stelle dy / dx = <b>'+fmt(d.m)+(mu?' '+mu:'')+'</b>'];
+  return {lines:L,note:rateHint(s,mu,d.m,'inst')+'<div class="note">Die Steigung stammt aus einer Ausgleichsparabel durch die benachbarten Messpunkte.</div>',
+    draw(m){const w=(m.R.x.max-m.R.x.min)*0.16;lineAcross(m,o,o.x0-w,d.y-d.m*w,o.x0+w,d.y+d.m*w,s.axis);dot(m,o,o.x0,d.y,s.axis,false);}};
+}
+function cArea(o,s,P){
+  if(o.x1==null||o.x2==null||o.x1===o.x2)return E('Gib zwei verschiedene Grenzen an (oder wähle sie im Diagramm).');
+  const a=Math.min(o.x1,o.x2),b=Math.max(o.x1,o.x2);
+  if(a<P[0].x-1e-12||b>P[P.length-1].x+1e-12)return E('Die Grenzen liegen außerhalb des Messbereichs von '+fmt(P[0].x)+' bis '+fmt(P[P.length-1].x)+'.');
+  const Q=[{x:a,y:interpY(P,a)}];P.forEach(p=>{if(p.x>a+1e-12&&p.x<b-1e-12)Q.push({x:p.x,y:p.y});});Q.push({x:b,y:interpY(P,b)});
+  let A=0;for(let i=0;i<Q.length-1;i++)A+=(Q[i].y+Q[i+1].y)/2*(Q[i+1].x-Q[i].x);
+  const au=mulUnit(yUnitT(s),xUnitT());
+  return {lines:['Grenzen: von x = <b>'+fmt(a)+'</b> bis x = <b>'+fmt(b)+'</b>','Fläche zwischen Kurve und x-Achse A = <b>'+fmt(A)+(au?' '+au:'')+'</b>'],
+    note:'<div class="note">Berechnet als Summe von Trapezen zwischen den Messpunkten (Näherung); die Grundlinie ist y = 0.</div>',
+    draw(m){const c=m.ctx;c.fillStyle=m.th.fill;c.beginPath();c.moveTo(m.X(Q[0].x),m.Y(0,s.axis));Q.forEach(p=>c.lineTo(m.X(p.x),m.Y(p.y,s.axis)));c.lineTo(m.X(Q[Q.length-1].x),m.Y(0,s.axis));c.closePath();c.fill();vline(m,o,a);vline(m,o,b);}};
+}
+function cSteep(o,s,P){
+  if(P.length<5)return E('Für den steilsten Punkt braucht die Reihe mindestens 5 Punkte.');
+  let best=-1,bv=0,bm=0;
+  for(let i=1;i<P.length-1;i++){const m=centralSlope(P,i);if(m!=null&&Math.abs(m)>bv){bv=Math.abs(m);bm=m;best=i;}}
+  if(best<0)return E('Es gibt keinen auswertbaren Verlauf.');
+  const bx=P[best].x,by=P[best].y,mu=divUnit(yUnitT(s),xUnitT());
+  const titr=/^V/.test((S.xName||'').trim())||/mL/.test(S.xUnit||'');
+  return {lines:['Steilster Punkt (Wendepunkt) bei x = <b>'+fmt(bx)+(xUnitT()?' '+xUnitT():'')+'</b>, y = <b>'+fmt(by)+(yUnitT(s)?' '+yUnitT(s):'')+'</b>','Steigung dort (aus den Nachbarpunkten): <b>'+fmt(bm)+(mu?' '+mu:'')+'</b>'],
+    note:'<div class="note">'+(titr?'Bei einer Titrationskurve entspricht der steilste Punkt etwa dem Äquivalenzpunkt. ':'')+'Der Wert ist ein Messpunkt; seine Genauigkeit ist durch den Abstand der Messpunkte begrenzt.</div>',
+    draw(m){vline(m,o,bx);const w=(m.R.x.max-m.R.x.min)*0.1;lineAcross(m,o,bx-w,by-bm*w,bx+w,by+bm*w,s.axis);dot(m,o,bx,by,s.axis,false);}};
+}
+function cExt(o,s,P){
+  let mx=P[0],mn=P[0];P.forEach(p=>{if(p.y>mx.y)mx=p;if(p.y<mn.y)mn=p;});
+  const uy=yUnitT(s),ux=xUnitT();
+  return {lines:['Maximum: y = <b>'+fmt(mx.y)+(uy?' '+uy:'')+'</b> bei x = <b>'+fmt(mx.x)+(ux?' '+ux:'')+'</b>','Minimum: y = <b>'+fmt(mn.y)+(uy?' '+uy:'')+'</b> bei x = <b>'+fmt(mn.x)+(ux?' '+ux:'')+'</b>'],
+    draw(m){dot(m,o,mx.x,mx.y,s.axis,true);dot(m,o,mn.x,mn.y,s.axis,true);}};
+}
+function cOrder(o,s){
+  /* immer mit den Originalwerten (nicht dargestellt) */
+  const raw=s.pts.filter(p=>isFinite(p.x)&&isFinite(p.y)&&p.y>0&&(o.x1==null||o.x2==null||(p.x>=Math.min(o.x1,o.x2)&&p.x<=Math.max(o.x1,o.x2))));
+  if(raw.length<3)return E('Für den Test braucht man mindestens 3 Punkte mit positiven y-Werten (Konzentrationen).');
+  const U=S.xUnit||'',cu=s.unit||'';
+  const V=[
+    {n:'c gegen t',o:'0. Ordnung',f:y=>y,k:r=>-r.m,ku:divUnit(cu,U)},
+    {n:'ln c gegen t',o:'1. Ordnung',f:Math.log,k:r=>-r.m,ku:U?invUnit(U):''},
+    {n:'1/c gegen t',o:'2. Ordnung',f:y=>1/y,k:r=>r.m,ku:divUnit(invUnit(cu),U)}
+  ];
+  let best=-1,bv=-Infinity;
+  V.forEach((v,i)=>{v.r=linreg(raw.map(p=>({x:p.x,y:v.f(p.y)})));if(v.r&&v.r.r2>bv){bv=v.r.r2;best=i;}});
+  let h='<table><tr><th>Darstellung</th><th>Reaktionsordnung</th><th>R²</th><th>Steigung m</th><th>Geschwindigkeitskonstante k</th></tr>';
+  V.forEach((v,i)=>{h+='<tr'+(i===best?' class="best"':'')+'><td>'+v.n+'</td><td>'+v.o+'</td><td>'+(v.r?v.r.r2.toFixed(4).replace('.',','):'–')+'</td><td>'+(v.r?fmt(v.r.m):'–')+'</td><td>'+(v.r?fmt(v.k(v.r))+(v.ku?' '+v.ku:''):'–')+'</td></tr>';});
+  h+='</table>';
+  return {lines:['Verglichen werden die Ausgleichsgeraden der drei Darstellungen ('+raw.length+' Punkte) – die Auftragung mit dem größten R² passt am besten: <b>'+V[best].o+'</b>.'],
+    note:h+'<div class="note">Der Vergleich ist nur sinnvoll, wenn y eine Konzentration ist und x die Zeit. Bei wenigen Punkten oder starker Streuung ist die Entscheidung unsicher; k ist hier ohne stöchiometrische Faktoren angegeben.</div>'};
+}
+function cFunc(o){
+  const f=o.f||(o.f=parseExpr(o.expr||''));
+  if(!o.expr||!f)return E('Die Funktion ist nicht lesbar. Erlaubt sind x, Zahlen, die Grundrechenarten, ^ für Potenzen, Klammern, exp, ln, lg, sqrt, sin, cos, tan, abs, pi, e (Beispiel: 0,1*exp(−0,008*x)).');
+  const L=['f(x) = <b>'+esc(o.expr)+'</b>'];
+  const s=serById(o.sid);
+  if(s){const P=viewPts(s);let ss=0,n=0;P.forEach(p=>{const y=f(p.x);if(isFinite(y)){ss+=(y-p.y)*(y-p.y);n++;}});if(n)L.push('Mittlere Abweichung (RMS) von der Reihe „'+esc(s.name)+'“: <b>'+fmt(Math.sqrt(ss/n))+'</b> in der dargestellten Größe');}
+  return {lines:L,note:'<div class="note">Die Funktion gilt für die dargestellten Werte (bei Linearisierung also für die umgerechneten Größen).</div>',
+    draw(m){const c=m.ctx;c.strokeStyle=objCol(m,o);c.lineWidth=2;c.setLineDash([2,3]);c.beginPath();let first=true;
+      for(let i=0;i<=400;i++){const x=m.R.x.min+(m.R.x.max-m.R.x.min)*i/400,y=f(x);if(!isFinite(y)||Math.abs(y)>1e12){first=true;continue;}
+        const px=m.X(x),py=m.Y(y,'L');if(first){c.moveTo(px,py);first=false;}else c.lineTo(px,py);}
+      c.stroke();c.setLineDash([]);}};
+}
+
+/* ====================== Auswertungsliste ====================== */
+function addObj(type,extra){
+  const s=actSer();
+  if(type!=='func'&&!s){msgBar('Lege zuerst Daten an oder lade welche.');return null;}
+  const o=Object.assign({id:S.nextId++,type,sid:s?s.id:null,ci:S.objs.length,x1:null,x2:null,x0:null},extra||{});
+  const P=s?viewPts(s):[];
+  if(P.length>=2&&(type==='avg'||type==='inst'||type==='area')){
+    const lo=P[0].x,hi=P[P.length-1].x,sp=hi-lo;
+    if(type==='avg'){o.x1=snapX(P,lo+sp*0.2);o.x2=snapX(P,lo+sp*0.6);}
+    if(type==='area'){o.x1=snapX(P,lo+sp*0.2);o.x2=snapX(P,lo+sp*0.8);}
+    if(type==='inst')o.x0=snapX(P,lo+sp*0.4);
+  }
+  if(type==='curve')o.kind=o.kind||'p2';
+  if(type==='func'){o.expr=o.expr||'';}
+  S.objs.push(o);
+  return o;
+}
+function msgBar(t){const r=$('readout');r.textContent=t;}
+const FIELDS={
+  fit:[['x1','von x (leer = alle)'],['x2','bis x']],
+  curve:[['x1','von x (leer = alle)'],['x2','bis x']],
+  avg:[['x1','Stelle 1 (x)'],['x2','Stelle 2 (x)']],
+  inst:[['x0','Stelle (x)']],
+  area:[['x1','untere Grenze (x)'],['x2','obere Grenze (x)']],
+  order:[['x1','von t (leer = alle)'],['x2','bis t']]
+};
+const numVal=v=>v==null?'':fmtPlain(+Number(v).toPrecision(6));
+function renderObjs(){
+  const box=$('objs');
+  if(!S.objs.length){box.innerHTML='<div class="hint">Noch keine Auswertung. Wähle links ein Verfahren; das Ergebnis erscheint hier und im Diagramm.</div>';return;}
+  let h='';
+  S.objs.forEach(o=>{
+    const s=serById(o.sid);
+    const r=o.res||{lines:[]};
+    const col=OBJC[(o.ci||0)%OBJC.length];
+    h+='<div class="obj" data-oid="'+o.id+'" style="border-left-color:'+col+'"><button class="del" data-del="'+o.id+'" title="Auswertung entfernen" type="button">×</button>';
+    h+='<h3>'+OBJ_NAMES[o.type]+(s&&o.type!=='func'?' <small>· Reihe „'+esc(s.name)+'“</small>':'')+'</h3>';
+    const fl=FIELDS[o.type];
+    let par='';
+    if(fl)fl.forEach(f=>{par+='<label>'+f[1]+'<span style="display:flex;gap:4px"><input type="text" data-f="'+f[0]+'" value="'+numVal(o[f[0]])+'" inputmode="decimal" autocomplete="off"><button class="btn" data-pick="'+f[0]+'" type="button" title="Stelle im Diagramm wählen">im Diagramm wählen</button></span></label>';});
+    if(o.type==='curve'){par='<label>Kurventyp<select data-f="kind">'+Object.keys(CURVE_NAMES).map(k=>'<option value="'+k+'"'+(o.kind===k?' selected':'')+'>'+CURVE_NAMES[k]+'</option>').join('')+'</select></label>'+par;}
+    if(o.type==='fit')par+='<label class="opt" style="flex-direction:row;align-items:center;font-size:13px"><input type="checkbox" data-f="through0"'+(o.through0?' checked':'')+'> durch den Ursprung</label>';
+    if(o.type==='func')par='<label>y =<input class="wide" type="text" data-f="expr" value="'+esc(o.expr||'')+'" placeholder="z. B. 0,1*exp(-0,008*x)" autocomplete="off" spellcheck="false"></label>';
+    if(par)h+='<div class="par">'+par+'</div>';
+    (r.lines||[]).forEach(l=>{h+='<div class="rl">'+l+'</div>';});
+    if(r.note)h+=r.note.charAt(0)==='<'?r.note:'<div class="note">'+r.note+'</div>';
+    h+='</div>';
+  });
+  box.innerHTML=h;
+}
+function recompute(){S.objs.forEach(o=>{o.res=computeObj(o);});}
+
+/* ====================== Modale ====================== */
+const openStack=[];
+function openM(id){$(id).hidden=false;openStack.push(id);}
+function closeM(id){$(id).hidden=true;const k=openStack.indexOf(id);if(k>=0)openStack.splice(k,1);}
+document.querySelectorAll('.modal').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m||e.target.hasAttribute('data-close'))closeM(m.id);});});
+document.addEventListener('keydown',e=>{
+  const top=openStack[openStack.length-1];
+  if(e.key==='Escape'&&top)closeM(top);
+  if(top==='mGrund'){if(e.key==='ArrowRight')gGo(1);if(e.key==='ArrowLeft')gGo(-1);}
+});
+$('helpLink').onclick=()=>openM('mHelp');
+$('vLink').onclick=e=>{e.preventDefault();openM('mVer');};
+const QR_URL=/^https?:/.test(location.href)?location.href.split('#')[0].split('?')[0]:'https://chemie.mail-baumgart.de/Werkzeuge/0-Graphen.html';
+$('qrSmall').innerHTML=QR.svg(QR_URL,{quiet:1,dark:'#000',light:'#fff'});
+$('qrBtn').onclick=()=>{$('qrBig').innerHTML=QR.svg(QR_URL,{quiet:2,dark:'#000',light:'#fff'});$('qrUrl').textContent=QR_URL;openM('mQr');};
+
+/* ====================== Grundlagen ====================== */
+const TOP=[
+['Diagramm anlegen und lesen','<p>Ein Diagramm zeigt, wie eine Größe von einer anderen abhängt. Auf die <b>x-Achse</b> kommt die Größe, die du vorgibst oder verstellst (Zeit, zugegebenes Volumen, Temperatur), auf die <b>y-Achse</b> die gemessene Größe.</p><ul><li>Jede Achse bekommt <b>Größe und Einheit</b>, z. B. „c in mol/L“ oder „t in s“.</li><li>Der Maßstab ist gleichmäßig und so gewählt, dass die Messpunkte den Platz gut ausfüllen.</li><li>Zeichne <b>Punkte</b>, keine Linien durch jeden einzelnen Punkt: Messwerte streuen. Eine <b>Ausgleichskurve oder -gerade</b> zeigt den Verlauf, den die Punkte erwarten lassen.</li><li>Haben zwei Reihen verschiedene Einheiten (z. B. pH und Leitfähigkeit), bekommt eine die rechte y-Achse.</li></ul>'],
+['Ausgleichsgerade und R²','<p>Liegen die Punkte ungefähr auf einer Geraden, bestimmt man die <b>Ausgleichsgerade</b> y = m · x + b. Sie wird so gelegt, dass die Summe der <b>Quadrate</b> der senkrechten Abweichungen aller Punkte möglichst klein ist (Methode der kleinsten Quadrate).</p><ul><li><b>Steigung m</b> = Δy / Δx, hat die Einheit „Einheit von y durch Einheit von x“.</li><li><b>Achsenabschnitt b</b> = y-Wert bei x = 0.</li><li>Das <b>Bestimmtheitsmaß R²</b> liegt zwischen 0 und 1; je näher an 1, desto besser beschreibt die Gerade die Punkte. Ein hoher Wert beweist aber nicht, dass der Zusammenhang wirklich linear ist: Schau dir immer auch das Diagramm an.</li><li>„Durch den Ursprung“ ist nur sinnvoll, wenn bei x = 0 sicher y = 0 gilt (z. B. Kalibrierung ohne Blindwert).</li></ul>'],
+['Durchschnittliche und momentane Steigung','<p>Die <b>Steigung</b> einer Kurve gibt an, wie schnell sich y mit x ändert.</p><ul><li><b>Zwischen zwei Stellen</b> (Durchschnitt): m = Δy / Δx = (y₂ − y₁) / (x₂ − x₁).</li><li><b>An einer Stelle</b> (momentan): Man legt eine Gerade an, die die Kurve an dieser Stelle gerade berührt; ihre Steigung ist die Änderungsrate genau zu diesem Zeitpunkt.</li></ul><p>Für die Reaktionsgeschwindigkeit gilt: <b>Durchschnittsgeschwindigkeit</b> v̄ = −Δc / Δt (Edukt, daher das Minuszeichen), <b>Momentangeschwindigkeit</b> v = −dc / dt. Bei fallenden Kurven ist die Steigung negativ; die Geschwindigkeit gibt man als Betrag an. Mit dieser Seite wird die momentane Steigung aus einer kleinen Ausgleichsparabel durch die benachbarten Messpunkte bestimmt.</p>'],
+['Fläche unter der Kurve','<p>Die Fläche zwischen Kurve und x-Achse entspricht dem Integral ∫ y dx. Ihre Einheit ist das <b>Produkt</b> der Einheiten von y und x.</p><ul><li>Chromatographie: Die <b>Peakfläche</b> ist ein Maß für die Stoffmenge im Peak.</li><li>Leistung gegen Zeit: Die Fläche ist die Energie (W · s = J).</li><li>Stromstärke gegen Zeit: Die Fläche ist die Ladung (A · s = C).</li></ul><p>Hier wird die Fläche als Summe von <b>Trapezen</b> zwischen den Messpunkten berechnet. Je dichter die Punkte liegen, desto genauer ist das Ergebnis.</p>'],
+['Linearisieren und Reaktionsordnung','<p>Welche Reaktionsordnung vorliegt, erkennt man daran, in welcher Auftragung die Messpunkte auf einer Geraden liegen (für eine Reaktion A → Produkte):</p><table><tr><th>Ordnung</th><th>Auftragung</th><th>Steigung</th><th>Halbwertszeit</th></tr><tr><td>0.</td><td>c gegen t</td><td>−k</td><td>c₀ / (2 · k)</td></tr><tr><td>1.</td><td>ln c gegen t</td><td>−k</td><td>ln 2 / k</td></tr><tr><td>2.</td><td>1/c gegen t</td><td>+k</td><td>1 / (k · c₀)</td></tr></table><p>Mit „x darstellen als“ und „y darstellen als“ (ln, 1/…) rechnet die Seite die Werte um. „Reaktionsordnung testen“ vergleicht alle drei Auftragungen über das Bestimmtheitsmaß R². Bei nur wenigen oder stark streuenden Punkten ist die Entscheidung unsicher.</p>'],
+['Arrhenius-Auftragung und Aktivierungsenergie','<p>Die Geschwindigkeitskonstante hängt von der Temperatur ab: k = A · e<sup>−E<sub>A</sub> / (R · T)</sup>. Logarithmiert ergibt sich eine Geradengleichung:</p><p><b>ln k = ln A − (E<sub>A</sub> / R) · (1 / T)</b></p><p>Trägt man ln k gegen 1/T auf, ist die Steigung m = −E<sub>A</sub> / R. Daraus folgt <b>E<sub>A</sub> = −m · R</b> mit R = 8,314 J/(mol · K).</p><ul><li>T muss in <b>Kelvin</b> angegeben werden: T / K = ϑ / °C + 273,15. Die Seite rechnet °C auf Wunsch selbst um.</li><li>Man braucht mindestens drei, besser fünf Temperaturen.</li><li>Das Ergebnis erscheint in kJ/mol.</li></ul>'],
+['Titrationskurve, Wendepunkt und Äquivalenzpunkt','<p>Bei der Titration ändert sich der pH-Wert nahe dem <b>Äquivalenzpunkt</b> sprunghaft. Dort ist die Kurve am steilsten (<b>Wendepunkt</b>). „Steilster Punkt“ sucht diese Stelle; das zugehörige Volumen ist das Äquivalenzvolumen V<sub>eq</sub>.</p><ul><li>Die <b>Steigungskurve</b> (ΔpH / ΔV) hat dort ein Maximum.</li><li>Starke Säure und starke Base: pH = 7 am Äquivalenzpunkt (25 °C). Schwache Säure mit starker Base: pH &gt; 7.</li><li>Bei einer schwachen Säure gilt am <b>Halbäquivalenzpunkt</b> (V = V<sub>eq</sub> / 2): pH = pK<sub>S</sub>.</li></ul><p>Die Genauigkeit der Bestimmung hängt vom Abstand der Messpunkte ab; kleine Volumenschritte nahe dem Sprung verbessern sie.</p>'],
+['Welche Ausgleichskurve passt?','<p>Die Form der Kurve soll zum chemischen Zusammenhang passen, nicht nur zu den Punkten.</p><ul><li><b>Gerade:</b> gleichbleibende Änderung (z. B. Kalibrierung, 0. Ordnung).</li><li><b>Exponentiell y = a · e<sup>b·x</sup>:</b> Abnahme oder Zunahme proportional zum Bestand (1. Ordnung, radioaktiver Zerfall).</li><li><b>Exponentiell mit Grenzwert y = A + B · e<sup>−k·x</sup>:</b> Annäherung an einen Endwert (Einstellen eines Gleichgewichts, Aufladen).</li><li><b>Parabel / Polynom:</b> nur zum Glätten oder zum Bestimmen eines Scheitelpunkts, ohne chemische Bedeutung der Koeffizienten.</li></ul><p>Eine Ausgleichskurve gilt nur im Bereich der Messwerte; über diesen Bereich hinaus (Extrapolation) wird sie schnell unzuverlässig.</p>']
+];
+let gi=0;
+function gShow(){const t=TOP[gi];$('gTitle').textContent=t[0];$('gBody').innerHTML=t[1];$('gCnt').textContent=(gi+1)+' / '+TOP.length;$('gPrev').disabled=gi===0;$('gNext').disabled=gi===TOP.length-1;}
+TOP.forEach((t,i)=>{const b=document.createElement('button');b.type='button';b.className='btn sm';b.style.textAlign='left';b.textContent=(i+1)+'. '+t[0];b.onclick=()=>{gi=i;gShow();openM('mGrund');};$('gList').appendChild(b);});
+function gGo(d){gi=Math.max(0,Math.min(TOP.length-1,gi+d));gShow();}
+$('gPrev').onclick=()=>gGo(-1);$('gNext').onclick=()=>gGo(1);
+$('gBtn').onclick=()=>{const h=$('gList').hidden;$('gList').hidden=!h;$('gBtn').setAttribute('aria-expanded',h);$('gBtn').textContent=(h?'▾':'▸')+' Grundlagen';};
+
+/* ====================== Daten übernehmen ====================== */
+function assignAxes(newS,existing){
+  let uL=null,uR=null;
+  existing.forEach(s=>{if(s.axis==='L'&&uL==null)uL=s.unit;if(s.axis==='R'&&uR==null)uR=s.unit;});
+  newS.forEach(s=>{
+    if(s.axis==='R'||s.axis==='L')return;
+    if(uL==null){uL=s.unit;s.axis='L';}
+    else if(s.unit===uL)s.axis='L';
+    else if(uR==null){uR=s.unit;s.axis='R';}
+    else s.axis=s.unit===uR?'R':'L';
+  });
+}
+function applyDataset(ds,mode,srcName){
+  if(!ds||!ds.series||!ds.series.length)return false;
+  if(mode==='replace'){S.series=[];S.objs=[];S.active=null;S.ciN=0;S.tx='none';S.ty='none';S.auto=true;S.lbl={x:'',yl:'',yr:''};S.xName=ds.xName||'x';S.xUnit=ds.xUnit||'';}
+  else if(!S.series.length){S.xName=ds.xName||'x';S.xUnit=ds.xUnit||'';}
+  const fresh=ds.series.map(x=>({name:String(x.name||'').slice(0,60),unit:String(x.unit||'').slice(0,20),pts:x.pts,axis:(x.axis==='R'||x.axis==='L')?x.axis:null,line:x.line,visible:x.visible!==false}));
+  assignAxes(fresh,S.series);
+  let first=null;
+  fresh.forEach(f=>{
+    const s=newSeries(f.name||undefined,f.unit,f.pts,f.axis||'L');
+    s.line=f.line==='smooth'||f.line==='none'?f.line:'lin';
+    s.marks=f.pts.length<=80;
+    s.visible=f.visible!==false;
+    if(!first)first=s;
+  });
+  S.active=first.id;
+  S.pick=null;
+  syncInputs();refresh();renderTable();
+  return true;
+}
+function importText(text,mode){
+  const ds=parseTable(text);
+  if(!ds)return false;
+  return applyDataset(ds,mode);
+}
+$('bFile').onclick=()=>$('fileCsv').click();
+$('fileCsv').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    const ok=importText(String(rd.result),$('loadMode').value);
+    $('fileMsg').className='msg'+(ok?' ok':' err');
+    $('fileMsg').textContent=ok?('Datei „'+f.name+'“ geladen.'):'In der Datei wurden keine Zahlenspalten gefunden (erste Spalte x, weitere Spalten y).';
+    S.src=null;$('srcBar').hidden=!srcWin;
+  };
+  rd.readAsText(f);e.target.value='';
+};
+$('bPaste').onclick=()=>{$('pasteMsg').textContent='';$('pasteMsg').className='msg';openM('mPaste');setTimeout(()=>$('pasteTa').focus(),50);};
+$('pasteGo').onclick=()=>{
+  const ok=importText($('pasteTa').value,$('loadMode').value);
+  if(ok){closeM('mPaste');$('pasteTa').value='';$('fileMsg').className='msg ok';$('fileMsg').textContent='Tabelle übernommen.';}
+  else{$('pasteMsg').className='msg err';$('pasteMsg').textContent='Es wurden keine Zahlenspalten erkannt. Erste Spalte: x, weitere Spalten: y; Trennung durch Tabulator, Semikolon oder Leerzeichen.';}
+};
+const NOISE=[0,.012,-.010,.008,-.015,.011,-.006,.014,-.009,.007,-.012];
+function demoData(k){
+  if(k==='zerfall'){
+    const pts=[];for(let i=0;i<=10;i++){const t=i*30;pts.push({x:t,y:+(0.100*Math.exp(-0.0085*t)*(1+NOISE[i])).toPrecision(4)});}
+    return {xName:'t',xUnit:'s',series:[{name:'c(A)',unit:'mol/L',pts}]};
+  }
+  if(k==='titration'){
+    const Vs=[0,2,4,6,8,10,12,14,16,18,20,22,23,24,24.5,24.8,24.9,25,25.1,25.2,25.5,26,27,28,30,32,34,36,38,40,45,50];
+    const pts=Vs.map(V=>{let pH;const vt=25+V,nH=2.5-0.1*V;
+      if(Math.abs(nH)<1e-9)pH=7;else if(nH>0)pH=-Math.log10(nH/vt);else pH=14+Math.log10(-nH/vt);
+      return {x:V,y:+pH.toFixed(2)};});
+    return {xName:'V(NaOH)',xUnit:'mL',series:[{name:'pH',unit:'',pts}]};
+  }
+  if(k==='arrh'){
+    const pts=[];for(let T=290;T<=340;T+=10)pts.push({x:T,y:+(2.0e9*Math.exp(-60000/(RGAS*T))).toPrecision(4)});
+    return {xName:'T',xUnit:'K',series:[{name:'k',unit:'1/s',pts}]};
+  }
+  return null;
+}
+$('demoSel').onchange=e=>{const k=e.target.value;if(!k)return;applyDataset(demoData(k),$('loadMode').value);S.src=null;e.target.value='';
+  $('fileMsg').className='msg ok';$('fileMsg').textContent='Beispieldaten geladen.';};
+$('bNew').onclick=()=>{const s=newSeries(undefined,'',[],'L');s.marks=true;S.active=s.id;refresh();renderTable();setTab('table');};
+$('bClear').onclick=()=>{S.series=[];S.objs=[];S.active=null;S.ciN=0;S.xName='x';S.xUnit='';S.tx='none';S.ty='none';S.lbl={x:'',yl:'',yr:''};S.deriv=false;$('oDeriv').checked=false;S.pick=null;syncInputs();refresh();renderTable();$('fileMsg').textContent='';};
+
+/* ====================== Eingaben links ====================== */
+function fillTfSelects(){
+  const names={none:'Messwerte',ln:'ln (natürlicher Logarithmus)',lg:'lg (Zehnerlogarithmus)',inv:'1/… (Kehrwert)',sq:'Quadrat',sqrt:'Wurzel'};
+  ['tx','ty'].forEach(id=>{$(id).innerHTML=Object.keys(names).map(k=>'<option value="'+k+'">'+names[k]+'</option>').join('');});
+  $('curveSel').innerHTML=Object.keys(CURVE_NAMES).map(k=>'<option value="'+k+'">'+CURVE_NAMES[k]+'</option>').join('');
+}
+function syncInputs(){
+  $('xName').value=S.xName;$('xUnit').value=S.xUnit;$('tx').value=S.tx;$('ty').value=S.ty;
+  $('celRow').hidden=!(S.tx==='inv'&&isCelX());$('celOn').checked=S.celsius;
+  $('oAuto').checked=S.auto;$('rangeBox').hidden=S.auto;
+  $('oGrid').checked=S.grid;$('oCross').checked=S.cross;
+  $('lblX').value=S.lbl.x;$('lblYL').value=S.lbl.yl;$('lblYR').value=S.lbl.yr;
+}
+[['lblX','x'],['lblYL','yl'],['lblYR','yr']].forEach(([id,k])=>{$(id).oninput=e=>{S.lbl[k]=e.target.value.slice(0,80);redraw();};});
+$('lblAuto').onclick=()=>{S.lbl={x:'',yl:'',yr:''};syncInputs();redraw();};
+function lblPlaceholders(){
+  $('lblX').placeholder=xLabel();
+  $('lblYL').placeholder=axisLabel('L')||'y';
+  let r=axisLabel('R');if(!r&&S.deriv){const a=actSer();r='Steigung dy/dx'+(a?' von '+a.name:'');}
+  $('lblYR').placeholder=r||'– keine Reihe auf der rechten Achse –';
+}
+function setTransform(tx,ty){
+  S.tx=tx;S.ty=ty;
+  S.objs=S.objs.filter(o=>o.type==='order');
+  if(S.setPts&&(tx!=='none'||ty!=='none')){S.setPts=false;$('setPts').checked=false;updSetMode();}
+  syncInputs();refresh();
+  if(tx!=='none'||ty!=='none')msgBar('Darstellung umgerechnet. Frühere Auswertungen wurden entfernt, weil sich die Achsengrößen geändert haben.');
+}
+$('tx').onchange=e=>setTransform(e.target.value,S.ty);
+$('ty').onchange=e=>setTransform(S.tx,e.target.value);
+$('celOn').onchange=e=>{S.celsius=e.target.checked;S.objs=S.objs.filter(o=>o.type==='order');refresh();};
+document.querySelectorAll('#linRow [data-lin]').forEach(b=>b.onclick=()=>{
+  const k=b.dataset.lin;
+  if(k==='none')setTransform('none','none');
+  else if(k==='ln')setTransform('none','ln');
+  else if(k==='inv')setTransform('none','inv');
+  else setTransform('inv','ln');
+});
+$('xName').oninput=e=>{S.xName=e.target.value;$('celRow').hidden=!(S.tx==='inv'&&isCelX());refresh(true);};
+$('xUnit').oninput=e=>{S.xUnit=e.target.value;$('celRow').hidden=!(S.tx==='inv'&&isCelX());refresh(true);};
+$('oGrid').onchange=e=>{S.grid=e.target.checked;redraw();};
+$('oCross').onchange=e=>{S.cross=e.target.checked;redraw();};
+$('oAuto').onchange=e=>{
+  S.auto=e.target.checked;$('rangeBox').hidden=S.auto;
+  if(!S.auto){const R=getRanges();$('rxmin').value=fmtPlain(R.x.min);$('rxmax').value=fmtPlain(R.x.max);$('rymin').value=fmtPlain(R.L.min);$('rymax').value=fmtPlain(R.L.max);$('ry2min').value=fmtPlain(R.R.min);$('ry2max').value=fmtPlain(R.R.max);readRange();}
+  redraw();
+};
+function readRange(){const g=S.rng;g.xmin=parseNum($('rxmin').value);g.xmax=parseNum($('rxmax').value);g.ymin=parseNum($('rymin').value);g.ymax=parseNum($('rymax').value);g.y2min=parseNum($('ry2min').value);g.y2max=parseNum($('ry2max').value);}
+['rxmin','rxmax','rymin','rymax','ry2min','ry2max'].forEach(id=>$(id).oninput=()=>{readRange();redraw();});
+function updSetMode(){
+  $('penRow').hidden=!S.setPts;$('penHint').hidden=!(S.setPts&&S.penOnly);$('setHint').hidden=!S.setPts;
+  $('cv').classList.toggle('draw',S.setPts||!!S.pick);
+}
+$('setPts').onchange=e=>{
+  if(e.target.checked&&(S.tx!=='none'||S.ty!=='none')){e.target.checked=false;msgBar('Punkte lassen sich nur in der Darstellung „Messwerte“ setzen.');return;}
+  S.setPts=e.target.checked;if(S.setPts&&!S.series.length){const s=newSeries(undefined,'',[],'L');S.active=s.id;refresh();renderTable();}
+  updSetMode();setTab('chart');
+};
+$('penOnly').onchange=e=>{S.penOnly=e.target.checked;updSetMode();};
+
+/* ====================== Reihen, Tabelle ====================== */
+function setTab(t){
+  document.querySelectorAll('.tabbtn').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));
+  $('tab-chart').hidden=t!=='chart';$('tab-table').hidden=t!=='table';
+  if(t==='chart')requestAnimationFrame(redraw);else renderTable();
+}
+document.querySelectorAll('.tabbtn').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+function renderActSel(){
+  const sel=$('actSel');
+  sel.innerHTML=S.series.map(s=>'<option value="'+s.id+'"'+(s.id===S.active?' selected':'')+'>'+esc(s.name)+(s.unit?' ('+esc(s.unit)+')':'')+'</option>').join('')||'<option value="">– keine Reihe –</option>';
+}
+$('actSel').onchange=e=>{S.active=+e.target.value;refresh();renderTable();};
+function renderLegend(){
+  const mk=()=>S.series.map(s=>'<span class="lg'+(s.id===S.active?' act':'')+(s.visible?'':' off')+'" data-sid="'+s.id+'"><i style="background:'+COL[s.ci%COL.length]+'"></i>'+esc(s.name)+(s.unit?' <span style="color:var(--text-dim)">('+esc(s.unit)+')</span>':'')+(s.axis==='R'?' <span style="color:var(--text-dim)">· rechts</span>':'')+'</span>').join('');
+  $('legend').innerHTML=mk()||'<span class="hint">Noch keine Daten: Lade eine CSV-Datei, füge eine Tabelle ein, wähle Beispieldaten, übernimm Messwerte aus einer Simulation oder lege eine neue Reihe an.</span>';
+  $('chips').innerHTML=mk()+'<button class="btn sm" id="chipNew" type="button">+ Reihe</button>';
+  const cn=$('chipNew');if(cn)cn.onclick=()=>$('bNew').click();
+}
+['legend','chips'].forEach(id=>$(id).addEventListener('click',e=>{
+  const c=e.target.closest('[data-sid]');if(!c)return;
+  S.active=+c.dataset.sid;refresh();if(!$('tab-table').hidden)renderTable();
+}));
+function renderTable(){
+  const s=actSer();
+  const sb=$('serBox'),gt=$('gt');
+  if(!s){sb.innerHTML='<div class="hint">Keine Reihe vorhanden.</div>';gt.innerHTML='';$('stats').textContent='';return;}
+  sb.innerHTML='<div class="serrow">'+
+   '<label class="field"><span>Name der Reihe</span><input type="text" id="sName" value="'+esc(s.name)+'" autocomplete="off"></label>'+
+   '<label class="field"><span>Einheit</span><input type="text" id="sUnit" value="'+esc(s.unit)+'" autocomplete="off"></label>'+
+   '<label class="field"><span>y-Achse</span><select id="sAxis"><option value="L"'+(s.axis==='L'?' selected':'')+'>links</option><option value="R"'+(s.axis==='R'?' selected':'')+'>rechts</option></select></label>'+
+   '<label class="field"><span>Linie</span><select id="sLine"><option value="none"'+(s.line==='none'?' selected':'')+'>keine</option><option value="lin"'+(s.line==='lin'?' selected':'')+'>gerade Stücke</option><option value="smooth"'+(s.line==='smooth'?' selected':'')+'>glatte Kurve</option></select></label>'+
+   '<label class="opt"><input type="checkbox" id="sMarks"'+(s.marks?' checked':'')+'> Punkte zeigen</label>'+
+   '<label class="opt"><input type="checkbox" id="sVis"'+(s.visible?' checked':'')+'> sichtbar</label>'+
+   '<button class="btn sm" id="sCol" type="button">Farbe wechseln</button>'+
+   '<button class="btn sm" id="sDel" type="button">Reihe löschen</button></div>';
+  const upd=()=>{refresh(true);};
+  $('sName').oninput=e=>{s.name=e.target.value;renderLegend();renderActSel();refresh(true);};
+  $('sUnit').oninput=e=>{s.unit=e.target.value;renderLegend();renderActSel();refresh(true);};
+  $('sAxis').onchange=e=>{s.axis=e.target.value;refresh();renderTable();};
+  $('sLine').onchange=e=>{s.line=e.target.value;upd();};
+  $('sMarks').onchange=e=>{s.marks=e.target.checked;upd();};
+  $('sVis').onchange=e=>{s.visible=e.target.checked;refresh();renderTable();};
+  $('sCol').onclick=()=>{s.ci=(s.ci+1)%COL.length;s.color=COL[s.ci];refresh();};
+  $('sDel').onclick=()=>{
+    S.series=S.series.filter(x=>x.id!==s.id);S.objs=S.objs.filter(o=>o.sid!==s.id);
+    S.active=S.series.length?S.series[0].id:null;refresh();renderTable();
+  };
+  const N=Math.min(s.pts.length,500);
+  let h='<tr><th>#</th><th>'+esc(xLabelRaw())+'</th><th>'+esc(s.name+(s.unit?' in '+s.unit:''))+'</th><th></th></tr>';
+  for(let i=0;i<N;i++){const p=s.pts[i];
+    h+='<tr data-i="'+i+'"><td class="n">'+(i+1)+'</td><td><input type="text" data-c="x" value="'+fmtPlain(p.x)+'" inputmode="decimal" autocomplete="off"></td><td><input type="text" data-c="y" value="'+fmtPlain(p.y)+'" inputmode="decimal" autocomplete="off"></td><td><button class="rm" data-rm="'+i+'" title="Zeile löschen" type="button">×</button></td></tr>';}
+  gt.innerHTML=h;
+  if(s.pts.length>N)gt.insertAdjacentHTML('beforeend','<tr><td colspan="4" class="hint">Es werden nur die ersten '+N+' von '+s.pts.length+' Zeilen angezeigt.</td></tr>');
+  renderStats(s);
+}
+function xLabelRaw(){return S.xUnit?(S.xName||'x')+' in '+S.xUnit:(S.xName||'x');}
+function renderStats(s){
+  const V=s.pts.filter(p=>isFinite(p.x)&&isFinite(p.y));
+  if(!V.length){$('stats').textContent='Keine gültigen Werte.';return;}
+  const n=V.length,my=V.reduce((a,p)=>a+p.y,0)/n;
+  const sd=n>1?Math.sqrt(V.reduce((a,p)=>a+(p.y-my)*(p.y-my),0)/(n-1)):0;
+  const xs=V.map(p=>p.x),ys=V.map(p=>p.y);
+  $('stats').innerHTML='<b>'+n+'</b> gültige Wertepaare · x von '+fmt(Math.min.apply(null,xs))+' bis '+fmt(Math.max.apply(null,xs))+' · y von '+fmt(Math.min.apply(null,ys))+' bis '+fmt(Math.max.apply(null,ys))+' · Mittelwert y = '+fmt(my)+(n>1?' · Standardabweichung = '+fmt(sd):'');
+}
+$('gt').addEventListener('change',e=>{
+  const inp=e.target;if(inp.tagName!=='INPUT')return;
+  const tr=inp.closest('tr'),s=actSer();if(!tr||!s)return;
+  const i=+tr.dataset.i,p=s.pts[i];if(!p)return;
+  const v=inp.value.trim()===''?NaN:parseNum(inp.value);
+  p[inp.dataset.c]=v;
+  inp.classList.toggle('bad',inp.value.trim()!==''&&!isFinite(v));
+  refresh(true);renderStats(s);
+});
+$('gt').addEventListener('click',e=>{
+  const b=e.target.closest('[data-rm]');if(!b)return;
+  const s=actSer();if(!s)return;
+  s.pts.splice(+b.dataset.rm,1);refresh();renderTable();
+});
+/* Neue Zeile: bei mindestens drei gleichmäßigen x-Abständen mit dem nächsten x-Wert vorbelegt (markiert, Tippen ersetzt ihn); Fokus immer auf x */
+function focusCell(i,c){const inp=$('gt').querySelector('tr[data-i="'+i+'"] input[data-c='+c+']');if(inp){inp.focus();try{inp.select();}catch(e){}inp.scrollIntoView({block:'nearest'});}}
+function addRow(){
+  const s=actSer();if(!s)return;
+  const P=s.pts,n=P.length;let x=NaN;
+  if(n>=3&&[1,2,3].every(k=>isFinite(P[n-k].x))){const d1=P[n-1].x-P[n-2].x,d2=P[n-2].x-P[n-3].x;if(d1!==0&&Math.abs(d1-d2)<=1e-9*Math.max(1,Math.abs(d1)))x=+(P[n-1].x+d1).toPrecision(10);}
+  P.push({x,y:NaN});renderTable();refresh(true);
+  focusCell(n,'x');
+}
+$('bRow').onclick=addRow;
+$('gt').addEventListener('keydown',e=>{
+  if(e.key!=='Enter')return;
+  const inp=e.target;if(inp.tagName!=='INPUT'||!inp.dataset.c)return;
+  e.preventDefault();
+  inp.dispatchEvent(new Event('change',{bubbles:true}));
+  const s=actSer();if(!s)return;
+  const i=+inp.closest('tr').dataset.i;
+  if(inp.dataset.c==='x'){focusCell(i,'y');return;}
+  if(i+1<Math.min(s.pts.length,500))focusCell(i+1,'x');else addRow();
+});
+/* Knopf „Werte eingeben“: Tabelle öffnen, leere Zeile bereitstellen */
+$('bEnter').onclick=()=>{
+  let s=actSer();
+  if(!s){s=newSeries(undefined,'',[],'L');s.marks=true;S.active=s.id;refresh();}
+  setTab('table');
+  const P=s.pts,last=P[P.length-1];
+  if(last&&!isFinite(last.y)&&P.length<=500){focusCell(P.length-1,'x');}
+  else addRow();
+};
+$('bSort').onclick=()=>{const s=actSer();if(!s)return;s.pts.sort((a,b)=>(isFinite(a.x)?a.x:Infinity)-(isFinite(b.x)?b.x:Infinity));refresh();renderTable();};
+
+/* ====================== Auswertungen anlegen ====================== */
+document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{
+  const o=addObj(b.dataset.add);if(!o)return;
+  refresh();setTab('chart');
+  const el=document.querySelector('.obj[data-oid="'+o.id+'"]');if(el)el.scrollIntoView({block:'nearest',behavior:'smooth'});
+});
+$('bCurve').onclick=()=>{const o=addObj('curve',{kind:$('curveSel').value});if(!o)return;refresh();setTab('chart');};
+$('oDeriv').onchange=e=>{S.deriv=e.target.checked;refresh();};
+function updateDerivHint(){
+  const usedR=S.series.some(s=>s.visible&&s.axis==='R');
+  $('derivHint').textContent=S.deriv&&usedR?'Die rechte y-Achse wird schon von einer Reihe genutzt; die Steigungskurve erscheint nur ohne Reihe auf der rechten Achse.':'Zeigt die Steigung der gewählten Reihe als gestrichelte Linie an der rechten y-Achse (z. B. ΔpH/ΔV bei der Titration).';
+}
+$('objs').addEventListener('click',e=>{
+  const d=e.target.closest('[data-del]');
+  if(d){S.objs=S.objs.filter(o=>o.id!==+d.dataset.del);refresh();return;}
+  const p=e.target.closest('[data-pick]');
+  if(p){const oid=+p.closest('.obj').dataset.oid;S.pick={oid,field:p.dataset.pick};updSetMode();setTab('chart');
+    msgBar('Tippe im Diagramm auf die gewünschte Stelle (x-Wert).');$('cv').scrollIntoView({block:'center',behavior:'smooth'});}
+});
+$('objs').addEventListener('change',e=>{
+  const inp=e.target;const f=inp.dataset.f;if(!f)return;
+  const o=S.objs.find(x=>x.id===+inp.closest('.obj').dataset.oid);if(!o)return;
+  if(f==='kind')o.kind=inp.value;
+  else if(f==='through0')o.through0=inp.checked;
+  else if(f==='expr'){o.expr=inp.value;o.f=null;}
+  else{const v=inp.value.trim()===''?null:parseNum(inp.value);o[f]=(v!=null&&isFinite(v))?v:null;}
+  refresh();
+});
+
+/* ====================== Diagramm: Zeigen, Wählen, Setzen ====================== */
+function canvasPos(e){const r=$('cv').getBoundingClientRect();return {px:e.clientX-r.left,py:e.clientY-r.top};}
+function dataAt(px,py,axis){
+  if(!LAST)return null;
+  const R=LAST.R,x=R.x.min+(px-LAST.pl)/(LAST.pr-LAST.pl)*(R.x.max-R.x.min);
+  const r=axis==='R'?R.R:R.L,y=r.min+(LAST.pb-py)/(LAST.pb-LAST.pt)*(r.max-r.min);
+  return {x,y};
+}
+function readoutAt(px,py){
+  if(!LAST||px<LAST.pl||px>LAST.pr||py<LAST.pt||py>LAST.pb){return;}
+  const R=LAST.R,x=R.x.min+(px-LAST.pl)/(LAST.pr-LAST.pl)*(R.x.max-R.x.min);
+  let t='x = '+fmt(x)+(xUnitT()?' '+xUnitT():'');
+  S.series.forEach(s=>{if(!s.visible)return;const y=interpY(viewPts(s),x);if(y!=null)t+='   '+s.name+' = '+fmt(y)+(yUnitT(s)?' '+yUnitT(s):'');});
+  $('readout').textContent=t;
+}
+let raf=0;
+const cv=$('cv');
+cv.addEventListener('pointermove',e=>{
+  const c=canvasPos(e);
+  if(e.pointerType==='mouse'||e.pointerType==='pen'||e.buttons){S.cursor=c;readoutAt(c.px,c.py);if(!raf)raf=requestAnimationFrame(()=>{raf=0;redraw();});}
+});
+cv.addEventListener('pointerleave',()=>{S.cursor=null;redraw();});
+cv.addEventListener('pointerdown',e=>{
+  const c=canvasPos(e);
+  if(!LAST)return;
+  if(c.px<LAST.pl-2||c.px>LAST.pr+2||c.py<LAST.pt-2||c.py>LAST.pb+2)return;
+  if(S.pick){
+    const o=S.objs.find(x=>x.id===S.pick.oid);
+    if(o){
+      const s=serById(o.sid);let x=dataAt(c.px,c.py,'L').x;
+      if(s){const P=viewPts(s);const sx=snapX(P,x);if(sx!=null&&Math.abs(LAST.X(sx)-c.px)<=10)x=sx;}
+      o[S.pick.field]=+x.toPrecision(8);
+    }
+    S.pick=null;updSetMode();refresh();e.preventDefault();return;
+  }
+  if(S.setPts){
+    if(S.penOnly&&e.pointerType!=='pen')return;
+    const s=actSer();if(!s)return;
+    const ax=s.axis;
+    /* vorhandenen Punkt in der Nähe löschen */
+    let bi=-1,bd=11;
+    s.pts.forEach((p,i)=>{if(!isFinite(p.x)||!isFinite(p.y))return;const d=Math.hypot(LAST.X(p.x)-c.px,LAST.Y(p.y,ax)-c.py);if(d<bd){bd=d;bi=i;}});
+    if(bi>=0)s.pts.splice(bi,1);
+    else{const d=dataAt(c.px,c.py,ax);s.pts.push({x:+d.x.toPrecision(5),y:+d.y.toPrecision(5)});}
+    refresh();if(!$('tab-table').hidden)renderTable();e.preventDefault();
+  }
+});
+
+/* ====================== CSV, Zwischenstand ====================== */
+function download(name,text,type){
+  const b=new Blob([text],{type});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+}
+$('bCsv').onclick=()=>{
+  const V=S.series.filter(s=>s.pts.some(p=>isFinite(p.x)&&isFinite(p.y)));if(!V.length){$('fileMsg').className='msg err';$('fileMsg').textContent='Keine Daten zum Speichern.';return;}
+  const num=v=>isFinite(v)?String(v).replace('.',','):'';
+  const same=V.every(s=>s.pts.length===V[0].pts.length&&s.pts.every((p,i)=>p.x===V[0].pts[i].x));
+  let t='';
+  if(same){t=xLabelRaw()+';'+V.map(s=>s.name+(s.unit?' ('+s.unit+')':'')).join(';')+'\r\n'+V[0].pts.map((p,i)=>num(p.x)+';'+V.map(s=>num(s.pts[i].y)).join(';')).join('\r\n');}
+  else{t=V.map(s=>xLabelRaw()+';'+s.name+(s.unit?' ('+s.unit+')':'')+'\r\n'+s.pts.filter(p=>isFinite(p.x)&&isFinite(p.y)).map(p=>num(p.x)+';'+num(p.y)).join('\r\n')).join('\r\n\r\n');}
+  download('Graphen_Daten.csv','﻿'+t,'text/csv;charset=utf-8');
+};
+$('bSave').onclick=()=>{
+  const st={app:'Graphen',version:'1.0',xName:S.xName,xUnit:S.xUnit,tx:S.tx,ty:S.ty,celsius:S.celsius,grid:S.grid,cross:S.cross,auto:S.auto,rng:S.rng,lbl:S.lbl,
+    series:S.series.map(s=>({name:s.name,unit:s.unit,axis:s.axis,line:s.line,marks:s.marks,visible:s.visible,ci:s.ci,pts:s.pts.map(p=>[isFinite(p.x)?p.x:null,isFinite(p.y)?p.y:null])})),
+    objs:S.objs.map(o=>({type:o.type,si:S.series.findIndex(s=>s.id===o.sid),ci:o.ci,x1:o.x1,x2:o.x2,x0:o.x0,kind:o.kind||null,through0:!!o.through0,expr:o.expr||null})),
+    active:S.series.findIndex(s=>s.id===S.active)};
+  download('Graphen_Zwischenstand.json',JSON.stringify(st),'application/json');
+};
+$('bLoad').onclick=()=>$('fileState').click();
+$('fileState').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;const rd=new FileReader();
+  rd.onload=()=>{
+    try{
+      const d=JSON.parse(rd.result);if(d.app!=='Graphen'||!Array.isArray(d.series)||d.series.length>20)throw 0;
+      const numOrNaN=v=>(typeof v==='number'&&isFinite(v))?v:NaN;
+      const num2=v=>(typeof v==='number'&&isFinite(v))?v:null;
+      S.series=[];S.objs=[];S.ciN=0;
+      d.series.forEach(x=>{
+        if(!Array.isArray(x.pts)||x.pts.length>5000)throw 0;
+        const s=newSeries(String(x.name||'').slice(0,60),String(x.unit||'').slice(0,20),x.pts.map(p=>({x:numOrNaN(p&&p[0]),y:numOrNaN(p&&p[1])})),x.axis==='R'?'R':'L');
+        s.line=['none','lin','smooth'].indexOf(x.line)>=0?x.line:'none';s.marks=x.marks!==false;s.visible=x.visible!==false;
+        s.ci=((+x.ci||0)%COL.length+COL.length)%COL.length;s.color=COL[s.ci];
+      });
+      S.xName=String(d.xName||'x').slice(0,60);S.xUnit=String(d.xUnit||'').slice(0,20);
+      S.tx=TFS[d.tx]?d.tx:'none';S.ty=TFS[d.ty]?d.ty:'none';S.celsius=d.celsius!==false;S.grid=d.grid!==false;S.cross=d.cross!==false;S.auto=d.auto!==false;
+      {const L=d.lbl&&typeof d.lbl==='object'?d.lbl:{};const st=v=>typeof v==='string'?v.slice(0,80):'';S.lbl={x:st(L.x),yl:st(L.yl),yr:st(L.yr)};}
+      if(d.rng&&typeof d.rng==='object')['xmin','xmax','ymin','ymax','y2min','y2max'].forEach(k=>{S.rng[k]=numOrNaN(d.rng[k]);});
+      S.active=S.series.length?S.series[Math.max(0,Math.min(S.series.length-1,+d.active||0))].id:null;
+      (Array.isArray(d.objs)?d.objs:[]).slice(0,40).forEach(x=>{
+        if(!OBJ_NAMES[x.type])return;
+        const o={id:S.nextId++,type:x.type,sid:S.series[x.si]?S.series[x.si].id:null,ci:+x.ci||0,x1:num2(x.x1),x2:num2(x.x2),x0:num2(x.x0)};
+        if(x.type==='curve')o.kind=CURVE_NAMES[x.kind]?x.kind:'p2';
+        if(x.type==='fit')o.through0=!!x.through0;
+        if(x.type==='func')o.expr=String(x.expr||'').slice(0,200);
+        S.objs.push(o);
+      });
+      syncInputs();refresh();renderTable();
+      $('fileMsg').className='msg ok';$('fileMsg').textContent='Zwischenstand geladen.';
+    }catch(_){$('fileMsg').className='msg err';$('fileMsg').textContent='Die Datei ist kein gültiger Zwischenstand dieses Werkzeugs.';}
+    e.target.value='';
+  };
+  rd.readAsText(f);
+};
+
+/* ====================== PDF ====================== */
+$('pdfBtn').onclick=()=>{
+  const H=$('pdfSel');H.innerHTML='';
+  const add=(label,checked,id)=>{const l=document.createElement('label');l.className='opt';l.innerHTML='<input type="checkbox" data-k="'+id+'"'+(checked?' checked':'')+'> '+esc(label);H.appendChild(l);};
+  if(!S.series.length){H.innerHTML='<div class="hint">Nichts auszugeben – lege zuerst Daten an.</div>';$('pdfGo').disabled=true;}
+  else{
+    $('pdfGo').disabled=false;
+    add('Diagramm',true,'chart');
+    if(S.objs.length)add('Auswertungen mit Ergebnissen ('+S.objs.length+')',true,'objs');
+    S.series.forEach(s=>add('Wertetabelle: '+s.name+(s.unit?' ('+s.unit+')':''),true,'s'+s.id));
+  }
+  openM('mPdf');
+};
+$('pdfGo').onclick=()=>{
+  const sel={};$('pdfSel').querySelectorAll('input[data-k]').forEach(i=>sel[i.dataset.k]=i.checked);
+  const name=$('pName').value.trim(),kurs=$('pKurs').value.trim();
+  const d=new Date(),ds=String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();
+  let h='<h1>Graphen zeichnen und auswerten</h1><div class="pmeta">'+(name?'Name: '+esc(name)+' · ':'')+(kurs?'Kurs: '+esc(kurs)+' · ':'')+'Datum: '+ds+'</div>';
+  if(sel.chart)h+='<img class="pchart" alt="Diagramm" src="'+chartImage()+'">';
+  if(sel.objs&&S.objs.length){
+    h+='<h2>Auswertungen</h2>';
+    S.objs.forEach(o=>{
+      const r=o.res||{lines:[]},s=serById(o.sid);
+      h+='<div class="pobj"><b class="t">'+OBJ_NAMES[o.type]+(s&&o.type!=='func'?' – Reihe „'+esc(s.name)+'“':'')+(o.type==='curve'?'':'')+'</b>';
+      (r.lines||[]).forEach(l=>{h+='<div>'+l+'</div>';});
+      if(r.note)h+=r.note.charAt(0)==='<'?r.note:'<div>'+r.note+'</div>';
+      h+='</div>';
+    });
+  }
+  S.series.forEach(s=>{
+    if(!sel['s'+s.id])return;
+    const V=s.pts.filter(p=>isFinite(p.x)&&isFinite(p.y));
+    h+='<div class="ptb'+(V.length>40?' long':'')+'"><h2>Wertetabelle: '+esc(s.name)+'</h2><table class="pt"><tr><th>'+esc(xLabelRaw())+'</th><th>'+esc(s.name+(s.unit?' in '+s.unit:''))+'</th></tr>'+V.map(p=>'<tr><td>'+fmtPlain(+p.x.toPrecision(8))+'</td><td>'+fmtPlain(+p.y.toPrecision(8))+'</td></tr>').join('')+'</table></div>';
+  });
+  h+='<div class="pfoot">Graphen zeichnen und auswerten V1.0 · Bastian Baumgart · chemie.mail-baumgart.de · Lizenz CC BY-NC-SA 4.0</div>';
+  $('print').innerHTML=h;closeM('mPdf');setTimeout(()=>{try{window.print();}catch(e){}},80);
+};
+
+/* ====================== Übernahme aus anderen Seiten (postMessage) ====================== */
+const Q=new URLSearchParams(location.search);
+const SRC_NAMES={kalorimetrie:'Kalorimetrie',reaktionsgeschwindigkeit:'Reaktionsgeschwindigkeit',titration:'Titration',gleichgewicht:'Chemisches Gleichgewicht',treibhauseffekt:'Treibhauseffekt'};
+let srcWin=null;
+try{srcWin=window.opener&&!window.opener.closed&&Q.get('from')?window.opener:null;}catch(e){srcWin=null;}
+const TGT=location.protocol==='file:'?'*':location.origin;
+function askSource(){if(!srcWin)return false;try{srcWin.postMessage({type:'graphReady'},TGT);return true;}catch(e){return false;}}
+function cleanDs(d){
+  if(!d||!Array.isArray(d.series))return null;
+  const str=(v,n)=>String(v==null?'':v).slice(0,n);
+  const out={xName:str(d.xName||'x',60),xUnit:str(d.xUnit,20),title:str(d.title,80),series:[]};
+  d.series.slice(0,12).forEach(s=>{
+    if(!s||!Array.isArray(s.x)||!Array.isArray(s.y))return;
+    const n=Math.min(s.x.length,s.y.length,5000),pts=[];
+    for(let i=0;i<n;i++){const x=+s.x[i],y=+s.y[i];if(isFinite(x)&&isFinite(y))pts.push({x,y});}
+    if(pts.length)out.series.push({name:str(s.name,60),unit:str(s.unit,20),pts,axis:s.axis==='R'?'R':s.axis==='L'?'L':null,line:s.line==='smooth'?'smooth':'lin',visible:!s.hidden});
+  });
+  return out.series.length?out:null;
+}
+let askTimer=0,gotData=false;
+/* Simulation aus dem Werkzeug öffnen (Auswahlmenü) – Rückgabe per postMessage */
+const SIM_URL={treibhauseffekt:'../EP/EP-Treibhauseffekt.html',kalorimetrie:'../Q1/1-Kalorimetrie.html',reaktionsgeschwindigkeit:'../Q1/1-Reaktionsgeschwindigkeit.html',gleichgewicht:'../Q1/1-Chemisches_Gleichgewicht.html',titration:'../Q2/2-Titration.html'};
+const jumpWins=new Map();
+function jumpMsg(cls,t){$('jumpInfo').className='msg'+(cls?' '+cls:'');$('jumpInfo').textContent=t;}
+$('jumpSel').onchange=()=>{$('jumpGo').disabled=!$('jumpSel').value;};
+$('jumpGo').onclick=()=>{
+  const k=$('jumpSel').value;if(!SIM_URL[k]){jumpMsg('err','Wähle zuerst eine Simulation.');return;}
+  let w=null;try{w=window.open(SIM_URL[k]+'?ret=graph','_blank');}catch(e){w=null;}
+  if(!w){jumpMsg('err','Bitte Pop-ups für diese Seite erlauben.');return;}
+  jumpWins.set(w,k);
+  jumpMsg('','„'+SRC_NAMES[k]+'“ wurde in einem neuen Tab geöffnet. Nimm dort Messwerte auf und tippe auf „Messwerte übernehmen ▸“. Deine Daten hier bleiben erhalten.');
+};
+window.addEventListener('message',e=>{
+  if(location.protocol!=='file:'&&e.origin!==location.origin)return;
+  const m=e.data;if(!m||m.type!=='graphData')return;
+  if(jumpWins.has(e.source)){
+    const nm=SRC_NAMES[jumpWins.get(e.source)]||'der Simulation';
+    if(m.cancel){jumpWins.delete(e.source);jumpMsg('','Aus „'+nm+'“ wurden keine Messwerte übernommen.');return;}
+    const ds=cleanDs(m);if(!ds){jumpMsg('err','Aus „'+nm+'“ kamen keine verwertbaren Messwerte an.');return;}
+    const mode=$('loadMode').value==='add'&&S.series.length?'add':'replace';
+    applyDataset(ds,mode);
+    jumpMsg('ok','Übernommen aus „'+nm+'“'+(ds.title?' – '+ds.title:'')+': '+ds.series.length+(ds.series.length===1?' Reihe':' Reihen')+', '+ds.series.reduce((a,s)=>a+s.pts.length,0)+' Wertepaare'+(mode==='add'?' (zu den vorhandenen Daten hinzugefügt)':'')+'.');
+    try{window.focus();}catch(err){}
+    return;
+  }
+  if(!srcWin||e.source!==srcWin)return;
+  const ds=cleanDs(m);if(!ds)return;
+  gotData=true;clearInterval(askTimer);
+  applyDataset(ds,'replace');
+  const nm=SRC_NAMES[Q.get('from')]||'der Simulation';
+  $('srcBar').hidden=false;
+  $('srcInfo').className='msg ok';
+  $('srcInfo').textContent='Übernommen aus „'+nm+'“'+(ds.title?' – '+ds.title:'')+': '+ds.series.length+(ds.series.length===1?' Reihe':' Reihen')+', '+ds.series.reduce((a,s)=>a+s.pts.length,0)+' Wertepaare. Die Simulation bleibt im anderen Tab geöffnet; „Messwerte neu holen“ aktualisiert die Daten.';
+});
+$('srcAgain').onclick=()=>{if(!askSource()){$('srcInfo').className='msg err';$('srcInfo').textContent='Die Simulation ist nicht mehr erreichbar. Öffne das Werkzeug erneut über den Knopf in der Simulation.';}};
+if(srcWin){
+  $('srcBar').hidden=false;$('srcInfo').className='msg';$('srcInfo').textContent='Messwerte aus „'+(SRC_NAMES[Q.get('from')]||'der Simulation')+'“ werden geholt …';
+  let tries=0;
+  const go=()=>{if(gotData)return;if(++tries>12){clearInterval(askTimer);if(!gotData){$('srcInfo').className='msg err';$('srcInfo').textContent='Es kamen keine Messwerte an. Starte in der Simulation zuerst eine Messung und öffne das Werkzeug erneut.';}return;}askSource();};
+  askTimer=setInterval(go,400);go();
+}
+
+/* ====================== Gesamtaktualisierung ====================== */
+function refresh(light){
+  if(!S.series.some(s=>s.id===S.active))S.active=S.series.length?S.series[0].id:null;
+  recompute();
+  if(!light||!document.activeElement||!document.activeElement.closest('#objs'))renderObjs();
+  renderLegend();renderActSel();updateDerivHint();lblPlaceholders();redraw();
+}
+function init(){
+  fillTfSelects();syncInputs();updSetMode();gShow();
+  window.addEventListener('resize',()=>redraw());
+  if(window.ResizeObserver)new ResizeObserver(()=>redraw()).observe($('cv').parentNode);
+  refresh();
+}
+init();
+
+</script><script id="bk-frac">
+/* Bruchdarstellung: setzt „a / b“ (Schrägstrich mit Leerzeichen) in Formeln als Bruch mit Bruchstrich – wie im Chemie-Rechner. */
+(function(){
+'use strict';
+var INL={sub:1,sup:1,i:1,b:1,strong:1,em:1,span:1,small:1};
+var UNIT=/^(kJ|J|mol|mmol|g|kg|mg|L|mL|K|V|s|min|h|W|Pa|kPa|hPa|bar|°C|ppm|%|cm|mm|dm|m|nm|pm|u)(\/[A-Za-z(][A-Za-z·()⁻¹²³\-]*)?$/;
+var UNITR=/^ (kJ|J|mol|mmol|g|kg|mg|L|mL|K|V|s|min|h|W|Pa|kPa|hPa|bar|°C|ppm|%|cm|mm|dm|m|nm|pm|u)(\/[A-Za-z(][A-Za-z·()⁻¹²³\-]*)?(?![A-Za-zäöüÄÖÜ])/;
+function sp(c){return c===' '||c==='\n'||c==='\t'||c===' ';}
+function strip(t){return t.replace(/<[^>]*>/g,'');}
+function tagAt(s,k){ // Tag, der bei k beginnt: {end,name,close}
+  if(s[k]!=='<')return null;var e=s.indexOf('>',k);if(e<0)return null;
+  var m=/^<(\/?)([a-zA-Z0-9]+)/.exec(s.slice(k,e+1));if(!m)return null;
+  return {end:e+1,name:m[2].toLowerCase(),close:m[1]==='/'};
+}
+function tagBefore(s,e){ // Tag, der vor e (exklusiv) endet
+  if(s[e-1]!=='>')return null;var b=s.lastIndexOf('<',e-1);if(b<0)return null;
+  var t=tagAt(s,b);if(!t||t.end!==e)return null;t.start=b;return t;
+}
+function balanced(h){
+  var st=[],re=/<(\/?)([a-zA-Z0-9]+)[^>]*>/g,m;
+  while((m=re.exec(h))){var n=m[2].toLowerCase();if(n==='br')continue;
+    if(m[1]){if(st.pop()!==n)return false}else st.push(n)}
+  return st.length===0;
+}
+/* ----- rechts: Nenner ----- */
+function readRight(s,j){
+  var n=s.length,k=j,depth=0,pd=0,c,stk=[];
+  if(k>=n)return -1;
+  while(k<n){
+    c=s[k];
+    if(c==='<'){var t=tagAt(s,k);if(!t||!INL[t.name])break;
+      if(t.close){if(!stk.length||stk[stk.length-1]!==t.name)break;stk.pop()}else stk.push(t.name);
+      if(t.name==='sub'||t.name==='sup')depth+=t.close?-1:1;k=t.end;continue}
+    if(sp(c))break;
+    if(c==='('){pd++;k++;
+      while(k<n&&pd>0){var d=s[k];if(d==='(')pd++;else if(d===')')pd--;k++}
+      if(pd>0)return -1;continue}
+    if(c===')')break;
+    if(depth===0&&(c===','||c==='.'||c===';'||c===':'||c==='!'||c==='?')){
+      var nx=s[k+1];if(nx===undefined||sp(nx)||nx==='<'||nx===')')break}
+    if(depth===0&&(c==='='||c==='≈'||c==='⇒'||c==='→'))break;
+    k++;
+  }
+  if(k===j)return -1;
+  var fac=strip(s.slice(j,k));
+  if(/^[−+\-]?\d[\d.,]*(·10.*)?$/.test(fac)){var m=UNITR.exec(s.slice(k));if(m)k+=m[0].length}
+  return k;
+}
+/* ----- links: ein Faktor, der vor e endet ----- */
+function readLeftFactor(s,e){
+  var k=e,depth=0,c,pd=0,stk=[];
+  if(k<=0)return -1;
+  while(k>0){
+    c=s[k-1];
+    if(c==='>'){var t=tagBefore(s,k);if(!t||!INL[t.name])break;
+      if(t.close)stk.push(t.name);else{if(!stk.length||stk[stk.length-1]!==t.name)break;stk.pop()}
+      if(t.name==='sub'||t.name==='sup')depth+=t.close?1:-1;k=t.start;continue}
+    if(sp(c))break;
+    if(c===')'){pd=1;k--;
+      while(k>0&&pd>0){var d=s[k-1];if(d===')')pd++;else if(d==='(')pd--;k--}
+      if(pd>0)return -1;continue}
+    if(c==='(')break;
+    if(depth===0&&(c===';'||c===':'||c==='='||c==='≈'||c==='⇒'||c==='→'))break;
+    if(depth===0&&c===','){var pv=s[k-2];if(!(pv&&/\d/.test(pv)))break}
+    k--;
+  }
+  if(k===e)return -1;
+  return k;
+}
+function readLeftChain(s,e){
+  var st=readLeftFactor(s,e);if(st<0)return -1;
+  var fac=strip(s.slice(st,e));
+  // Einheit hinter Zahl: „0,500 g“, „−11,2 kJ“
+  if(UNIT.test(fac)&&s[st-1]===' '){
+    var st2=readLeftFactor(s,st-1);
+    if(st2>=0&&/^[−+\-]?\d[\d.,]*(·10.*)?$/.test(strip(s.slice(st2,st-1))))st=st2;
+  }
+  // Produktkette: „n · R · T“
+  while(st>=3){
+    var sep=s.slice(st-3,st);
+    if(sep===' · '||sep===' × '||sep===' * '){
+      var st3=readLeftFactor(s,st-3);if(st3<0)break;
+      var f2=strip(s.slice(st3,st-3));
+      var st4=st3;
+      if(UNIT.test(f2)&&s[st3-1]===' '){var st5=readLeftFactor(s,st3-1);if(st5>=0&&/^[−+\-]?\d[\d.,]*(·10.*)?$/.test(strip(s.slice(st5,st3-1))))st4=st5}
+      st=st4;
+    }else break;
+  }
+  return st;
+}
+function mathy(h){
+  var t=strip(h.replace(/<(sub|sup)>.*?<\/\1>/g,'')).replace(/\([^()]*\)/g,'()').replace(/\b(mol|min|ppm|bar|exp|log|lg|ln|kJ|kg|kPa|hPa)\b/g,'');
+  t=t.trim();
+  if(!t)return false;
+  if(/[a-zäöüß]{3,}/.test(t))return false;
+  if(/^[δΔ]?[+−\-]$/.test(strip(h).trim()))return false;
+  return true;
+}
+function unwrap(h){
+  var t=h.trim();
+  if(t[0]==='('&&t[t.length-1]===')'){var pd=0,ok=true;
+    for(var i=0;i<t.length;i++){var c=t[i];if(c==='(')pd++;else if(c===')'){pd--;if(pd===0&&i<t.length-1){ok=false;break}}}
+    if(ok)return t.slice(1,-1).trim()}
+  return t;
+}
+var BOUND=/<br\s*\/?>|[;:](?=\s)|[.!?]\s+(?=[A-ZÄÖÜ])/g;
+function ctxOK(s,start,whole,numH,denH){
+  var pre=s.slice(0,start),last=0,m;
+  BOUND.lastIndex=0;
+  while((m=BOUND.exec(pre)))last=m.index+m[0].length;
+  var clause=pre.slice(last);
+  var q=clause.search(/[=≈⇒]/);
+  if(q>=0){
+    var lhs=strip(clause.slice(0,q)).trim();
+    return lhs.length>0;
+  }
+  // Zahl (mit Einheit) durch einzelne Größe, z. B. „0,059 V / z“
+  var ns=strip(numH).trim(),ds=strip(denH).trim();
+  if(/^[−+\-]?\d[\d.,]*( (V|J|kJ|K|mol|g|L|s))?$/.test(ns)&&/^[A-Za-zΔν]$/.test(strip(denH.replace(/<sub>.*?<\/sub>/g,'')).trim()))return true;
+  // freistehender Ausdruck (z. B. Tabellenzelle „n / ν“)
+  var w=strip(whole).replace(/\s+/g,' ').trim();
+  var own=(strip(numH)+' / '+strip(denH)).replace(/\s+/g,' ').trim();
+  var strict=function(x){var t=strip(x).trim();return /[νρηΣΔϑαβγλμπσ]/.test(t)||/^[A-Za-z]$/.test(t)||/<su[bp]>/.test(x)};
+  return w===own&&strict(numH)&&strict(denH)&&!/[δ]/.test(w);
+}
+function tryAt(s,i,whole){
+  var ns=readLeftChain(s,i);if(ns<0)return null;
+  var de=readRight(s,i+3);if(de<0)return null;
+  var numH=s.slice(ns,i),denH=s.slice(i+3,de);
+  if(!balanced(numH)||!balanced(denH))return null;
+  var nu=unwrap(numH),dn=unwrap(denH);
+  if(!nu||!dn||!mathy(nu)||!mathy(dn))return null;
+  if(!ctxOK(s,ns,whole,numH,denH))return null;
+  var html='<span class="bkfrac"><span class="bkn">'+nu+'</span><span class="bkd">'+dn+'</span></span>';
+  return {s:s.slice(0,ns)+html+s.slice(de),next:ns+html.length};
+}
+function conv(h,whole){
+  if(h.indexOf(' / ')<0)return h;
+  var pos=0,guard=0,i;
+  while(guard++<60){
+    i=h.indexOf(' / ',pos);if(i<0)break;
+    var lt=h.lastIndexOf('<',i),gt=h.lastIndexOf('>',i);
+    if(lt>gt){pos=i+3;continue}
+    var r=tryAt(h,i,whole||h);
+    if(r){h=r.s;pos=r.next}else pos=i+3;
+  }
+  return h;
+}
+/* ----- DOM ----- */
+var BLK='div,p,li,td,th,tr,table,ul,ol,h1,h2,h3,h4,h5,h6,dl,dt,dd,section,pre,details,summary,canvas,svg,select,textarea,input,button,img,form,nav,header,footer,main,aside,figure';
+var BLOCKISH={DIV:1,P:1,LI:1,TD:1,TH:1,H1:1,H2:1,H3:1,H4:1,H5:1,H6:1,DT:1,DD:1,LABEL:1,BUTTON:1,SUMMARY:1,FIGCAPTION:1,CAPTION:1};
+var SKIPT={SCRIPT:1,STYLE:1,TEXTAREA:1,INPUT:1,SELECT:1,OPTION:1,NOSCRIPT:1,TITLE:1,SVG:1,CANVAS:1};
+var done=new WeakMap();
+function isCand(e){
+  if(e.nodeType!==1||SKIPT[e.tagName]||!e.tagName)return false;
+  if(e.namespaceURI!=='http://www.w3.org/1999/xhtml')return false;
+  if(e.closest('svg,script,style,textarea,[data-nofrac],[contenteditable="true"]'))return false;
+  if(e.querySelector(BLK))return false;
+  var ok=BLOCKISH[e.tagName]||(e.parentElement&&e.parentElement.querySelector(BLK)&&e.tagName!=='BODY');
+  return !!ok;
+}
+function proc(e){
+  var h=e.innerHTML;
+  if(h.indexOf(' / ')<0)return;
+  if(done.get(e)===h)return;
+  var n=conv(h,h);
+  if(n!==h){e.innerHTML=n;done.set(e,e.innerHTML)}else done.set(e,h);
+}
+function scan(root){
+  if(!root||root.nodeType!==1||!root.isConnected)return;
+  var tw=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null),n,seen=new Set(),list=[];
+  while((n=tw.nextNode())){
+    if(n.nodeValue.indexOf(' / ')<0)continue;
+    for(var a=n.parentElement;a;a=a.parentElement){
+      if(a===document.body||a===document.documentElement)break;
+      if(isCand(a)){if(!seen.has(a)){seen.add(a);list.push(a)}break}
+    }
+  }
+  list.forEach(proc); // erst nach dem Durchlauf umbauen (der TreeWalker verliert sonst seine Position)
+}
+var dirty=new Set(),sched=false;
+function flush(){sched=false;var arr=Array.from(dirty);dirty.clear();arr.forEach(scan)}
+function mark(n){
+  if(!n)return;var el=n.nodeType===1?n:n.parentElement;if(!el)return;
+  dirty.add(el);if(!sched){sched=true;(window.requestAnimationFrame||setTimeout)(flush)}
+}
+function start(){
+  scan(document.body);
+  new MutationObserver(function(ms){
+    ms.forEach(function(m){
+      if(m.type==='characterData')mark(m.target);
+      else{mark(m.target);for(var i=0;i<m.addedNodes.length;i++)mark(m.addedNodes[i])}
+    });
+  }).observe(document.body,{childList:true,subtree:true,characterData:true});
+  // vor dem Drucken/PDF sofort umwandeln (nicht erst im nächsten Frame)
+  window.addEventListener('beforeprint',function(){flush();scan(document.body)});
+}
+window.BKFRAC={conv:conv,scan:scan,isCand:isCand,proc:proc,done:done,flush:flush};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+})();
+
+</script>

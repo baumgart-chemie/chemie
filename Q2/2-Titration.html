@@ -207,6 +207,10 @@ table.gg tr.sep th, table.gg tr.sep td{border-top:1px solid var(--line);}
 #calcHead{margin-top:22px;}
 ol.howto{margin:10px 0 0; padding-left:20px; font-size:13px; color:var(--text-dim); line-height:1.7;}
 canvas#cvG{touch-action:pan-y; cursor:crosshair;}
+.graph-row{display:flex; align-items:center; justify-content:flex-end; gap:6px 12px; flex-wrap:wrap; border-top:1px solid var(--line-soft); padding:10px 4px 2px;}
+.graph-row .hint{margin:0;}
+.btn.graph{border-color:var(--teal); color:var(--teal); font-weight:600;}
+.btn.graph:hover{background:var(--teal); color:#0d1614;}
 .readout-bar{display:flex; gap:26px; padding:10px 4px 12px; flex-wrap:wrap; border-top:1px solid var(--line-soft); margin-top:8px;}
 .readout{display:flex; flex-direction:column; gap:2px;}
 .readout .k{font-size:10.5px; color:var(--text-faint);}
@@ -483,10 +487,10 @@ header>.tag{flex:1 1 160px;min-width:0}
       <p>Ein <strong>Indikator</strong> färbt die Lösung je nach pH-Wert. Beim Eintropfen siehst du kurz eine farbige Schliere, bevor der Rührer die Lösung durchmischt – kurz vor dem Äquivalenzpunkt bleibt sie immer länger sichtbar.</p>
 
       <h3>Diagramm</h3>
-      <p>Tippe oder fahre über das Diagramm, um die Messwerte an einer Stelle abzulesen. Optional lassen sich der <strong>Umschlagbereich</strong> des Indikators, die <strong>Äquivalenzpunkte</strong>, die <strong>Halbäquivalenzpunkte</strong> (pH = pKs) und die vorab <strong>berechnete Kurve</strong> einblenden.</p>
+      <p>Tippe oder fahre über das Diagramm, um die Messwerte an einer Stelle abzulesen. Optional lassen sich der <strong>Umschlagbereich</strong> des Indikators, die <strong>Äquivalenzpunkte</strong>, die <strong>Halbäquivalenzpunkte</strong> (pH = pKs) und die vorab <strong>berechnete Kurve</strong> einblenden. Mit <strong>„Im Graphen auswerten ▸“</strong> unter der Kurve öffnest du die Messwerte im Werkzeug „Graphen zeichnen und auswerten“ (steilster Punkt, Steigungskurve, Ausgleichskurven).</p>
 
       <h3>Auswerten</h3>
-      <p>Lies das <strong>Äquivalenzvolumen V<sub>ÄP</sub></strong> am steilsten Punkt des Sprungs (pH) bzw. am Knick der Kurve (Leitfähigkeit) ab und trage es im Reiter „Auswertung" ein. Stelle dort außerdem die <strong>Reaktionsgleichung der Neutralisation</strong> auf (Eingabe z. B. als <span class="mono">H2SO4 + 2 NaOH -> Na2SO4 + 2 H2O</span>, Zahlen in Formeln werden automatisch tiefgestellt) und lass sie mit „Prüfen" kontrollieren – oder lass sie dir mit „vorgeben" anzeigen. Aus der Gleichung ergibt sich das Stoffmengenverhältnis, danach wird die Konzentration der Probe Schritt für Schritt berechnet. Bei schwachen Säuren und Basen wird zusätzlich der pKs-Wert aus deinem Messwert am Halbäquivalenzpunkt bestimmt.</p>
+      <p>Lies das <strong>Äquivalenzvolumen V<sub>ÄP</sub></strong> am steilsten Punkt des Sprungs (pH) bzw. am Knick der Kurve (Leitfähigkeit) ab und trage es im Reiter „Auswertung" ein. Stelle dort außerdem die <strong>Reaktionsgleichung der Neutralisation</strong> auf (Eingabe z. B. als <span class="mono">H2SO4 + 2 NaOH -> Na2SO4 + 2 H2O</span>, Zahlen in Formeln werden automatisch tiefgestellt) und lass sie mit „Prüfen" kontrollieren – oder lass sie dir mit „vorgeben" anzeigen. Aus der Gleichung ergibt sich das Stoffmengenverhältnis, danach wird die Konzentration der Probe Schritt für Schritt berechnet. Bei schwachen Säuren und Basen wird zusätzlich der pKs-Wert aus deinem Messwert am Halbäquivalenzpunkt bestimmt. Die Reaktionsgleichung kannst du bei Säure-Base-Titrationen auch mit <strong>„mit Werkzeug ▸“</strong> im Werkzeug „Reaktionsgleichungen und Stöchiometrie“ aufstellen und übernehmen.</p>
 
       <h3>Aufgabe: unbekannte Konzentration</h3>
       <p>Mit dem Schalter <strong>„Unbekannte Konzentration"</strong> ganz oben in der Seitenleiste erhältst du eine nummerierte Probe, deren Konzentration c₀ zufällig gewählt und verborgen ist. Berechnete Kurve, Äquivalenzpunkte und Teilchenbilanz sind gesperrt, und die Auswertung rechnet nicht mehr vor.</p>
@@ -516,6 +520,12 @@ header>.tag{flex:1 1 160px;min-width:0}
       <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.3</span><span class="d">26.11.2026</span></div>
+      <ul>
+        <li><strong>Verknüpfung mit „Graphen zeichnen und auswerten“:</strong> Unter der Titrationskurve (gut sichtbar) und im Reiter „Messwerte“ übergibt „Im Graphen auswerten“ die Titrationskurve (pH und Leitfähigkeit bzw. Spannung gegen das Volumen) an das Werkzeug, z. B. für den steilsten Punkt (Äquivalenzpunkt) und die Steigungskurve. Das Werkzeug öffnet sich in einem neuen Tab, die Titration bleibt geöffnet; es wird nichts gespeichert.</li>
+        <li>Wird die Simulation aus dem Werkzeug „Graphen zeichnen und auswerten“ geöffnet, erscheint unter der Kopfzeile eine Leiste mit „Messwerte übernehmen ▸“: Die Messwerte gehen zurück an das Werkzeug, der Tab der Simulation schließt sich.</li>
+        <li><strong>Reaktionsgleichung mit dem Werkzeug:</strong> Bei Säure-Base-Titrationen öffnet „mit Werkzeug ▸“ neben „vorgeben“ das Werkzeug „Reaktionsgleichungen und Stöchiometrie“ mit Probelösung und Maßlösung. Die dort aufgestellte Gleichung kommt mit „In die Titration übernehmen“ zurück, wird geprüft und als „mit Werkzeug aufgestellt“ gekennzeichnet (neuer Tab, nichts wird gespeichert). Bei Redox-Titrationen werden die Teilgleichungen weiterhin selbst aufgestellt.</li>
+      </ul>
       <div class="vh-ver"><span class="v">V1.2</span><span class="d">07.11.2026</span></div>
       <ul>
         <li><strong>Auswertung als PDF:</strong> einheitlicher Dialog „Auswertung als PDF“: Jeder abgeschlossene Lauf ist einzeln auswählbar, dazu optionale Felder für Name und Kurs. Das PDF enthält je Lauf Versuchsbedingungen, Diagramm (weißer Hintergrund) und Messwerte im druckfreundlichen A4-Layout.</li><li><strong>QR-Code:</strong> Schaltfläche rechts in der Kopfzeile; Antippen vergrößert den QR-Code, mit dem sich diese Seite direkt auf dem Mobilgerät öffnen lässt.</li>
@@ -713,6 +723,7 @@ header>.tag{flex:1 1 160px;min-width:0}
         <div class="readout"><span class="k">Farbe der Lösung</span><span class="v plain" id="roInd">–</span></div>
         <div class="readout" id="roPtsw"><span class="k">Messpunkte</span><span class="v mono plain" id="roPts">0</span></div>
       </div>
+      <div class="graph-row"><span class="hint">Titrationskurve weiter auswerten – steilster Punkt, Steigungskurve, Ausgleichskurven:</span><button class="btn graph" id="btnGraph2" title="Messwerte im Werkzeug „Graphen zeichnen und auswerten“ öffnen">Im Graphen auswerten ▸</button></div>
     </div>
 
     <div class="tabs">
@@ -776,6 +787,7 @@ header>.tag{flex:1 1 160px;min-width:0}
               <input type="text" id="inRxn" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="z. B. HCl + NaOH -> NaCl + H2O">
               <button class="btn" id="btnRxnCheck">Prüfen</button>
               <button class="btn ghost" id="btnRxnGive">vorgeben</button>
+              <button class="btn ghost" id="btnRxnTool" title="Gleichung im Werkzeug „Reaktionsgleichungen und Stöchiometrie“ (neuer Tab) aufstellen und hierher übernehmen">mit Werkzeug ▸</button>
             </div>
             <div class="rxn-prev" id="rxnPrev"></div>
           </div>
@@ -790,6 +802,7 @@ header>.tag{flex:1 1 160px;min-width:0}
       <div class="tbl-tools">
         <button class="btn" id="btnCopy">Tabelle kopieren</button>
         <button class="btn ghost" id="btnCSV">CSV speichern</button>
+        <button class="btn" id="btnGraph" title="Messwerte im Werkzeug „Graphen zeichnen und auswerten“ öffnen (Wendepunkt, Steigungskurve)">Im Graphen auswerten ▸</button>
         <span class="hint" id="copyHint"></span>
       </div>
       <div class="tbl-wrap"><table class="mw"><thead><tr id="thRow"></tr></thead><tbody id="tblBody"></tbody></table></div>
@@ -804,7 +817,7 @@ header>.tag{flex:1 1 160px;min-width:0}
 
 <footer>
   <p class="footer-note">Simulierte Daten zu Lehrzwecken · 25 °C, K<sub>W</sub> = 10⁻¹⁴ mol²/L², Aktivitäten durch Konzentrationen ersetzt, Volumenkontraktion vernachlässigt. Leitfähigkeiten aus Ionen-Grenzleitfähigkeiten berechnet (idealisiert, ohne Konzentrationsabhängigkeit). pKs-Werte sind Tabellenwerte und können je nach Schulbuch geringfügig abweichen. Redox-Titration: Potentiale gegen die Standard-Wasserstoffelektrode, vereinfacht mit Standard- bzw. Formalpotentialen bei c(H⁺) ≈ 1 mol/L berechnet.</p>
-  <p class="footer-credit">Bastian Baumgart · Simulation „Titration“ V1.2 · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Simulation „Titration“ V1.3 · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <script>
@@ -1801,11 +1814,12 @@ function renderRxn(){
   const key = rxnKey(), st = S.rxn.done[key], e = S.rxn.form[key] || RXN[S.an][epIdx()], el = $('rxnPrev');
   const inp = $('inRxn');
   inp.disabled = !!st || lock; $('btnRxnCheck').disabled = !!st || lock; $('btnRxnGive').disabled = !!st || lock;
+  $('btnRxnTool').hidden = RX(); $('btnRxnTool').disabled = !!st || lock;
   $('btnCheck').disabled = !st; $('checkHint').hidden = !!st;
   $('checkHint').textContent = RX() ? 'Erst die Teilgleichungen und die Redoxgleichung aufstellen oder vorgeben.' : 'Erst die Reaktionsgleichung aufstellen oder vorgeben.';
   if (!st && lock){ el.innerHTML = '<p class="note" style="margin-top:0">Stelle zuerst die beiden Teilgleichungen auf (oder lass sie dir vorgeben). Multipliziere sie dann so, dass gleich viele Elektronen abgegeben und aufgenommen werden, und addiere sie.</p>'; return; }
   if (st){
-    el.innerHTML = `<div class="eq ok">${eqTxt(e)}<span class="tagl ${st === 'ok' ? 'good' : 'mid'}">${st === 'ok' ? 'richtig' : 'vorgegeben'}</span></div>`;
+    el.innerHTML = `<div class="eq ok">${eqTxt(e)}<span class="tagl ${st === 'ok' ? 'good' : 'mid'}">${st === 'ok' ? 'richtig' : st === 'tool' ? 'mit Werkzeug aufgestellt' : 'vorgegeben'}</span></div>`;
     return;
   }
   let h = '';
@@ -2403,6 +2417,103 @@ function loop(now){
   if (dataDirty && sinceTabs > 0.4){ sinceTabs = 0; dataDirty = false; renderData(); renderTabs(); }
   requestAnimationFrame(loop);
 }
+
+/* ---------- Übergabe an „Graphen zeichnen und auswerten“ (Werkzeuge/0-Graphen.html) ----------
+   Neuer Tab bzw. Rückgabe an das aufrufende Werkzeug (?ret=graph), Daten per postMessage,
+   ohne Browser-Speicher (Leitfaden Abschnitt 7). */
+const GRAPH={win:null,fn:null,tgt:(/^https?:$/.test(location.protocol)&&location.origin&&location.origin!=='null')?location.origin:'*'};
+function graphRet(){
+  try{return new URLSearchParams(location.search).get('ret')==='graph'&&window.opener&&!window.opener.closed?window.opener:null;}catch(e){return null;}
+}
+function graphNote(btn,t){
+  let n=btn._gn;
+  if(!n||!n.isConnected){n=document.createElement('span');n.className='graph-note';n.style.cssText='margin-left:8px;font-size:12.5px;color:#9aa2a9';btn.insertAdjacentElement('afterend',n);btn._gn=n;}
+  n.textContent=t;clearTimeout(n._t);n._t=setTimeout(()=>{n.textContent='';},7000);
+}
+function graphOpen(btn,id,fn,emptyMsg){
+  let d=null;try{d=fn();}catch(e){d=null;}
+  if(!d){graphNote(btn,emptyMsg);return;}
+  const r=graphRet();
+  if(r){
+    try{r.postMessage(Object.assign({type:'graphData',src:id},d),GRAPH.tgt);}
+    catch(e){graphNote(btn,'Das Werkzeug ist nicht mehr erreichbar.');return;}
+    graphNote(btn,'Messwerte übertragen. Dieser Tab schließt sich …');
+    setTimeout(()=>{try{window.close();}catch(e){}setTimeout(()=>graphNote(btn,'Messwerte übertragen – du kannst diesen Tab schließen.'),300);},400);
+    return;
+  }
+  const w=window.open('../Werkzeuge/0-Graphen.html?from='+id,'_blank');
+  if(!w){graphNote(btn,'Bitte Pop-ups für diese Seite erlauben.');return;}
+  GRAPH.win=w;GRAPH.fn=fn;
+  graphNote(btn,'Das Werkzeug wurde in einem neuen Tab geöffnet. Deine Eingaben hier bleiben erhalten.');
+}
+window.addEventListener('message',e=>{
+  if(!GRAPH.win||e.source!==GRAPH.win)return;
+  if(GRAPH.tgt!=='*'&&e.origin!==GRAPH.tgt)return;
+  const m=e.data;if(!m||m.type!=='graphReady'||!GRAPH.fn)return;
+  let d=null;try{d=GRAPH.fn();}catch(err){d=null;}
+  if(d){try{GRAPH.win.postMessage(Object.assign({type:'graphData'},d),GRAPH.tgt);}catch(err){}}
+});
+/* Aufruf aus dem Werkzeug: Leiste unter der Kopfzeile, Knöpfe geben die Messwerte zurück */
+function graphRetSetup(id,fn,emptyMsg,where){
+  if(!graphRet())return;
+  [['bGraph','Messwerte übernehmen ▸'],['btnToGraph','Messwerte übernehmen ▸'],['btnGraph','Messwerte übernehmen ▸'],['btnRunsGraph','Messreihen übernehmen ▸']].forEach(([i,t])=>{const b=document.getElementById(i);if(b)b.textContent=t;});
+  const st=document.createElement('style');st.textContent='@media print{#graphRetBar{display:none!important}}';document.head.appendChild(st);
+  const bar=document.createElement('div');bar.id='graphRetBar';
+  bar.style.cssText='display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:10px 16px 0;padding:10px 14px;background:#20252a;border:1px solid #4fd1c5;border-radius:8px;color:#e7e4dd;font-size:14px;line-height:1.4';
+  const tx=document.createElement('span');tx.style.cssText='flex:1 1 320px';
+  tx.innerHTML='<b style="color:#4fd1c5">Du kommst vom Werkzeug „Graphen zeichnen und auswerten“.</b> Nimm hier Messwerte auf und tippe dann auf „Messwerte übernehmen ▸“ (hier oder '+where+'). Die Werte erscheinen im Werkzeug, dieser Tab schließt sich.';
+  const bs='font:inherit;font-size:14px;font-weight:600;border-radius:6px;padding:8px 14px;min-height:40px;cursor:pointer;';
+  const b1=document.createElement('button');b1.type='button';b1.id='graphRetTake';b1.textContent='Messwerte übernehmen ▸';b1.style.cssText=bs+'background:#4fd1c5;color:#14171a;border:1px solid #4fd1c5';
+  const b2=document.createElement('button');b2.type='button';b2.id='graphRetCancel';b2.textContent='Zurück ohne Übernahme';b2.style.cssText=bs+'background:transparent;color:#9aa2a9;border:1px solid #31383e';
+  b1.onclick=()=>graphOpen(b1,id,fn,emptyMsg);
+  b2.onclick=()=>{const r=graphRet();try{if(r)r.postMessage({type:'graphData',src:id,cancel:true},GRAPH.tgt);}catch(e){}setTimeout(()=>{try{window.close();}catch(e){}},150);};
+  const box=document.createElement('span');box.style.cssText='display:flex;flex-wrap:wrap;align-items:center;gap:8px';box.append(b1,b2);
+  bar.append(tx,box);
+  const h=document.querySelector('header');
+  if(h)h.insertAdjacentElement('afterend',bar);else document.body.insertBefore(bar,document.body.firstChild);
+}
+
+function graphDataTit(){
+  const pts = S.points; if(!pts || pts.length < 2) return null;
+  const T = TIT(), x = pts.map(p => p.V), xn = 'V(' + T.f + ')';
+  if(RX()) return {title:'Redox-Titration', xName:xn, xUnit:'mL', series:[{name:'E', unit:'V', x, y:pts.map(p => p.E), axis:'L'}]};
+  return {title:'Säure-Base-Titration', xName:xn, xUnit:'mL', series:[
+    {name:'pH', unit:'', x, y:pts.map(p => p.pH), axis:'L'},
+    {name:'κ', unit:'mS/cm', x, y:pts.map(p => p.k), axis:'R'}]};
+}
+$('btnGraph').addEventListener('click', () => graphOpen($('btnGraph'), 'titration', graphDataTit, 'Noch keine Messwerte – schalte ein Messgerät ein und titriere.'));
+graphRetSetup('titration', graphDataTit, 'Noch keine Messwerte – schalte ein Messgerät ein und titriere.', 'unter der Titrationskurve');
+
+/* ---------- Reaktionsgleichung mit dem Werkzeug „Reaktionsgleichungen und Stöchiometrie“ aufstellen ----------
+   Neuer Tab (?ret=titration), Rückgabe per postMessage, ohne Browser-Speicher (Leitfaden Abschnitt 7).
+   Nur bei Säure-Base-Titrationen; bei Redox-Titrationen werden die Teilgleichungen selbst aufgestellt. */
+const RQ = {win:null, key:null};
+$('btnRxnTool').addEventListener('click', () => {
+  if (RX() || S.rxn.done[rxnKey()]) return;
+  const nm = s => String(s).replace(/-Lösung$/, '');
+  const q = nm(A().name) + ' + ' + nm(TIT().name);
+  let w = null;
+  try { w = window.open('../Werkzeuge/0-Reaktionsgleichungen.html?ret=titration&q=' + encodeURIComponent(q), '_blank'); } catch (e) { w = null; }
+  if (!w){ S.rxn.fb = {cls:'bad', t:'Werkzeug nicht geöffnet', p:['Bitte Pop-ups für diese Seite erlauben.']}; renderRxn(); return; }
+  RQ.win = w; RQ.key = rxnKey();
+  S.rxn.fb = {cls:'mid', t:'Werkzeug geöffnet', p:['Das Werkzeug „Reaktionsgleichungen und Stöchiometrie“ wurde in einem neuen Tab geöffnet. Stelle dort die Gleichung auf und tippe auf „In die Titration übernehmen“. Deine Eingaben hier bleiben erhalten.']};
+  renderRxn();
+});
+window.addEventListener('message', e => {
+  if (!RQ.win || e.source !== RQ.win) return;
+  if (GRAPH.tgt !== '*' && e.origin !== GRAPH.tgt) return;
+  const d = e.data; if (!d || typeof d !== 'object' || d.type !== 'chemXfer') return;
+  RQ.win = null;
+  try { window.focus(); } catch (x) {}
+  if (d.cancel || !d.eq){ S.rxn.fb = {cls:'mid', t:'Keine Gleichung übernommen', p:['Du bist ohne Übernahme aus dem Werkzeug zurückgekehrt.']}; renderRxn(); return; }
+  if (RQ.key !== rxnKey() || RX() || S.rxn.done[rxnKey()]){ S.rxn.fb = {cls:'bad', t:'Nicht übernommen', p:['Die Titration wurde inzwischen geändert. Öffne das Werkzeug erneut über „mit Werkzeug ▸“.']}; renderRxn(); return; }
+  $('inRxn').value = String(d.eq).slice(0, 300);
+  checkRxn();
+  if (S.rxn.done[rxnKey()] === 'ok'){ S.rxn.done[rxnKey()] = 'tool'; renderRxn(); renderCalc(); renderEq(); }
+  else if (S.rxn.fb){ S.rxn.fb.p.unshift('Die Gleichung kommt aus dem Werkzeug und passt noch nicht zu dieser Titration (z. B. zum gewählten Äquivalenzpunkt). Passe sie hier an.'); renderRxn(); }
+});
+$('btnGraph2').addEventListener('click', () => graphOpen($('btnGraph2'), 'titration', graphDataTit, 'Noch keine Messwerte – schalte ein Messgerät ein und titriere.'));
+if (graphRet()) $('btnGraph2').textContent = 'Messwerte übernehmen ▸';
 requestAnimationFrame(loop);
 
 })();
@@ -2788,7 +2899,7 @@ function snap(useCache,label){
   const c=(useCache&&cache)?cache:capture(),n=BK.runs.length+1;
   return {label:(label||'Lauf '+n)+': '+BK.esc(c.an)+' mit '+BK.esc(c.tit),color:BK.COL[(n-1)%BK.COL.length],html:html(c)};
 }
-BK.setup({url:'https://chemie.mail-baumgart.de/Q2/2-Titration.html',sim:true,footName:'Simulation „Titration“',version:'1.2',printTitle:'Titration – Auswertung',
+BK.setup({url:'https://chemie.mail-baumgart.de/Q2/2-Titration.html',sim:true,footName:'Simulation „Titration“',version:'1.3',printTitle:'Titration – Auswertung',
   hint:'Die Auswertung enthält je gewähltem Lauf die Versuchsbedingungen, die Titrationskurve, die Messwerttabelle sowie die eigene Auswertung und Berechnung. Ein Lauf endet mit „Zurücksetzen“, „Neue Probe“ oder einer Änderung der Lösungen; die laufende Titration steht als „aktueller Lauf“ zur Wahl.',
   noRuns:'Noch kein Lauf vorhanden. Gib Maßlösung zu, um eine Titration zu beginnen.',
   buttons:[{ref:'#btnCSV',pos:'afterend'},{ref:'#btnReset',pos:'afterend'}],btnClass:'btn ghost',

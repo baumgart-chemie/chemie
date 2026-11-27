@@ -556,6 +556,11 @@ header>.tag{flex:1 1 160px;min-width:0}
       <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.4</span><span class="d">26.11.2026</span></div>
+      <ul>
+        <li><strong>Verknüpfung mit „Graphen zeichnen und auswerten“:</strong> Neben dem Konzentrations-Zeit-Diagramm übergibt „Im Graphen auswerten“ den bisherigen Verlauf aller Stoffe an das Werkzeug; ausgeblendete Stoffe bleiben dort ausgeblendet. Das Werkzeug öffnet sich in einem neuen Tab, die Simulation bleibt geöffnet; es wird nichts gespeichert.</li>
+        <li>Wird die Simulation aus dem Werkzeug „Graphen zeichnen und auswerten“ geöffnet, erscheint unter der Kopfzeile eine Leiste mit „Messwerte übernehmen ▸“: Die Messwerte gehen zurück an das Werkzeug, der Tab der Simulation schließt sich.</li>
+      </ul>
       <div class="vh-ver"><span class="v">V1.3</span><span class="d">18.11.2026</span></div>
       <ul>
         <li><strong>Startauswahl:</strong> Beim Öffnen wählt man einen von drei Bereichen (Karten im Hauptfenster, „Bereich wählen“ in der linken Spalte). Die bisherige Simulation heißt jetzt „Simulation des Gleichgewichts spezifischer chemischer Reaktionen“.</li>
@@ -713,6 +718,7 @@ header>.tag{flex:1 1 160px;min-width:0}
       <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px">
         <div class="legend" id="legend"></div>
         <label class="chk"><input type="checkbox" id="logScale"> logarithmische Achse</label>
+        <button class="btn ghost" id="btnGraph" title="Konzentrations-Zeit-Verlauf im Werkzeug „Graphen zeichnen und auswerten“ öffnen">Im Graphen auswerten ▸</button>
       </div>
       <div class="readout-bar">
         <div class="readout"><span class="k">Zeit</span><span class="v mono" id="roTime">0 s</span></div>
@@ -887,7 +893,7 @@ header>.tag{flex:1 1 160px;min-width:0}
 
 <footer>
   <p class="footer-note">Simulierte Daten zu Lehrzwecken · Gasreaktionen im Zylinder mit arretiertem Kolben (konstantes Volumen, ideales Gas); Temperaturabhängigkeit nach Van ’t Hoff mit konstantem ΔH<sub>r</sub>. K<sub>c</sub>- und ΔH<sub>r</sub>-Werte gerundet, bei Eisen-thiocyanat und Cobalt-Komplex Modellwerte. Die Geschwindigkeit der Gleichgewichtseinstellung ist rein illustrativ. Haber-Bosch: K<sub>p</sub> nach Gillespie/Beattie für ideale Gase (Druck in bar ≈ atm); Annäherung an das Gleichgewicht im Reaktor und Produktionsleistung sind Modellwerte.</p>
-  <p class="footer-credit">Bastian Baumgart · Simulation „Chemisches Gleichgewicht“ V1.3 · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Simulation „Chemisches Gleichgewicht“ V1.4 · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <script>
@@ -1420,6 +1426,72 @@ function frame(now){
   updateUI(); drawVessel(); drawChart(); drawK();
   requestAnimationFrame(frame);
 }
+
+/* ---------- Übergabe an „Graphen zeichnen und auswerten“ (Werkzeuge/0-Graphen.html) ----------
+   Neuer Tab bzw. Rückgabe an das aufrufende Werkzeug (?ret=graph), Daten per postMessage,
+   ohne Browser-Speicher (Leitfaden Abschnitt 7). */
+const GRAPH={win:null,fn:null,tgt:(/^https?:$/.test(location.protocol)&&location.origin&&location.origin!=='null')?location.origin:'*'};
+function graphRet(){
+  try{return new URLSearchParams(location.search).get('ret')==='graph'&&window.opener&&!window.opener.closed?window.opener:null;}catch(e){return null;}
+}
+function graphNote(btn,t){
+  let n=btn._gn;
+  if(!n||!n.isConnected){n=document.createElement('span');n.className='graph-note';n.style.cssText='margin-left:8px;font-size:12.5px;color:#9aa2a9';btn.insertAdjacentElement('afterend',n);btn._gn=n;}
+  n.textContent=t;clearTimeout(n._t);n._t=setTimeout(()=>{n.textContent='';},7000);
+}
+function graphOpen(btn,id,fn,emptyMsg){
+  let d=null;try{d=fn();}catch(e){d=null;}
+  if(!d){graphNote(btn,emptyMsg);return;}
+  const r=graphRet();
+  if(r){
+    try{r.postMessage(Object.assign({type:'graphData',src:id},d),GRAPH.tgt);}
+    catch(e){graphNote(btn,'Das Werkzeug ist nicht mehr erreichbar.');return;}
+    graphNote(btn,'Messwerte übertragen. Dieser Tab schließt sich …');
+    setTimeout(()=>{try{window.close();}catch(e){}setTimeout(()=>graphNote(btn,'Messwerte übertragen – du kannst diesen Tab schließen.'),300);},400);
+    return;
+  }
+  const w=window.open('../Werkzeuge/0-Graphen.html?from='+id,'_blank');
+  if(!w){graphNote(btn,'Bitte Pop-ups für diese Seite erlauben.');return;}
+  GRAPH.win=w;GRAPH.fn=fn;
+  graphNote(btn,'Das Werkzeug wurde in einem neuen Tab geöffnet. Deine Eingaben hier bleiben erhalten.');
+}
+window.addEventListener('message',e=>{
+  if(!GRAPH.win||e.source!==GRAPH.win)return;
+  if(GRAPH.tgt!=='*'&&e.origin!==GRAPH.tgt)return;
+  const m=e.data;if(!m||m.type!=='graphReady'||!GRAPH.fn)return;
+  let d=null;try{d=GRAPH.fn();}catch(err){d=null;}
+  if(d){try{GRAPH.win.postMessage(Object.assign({type:'graphData'},d),GRAPH.tgt);}catch(err){}}
+});
+/* Aufruf aus dem Werkzeug: Leiste unter der Kopfzeile, Knöpfe geben die Messwerte zurück */
+function graphRetSetup(id,fn,emptyMsg,where){
+  if(!graphRet())return;
+  [['bGraph','Messwerte übernehmen ▸'],['btnToGraph','Messwerte übernehmen ▸'],['btnGraph','Messwerte übernehmen ▸'],['btnRunsGraph','Messreihen übernehmen ▸']].forEach(([i,t])=>{const b=document.getElementById(i);if(b)b.textContent=t;});
+  const st=document.createElement('style');st.textContent='@media print{#graphRetBar{display:none!important}}';document.head.appendChild(st);
+  const bar=document.createElement('div');bar.id='graphRetBar';
+  bar.style.cssText='display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:10px 16px 0;padding:10px 14px;background:#20252a;border:1px solid #4fd1c5;border-radius:8px;color:#e7e4dd;font-size:14px;line-height:1.4';
+  const tx=document.createElement('span');tx.style.cssText='flex:1 1 320px';
+  tx.innerHTML='<b style="color:#4fd1c5">Du kommst vom Werkzeug „Graphen zeichnen und auswerten“.</b> Nimm hier Messwerte auf und tippe dann auf „Messwerte übernehmen ▸“ (hier oder '+where+'). Die Werte erscheinen im Werkzeug, dieser Tab schließt sich.';
+  const bs='font:inherit;font-size:14px;font-weight:600;border-radius:6px;padding:8px 14px;min-height:40px;cursor:pointer;';
+  const b1=document.createElement('button');b1.type='button';b1.id='graphRetTake';b1.textContent='Messwerte übernehmen ▸';b1.style.cssText=bs+'background:#4fd1c5;color:#14171a;border:1px solid #4fd1c5';
+  const b2=document.createElement('button');b2.type='button';b2.id='graphRetCancel';b2.textContent='Zurück ohne Übernahme';b2.style.cssText=bs+'background:transparent;color:#9aa2a9;border:1px solid #31383e';
+  b1.onclick=()=>graphOpen(b1,id,fn,emptyMsg);
+  b2.onclick=()=>{const r=graphRet();try{if(r)r.postMessage({type:'graphData',src:id,cancel:true},GRAPH.tgt);}catch(e){}setTimeout(()=>{try{window.close();}catch(e){}},150);};
+  const box=document.createElement('span');box.style.cssText='display:flex;flex-wrap:wrap;align-items:center;gap:8px';box.append(b1,b2);
+  bar.append(tx,box);
+  const h=document.querySelector('header');
+  if(h)h.insertAdjacentElement('afterend',bar);else document.body.insertBefore(bar,document.body.firstChild);
+}
+
+function graphDataGG(){
+  if(!S.hist || S.hist.length < 2) return null;
+  const N = S.hist.length, st = Math.max(1, Math.floor(N/300)), idx = [];
+  for(let i=0;i<N;i+=st) idx.push(i);
+  if(idx[idx.length-1] !== N-1) idx.push(N-1);
+  const x = idx.map(i => S.hist[i].t);
+  return {title:rx.name, xName:"t", xUnit:"s", series:rx.species.map((sp,k)=>({name:"c("+sp.txt+")", unit:"mol/L", x, y:idx.map(i=>S.hist[i].c[k]), hidden:S.hidden.has(k)}))};
+}
+$("btnGraph").addEventListener("click", ()=>graphOpen($("btnGraph"),"gleichgewicht",graphDataGG,"Starte zuerst die Reaktion – dann lässt sich der Verlauf übernehmen."));
+graphRetSetup("gleichgewicht",graphDataGG,"Wähle die Simulation des Gleichgewichts und starte die Reaktion.","neben dem Konzentrations-Zeit-Diagramm");
 load(0);
 requestAnimationFrame(frame);
 })();
@@ -3056,7 +3128,7 @@ function snap(label){
     +BK.sec('Protokoll der Änderungen',BK.tbl($('logBody').closest('table'),{emptyText:'Keine Änderungen vorgenommen.'}),true);
   return {label:(label||'Lauf '+n)+': '+G.rx.name+' · '+$('lT').textContent+($('lP').textContent!=='–'?' · '+$('lP').textContent:''),color:BK.COL[(n-1)%BK.COL.length],html};
 }
-BK.setup({url:'https://chemie.mail-baumgart.de/Q1/1-Chemisches_Gleichgewicht.html',sim:true,footName:'Simulation „Chemisches Gleichgewicht“',version:'1.3',printTitle:'Chemisches Gleichgewicht – Auswertung',
+BK.setup({url:'https://chemie.mail-baumgart.de/Q1/1-Chemisches_Gleichgewicht.html',sim:true,footName:'Simulation „Chemisches Gleichgewicht“',version:'1.4',printTitle:'Chemisches Gleichgewicht – Auswertung',
   hint:'Die Auswertung enthält je gewähltem Lauf die Reaktionsgleichung, die Bedingungen, die Ergebnisse (Konzentrationen mit K<sub>c</sub> und Q<sub>c</sub> bzw. NH₃-Anteile bei der Haber-Bosch-Synthese), das Diagramm und das Protokoll der Änderungen. Ein Lauf endet mit „Zurücksetzen“ oder dem Wechsel der Reaktion; der laufende Versuch des geöffneten Bereichs steht als „aktueller Lauf“ zur Wahl.',
   noRuns:'Noch kein Lauf vorhanden. Starte die Reaktion bzw. die Anlage.',
   buttons:[{ref:'#btnExport',pos:'afterend'},{ref:'#hbCsv',pos:'afterend'}],btnClass:'btn ghost',

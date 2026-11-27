@@ -300,7 +300,7 @@ header>.tag{flex:1 1 160px;min-width:0}
 
 <footer>
   <p>Simulierte Daten zu Lehrzwecken. Modellannahmen: c(Wasser) = 4,18 J/(g·K); Wärmeverluste und Wärmekapazität des Kalorimeters werden vernachlässigt; verdünnte Lösungen werden wie Wasser behandelt (ρ = 1,00 g/mL); Literaturwerte gerundet (25 °C, 1013 hPa), für Holz und Kerzenwachs Richtwerte.</p>
-  <p>Bastian Baumgart · Kalorimetrie V1.1 · <a href="#" id="lnkVer">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p>Bastian Baumgart · Kalorimetrie V1.2 · <a href="#" id="lnkVer">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 
 <div class="ov" id="ov">
@@ -318,7 +318,7 @@ header>.tag{flex:1 1 160px;min-width:0}
 'use strict';
 /* ================= Daten ================= */
 const C_W = 4.18;
-const VERSION = '1.1';
+const VERSION = '1.2';
 const TITLE = 'Kalorimetrie';
 const STOFFE = {
   verbrennung: [
@@ -666,6 +666,10 @@ $('#lnkAnl').onclick=e=>{e.preventDefault();openModal('Anleitung',`
 <h3>5. Zusammenfassung</h3><ul><li>Im letzten Schritt erstellst du über die Druckfunktion ein PDF mit allen Messwerten und Ergebnissen.</li><li>„Zwischenstand speichern“ lädt eine Datei herunter (auf dem iPad unter „Dateien → Downloads“), die du mit „Zwischenstand laden“ wieder öffnest. Es werden keine Daten übertragen oder im Browser gespeichert.</li></ul>
 <h3>Bedingungen variieren</h3><p>Nach Anhaken von „Bedingungen variieren“ lassen sich Wassermasse, Anfangstemperatur und Stoffportion ändern (nur vor Messbeginn). „Erklärungen anzeigen“ blendet Hintergründe zu den gewählten Bedingungen ein.</p>`);};
 $('#lnkVer').onclick=e=>{e.preventDefault();openModal('Versionshinweise',`
+<h3>Version 1.2 – 26.11.2026</h3><ul>
+<li>Neuer Knopf „Im Graphen auswerten“ unter der Messwerttabelle: Die eigenen Messwerte (t, T) werden an das Werkzeug „Graphen zeichnen und auswerten“ übergeben (neuer Tab, die Simulation bleibt mit allen Eingaben geöffnet, nichts wird gespeichert).</li>
+<li>Wird die Simulation aus dem Werkzeug „Graphen zeichnen und auswerten“ geöffnet, erscheint unter der Kopfzeile eine Leiste mit „Messwerte übernehmen ▸“: Die Messwerte gehen zurück an das Werkzeug, der Tab der Simulation schließt sich.</li>
+</ul>
 <h3>Version 1.1 – 07.11.2026</h3><ul>
 <li>Einheitlicher Dialog „Auswertung als PDF“: Statistik (Schritte, beim 1. Versuch richtig, Lösung angesehen, Erfolgsquote) und optionale Felder für Name und Kurs; das Datum steht automatisch auf dem Ausdruck. Fußzeile des Ausdrucks ohne Anschrift.</li>
 <li>QR-Schaltfläche rechts in der Kopfzeile; Antippen vergrößert den QR-Code, mit dem sich die Seite direkt auf dem Mobilgerät öffnen lässt.</li>
@@ -759,12 +763,13 @@ function renderMain(){
     </div>
     <div class="card" id="cardWaage"><h2>Waage</h2><div class="screen" id="waageSvg"></div><div class="btnrow" style="margin-top:10px" id="waageBtns"></div><div id="massFields"></div></div>
   </div>`;
-  h+=`<div class="card" id="cardTab"><h2>Messwerttabelle<span class="tag">Temperatur des ${isComb()?'Wassers':(s.fluid==='Wasser'?'Wassers':'Kalorimeterinhalts')}</span></h2><div class="tabwrap"><div><div class="tscroll" id="tabBox"></div><div class="btnrow" style="margin-top:8px"><button class="small" id="bCsv">CSV-Export</button></div></div><div><div class="screen" id="diagSvg"></div><div class="hint">Diagramm deiner eingetragenen Messwerte.</div></div></div></div>`;
+  h+=`<div class="card" id="cardTab"><h2>Messwerttabelle<span class="tag">Temperatur des ${isComb()?'Wassers':(s.fluid==='Wasser'?'Wassers':'Kalorimeterinhalts')}</span></h2><div class="tabwrap"><div><div class="tscroll" id="tabBox"></div><div class="btnrow" style="margin-top:8px"><button class="small" id="bCsv">CSV-Export</button> <button class="small" id="bGraph" title="Eigene Messwerte im Werkzeug „Graphen zeichnen und auswerten“ öffnen">${graphRet()?'Messwerte übernehmen ▸':'Im Graphen auswerten ▸'}</button></div></div><div><div class="screen" id="diagSvg"></div><div class="hint">Diagramm deiner eingetragenen Messwerte.</div></div></div></div>`;
   h+=`<div class="card" id="cardAusw"><h2>Auswertung</h2><div id="calcs"></div></div>`;
   h+=`<div class="card" id="cardPdf"><h2>Zusammenfassung als PDF</h2><div id="pdfBox"></div></div>`;
   M.innerHTML=h;
   renderWaage(); renderTable(); renderCalcs(); renderPdf(); renderControls(); updateLive(true);
   $('#bCsv').onclick=exportCSV;
+  $('#bGraph').onclick=()=>graphOpen($('#bGraph'),'kalorimetrie',graphData,'Trage zuerst mindestens zwei Messwerte in die Tabelle ein.');
 }
 function explainHTML(){
   const P=S.params, D=defaultsFor(), s=stoff();
@@ -1306,6 +1311,69 @@ function cardOk(id){ const d=cardDefs().find(x=>x.id===id); return d.fields.ever
 
 /* ================= Rendern ================= */
 function renderAll(){ renderAside(); renderMain(); updateStatus(); }
+
+/* ---------- Übergabe an „Graphen zeichnen und auswerten“ (Werkzeuge/0-Graphen.html) ----------
+   Neuer Tab bzw. Rückgabe an das aufrufende Werkzeug (?ret=graph), Daten per postMessage,
+   ohne Browser-Speicher (Leitfaden Abschnitt 7). */
+const GRAPH={win:null,fn:null,tgt:(/^https?:$/.test(location.protocol)&&location.origin&&location.origin!=='null')?location.origin:'*'};
+function graphRet(){
+  try{return new URLSearchParams(location.search).get('ret')==='graph'&&window.opener&&!window.opener.closed?window.opener:null;}catch(e){return null;}
+}
+function graphNote(btn,t){
+  let n=btn._gn;
+  if(!n||!n.isConnected){n=document.createElement('span');n.className='graph-note';n.style.cssText='margin-left:8px;font-size:12.5px;color:#9aa2a9';btn.insertAdjacentElement('afterend',n);btn._gn=n;}
+  n.textContent=t;clearTimeout(n._t);n._t=setTimeout(()=>{n.textContent='';},7000);
+}
+function graphOpen(btn,id,fn,emptyMsg){
+  let d=null;try{d=fn();}catch(e){d=null;}
+  if(!d){graphNote(btn,emptyMsg);return;}
+  const r=graphRet();
+  if(r){
+    try{r.postMessage(Object.assign({type:'graphData',src:id},d),GRAPH.tgt);}
+    catch(e){graphNote(btn,'Das Werkzeug ist nicht mehr erreichbar.');return;}
+    graphNote(btn,'Messwerte übertragen. Dieser Tab schließt sich …');
+    setTimeout(()=>{try{window.close();}catch(e){}setTimeout(()=>graphNote(btn,'Messwerte übertragen – du kannst diesen Tab schließen.'),300);},400);
+    return;
+  }
+  const w=window.open('../Werkzeuge/0-Graphen.html?from='+id,'_blank');
+  if(!w){graphNote(btn,'Bitte Pop-ups für diese Seite erlauben.');return;}
+  GRAPH.win=w;GRAPH.fn=fn;
+  graphNote(btn,'Das Werkzeug wurde in einem neuen Tab geöffnet. Deine Eingaben hier bleiben erhalten.');
+}
+window.addEventListener('message',e=>{
+  if(!GRAPH.win||e.source!==GRAPH.win)return;
+  if(GRAPH.tgt!=='*'&&e.origin!==GRAPH.tgt)return;
+  const m=e.data;if(!m||m.type!=='graphReady'||!GRAPH.fn)return;
+  let d=null;try{d=GRAPH.fn();}catch(err){d=null;}
+  if(d){try{GRAPH.win.postMessage(Object.assign({type:'graphData'},d),GRAPH.tgt);}catch(err){}}
+});
+/* Aufruf aus dem Werkzeug: Leiste unter der Kopfzeile, Knöpfe geben die Messwerte zurück */
+function graphRetSetup(id,fn,emptyMsg,where){
+  if(!graphRet())return;
+  [['bGraph','Messwerte übernehmen ▸'],['btnToGraph','Messwerte übernehmen ▸'],['btnGraph','Messwerte übernehmen ▸'],['btnRunsGraph','Messreihen übernehmen ▸']].forEach(([i,t])=>{const b=document.getElementById(i);if(b)b.textContent=t;});
+  const st=document.createElement('style');st.textContent='@media print{#graphRetBar{display:none!important}}';document.head.appendChild(st);
+  const bar=document.createElement('div');bar.id='graphRetBar';
+  bar.style.cssText='display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:10px 16px 0;padding:10px 14px;background:#20252a;border:1px solid #4fd1c5;border-radius:8px;color:#e7e4dd;font-size:14px;line-height:1.4';
+  const tx=document.createElement('span');tx.style.cssText='flex:1 1 320px';
+  tx.innerHTML='<b style="color:#4fd1c5">Du kommst vom Werkzeug „Graphen zeichnen und auswerten“.</b> Nimm hier Messwerte auf und tippe dann auf „Messwerte übernehmen ▸“ (hier oder '+where+'). Die Werte erscheinen im Werkzeug, dieser Tab schließt sich.';
+  const bs='font:inherit;font-size:14px;font-weight:600;border-radius:6px;padding:8px 14px;min-height:40px;cursor:pointer;';
+  const b1=document.createElement('button');b1.type='button';b1.id='graphRetTake';b1.textContent='Messwerte übernehmen ▸';b1.style.cssText=bs+'background:#4fd1c5;color:#14171a;border:1px solid #4fd1c5';
+  const b2=document.createElement('button');b2.type='button';b2.id='graphRetCancel';b2.textContent='Zurück ohne Übernahme';b2.style.cssText=bs+'background:transparent;color:#9aa2a9;border:1px solid #31383e';
+  b1.onclick=()=>graphOpen(b1,id,fn,emptyMsg);
+  b2.onclick=()=>{const r=graphRet();try{if(r)r.postMessage({type:'graphData',src:id,cancel:true},GRAPH.tgt);}catch(e){}setTimeout(()=>{try{window.close();}catch(e){}},150);};
+  const box=document.createElement('span');box.style.cssText='display:flex;flex-wrap:wrap;align-items:center;gap:8px';box.append(b1,b2);
+  bar.append(tx,box);
+  const h=document.querySelector('header');
+  if(h)h.insertAdjacentElement('afterend',bar);else document.body.insertBefore(bar,document.body.firstChild);
+}
+
+function graphData(){
+  const x=[],y=[];
+  ownRows().forEach(r=>{if(isFinite(r.t)&&isFinite(r.v)){x.push(r.t);y.push(r.v);}});
+  if(x.length<2)return null;
+  return {title:'Kalorimetrie – eigene Messwerte',xName:'t',xUnit:'s',series:[{name:'T',unit:'°C',x,y}]};
+}
+graphRetSetup('kalorimetrie',graphData,'Trage zuerst mindestens zwei Messwerte in die Tabelle ein.','unter der Messwerttabelle');
 renderAll();
 requestAnimationFrame(loop);
 </script>

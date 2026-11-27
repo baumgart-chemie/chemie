@@ -502,7 +502,7 @@ header>.tag{flex:1 1 160px;min-width:0}
       <p>Δ<sub>c</sub>H &lt; 0: Die Reaktion ist <strong>exotherm</strong>. Δ<sub>c</sub>H &gt; 0: Die Reaktion ist <strong>endotherm</strong>.</p>
 
       <h3>Reaktionsgleichung aufstellen</h3>
-      <p>Bei „Selbst aufstellen“ werden die Summenformel des Alkans, der Reaktionspartner und die Produkte der vollständigen Verbrennung selbst eingetragen, dazu die Koeffizienten. Ein leeres Koeffizientenfeld gilt als 1. Erlaubt sind die <strong>kleinsten ganzzahligen Koeffizienten</strong> (z. B. 2 C<sub>2</sub>H<sub>6</sub> + 7 O<sub>2</sub> …) oder die Gleichung <strong>bezogen auf ein Alkanmolekül</strong> mit halbzahligem Koeffizienten vor O<sub>2</sub> (z. B. C<sub>2</sub>H<sub>6</sub> + 3,5 O<sub>2</sub> …). Bei „Nur ausgleichen“ sind die Formeln vorgegeben.</p>
+      <p>Bei „Selbst aufstellen“ werden die Summenformel des Alkans, der Reaktionspartner und die Produkte der vollständigen Verbrennung selbst eingetragen, dazu die Koeffizienten. Ein leeres Koeffizientenfeld gilt als 1. Erlaubt sind die <strong>kleinsten ganzzahligen Koeffizienten</strong> (z. B. 2 C<sub>2</sub>H<sub>6</sub> + 7 O<sub>2</sub> …) oder die Gleichung <strong>bezogen auf ein Alkanmolekül</strong> mit halbzahligem Koeffizienten vor O<sub>2</sub> (z. B. C<sub>2</sub>H<sub>6</sub> + 3,5 O<sub>2</sub> …). Bei „Nur ausgleichen“ sind die Formeln vorgegeben. Mit „mit Werkzeug ▸“ lässt sich die Gleichung auch im Werkzeug „Reaktionsgleichungen und Stöchiometrie“ aufstellen und übernehmen (zählt als Hilfe).</p>
       <p>Statt der Summenformel darf auch eine Halbstrukturformel eingegeben werden, z. B. CH3CH2CH3. Auf Groß- und Kleinschreibung achten. Wasser entsteht hier gasförmig, alle Stoffe werden als Gase betrachtet.</p>
 
       <p>Ist die Gleichung richtig, erscheint sie zusätzlich mit <strong>Strukturformeln</strong> (Valenzstrichformeln). Daran lassen sich die Bindungen abzählen. Die Bindungsarten sind farbig markiert, passend zu den Farbstrichen in der Rechentabelle. Farben und freie Elektronenpaare lassen sich ausblenden.</p>
@@ -610,6 +610,7 @@ header>.tag{flex:1 1 160px;min-width:0}
       </div>
       <div class="eq-check" id="eqCheckRow">
         <button class="btn" id="btnCheckEq">Gleichung prüfen</button>
+        <button class="btn ghost" id="btnEqTool" title="Gleichung im Werkzeug „Reaktionsgleichungen und Stöchiometrie“ (neuer Tab) aufstellen und hierher übernehmen">mit Werkzeug ▸</button>
       </div>
       <div class="feedback" id="eqFeedback"></div>
 
@@ -701,7 +702,7 @@ header>.tag{flex:1 1 160px;min-width:0}
 
 <footer>
   <p class="footer-note">Mittlere Bindungsenthalpien nach gängigen Schulbuch-Tabellenwerken, gerundet auf ganze kJ/mol. Einzelne Schulbücher geben teilweise leicht abweichende Werte an. Die Berechnung mit mittleren Bindungsenthalpien liefert Näherungswerte.</p>
-  <p class="footer-credit">Bastian Baumgart · Verbrennungsenthalpie von Alkanen V1.5 · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+  <p class="footer-credit">Bastian Baumgart · Verbrennungsenthalpie von Alkanen V1.6 · <a href="#" id="btnChangelog">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
 </footer>
 <script>
 (function(){
@@ -1042,6 +1043,7 @@ header>.tag{flex:1 1 160px;min-width:0}
       : (form==="self" ? "Trage Formeln und Koeffizienten ein. Leere Koeffizientenfelder gelten als 1." : "Trage die Koeffizienten ein. Leere Felder gelten als 1.");
     $("eqCheckRow").hidden = task.eqOk;
     $("btnCheckEq").disabled = task.done;
+    $("btnEqTool").disabled = task.done;
 
     const step = mode === "step";
     const ok = task.eqOk;
@@ -1333,10 +1335,10 @@ header>.tag{flex:1 1 160px;min-width:0}
     if(finalOk && clsOk && rOk){
       task.done = true;
       stats.solved++;
-      const firstTry = !task.wrong && task.hint === 0 && task.ehint === 0;
+      const firstTry = !task.wrong && task.hint === 0 && task.ehint === 0 && !task.tool;
       if(firstTry) stats.first++;
       stats.streak++;
-      logHistory(task, firstTry ? "first" : ((task.hint>0 || task.ehint>0) ? "help" : "ok"));
+      logHistory(task, firstTry ? "first" : ((task.hint>0 || task.ehint>0 || task.tool) ? "help" : "ok"));
       solvedAlk.set(task.a.name, task.a);
       let msg = `Richtig! Δ<sub>c</sub>H(${task.a.name}) ≈ ${fmt(s.dc)} kJ/mol, die Verbrennung ist exotherm.`;
       if(step && empty) msg += " Einige Zwischenschritte waren leer, der Lösungsweg zeigt sie vollständig.";
@@ -1630,6 +1632,59 @@ header>.tag{flex:1 1 160px;min-width:0}
   $("btnNew").addEventListener("click", ()=>newTask());
   $("btnCheck").addEventListener("click", check);
   $("btnCheckEq").addEventListener("click", checkEquation);
+
+  // ---------- Reaktionsgleichung mit dem Werkzeug „Reaktionsgleichungen und Stöchiometrie“ ----------
+  // Neuer Tab (?ret=verbrennungsenthalpie), Rückgabe per postMessage, ohne Browser-Speicher (Leitfaden Abschnitt 7).
+  // Eine übernommene Gleichung zählt wie eine Hilfe (nicht „im 1. Versuch“).
+  const RQ = {win:null, num:0, tgt:(/^https?:$/.test(location.protocol)&&location.origin&&location.origin!=="null")?location.origin:"*"};
+  const rqEsc = s => String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  function rqParse(eq){
+    const parts = String(eq).split(/\s*(?:->|→|⟶)\s*/);
+    if(parts.length!==2) return null;
+    const side = s => s.split(/\s+\+\s+/).map(x=>{ x=x.trim(); const m=/^(\d+)\s+(.+)$/.exec(x); return m ? {c:+m[1], f:m[2].trim()} : {c:1, f:x}; });
+    return [side(parts[0]), side(parts[1])];
+  }
+  function rqOpen(q){
+    let w = null;
+    try{ w = window.open("../Werkzeuge/0-Reaktionsgleichungen.html?ret=verbrennungsenthalpie&q="+encodeURIComponent(q), "_blank"); }catch(e){ w = null; }
+    if(!w){ $("eqFeedback").innerHTML = fb("bad","Bitte Pop-ups für diese Seite erlauben."); return; }
+    RQ.win = w; RQ.num = task.num;
+    $("eqFeedback").innerHTML = fb("info","Das Werkzeug „Reaktionsgleichungen und Stöchiometrie“ wurde in einem neuen Tab geöffnet. Stelle die Gleichung dort auf und tippe auf „In die Verbrennungsenthalpie übernehmen“. Deine Eingaben hier bleiben erhalten.");
+  }
+  window.addEventListener("message", e=>{
+    if(!RQ.win || e.source!==RQ.win) return;
+    if(RQ.tgt!=="*" && e.origin!==RQ.tgt) return;
+    const d = e.data; if(!d || typeof d!=="object" || d.type!=="chemXfer") return;
+    RQ.win = null;
+    try{ window.focus(); }catch(x){}
+    if(d.cancel || !d.eq){ $("eqFeedback").innerHTML = fb("info","Keine Gleichung aus dem Werkzeug übernommen."); return; }
+    if(!task || task.num!==RQ.num || task.done || task.eqOk){ $("eqFeedback").innerHTML = fb("bad","Die Aufgabe hat sich inzwischen geändert. Öffne das Werkzeug erneut über „mit Werkzeug ▸“."); return; }
+    const eq = String(d.eq).slice(0,300), P = rqParse(eq);
+    if(!P || !rqApply(P)){ $("eqFeedback").innerHTML = fb("bad","Die Gleichung aus dem Werkzeug passt nicht zu dieser Aufgabe: "+rqEsc(eq)+". Trage die Gleichung selbst ein."); return; }
+    task.tool = true; task.touched = true;
+    renderTask();
+    checkEquation();
+    $("eqFeedback").insertAdjacentHTML("afterbegin", fb("info","Die Gleichung stammt aus dem Werkzeug – die Aufgabe zählt als „mit Hilfen gelöst“."));
+  });
+  function rqApply(P){
+    if(P[0].length!==2 || P[1].length!==2) return false;
+    const target = {A:atoms(alkF(task.a)), O2:{O:2}, CO2:{C:1,O:2}, H2O:{H:2,O:1}};
+    const key = f => { const at = atoms(f); return at ? (SPECIES.find(k=>sameAtoms(at, target[k])) || null) : null; };
+    const L = P[0].map(x=>({...x, k:key(x.f)})), R = P[1].map(x=>({...x, k:key(x.f)}));
+    const lk = L.map(x=>x.k).sort().join(), rk = R.map(x=>x.k).sort().join();
+    if(lk!==["A","O2"].sort().join() || rk!==["CO2","H2O"].sort().join()) return false;
+    const all = L.concat(R);
+    if(form === "self"){
+      all.forEach((x,i)=>{ task.vals["f"+i] = x.f; task.vals["c"+i] = String(x.c); });
+    } else {
+      SPECIES.forEach((k,i)=>{ task.vals["c"+i] = String(all.find(x=>x.k===k).c); });
+    }
+    return true;
+  }
+  $("btnEqTool").addEventListener("click", ()=>{
+    if(!task || task.done || task.eqOk) return;
+    rqOpen(form === "self" ? task.a.name+" + Sauerstoff" : alkFormula(task.a)+" + O2 -> CO2 + H2O");
+  });
   $("btnHint").addEventListener("click", hint);
   $("btnSolve").addEventListener("click", showSolution);
   document.addEventListener("keydown", e=>{
@@ -1722,6 +1777,10 @@ header>.tag{flex:1 1 160px;min-width:0}
       <button class="modal-close" id="closeChangelog" aria-label="Schließen">×</button>
     </div>
     <div class="modal-body">
+      <div class="vh-ver"><span class="v">V1.6</span><span class="d">27.11.2026</span></div>
+      <ul>
+        <li><strong>Gleichung mit dem Werkzeug aufstellen:</strong> „mit Werkzeug ▸“ neben „Gleichung prüfen“ öffnet das Werkzeug „Reaktionsgleichungen und Stöchiometrie“ mit dem Alkan und Sauerstoff (neuer Tab). Mit „In die Verbrennungsenthalpie übernehmen“ kommen Formeln und Koeffizienten zurück und werden geprüft; die Aufgabe zählt dann als „mit Hilfen gelöst“. Es wird nichts gespeichert.</li>
+      </ul>
       <div class="vh-ver"><span class="v">V1.5</span><span class="d">24.11.2026</span></div>
       <ul>
         <li><strong>Bindungsenthalpien:</strong> C–H jetzt 414 kJ/mol (bisher 413), C–C jetzt 346 kJ/mol (bisher 348) – einheitlich mit dem Chemie-Rechner. Beispiel Methan: Δ<sub>c</sub>H ≈ −806 kJ/mol.</li>
@@ -2036,7 +2095,7 @@ BK.trainer=o=>{
 
 </script>
 <script id="bk-page">
-BK.trainer({url:'https://chemie.mail-baumgart.de/EP/EP-Verbrennungsenthalpie.html',footName:'Verbrennungsenthalpie von Alkanen',version:'1.5',printTitle:'Verbrennungsenthalpie von Alkanen – Zusammenfassung',
+BK.trainer({url:'https://chemie.mail-baumgart.de/EP/EP-Verbrennungsenthalpie.html',footName:'Verbrennungsenthalpie von Alkanen',version:'1.6',printTitle:'Verbrennungsenthalpie von Alkanen – Zusammenfassung',
   hint:'Die Auswertung enthält jede bearbeitete Aufgabe mit der richtigen Lösung und dem Vermerk, ob sie richtig gelöst wurde, sowie die Statistik mit der Erfolgsquote.',
   items:()=>globalThis.__H.map(h=>({no:h.num,st:h.status,task:h.pdf.task,sol:h.pdf.sol}))});
 

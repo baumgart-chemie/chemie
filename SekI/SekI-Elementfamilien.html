@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Elementfamilien – Zuordnen und Flammenfärbung</title>
+<style>
+:root{
+  --bg:#14171a; --panel:#1b1f23; --panel-alt:#20252a; --line:#31383e; --line-soft:#262c31;
+  --text:#e7e4dd; --text-dim:#9aa2a9; --text-faint:#5f6870;
+  --amber:#ffb454; --teal:#4fd1c5; --good:#7fd68a; --danger:#e4785b; --screen:#0e1113;
+  --f-ak:#f0a050; --f-ea:#d9c46a; --f-ha:#b48cff; --f-eg:#5fb8e8; --f-no:#8a939a;
+  --mono:ui-monospace,'Cascadia Mono',Consolas,Menlo,monospace;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.45}
+a{color:var(--teal)}
+sub,sup{font-size:.72em;line-height:0}
+
+/* Kopfzeile */
+header{display:flex;align-items:center;gap:14px;flex-wrap:nowrap;padding:14px 28px;border-bottom:1px solid var(--line);background:var(--panel)}
+header .back-btn{align-self:baseline;flex:0 0 auto;color:var(--text);text-decoration:none;border:1px solid var(--line);background:var(--panel-alt);border-radius:8px;padding:7px 12px;font-size:14px;white-space:nowrap}
+header .back-btn:hover{border-color:var(--teal);color:var(--teal)}
+header h1{margin:0;font-size:22px;font-weight:700;white-space:nowrap;flex:0 0 auto}
+header>.tag{color:var(--text-dim);font-size:13.5px;flex:1 1 160px;min-width:0}
+header .hlink{color:var(--teal);font-size:14px;text-decoration:none;border-bottom:1px solid transparent;white-space:nowrap;background:none;border-top:0;border-left:0;border-right:0;cursor:pointer;font-family:inherit;padding:0}
+header .hlink:hover{border-bottom-color:var(--teal)}
+.qrbtn{display:flex;align-items:center;gap:7px;padding:2px 8px 2px 2px;border:1px solid var(--line);border-radius:4px;background:var(--panel-alt);color:var(--text);cursor:pointer;font-family:inherit;text-align:left;flex:0 0 auto}
+.qrbtn .qrmini{width:30px;height:30px;background:#fff;border-radius:2px;display:block}
+.qrbtn .qrmini svg{width:30px;height:30px;display:block}
+.qrbtn .qrt{font-size:10px;line-height:1.2;color:var(--text-dim)}
+.qrbtn .qrt b{display:block;font-size:10.5px;color:var(--text)}
+.status{font-family:var(--mono);font-size:12px;color:var(--amber);white-space:nowrap;flex:0 0 auto}
+@media (max-width:1050px){ header{flex-wrap:wrap;row-gap:6px} header>.tag{order:10;flex-basis:100%} .status{display:none} }
+@media (max-width:600px){ .qrbtn .qrt{display:none} .qrbtn{padding:2px} header{padding:12px 16px;flex-wrap:wrap} .status{display:none} }
+
+/* Grundlayout */
+.layout{display:grid;grid-template-columns:330px 1fr;gap:22px;padding:20px 28px;align-items:start}
+aside.side{position:sticky;top:14px;max-height:calc(100vh - 28px);overflow:auto;padding-right:4px}
+main{min-width:0}
+@media (max-width:920px){ .layout{grid-template-columns:1fr;padding:16px} aside.side{position:static;max-height:none} }
+
+.box{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:0 0 14px}
+.box h3{margin:0 0 8px;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--amber);font-weight:700}
+.muted{color:var(--text-dim)}
+.small{font-size:13px}
+
+/* Grundlagen */
+.gb-toggle{display:flex;justify-content:space-between;align-items:center;width:100%;background:var(--panel);border:1px solid var(--line);border-radius:10px;color:var(--text);font:inherit;font-weight:600;padding:12px 14px;cursor:pointer;margin:0 0 14px}
+.gb-toggle .arr{color:var(--teal);transition:transform .2s}
+.gb-toggle[aria-expanded="true"] .arr{transform:rotate(90deg)}
+.gb-list{list-style:none;margin:-8px 0 14px;padding:6px;border:1px solid var(--line);border-radius:10px;background:var(--panel);display:flex;flex-direction:column;gap:4px}
+.gb-list button{width:100%;text-align:left;background:transparent;border:0;color:var(--text);font:inherit;font-size:14px;padding:8px 10px;border-radius:6px;cursor:pointer}
+.gb-list button:hover{background:var(--panel-alt);color:var(--teal)}
+.gb-list .num{font-family:var(--mono);color:var(--amber);margin-right:8px;font-size:12px}
+
+.homebtn{display:block;width:100%;text-align:left;background:var(--panel-alt);border:1px solid var(--teal);border-radius:8px;color:var(--teal);font:inherit;font-size:16px;font-weight:600;padding:12px 14px;margin:0 0 14px;cursor:pointer}
+.homebtn:hover{background:var(--teal);color:var(--bg)}
+
+/* Knöpfe */
+.btn{background:var(--panel-alt);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:10px 14px;font:inherit;font-size:15px;cursor:pointer;min-height:44px;touch-action:manipulation}
+.btn:hover{border-color:var(--text-dim)}
+.btn.primary{border-color:var(--teal);color:var(--teal);font-weight:600}
+.btn.primary:hover{background:var(--teal);color:var(--bg)}
+.btn.big{font-size:17px;padding:12px 18px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.full{width:100%;margin-top:8px}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{flex:1;background:var(--panel-alt);border:0;border-right:1px solid var(--line);color:var(--text-dim);font:inherit;font-size:14px;padding:10px 6px;cursor:pointer;min-height:42px}
+.seg button:last-child{border-right:0}
+.seg button.active{background:#1d3533;color:var(--teal);font-weight:600}
+label.chk{display:flex;gap:9px;align-items:flex-start;padding:6px 0;cursor:pointer;font-size:14px}
+label.chk input{width:20px;height:20px;margin:0;flex:0 0 auto;accent-color:var(--teal)}
+label.chk.dis{opacity:.4;cursor:not-allowed}
+
+/* Bilanz */
+.bil{display:grid;grid-template-columns:1fr auto;gap:3px 10px;font-size:13.5px}
+.bil span:nth-child(even){font-family:var(--mono);color:var(--amber);text-align:right}
+
+/* Kacheln */
+.intro{margin:0 0 16px;color:var(--text-dim);max-width:900px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;text-align:left;color:var(--text);font:inherit;display:flex;flex-direction:column;gap:8px;min-height:190px;transition:border-color .15s,transform .15s}
+.tile:hover{border-color:var(--teal);transform:translateY(-2px)}
+.tile .ic{height:64px}
+.tile .ic svg{height:64px;width:auto}
+.tile h2{margin:0;font-size:18px}
+.tile p{margin:0;color:var(--text-dim);font-size:14px}
+.tile .kind{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--amber);font-weight:700}
+
+/* Aufgabe */
+.taskhead{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin:0 0 10px}
+.taskhead h2{margin:0;font-size:20px}
+.taskhead .lvl{font-size:12px;color:var(--amber);font-family:var(--mono);margin-left:8px}
+.instr{margin:0 0 12px;color:var(--text-dim)}
+.pool{min-height:64px;background:#1e2328;border:1px dashed var(--line);border-radius:10px;padding:8px 10px 10px;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;margin:0 0 14px;position:sticky;top:0;z-index:20;max-height:40vh;overflow-y:auto;box-shadow:0 6px 14px rgba(0,0,0,.45)}
+#vTask{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.pool .card.txt{max-width:235px;font-size:13.5px;padding:7px 9px}
+.pool.hot,.zone.hot{border-color:var(--teal);border-style:solid;background:#1c2c2c}
+.pool .empty{color:var(--text-faint);font-size:13px;align-self:center}
+.pool .pgrp{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start}
+.pool .plbl{flex:0 0 100%;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--amber);font-weight:700;margin-top:2px}
+.tblwrap{overflow-x:auto;margin:0 0 14px;padding-bottom:4px}
+.tbl{display:grid;gap:8px;min-width:640px}
+.tbl .th{padding:9px 8px;border-radius:9px;font-weight:700;color:#14171a;font-size:15px;text-align:center;display:flex;align-items:center;justify-content:center;line-height:1.2}
+.tbl .rowlbl{grid-column:1/-1;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--amber);font-weight:700;margin:8px 0 -2px;padding-left:2px;border-bottom:1px solid var(--line-soft);padding-bottom:3px}
+.zone{background:var(--panel);border:1px dashed var(--line);border-radius:10px;min-height:96px;padding:7px;display:flex;flex-wrap:wrap;gap:7px;align-content:flex-start;cursor:pointer}
+.zone.r-el{min-height:76px}
+.zone .zl{flex:0 0 100%;font-size:10.5px;font-weight:700;letter-spacing:.03em;line-height:1.1;margin:-1px 0 1px;opacity:.85;pointer-events:none}
+.cell.off{border:1px dashed var(--line-soft);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--text-faint);font-size:13px;min-height:60px;opacity:.6}
+.card{background:#262c32;border:1px solid #3a4249;border-radius:8px;padding:8px 10px;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;min-height:44px;position:relative;color:var(--text)}
+.card.el{width:76px;text-align:center;padding:6px 4px}
+.card.el .sym{font-size:25px;font-weight:700;line-height:1.15}
+.card.el .nm{font-size:11.5px;color:var(--text-dim);line-height:1.2}
+.card.el .z{position:absolute;top:3px;left:5px;font-size:10px;color:var(--text-faint);font-family:var(--mono)}
+.card.txt{max-width:260px;font-size:14px;line-height:1.32}
+.zone .card.txt{max-width:none;width:100%;font-size:13.5px;padding:7px 9px}
+.zone .card.el{width:68px}
+.card.sel{outline:3px solid var(--teal);outline-offset:1px}
+.card.tip{box-shadow:0 0 0 3px var(--amber)}
+.card.ok{border-color:var(--good);background:rgba(127,214,138,.13);cursor:default}
+.card.bad{border-color:var(--danger);background:rgba(228,120,91,.16)}
+.card .hint{display:block;font-size:12px;color:var(--amber);margin-top:4px;line-height:1.3;text-align:left}
+.card.dragging{opacity:.3}
+.ghost{position:fixed;z-index:2000;pointer-events:none;opacity:.95;box-shadow:0 8px 24px rgba(0,0,0,.6);transform:scale(1.05)}
+.fb{min-height:24px;margin:4px 0 12px;padding:10px 12px;border-radius:8px;background:var(--panel);border:1px solid var(--line)}
+.fb.good{border-color:var(--good);color:var(--good)}
+.fb.bad{border-color:var(--danger)}
+.fb.info{border-color:var(--line);color:var(--text-dim)}
+.pse-wrap{margin:0 0 14px;padding:10px;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow-x:auto}
+
+/* Flamme */
+.flamegrid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(250px,1fr);gap:16px;align-items:start}
+@media (max-width:1100px){ .flamegrid{grid-template-columns:1fr} }
+.stage{background:var(--screen);border:1px solid var(--line);border-radius:10px;overflow:hidden;position:relative}
+.stage canvas{display:block;width:100%;height:auto}
+.obs{display:flex;gap:14px;align-items:center}
+.swatch{width:84px;height:84px;border-radius:10px;border:1px solid var(--line);flex:0 0 auto;background:#222;display:flex;align-items:center;justify-content:center;color:var(--text-faint);font-size:12px;text-align:center}
+.obs .big{font-size:20px;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}
+.chip{background:var(--panel-alt);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px;cursor:pointer;min-height:42px;text-align:left;line-height:1.15}
+.chip small{display:block;color:var(--text-dim);font-size:11px}
+.chip.active{border-color:var(--teal);background:#1d3533;color:var(--teal)}
+.chip.ok{border-color:var(--good);color:var(--good)}
+.chip.bad{border-color:var(--danger);color:var(--danger)}
+.grp{font-size:12px;color:var(--text-dim);margin-top:6px}
+.specbox{margin-top:14px}
+.specbox canvas{display:block;width:100%;height:auto;border-radius:8px;border:1px solid var(--line);background:#000}
+.expl{margin-top:10px;padding:10px 12px;border-left:3px solid var(--amber);background:var(--panel-alt);border-radius:0 8px 8px 0;font-size:14px}
+table.prot{width:100%;border-collapse:collapse;font-size:14px}
+table.prot th,table.prot td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:middle}
+table.prot th{color:var(--text-dim);font-weight:600;font-size:13px}
+.dot{display:inline-block;width:18px;height:18px;border-radius:4px;vertical-align:middle;margin-right:6px;border:1px solid #444}
+.note{font-size:13px;color:var(--amber);min-height:18px}
+
+/* Modale Fenster */
+.mbg{position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:3000;display:flex;align-items:center;justify-content:center;padding:18px}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:12px;max-width:760px;width:100%;max-height:88vh;overflow:auto;padding:20px 24px;position:relative}
+.modal.wide{max-width:1000px}
+.modal h2{margin:0 0 12px;font-size:20px;padding-right:36px}
+.modal h4{margin:16px 0 6px;color:var(--amber);font-size:14px;text-transform:uppercase;letter-spacing:.04em}
+.modal .x{position:absolute;top:10px;right:12px;background:none;border:0;color:var(--text-dim);font-size:26px;cursor:pointer;line-height:1;width:40px;height:40px}
+.modal .x:hover{color:var(--text)}
+.modal p,.modal li{font-size:15px}
+.modal table{border-collapse:collapse;margin:8px 0}
+.modal td,.modal th{border:1px solid var(--line);padding:5px 9px;font-size:14px;text-align:left}
+.modal th{color:var(--text-dim)}
+.gbnav{display:flex;justify-content:space-between;gap:10px;margin-top:18px;border-top:1px solid var(--line);padding-top:12px}
+.fig{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;margin:10px 0}
+.fig svg{max-width:100%;height:auto}
+.eq{font-family:var(--mono);background:var(--panel-alt);border-radius:6px;padding:6px 10px;display:inline-block;margin:4px 0;font-size:14px}
+.qrbig{background:#fff;padding:14px;border-radius:8px;width:300px;max-width:100%;margin:6px auto}
+.qrbig svg{width:100%;height:auto;display:block}
+.pdfgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pdfgrid input{width:100%;background:var(--panel-alt);border:1px solid var(--line);border-radius:8px;color:var(--text);font:inherit;padding:10px}
+.runrow{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--line-soft)}
+.runrow input{width:20px;height:20px;accent-color:var(--teal)}
+
+/* Fußzeile */
+footer{padding:16px 28px 30px; color:var(--text-faint); font-size:11.5px; border-top:1px solid var(--line-soft); margin-top:10px;}
+footer p{margin:0;}
+footer a{color:var(--text-dim); text-decoration:none; border-bottom:1px solid var(--line); cursor:pointer}
+footer a:hover{color:var(--text); border-bottom-color:var(--text-dim);}
+footer .footer-credit{margin-top:8px; color:var(--text-dim);}
+@media (max-width:600px){ footer{padding:16px 16px 30px;} }
+
+/* Druck */
+#print{display:none}
+@page{size:A4;margin:14mm}
+@media print{
+  html,body{background:#fff!important;color:#000}
+  body>*:not(#print){display:none!important}
+  #print{display:block;color:#000;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:10.5pt;line-height:1.4}
+  #print h1{font-size:16pt;margin:0 0 2mm}
+  #print .phead{border-bottom:1.5px solid #000;padding-bottom:2mm;margin-bottom:4mm}
+  #print .pmeta{display:flex;gap:10mm;font-size:10pt}
+  #print h2{font-size:12pt;margin:5mm 0 2mm}
+  #print table{border-collapse:collapse;width:100%;break-inside:avoid;page-break-inside:avoid;margin:1mm 0 3mm}
+  #print tr{break-inside:avoid}
+  #print th,#print td{border:.6pt solid #888;padding:1.2mm 2mm;text-align:left;vertical-align:top;font-size:9.5pt}
+  #print th{background:#eee;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #print .pblock{break-inside:avoid;page-break-inside:avoid;border-left:4px solid #999;padding:1.5mm 3mm;margin:3mm 0}
+  #print .pblock.g{border-color:#2e8b3d} #print .pblock.r{border-color:#c0392b} #print .pblock.n{border-color:#999}
+  #print .verm{font-weight:700;margin:1mm 0}
+  #print .pblock.g .verm{color:#2e7d32} #print .pblock.r .verm{color:#b03020}
+  #print .wrong{color:#b03020}
+  #print .sw{display:inline-block;width:5mm;height:5mm;border:.5pt solid #555;vertical-align:middle;margin-right:2mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #print .pfoot{margin-top:8mm;border-top:.6pt solid #888;padding-top:2mm;font-size:8.5pt;color:#444}
+  #print .stat{display:grid;grid-template-columns:auto auto;gap:.5mm 8mm;justify-content:start;font-size:10pt}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="back-btn" href="../index.html">← Zur Übersicht</a>
+  <h1>Elementfamilien</h1>
+  <span class="tag">Alkalimetalle, Erdalkalimetalle, Halogene und Edelgase – zuordnen und Flammenfärbung</span>
+  <button class="hlink" id="lnkHelp" type="button">Anleitung</button>
+  <button class="qrbtn" id="qrBtn" type="button" aria-label="QR-Code vergrößern">
+    <span class="qrmini" id="qrMini"></span>
+    <span class="qrt"><b>Auf dem Mobilgerät öffnen</b>QR-Code antippen zum Vergrößern</span>
+  </button>
+  <span class="status" id="status">Auswahl</span>
+</header>
+
+<div class="layout">
+  <aside class="side">
+    <button class="gb-toggle" id="gbToggle" type="button" aria-expanded="false"><span>Grundlagen · <span id="gbCount">8</span> Themen</span><span class="arr">▸</span></button>
+    <ul class="gb-list" id="gbList" hidden></ul>
+    <button class="homebtn" id="homeBtn" type="button" hidden>◂ Zur Auswahl</button>
+
+    <div id="sideHome">
+      <div class="box"><h3>So geht's</h3><p class="small muted" style="margin:0">Wähle rechts eine Übung oder die Simulation zur Flammenfärbung. Mit „◂ Zur Auswahl“ kommst du jederzeit zu den Kacheln zurück.</p></div>
+    </div>
+
+    <div id="sideTask" hidden>
+      <div class="box">
+        <h3>Schwierigkeit</h3>
+        <div class="seg" id="lvlSeg">
+          <button type="button" data-l="L" class="active">Leicht</button>
+          <button type="button" data-l="M">Mittel</button>
+          <button type="button" data-l="S">Schwer</button>
+        </div>
+        <p class="small muted" id="lvlInfo" style="margin:8px 0 0"></p>
+      </div>
+      <div class="box">
+        <h3>Hilfen</h3>
+        <label class="chk"><input type="checkbox" id="optPse"> Periodensystem einblenden</label>
+        <p class="small muted" style="margin:2px 0 0">Wer beim Prüfen das Periodensystem eingeblendet hat oder einen Tipp nutzt, löst die Aufgabe „mit Hilfen“.</p>
+      </div>
+    </div>
+
+    <div id="sideFlame" hidden>
+      <div class="box">
+        <h3>Modus</h3>
+        <div class="seg" id="modeSeg">
+          <button type="button" data-m="sim" class="active">Versuch</button>
+          <button type="button" data-m="pr">Unbekannte Probe</button>
+        </div>
+      </div>
+      <div id="sideSim">
+        <div class="box">
+          <h3>Probe auswählen</h3>
+          <div id="sampleChips"></div>
+        </div>
+        <div class="box">
+          <label class="chk"><input type="checkbox" id="optVary"> <b>Bedingungen variieren</b></label>
+          <div id="varyBox">
+            <label class="chk dis"><input type="checkbox" id="optCob" disabled> Kobaltglas vor die Flamme halten</label>
+            <label class="chk dis"><input type="checkbox" id="optSpec" disabled> Spektroskop einblenden</label>
+            <label class="chk dis"><input type="checkbox" id="optClean" checked disabled> Stäbchen vor jeder Probe automatisch reinigen</label>
+            <label class="chk dis"><input type="checkbox" id="optExpl" disabled> Erklärungen anzeigen</label>
+            <button class="btn full" id="btnStd" type="button" disabled>Standardbedingungen</button>
+          </div>
+        </div>
+      </div>
+      <div id="sidePr" hidden>
+        <div class="box">
+          <h3>Schwierigkeit</h3>
+          <div class="seg" id="prSeg">
+            <button type="button" data-l="L" class="active">Leicht</button>
+            <button type="button" data-l="M">Mittel</button>
+            <button type="button" data-l="S">Schwer</button>
+          </div>
+          <p class="small muted" id="prInfo" style="margin:8px 0 0"></p>
+        </div>
+        <div class="box">
+          <h3>Hilfsmittel</h3>
+          <label class="chk"><input type="checkbox" id="prCob"> Kobaltglas vor die Flamme halten</label>
+          <label class="chk"><input type="checkbox" id="prSpec"> Spektroskop einblenden</label>
+          <p class="small muted" style="margin:2px 0 0">Kobaltglas und Spektroskop sind Laborgeräte und zählen nicht als Hilfe.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="sideBil" hidden>
+      <div class="box">
+        <h3>Bilanz</h3>
+        <div class="bil" id="bil"></div>
+        <button class="btn primary full" id="btnSum" type="button">Zusammenfassung als PDF</button>
+        <div class="btnrow" style="margin-top:8px">
+          <button class="btn" id="btnSave" type="button" style="flex:1">Zwischenstand speichern</button>
+          <button class="btn" id="btnLoad" type="button" style="flex:1">Zwischenstand laden</button>
+          <input type="file" id="fileLoad" accept=".json,application/json" hidden>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <!-- Kacheln -->
+    <section id="vHome">
+      <p class="intro">Elemente mit ähnlichen Eigenschaften bilden <b>Elementfamilien</b>. Sie stehen im Periodensystem in derselben Hauptgruppe. Ordne in einer Tabelle Elemente, Eigenschaften und Verwendungen den vier Familien zu oder untersuche in der Simulation, welche Farbe ein Element der Brennerflamme gibt.</p>
+      <div class="tiles" id="tiles"></div>
+    </section>
+
+    <!-- Zuordnungsübung -->
+    <section id="vTask" hidden>
+      <div class="taskhead">
+        <div><h2 id="tTitle">Elemente zuordnen</h2></div>
+        <button class="btn primary" id="btnNew" type="button">Neue Aufgabe</button>
+      </div>
+      <p class="instr" id="tInstr"></p>
+      <div class="pse-wrap" id="pseWrap" hidden></div>
+      <div class="pool" id="pool" data-zone="pool"></div>
+      <div class="tblwrap"><div class="tbl" id="zones"></div></div>
+      <div class="btnrow" style="margin-bottom:10px">
+        <button class="btn primary big" id="btnCheck" type="button">Prüfen</button>
+        <button class="btn" id="btnTip" type="button">Tipp</button>
+        <button class="btn" id="btnSol" type="button">Lösung zeigen</button>
+        <span class="muted small" id="tCount"></span>
+      </div>
+      <div class="fb info" id="fb">Ziehe jede Karte in das passende Feld der Tabelle.</div>
+    </section>
+
+    <!-- Flammenfärbung -->
+    <section id="vFlame" hidden>
+      <div class="taskhead">
+        <div><h2 id="fTitle">Flammenfärbung</h2></div>
+        <button class="btn primary" id="btnNewPr" type="button" hidden>Neue Probe</button>
+      </div>
+      <p class="instr" id="fInstr">Wähle links eine Probe. Mit „In die Flamme halten“ wird ein Magnesiastäbchen in das Salz getaucht und in die nicht leuchtende Brennerflamme gehalten.</p>
+      <div class="flamegrid">
+        <div>
+          <div class="stage"><canvas id="cv" width="600" height="440" aria-label="Bunsenbrenner mit Flamme"></canvas></div>
+          <div class="btnrow" style="margin-top:10px">
+            <button class="btn primary big" id="btnHold" type="button">In die Flamme halten ▸</button>
+            <button class="btn" id="btnOut" type="button" disabled>Herausnehmen</button>
+            <button class="btn" id="btnClean" type="button" hidden>Stäbchen reinigen</button>
+          </div>
+          <div class="note" id="fNote"></div>
+        </div>
+        <div>
+          <div class="box">
+            <h3>Beobachtung</h3>
+            <div class="obs">
+              <div class="swatch" id="obsSw">–</div>
+              <div>
+                <div class="muted small">Flammenfärbung</div>
+                <div class="big" id="obsName">–</div>
+                <div class="small muted" id="obsSub"></div>
+              </div>
+            </div>
+            <div class="expl" id="explBox" hidden></div>
+          </div>
+          <div class="box" id="answerBox" hidden>
+            <h3>Welches Element enthält die Probe?</h3>
+            <p class="small muted" id="ansHint" style="margin:0 0 4px"></p>
+            <div class="chips" id="ansChips"></div>
+            <div class="btnrow">
+              <button class="btn primary" id="btnPrCheck" type="button">Prüfen</button>
+              <button class="btn" id="btnPrSol" type="button">Lösung zeigen</button>
+            </div>
+            <div class="fb info" id="prFb" style="margin-top:10px">Halte die Probe in die Flamme und beobachte die Farbe.</div>
+          </div>
+        </div>
+      </div>
+      <div class="specbox" id="specBox" hidden>
+        <h3 style="margin:0 0 6px;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--amber)">Spektroskop (vereinfacht)</h3>
+        <canvas id="spc" width="900" height="120"></canvas>
+        <p class="small muted" style="margin:6px 0 0" id="specNote">Das Spektroskop zerlegt das Licht der Flamme. Jedes Element zeigt typische Linien – wie ein Fingerabdruck. Gezeigt ist der sichtbare Bereich von 380 nm bis 780 nm.</p>
+      </div>
+      <div class="box" id="protBox" style="margin-top:16px">
+        <h3>Beobachtungsprotokoll</h3>
+        <div id="protWrap"><p class="small muted" style="margin:0">Noch keine Flammenprobe durchgeführt.</p></div>
+        <div class="btnrow" style="margin-top:10px">
+          <button class="btn primary" id="btnSimPdf" type="button" disabled>Ausgabe als PDF</button>
+          <button class="btn" id="btnProtClear" type="button" disabled>Protokoll leeren</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer>
+  <p class="footer-note">Vereinfachte Darstellung zu Lehrzwecken: Flammenfarben und Spektrallinien sind gerundete Modellwerte; die wirkliche Farbe hängt vom Salz, von der Flamme und vom Bildschirm ab.</p>
+  <p class="footer-credit">Bastian Baumgart · Elementfamilien V1.0 · <a id="lnkVers">Versionshinweise</a> · <a href="../impressum.html#impressum">Impressum</a> · <a href="../impressum.html#datenschutz">Datenschutz</a></p>
+</footer>
+
+<!-- Modale Fenster -->
+<div class="mbg" id="mHelp" hidden><div class="modal">
+  <button class="x" data-close type="button" aria-label="Schließen">×</button>
+  <h2>Anleitung</h2>
+  <h4>Aufbau</h4>
+  <p>Auf der Startseite wählst du die Übung <b>Elementfamilien zuordnen</b> oder die Simulation <b>Flammenfärbung</b>. „◂ Zur Auswahl“ in der linken Spalte führt zurück zu den Kacheln. Unter „Grundlagen“ findest du Erklärungen zu allen Themen.</p>
+  <h4>Elementfamilien zuordnen</h4>
+  <ul>
+    <li><b>Tabelle:</b> Die Spalten sind die vier Familien, die Zeilen heißen <b>Elemente</b>, <b>Eigenschaften</b> und <b>Verwendung</b>. Im Kartenstapel darüber sind die Karten nach diesen drei Gruppen sortiert. Jede Karte gehört in ihre Zeile und dort unter die richtige Familie.</li>
+    <li><b>Ziehen:</b> Karte mit Finger, Stift oder Maus in das passende Feld ziehen. Eine Karte lässt sich jederzeit wieder verschieben oder zurück in den Kartenstapel ziehen.</li>
+    <li><b>Antippen:</b> Karte antippen (sie wird türkis umrandet), dann das Feld antippen.</li>
+    <li><b>Prüfen:</b> Richtig zugeordnete Karten werden grün und bleiben liegen, falsche werden rot. Nach dem zweiten Fehlversuch steht bei jeder roten Karte ein Hinweis.</li>
+    <li><b>Tipp</b> zeigt einen Hinweis zu einer Karte, die noch nicht richtig liegt. <b>Lösung zeigen</b> ordnet alle Karten richtig ein.</li>
+    <li><b>Schwierigkeit:</b> Leicht = 20 Karten (Elemente mit Name und Ordnungszahl), Mittel = 28 Karten, Schwer = 39 Karten; bei „Schwer“ stehen auf den Elementkarten nur Symbole, und eine zusätzliche Spalte nimmt Elemente auf, die zu keiner der vier Familien gehören.</li>
+  </ul>
+  <h4>Flammenfärbung</h4>
+  <ul>
+    <li><b>Versuch:</b> Probe (Salz) links auswählen, dann „In die Flamme halten“. Das Magnesiastäbchen wird in das Salz getaucht und in die Flamme gehalten. Die Farbe der Flamme und ihr Name erscheinen unter „Beobachtung“ und im Protokoll.</li>
+    <li><b>Bedingungen variieren:</b> Kobaltglas vorhalten, Spektroskop einblenden, Gemische untersuchen, das automatische Reinigen des Stäbchens abschalten (dann färben Reste der vorherigen Probe mit) und Erklärungen einblenden. „Standardbedingungen“ setzt alles zurück.</li>
+    <li><b>Unbekannte Probe:</b> Die Probe ist nicht beschriftet. Halte sie in die Flamme, beobachte die Farbe (Kobaltglas und Spektroskop helfen) und wähle das Element. Bei „Schwer“ können auch zwei Elemente enthalten sein.</li>
+  </ul>
+  <h4>PDF und Zwischenstand</h4>
+  <p>„Zusammenfassung als PDF“ enthält alle bearbeiteten Aufgaben mit richtiger Lösung (als Tabelle), einem Vermerk und der Statistik. „Ausgabe als PDF“ unter dem Protokoll druckt die ausgewählten Flammenproben. Mit „Zwischenstand speichern“ wird eine Datei heruntergeladen (am iPad unter Dateien → Downloads), die du später wieder laden kannst. Es wird nichts im Browser gespeichert oder übertragen.</p>
+</div></div>
+
+<div class="mbg" id="mGb" hidden><div class="modal wide">
+  <button class="x" data-close type="button" aria-label="Schließen">×</button>
+  <div id="gbBody"></div>
+  <div class="gbnav">
+    <button class="btn" id="gbPrev" type="button">◂ Vorheriges Thema</button>
+    <span class="muted small" id="gbPos" style="align-self:center"></span>
+    <button class="btn" id="gbNext" type="button">Nächstes Thema ▸</button>
+  </div>
+</div></div>
+
+<div class="mbg" id="mVers" hidden><div class="modal">
+  <button class="x" data-close type="button" aria-label="Schließen">×</button>
+  <h2>Versionshinweise</h2>
+  <h4>Version 1.0 · 27.11.2026</h4>
+  <ul>
+    <li>Neue Seite „Elementfamilien“ mit Kacheln als Startauswahl.</li>
+    <li>Übung „Elementfamilien zuordnen“ als Tabelle zum Ziehen (oder Antippen): Spalten Alkalimetalle, Erdalkalimetalle, Halogene und Edelgase, Zeilen Elemente, Eigenschaften und Verwendung; rund 50 Eigenschaften (auch allgemeine Eigenschaften der Hauptgruppen) und über 20 Verwendungen; drei Schwierigkeitsstufen, bei „Schwer“ zusätzlich Elemente, die zu keiner der vier Familien gehören.</li>
+    <li>Prüfen mit grün/rot, Hinweise nach dem zweiten Fehlversuch, Tipp, Lösung zeigen, Periodensystem als Hilfe, Bilanz mit Erfolgsquote.</li>
+    <li>Simulation „Flammenfärbung“ mit Bunsenbrenner, Magnesiastäbchen und zehn Salzen (Li, Na, K, Rb, Cs, Mg, Ca, Sr, Ba, Cu); Bedingungen variieren: Kobaltglas, Spektroskop, Gemische, Verunreinigung durch ungereinigtes Stäbchen, Erklärungen.</li>
+    <li>Modus „Unbekannte Probe“: Element an der Flammenfarbe erkennen, bei „Schwer“ auch Gemische.</li>
+    <li>Grundlagen mit acht Themen, Beobachtungsprotokoll, PDF-Ausgabe, Zwischenstand als Datei, QR-Code.</li>
+  </ul>
+</div></div>
+
+<div class="mbg" id="mQr" hidden><div class="modal" style="max-width:420px;text-align:center">
+  <button class="x" data-close type="button" aria-label="Schließen">×</button>
+  <h2>Auf dem Mobilgerät öffnen</h2>
+  <div class="qrbig" id="qrBig"></div>
+  <p class="small" style="word-break:break-all;font-family:var(--mono)" id="qrUrl"></p>
+  <p class="small muted">Mit der Kamera scannen, um diese Übung auf dem eigenen Gerät zu öffnen.</p>
+  <button class="btn" data-close type="button">Schließen</button>
+</div></div>
+
+<div class="mbg" id="mPdf" hidden><div class="modal" style="max-width:620px">
+  <button class="x" data-close type="button" aria-label="Schließen">×</button>
+  <h2>Auswertung als PDF</h2>
+  <div id="pdfSel"></div>
+  <h4>Angaben (optional)</h4>
+  <div class="pdfgrid">
+    <input type="text" id="pdfName" placeholder="Name" autocomplete="off">
+    <input type="text" id="pdfKurs" placeholder="Kurs" autocomplete="off">
+  </div>
+  <p class="small muted" id="pdfHint"></p>
+  <p class="small muted"><b>So speicherst du das PDF:</b> Nach „PDF erstellen“ öffnet sich der Druckdialog des Browsers. Dort als Drucker bzw. Ziel „Als PDF speichern“ wählen und auf „Speichern“ tippen (am iPad: Teilen → „In Dateien sichern“). Es wird nichts gedruckt oder übertragen.</p>
+  <div class="btnrow" style="justify-content:flex-end">
+    <button class="btn" data-close type="button">Abbrechen</button>
+    <button class="btn primary" id="pdfGo" type="button">PDF erstellen</button>
+  </div>
+</div></div>
+
+<div id="print"></div>
+
+<script>
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const PAGE_URL='https://chemie.mail-baumgart.de/SekI/SekI-Elementfamilien.html';
+const PAGE_TITLE='Elementfamilien', VERSION='1.0';
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const pick=(a,n)=>shuffle(a).slice(0,n);
+
+/* ================= Daten ================= */
+const FAM={
+  ak:{name:'Alkalimetalle',hg:'I. Hauptgruppe',col:'#f0a050'},
+  ea:{name:'Erdalkalimetalle',hg:'II. Hauptgruppe',col:'#d9c46a'},
+  ha:{name:'Halogene',hg:'VII. Hauptgruppe',col:'#b48cff'},
+  eg:{name:'Edelgase',hg:'VIII. Hauptgruppe',col:'#5fb8e8'},
+  no:{name:'keine der vier Familien',hg:'',col:'#8a939a'}
+};
+const FAMS=['ak','ea','ha','eg'];
+const HG=['','I.','II.','III.','IV.','V.','VI.','VII.','VIII.'];
+// s, Name, Z, Familie, Periode, Stufe
+const ELEM=[
+ ['Li','Lithium',3,'ak',2,1],['Na','Natrium',11,'ak',3,1],['K','Kalium',19,'ak',4,1],['Rb','Rubidium',37,'ak',5,2],['Cs','Caesium',55,'ak',6,2],['Fr','Francium',87,'ak',7,3],
+ ['Be','Beryllium',4,'ea',2,1],['Mg','Magnesium',12,'ea',3,1],['Ca','Calcium',20,'ea',4,1],['Sr','Strontium',38,'ea',5,2],['Ba','Barium',56,'ea',6,2],['Ra','Radium',88,'ea',7,3],
+ ['F','Fluor',9,'ha',2,1],['Cl','Chlor',17,'ha',3,1],['Br','Brom',35,'ha',4,1],['I','Iod',53,'ha',5,2],['At','Astat',85,'ha',6,3],
+ ['He','Helium',2,'eg',1,1],['Ne','Neon',10,'eg',2,1],['Ar','Argon',18,'eg',3,1],['Kr','Krypton',36,'eg',4,2],['Xe','Xenon',54,'eg',5,2],['Rn','Radon',86,'eg',6,3]
+].map(([s,n,z,f,p,l])=>({s,n,z,f,p,l,g:{ak:1,ea:2,ha:7,eg:8}[f]}));
+const OTHERS=[
+ {s:'H',n:'Wasserstoff',z:1,hint:'Wasserstoff steht zwar in der I. Hauptgruppe, ist aber ein gasförmiges Nichtmetall – kein Alkalimetall.'},
+ {s:'B',n:'Bor',z:5,hint:'Bor steht in der III. Hauptgruppe.'},
+ {s:'C',n:'Kohlenstoff',z:6,hint:'Kohlenstoff steht in der IV. Hauptgruppe.'},
+ {s:'N',n:'Stickstoff',z:7,hint:'Stickstoff steht in der V. Hauptgruppe. Er ist reaktionsträge, aber kein Edelgas: Er besteht aus N₂-Molekülen.'},
+ {s:'O',n:'Sauerstoff',z:8,hint:'Sauerstoff steht in der VI. Hauptgruppe – direkt neben den Halogenen.'},
+ {s:'Al',n:'Aluminium',z:13,hint:'Aluminium ist ein Leichtmetall der III. Hauptgruppe.'},
+ {s:'Si',n:'Silicium',z:14,hint:'Silicium steht in der IV. Hauptgruppe.'},
+ {s:'P',n:'Phosphor',z:15,hint:'Phosphor steht in der V. Hauptgruppe.'},
+ {s:'S',n:'Schwefel',z:16,hint:'Schwefel steht in der VI. Hauptgruppe.'},
+ {s:'Fe',n:'Eisen',z:26,hint:'Eisen ist ein Nebengruppenelement (Übergangsmetall).'},
+ {s:'Cu',n:'Kupfer',z:29,hint:'Kupfer ist ein Nebengruppenelement – es färbt die Flamme zwar, ist aber kein Alkali- oder Erdalkalimetall.'},
+ {s:'Zn',n:'Zink',z:30,hint:'Zink ist ein Nebengruppenelement.'}
+];
+const PROPS={
+ ak:[
+  ['Weiche, silbrig glänzende Metalle, die sich mit dem Messer schneiden lassen','Weich und mit dem Messer schneidbar sind die Metalle mit nur einem Valenzelektron.'],
+  ['Reagieren sehr heftig mit Wasser – Kalium sogar mit Feuererscheinung; es entstehen Wasserstoff und eine Lauge','Die heftigste Reaktion mit Wasser zeigen die Metalle der I. Hauptgruppe – daher auch der Name (Lauge = alkalische Lösung).'],
+  ['Werden unter Paraffinöl aufbewahrt, weil sie mit Luft und Wasser reagieren','Unter Paraffinöl lagert man die reaktionsfreudigsten Metalle der I. Hauptgruppe.'],
+  ['Atome mit genau einem Valenzelektron','Ein Valenzelektron → I. Hauptgruppe.'],
+  ['Bilden einfach positiv geladene Ionen, z. B. Na⁺','Wer ein Elektron abgibt, steht in der I. Hauptgruppe.'],
+  ['So geringe Dichte, dass einige von ihnen auf Wasser schwimmen','Lithium, Natrium und Kalium schwimmen auf Wasser.'],
+  ['Reaktivität nimmt innerhalb der Familie von oben nach unten zu (Lithium → Caesium)','Kalium reagiert heftiger als Natrium, Natrium heftiger als Lithium.'],
+  ['Die reaktionsfreudigsten aller Metalle','Noch reaktionsfreudiger als die Erdalkalimetalle sind die Metalle der I. Hauptgruppe.'],
+  ['Die glänzende Schnittfläche wird an der Luft innerhalb von Sekunden matt','So schnell reagieren nur die Metalle der I. Hauptgruppe mit dem Sauerstoff der Luft.'],
+  ['Für Metalle sehr niedrige Schmelztemperaturen – Natrium schmilzt schon bei 98 °C','Natrium ist ein Alkalimetall.'],
+  ['Ihre Hydroxide, z. B. Natriumhydroxid (NaOH), bilden stark ätzende Laugen','NaOH und KOH enthalten Metalle der I. Hauptgruppe.'],
+  ['Fast alle ihre Salze lösen sich gut in Wasser','Natrium- und Kaliumsalze lösen sich fast immer gut – anders als z. B. Kalk (Calciumcarbonat).'],
+  ['Färben die Brennerflamme typisch: Lithium rot, Natrium gelb, Kalium violett','Lithium, Natrium und Kalium stehen in der I. Hauptgruppe.']
+ ],
+ ea:[
+  ['Atome mit genau zwei Valenzelektronen','Zwei Valenzelektronen → II. Hauptgruppe.'],
+  ['Bilden zweifach positiv geladene Ionen, z. B. Mg²⁺ und Ca²⁺','Wer zwei Elektronen abgibt, steht in der II. Hauptgruppe.'],
+  ['Leichtmetalle, die härter sind als die Alkalimetalle','Härter als die Alkalimetalle, aber ebenfalls Leichtmetalle: die II. Hauptgruppe.'],
+  ['Reagieren mit Wasser langsamer als die Alkalimetalle, Magnesium erst mit heißem Wasser','Magnesium und Calcium reagieren mit Wasser – aber weniger heftig als Natrium.'],
+  ['Ihre Verbindungen bilden viele Gesteine, z. B. Kalkstein (Calciumcarbonat)','Kalkstein und Dolomit enthalten Calcium bzw. Magnesium.'],
+  ['Der Name kommt von „Erden“: So nannte man früher ihre schwer schmelzbaren Oxide','Kalk (Calciumoxid) und Magnesia (Magnesiumoxid) hießen früher „Erden“.'],
+  ['Überziehen sich an der Luft mit einer dünnen, schützenden Oxidschicht','Die Oxidschicht schützt Magnesium und Calcium – Metalle der II. Hauptgruppe.'],
+  ['Verbrennen an der Luft mit sehr heller Flamme zu Oxiden, z. B. Magnesium zu Magnesiumoxid','Magnesium steht in der II. Hauptgruppe.'],
+  ['Weniger reaktionsfreudig als die Alkalimetalle, aber reaktionsfreudiger als z. B. Eisen oder Kupfer','Gleich nach den Alkalimetallen kommen die Metalle der II. Hauptgruppe.'],
+  ['Ihre Ionen (Calcium, Magnesium) machen Leitungswasser „hart“ und verursachen Kalkablagerungen','Calcium und Magnesium sind Erdalkalimetalle.'],
+  ['Reaktivität nimmt innerhalb der Familie von oben nach unten zu (Beryllium → Barium)','Beryllium und Barium stehen in der II. Hauptgruppe.'],
+  ['Wichtig für Lebewesen: Calcium in Knochen und Zähnen, Magnesium im Blattgrün','Calcium und Magnesium gehören zur II. Hauptgruppe.'],
+  ['Färben die Brennerflamme typisch: Calcium ziegelrot, Strontium rot, Barium grün','Calcium, Strontium und Barium stehen in der II. Hauptgruppe.']
+ ],
+ ha:[
+  ['Atome mit sieben Valenzelektronen','Sieben Valenzelektronen → VII. Hauptgruppe.'],
+  ['Bilden einfach negativ geladene Ionen, z. B. Cl⁻','Wer ein Elektron aufnimmt, steht in der VII. Hauptgruppe.'],
+  ['Bestehen aus zweiatomigen Molekülen, z. B. Cl₂','Cl₂, Br₂, I₂ – zweiatomige Moleküle bilden die Halogene.'],
+  ['Reagieren mit Metallen zu Salzen – der Name bedeutet „Salzbildner“','„Halogen“ ist griechisch und heißt „Salzbildner“.'],
+  ['Bei Raumtemperatur gasförmig, flüssig oder fest: Chlor ist ein Gas, Brom eine Flüssigkeit, Iod ein Feststoff','Chlor, Brom und Iod gehören zu einer Familie.'],
+  ['Farbige, giftige Stoffe mit stechendem Geruch','Gelbgrünes Chlor, rotbraunes Brom – farbig und giftig sind die Halogene.'],
+  ['Reaktivität nimmt innerhalb der Familie von oben nach unten ab (Fluor ist am reaktionsfreudigsten)','Fluor ist das reaktionsfreudigste aller Elemente – es steht ganz oben in der VII. Hauptgruppe.'],
+  ['Sehr reaktionsfreudige Nichtmetalle','Die reaktionsfreudigsten Nichtmetalle stehen in der VII. Hauptgruppe.'],
+  ['Ihre Atome nehmen bei Reaktionen leicht ein Elektron auf','Mit einem zusätzlichen Elektron erreichen Atome der VII. Hauptgruppe die Edelgaskonfiguration.'],
+  ['Ihre Dämpfe reizen Augen und Atemwege – man arbeitet mit ihnen nur im Abzug','Chlor- und Bromdämpfe sind giftig.'],
+  ['Die Farbe wird innerhalb der Familie von oben nach unten dunkler: blassgelb, gelbgrün, rotbraun, violett-schwarz','Fluor, Chlor, Brom und Iod gehören zu einer Familie.'],
+  ['Kommen in der Natur nur in Verbindungen vor, z. B. als Chlorid-Ionen im Meerwasser','Chlor steht in der VII. Hauptgruppe.'],
+  ['Reagieren mit Wasserstoff zu stechend riechenden Gasen, die mit Wasser Säuren bilden (Chlorwasserstoff → Salzsäure)','Chlorwasserstoff enthält Chlor, ein Element der VII. Hauptgruppe.']
+ ],
+ eg:[
+  ['Voll besetzte äußere Schale (Edelgaskonfiguration)','Voll besetzte Außenschale → VIII. Hauptgruppe.'],
+  ['Reagieren kaum mit anderen Stoffen – sie sind sehr reaktionsträge','Die reaktionsträgsten Elemente stehen in der VIII. Hauptgruppe.'],
+  ['Kommen als einzelne Atome vor, nicht als Moleküle','Einatomige Gase sind die Elemente der VIII. Hauptgruppe.'],
+  ['Farblose, geruchlose und ungiftige Gase','Farblos, geruchlos, ungiftig und reaktionsträge: die Edelgase.'],
+  ['Leuchten in Gasentladungsröhren in typischen Farben','Leuchtröhren werden mit Neon, Argon oder Krypton gefüllt.'],
+  ['Sehr niedrige Siedetemperaturen – Helium siedet erst bei −269 °C','Helium ist ein Edelgas.'],
+  ['Bilden fast keine Verbindungen mit anderen Elementen','Fast keine Verbindungen bilden die Elemente der VIII. Hauptgruppe.'],
+  ['Weder brennbar noch giftig','Nicht brennbar und ungiftig – deshalb füllt man Ballons mit Helium statt mit Wasserstoff.'],
+  ['Bei Raumtemperatur sind alle Elemente dieser Familie gasförmig','Bei den Halogenen gibt es auch eine Flüssigkeit (Brom) und einen Feststoff (Iod) – hier sind alle Gase.'],
+  ['Ihre Atome geben keine Elektronen ab und nehmen keine auf','Mit voll besetzter Außenschale ist nichts abzugeben oder aufzunehmen.'],
+  ['In kleinen Mengen in der Luft enthalten – Argon zu knapp 1 %','Argon ist ein Edelgas.'],
+  ['Helium ist nach Wasserstoff das Gas mit der geringsten Dichte','Helium steht in der VIII. Hauptgruppe.']
+ ]
+};
+const USES={
+ ak:[
+  ['Lithium in Akkus von Smartphones und Elektroautos','Lithium ist das leichteste Metall – ein Alkalimetall.'],
+  ['Natrium in Natriumdampflampen für gelbes Straßenlicht','Natrium (Na) steht in der I. Hauptgruppe.'],
+  ['Kaliumverbindungen als Pflanzendünger','Kalium (K) ist ein Alkalimetall.'],
+  ['Caesium in Atomuhren, die die genaue Zeit angeben','Caesium (Cs) steht in der I. Hauptgruppe.'],
+  ['Natriumhydrogencarbonat (Natron) im Backpulver','Natrium (Na) ist ein Alkalimetall.']
+ ],
+ ea:[
+  ['Magnesium in leichten Legierungen für Autofelgen und Flugzeuge','Magnesium (Mg) steht in der II. Hauptgruppe.'],
+  ['Calciumcarbonat (Kalk) und Calciumsulfat (Gips) als Baustoffe','Calcium (Ca) ist ein Erdalkalimetall.'],
+  ['Strontiumverbindungen für rotes Licht im Feuerwerk','Strontium (Sr) steht in der II. Hauptgruppe.'],
+  ['Bariumsulfat als Kontrastmittel beim Röntgen des Magens','Barium (Ba) ist ein Erdalkalimetall.'],
+  ['Bariumverbindungen für grünes Licht im Feuerwerk','Barium (Ba) steht in der II. Hauptgruppe.'],
+  ['Magnesiumpulver für grellweiße Lichteffekte','Magnesium (Mg) ist ein Erdalkalimetall.']
+ ],
+ ha:[
+  ['Chlor zur Desinfektion von Schwimmbad- und Trinkwasser','Chlor (Cl) steht in der VII. Hauptgruppe.'],
+  ['Fluoride in Zahnpasta zum Härten des Zahnschmelzes','Fluor (F) ist ein Halogen.'],
+  ['Iod in Iodtinktur zur Desinfektion von Wunden','Iod (I) steht in der VII. Hauptgruppe.'],
+  ['Brom- und Iodverbindungen als Füllung von Halogenlampen','Der Name „Halogenlampe“ verrät die Familie.'],
+  ['Chlor zur Herstellung des Kunststoffs PVC (Polyvinylchlorid)','Chlor (Cl) ist ein Halogen.']
+ ],
+ eg:[
+  ['Helium als Füllgas für Ballons und Luftschiffe','Helium (He) ist ein reaktionsträges, leichtes Gas der VIII. Hauptgruppe.'],
+  ['Neon in roten Leuchtreklamen','Neon (Ne) ist ein Edelgas.'],
+  ['Argon als Schutzgas beim Schweißen','Argon (Ar) reagiert nicht – es steht in der VIII. Hauptgruppe.'],
+  ['Xenon in besonders hellen Autoscheinwerfern','Xenon (Xe) ist ein Edelgas.'],
+  ['Argon oder Krypton zwischen den Scheiben von Wärmeschutzfenstern','Argon und Krypton sind Edelgase.'],
+  ['Flüssiges Helium zum Kühlen der Magnete im MRT','Helium (He) steht in der VIII. Hauptgruppe.']
+ ]
+};
+const TYPES={
+ zu:{title:'Elementfamilien zuordnen',kind:'Übung',desc:'Ordne in einer Tabelle Elemente, Eigenschaften und Verwendungen den vier Familien zu.',instr:'Ziehe jede Karte in das passende Feld der Tabelle: Elemente in die Zeile „Elemente“, Eigenschaften in die Zeile „Eigenschaften“ und Verwendungen in die Zeile „Verwendung“ – jeweils unter die richtige Familie. Alternativ: Karte antippen, dann das Feld antippen.'},
+ ff:{title:'Flammenfärbung',kind:'Simulation',desc:'Halte ein Salz in die Brennerflamme und beobachte die Farbe – oder bestimme eine unbekannte Probe.'}
+};
+const CATS=[['el','Elemente'],['ei','Eigenschaften'],['vw','Verwendung']];
+const CATN={el:'Elemente',ei:'Eigenschaften',vw:'Verwendung'};
+const PER={L:{el:2,ei:2,vw:1},M:{el:2,ei:3,vw:2},S:{el:3,ei:4,vw:2}};
+const LVL_INFO={zu:{
+ L:'20 Karten: je Familie 2 Elemente (mit Name und Ordnungszahl, 1.–4. Periode), 2 Eigenschaften und 1 Verwendung.',
+ M:'28 Karten: je Familie 2 Elemente (mit Name, bis zur 6. Periode), 3 Eigenschaften und 2 Verwendungen.',
+ S:'39 Karten: je Familie 3 Elemente (nur Symbol), 4 Eigenschaften und 2 Verwendungen; dazu 3 Elemente, die zu keiner der vier Familien gehören.'}};
+
+/* Flammenfärbung: Farben und Linien sind Modellwerte */
+const SALT={
+ Li:{el:'Lithium',salt:'Lithiumchlorid',f:'LiCl',fam:'ak',col:'#ff1f4f',name:'karminrot',str:1,cob:'#c8207e',cobS:.8,cobName:'purpurrot',lines:[[670.8,1],[610.4,.18],[460.3,.08]],
+     note:'Lithium färbt die Flamme karminrot – ähnlich wie Strontium. Sicher unterscheiden lassen sich beide mit dem Spektroskop: Lithium zeigt vor allem eine einzelne rote Linie.'},
+ Na:{el:'Natrium',salt:'Natriumchlorid',f:'NaCl',fam:'ak',col:'#ffb81c',name:'gelb',str:3,cob:'#ffb81c',cobS:.02,cobName:'nicht sichtbar',lines:[[589.0,1],[589.6,.95]],
+     note:'Natrium leuchtet so stark gelb, dass schon Spuren – Schweiß an den Fingern, Reste am Stäbchen – die Flamme gelb färben. Kobaltglas (blaues Glas) verschluckt das gelbe Licht.'},
+ K:{el:'Kalium',salt:'Kaliumchlorid',f:'KCl',fam:'ak',col:'#c69cff',name:'fahlviolett',str:.55,cob:'#d466ff',cobS:.9,cobName:'rotviolett (deutlich)',lines:[[766.5,1],[769.9,.8],[404.4,.4],[404.7,.3]],
+     note:'Die schwache, fahlviolette Kaliumflamme wird leicht vom Natriumgelb überdeckt. Durch Kobaltglas wird das gelbe Licht verschluckt, die Kaliumfarbe bleibt rotviolett sichtbar.'},
+ Rb:{el:'Rubidium',salt:'Rubidiumchlorid',f:'RbCl',fam:'ak',col:'#d84fb4',name:'rotviolett',str:.8,cob:'#c24cd4',cobS:.8,cobName:'violett',lines:[[780.0,1],[420.2,.45],[421.6,.3]],
+     note:'Rubidium wurde 1861 von Bunsen und Kirchhoff mit dem Spektroskop entdeckt. Der Name kommt von seinen roten Spektrallinien (lat. rubidus = dunkelrot).'},
+ Cs:{el:'Caesium',salt:'Caesiumchlorid',f:'CsCl',fam:'ak',col:'#7d7eff',name:'blauviolett',str:.75,cob:'#6d70ff',cobS:.75,cobName:'blauviolett',lines:[[455.5,.9],[459.3,.55]],
+     note:'Caesium wurde 1860 von Bunsen und Kirchhoff an zwei blauen Spektrallinien entdeckt (lat. caesius = himmelblau).'},
+ Mg:{el:'Magnesium',salt:'Magnesiumchlorid',f:'MgCl₂',fam:'ea',col:null,name:'keine Flammenfärbung',str:0,cob:null,cobS:0,cobName:'keine Flammenfärbung',lines:[],
+     note:'Magnesiumsalze färben die Flamme nicht. (Magnesium als Metall verbrennt dagegen mit grellweißem Licht.)'},
+ Ca:{el:'Calcium',salt:'Calciumchlorid',f:'CaCl₂',fam:'ea',col:'#ff5a1e',name:'ziegelrot',str:.9,cob:'#a8326c',cobS:.35,cobName:'schwach rötlich',lines:[[622,1,9],[554,.55,7],[422.7,.3]],
+     note:'Calcium färbt die Flamme ziegelrot (orangerot).'},
+ Sr:{el:'Strontium',salt:'Strontiumchlorid',f:'SrCl₂',fam:'ea',col:'#ff1a1a',name:'karminrot (leuchtend rot)',str:1,cob:'#c4186a',cobS:.7,cobName:'purpurrot',lines:[[606,.5,5],[636,.5,4],[648,.7,4],[662,.9,4],[674,.8,4],[682,.7,4],[460.7,.4]],
+     note:'Strontiumsalze erzeugen das leuchtende Rot im Feuerwerk. Im Spektroskop sieht man mehrere rote Banden und eine blaue Linie.'},
+ Ba:{el:'Barium',salt:'Bariumchlorid',f:'BaCl₂',fam:'ea',col:'#a6ff4d',name:'fahlgrün (gelbgrün)',str:.8,cob:'#2f6a72',cobS:.2,cobName:'kaum sichtbar',lines:[[553.5,.6],[513,.8,5],[524,.9,5],[487,.5,4]],
+     note:'Bariumsalze färben die Flamme fahlgrün; sie liefern im Feuerwerk die grüne Farbe. Bariumsalze sind giftig.'},
+ Cu:{el:'Kupfer',salt:'Kupfer(II)-chlorid',f:'CuCl₂',fam:null,col:'#22e0b4',name:'blaugrün',str:.9,cob:'#2c7ad8',cobS:.6,cobName:'blau',lines:[[428,.5,6],[435,.6,6],[443,.5,6],[488,.5,4],[510,.8,5],[526,.7,5]],
+     note:'Kupfer ist kein Alkali- oder Erdalkalimetall, sondern ein Nebengruppenelement. Kupfer(II)-chlorid färbt die Flamme blaugrün.'}
+};
+const MIX={
+ NaK:{comps:['Na','K'],salt:'Gemisch: Natriumchlorid + Kaliumchlorid',f:'NaCl + KCl',note:'Im Gemisch überdeckt das starke Natriumgelb das schwache Kaliumviolett. Erst durch das Kobaltglas wird das Kalium sichtbar.'},
+ NaLi:{comps:['Na','Li'],salt:'Gemisch: Natriumchlorid + Lithiumchlorid',f:'NaCl + LiCl',note:'Das Natriumgelb überdeckt das Lithiumrot. Durch das Kobaltglas erscheint die Lithiumfarbe purpurrot.'}
+};
+const SIM_ORDER=[['Alkalimetalle',['Li','Na','K','Rb','Cs']],['Erdalkalimetalle',['Mg','Ca','Sr','Ba']],['Nebengruppenelement',['Cu']]];
+const PR_POOL={L:['Li','Na','K','Ca','Ba','Cu'],M:['Li','Na','K','Rb','Cs','Mg','Ca','Sr','Ba','Cu'],S:['Li','Na','K','Rb','Cs','Mg','Ca','Sr','Ba','Cu']};
+const PR_INFO={L:'Sechs Salze mit gut unterscheidbaren Farben.',M:'Zehn Salze – auch ähnliche Farben und eine Probe ohne Flammenfärbung.',S:'Wie „Mittel“, zusätzlich Gemische aus zwei Salzen (Kobaltglas!).'};
+
+/* ================= QR-Code (Byte-Modus, Fehlerkorrektur L, Version 1–5) ================= */
+const QR=(()=>{
+  const CAP=[0,19,34,55,80,108], ECC=[0,7,10,15,20,26], ALIGN=[0,0,18,22,26,30];
+  function mul(x,y){let z=0;for(let i=7;i>=0;i--){z=(z<<1)^((z>>>7)*0x11d);z^=((y>>>i)&1)*x;}return z&255;}
+  function divisor(d){const r=new Array(d).fill(0);r[d-1]=1;let root=1;for(let i=0;i<d;i++){for(let j=0;j<d;j++){r[j]=mul(r[j],root);if(j+1<d)r[j]^=r[j+1];}root=mul(root,2);}return r;}
+  function rem(data,div){const r=new Array(div.length).fill(0);for(const b of data){const f=b^r.shift();r.push(0);div.forEach((c,i)=>r[i]^=mul(c,f));}return r;}
+  function make(text){
+    const bytes=[...new TextEncoder().encode(text)];
+    let v=1;while(v<=5&&4+8+8*bytes.length>CAP[v]*8)v++;
+    if(v>5)throw new Error('Text zu lang');
+    const bits=[];const put=(val,n)=>{for(let i=n-1;i>=0;i--)bits.push((val>>>i)&1);};
+    put(4,4);put(bytes.length,8);bytes.forEach(b=>put(b,8));
+    const cap=CAP[v]*8;put(0,Math.min(4,cap-bits.length));while(bits.length%8)bits.push(0);
+    for(let p=0xEC;bits.length<cap;p^=0xEC^0x11)put(p,8);
+    const data=[];for(let i=0;i<bits.length;i+=8){let b=0;for(let j=0;j<8;j++)b=(b<<1)|bits[i+j];data.push(b);}
+    const all=data.concat(rem(data,divisor(ECC[v])));
+    const N=17+4*v, M=[...Array(N)].map(()=>new Array(N).fill(false)), F=[...Array(N)].map(()=>new Array(N).fill(false));
+    const set=(x,y,d)=>{M[y][x]=d;F[y][x]=true;};
+    for(let i=0;i<N;i++){set(6,i,i%2===0);set(i,6,i%2===0);}
+    const finder=(cx,cy)=>{for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){const x=cx+dx,y=cy+dy;if(x<0||y<0||x>=N||y>=N)continue;const d=Math.max(Math.abs(dx),Math.abs(dy));set(x,y,d!==2&&d!==4);}};
+    finder(3,3);finder(N-4,3);finder(3,N-4);
+    if(v>1){const a=ALIGN[v];for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)set(a+dx,a+dy,Math.max(Math.abs(dx),Math.abs(dy))!==1);}
+    const fmt=(mask)=>{const d=(1<<3)|mask;let r=d;for(let i=0;i<10;i++)r=(r<<1)^((r>>>9)*0x537);const b=((d<<10)|r)^0x5412;const g=i=>((b>>>i)&1)===1;
+      for(let i=0;i<=5;i++)set(8,i,g(i));set(8,7,g(6));set(8,8,g(7));set(7,8,g(8));for(let i=9;i<15;i++)set(14-i,8,g(i));
+      for(let i=0;i<8;i++)set(N-1-i,8,g(i));for(let i=8;i<15;i++)set(8,N-15+i,g(i));set(8,N-8,true);};
+    fmt(0);
+    let k=0;for(let right=N-1;right>=1;right-=2){if(right===6)right=5;for(let vert=0;vert<N;vert++)for(let j=0;j<2;j++){const x=right-j,up=((right+1)&2)===0,y=up?N-1-vert:vert;if(!F[y][x]&&k<all.length*8){M[y][x]=((all[k>>>3]>>>(7-(k&7)))&1)===1;k++;}}}
+    const MASK=[(x,y)=>(x+y)%2===0,(x,y)=>y%2===0,(x,y)=>x%3===0,(x,y)=>(x+y)%3===0,(x,y)=>(Math.floor(x/3)+Math.floor(y/2))%2===0,(x,y)=>x*y%2+x*y%3===0,(x,y)=>(x*y%2+x*y%3)%2===0,(x,y)=>((x+y)%2+x*y%3)%2===0];
+    const apply=m=>{for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(!F[y][x]&&MASK[m](x,y))M[y][x]=!M[y][x];};
+    const penalty=()=>{let p=0;for(let y=0;y<N;y++){let run=1;for(let x=1;x<N;x++){if(M[y][x]===M[y][x-1]){run++;if(run===5)p+=3;else if(run>5)p++;}else run=1;}}
+      for(let x=0;x<N;x++){let run=1;for(let y=1;y<N;y++){if(M[y][x]===M[y-1][x]){run++;if(run===5)p+=3;else if(run>5)p++;}else run=1;}}
+      for(let y=0;y<N-1;y++)for(let x=0;x<N-1;x++){const c=M[y][x];if(c===M[y][x+1]&&c===M[y+1][x]&&c===M[y+1][x+1])p+=3;}
+      let dark=0;M.forEach(r=>r.forEach(c=>{if(c)dark++;}));p+=Math.floor(Math.abs(dark*20-N*N*10)/(N*N))*10;return p;};
+    let best=0,bp=Infinity;for(let m=0;m<8;m++){apply(m);fmt(m);const p=penalty();if(p<bp){bp=p;best=m;}apply(m);}
+    apply(best);fmt(best);return M;
+  }
+  function svg(text){const M=make(text),N=M.length,q=4,S=N+2*q;let d='';
+    for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(M[y][x])d+=`M${x+q} ${y+q}h1v1h-1z`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${S} ${S}" shape-rendering="crispEdges"><rect width="${S}" height="${S}" fill="#fff"/><path d="${d}" fill="#000"/></svg>`;}
+  return {make,svg};
+})();
+
+/* ================= SVG-Grafiken ================= */
+const PSE_ROWS=[
+ ['H','','','','','','','He'],
+ ['Li','Be','B','C','N','O','F','Ne'],
+ ['Na','Mg','Al','Si','P','S','Cl','Ar'],
+ ['K','Ca','Ga','Ge','As','Se','Br','Kr'],
+ ['Rb','Sr','In','Sn','Sb','Te','I','Xe'],
+ ['Cs','Ba','Tl','Pb','Bi','Po','At','Rn'],
+ ['Fr','Ra','','','','','','']
+];
+function famOf(sym){const e=ELEM.find(x=>x.s===sym);return e?e.f:null;}
+function pseSVG(colored){
+  const cw=48,ch=40,ox=34,oy=26;let s=`<svg viewBox="0 0 ${ox+8*cw+4} ${oy+7*ch+4}" width="${ox+8*cw+4}" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">`;
+  for(let g=0;g<8;g++)s+=`<text x="${ox+g*cw+cw/2}" y="17" text-anchor="middle" font-size="12" fill="#9aa2a9">${HG[g+1]}</text>`;
+  for(let p=0;p<7;p++){s+=`<text x="16" y="${oy+p*ch+ch/2+5}" text-anchor="middle" font-size="12" fill="#9aa2a9">${p+1}</text>`;
+    for(let g=0;g<8;g++){const sym=PSE_ROWS[p][g];if(!sym)continue;const f=famOf(sym);const fill=colored&&f?FAM[f].col:'#20252a';const tc=colored&&f?'#14171a':'#e7e4dd';
+      s+=`<rect x="${ox+g*cw+1}" y="${oy+p*ch+1}" width="${cw-3}" height="${ch-3}" rx="4" fill="${fill}" stroke="#31383e"/><text x="${ox+g*cw+cw/2}" y="${oy+p*ch+ch/2+6}" text-anchor="middle" font-size="16" font-weight="700" fill="${tc}">${sym}</text>`;}}
+  s+=`<text x="${ox}" y="${oy+7*ch+2}" font-size="0"> </text></svg>`;return s;
+}
+function shellSVG(sym,shells,opt={}){
+  const r0=opt.r0||17,dr=opt.dr||15,n=shells.length,R=r0+n*dr,W=2*R+24,c=W/2;
+  let s=`<svg viewBox="0 0 ${W} ${W+(opt.label?22:0)}" width="${opt.w||W}" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">`;
+  shells.forEach((k,i)=>{const r=r0+(i+1)*dr;s+=`<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="#5f6870" stroke-width="1.2"/>`;
+    for(let j=0;j<k;j++){const a=-Math.PI/2+j*2*Math.PI/k;const val=i===n-1;s+=`<circle cx="${(c+r*Math.cos(a)).toFixed(1)}" cy="${(c+r*Math.sin(a)).toFixed(1)}" r="4.2" fill="${val?'#ffb454':'#4fd1c5'}"/>`;}});
+  s+=`<circle cx="${c}" cy="${c}" r="${r0-3}" fill="#20252a" stroke="#9aa2a9"/><text x="${c}" y="${c+5}" text-anchor="middle" font-size="14" font-weight="700" fill="#e7e4dd">${sym}</text>`;
+  if(opt.charge)s+=`<text x="${c+R-4}" y="${c-R+14}" font-size="16" font-weight="700" fill="#ffb454">${opt.charge}</text>`;
+  if(opt.label)s+=`<text x="${c}" y="${W+14}" text-anchor="middle" font-size="13" fill="#9aa2a9">${opt.label}</text>`;
+  return s+'</svg>';
+}
+function iconSVG(kind){
+  if(kind==='zu')return `<svg viewBox="0 0 120 64"><g font-family="system-ui" font-weight="700" font-size="10" text-anchor="middle">
+    <rect x="2" y="2" width="27" height="12" rx="3" fill="#f0a050"/><rect x="32" y="2" width="27" height="12" rx="3" fill="#d9c46a"/><rect x="62" y="2" width="27" height="12" rx="3" fill="#b48cff"/><rect x="92" y="2" width="27" height="12" rx="3" fill="#5fb8e8"/>
+    ${[0,1,2].map(r=>[0,1,2,3].map(c=>`<rect x="${2+c*30}" y="${18+r*15}" width="27" height="12" rx="3" fill="#20252a" stroke="#4fd1c5" stroke-dasharray="2 2"/>`).join('')).join('')}
+    <text x="15" y="28" fill="#e7e4dd">Na</text><text x="75" y="28" fill="#e7e4dd">Cl</text><rect x="34" y="35" width="23" height="8" rx="2" fill="#9aa2a9"/><rect x="94" y="50" width="23" height="8" rx="2" fill="#9aa2a9"/></g></svg>`;
+  if(kind==='el')return `<svg viewBox="0 0 120 64"><g font-family="system-ui" font-weight="700" font-size="17" text-anchor="middle">
+    <rect x="2" y="4" width="34" height="34" rx="5" fill="#f0a050"/><text x="19" y="27" fill="#14171a">Na</text>
+    <rect x="42" y="14" width="34" height="34" rx="5" fill="#b48cff"/><text x="59" y="37" fill="#14171a">Cl</text>
+    <rect x="82" y="24" width="34" height="34" rx="5" fill="#5fb8e8"/><text x="99" y="47" fill="#14171a">Ne</text></g></svg>`;
+  if(kind==='ei')return `<svg viewBox="0 0 120 64"><rect x="4" y="6" width="74" height="13" rx="4" fill="#d9c46a"/><rect x="4" y="25" width="60" height="13" rx="4" fill="#f0a050"/><rect x="4" y="44" width="68" height="13" rx="4" fill="#5fb8e8"/>
+    <circle cx="96" cy="30" r="14" fill="none" stroke="#4fd1c5" stroke-width="4"/><line x1="106" y1="40" x2="116" y2="52" stroke="#4fd1c5" stroke-width="5" stroke-linecap="round"/></svg>`;
+  if(kind==='vw')return `<svg viewBox="0 0 120 64"><ellipse cx="28" cy="24" rx="16" ry="19" fill="#5fb8e8"/><path d="M28 43 q-3 8 2 18" stroke="#9aa2a9" fill="none" stroke-width="1.5"/>
+    <circle cx="74" cy="26" r="15" fill="#ffb454" opacity=".9"/><rect x="67" y="41" width="14" height="10" rx="2" fill="#9aa2a9"/>
+    <rect x="96" y="10" width="18" height="40" rx="4" fill="#f0a050"/><rect x="101" y="5" width="8" height="6" fill="#9aa2a9"/><rect x="99" y="30" width="12" height="17" fill="#7fd68a"/></svg>`;
+  return `<svg viewBox="0 0 120 64"><rect x="52" y="44" width="16" height="16" fill="#5f6870"/><rect x="40" y="58" width="40" height="5" rx="2" fill="#5f6870"/>
+    <path d="M60 44 C44 30 54 18 60 2 C66 18 76 30 60 44 Z" fill="#ff1f4f" opacity=".9"/><path d="M60 44 C52 36 56 28 60 20 C64 28 68 36 60 44Z" fill="#ffb81c"/>
+    <path d="M24 44 C14 34 20 24 24 12 C28 24 34 34 24 44Z" fill="#a6ff4d" opacity=".85"/><path d="M96 44 C86 34 92 24 96 12 C100 24 106 34 96 44Z" fill="#c69cff" opacity=".9"/></svg>`;
+}
+
+/* ================= Grundlagen ================= */
+function swatchRow(ids){return ids.map(id=>{const S=SALT[id];return `<tr><td>${S.el}</td><td>${S.salt}</td><td>${S.col?`<span class="dot" style="background:${S.col}"></span>`:''}${S.name}</td></tr>`;}).join('');}
+const GB=[
+ {t:'Elementfamilien im Periodensystem',h:()=>`
+  <p>Im <b>Periodensystem der Elemente (PSE)</b> sind die Elemente nach steigender Ordnungszahl (Protonenzahl) angeordnet. Die waagerechten Zeilen heißen <b>Perioden</b>, die senkrechten Spalten der Hauptgruppenelemente heißen <b>Hauptgruppen</b> (I bis VIII).</p>
+  <p>Elemente einer Hauptgruppe haben ähnliche Eigenschaften. Man fasst sie zu einer <b>Elementfamilie</b> zusammen. Vier wichtige Familien:</p>
+  <div class="fig">${pseSVG(true)}
+   <table><tr><th>Familie</th><th>Hauptgruppe</th><th>Valenzelektronen</th></tr>
+   ${FAMS.map(f=>`<tr><td><span class="dot" style="background:${FAM[f].col}"></span>${FAM[f].name}</td><td>${FAM[f].hg}</td><td>${{ak:1,ea:2,ha:7,eg:'8 (He: 2)'}[f]}</td></tr>`).join('')}</table></div>
+  <p>Wasserstoff steht im PSE über den Alkalimetallen, gehört aber nicht zu ihnen: Er ist ein gasförmiges Nichtmetall.</p>`},
+ {t:'Alkalimetalle (I. Hauptgruppe)',h:()=>`
+  <p>Lithium, Natrium, Kalium, Rubidium, Caesium (und das radioaktive Francium) sind <b>weiche, silbrig glänzende Leichtmetalle</b>. Man kann sie mit dem Messer schneiden; die Schnittfläche läuft an der Luft sofort an.</p>
+  <p>Mit Wasser reagieren sie heftig. Dabei entstehen <b>Wasserstoff</b> und eine <b>alkalische Lösung</b> (Lauge) – daher der Name.</p>
+  <p><span class="eq">2 Na + 2 H<sub>2</sub>O ⟶ 2 NaOH + H<sub>2</sub></span></p>
+  <div class="fig">${shellSVG('Li',[2,1],{label:'Lithium'})}${shellSVG('Na',[2,8,1],{label:'Natrium'})}${shellSVG('K',[2,8,8,1],{label:'Kalium',dr:13})}</div>
+  <p>Alle Alkalimetall-Atome haben <b>ein Valenzelektron</b> (orange). Sie geben es leicht ab und bilden einfach positiv geladene Ionen (Li<sup>+</sup>, Na<sup>+</sup>, K<sup>+</sup>). Von oben nach unten wird das Valenzelektron immer leichter abgegeben: Die <b>Reaktivität nimmt zu</b> – Kalium reagiert heftiger als Natrium. Alkalimetalle sind die reaktionsfreudigsten Metalle.</p>
+  <p>Für Metalle haben sie sehr <b>niedrige Schmelztemperaturen</b> (Natrium: 98 °C). Ihre Hydroxide (z. B. NaOH, KOH) bilden stark ätzende Laugen, und fast alle ihre Salze lösen sich gut in Wasser. In der Brennerflamme färben Lithium rot, Natrium gelb und Kalium violett.</p>
+  <p><b>Sicherheit:</b> Alkalimetalle werden unter Paraffinöl aufbewahrt und nur in kleinen Stücken mit Schutzbrille und Schutzscheibe verwendet.</p>`},
+ {t:'Erdalkalimetalle (II. Hauptgruppe)',h:()=>`
+  <p>Beryllium, Magnesium, Calcium, Strontium, Barium (und das radioaktive Radium) sind <b>Leichtmetalle</b>, aber härter als die Alkalimetalle. An der Luft überziehen sie sich mit einer Oxidschicht.</p>
+  <p>Mit Wasser reagieren sie weniger heftig als die Alkalimetalle; Magnesium reagiert erst mit heißem Wasser. Auch hier entstehen Wasserstoff und eine alkalische Lösung:</p>
+  <p><span class="eq">Ca + 2 H<sub>2</sub>O ⟶ Ca(OH)<sub>2</sub> + H<sub>2</sub></span></p>
+  <div class="fig">${shellSVG('Mg',[2,8,2],{label:'Magnesium'})}${shellSVG('Ca',[2,8,8,2],{label:'Calcium',dr:13})}</div>
+  <p>Die Atome haben <b>zwei Valenzelektronen</b> und bilden zweifach positiv geladene Ionen (Mg<sup>2+</sup>, Ca<sup>2+</sup>). Der Name stammt von ihren Oxiden, die man früher „Erden“ nannte (z. B. Kalk, Magnesia). Viele Gesteine enthalten Erdalkalimetall-Verbindungen, z. B. Kalkstein (Calciumcarbonat) und Gips (Calciumsulfat).</p>
+  <p>Sie sind weniger reaktionsfreudig als die Alkalimetalle, aber reaktionsfreudiger als z. B. Eisen oder Kupfer; von oben nach unten nimmt die Reaktivität zu. An der Luft verbrennen sie mit heller Flamme zu Oxiden. Calcium- und Magnesium-Ionen im Leitungswasser machen das Wasser <b>„hart“</b> (Kalkablagerungen). Für Lebewesen sind sie wichtig: Calcium ist Baustoff von Knochen und Zähnen, Magnesium ist im Blattgrün enthalten. Flammenfärbung: Calcium ziegelrot, Strontium rot, Barium grün.</p>`},
+ {t:'Halogene (VII. Hauptgruppe)',h:()=>`
+  <p>Fluor, Chlor, Brom, Iod (und das radioaktive Astat) sind <b>reaktionsfreudige Nichtmetalle</b>. Sie bestehen aus <b>zweiatomigen Molekülen</b> (F<sub>2</sub>, Cl<sub>2</sub>, Br<sub>2</sub>, I<sub>2</sub>), sind farbig, giftig und riechen stechend.</p>
+  <table><tr><th>Element</th><th>Zustand bei 20 °C</th><th>Farbe</th></tr>
+   <tr><td>Fluor F<sub>2</sub></td><td>gasförmig</td><td>blassgelb</td></tr><tr><td>Chlor Cl<sub>2</sub></td><td>gasförmig</td><td>gelbgrün</td></tr>
+   <tr><td>Brom Br<sub>2</sub></td><td>flüssig</td><td>rotbraun</td></tr><tr><td>Iod I<sub>2</sub></td><td>fest</td><td>grauschwarz, Dampf violett</td></tr></table>
+  <p>Mit Metallen reagieren sie zu <b>Salzen</b> – „Halogen“ bedeutet „Salzbildner“:</p>
+  <p><span class="eq">2 Na + Cl<sub>2</sub> ⟶ 2 NaCl</span></p>
+  <div class="fig">${shellSVG('F',[2,7],{label:'Fluor'})}${shellSVG('Cl',[2,8,7],{label:'Chlor'})}</div>
+  <p>Die Atome haben <b>sieben Valenzelektronen</b>. Sie nehmen ein Elektron auf und bilden einfach negativ geladene Ionen (F<sup>−</sup>, Cl<sup>−</sup>, Br<sup>−</sup>). Von oben nach unten nimmt die <b>Reaktivität ab</b>: Fluor ist das reaktionsfreudigste aller Elemente. Die Farbe wird von oben nach unten dunkler.</p>
+  <p>Mit Wasserstoff reagieren Halogene zu stechend riechenden Gasen (Halogenwasserstoffe); Chlorwasserstoff bildet mit Wasser Salzsäure. In der Natur kommen Halogene nur in Verbindungen vor, z. B. als Chlorid-Ionen im Meerwasser.</p>
+  <p><b>Sicherheit:</b> Mit Chlor und Brom wird nur im Abzug gearbeitet.</p>`},
+ {t:'Edelgase (VIII. Hauptgruppe)',h:()=>`
+  <p>Helium, Neon, Argon, Krypton, Xenon und Radon sind <b>farblose, geruchlose Gase</b>. Sie sind sehr <b>reaktionsträge</b> und kommen als <b>einzelne Atome</b> vor, nicht als Moleküle.</p>
+  <div class="fig">${shellSVG('He',[2],{label:'Helium'})}${shellSVG('Ne',[2,8],{label:'Neon'})}${shellSVG('Ar',[2,8,8],{label:'Argon'})}</div>
+  <p>Ihre äußere Schale ist <b>voll besetzt</b> (Helium: 2 Elektronen, die anderen: 8). Diese besonders stabile Anordnung heißt <b>Edelgaskonfiguration</b>. Edelgas-Atome geben deshalb keine Elektronen ab und nehmen keine auf; sie bilden fast keine Verbindungen.</p>
+  <p>Alle Edelgase sind bei Raumtemperatur gasförmig, weder brennbar noch giftig und haben sehr niedrige Siedetemperaturen. Die Luft enthält knapp 1 % Argon. Helium ist nach Wasserstoff das Gas mit der geringsten Dichte.</p>
+  <p>Verwendung: Helium als Ballongas, Neon in Leuchtreklamen, Argon als Schutzgas beim Schweißen und als Füllgas in Fenstern, Xenon in Autoscheinwerfern.</p>`},
+ {t:'Warum ähneln sich die Elemente einer Familie?',h:()=>`
+  <p>Die Elemente einer Hauptgruppe haben <b>gleich viele Valenzelektronen</b> (Elektronen auf der äußersten Schale). Die Nummer der Hauptgruppe gibt diese Anzahl an. Weil chemische Reaktionen vor allem die Valenzelektronen betreffen, reagieren die Elemente einer Familie ähnlich.</p>
+  <p>Atome streben die stabile <b>Edelgaskonfiguration</b> an: Metall-Atome geben ihre Valenzelektronen ab, Halogen-Atome nehmen ein Elektron auf.</p>
+  <div class="fig">${shellSVG('Na',[2,8,1],{label:'Na-Atom'})}<div style="align-self:center;font-size:22px;color:#9aa2a9">⟶</div>${shellSVG('Na',[2,8],{label:'Na⁺-Ion',charge:'+'})}
+   <div style="width:24px"></div>${shellSVG('Cl',[2,8,7],{label:'Cl-Atom'})}<div style="align-self:center;font-size:22px;color:#9aa2a9">⟶</div>${shellSVG('Cl',[2,8,8],{label:'Cl⁻-Ion',charge:'−'})}</div>
+  <p><span class="eq">Na ⟶ Na<sup>+</sup> + e<sup>−</sup></span> &nbsp; <span class="eq">Cl + e<sup>−</sup> ⟶ Cl<sup>−</sup></span></p>
+  <p>Innerhalb einer Familie ändern sich die Eigenschaften gleichmäßig (<b>Abstufung</b>): Von oben nach unten werden die Atome größer, weil eine Schale dazukommt. Bei den Alkali- und Erdalkalimetallen steigt dadurch die Reaktivität, bei den Halogenen sinkt sie.</p>`},
+ {t:'Flammenfärbung – Durchführung',h:()=>`
+  <p>Viele Metalle und ihre Salze färben eine Brennerflamme in einer <b>typischen Farbe</b>. Damit kann man Elemente nachweisen (<b>Nachweisreaktion</b>).</p>
+  <ol><li>Ein Magnesiastäbchen (oder Platindraht) in Salzsäure tauchen und in der Flamme ausglühen, bis es die Flamme nicht mehr färbt.</li>
+   <li>Mit dem Stäbchen etwas Salz aufnehmen.</li>
+   <li>Das Stäbchen in den äußeren Bereich der <b>nicht leuchtenden</b> (blauen, rauschenden) Brennerflamme halten – die Luftzufuhr ist dafür geöffnet.</li>
+   <li>Die Farbe beobachten und notieren. Vor der nächsten Probe das Stäbchen wieder reinigen.</li></ol>
+  <table><tr><th>Element</th><th>Salz (Beispiel)</th><th>Flammenfärbung</th></tr>${swatchRow(['Li','Na','K','Rb','Cs','Ca','Sr','Ba','Cu','Mg'])}</table>
+  <p><b>Kobaltglas:</b> Natrium färbt so stark gelb, dass es andere Farben überdeckt – schon Spuren genügen. Ein blaues Kobaltglas verschluckt das gelbe Licht. So wird z. B. die Kaliumfarbe (rotviolett) sichtbar.</p>
+  <p><b>Sicherheit:</b> Schutzbrille tragen; Barium- und Kupfersalze sind gesundheitsschädlich.</p>`},
+ {t:'Flammenfärbung – Deutung',h:()=>`
+  <p>Die heiße Flamme führt den Atomen Energie zu. Dabei werden Elektronen auf eine <b>weiter außen liegende Schale</b> gehoben (angeregter Zustand). Dort bleiben sie nicht: Sie springen zurück und geben die aufgenommene Energie als <b>Licht</b> wieder ab.</p>
+  <div class="fig"><svg viewBox="0 0 380 170" width="380" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">
+   <circle cx="90" cy="85" r="14" fill="#20252a" stroke="#9aa2a9"/><text x="90" y="90" text-anchor="middle" font-size="12" fill="#e7e4dd">Kern</text>
+   <circle cx="90" cy="85" r="38" fill="none" stroke="#5f6870"/><circle cx="90" cy="85" r="70" fill="none" stroke="#5f6870" stroke-dasharray="4 4"/>
+   <circle cx="128" cy="85" r="5" fill="#4fd1c5" opacity=".45"/><circle cx="160" cy="85" r="5" fill="#ffb454"/>
+   <path d="M132 78 Q146 62 157 78" stroke="#ff6b4a" fill="none" stroke-width="2" marker-end="url(#ah)"/><text x="140" y="56" font-size="12" fill="#ff6b4a" text-anchor="middle">Energie</text>
+   <path d="M157 93 Q146 108 132 93" stroke="#4fd1c5" fill="none" stroke-width="2" marker-end="url(#ah2)"/>
+   <path d="M175 110 q8 -10 16 0 t16 0 t16 0 t16 0 t16 0" stroke="#ff1f4f" fill="none" stroke-width="2.5"/><text x="215" y="138" font-size="12" fill="#e7e4dd" text-anchor="middle">Licht einer bestimmten Farbe</text>
+   <defs><marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8z" fill="#ff6b4a"/></marker><marker id="ah2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8z" fill="#4fd1c5"/></marker></defs>
+   <text x="300" y="40" font-size="12" fill="#9aa2a9">1 Anregung</text><text x="300" y="58" font-size="12" fill="#9aa2a9">2 Rücksprung</text><text x="300" y="76" font-size="12" fill="#9aa2a9">3 Lichtabgabe</text></svg></div>
+  <p>Die Energiestufen sind bei jedem Element anders. Darum sendet jedes Element Licht mit <b>eigenen, typischen Farben</b> aus. Mit einem <b>Spektroskop</b> lässt sich das Licht in einzelne farbige Linien zerlegen. Dieses <b>Linienspektrum</b> ist für jedes Element so typisch wie ein Fingerabdruck. Robert Bunsen und Gustav Kirchhoff entdeckten auf diese Weise 1860/61 die Elemente Caesium und Rubidium.</p>`}
+];
+
+/* ================= Zustand ================= */
+const ST={view:'home',level:'L',tasks:{},hist:[],stats:{solved:0,first:0,help:0,shown:0,streak:0,best:0,cChk:0,cOk:0}};
+
+/* ================= Routing ================= */
+const HASH={zu:'zu',el:'zu',ei:'zu',vw:'zu',ff:'ff'};
+function go(v){
+  // Adresse nur ändern, wenn der Browser es erlaubt (in eingebetteten Vorschauen ist pushState gesperrt)
+  try{const base=location.href.split('#')[0];history.pushState(null,'',v==='home'?base:base+'#'+v);}catch(_){}
+  show(v);
+}
+window.addEventListener('hashchange',()=>route());
+window.addEventListener('popstate',()=>route());
+function route(){let h='';try{h=location.hash.replace('#','');}catch(_){}show(HASH[h]||'home');}
+function show(v){
+  ST.view=v;const ex=v==='zu';
+  $('#vHome').hidden=v!=='home';$('#vTask').hidden=!ex;$('#vFlame').hidden=v!=='ff';
+  $('#sideHome').hidden=v!=='home';$('#sideTask').hidden=!ex;$('#sideFlame').hidden=v!=='ff';
+  $('#homeBtn').hidden=v==='home';
+  $('#sideBil').hidden=!(ex||(v==='ff'&&FL.mode==='pr'));
+  $('#status').textContent=v==='home'?'Auswahl':(TYPES[v].kind+' · '+TYPES[v].title);
+  if(ex){if(!ST.tasks[v])ST.tasks[v]=makeTask(v,ST.level);renderTask();}
+  if(v==='ff'){flameEnter();}else flameLeave();
+  window.scrollTo({top:0});
+}
+
+/* ================= Zuordnungsübung ================= */
+let uid=0;
+function makeTask(type,lvl){
+  let cards=[];const zones=FAMS.slice(),per=PER[lvl];
+  const maxL={L:1,M:2,S:3}[lvl];
+  FAMS.forEach(f=>{let src=ELEM.filter(e=>e.f===f&&e.l<=maxL),n=per.el;
+    if(lvl==='S'){const nrm=src.filter(e=>e.l<3),rad=src.filter(e=>e.l===3);src=pick(nrm,n-(Math.random()<.35&&rad.length?1:0));if(src.length<n)src=src.concat(pick(rad,n-src.length));}
+    else src=pick(src,n);
+    src.forEach(e=>cards.push({id:'c'+(++uid),cat:'el',kind:'el',sym:e.s,name:e.n,z:e.z,fam:f,hint:`${e.n} (${e.s}) steht in der ${HG[e.g]} Hauptgruppe, ${e.p}. Periode.`}));
+    pick(PROPS[f],per.ei).forEach(([t,h])=>cards.push({id:'c'+(++uid),cat:'ei',kind:'txt',text:t,fam:f,hint:h}));
+    pick(USES[f],per.vw).forEach(([t,h])=>cards.push({id:'c'+(++uid),cat:'vw',kind:'txt',text:t,fam:f,hint:h}));});
+  if(lvl==='S'){zones.push('no');pick(OTHERS,3).forEach(o=>cards.push({id:'c'+(++uid),cat:'el',kind:'el',sym:o.s,name:o.n,z:o.z,fam:'no',hint:o.hint}));}
+  cards=shuffle(cards).map(c=>Object.assign(c,{place:null,state:''}));
+  return {type,lvl,cards,zones,checks:0,help:false,shown:false,done:false,touched:false,wrongFirst:[],showHints:false,sel:null,tipId:null};
+}
+const target=c=>c.cat+':'+c.fam;
+function cardLabel(c){return c.kind==='el'?`${c.sym} (${c.name})`:c.text;}
+function cardHTML(c,t){
+  const cls=['card',c.kind,c.state,t.sel===c.id?'sel':'',t.tipId===c.id?'tip':''].join(' ');
+  const hint=(c.state==='bad'&&t.showHints)?`<span class="hint">${esc(c.hint)}</span>`:'';
+  if(c.kind==='el'){const showName=t.lvl!=='S',showZ=t.lvl==='L';
+    return `<div class="${cls}" data-id="${c.id}">${showZ?`<span class="z">${c.z}</span>`:''}<div class="sym">${c.sym}</div>${showName?`<div class="nm">${c.name}</div>`:''}${hint}</div>`;}
+  return `<div class="${cls}" data-id="${c.id}">${esc(c.text)}${hint}</div>`;
+}
+function renderTask(){
+  const t=ST.tasks[ST.view];if(!t)return;
+  $('#tTitle').innerHTML=esc(TYPES[t.type].title)+`<span class="lvl">${{L:'Leicht',M:'Mittel',S:'Schwer'}[t.lvl]}</span>`;
+  $('#tInstr').textContent=TYPES[t.type].instr+(t.lvl==='S'?' Einige Elemente gehören zu keiner der vier Familien.':'');
+  $$('#lvlSeg button').forEach(b=>b.classList.toggle('active',b.dataset.l===ST.level));
+  $('#lvlInfo').textContent=LVL_INFO.zu[ST.level]+(ST.level!==t.lvl?' (gilt ab der nächsten Aufgabe)':'');
+  const pool=t.cards.filter(c=>!c.place);
+  $('#pool').innerHTML=pool.length?CATS.map(([k,n])=>{const cs=pool.filter(c=>c.cat===k);return cs.length?`<div class="pgrp"><div class="plbl">${n}</div>${cs.map(c=>cardHTML(c,t)).join('')}</div>`:'';}).join(''):'<span class="empty">Alle Karten sind zugeordnet.</span>';
+  const tb=$('#zones');tb.style.gridTemplateColumns=`repeat(${t.zones.length},minmax(0,1fr))`;tb.style.minWidth=(t.zones.length*150)+'px';
+  let h=t.zones.map(z=>`<div class="th" style="background:${FAM[z].col}">${FAM[z].name}</div>`).join('');
+  CATS.forEach(([k,n])=>{h+=`<div class="rowlbl">${n}</div>`;
+    t.zones.forEach(z=>{if(z==='no'&&k!=='el'){h+='<div class="cell off">—</div>';return;}
+      h+=`<div class="zone r-${k}" data-zone="${k}:${z}" style="border-top:3px solid ${FAM[z].col}"><span class="zl" style="color:${FAM[z].col}">${FAM[z].name}</span>${t.cards.filter(c=>c.place===k+':'+z).map(c=>cardHTML(c,t)).join('')}</div>`;});});
+  tb.innerHTML=h;
+  const placed=t.cards.filter(c=>c.place).length;
+  $('#tCount').textContent=t.done?'':`${placed} von ${t.cards.length} Karten zugeordnet`;
+  $('#btnCheck').disabled=t.done;$('#btnTip').disabled=t.done;$('#btnSol').disabled=t.done;
+  $('#pseWrap').hidden=!$('#optPse').checked;
+  renderBil();
+}
+function fb(html,cls){const f=$('#fb');f.className='fb '+(cls||'info');f.innerHTML=html;}
+function curTask(){return ST.tasks[ST.view];}
+function place(id,zone){
+  const t=curTask();if(!t||t.done)return;const c=t.cards.find(x=>x.id===id);if(!c||c.state==='ok')return;
+  const z=zone==='pool'?null:zone;
+  if(z&&z.split(':')[0]!==c.cat){t.sel=null;fb(`${c.kind==='el'?'Elementkarten':c.cat==='ei'?'Eigenschaften':'Verwendungen'} gehören in die Zeile „${CATN[c.cat]}“.`,'bad');renderTask();return;}
+  if(c.place===z){t.sel=null;renderTask();return;}
+  c.place=z;c.state='';t.sel=null;t.touched=true;if(t.tipId===id)t.tipId=null;renderTask();
+}
+function newTask(){
+  const t=curTask();if(t&&t.touched&&!t.done)archiveOpen(t);
+  ST.tasks[ST.view]=makeTask(ST.view,ST.level);renderTask();
+  fb('Neue Aufgabe: Ziehe jede Karte in das passende Feld der Tabelle.','info');
+}
+function archiveOpen(t){ST.hist.push(histEntry(t,'open'));}
+function histEntry(t,status){
+  return {type:t.type,lvl:t.lvl,status,checks:t.checks,zones:t.zones.slice(),cards:t.cards.map(c=>({label:cardLabel(c),cat:c.cat,fam:c.fam,wrong:t.wrongFirst.includes(c.id)})),time:Date.now()};
+}
+function check(){
+  const t=curTask();if(!t||t.done)return;
+  const open=t.cards.filter(c=>!c.place).length;
+  if(open){fb(`Ordne zuerst alle Karten zu – es fehlen noch ${open}.`,'bad');return;}
+  if($('#optPse').checked)t.help=true;
+  t.checks++;t.touched=true;t.tipId=null;
+  let ok=0;t.cards.forEach(c=>{if(c.place===target(c)){c.state='ok';ok++;}else c.state='bad';});
+  const n=t.cards.length;
+  if(t.checks===1){t.wrongFirst=t.cards.filter(c=>c.state==='bad').map(c=>c.id);ST.stats.cChk+=n;ST.stats.cOk+=t.help?0:ok;}
+  if(ok===n){
+    t.done=true;ST.stats.solved++;
+    let st='retry';if(t.checks===1&&!t.help){st='first';ST.stats.first++;ST.stats.streak++;ST.stats.best=Math.max(ST.stats.best,ST.stats.streak);}
+    else{if(t.help){st='help';ST.stats.help++;}ST.stats.streak=0;}
+    ST.hist.push(histEntry(t,st));
+    fb(st==='first'?'✓ Alles richtig – im ersten Versuch! Weiter mit „Neue Aufgabe“.':st==='help'?'✓ Alles richtig – mit Hilfen gelöst. Weiter mit „Neue Aufgabe“.':`✓ Alles richtig – nach ${t.checks} Prüfungen. Weiter mit „Neue Aufgabe“.`,'good');
+  }else{
+    if(t.checks>=2)t.showHints=true;
+    const rows=CATS.map(([k,nm])=>{const cs=t.cards.filter(c=>c.cat===k);return `${nm} ${cs.filter(c=>c.state==='ok').length}/${cs.length}`;}).join(' · ');
+    fb(`${ok} von ${n} Karten liegen richtig (${rows}). Verschiebe die rot markierten Karten.`+(t.checks>=2?' Bei jeder roten Karte steht ein Hinweis.':' Nach dem nächsten Fehlversuch erscheinen Hinweise.'),'bad');
+  }
+  renderTask();
+}
+function tip(){
+  const t=curTask();if(!t||t.done)return;
+  const c=t.cards.find(x=>x.state==='bad'&&x.place!==target(x))||t.cards.find(x=>x.place&&x.place!==target(x))||t.cards.find(x=>!x.place);
+  if(!c){fb('Alle Karten liegen richtig – prüfe jetzt.','info');return;}
+  t.help=true;t.touched=true;t.tipId=c.id;
+  fb(`<b>Tipp zu „${esc(cardLabel(c))}“:</b> ${esc(c.hint)}`,'info');renderTask();
+}
+function solution(){
+  const t=curTask();if(!t||t.done)return;
+  if(t.checks===0){ST.stats.cChk+=t.cards.length;t.wrongFirst=t.cards.map(c=>c.id);}
+  t.cards.forEach(c=>{if(c.state!=='ok'){c.place=target(c);c.state='ok';}});
+  t.done=true;t.shown=true;t.touched=true;ST.stats.shown++;ST.stats.streak=0;
+  ST.hist.push(histEntry(t,'shown'));
+  fb('Die Lösung ist eingetragen. Präge dir die Zuordnung ein und starte dann eine neue Aufgabe.','info');renderTask();
+}
+
+/* --- Ziehen und Antippen (Pointer-Events) --- */
+let drag=null;
+document.addEventListener('pointerdown',e=>{
+  const card=e.target.closest('#vTask .card');if(!card)return;
+  const t=curTask();if(!t||t.done)return;const c=t.cards.find(x=>x.id===card.dataset.id);if(!c||c.state==='ok')return;
+  e.preventDefault();drag={id:c.id,el:card,x0:e.clientX,y0:e.clientY,moved:false,ghost:null,pid:e.pointerId,ox:0,oy:0};
+  try{card.setPointerCapture(e.pointerId);}catch(_){}
+});
+document.addEventListener('pointermove',e=>{
+  if(!drag||e.pointerId!==drag.pid)return;
+  const dx=e.clientX-drag.x0,dy=e.clientY-drag.y0;
+  if(!drag.moved&&Math.hypot(dx,dy)>7){
+    drag.moved=true;const r=drag.el.getBoundingClientRect();drag.ox=drag.x0-r.left;drag.oy=drag.y0-r.top;
+    const g=drag.el.cloneNode(true);g.classList.add('ghost');g.classList.remove('sel');g.style.width=r.width+'px';document.body.appendChild(g);drag.ghost=g;drag.el.classList.add('dragging');
+  }
+  if(drag.moved){drag.ghost.style.left=(e.clientX-drag.ox)+'px';drag.ghost.style.top=(e.clientY-drag.oy)+'px';
+    $$('.zone.hot,.pool.hot').forEach(z=>z.classList.remove('hot'));const z=zoneAt(e.clientX,e.clientY);if(z)z.classList.add('hot');
+    autoScroll(e.clientY);}
+});
+function zoneAt(x,y){const el=document.elementFromPoint(x,y);return el?el.closest('[data-zone]'):null;}
+function autoScroll(y){
+  // Der Kartenstapel bleibt oben stehen: nach oben scrollen, wenn die Karte schon einmal unterhalb des Stapels war und wieder an seinen unteren Rand kommt
+  const pr=$('#pool').getBoundingClientRect(),stuck=pr.top<=2;
+  if(drag&&y>pr.bottom+30)drag.left=true;
+  if(stuck){if(drag&&drag.left&&y<pr.bottom+22&&window.scrollY>0)window.scrollBy(0,-16);}
+  else if(y<60)window.scrollBy(0,-12);
+  if(y>window.innerHeight-60)window.scrollBy(0,16);
+}
+function endDrag(e,cancel){
+  if(!drag||e.pointerId!==drag.pid)return;const d=drag;drag=null;
+  $$('.zone.hot,.pool.hot').forEach(z=>z.classList.remove('hot'));
+  if(d.ghost)d.ghost.remove();d.el.classList.remove('dragging');
+  const t=curTask();if(!t)return;
+  if(cancel){renderTask();return;}
+  if(d.moved){const z=zoneAt(e.clientX,e.clientY);if(z)place(d.id,z.dataset.zone);else renderTask();}
+  else{t.sel=t.sel===d.id?null:d.id;renderTask();}
+}
+document.addEventListener('pointerup',e=>endDrag(e,false));
+document.addEventListener('pointercancel',e=>endDrag(e,true));
+document.addEventListener('click',e=>{
+  if(e.target.closest('.card'))return;const z=e.target.closest('#vTask [data-zone]');if(!z)return;
+  const t=curTask();if(t&&t.sel)place(t.sel,z.dataset.zone);
+});
+
+/* ================= Bilanz ================= */
+function renderBil(){
+  const s=ST.stats,q=s.cChk?Math.round(100*s.cOk/s.cChk)+' %':'–';
+  $('#bil').innerHTML=`<span>Aufgaben vollständig gelöst</span><span>${s.solved}</span><span>davon im 1. Versuch</span><span>${s.first}</span><span>davon mit Hilfen</span><span>${s.help}</span><span>Lösung angesehen</span><span>${s.shown}</span><span>Serie (beste)</span><span>${s.streak} (${s.best})</span><span>Erfolgsquote</span><span>${q}</span>`;
+}
+
+/* ================= Flammenfärbung ================= */
+const FL={mode:'sim',sample:'Na',vary:false,cob:false,spec:false,autoClean:true,expl:false,residue:{},
+  phase:'rest',pt:0,tip:null,inT:0,comps:null,logKey:'',runs:[],pr:null,prLvl:'L',prSel:[],running:false,lastT:0};
+const P={W:600,H:440,cx:220,y0:300};
+const POS={rest:{x:452,y:342},dip:{x:452,y:398},lift:{x:420,y:300},flame:{x:240,y:236}};
+const hex2rgb=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+const rgbStr=(c,a=1)=>`rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`;
+function sampleComps(){
+  if(FL.mode==='pr'&&FL.pr)return FL.pr.comps.map(id=>({id,amt:1}));
+  if(MIX[FL.sample])return MIX[FL.sample].comps.map(id=>({id,amt:1}));
+  return [{id:FL.sample,amt:1}];
+}
+function sampleInfo(){
+  if(FL.mode==='pr')return {salt:'Unbekannte Probe',f:'?'};
+  if(MIX[FL.sample])return {salt:MIX[FL.sample].salt,f:MIX[FL.sample].f};
+  const S=SALT[FL.sample];return {salt:S.salt,f:S.f,el:S.el,fam:S.fam};
+}
+function cobOn(){return FL.mode==='pr'?$('#prCob').checked:(FL.vary&&FL.cob);}
+function specOn(){return FL.mode==='pr'?$('#prSpec').checked:(FL.vary&&FL.spec);}
+function colorOf(comps,cob){
+  let tw=0;const acc=[0,0,0],parts=[];let hasNa=false;
+  (comps||[]).forEach(c=>{const S=SALT[c.id];if(c.id==='Na')hasNa=true;const col=cob?S.cob:S.col,str=cob?S.cobS:S.str;if(!col||str<=0)return;
+    const w=c.amt*str;if(w<=0)return;const r=hex2rgb(col);acc[0]+=w*r[0];acc[1]+=w*r[1];acc[2]+=w*r[2];tw+=w;parts.push({id:c.id,w});});
+  if(tw<0.06)return {rgb:null,I:0,name:(cob&&hasNa)?'keine Färbung erkennbar':'keine Flammenfärbung',sub:(cob&&hasNa)?'Das gelbe Natriumlicht wird vom Kobaltglas verschluckt.':''};
+  parts.sort((a,b)=>b.w-a.w);
+  const nm=id=>cob?SALT[id].cobName:SALT[id].name;
+  let name,sub='';
+  const sig=parts.filter(p=>p.w>=.08*tw);
+  if(parts[0].w>=0.72*tw){name=nm(parts[0].id);if(sig.length>1)sub='Andere Farben werden überdeckt.';else if(cob&&hasNa&&parts[0].id!=='Na')sub='Das gelbe Natriumlicht wird vom Kobaltglas verschluckt.';}
+  else name='Mischfarbe aus '+sig.map(p=>nm(p.id)).join(' und ');
+  return {rgb:acc.map(v=>v/tw),I:Math.min(1,tw),name,sub,dom:parts[0].id};
+}
+function intensityAt(t){if(t<0)return 0;if(t<.5)return t/.5;if(t<6)return 1;return Math.max(0,Math.exp(-(t-6)/2.2));}
+
+/* --- Seitenleiste Flamme --- */
+function buildSampleChips(){
+  let h='';SIM_ORDER.forEach(([g,ids])=>{h+=`<div class="grp">${g}</div><div class="chips">`+ids.map(id=>`<button type="button" class="chip${FL.sample===id?' active':''}" data-s="${id}">${SALT[id].el}<small>${SALT[id].salt}</small></button>`).join('')+'</div>';});
+  if(FL.vary){h+=`<div class="grp">Gemische</div><div class="chips">`+Object.keys(MIX).map(id=>`<button type="button" class="chip${FL.sample===id?' active':''}" data-s="${id}">${MIX[id].comps.map(c=>SALT[c].el).join(' + ')}<small>${MIX[id].f}</small></button>`).join('')+'</div>';}
+  $('#sampleChips').innerHTML=h;
+}
+$('#sampleChips').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(!b)return;
+  if(FL.phase!=='rest'){busyNote();return;}
+  FL.sample=b.dataset.s;buildSampleChips();resetObs();updateExpl();});
+function setVary(on){
+  FL.vary=on;$('#optVary').checked=on;
+  ['optCob','optSpec','optClean','optExpl'].forEach(id=>{$('#'+id).disabled=!on;$('#'+id).closest('label').classList.toggle('dis',!on);});
+  $('#btnStd').disabled=!on;
+  if(!on){FL.cob=false;FL.spec=false;FL.autoClean=true;FL.expl=false;$('#optCob').checked=false;$('#optSpec').checked=false;$('#optClean').checked=true;$('#optExpl').checked=false;FL.residue={};if(MIX[FL.sample])FL.sample='Na';}
+  buildSampleChips();flameUI();
+}
+$('#optVary').addEventListener('change',e=>setVary(e.target.checked));
+$('#optCob').addEventListener('change',e=>{FL.cob=e.target.checked;flameUI();});
+$('#optSpec').addEventListener('change',e=>{FL.spec=e.target.checked;flameUI();});
+$('#optClean').addEventListener('change',e=>{FL.autoClean=e.target.checked;if(FL.autoClean)FL.residue={};flameUI();});
+$('#optExpl').addEventListener('change',e=>{FL.expl=e.target.checked;updateExpl();});
+$('#btnStd').addEventListener('click',()=>{setVary(false);FL.sample='Na';buildSampleChips();resetObs();updateExpl();});
+$('#prCob').addEventListener('change',flameUI);$('#prSpec').addEventListener('change',flameUI);
+$$('#modeSeg button').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.m)));
+$$('#prSeg button').forEach(b=>b.addEventListener('click',()=>{FL.prLvl=b.dataset.l;$$('#prSeg button').forEach(x=>x.classList.toggle('active',x===b));$('#prInfo').textContent=PR_INFO[FL.prLvl]+(FL.pr&&FL.pr.lvl!==FL.prLvl&&!FL.pr.done?' (gilt ab der nächsten Probe)':'');}));
+function setMode(m){
+  if(FL.phase!=='rest'){busyNote();return;}
+  FL.mode=m;$$('#modeSeg button').forEach(b=>b.classList.toggle('active',b.dataset.m===m));
+  $('#sideSim').hidden=m!=='sim';$('#sidePr').hidden=m!=='pr';$('#sideBil').hidden=m!=='pr';
+  $('#btnNewPr').hidden=m!=='pr';$('#answerBox').hidden=m!=='pr';$('#protBox').hidden=m!=='sim';
+  $('#fTitle').textContent=m==='pr'?'Flammenfärbung – unbekannte Probe':'Flammenfärbung';
+  $('#fInstr').textContent=m==='pr'?'Halte die unbekannte Probe in die Flamme, beobachte die Farbe und wähle das Element. Kobaltglas und Spektroskop findest du links.':'Wähle links eine Probe. Mit „In die Flamme halten“ wird ein Magnesiastäbchen in das Salz getaucht und in die nicht leuchtende Brennerflamme gehalten.';
+  $('#status').textContent=m==='pr'?'Übung · Unbekannte Probe':'Simulation · Flammenfärbung';
+  FL.residue={};
+  if(m==='pr'&&!FL.pr)newProbe(false);
+  $('#prInfo').textContent=PR_INFO[FL.prLvl];
+  resetObs();updateExpl();flameUI();renderBil();
+}
+function flameUI(){
+  const sim=FL.mode==='sim';
+  $('#btnClean').hidden=!(sim&&FL.vary&&!FL.autoClean);
+  $('#specBox').hidden=!specOn();
+  $('#btnHold').disabled=FL.phase!=='rest';
+  $('#btnOut').disabled=FL.phase!=='flame';
+  updateObs();renderProt();
+  if(FL.mode==='pr')renderAnswer();
+}
+function busyNote(){fNote(FL.phase==='flame'?'Nimm das Stäbchen zuerst aus der Flamme.':'Einen Moment – das Stäbchen ist gerade unterwegs.');}
+function fNote(t){$('#fNote').textContent=t||'';}
+function resetObs(){FL.comps=null;$('#obsSw').style.background='#222';$('#obsSw').textContent='–';$('#obsName').textContent='–';$('#obsSub').textContent='';fNote('');}
+
+/* --- Beobachtung --- */
+function curColor(){if(!FL.comps)return null;return colorOf(FL.comps,cobOn());}
+function updateObs(){
+  if(FL.phase!=='flame'||!FL.comps||FL.inT<.4){return;}
+  const c=curColor(),I=intensityAt(FL.inT);
+  const sw=$('#obsSw');
+  if(c.rgb){sw.style.background=rgbStr(c.rgb,Math.max(.25,I*c.I));sw.textContent='';}else{sw.style.background='#1a2a55';sw.textContent='blau (Brennerflamme)';}
+  if(FL.mode==='pr'&&!(FL.pr&&FL.pr.done)){$('#obsName').textContent='?';$('#obsSub').textContent='Beobachte die Farbe der Flamme.';}
+  else{$('#obsName').textContent=c.name;const inf=sampleInfo();
+    let sub=FL.mode==='pr'?SOLTEXT():`${inf.salt} (${inf.f})`+(inf.el?` · ${inf.el}`+(inf.fam?` – ${FAM[inf.fam].name.replace(/e$/,'')}`:' – Nebengruppenelement'):'');
+    if(c.sub)sub+=' · '+c.sub;if(FL.hadResidue)sub+=' · Reste der vorherigen Probe färben mit.';
+    $('#obsSub').textContent=sub;}
+}
+function SOLTEXT(){return FL.pr?FL.pr.comps.map(id=>`${SALT[id].el} (${SALT[id].f})`).join(' + '):'';}
+function updateExpl(){
+  const box=$('#explBox');
+  if(FL.mode!=='sim'||!FL.vary||!FL.expl){box.hidden=true;return;}
+  const note=MIX[FL.sample]?MIX[FL.sample].note:SALT[FL.sample].note;
+  box.hidden=false;box.innerHTML=`<b>Deutung:</b> Die Flamme führt den Atomen Energie zu; Elektronen werden auf eine weiter außen liegende Schale gehoben. Beim Zurückspringen geben sie die Energie als Licht mit typischen Farben ab.<br><br>${esc(note)}`+(!FL.autoClean?'<br><br><b>Stäbchen nicht gereinigt:</b> Reste der vorherigen Probe färben die Flamme mit – besonders Natrium.':'');
+}
+
+/* --- Protokoll --- */
+function logRun(){
+  if(FL.mode!=='sim')return;const c=curColor();if(!c)return;
+  const inf=sampleInfo();const key=FL.sample+'|'+cobOn()+'|'+(FL.hadResidue?1:0);
+  if(key===FL.logKey)return;FL.logKey=key;
+  FL.runs.push({nr:FL.runs.length+1,salt:inf.salt,f:inf.f,el:inf.el||MIX[FL.sample].comps.map(x=>SALT[x].el).join(' + '),cob:cobOn(),res:!!FL.hadResidue,name:c.name,rgb:c.rgb?c.rgb.map(v=>Math.round(v)):null,time:Date.now()});
+  renderProt();
+}
+function renderProt(){
+  const r=FL.runs;$('#btnSimPdf').disabled=!r.length;$('#btnProtClear').disabled=!r.length;
+  if(!r.length){$('#protWrap').innerHTML='<p class="small muted" style="margin:0">Noch keine Flammenprobe durchgeführt.</p>';return;}
+  $('#protWrap').innerHTML=`<table class="prot"><tr><th>Nr.</th><th>Probe</th><th>Bedingungen</th><th>Flammenfärbung</th></tr>${r.map(x=>`<tr><td>${x.nr}</td><td>${esc(x.salt)}<br><span class="muted small">${esc(x.f)}</span></td><td class="small">${x.cob?'mit Kobaltglas':'ohne Kobaltglas'}${x.res?'<br>Stäbchen nicht gereinigt':''}</td><td>${x.rgb?`<span class="dot" style="background:rgb(${x.rgb})"></span>`:''}${esc(x.name)}</td></tr>`).join('')}</table>`;
+}
+$('#btnProtClear').addEventListener('click',()=>{if(!confirm('Protokoll wirklich leeren?'))return;FL.runs=[];FL.logKey='';renderProt();});
+
+/* --- Ablauf --- */
+function hold(){
+  if(FL.phase!=='rest')return;
+  if(FL.mode==='sim'&&FL.autoClean)FL.residue={};
+  const comps=sampleComps();FL.hadResidue=false;
+  Object.entries(FL.residue).forEach(([id,amt])=>{if(amt<.03)return;const ex=comps.find(c=>c.id===id);if(ex)ex.amt+=amt;else{comps.push({id,amt});FL.hadResidue=true;}});
+  FL.comps=comps;FL.logKey='';FL.phase='go';FL.pt=0;FL.inT=0;fNote('');
+  $('#btnHold').disabled=true;
+}
+function takeOut(){if(FL.phase!=='flame')return;FL.phase='back';FL.pt=0;$('#btnOut').disabled=true;}
+$('#btnHold').addEventListener('click',hold);
+$('#btnOut').addEventListener('click',takeOut);
+$('#btnClean').addEventListener('click',()=>{if(FL.phase!=='rest'){busyNote();return;}FL.residue={};fNote('Stäbchen in Salzsäure getaucht und ausgeglüht – es ist sauber.');});
+function lerp(a,b,s){return {x:a.x+(b.x-a.x)*s,y:a.y+(b.y-a.y)*s};}
+const ease=s=>s<.5?2*s*s:1-Math.pow(-2*s+2,2)/2;
+function step(dt){
+  FL.pt+=dt;
+  if(FL.phase==='go'){
+    const seg=[[POS.rest,POS.dip,.45],[POS.dip,POS.lift,.4],[POS.lift,POS.flame,.8]];let t=FL.pt,done=true;
+    for(const [a,b,d] of seg){if(t<d){FL.tip=lerp(a,b,ease(t/d));done=false;break;}t-=d;}
+    if(done){FL.phase='flame';FL.inT=0;FL.tip={...POS.flame};$('#btnOut').disabled=false;if(FL.mode==='pr'&&FL.pr)FL.pr.flamed=true;}
+  }else if(FL.phase==='flame'){
+    FL.inT+=dt;FL.tip={...POS.flame};
+    if(FL.inT>.7)logRun();
+    updateObs();
+    if(FL.inT>11&&!$('#fNote').textContent)fNote('Das Salz ist verdampft. Stäbchen herausnehmen und erneut eintauchen.');
+    if(FL.mode==='pr'&&FL.inT>.6)renderAnswerState();
+  }else if(FL.phase==='back'){
+    const d=.8;FL.tip=lerp(POS.flame,POS.rest,ease(Math.min(1,FL.pt/d)));
+    if(FL.pt>=d){FL.phase='rest';FL.tip={...POS.rest};
+      if(FL.mode==='sim'&&!FL.autoClean){const left=Math.max(.15,intensityAt(FL.inT));const res={};FL.comps.forEach(c=>{res[c.id]=Math.min(.6,c.amt*.35*left+.04);});FL.residue=res;}
+      else FL.residue={};
+      $('#btnHold').disabled=false;fNote(FL.mode==='sim'&&!FL.autoClean?'Achtung: Das Stäbchen ist nicht gereinigt.':'');}
+  }else FL.tip={...POS.rest};
+}
+
+/* --- Zeichnen --- */
+const cv=$('#cv'),cx2=cv.getContext('2d');
+function fitCanvas(){const w=cv.clientWidth||600,dpr=Math.min(2,window.devicePixelRatio||1);const W=Math.round(w*dpr),H=Math.round(w*P.H/P.W*dpr);if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H;}}
+function flamePath(ctx,cx,yb,ytop,wmax,t,seed,amp){
+  const N=18,L=[],R=[];
+  for(let k=0;k<=N;k++){const s=k/N,y=yb+(ytop-yb)*s;let w=wmax*Math.pow(1-s,.75)*Math.min(1,(s+.14)*2.6);
+    const sw=(Math.sin(t*6.3+s*5.2+seed)*3.2*s+Math.sin(t*2.1+seed*1.7)*4.5*s*s+Math.sin(t*11+s*9+seed)*1.2*s)*amp;
+    L.push([cx+sw-w,y]);R.push([cx+sw+w,y]);}
+  const pts=L.concat(R.reverse());ctx.beginPath();ctx.moveTo((pts[0][0]+pts[pts.length-1][0])/2,(pts[0][1]+pts[pts.length-1][1])/2);
+  for(let i=0;i<pts.length;i++){const a=pts[i],b=pts[(i+1)%pts.length];ctx.quadraticCurveTo(a[0],a[1],(a[0]+b[0])/2,(a[1]+b[1])/2);}
+  ctx.closePath();
+}
+function draw(t){
+  fitCanvas();const ctx=cx2,sc=cv.width/P.W;ctx.setTransform(sc,0,0,sc,0,0);
+  const {cx,y0}=P;ctx.clearRect(0,0,P.W,P.H);
+  ctx.fillStyle='#0e1113';ctx.fillRect(0,0,P.W,P.H);
+  const col=FL.phase==='flame'&&FL.comps?curColor():null;const I=FL.phase==='flame'?intensityAt(FL.inT)*(col&&col.rgb?col.I:0):0;
+  const cob=cobOn();
+  if(I>0&&col.rgb){const g=ctx.createRadialGradient(cx,y0-110,10,cx,y0-110,330);g.addColorStop(0,rgbStr(col.rgb,.2*I));g.addColorStop(1,rgbStr(col.rgb,0));ctx.fillStyle=g;ctx.fillRect(0,0,P.W,P.H);}
+  // Tisch
+  ctx.fillStyle='#1a1e22';ctx.fillRect(0,428,P.W,12);ctx.strokeStyle='#31383e';ctx.beginPath();ctx.moveTo(0,428);ctx.lineTo(P.W,428);ctx.stroke();
+  // Schlauch
+  ctx.strokeStyle='#7a3b2c';ctx.lineWidth=9;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(cx-46,418);ctx.bezierCurveTo(cx-90,418,cx-110,436,-10,430);ctx.stroke();
+  // Brenner
+  let g=ctx.createLinearGradient(cx-60,0,cx+60,0);g.addColorStop(0,'#3a4148');g.addColorStop(.5,'#6b747c');g.addColorStop(1,'#33393f');
+  ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(cx-58,428);ctx.lineTo(cx+58,428);ctx.lineTo(cx+44,412);ctx.lineTo(cx-44,412);ctx.closePath();ctx.fill();
+  g=ctx.createLinearGradient(cx-13,0,cx+13,0);g.addColorStop(0,'#4a525a');g.addColorStop(.45,'#a7b0b8');g.addColorStop(1,'#3b4249');
+  ctx.fillStyle=g;ctx.fillRect(cx-12,y0,24,114);ctx.fillStyle='#2b3136';ctx.fillRect(cx-16,378,32,16);ctx.fillStyle='#14171a';ctx.fillRect(cx-6,382,12,8);
+  ctx.fillStyle='#5a636b';ctx.fillRect(cx-46,404,22,8);
+  // Grundflamme
+  const fl=Math.sin(t*7)*4+Math.sin(t*13)*2;
+  ctx.save();ctx.globalCompositeOperation='lighter';
+  flamePath(ctx,cx,y0+2,y0-200+fl,28,t,1,1);g=ctx.createLinearGradient(0,y0,0,y0-205);g.addColorStop(0,'rgba(90,120,255,.42)');g.addColorStop(.5,'rgba(110,110,240,.22)');g.addColorStop(1,'rgba(140,110,255,.04)');ctx.fillStyle=g;ctx.fill();
+  flamePath(ctx,cx,y0+1,y0-58+fl*.3,10.5,t,2,.35);g=ctx.createLinearGradient(0,y0,0,y0-58);g.addColorStop(0,'rgba(80,170,255,.95)');g.addColorStop(1,'rgba(90,140,255,.35)');ctx.fillStyle=g;ctx.fill();
+  ctx.restore();
+  // Farbige Flamme
+  if(I>0.01&&col.rgb){
+    const c=col.rgb,top=y0-228+fl*1.6,yb=FL.tip.y+22;
+    ctx.save();ctx.shadowColor=rgbStr(c,.9);ctx.shadowBlur=28;
+    flamePath(ctx,cx+6,yb,top,38+10*I,t,3,1.3);g=ctx.createLinearGradient(0,yb,0,top);g.addColorStop(0,rgbStr(c,.9*I));g.addColorStop(.55,rgbStr(c,.78*I));g.addColorStop(1,rgbStr(c,.08*I));ctx.fillStyle=g;ctx.fill();
+    ctx.shadowBlur=0;const lc=c.map(v=>v+(255-v)*.35);
+    flamePath(ctx,cx+8,yb-4,top+34,19+6*I,t+.5,5,1.4);g=ctx.createLinearGradient(0,yb,0,top+34);g.addColorStop(0,rgbStr(lc,.75*I));g.addColorStop(1,rgbStr(lc,0));ctx.fillStyle=g;ctx.fill();
+    ctx.restore();
+    const rg=ctx.createRadialGradient(FL.tip.x,FL.tip.y,2,FL.tip.x,FL.tip.y,26);rg.addColorStop(0,rgbStr(c,.9*I));rg.addColorStop(1,rgbStr(c,0));ctx.fillStyle=rg;ctx.beginPath();ctx.arc(FL.tip.x,FL.tip.y,26,0,7);ctx.fill();
+  }
+  // Uhrglas mit Salz
+  const dish={x:452,y:404};
+  ctx.fillStyle='rgba(200,220,235,.18)';ctx.strokeStyle='rgba(200,220,235,.55)';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(dish.x,dish.y,50,10,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+  const pc=FL.mode==='pr'?'#e9e6df':(MIX[FL.sample]?'#ece9e2':(FL.sample==='Cu'?'#3fae9f':'#ece9e2'));
+  ctx.fillStyle=pc;ctx.beginPath();ctx.ellipse(dish.x,dish.y-3,24,6,0,Math.PI,0);ctx.fill();
+  ctx.fillStyle='#9aa2a9';ctx.font='600 14px system-ui,sans-serif';ctx.textAlign='center';
+  ctx.fillText(FL.mode==='pr'?'Probe ?':sampleInfo().f,dish.x,dish.y+30);
+  // Stäbchen
+  const tp=FL.tip||POS.rest,ang=0.5,Lr=170,ex=tp.x+Lr*Math.cos(ang),ey=tp.y-Lr*Math.sin(ang);
+  ctx.strokeStyle='#d8d4cc';ctx.lineWidth=4.5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(tp.x,tp.y);ctx.lineTo(ex,ey);ctx.stroke();
+  const heat=FL.phase==='flame'?Math.min(1,FL.inT/1.2):0;
+  if(heat>0){ctx.strokeStyle=`rgba(255,${140+60*(1-heat)|0},60,${.85*heat})`;ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(tp.x,tp.y);ctx.lineTo(tp.x+22*Math.cos(ang),tp.y-22*Math.sin(ang));ctx.stroke();}
+  if(FL.phase==='go'&&FL.pt>.45||FL.phase==='flame'&&FL.inT<1){ctx.fillStyle=pc;ctx.beginPath();ctx.arc(tp.x+2,tp.y-1,3.6,0,7);ctx.fill();}
+  // Holzklammer
+  ctx.save();ctx.translate(ex,ey);ctx.rotate(-ang);ctx.fillStyle='#a87b4f';ctx.fillRect(-14,-8,58,16);ctx.fillStyle='#7d5a37';ctx.fillRect(-14,-1,58,2);ctx.restore();
+  // Kobaltglas
+  if(cob){ctx.fillStyle='rgba(35,70,230,.20)';ctx.strokeStyle='rgba(130,160,255,.75)';ctx.lineWidth=2;
+    const gx=cx-96,gy=58,gw=180,gh=264;ctx.beginPath();ctx.roundRect?ctx.roundRect(gx,gy,gw,gh,8):ctx.rect(gx,gy,gw,gh);ctx.fill();ctx.stroke();
+    ctx.fillStyle='rgba(170,190,255,.95)';ctx.font='600 13px system-ui,sans-serif';ctx.textAlign='left';ctx.fillText('Kobaltglas',gx+8,gy+18);}
+  // Beschriftung
+  ctx.fillStyle='#5f6870';ctx.font='12px system-ui,sans-serif';ctx.textAlign='left';ctx.fillText('nicht leuchtende Flamme (Luftzufuhr geöffnet)',12,20);
+  ctx.fillText('Magnesiastäbchen',P.W-130,180);
+}
+/* Spektroskop */
+function wl2rgb(w){let r=0,g=0,b=0;
+  if(w<440){r=-(w-440)/60;b=1;}else if(w<490){g=(w-440)/50;b=1;}else if(w<510){g=1;b=-(w-510)/20;}else if(w<580){r=(w-510)/70;g=1;}else if(w<645){r=1;g=-(w-645)/65;}else r=1;
+  let f=1;if(w<420)f=.3+.7*(w-380)/40;else if(w>700)f=.3+.7*(780-w)/80;return [r,g,b].map(v=>Math.round(255*Math.pow(v*f,.8)));}
+function drawSpec(){
+  const c=$('#spc'),ctx=c.getContext('2d'),W=c.width,H=c.height,x=w=>20+(W-40)*(w-380)/400;
+  ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+  // dezentes Vergleichsspektrum (Skala)
+  for(let w=380;w<=780;w+=2){const cc=wl2rgb(w);ctx.fillStyle=`rgba(${cc},.10)`;ctx.fillRect(x(w),8,(W-40)/200+1,H-38);}
+  ctx.fillStyle='#9aa2a9';ctx.font='12px system-ui,sans-serif';ctx.textAlign='center';
+  for(let w=400;w<=750;w+=50){ctx.fillRect(x(w),H-28,1,6);ctx.fillText(w,x(w),H-10);}
+  ctx.textAlign='left';ctx.fillText('nm',W-26,H-10);
+  const I=FL.phase==='flame'?intensityAt(FL.inT):0;
+  if(I<=0.01||!FL.comps)return;
+  FL.comps.forEach(cp=>{const S=SALT[cp.id];const a=Math.min(1,cp.amt)*I;
+    S.lines.forEach(([w,inten,bw])=>{if(w<380||w>780)return;const cc=wl2rgb(w),X=x(w),hgt=H-38;
+      if(bw){const px=(W-40)*bw/400;const g=ctx.createLinearGradient(X-px,0,X+px,0);g.addColorStop(0,`rgba(${cc},0)`);g.addColorStop(.5,`rgba(${cc},${Math.min(1,inten*a*1.1)})`);g.addColorStop(1,`rgba(${cc},0)`);ctx.fillStyle=g;ctx.fillRect(X-px,8,2*px,hgt);}
+      else{ctx.fillStyle=`rgba(${cc},${Math.min(1,.35+inten*a)})`;ctx.fillRect(X-1.5,8,3,hgt);ctx.fillStyle=`rgba(${cc},${.25*inten*a})`;ctx.fillRect(X-4,8,8,hgt);}});});
+}
+let raf=0;
+function loop(ts){if(!FL.running)return;const t=ts/1000;const dt=Math.min(.1,FL.lastT?t-FL.lastT:0);FL.lastT=t;step(dt);draw(t);if(specOn())drawSpec();raf=requestAnimationFrame(loop);}
+function flameEnter(){if(!FL.tip)FL.tip={...POS.rest};buildSampleChips();setMode(FL.mode);if(!FL.running){FL.running=true;FL.lastT=0;raf=requestAnimationFrame(loop);}}
+function flameLeave(){FL.running=false;cancelAnimationFrame(raf);if(FL.phase!=='rest'){FL.phase='rest';FL.tip={...POS.rest};FL.residue=FL.autoClean?{}:FL.residue;}}
+
+/* --- Unbekannte Probe --- */
+function newProbe(archive=true){
+  if(FL.phase!=='rest'){busyNote();return;}
+  const p=FL.pr;if(archive&&p&&!p.done&&(p.answers.length||p.flamed))ST.hist.push(prHist(p,'open'));
+  const lvl=FL.prLvl;let comps;
+  const last=p?p.comps.join():'';
+  do{if(lvl==='S'&&Math.random()<.35)comps=MIX[pick(Object.keys(MIX),1)[0]].comps.slice();else comps=[pick(PR_POOL[lvl],1)[0]];}while(comps.join()===last);
+  FL.pr={comps,lvl,answers:[],flamed:false,done:false,status:null};FL.prSel=[];
+  $('#prInfo').textContent=PR_INFO[FL.prLvl];
+  resetObs();prFb('Halte die Probe in die Flamme und beobachte die Farbe.','info');renderAnswer();
+}
+$('#btnNewPr').addEventListener('click',()=>newProbe(true));
+function prHist(p,status){return {type:'pr',lvl:p.lvl,status,comps:p.comps.slice(),answers:p.answers.map(a=>({sel:a.sel.slice(),ok:a.ok})),time:Date.now()};}
+function prFb(h,c){const f=$('#prFb');f.className='fb '+(c||'info');f.innerHTML=h;}
+function renderAnswer(){
+  const p=FL.pr;if(!p)return;const multi=p.lvl==='S';
+  $('#ansHint').textContent=multi?'Die Probe kann ein oder zwei Elemente enthalten – wähle alle aus.':'Wähle ein Element.';
+  $('#ansChips').innerHTML=PR_POOL[p.lvl].map(id=>{let cls='chip';if(FL.prSel.includes(id))cls+=' active';if(p.done&&p.comps.includes(id))cls+=' ok';
+    return `<button type="button" class="${cls}" data-a="${id}">${SALT[id].el}<small>${SALT[id].f}</small></button>`;}).join('');
+  renderAnswerState();
+}
+function renderAnswerState(){const p=FL.pr;if(!p)return;$('#btnPrCheck').disabled=p.done;$('#btnPrSol').disabled=p.done||!p.flamed;}
+$('#ansChips').addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b||!FL.pr||FL.pr.done)return;const id=b.dataset.a;
+  if(FL.pr.lvl==='S'){FL.prSel=FL.prSel.includes(id)?FL.prSel.filter(x=>x!==id):FL.prSel.concat(id).slice(-2);}else FL.prSel=[id];renderAnswer();});
+$('#btnPrCheck').addEventListener('click',()=>{
+  const p=FL.pr;if(!p||p.done)return;
+  if(!p.flamed){prFb('Halte die Probe zuerst in die Flamme.','bad');return;}
+  if(!FL.prSel.length){prFb('Wähle ein Element aus.','bad');return;}
+  const ok=FL.prSel.length===p.comps.length&&FL.prSel.every(x=>p.comps.includes(x));
+  p.answers.push({sel:FL.prSel.slice(),ok});
+  if(p.answers.length===1){ST.stats.cChk++;if(ok)ST.stats.cOk++;}
+  if(ok){p.done=true;ST.stats.solved++;
+    if(p.answers.length===1){p.status='first';ST.stats.first++;ST.stats.streak++;ST.stats.best=Math.max(ST.stats.best,ST.stats.streak);}else{p.status='retry';ST.stats.streak=0;}
+    ST.hist.push(prHist(p,p.status));
+    prFb(`✓ Richtig: ${p.comps.map(id=>`${SALT[id].el} (${SALT[id].salt})`).join(' und ')}. Weiter mit „Neue Probe“.`,'good');updateObs();
+    if(FL.phase!=='flame'){$('#obsName').textContent=colorOf(p.comps.map(id=>({id,amt:1})),false).name;$('#obsSub').textContent=SOLTEXT();}
+  }else{prFb(prHint(p),'bad');}
+  renderAnswer();renderBil();
+});
+function prHint(p){
+  const n=p.answers.length,sel=FL.prSel,act=p.comps;
+  if(n===1)return 'Nicht richtig. Halte die Probe noch einmal in die Flamme und vergleiche die Farbe genau'+(p.lvl==='S'?' – auch durch das Kobaltglas.':'.');
+  if(act.length===2)return 'Die Flamme leuchtet gelb – Natrium ist dabei. Natrium überdeckt aber andere Farben: Schau durch das Kobaltglas, welche Farbe dann zu sehen ist.';
+  if(sel.length===2)return 'Die Probe enthält nur ein Element.';
+  const a=act[0],s=sel[0],nm=SALT[a].name;
+  const pair=[a,s].sort().join();
+  if(pair==='Li,Sr')return 'Lithium und Strontium färben beide rot. Vergleiche im Spektroskop: Lithium zeigt vor allem eine starke rote Linie, Strontium mehrere rote Banden und eine blaue Linie.';
+  if(['K,Rb','Cs,K','Cs,Rb'].includes(pair))return `Kalium, Rubidium und Caesium färben violett in verschiedenen Tönen. Die Flamme ist ${nm}. Das Spektroskop hilft beim Unterscheiden.`;
+  if(a==='Mg')return 'Die Flamme bleibt blau – dieses Salz färbt die Flamme nicht.';
+  return `Die Flamme ist ${nm}. Welches Element färbt so? Sieh in den Grundlagen („Flammenfärbung – Durchführung“) nach.`;
+}
+$('#btnPrSol').addEventListener('click',()=>{
+  const p=FL.pr;if(!p||p.done||!p.flamed)return;
+  if(!p.answers.length)ST.stats.cChk++;
+  p.done=true;p.status='shown';ST.stats.shown++;ST.stats.streak=0;FL.prSel=p.comps.slice();
+  ST.hist.push(prHist(p,'shown'));
+  const cc=colorOf(p.comps.map(id=>({id,amt:1})),false);
+  prFb(`Lösung: ${p.comps.map(id=>`${SALT[id].el} (${SALT[id].salt})`).join(' und ')} – Flammenfärbung ${cc.name}.`,'info');
+  $('#obsName').textContent=cc.name;$('#obsSub').textContent=SOLTEXT();renderAnswer();renderBil();
+});
+
+/* ================= PDF ================= */
+let pdfMode='sum';
+function touchedOpen(){const out=[];['zu'].forEach(k=>{const t=ST.tasks[k];if(t&&t.touched&&!t.done)out.push(histEntry(t,'open'));});
+  const p=FL.pr;if(p&&!p.done&&(p.flamed||p.answers.length))out.push(prHist(p,'open'));return out;}
+function openPdf(mode){
+  pdfMode=mode;const sel=$('#pdfSel');
+  if(mode==='sum'){
+    const s=ST.stats,q=s.cChk?Math.round(100*s.cOk/s.cChk)+' %':'–';
+    sel.innerHTML=`<h4>Statistik</h4><div class="bil" style="max-width:380px"><span>Aufgaben vollständig gelöst</span><span>${s.solved}</span><span>davon im 1. Versuch</span><span>${s.first}</span><span>davon mit Hilfen</span><span>${s.help}</span><span>Lösung angesehen</span><span>${s.shown}</span><span>Erfolgsquote</span><span>${q}</span></div>`;
+    $('#pdfHint').textContent='Das PDF enthält alle bearbeiteten Aufgaben (Zuordnungen und unbekannte Proben) mit der richtigen Lösung, einem Vermerk, ob die Aufgabe richtig gelöst wurde, und die Statistik mit Erfolgsquote.';
+    $('#pdfGo').disabled=!(ST.hist.length+touchedOpen().length);
+  }else{
+    sel.innerHTML=`<h4>Welche Läufe sollen ins PDF?</h4>`+FL.runs.map(r=>`<label class="runrow"><input type="checkbox" data-run="${r.nr}" checked><span class="dot" style="background:${r.rgb?`rgb(${r.rgb})`:'#1a2a55'}"></span><span>Probe ${r.nr}: ${esc(r.salt)} · ${r.cob?'mit':'ohne'} Kobaltglas${r.res?' · Stäbchen nicht gereinigt':''}</span></label>`).join('');
+    $('#pdfHint').textContent='Das PDF enthält das Beobachtungsprotokoll der gewählten Flammenproben (Probe, Bedingungen, beobachtete Farbe) und eine Übersicht der typischen Flammenfarben.';
+    $('#pdfGo').disabled=!FL.runs.length;
+    sel.onchange=()=>{$('#pdfGo').disabled=!$$('#pdfSel [data-run]:checked').length;};
+  }
+  openModal('#mPdf');
+}
+$('#btnSum').addEventListener('click',()=>openPdf('sum'));
+$('#btnSimPdf').addEventListener('click',()=>openPdf('sim'));
+$('#pdfGo').addEventListener('click',()=>{buildPrint();closeModal('#mPdf');setTimeout(()=>window.print(),60);});
+function verm(st,checks){return {first:'✓ richtig gelöst – im 1. Versuch',retry:`✓ richtig gelöst – nach Fehlversuch${checks?` (${checks} Prüfungen)`:''}`,help:'✓ richtig gelöst – mit Hilfen',shown:'✗ nicht selbst gelöst – Lösung angesehen',open:'– nicht beendet'}[st];}
+function stCls(st){return st==='shown'?'r':st==='open'?'n':'g';}
+function buildPrint(){
+  const name=$('#pdfName').value.trim(),kurs=$('#pdfKurs').value.trim(),dat=new Date().toLocaleDateString('de-DE');
+  let h=`<div class="phead"><h1>${pdfMode==='sum'?'Elementfamilien – Zusammenfassung der Übungen':'Flammenfärbung – Beobachtungsprotokoll'}</h1><div class="pmeta"><span>Name: ${esc(name)||'________________'}</span><span>Kurs: ${esc(kurs)||'________'}</span><span>Datum: ${dat}</span></div></div>`;
+  if(pdfMode==='sum'){
+    const s=ST.stats,q=s.cChk?Math.round(100*s.cOk/s.cChk)+' %':'–';
+    const all=ST.hist.concat(touchedOpen());
+    h+=`<h2>Statistik</h2><div class="stat"><span>Aufgaben bearbeitet</span><b>${all.length}</b><span>Aufgaben vollständig gelöst</span><b>${s.solved}</b><span>davon im 1. Versuch</span><b>${s.first}</b><span>davon mit Hilfen</span><b>${s.help}</b><span>Lösung angesehen</span><b>${s.shown}</b><span>Beste Serie</span><b>${s.best}</b><span>Erfolgsquote</span><b>${q}</b></div>
+      <p style="font-size:9pt;color:#444">Erfolgsquote: Anteil der Karten bzw. Proben, die beim ersten Prüfen ohne Hilfen richtig waren. Karten, die beim ersten Prüfen falsch lagen, sind rot markiert.</p><h2>Aufgaben</h2>`;
+    all.forEach((e,i)=>{
+      const lv={L:'Leicht',M:'Mittel',S:'Schwer'}[e.lvl];
+      if(e.type==='pr'){const cc=colorOf(e.comps.map(id=>({id,amt:1})),false);
+        h+=`<div class="pblock ${stCls(e.status)}"><b>Aufgabe ${i+1} · Unbekannte Probe (Flammenfärbung) · ${lv}</b><div class="verm">${verm(e.status)}</div>
+          <div>Richtige Lösung: <b>${e.comps.map(id=>`${SALT[id].el} (${SALT[id].salt}, ${SALT[id].f})`).join(' und ')}</b> – Flammenfärbung ${cc.rgb?`<span class="sw" style="background:rgb(${cc.rgb.map(Math.round)})"></span>`:''}${esc(cc.name)}${e.comps.length>1?'; durch Kobaltglas: '+esc(colorOf(e.comps.map(id=>({id,amt:1})),true).name):''}</div>
+          ${e.answers.length?`<div>Deine Antworten: ${e.answers.map(a=>`<span class="${a.ok?'':'wrong'}">${a.sel.map(id=>SALT[id].el).join(' + ')} ${a.ok?'✓':'✗'}</span>`).join(', ')}</div>`:''}</div>`;
+      }else{
+        h+=`<div class="pblock ${stCls(e.status)}"><b>Aufgabe ${i+1} · ${TYPES[e.type].title} · ${lv}</b><div class="verm">${verm(e.status,e.checks)}</div>
+          <table><tr><th></th>${e.zones.map(z=>`<th>${FAM[z].name}</th>`).join('')}</tr>${CATS.map(([k,nm])=>`<tr><th>${nm}</th>${e.zones.map(z=>`<td>${e.cards.filter(c=>(c.cat||'el')===k&&c.fam===z).map(c=>`<div class="${c.wrong?'wrong':''}">${esc(c.label)}${c.wrong?' ✗':''}</div>`).join('')}</td>`).join('')}</tr>`).join('')}</table></div>`;
+      }});
+    h+=`<div class="pfoot">${PAGE_TITLE} V${VERSION} · Bastian Baumgart · chemie.mail-baumgart.de · Lizenz CC BY-NC-SA 4.0</div>`;
+  }else{
+    const ids=$$('#pdfSel [data-run]:checked').map(x=>+x.dataset.run);const runs=FL.runs.filter(r=>ids.includes(r.nr));
+    h+=`<h2>Versuch</h2><p>Ein gereinigtes Magnesiastäbchen wird in das Salz getaucht und in die nicht leuchtende Brennerflamme gehalten. Beobachtet wird die Farbe der Flamme.</p>
+      <h2>Beobachtungen</h2><table><tr><th>Nr.</th><th>Probe</th><th>Element</th><th>Bedingungen</th><th>Flammenfärbung</th></tr>${runs.map(r=>`<tr><td>${r.nr}</td><td>${esc(r.salt)} (${esc(r.f)})</td><td>${esc(r.el)}</td><td>${r.cob?'mit':'ohne'} Kobaltglas${r.res?'; Stäbchen nicht gereinigt':''}</td><td>${r.rgb?`<span class="sw" style="background:rgb(${r.rgb})"></span>`:''}${esc(r.name)}</td></tr>`).join('')}</table>
+      <h2>Typische Flammenfarben (Übersicht)</h2><table><tr><th>Element</th><th>Familie</th><th>Flammenfärbung</th></tr>${Object.keys(SALT).map(id=>{const S=SALT[id];return `<tr><td>${S.el}</td><td>${S.fam?FAM[S.fam].name:'Nebengruppenelement'}</td><td>${S.col?`<span class="sw" style="background:${S.col}"></span>`:''}${S.name}</td></tr>`;}).join('')}</table>
+      <h2>Deutung</h2><p>Die Flamme führt den Atomen Energie zu. Elektronen werden auf eine weiter außen liegende Schale gehoben und geben die Energie beim Zurückspringen als Licht einer typischen Farbe ab. Natrium überdeckt andere Farben; Kobaltglas verschluckt das gelbe Natriumlicht.</p>
+      <div class="pfoot">${PAGE_TITLE} V${VERSION} · Bastian Baumgart · chemie.mail-baumgart.de · Lizenz CC BY-NC-SA 4.0 · Simulierte Daten zu Lehrzwecken</div>`;
+  }
+  $('#print').innerHTML=h;
+}
+
+/* ================= Zwischenstand ================= */
+$('#btnSave').addEventListener('click',()=>{
+  const data={app:'SekI-Elementfamilien',version:VERSION,saved:new Date().toISOString(),hist:ST.hist,stats:ST.stats,runs:FL.runs};
+  const blob=new Blob([JSON.stringify(data,null,1)],{type:'application/json'});const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='Elementfamilien-Zwischenstand.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+});
+$('#btnLoad').addEventListener('click',()=>$('#fileLoad').click());
+$('#fileLoad').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{try{const d=JSON.parse(r.result);if(d.app!=='SekI-Elementfamilien'||!Array.isArray(d.hist))throw 0;
+    const okSt=['first','retry','help','shown','open'];
+    ST.hist=d.hist.filter(h=>h&&okSt.includes(h.status)&&(h.type==='pr'?Array.isArray(h.comps)&&h.comps.every(c=>SALT[c]):TYPES[h.type]&&Array.isArray(h.cards)&&Array.isArray(h.zones)&&h.zones.every(z=>FAM[z])));
+    const s=d.stats||{};Object.keys(ST.stats).forEach(k=>{ST.stats[k]=Math.max(0,parseInt(s[k])||0);});
+    FL.runs=Array.isArray(d.runs)?d.runs.filter(x=>x&&typeof x.salt==='string').map((x,i)=>({nr:i+1,salt:String(x.salt),f:String(x.f||''),el:String(x.el||''),cob:!!x.cob,res:!!x.res,name:String(x.name||''),rgb:Array.isArray(x.rgb)?x.rgb.slice(0,3).map(v=>Math.max(0,Math.min(255,+v||0))):null})):[];
+    renderBil();renderProt();alert('Zwischenstand geladen: '+ST.hist.length+' Aufgaben.');}catch(_){alert('Die Datei ist kein gültiger Zwischenstand dieser Seite.');}
+    e.target.value='';};r.readAsText(f);});
+
+/* ================= Modale, Grundlagen, QR ================= */
+let gbIdx=0;
+function openModal(id){$(id).hidden=false;}
+function closeModal(id){$(id).hidden=true;}
+$$('.mbg').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m||e.target.closest('[data-close]'))m.hidden=true;});});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')$$('.mbg').forEach(m=>m.hidden=true);
+  if(!$('#mGb').hidden){if(e.key==='ArrowRight')showGb(gbIdx+1);if(e.key==='ArrowLeft')showGb(gbIdx-1);}
+});
+$('#lnkHelp').addEventListener('click',()=>openModal('#mHelp'));
+$('#lnkVers').addEventListener('click',()=>openModal('#mVers'));
+$('#gbCount').textContent=GB.length;
+$('#gbList').innerHTML=GB.map((g,i)=>`<li><button type="button" data-gb="${i}"><span class="num">${i+1}</span>${g.t}</button></li>`).join('');
+$('#gbToggle').addEventListener('click',()=>{const l=$('#gbList'),o=l.hidden;l.hidden=!o;$('#gbToggle').setAttribute('aria-expanded',String(o));});
+$('#gbList').addEventListener('click',e=>{const b=e.target.closest('[data-gb]');if(b)showGb(+b.dataset.gb);});
+function showGb(i){if(i<0||i>=GB.length)return;gbIdx=i;$('#gbBody').innerHTML=`<h2>${GB[i].t}</h2>`+GB[i].h();$('#gbPos').textContent=`Thema ${i+1} von ${GB.length}`;$('#gbPrev').disabled=i===0;$('#gbNext').disabled=i===GB.length-1;openModal('#mGb');$('#mGb .modal').scrollTop=0;}
+$('#gbPrev').addEventListener('click',()=>showGb(gbIdx-1));$('#gbNext').addEventListener('click',()=>showGb(gbIdx+1));
+$('#homeBtn').addEventListener('click',()=>go('home'));
+$('#btnNew').addEventListener('click',newTask);$('#btnCheck').addEventListener('click',check);$('#btnTip').addEventListener('click',tip);$('#btnSol').addEventListener('click',solution);
+$$('#lvlSeg button').forEach(b=>b.addEventListener('click',()=>{ST.level=b.dataset.l;const t=curTask();if(t&&!t.touched){ST.tasks[ST.view]=makeTask(ST.view,ST.level);fb('Ziehe jede Karte in das passende Feld der Tabelle.','info');}renderTask();}));
+$('#optPse').addEventListener('change',renderTask);
+$('#tiles').innerHTML=['zu','ff'].map(k=>`<button class="tile" type="button" data-go="${k}"><span class="ic">${iconSVG(k)}</span><span class="kind">${TYPES[k].kind}</span><h2>${TYPES[k].title}</h2><p>${TYPES[k].desc}</p></button>`).join('');
+$('#tiles').addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)go(b.dataset.go);});
+$('#pseWrap').innerHTML=pseSVG(false);
+const qrSvg=QR.svg(PAGE_URL);$('#qrMini').innerHTML=qrSvg;$('#qrBig').innerHTML=qrSvg;$('#qrUrl').textContent=PAGE_URL;
+$('#qrBtn').addEventListener('click',()=>openModal('#mQr'));
+window.addEventListener('beforeprint',()=>{if(!$('#print').innerHTML)buildPrint();});
+window.addEventListener('afterprint',()=>{$('#print').innerHTML='';});
+FL.tip={...POS.rest};
+route();
+</script>
+</body>
+</html>
